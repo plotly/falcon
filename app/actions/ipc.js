@@ -11,3 +11,10 @@ export function query (statement) {
         ipcRenderer.send('receive', {statement});
     }
 }
+
+export function connect (statement) {
+    return dispatch => {
+        console.warn('proceeding to connect to database');
+        ipcRenderer.send('connect', {statement});
+    }
+}
