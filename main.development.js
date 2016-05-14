@@ -65,10 +65,9 @@ mainWindow.webContents.on('did-finish-load', function() {
         var engine = 'mysql';
 
         console.warn('payload: ', payload);
-        const response = sequelizeManager.initialize(usr, psw, db, prt, engine);
-        console.warn(sequelizeManager.connectionState);
-        event.sender.send('channel', response);
-        console.warn('response: ', response);
+        sequelizeManager.initialize(usr, psw, db, prt, engine);
+        console.warn('connection state is ', sequelizeManager.connectionState);
+        event.sender.send('channel', {error: sequelizeManager.connectionState});
     });
 
     ipcMain.on('receive', function(event, payload) {
