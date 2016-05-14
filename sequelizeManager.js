@@ -2,7 +2,6 @@ import Sequelize from 'sequelize';
 
 export default class sequelizeManager{
     constructor(){
-        // nothing for now
     }
     initialize (usr, psw, db, prt, engine){
       // create new sequelize object
