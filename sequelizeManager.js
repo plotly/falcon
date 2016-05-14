@@ -11,7 +11,6 @@ export default class sequelizeManager{
               port:    prt
       });
 
-      console.log('making request');
       // connect
       this.connection.authenticate().then(msg => {
           console.log('succcess: ', msg);

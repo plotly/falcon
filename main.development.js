@@ -64,14 +64,14 @@ mainWindow.webContents.on('did-finish-load', function() {
         var prt = 3306;
         var engine = 'mysql';
 
-        console.log('payload: ', payload);
+        console.warn('payload: ', payload);
         const response = sequelizeManager.initialize(usr, psw, db, prt, engine);
         event.sender.send('channel', response);
-        console.log('response: ', response);
+        console.warn('response: ', response);
     });
 
     ipcMain.on('receive', function(event, payload) {
-        console.log('payload: ', payload);
+        console.warn('payload: ', payload);
         sequelizeManager.connection.query(payload.statement).spread((rows, metadata) => {
             const response = {rows, metadata, error: ''};
             event.sender.send('channel', response);
