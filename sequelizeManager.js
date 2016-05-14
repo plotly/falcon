@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 
 export default class sequelizeManager{
     constructor(){
+        this.connectionState = 'none: credentials were not sent';
     }
     initialize (usr, psw, db, prt, engine){
       // create new sequelize object
@@ -12,9 +13,9 @@ export default class sequelizeManager{
 
       // connect
       this.connection.authenticate().then(msg => {
-          console.log('succcess: ', msg);
+          this.connectionState = 'succcess: ', msg;
       }).catch(err => {
-          console.log('failed: ', err);
+          this.connectionState = 'failed: ', err;
       });
     }
 }

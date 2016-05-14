@@ -66,6 +66,7 @@ mainWindow.webContents.on('did-finish-load', function() {
 
         console.warn('payload: ', payload);
         const response = sequelizeManager.initialize(usr, psw, db, prt, engine);
+        console.warn(sequelizeManager.connectionState);
         event.sender.send('channel', response);
         console.warn('response: ', response);
     });
