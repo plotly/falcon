@@ -1,14 +1,9 @@
 import { app, BrowserWindow, Menu, crashReporter, shell } from 'electron';
-import { createStore, applyMiddleware, compose } from 'redux';
-import { electronEnhancer } from 'redux-electron-store';
-import Immutable from 'immutable';
 import restify from 'restify';
 import parse from './parse';
+import SequelizeManager from './sequelizeManager';
 
-
-var sequelizeActions = require('./sequelizeManager');
-let sequelizeManager = new  sequelizeActions();
-
+const sequelizeManager = new SequelizeManager();
 const ipcMain = require('electron').ipcMain;
 
 let menu;
@@ -43,63 +38,55 @@ app.on('ready', () => {
     mainWindow = null;
   });
 
-const server = restify.createServer();
-server.use(restify.queryParser());
-server.use(restify.CORS({
+  const server = restify.createServer();
+  server.use(restify.queryParser());
+  server.use(restify.CORS({
     origins: ['*'],   // defaults to ['*']
     credentials: false,                 // defaults to false
     headers: ['Access-Control-Allow-Origin']  // sets expose-headers
-}));
+  }));
 
-server.listen(5000, function(){
-    console.log('%s listening at %s', server.name, server.url);
-});
+  server.listen(5000, () => {
+  });
 
-mainWindow.webContents.on('did-finish-load', function() {
+  mainWindow.webContents.on('did-finish-load', () => {
+    ipcMain.on('connect', (event, payload) => {
+      const usr = 'root';
+      const psw = 'MyPassword1';
+      const db = 'fake_plotly';
+      const prt = 3306;
+      const engine = 'mysql';
 
-    ipcMain.on('connect', function(event, payload) {
-        var usr = 'root';
-        var psw = 'MyPassword1';
-        var db = 'fake_plotly';
-        var prt = 3306;
-        var engine = 'mysql';
-
-        console.warn('payload: ', payload);
-        sequelizeManager.initialize(usr, psw, db, prt, engine);
-        console.warn('connection state is ', sequelizeManager.connectionState);
-        event.sender.send('channel', {error: sequelizeManager.connectionState});
+      sequelizeManager.login(usr, psw, db, prt, engine);
+      event.sender.send('channel', { log: sequelizeManager.connectionState });
     });
 
     ipcMain.on('receive', function(event, payload) {
-        console.warn('payload: ', payload);
-        sequelizeManager.connection.query(payload.statement).spread((rows, metadata) => {
-            const response = {rows, metadata, error: ''};
-            event.sender.send('channel', response);
-        }).catch(err => {
-            console.warn('ERROR: ', err);
-            event.sender.send('channel', {error: err});
-        });
+      const statement = payload.statement;
+      sequelizeManager.connection.query(statement).spread((rows, metadata) => {
+        const response = {rows, metadata, error: ''};
+        event.sender.send('channel', response);
+      }).catch(err => {
+        event.sender.send('channel', {error: err});
+      });
     });
 
-    server.get('/query', function(req, res, next) {
-        console.warn('query: ', req.query.statement);
-        const statement = req.query.statement;
-        mainWindow.webContents.send('channel', {log: statement});
-        sequelizeManager.connection.query(statement).spread((rows, metadata) => {
-            const response = {rows, metadata, error: ''};
+    server.get('/query', (req, res) => {
+      const statement = req.query.statement;
+      mainWindow.webContents.send('channel', { log: statement });
+      sequelizeManager.connection.query(statement).spread((rows, metadata) => {
+        const response = { rows, metadata, error: '' };
             // Send back to app
-            mainWindow.webContents.send('channel', response);
+        mainWindow.webContents.send('channel', response);
             // Send back to plotly 2.0
-            const parsedResponse = parse(rows);
-            console.warn('response: ', parsedResponse);
-            res.send(parsedResponse);
-        }).catch(err => {
-            console.warn('ERROR: ', err);
-            mainWindow.webContents.send('channel', {error: err});
-            res.send({err});
-        });
+        const parsedResponse = parse(rows);
+        res.send(parsedResponse);
+      }).catch(err => {
+        mainWindow.webContents.send('channel', { error: err });
+        res.send({ err });
+      });
     });
-});
+  });
 
   if (process.env.NODE_ENV === 'development') {
     mainWindow.openDevTools();
