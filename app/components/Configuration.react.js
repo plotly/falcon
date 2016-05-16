@@ -4,8 +4,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import Immutable from 'immutable';
 import AceEditor from 'react-ace';
 import brace from 'brace';
-import styles from './Counter.css';
-
+import styles from './Configuration.css';
 
 
 require('brace/mode/sql');
@@ -44,14 +43,17 @@ export default class Configuration extends Component {
                     onChange={onChangeQuery}
           			mode="sql"
           			theme="tomorrow"
+                height='100'
           />
 
-          <button onClick={onPressConnect}>
-            connect
-          </button>
-          <button onClick={onSendQuery}>
-            send query
-          </button>
+          <div className={styles.btnGroup}>
+            <button  className={styles.btn} onClick={onPressConnect}>
+              connect
+            </button>
+            <button  className={styles.btn} onClick={onSendQuery}>
+              query
+            </button>
+          </div>
 
           <pre>
             {JSON.stringify(this.props.ipc.toJS().rows, null, 2)}
