@@ -4,6 +4,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import Immutable from 'immutable';
 import AceEditor from 'react-ace';
 import brace from 'brace';
+import styles from './Configuration.css';
 
 
 require('brace/mode/sql');
@@ -13,21 +14,23 @@ require('brace/theme/tomorrow');
 export default class Configuration extends Component {
     constructor(props) {
         super(props);
-        this.state = {query: ''}
+        this.state = {query: ''};
     }
 
   render() {
     console.warn('this.props: ', this.props);
     const configuration = this.props.configuration.toJS();
 
-    const onChange = query => {
-        this.setState({query})
-        this.props.ipcActions.query(query);
-        /*
-        this.props.configActions.setValue({
-            key: e.target.value, value: e.target.value
-        });
-        */
+    const onChangeQuery = query => {
+        this.setState({query});
+    }
+
+    const onPressConnect = (event) => {
+      this.props.ipcActions.connect(this.state.connect);
+    }
+
+    const onSendQuery = (event) => {
+        this.props.ipcActions.query(this.state.query);
     }
 
     return (
@@ -37,30 +40,36 @@ export default class Configuration extends Component {
 
           <AceEditor
                     value={this.state.query}
-                    onChange={onChange}
+                    onChange={onChangeQuery}
           			mode="sql"
           			theme="tomorrow"
+                height='100'
           />
 
-          <input onChange={onChange}/>
-
-          <pre>
-            {JSON.stringify(this.props.ipc.toJS().log, null, 2)}
-          </pre>
+          <div className={styles.btnGroup}>
+            <button  className={styles.btn} onClick={onPressConnect}>
+              connect
+            </button>
+            <button  className={styles.btn} onClick={onSendQuery}>
+              query
+            </button>
+          </div>
 
           <pre>
             {JSON.stringify(this.props.ipc.toJS().rows, null, 2)}
           </pre>
 
           <pre>
+            {JSON.stringify(this.props.ipc.toJS().log, null, 2)}
+          </pre>
+
+          <pre>
             {JSON.stringify(this.props.ipc.toJS().metadata, null, 2)}
           </pre>
 
-
-            <pre>
-              {JSON.stringify(this.props.ipc.toJS().error, null, 2)}
-            </pre>
-
+          <pre>
+            {JSON.stringify(this.props.ipc.toJS().error, null, 2)}
+          </pre>
 
         </div>
       </div>

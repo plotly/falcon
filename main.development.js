@@ -2,8 +2,12 @@ import { app, BrowserWindow, Menu, crashReporter, shell } from 'electron';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { electronEnhancer } from 'redux-electron-store';
 import Immutable from 'immutable';
-import Sequelize from 'sequelize';
 import restify from 'restify';
+import parse from './parse';
+
+
+var sequelizeActions = require('./sequelizeManager');
+let sequelizeManager = new  sequelizeActions();
 
 const ipcMain = require('electron').ipcMain;
 
@@ -13,57 +17,13 @@ let mainWindow = null;
 
 crashReporter.start();
 
-
 if (process.env.NODE_ENV === 'development') {
   require('electron-debug')();
 }
 
-/*
-// REDUX STORE
-let enhancer = compose(
-  // applyMiddleware(...middleware),
-  electronEnhancer()
-);
-
-const initialState = Immutable.Map({
-    query: 'asdfasdfasdf',
-    status: true,
-    config: {
-        username: 'chris',
-        pw: 'test'
-    }
-});
-
-function reducer(state = initialState, action) {
-    switch (action.type) {
-        case 'update':
-            state = state.set(action.key, action.value);
-            console.warn('updating store: ', state.toJS());
-            return state;
-        default:
-            return state;
-    }
-}
-
-// Note: passing enhancer as the last argument to createStore requires redux@>=3.1.0
-let i = 99;
-// const initialState = Immutable.Map({test: i});
-const store = createStore(reducer, initialState, electronEnhancer());
-
-setInterval(() => {
-    console.warn(`dispatching ${i}`);
-    i += 1;
-    store.dispatch({type: 'update', key: 'test', value: i});
-}, 10000);
-*/
-
-
-//////////
-
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
-
 
 app.on('ready', () => {
   mainWindow = new BrowserWindow({
@@ -83,49 +43,6 @@ app.on('ready', () => {
     mainWindow = null;
   });
 
-
-
-
-  function parse(data) {
-
-      var nrows = data.length;
-
-      if (nrows === undefined || nrows === null){
-          keys = ['message'];
-          nrows = 1;
-          ncols = 1;
-          rows = [['command executed']];
-      }else{
-          var rows = [];
-          var ncols = Object.keys(data[0]).length;
-          var keys = Object.keys(data[0]);
-
-          for (var i = 0; i < nrows; i++) {
-              var row = [];
-              for (var j = 0; j < ncols; j++) {
-                  row.push(data[i][keys[j]]);
-              };
-              rows.push(row);
-          };
-      };
-      const data_formatted = { 'columnnames': keys, 'ncols': ncols, 'nrows': nrows, 'rows': rows };
-
-      return data_formatted;
-
-  };
-
-
-
-
-
-
-
-
-
-
-
-
-
 const server = restify.createServer();
 server.use(restify.queryParser());
 server.use(restify.CORS({
@@ -136,59 +53,42 @@ server.use(restify.CORS({
 
 server.listen(5000, function(){
     console.log('%s listening at %s', server.name, server.url);
-})
-
-
-// extract variables from the sent url to localhost 5000
-var usr = 'readonly';
-var psw = 'password';
-var db = 'world';
-var prt = 3308;
-var engine = 'mysql';
-
-console.log('Trying to connect to database ' + db + ' as ' + usr);
-
-const sequelize = new Sequelize(db, usr, psw, {
-    dialect: engine, // 'mysql'|'mariadb'|'sqlite'|'postgres'|'mssql'
-    port:    prt, // or 5432 (for postgres)
 });
 
 mainWindow.webContents.on('did-finish-load', function() {
 
-    console.warn('making request');
-    sequelize.authenticate().then(msg => {
-        console.warn('succcess: ', msg);
-        mainWindow.webContents.send('channel', {success: msg});
+    ipcMain.on('connect', function(event, payload) {
+        var usr = 'root';
+        var psw = 'MyPassword1';
+        var db = 'fake_plotly';
+        var prt = 3306;
+        var engine = 'mysql';
 
-    }).catch(err => {
-        console.warn('failed: ', err);
-        mainWindow.webContents.send('channel', {error: err});
+        console.warn('payload: ', payload);
+        sequelizeManager.initialize(usr, psw, db, prt, engine);
+        console.warn('connection state is ', sequelizeManager.connectionState);
+        event.sender.send('channel', {error: sequelizeManager.connectionState});
     });
 
     ipcMain.on('receive', function(event, payload) {
-        console.log('payload: ', payload);
-
-        sequelize.query(payload.statement).spread((rows, metadata) => {
+        console.warn('payload: ', payload);
+        sequelizeManager.connection.query(payload.statement).spread((rows, metadata) => {
             const response = {rows, metadata, error: ''};
             event.sender.send('channel', response);
         }).catch(err => {
             console.warn('ERROR: ', err);
             event.sender.send('channel', {error: err});
         });
-
     });
-
 
     server.get('/query', function(req, res, next) {
         console.warn('query: ', req.query.statement);
         const statement = req.query.statement;
         mainWindow.webContents.send('channel', {log: statement});
-        sequelize.query(statement).spread((rows, metadata) => {
+        sequelizeManager.connection.query(statement).spread((rows, metadata) => {
             const response = {rows, metadata, error: ''};
-
             // Send back to app
             mainWindow.webContents.send('channel', response);
-
             // Send back to plotly 2.0
             const parsedResponse = parse(rows);
             console.warn('response: ', parsedResponse);
@@ -199,8 +99,6 @@ mainWindow.webContents.on('did-finish-load', function() {
             res.send({err});
         });
     });
-
-
 });
 
   if (process.env.NODE_ENV === 'development') {
