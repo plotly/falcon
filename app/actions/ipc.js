@@ -11,8 +11,8 @@ export function query (statement) {
     };
 }
 
-export function connect () {
+export function connect (credentials) {
     return () => {
-        ipcRenderer.send('connect', {});
+        ipcRenderer.send('connect', credentials);
     };
 }

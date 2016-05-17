@@ -20,7 +20,7 @@ export default class Configuration extends Component {
     };
 
     const onPressConnect = () => {
-      this.props.ipcActions.connect();
+      this.props.ipcActions.connect(this.props.configuration.toJS());
     };
 
     const onSendQuery = () => {
@@ -58,18 +58,18 @@ export default class Configuration extends Component {
 
           <input
             onChange={onUpdateCredentials}
-            placeholder="port"
-            name="port"
+            placeholder="port number"
+            name="portnb"
           />
           <input
             onChange={onUpdateCredentials}
-            placeholder="engine"
-            name="database engine"
+            placeholder="database engine"
+            name="engine"
           />
           <input
             onChange={onUpdateCredentials}
             placeholder="database name"
-            name="database name"
+            name="database"
           />
           <input
             onChange={onUpdateCredentials}
