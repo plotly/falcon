@@ -10,12 +10,7 @@ export default class SequelizeManager {
       dialect: engine,
       port: prt
     });
-
-      // connect
-    this.connection.authenticate().then(msg => {
-      this.connectionState = `succcess:  ${msg}`;
-    }).catch(err => {
-      this.connectionState = `failed: ' + ${err}`;
-    });
+      // returns a promise of database msg
+    return this.connection.authenticate();
   }
 }

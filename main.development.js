@@ -57,8 +57,11 @@ app.on('ready', () => {
       const prt = 3306;
       const engine = 'mysql';
 
-      sequelizeManager.login(usr, psw, db, prt, engine);
-      event.sender.send('channel', { log: sequelizeManager.connectionState });
+      sequelizeManager.login(usr, psw, db, prt, engine).then(msg => {
+        event.sender.send('channel', { log: `logged in, ${msg}` });
+      }).catch(err => {
+        event.sender.send('channel', { error: err });
+      });
     });
 
     ipcMain.on('receive', function(event, payload) {
