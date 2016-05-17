@@ -6,15 +6,13 @@ export const UPDATE_STATE = 'UPDATE_STATE';
 export const updateState = createAction(UPDATE_STATE);
 
 export function query (statement) {
-    return dispatch => {
-        console.warn('sending query');
+    return () => {
         ipcRenderer.send('receive', {statement});
-    }
+    };
 }
 
 export function connect (statement) {
-    return dispatch => {
-        console.warn('proceeding to connect to database');
+    return () => {
         ipcRenderer.send('connect', {statement});
-    }
+    };
 }
