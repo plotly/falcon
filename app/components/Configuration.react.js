@@ -20,7 +20,7 @@ export default class Configuration extends Component {
     };
 
     const onPressConnect = () => {
-      this.props.ipcActions.connect(this.state.connect);
+      this.props.ipcActions.connect();
     };
 
     const onSendQuery = () => {
