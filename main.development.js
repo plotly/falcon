@@ -59,8 +59,8 @@ app.on('ready', () => {
 
       sequelizeManager.login(usr, psw, db, prt, engine).then(msg => {
         event.sender.send('channel', { log: `logged in, ${msg}` });
-      }).catch(err => {
-        event.sender.send('channel', { error: err });
+      }).catch(error => {
+         event.sender.send('channel', { error });
       });
     });
 
@@ -68,8 +68,8 @@ app.on('ready', () => {
       const statement = payload.statement;
       sequelizeManager.connection.query(statement).spread((rows, metadata) => {
         event.sender.send('channel', {rows, metadata, error: ''});
-      }).catch(err => {
-        event.sender.send('channel', {error: err});
+      }).catch(error => {
+        event.sender.send('channel', { error });
       });
     });
 
@@ -77,13 +77,13 @@ app.on('ready', () => {
       const statement = req.query.statement;
       mainWindow.webContents.send('channel', { log: statement });
       sequelizeManager.connection.query(statement).spread((rows, metadata) => {
-            // Send back to app
+        // Send back to app
         mainWindow.webContents.send('channel', { rows, metadata, error: '' });
-            // Send back to plotly 2.0
+        // Send back to plotly 2.0
         res.send(parse(rows));
-      }).catch(err => {
-        mainWindow.webContents.send('channel', { error: err });
-        res.send({ err });
+      }).catch(error => {
+        event.sender.send('channel', { error });
+        res.send({ error });
       });
     });
   });
