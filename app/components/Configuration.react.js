@@ -19,19 +19,16 @@ export default class Configuration extends Component {
       this.setState({query});
     };
 
-    const onPressConnect = () => {
+    const onClickConnect = () => {
       this.props.ipcActions.connect(this.props.configuration.toJS());
     };
 
-    const onSendQuery = () => {
+    const onClickQuery = () => {
       this.props.ipcActions.query(this.state.query);
     };
 
-    const onUpdateCredentials = e => {
-      this.props.configActions.setValue({
-        key: e.target.name,
-        value: e.target.value
-      });
+    const onUpdateCredentials = key => e => {
+      this.props.configActions.setValue({key, value: e.target.value});
     };
 
     return (
@@ -48,38 +45,33 @@ export default class Configuration extends Component {
           />
 
           <div className={styles.btnGroup}>
-            <button className={styles.btn} onClick={onPressConnect}>
+            <button className={styles.btn} onClick={onClickConnect}>
               connect
             </button>
-            <button className={styles.btn} onClick={onSendQuery}>
+            <button className={styles.btn} onClick={onClickQuery}>
               query
             </button>
           </div>
 
           <input
-            onChange={onUpdateCredentials}
+            onChange={onUpdateCredentials('portNumber')}
             placeholder="port number"
-            name="portnb"
           />
           <input
-            onChange={onUpdateCredentials}
+            onChange={onUpdateCredentials('engine')}
             placeholder="database engine"
-            name="engine"
           />
           <input
-            onChange={onUpdateCredentials}
+            onChange={onUpdateCredentials('database')}
             placeholder="database name"
-            name="database"
           />
           <input
-            onChange={onUpdateCredentials}
+            onChange={onUpdateCredentials('username')}
             placeholder="username"
-            name="username"
           />
           <input
-            onChange={onUpdateCredentials}
+            onChange={onUpdateCredentials('password')}
             placeholder="password"
-            name="password"
           />
 
           <pre>
