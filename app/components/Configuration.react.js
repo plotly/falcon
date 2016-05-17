@@ -9,14 +9,14 @@ require('brace/theme/tomorrow');
 
 
 export default class Configuration extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {query: ''};
-    }
+  constructor(props) {
+    super(props);
+    this.state = {query: ''};
+  }
 
   render() {
     const onChangeQuery = query => {
-        this.setState({query});
+      this.setState({query});
     };
 
     const onPressConnect = () => {
@@ -24,7 +24,14 @@ export default class Configuration extends Component {
     };
 
     const onSendQuery = () => {
-        this.props.ipcActions.query(this.state.query);
+      this.props.ipcActions.query(this.state.query);
+    };
+
+    const onUpdateCredentials = e => {
+      this.props.configActions.setValue({
+        key: e.target.name,
+        value: e.target.value
+      });
     };
 
     return (
@@ -48,6 +55,36 @@ export default class Configuration extends Component {
               query
             </button>
           </div>
+
+          <input
+            onChange={onUpdateCredentials}
+            placeholder="port"
+            name="port"
+          />
+          <input
+            onChange={onUpdateCredentials}
+            placeholder="engine"
+            name="database engine"
+          />
+          <input
+            onChange={onUpdateCredentials}
+            placeholder="database name"
+            name="database name"
+          />
+          <input
+            onChange={onUpdateCredentials}
+            placeholder="username"
+            name="username"
+          />
+          <input
+            onChange={onUpdateCredentials}
+            placeholder="password"
+            name="password"
+          />
+
+          <pre>
+            {JSON.stringify(this.props.configuration.toJS())}
+          </pre>
 
           <pre>
             {JSON.stringify(this.props.ipc.toJS().rows, null, 2)}
@@ -75,5 +112,6 @@ Configuration.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
     setValue: PropTypes.func.isRequired,
     ipc: ImmutablePropTypes.map.isRequired,
-    ipcActions: PropTypes.Object
+    ipcActions: PropTypes.Object,
+    configActions: PropTypes.Object
 };
