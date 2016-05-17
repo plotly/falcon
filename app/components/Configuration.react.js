@@ -1,9 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import Immutable from 'immutable';
 import AceEditor from 'react-ace';
-import brace from 'brace';
 import styles from './Configuration.css';
 
 
@@ -18,20 +15,17 @@ export default class Configuration extends Component {
     }
 
   render() {
-    console.warn('this.props: ', this.props);
-    const configuration = this.props.configuration.toJS();
-
     const onChangeQuery = query => {
         this.setState({query});
-    }
+    };
 
-    const onPressConnect = (event) => {
+    const onPressConnect = () => {
       this.props.ipcActions.connect(this.state.connect);
-    }
+    };
 
-    const onSendQuery = (event) => {
+    const onSendQuery = () => {
         this.props.ipcActions.query(this.state.query);
-    }
+    };
 
     return (
       <div>
@@ -39,18 +33,18 @@ export default class Configuration extends Component {
           <h5>Getting staarted</h5>
 
           <AceEditor
-                    value={this.state.query}
-                    onChange={onChangeQuery}
-          			mode="sql"
-          			theme="tomorrow"
-                height='100'
+            value={this.state.query}
+            onChange={onChangeQuery}
+            mode="sql"
+            theme="tomorrow"
+            height="100"
           />
 
           <div className={styles.btnGroup}>
-            <button  className={styles.btn} onClick={onPressConnect}>
+            <button className={styles.btn} onClick={onPressConnect}>
               connect
             </button>
-            <button  className={styles.btn} onClick={onSendQuery}>
+            <button className={styles.btn} onClick={onSendQuery}>
               query
             </button>
           </div>
@@ -77,7 +71,9 @@ export default class Configuration extends Component {
   }
 }
 
-Configuration.PropTypes = {
+Configuration.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
-    setValue: PropTypes.func.isRequired
-}
+    setValue: PropTypes.func.isRequired,
+    ipc: ImmutablePropTypes.map.isRequired,
+    ipcActions: PropTypes.Object
+};
