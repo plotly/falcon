@@ -64,11 +64,10 @@ app.on('ready', () => {
       });
     });
 
-    ipcMain.on('receive', function(event, payload) {
+    ipcMain.on('receive', (event, payload) => {
       const statement = payload.statement;
       sequelizeManager.connection.query(statement).spread((rows, metadata) => {
-        const response = {rows, metadata, error: ''};
-        event.sender.send('channel', response);
+        event.sender.send('channel', {rows, metadata, error: ''});
       }).catch(err => {
         event.sender.send('channel', {error: err});
       });
@@ -78,12 +77,10 @@ app.on('ready', () => {
       const statement = req.query.statement;
       mainWindow.webContents.send('channel', { log: statement });
       sequelizeManager.connection.query(statement).spread((rows, metadata) => {
-        const response = { rows, metadata, error: '' };
             // Send back to app
-        mainWindow.webContents.send('channel', response);
+        mainWindow.webContents.send('channel', { rows, metadata, error: '' });
             // Send back to plotly 2.0
-        const parsedResponse = parse(rows);
-        res.send(parsedResponse);
+        res.send(parse(rows));
       }).catch(err => {
         mainWindow.webContents.send('channel', { error: err });
         res.send({ err });
