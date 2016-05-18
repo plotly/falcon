@@ -2,7 +2,13 @@ import { SET_VALUE } from '../actions/configuration.js';
 
 import Immutable from 'immutable';
 
-const INITIAL_STATE = Immutable.Map(); // {} // []
+const INITIAL_STATE = Immutable.Map({
+    username: null,
+    password: null,
+    database: null,
+    engine: null,
+    port: null
+});
 
 export default function configuration(state = INITIAL_STATE, action) {
     switch (action.type) {

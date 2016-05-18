@@ -51,16 +51,10 @@ app.on('ready', () => {
 
   mainWindow.webContents.on('did-finish-load', () => {
     ipcMain.on('connect', (event, payload) => {
-      const usr = 'root';
-      const psw = 'MyPassword1';
-      const db = 'fake_plotly';
-      const prt = 3306;
-      const engine = 'mysql';
-
-      sequelizeManager.login(usr, psw, db, prt, engine).then(msg => {
+      sequelizeManager.login(payload).then(msg => {
         event.sender.send('channel', { log: `logged in, ${msg}` });
       }).catch(error => {
-         event.sender.send('channel', { error });
+        event.sender.send('channel', { error });
       });
     });
 

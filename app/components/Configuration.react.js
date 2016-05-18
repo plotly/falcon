@@ -9,22 +9,26 @@ require('brace/theme/tomorrow');
 
 
 export default class Configuration extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {query: ''};
-    }
+  constructor(props) {
+    super(props);
+    this.state = {query: ''};
+  }
 
   render() {
     const onChangeQuery = query => {
-        this.setState({query});
+      this.setState({query});
     };
 
-    const onPressConnect = () => {
-      this.props.ipcActions.connect(this.state.connect);
+    const onClickConnect = () => {
+      this.props.ipcActions.connect(this.props.configuration);
     };
 
-    const onSendQuery = () => {
-        this.props.ipcActions.query(this.state.query);
+    const onClickQuery = () => {
+      this.props.ipcActions.query(this.state.query);
+    };
+
+    const onUpdateCredentials = key => e => {
+      this.props.configActions.setValue({key, value: e.target.value});
     };
 
     return (
@@ -41,13 +45,38 @@ export default class Configuration extends Component {
           />
 
           <div className={styles.btnGroup}>
-            <button className={styles.btn} onClick={onPressConnect}>
+            <button className={styles.btn} onClick={onClickConnect}>
               connect
             </button>
-            <button className={styles.btn} onClick={onSendQuery}>
+            <button className={styles.btn} onClick={onClickQuery}>
               query
             </button>
           </div>
+
+          <input
+            onChange={onUpdateCredentials('portNumber')}
+            placeholder="port number"
+          />
+          <input
+            onChange={onUpdateCredentials('engine')}
+            placeholder="database engine"
+          />
+          <input
+            onChange={onUpdateCredentials('database')}
+            placeholder="database name"
+          />
+          <input
+            onChange={onUpdateCredentials('username')}
+            placeholder="username"
+          />
+          <input
+            onChange={onUpdateCredentials('password')}
+            placeholder="password"
+          />
+
+          <pre>
+            {JSON.stringify(this.props.configuration.toJS())}
+          </pre>
 
           <pre>
             {JSON.stringify(this.props.ipc.toJS().rows, null, 2)}
@@ -75,5 +104,6 @@ Configuration.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
     setValue: PropTypes.func.isRequired,
     ipc: ImmutablePropTypes.map.isRequired,
-    ipcActions: PropTypes.Object
+    ipcActions: PropTypes.Object,
+    configActions: PropTypes.Object
 };
