@@ -20,7 +20,7 @@ export default class Configuration extends Component {
     };
 
     const onClickConnect = () => {
-      this.props.ipcActions.connect(this.props.configuration.toJS());
+      this.props.ipcActions.connect(this.props.configuration);
     };
 
     const onClickQuery = () => {
