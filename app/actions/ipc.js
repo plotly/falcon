@@ -19,6 +19,12 @@ export function connect (credentials) {
     };
 }
 
+export function useDatabase (database) {
+    return () => {
+        ipcRenderer.send('useDatabase', database);
+    };
+}
+
 function immutableToJS(thing) {
     if (Immutable.Iterable.isIterable(thing)) {
         return thing.toJS();
