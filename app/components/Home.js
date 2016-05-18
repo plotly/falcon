@@ -8,8 +8,8 @@ export default class Home extends Component {
         return (
             <div>
             <div className={styles.container}>
-            <h2>Plotly Databse Connector</h2>
-            <Link to="/configuration">Connect to a database ...</Link>
+            <h2>Plotly Database Connector</h2>
+            <Link to="/configuration">Click to connect!</Link>
             </div>
             </div>
         );
