@@ -1,25 +1,17 @@
-# electron-react-boilerplate
+# electron-sql-connector
 
 [![NPM version][npm-image]][npm-url]
 [![Build Status][travis-image]][travis-url]
 [![Dependency Status][david_img]][david_site]
 
-![](./erb-logo.png)
-
-> Live editing development on desktop app
-
-[Electron](http://electron.atom.io/) application boilerplate based on [React](https://facebook.github.io/react/), [Redux](https://github.com/reactjs/redux), [React Router](https://github.com/reactjs/react-router), [Webpack](http://webpack.github.io/docs/), [React Transform HMR](https://github.com/gaearon/react-transform-hmr) for rapid application development
-
-## Screenshot
-
-![](https://cloud.githubusercontent.com/assets/3382565/10557547/b1f07a4e-74e3-11e5-8d27-79ab6947d429.gif)
+Based on [electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate)
 
 ## Install
 
 First, clone the repo via git:
 
 ```bash
-git clone https://github.com/chentsulin/electron-react-boilerplate.git your-project-name
+git clone https://github.com/plotly/electron-sql-connector your-project-name
 ```
 
 And then install dependencies.
@@ -138,15 +130,8 @@ We use [webpack-target-electron-renderer](https://github.com/chentsulin/webpack-
 
 If you want to have native-like User Interface (OS X El Capitan and Windows 10), [react-desktop](https://github.com/gabrielbull/react-desktop) may perfect suit for you.
 
-
-## Maintainers
-
-- [C. T. Lin](https://github.com/chentsulin)
-- [Jhen-Jie Hong](https://github.com/jhen0409)
-
-
 ## License
-MIT © [C. T. Lin](https://github.com/chentsulin)
+Code released under the MIT © [License](Code released under the [MIT license](https://github.com/plotly/electron-sql-connector/blob/master/LICENSE)
 
 [npm-image]: https://img.shields.io/npm/v/electron-react-boilerplate.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/electron-react-boilerplate
