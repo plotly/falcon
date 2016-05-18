@@ -13,13 +13,13 @@ const history = syncHistoryWithStore(hashHistory, store);
 
 const ipcRenderer = require('electron').ipcRenderer;
 ipcRenderer.on('channel', function(event, message) {
-  console.log('index.js', message);
-  store.dispatch(updateState(message))
+    console.log('index.js', message);
+    store.dispatch(updateState(message));
 });
 
 render(
-  <Provider store={store}>
+    <Provider store={store}>
     <Router history={history} routes={routes} />
-  </Provider>,
-  document.getElementById('root')
+    </Provider>,
+    document.getElementById('root')
 );

@@ -6,9 +6,9 @@ import CounterPage from './containers/CounterPage';
 import ConfigurationPage from './containers/ConfigurationPage';
 
 export default (
-  <Route path="/" component={App}>
+    <Route path="/" component={App}>
     <IndexRoute component={HomePage} />
     <Route path="/counter" component={CounterPage} />
     <Route path="/configuration" component={ConfigurationPage} />
-  </Route>
+    </Route>
 );

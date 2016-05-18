@@ -9,95 +9,95 @@ require('brace/theme/tomorrow');
 
 
 export default class Configuration extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {query: ''};
-  }
+    constructor(props) {
+        super(props);
+        this.state = {query: ''};
+    }
 
-  render() {
-    const onChangeQuery = query => {
-      this.setState({query});
-    };
+    render() {
+        const onChangeQuery = query => {
+            this.setState({query});
+        };
 
-    const onClickConnect = () => {
-      this.props.ipcActions.connect(this.props.configuration);
-    };
+        const onClickConnect = () => {
+            this.props.ipcActions.connect(this.props.configuration);
+        };
 
-    const onClickQuery = () => {
-      this.props.ipcActions.query(this.state.query);
-    };
+        const onClickQuery = () => {
+            this.props.ipcActions.query(this.state.query);
+        };
 
-    const onUpdateCredentials = key => e => {
-      this.props.configActions.setValue({key, value: e.target.value});
-    };
+        const onUpdateCredentials = key => e => {
+            this.props.configActions.setValue({key, value: e.target.value});
+        };
 
-    return (
-      <div>
-        <div className={{}}>
-          <h5>Getting staarted</h5>
+        return (
+            <div>
+            <div className={{}}>
+            <h5>Getting staarted</h5>
 
-          <AceEditor
+            <AceEditor
             value={this.state.query}
             onChange={onChangeQuery}
             mode="sql"
             theme="tomorrow"
             height="100"
-          />
+            />
 
-          <div className={styles.btnGroup}>
+            <div className={styles.btnGroup}>
             <button className={styles.btn} onClick={onClickConnect}>
-              connect
+            connect
             </button>
             <button className={styles.btn} onClick={onClickQuery}>
-              query
+            query
             </button>
-          </div>
+            </div>
 
-          <input
+            <input
             onChange={onUpdateCredentials('portNumber')}
             placeholder="port number"
-          />
-          <input
+            />
+            <input
             onChange={onUpdateCredentials('engine')}
             placeholder="database engine"
-          />
-          <input
+            />
+            <input
             onChange={onUpdateCredentials('database')}
             placeholder="database name"
-          />
-          <input
+            />
+            <input
             onChange={onUpdateCredentials('username')}
             placeholder="username"
-          />
-          <input
+            />
+            <input
             onChange={onUpdateCredentials('password')}
             placeholder="password"
-          />
+            />
 
-          <pre>
+            <pre>
             {JSON.stringify(this.props.configuration.toJS())}
-          </pre>
+            </pre>
 
-          <pre>
+            <pre>
             {JSON.stringify(this.props.ipc.toJS().rows, null, 2)}
-          </pre>
+            </pre>
 
-          <pre>
+            <pre>
             {JSON.stringify(this.props.ipc.toJS().log, null, 2)}
-          </pre>
+            </pre>
 
-          <pre>
+            <pre>
             {JSON.stringify(this.props.ipc.toJS().metadata, null, 2)}
-          </pre>
+            </pre>
 
-          <pre>
+            <pre>
             {JSON.stringify(this.props.ipc.toJS().error, null, 2)}
-          </pre>
+            </pre>
 
-        </div>
-      </div>
-    );
-  }
+            </div>
+            </div>
+        );
+    }
 }
 
 Configuration.propTypes = {
