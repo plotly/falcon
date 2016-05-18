@@ -55,11 +55,12 @@ app.on('ready', () => {
                 event.sender.send('channel', { log: `logged in, ${msg}` });
             }).catch(error => {
                 event.sender.send('channel', { error });
-            });
-            sequelizeManager.connection.query('SHOW DATABASES').spread((rows, metadata) => {
-                event.sender.send('channel', {databases: rows, metadata, error: ''});
-            }).catch(error => {
-                event.sender.send('channel', { error });
+            }).then( () => {
+                sequelizeManager.connection.query('SHOW DATABASES').spread((rows, metadata) => {
+                    event.sender.send('channel', {databases: rows, metadata, error: ''});
+                }).catch(error => {
+                    event.sender.send('channel', { error });
+                });
             });
         });
 
@@ -69,6 +70,20 @@ app.on('ready', () => {
                 event.sender.send('channel', {rows, metadata, error: ''});
             }).catch(error => {
                 event.sender.send('channel', { error });
+            });
+        });
+
+        ipcMain.on('useDatabase', (event, database) => {
+            sequelizeManager.connection.query(`USE ${database}`).spread((rows, metadata) => {
+                event.sender.send('channel', {log: rows, metadata, error: ''});
+            }).catch(error => {
+                event.sender.send('channel', { error });
+            }).then( () => {
+                sequelizeManager.connection.query('SHOW TABLES').spread((rows, metadata) => {
+                    event.sender.send('channel', {tables: rows, metadata, error: ''});
+                }).catch(error => {
+                    event.sender.send('channel', { error });
+                });
             });
         });
 
