@@ -8,9 +8,8 @@ export default class Home extends Component {
         return (
             <div>
             <div className={styles.container}>
-            <h2>Home</h2>
-            <Link to="/counter">to Counter</Link>
-            <Link to="/configuration">to conf</Link>
+            <h2>Plotly Databse Connector</h2>
+            <Link to="/configuration">Connect to a database ...</Link>
             </div>
             </div>
         );
