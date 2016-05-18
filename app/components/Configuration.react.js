@@ -31,6 +31,10 @@ export default class Configuration extends Component {
             this.props.configActions.setValue({key, value: e.target.value});
         };
 
+        const onSubmitDatabase = e => {
+            this.props.ipcActions.useDatabase(this.props.configuration.get('database'));
+        };
+
         return (
             <div>
             <div className={{}}>
@@ -81,9 +85,17 @@ export default class Configuration extends Component {
             onChange={onUpdateCredentials('database')}
             placeholder="database name"
             />
+            <div className={styles.btnGroupActions}>
+            <button className={styles.btn} onClick={onSubmitDatabase}>
+            use this one
+            </button>
+            </div>
 
             <h5>Step 4: Preview Tables here</h5>
-            show list of tables here
+            available tables
+            <pre>
+            {JSON.stringify(this.props.ipc.toJS().tables, null, 2)}
+            </pre>
 
             <h5>Step 5: Enter Query</h5>
 
@@ -101,7 +113,7 @@ export default class Configuration extends Component {
             </button>
             </div>
 
-            <h5>Step 7: Preview Response</h5>
+            <h5>Step 6: Preview Response</h5>
 
             <pre>
             {JSON.stringify(this.props.configuration.toJS())}
