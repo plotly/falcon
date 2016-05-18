@@ -56,6 +56,11 @@ app.on('ready', () => {
             }).catch(error => {
                 event.sender.send('channel', { error });
             });
+            sequelizeManager.connection.query('SHOW DATABASES').spread((rows, metadata) => {
+                event.sender.send('channel', {databases: rows, metadata, error: ''});
+            }).catch(error => {
+                event.sender.send('channel', { error });
+            });
         });
 
         ipcMain.on('receive', (event, payload) => {

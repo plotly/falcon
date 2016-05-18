@@ -74,6 +74,9 @@ export default class Configuration extends Component {
             </div>
 
             <h5>Step 3: Choose Database</h5>
+            <pre>
+            {JSON.stringify(this.props.ipc.toJS().databases, null, 2)}
+            </pre>
             <input
             onChange={onUpdateCredentials('database')}
             placeholder="database name"
@@ -83,12 +86,13 @@ export default class Configuration extends Component {
             show list of tables here
 
             <h5>Step 5: Enter Query</h5>
+
             <AceEditor
             value={this.state.query}
             onChange={onChangeQuery}
             mode="sql"
             theme="tomorrow"
-            height="100"
+            height="50"
             />
 
             <div className={styles.btnGroupActions}>
