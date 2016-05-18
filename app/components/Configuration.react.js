@@ -34,8 +34,8 @@ export default class Configuration extends Component {
         return (
             <div>
             <div className={{}}>
-            
-            <h5>Choose Database</h5>
+
+            <h5>Step 1: Choose Database</h5>
             <div className={styles.btnGroupEngines}>
             <button className={styles.btn} onClick={onUpdateCredentials('engine')} value="mysql">
             mysql
@@ -54,34 +54,10 @@ export default class Configuration extends Component {
             </button>
             </div>
 
-            <AceEditor
-            value={this.state.query}
-            onChange={onChangeQuery}
-            mode="sql"
-            theme="tomorrow"
-            height="100"
-            />
-
-            <div className={styles.btnGroupActions}>
-            <button className={styles.btn} onClick={onClickConnect}>
-            connect
-            </button>
-            <button className={styles.btn} onClick={onClickQuery}>
-            query
-            </button>
-            </div>
-
+            <h5>Step 2: Enter Credentials</h5>
             <input
             onChange={onUpdateCredentials('portNumber')}
             placeholder="port number"
-            />
-            <input
-            onChange={onUpdateCredentials('engine')}
-            placeholder="database engine"
-            />
-            <input
-            onChange={onUpdateCredentials('database')}
-            placeholder="database name"
             />
             <input
             onChange={onUpdateCredentials('username')}
@@ -91,6 +67,37 @@ export default class Configuration extends Component {
             onChange={onUpdateCredentials('password')}
             placeholder="password"
             />
+            <div className={styles.btnGroupActions}>
+            <button className={styles.btn} onClick={onClickConnect}>
+            connect
+            </button>
+            </div>
+
+            <h5>Step 3: Choose Database</h5>
+            <input
+            onChange={onUpdateCredentials('database')}
+            placeholder="database name"
+            />
+
+            <h5>Step 4: Preview Tables here</h5>
+            show list of tables here
+
+            <h5>Step 5: Enter Query</h5>
+            <AceEditor
+            value={this.state.query}
+            onChange={onChangeQuery}
+            mode="sql"
+            theme="tomorrow"
+            height="100"
+            />
+
+            <div className={styles.btnGroupActions}>
+            <button className={styles.btn} onClick={onClickQuery}>
+            query
+            </button>
+            </div>
+
+            <h5>Step 7: Preview Response</h5>
 
             <pre>
             {JSON.stringify(this.props.configuration.toJS())}
