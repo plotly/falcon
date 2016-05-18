@@ -1,7 +1,14 @@
-.btnGroup {
+.btnGroupEngines {
     position: relative;
     top: 0px;
-    width: 420px;
+    width: 1000px;
+    margin: 0 auto;
+}
+
+.btnGroupActions {
+    position: relative;
+    top: 0px;
+    width: 1000px;
     margin: 0 auto;
 }
 

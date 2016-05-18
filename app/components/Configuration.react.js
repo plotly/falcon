@@ -34,7 +34,25 @@ export default class Configuration extends Component {
         return (
             <div>
             <div className={{}}>
-            <h5>Getting staarted</h5>
+            
+            <h5>Choose Database</h5>
+            <div className={styles.btnGroupEngines}>
+            <button className={styles.btn} onClick={onUpdateCredentials('engine')} value="mysql">
+            mysql
+            </button>
+            <button className={styles.btn} onClick={onUpdateCredentials('engine')} value="mariadb">
+            mariadb
+            </button>
+            <button className={styles.btn} onClick={onUpdateCredentials('engine')} value="sqlite">
+            sqlite
+            </button>
+            <button className={styles.btn} onClick={onUpdateCredentials('engine')} value="postgres">
+            postgres
+            </button>
+            <button className={styles.btn} onClick={onUpdateCredentials('engine')} value="mssql">
+            mssql
+            </button>
+            </div>
 
             <AceEditor
             value={this.state.query}
@@ -44,7 +62,7 @@ export default class Configuration extends Component {
             height="100"
             />
 
-            <div className={styles.btnGroup}>
+            <div className={styles.btnGroupActions}>
             <button className={styles.btn} onClick={onClickConnect}>
             connect
             </button>
