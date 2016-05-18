@@ -5,10 +5,10 @@ import configuration from './configuration';
 import ipc from './ipc';
 
 const rootReducer = combineReducers({
-  counter,
-  configuration,
-  ipc,
-  routing
+    counter,
+    configuration,
+    ipc,
+    routing
 });
 
 export default rootReducer;

@@ -6,17 +6,17 @@ import * as IpcActions from '../actions/ipc';
 
 function mapStateToProps(state) {
     console.warn('state: ', state);
-  return {
-      configuration: state.configuration,
-      ipc: state.ipc
-  };
+    return {
+        configuration: state.configuration,
+        ipc: state.ipc
+    };
 }
 
 function mapDispatchToProps(dispatch) {
-  const configActions = bindActionCreators(ConfigurationActions, dispatch);
-  const ipcActions = bindActionCreators(IpcActions, dispatch);
+    const configActions = bindActionCreators(ConfigurationActions, dispatch);
+    const ipcActions = bindActionCreators(IpcActions, dispatch);
 
-  return {configActions, ipcActions};
+    return {configActions, ipcActions};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Configuration);

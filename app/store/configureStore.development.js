@@ -9,8 +9,8 @@ import DevTools from '../containers/DevTools';
 import { electronEnhancer } from 'redux-electron-store';
 
 const logger = createLogger({
-  level: 'info',
-  collapsed: true,
+    level: 'info',
+    collapsed: true
 });
 
 const router = routerMiddleware(hashHistory);
@@ -18,24 +18,24 @@ const router = routerMiddleware(hashHistory);
 console.warn('setting up dev store');
 
 const enhancer = compose(
-  applyMiddleware(thunk, router, logger),
-//  electronEnhancer(true), // ({test: true}),
-  DevTools.instrument(),
-  persistState(
-    window.location.href.match(
-      /[?&]debug_session=([^&]+)\b/
+    applyMiddleware(thunk, router, logger),
+    //  electronEnhancer(true), // ({test: true}),
+    DevTools.instrument(),
+    persistState(
+        window.location.href.match(
+            /[?&]debug_session=([^&]+)\b/
+        )
     )
-  )
 );
 
 export default function configureStore(initialState) {
-  const store = createStore(rootReducer, initialState, enhancer);
+    const store = createStore(rootReducer, initialState, enhancer);
 
-  if (module.hot) {
-    module.hot.accept('../reducers', () =>
-      store.replaceReducer(require('../reducers'))
+    if (module.hot) {
+        module.hot.accept('../reducers', () =>
+        store.replaceReducer(require('../reducers'))
     );
-  }
+}
 
-  return store;
+return store;
 }
