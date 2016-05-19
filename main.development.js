@@ -52,14 +52,14 @@ app.on('ready', () => {
     mainWindow.webContents.on('did-finish-load', () => {
         ipcMain.on('connect', (event, payload) => {
             sequelizeManager.login(payload).then(msg => {
-                event.sender.send('channel', { log: `logged in, ${msg}` });
-            }).catch(error => {
-                event.sender.send('channel', { error });
-            }).then( () => {
+                event.sender.send('channel', { log: `logged in, msg: ${msg}` });
+            })
+            .then( () => {
                 sequelizeManager.connection.query('SHOW DATABASES').spread((rows, metadata) => {
-                    event.sender.send('channel', {databases: rows, metadata, error: ''});
-                }).catch(error => {
-                    event.sender.send('channel', { error });
+                    event.sender.send('channel', {databases: rows, metadata, error: '', tables: ''});
+                })
+            .catch(error => {
+                event.sender.send('channel', { error });
                 });
             });
         });
@@ -76,13 +76,13 @@ app.on('ready', () => {
         ipcMain.on('useDatabase', (event, database) => {
             sequelizeManager.connection.query(`USE ${database}`).spread((rows, metadata) => {
                 event.sender.send('channel', {log: rows, metadata, error: ''});
-            }).catch(error => {
-                event.sender.send('channel', { error });
-            }).then( () => {
+            })
+            .then( () => {
                 sequelizeManager.connection.query('SHOW TABLES').spread((rows, metadata) => {
                     event.sender.send('channel', {tables: rows, metadata, error: ''});
-                }).catch(error => {
-                    event.sender.send('channel', { error });
+                })
+            .catch(error => {
+                event.sender.send('channel', { error });
                 });
             });
         });
