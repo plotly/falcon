@@ -1,20 +1,26 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import AceEditor from 'react-ace';
+// import AceEditor from 'react-ace';
 import styles from './Configuration.css';
+import Settings from './Configuration/Settings.react';
+import Monitor from './Configuration/Monitor.react';
 
-
-require('brace/mode/sql');
-require('brace/theme/tomorrow');
-
+const tabs = {
+    SETTINGS: 'SETTINGS',
+    MONITOR: 'MONITOR'
+};
 
 export default class Configuration extends Component {
     constructor(props) {
         super(props);
-        this.state = {query: ''};
+        this.state = {
+            query: '',
+            currentTab: tabs.SETTINGS
+        };
     }
 
     render() {
+        /*
         const onChangeQuery = query => {
             this.setState({query});
         };
@@ -38,8 +44,27 @@ export default class Configuration extends Component {
         const onSubmitDatabase = e => {
             this.props.ipcActions.useDatabase(this.props.configuration.get('database'));
         };
+        */
+        let content;
+        if (this.state.currentTab === tabs.SETTINGS) {
+            content = <Settings
+                configuration={this.props.configuration}
+                configActions={this.props.configActions}
+                ipcActions={this.props.ipcActions}
+                ipc={this.props.ipc}
+            />;
+        } else {
+            content = <Monitor/>;
+        }
 
+        console.log('content: ', content);
+        console.warn('styles: ', styles);
         return (
+            <div className={styles.container}>
+                {content}
+            </div>
+        );
+        /*
             <div>
             <div className={{}}>
 
@@ -145,6 +170,7 @@ export default class Configuration extends Component {
             </div>
             </div>
         );
+        */
     }
 }
 

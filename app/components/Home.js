@@ -9,7 +9,7 @@ export default class Home extends Component {
             <div>
             <div className={styles.container}>
             <h2>Plotly Database Connector</h2>
-            <Link to="/configuration">Click to connect!</Link>
+            <Link to="/configuration">Get started</Link>
             </div>
             </div>
         );

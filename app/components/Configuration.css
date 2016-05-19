@@ -1,29 +1,6 @@
-.btnGroupEngines {
-    position: relative;
-    top: 0px;
-    margin: 0 auto;
-}
-
-.btnGroupActions {
-    position: relative;
-    top: 0px;
-    margin: 0 auto;
-}
-
-.btn {
-    font-size: 0.75rem;
-    font-weight: bold;
-    background-color: #fff;
-    border-radius: 50%;
-    margin: 5px;
-    width: 50px;
-    height: 50px;
-    opacity: .7;
-    cursor: pointer;
-    font-family: Arial, Helvetica, Helvetica Neue;
-}
-
-.btn:hover {
-    color: white;
-    background-color: rgba(0, 0, 0, 0.5);
+.container {
+    margin-top: 100px;
+    text-align: center;
+    width: 100%;
+    height: 200px;
 }
