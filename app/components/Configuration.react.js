@@ -23,6 +23,10 @@ export default class Configuration extends Component {
             this.props.ipcActions.connect(this.props.configuration);
         };
 
+        const onClickDisconnect = () => {
+            this.props.ipcActions.disconnect();
+        };
+
         const onClickQuery = () => {
             this.props.ipcActions.query(this.state.query);
         };
@@ -74,6 +78,9 @@ export default class Configuration extends Component {
             <div className={styles.btnGroupActions}>
             <button className={styles.btn} onClick={onClickConnect}>
             connect
+            </button>
+            <button className={styles.btn} onClick={onClickDisconnect}>
+            disconnect
             </button>
             </div>
 

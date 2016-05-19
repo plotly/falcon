@@ -25,6 +25,12 @@ export function useDatabase (database) {
     };
 }
 
+export function disconnect () {
+    return () => {
+        ipcRenderer.send('disconnect');
+    };
+}
+
 function immutableToJS(thing) {
     if (Immutable.Iterable.isIterable(thing)) {
         return thing.toJS();

@@ -13,4 +13,11 @@ export default class SequelizeManager {
         // returns a promise of database msg
         return this.connection.authenticate();
     }
+    disconnect() {
+        /*
+            does not return a promise for now but issue is open
+            https://github.com/sequelize/sequelize/pull/5776
+        */    
+        this.connection.close();
+    }
 }

@@ -64,6 +64,12 @@ app.on('ready', () => {
             });
         });
 
+        ipcMain.on('disconnect', (event) => {
+            console.warn('disconnect');
+            sequelizeManager.disconnect();
+            event.sender.send('channel', { log: 'You are logged out'});
+        });
+
         ipcMain.on('receive', (event, payload) => {
             const statement = payload.statement;
             sequelizeManager.connection.query(statement).spread((rows, metadata) => {
