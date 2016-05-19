@@ -51,17 +51,47 @@ app.on('ready', () => {
 
     mainWindow.webContents.on('did-finish-load', () => {
         ipcMain.on('connect', (event, payload) => {
-            sequelizeManager.login(payload).then(msg => {
+            sequelizeManager.login(payload)
+            .then(msg => {
                 event.sender.send('channel', { log: `logged in, msg: ${msg}` });
             })
             .then( () => {
-                sequelizeManager.connection.query('SHOW DATABASES').spread((rows, metadata) => {
-                    event.sender.send('channel', {databases: rows, metadata, error: '', tables: ''});
-                })
+                sequelizeManager.connection.query('SHOW DATABASES')
+                    .spread((rows, metadata) => {
+                        event.sender.send('channel', {databases: rows, metadata, error: '', tables: ''});
+                        return null;
+                    });
+            })
             .catch(error => {
                 event.sender.send('channel', { error });
                 });
+        });
+
+        ipcMain.on('receive', (event, payload) => {
+            const statement = payload.statement;
+            sequelizeManager.connection.query(statement)
+            .spread((rows, metadata) => {
+                event.sender.send('channel', {rows, metadata, error: ''});
+            }).catch(error => {
+                event.sender.send('channel', { error });
             });
+        });
+
+        ipcMain.on('useDatabase', (event, database) => {
+            sequelizeManager.connection.query(`USE ${database}`)
+            .spread((rows, metadata) => {
+                event.sender.send('channel', {log: rows, metadata, error: ''});
+            })
+            .then( () => {
+                sequelizeManager.connection.query('SHOW TABLES')
+                .spread((rows, metadata) => {
+                    event.sender.send('channel', {tables: rows, metadata, error: ''});
+                    return null;
+                });
+            })
+            .catch(error => {
+                event.sender.send('channel', { error });
+                });
         });
 
         ipcMain.on('disconnect', (event) => {
@@ -70,28 +100,6 @@ app.on('ready', () => {
             event.sender.send('channel', { log: 'You are logged out'});
         });
 
-        ipcMain.on('receive', (event, payload) => {
-            const statement = payload.statement;
-            sequelizeManager.connection.query(statement).spread((rows, metadata) => {
-                event.sender.send('channel', {rows, metadata, error: ''});
-            }).catch(error => {
-                event.sender.send('channel', { error });
-            });
-        });
-
-        ipcMain.on('useDatabase', (event, database) => {
-            sequelizeManager.connection.query(`USE ${database}`).spread((rows, metadata) => {
-                event.sender.send('channel', {log: rows, metadata, error: ''});
-            })
-            .then( () => {
-                sequelizeManager.connection.query('SHOW TABLES').spread((rows, metadata) => {
-                    event.sender.send('channel', {tables: rows, metadata, error: ''});
-                })
-            .catch(error => {
-                event.sender.send('channel', { error });
-                });
-            });
-        });
 
         server.get('/query', (req, res) => {
             const statement = req.query.statement;
