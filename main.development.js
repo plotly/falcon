@@ -53,7 +53,7 @@ app.on('ready', () => {
         ipcMain.on('connect', (event, payload) => {
             sequelizeManager.login(payload)
             .then(msg => {
-                event.sender.send('channel', { log: `logged in, msg: ${msg}` });
+                event.sender.send('channel', { log: 'You are logged in.' });
             })
             .then( () => {
                 sequelizeManager.connection.query('SHOW DATABASES')
@@ -77,7 +77,7 @@ app.on('ready', () => {
             });
         });
 
-        ipcMain.on('useDatabase', (event, database) => {
+        ipcMain.on('useDatabase', (event, payload) => {
             sequelizeManager.login(payload)
             .then(msg => {
                 event.sender.send('channel', { log: `logged in, msg: ${msg}` });
@@ -97,7 +97,7 @@ app.on('ready', () => {
         ipcMain.on('disconnect', (event) => {
             console.warn('disconnect');
             sequelizeManager.disconnect();
-            event.sender.send('channel', { log: 'You are logged out'});
+            event.sender.send('channel', { log: 'You are logged out', databases: ''});
         });
 
 

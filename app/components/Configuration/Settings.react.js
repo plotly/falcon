@@ -40,9 +40,10 @@ export default class Settings extends Component {
 
     componentWillReceiveProps(nextProps) {
         let status;
+
         if (nextProps.ipc.hasIn(['error', 'message'])) {
             status = 'ERROR';
-        } else if (nextProps.ipc.hasIn('rows')) {
+        } else if (nextProps.ipc.has('databases')) {
             status = 'SUCCESS';
         }
         if (status) {
@@ -100,9 +101,10 @@ export default class Settings extends Component {
         } else if (this.state.status === 'SUCCESS') {
             successMessage = (
                 <pre>
-                    {ipc.get('rows').toJS()}
+                    {ipc.toJS().log}
                 </pre>
             );
+            buttonMessage = 'Connected';
         } else if (this.state.status === 'LOADING') {
             buttonMessage = 'Connecting';
         }
@@ -138,8 +140,21 @@ export default class Settings extends Component {
                 {successMessage}
 
                 <hr/>
+                log
                 <pre>
-                    {JSON.stringify(this.props.ipc.toJS().error, null, 2)}
+                    {JSON.stringify(this.props.ipc.toJS().log, null, 2)}
+                </pre>
+                databases
+                <pre>
+                    {JSON.stringify(this.props.ipc.toJS().databases, null, 2)}
+                </pre>
+                tables
+                <pre>
+                    {JSON.stringify(this.props.ipc.toJS().tables, null, 2)}
+                </pre>
+                rows
+                <pre>
+                    {JSON.stringify(this.props.ipc.toJS().rows, null, 2)}
                 </pre>
 
             </div>

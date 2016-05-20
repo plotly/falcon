@@ -44,7 +44,7 @@ export default class Configuration extends Component {
         const onSubmitDatabase = e => {
             this.props.ipcActions.useDatabase(this.props.configuration);
         };
-
+        */
         let content;
         if (this.state.currentTab === tabs.SETTINGS) {
             content = <Settings
