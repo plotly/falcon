@@ -78,16 +78,16 @@ app.on('ready', () => {
         });
 
         ipcMain.on('useDatabase', (event, database) => {
-            sequelizeManager.connection.query(`USE ${database}`)
-            .spread((rows, metadata) => {
-                event.sender.send('channel', {log: rows, metadata, error: ''});
+            sequelizeManager.login(payload)
+            .then(msg => {
+                event.sender.send('channel', { log: `logged in, msg: ${msg}` });
             })
             .then( () => {
                 sequelizeManager.connection.query('SHOW TABLES')
-                .spread((rows, metadata) => {
-                    event.sender.send('channel', {tables: rows, metadata, error: ''});
-                    return null;
-                });
+                    .spread((rows, metadata) => {
+                        event.sender.send('channel', {databases: rows, metadata, error: '', tables: ''});
+                        return null;
+                    });
             })
             .catch(error => {
                 event.sender.send('channel', { error });

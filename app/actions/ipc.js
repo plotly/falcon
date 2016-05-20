@@ -19,9 +19,9 @@ export function connect (credentials) {
     };
 }
 
-export function useDatabase (database) {
+export function useDatabase (credentials) {
     return () => {
-        ipcRenderer.send('useDatabase', database);
+        ipcRenderer.send('useDatabase', credentials);
     };
 }
 
