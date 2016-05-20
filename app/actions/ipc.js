@@ -21,7 +21,7 @@ export function connect (credentials) {
 
 export function useDatabase (credentials) {
     return () => {
-        ipcRenderer.send('useDatabase', credentials);
+        ipcRenderer.send('useDatabase', immutableToJS(credentials));
     };
 }
 
