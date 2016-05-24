@@ -126,6 +126,7 @@ export default class Settings extends Component {
 
         function onSelectDatabase(database) {
             setValue({key: 'database', value: database.value});
+            ipcActions.useDatabase();
         }
 
         console.warn('this.state: ', this.state);
