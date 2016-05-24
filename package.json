@@ -115,6 +115,7 @@
     "react-redux": "^4.4.5",
     "react-router": "^2.2.4",
     "react-router-redux": "^4.0.2",
+    "react-select": "^1.0.0-beta13",
     "redux": "^3.4.0",
     "redux-actions": "^0.9.1",
     "redux-electron-store": "^0.3.8",
