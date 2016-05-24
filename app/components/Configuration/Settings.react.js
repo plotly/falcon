@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './Settings.css';
 import classnames from 'classnames';
+import Select from 'react-select';
 
 const DB_CREDENTIALS = [
     'username',
@@ -8,7 +9,7 @@ const DB_CREDENTIALS = [
     'port'
 ];
 
-const DATABASES = {
+const ENGINES = {
     MYSQL: 'MYSQL',
     SQLITE: 'SQLITE',
     POSTGRES: 'POSTGRES',
@@ -24,17 +25,20 @@ const LOGOS = {
     SQLITE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/SQLite370.svg/1280px-SQLite370.svg.png'
 };
 
+const DATABASES = [
+    'none found'
+];
 
 export default class Settings extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedDB: DATABASES.MYSQL,
+            selectedDB: ENGINES.MYSQL,
             status: 'INITIALIZED'
         };
         props.configActions.setValue({
             key: 'engine',
-            value: DATABASES.MYSQL.toLowerCase()
+            value: ENGINES.MYSQL.toLowerCase()
         });
     }
 
@@ -55,7 +59,7 @@ export default class Settings extends Component {
         const {ipcActions, configActions, configuration, ipc} = this.props;
         const {setValue} = configActions;
 
-        const logos = Object.keys(DATABASES).map(DB => (
+        const logos = Object.keys(ENGINES).map(DB => (
             <div className={classnames(
                     styles.logo, {
                         [styles.logoSelected]: this.state.selectedDB === DB
@@ -86,6 +90,17 @@ export default class Settings extends Component {
             />
         ));
 
+        const ipcDatabases = ipc.toJS().databases;
+        let databases;
+        if (ipcDatabases) {
+            // databases = [{ value: 'Some', label: 'Some Found' }];
+            databases = ipcDatabases.map(database => (
+                { value: database.Database, label: database.Database }
+            ));
+        } else {
+            databases = [{ value: 'None', label: 'None Found' }];
+        }
+
         let successMessage = null;
         let errorMessage = null;
         let buttonMessage = 'Connect';
@@ -107,6 +122,10 @@ export default class Settings extends Component {
             buttonMessage = 'Connected';
         } else if (this.state.status === 'LOADING') {
             buttonMessage = 'Connecting';
+        }
+
+        function onSelectDatabase(database) {
+            setValue({key: 'database', value: database.value});
         }
 
         console.warn('this.state: ', this.state);
@@ -136,17 +155,22 @@ export default class Settings extends Component {
                     </a>
                 </div>
 
+                <div className={styles.dropdown}>
+                    <Select
+                        name="form-field-name"
+                        placeholder="Select Your Database"
+                        options={databases}
+                        onChange={onSelectDatabase}
+                    />
+                </div>
+
                 {errorMessage}
                 {successMessage}
 
                 <hr/>
                 log
                 <pre>
-                    {JSON.stringify(this.props.ipc.toJS().log, null, 2)}
-                </pre>
-                databases
-                <pre>
-                    {JSON.stringify(this.props.ipc.toJS().databases, null, 2)}
+                    {JSON.stringify(this.props.configuration.toJS())}
                 </pre>
                 tables
                 <pre>
