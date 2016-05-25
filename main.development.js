@@ -52,52 +52,33 @@ app.on('ready', () => {
     mainWindow.webContents.on('did-finish-load', () => {
         ipcMain.on('connect', (event, payload) => {
             sequelizeManager.login(payload)
-            .then(msg => {
-                event.sender.send('channel', { log: 'You are logged in.' });
-            })
-            .then( () => {
-                sequelizeManager.connection.query('SHOW DATABASES')
-                    .spread((rows, metadata) => {
-                        event.sender.send('channel', {databases: rows, metadata, error: null, tables: null});
-                        return null;
-                    });
-            })
-            .catch(error => {
-                event.sender.send('channel', { error });
-                });
+            .then(sequelizeManager.updateLog(event, 'you are connected'))
+            .then(sequelizeManager.showDatabases(event))
+            .catch( error => {
+                sequelizeManager.raiseError(event, error);
+            });
         });
 
         ipcMain.on('receive', (event, payload) => {
-            const statement = payload.statement;
-            sequelizeManager.connection.query(statement)
-            .spread((rows, metadata) => {
-                event.sender.send('channel', {rows, metadata, error: ''});
-            }).catch(error => {
-                event.sender.send('channel', { error });
+            const query = payload.statement;
+            sequelizeManager.sendQuery(event, query)
+            .catch( error => {
+                sequelizeManager.raiseError(event, error);
             });
         });
 
         ipcMain.on('useDatabase', (event, payload) => {
             sequelizeManager.login(payload)
-            .then(msg => {
-                event.sender.send('channel', { log: `logged in, msg: ${msg}` });
-            })
-            .then( () => {
-                sequelizeManager.connection.query('SHOW TABLES')
-                    .spread((rows, metadata) => {
-                        event.sender.send('channel', {tables: rows, metadata, error: null});
-                        return null;
-                    });
-            })
-            .catch(error => {
-                event.sender.send('channel', { error });
-                });
+            .then(sequelizeManager.updateLog(event, 'database accessed'))
+            .then(sequelizeManager.showTables(event))
+            .catch( error => {
+                sequelizeManager.raiseError(event, error);
+            });
         });
 
         ipcMain.on('disconnect', (event) => {
-            console.warn('disconnect');
-            sequelizeManager.disconnect();
-            event.sender.send('channel', { log: 'You are logged out', databases: null, tables: null, metadata: null, rows: null});
+            sequelizeManager.disconnect(event);
+            sequelizeManager.updateLog(event, 'your are disconnected');
         });
 
         server.get('/query', (req, res) => {
