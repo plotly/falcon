@@ -125,6 +125,11 @@ export default class Settings extends Component {
         } else if (this.state.status === 'LOADING') {
             buttonMessage = 'Connecting';
         } else if (this.state.status === 'DISCONNECTED') {
+            successMessage = (
+                <pre>
+                    {ipc.toJS().log}
+                </pre>
+            );
             buttonMessage = 'Connect';
         }
 
