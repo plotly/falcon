@@ -58,7 +58,7 @@ app.on('ready', () => {
             .then( () => {
                 sequelizeManager.connection.query('SHOW DATABASES')
                     .spread((rows, metadata) => {
-                        event.sender.send('channel', {databases: rows, metadata, error: '', tables: ''});
+                        event.sender.send('channel', {databases: rows, metadata, error: null, tables: null});
                         return null;
                     });
             })
@@ -85,7 +85,7 @@ app.on('ready', () => {
             .then( () => {
                 sequelizeManager.connection.query('SHOW TABLES')
                     .spread((rows, metadata) => {
-                        event.sender.send('channel', {tables: rows, metadata, error: ''});
+                        event.sender.send('channel', {tables: rows, metadata, error: null});
                         return null;
                     });
             })
@@ -97,9 +97,8 @@ app.on('ready', () => {
         ipcMain.on('disconnect', (event) => {
             console.warn('disconnect');
             sequelizeManager.disconnect();
-            event.sender.send('channel', { log: 'You are logged out', databases: ''});
+            event.sender.send('channel', { log: 'You are logged out', databases: null, tables: null, metadata: null, rows: null});
         });
-
 
         server.get('/query', (req, res) => {
             const statement = req.query.statement;

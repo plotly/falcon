@@ -122,7 +122,13 @@ export default class Settings extends Component {
             buttonMessage = 'Connected';
         } else if (this.state.status === 'LOADING') {
             buttonMessage = 'Connecting';
+        } else if (this.state.status === 'DISCONNECTED') {
+            buttonMessage = 'Connect';
         }
+
+        const onClickDisconnect = () => {
+            ipcActions.disconnect();
+        };
 
         function onSelectDatabase(database) {
             setValue({key: 'database', value: database.value});
@@ -153,6 +159,11 @@ export default class Settings extends Component {
                        }}
                     >
                         {buttonMessage}
+                    </a>
+                    <a className={styles.buttonSecondary}
+                       onClick={onClickDisconnect}
+                    >
+                        disconnect
                     </a>
                 </div>
 
