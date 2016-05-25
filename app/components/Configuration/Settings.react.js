@@ -47,8 +47,11 @@ export default class Settings extends Component {
 
         if (nextProps.ipc.hasIn(['error', 'message'])) {
             status = 'ERROR';
-        } else if (nextProps.ipc.has('databases')) {
+        } else if (nextProps.ipc.get('databases')) {
+            console.log('DATABASES' + nextProps.ipc.has('databases'));
             status = 'SUCCESS';
+        } else if (!nextProps.ipc.get('databases')) {
+            status = 'DISCONNECTED';
         }
         if (status) {
             this.setState({status});
