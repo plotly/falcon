@@ -85,7 +85,7 @@ app.on('ready', () => {
             .then( () => {
                 sequelizeManager.connection.query('SHOW TABLES')
                     .spread((rows, metadata) => {
-                        event.sender.send('channel', {databases: rows, metadata, error: '', tables: ''});
+                        event.sender.send('channel', {tables: rows, metadata, error: ''});
                         return null;
                     });
             })
