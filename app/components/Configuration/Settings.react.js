@@ -18,11 +18,11 @@ const ENGINES = {
 };
 
 const LOGOS = {
-    POSTGRES: 'https://www.joyent.com/content/02-public-cloud/02-benchmarks/03-postgresql/header.png?v=1433286515',
+    POSTGRES: './images/postgresqlLogo.png',
     MYSQL: './images/mysqlLogo.png',
-    MARIADB: 'https://mariadb.org/wp-content/uploads/2015/10/mariadb-usa-inc.png',
-    MSSQL: 'http://www.softwaresolutionsweb.com/images/sqlimage.png',
-    SQLITE: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/SQLite370.svg/1280px-SQLite370.svg.png'
+    MARIADB: './images/sqliteLogo.png',
+    MSSQL: './images/mssqlLogo.png',
+    SQLITE: './images/sqliteLogo.png'
 };
 
 const DATABASES = [
@@ -48,7 +48,6 @@ export default class Settings extends Component {
         if (nextProps.ipc.hasIn(['error', 'message'])) {
             status = 'ERROR';
         } else if (nextProps.ipc.get('databases')) {
-            console.log('DATABASES' + nextProps.ipc.has('databases'));
             status = 'SUCCESS';
         } else if (!nextProps.ipc.get('databases')) {
             status = 'DISCONNECTED';
