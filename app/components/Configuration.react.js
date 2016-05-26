@@ -20,31 +20,7 @@ export default class Configuration extends Component {
     }
 
     render() {
-        /*
-        const onChangeQuery = query => {
-            this.setState({query});
-        };
 
-        const onClickConnect = () => {
-            this.props.ipcActions.connect(this.props.configuration);
-        };
-
-        const onClickDisconnect = () => {
-            this.props.ipcActions.disconnect();
-        };
-
-        const onClickQuery = () => {
-            this.props.ipcActions.query(this.state.query);
-        };
-
-        const onUpdateCredentials = key => e => {
-            this.props.configActions.setValue({key, value: e.target.value});
-        };
-
-        const onSubmitDatabase = e => {
-            this.props.ipcActions.useDatabase(this.props.configuration);
-        };
-        */
         let content;
         if (this.state.currentTab === tabs.SETTINGS) {
             content = <Settings
@@ -57,78 +33,13 @@ export default class Configuration extends Component {
             content = <Monitor/>;
         }
 
-        console.log('content: ', content);
-        console.warn('styles: ', styles);
         return (
             <div className={styles.container}>
                 {content}
             </div>
         );
+
         /*
-            <div>
-            <div className={{}}>
-
-            <h5>Step 1: Choose Database</h5>
-            <div className={styles.btnGroupEngines}>
-            <button className={styles.btn} onClick={onUpdateCredentials('engine')} value="mysql">
-            mysql
-            </button>
-            <button className={styles.btn} onClick={onUpdateCredentials('engine')} value="mariadb">
-            mariadb
-            </button>
-            <button className={styles.btn} onClick={onUpdateCredentials('engine')} value="sqlite">
-            sqlite
-            </button>
-            <button className={styles.btn} onClick={onUpdateCredentials('engine')} value="postgres">
-            postgres
-            </button>
-            <button className={styles.btn} onClick={onUpdateCredentials('engine')} value="mssql">
-            mssql
-            </button>
-            </div>
-
-            <h5>Step 2: Enter Credentials</h5>
-            <input
-            onChange={onUpdateCredentials('portNumber')}
-            placeholder="port number"
-            />
-            <input
-            onChange={onUpdateCredentials('username')}
-            placeholder="username"
-            />
-            <input
-            onChange={onUpdateCredentials('password')}
-            placeholder="password"
-            />
-            <div className={styles.btnGroupActions}>
-            <button className={styles.btn} onClick={onClickConnect}>
-            connect
-            </button>
-            <button className={styles.btn} onClick={onClickDisconnect}>
-            disconnect
-            </button>
-            </div>
-
-            <h5>Step 3: Choose Database</h5>
-            <pre>
-            {JSON.stringify(this.props.ipc.toJS().databases, null, 2)}
-            </pre>
-            <input
-            onChange={onUpdateCredentials('database')}
-            placeholder="database name"
-            />
-            <div className={styles.btnGroupActions}>
-            <button className={styles.btn} onClick={onSubmitDatabase}>
-            use this one
-            </button>
-            </div>
-
-            <h5>Step 4: Preview Tables here</h5>
-            available tables
-            <pre>
-            {JSON.stringify(this.props.ipc.toJS().tables, null, 2)}
-            </pre>
-
             <h5>Step 5: Enter Query</h5>
 
             <AceEditor
@@ -144,33 +55,8 @@ export default class Configuration extends Component {
             query
             </button>
             </div>
-
-            <h5>Step 6: Preview Response</h5>
-
-            <pre>
-            {JSON.stringify(this.props.configuration.toJS())}
-            </pre>
-
-            <pre>
-            {JSON.stringify(this.props.ipc.toJS().rows, null, 2)}
-            </pre>
-
-            <pre>
-            {JSON.stringify(this.props.ipc.toJS().log, null, 2)}
-            </pre>
-
-            <pre>
-            {JSON.stringify(this.props.ipc.toJS().metadata, null, 2)}
-            </pre>
-
-            <pre>
-            {JSON.stringify(this.props.ipc.toJS().error, null, 2)}
-            </pre>
-
-            </div>
-            </div>
-        );
         */
+        
     }
 }
 
