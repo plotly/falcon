@@ -20,7 +20,7 @@ const ENGINES = {
 const LOGOS = {
     POSTGRES: './images/postgresqlLogo.png',
     MYSQL: './images/mysqlLogo.png',
-    MARIADB: './images/sqliteLogo.png',
+    MARIADB: './images/mariadbLogo.png',
     MSSQL: './images/mssqlLogo.png',
     SQLITE: './images/sqliteLogo.png'
 };
