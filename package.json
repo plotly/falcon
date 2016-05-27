@@ -18,34 +18,36 @@
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
     "package-all": "npm run package -- --all",
     "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
-    "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\""
+    "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\"",
+    "install": "sh install.sh"
   },
   "bin": {
     "electron": "./node_modules/.bin/electron"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chentsulin/electron-react-boilerplate.git"
+    "url": "git+https://github.com/plotly/electron-sql-connector"
   },
   "author": {
-    "name": "C. T. Lin",
-    "email": "chentsulin@gmail.com",
-    "url": "https://github.com/chentsulin"
+    "name": "Plotly",
+    "email": "",
+    "url": ""
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chentsulin/electron-react-boilerplate/issues"
+    "url": ""
   },
   "keywords": [
     "electron",
-    "boilerplate",
     "react",
     "react-router",
     "flux",
     "webpack",
-    "react-hot"
+    "react-hot",
+    "sql",
+    "connector"
   ],
-  "homepage": "https://github.com/chentsulin/electron-react-boilerplate#readme",
+  "homepage": "",
   "devDependencies": {
     "asar": "^0.11.0",
     "babel-core": "^6.7.6",
@@ -67,7 +69,7 @@
     "css-loader": "^0.23.1",
     "del": "^2.2.0",
     "electron-packager": "^6.0.2",
-    "electron-prebuilt": "^0.37.6",
+    "electron-prebuilt": "1.2.0",
     "electron-rebuild": "^1.1.3",
     "eslint": "^2.10.1",
     "eslint-config-airbnb": "^7.0.0",
@@ -99,10 +101,12 @@
     "classnames": "^2.2.5",
     "css-modules-require-hook": "^4.0.0",
     "electron-debug": "^0.6.0",
+    "electron-prebuilt": "1.2.0",
     "eslint-plugin-import": "^1.8.0",
     "font-awesome": "^4.6.1",
     "immutable": "^3.8.1",
     "mysql": "^2.10.2",
+    "node-gyp": "^3.3.1",
     "node-restify": "^0.2.1",
     "pg": "^4.5.5",
     "pg-hstore": "^2.3.2",
