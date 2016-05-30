@@ -7,7 +7,8 @@ const INITIAL_STATE = Immutable.Map({
     password: null,
     database: null,
     engine: null,
-    port: null
+    port: null,
+    databasePath: null
 });
 
 export default function configuration(state = INITIAL_STATE, action) {

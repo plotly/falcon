@@ -69,7 +69,7 @@ export default class Settings extends Component {
                 )}
                 onClick={() => {
                     this.setState({selectedDB: DB});
-                    configActions.setValue({
+                    setValue({
                         key: 'engine',
                         value: DB.toLowerCase()
                     });
@@ -82,15 +82,27 @@ export default class Settings extends Component {
             </div>
         ));
 
-        const inputs = DB_CREDENTIALS.map(credential => (
-            <input
-                placeholder={credential}
-                type={credential === 'password' ? 'password' : 'text'}
-                onChange={e => (
-                    setValue({key: credential, value: e.target.value})
-                )}
-            />
-        ));
+        let inputs;
+        if (this.state.selectedDB === ENGINES.SQLITE) {
+            inputs =
+                <input
+                    placeholder="path to database"
+                    type="text"
+                    onChange={e => (
+                        setValue({key: 'databasePath', value: e.target.value})
+                    )}
+                />;
+        } else {
+            inputs = DB_CREDENTIALS.map(credential => (
+                <input
+                    placeholder={credential}
+                    type={credential === 'password' ? 'password' : 'text'}
+                    onChange={e => (
+                        setValue({key: credential, value: e.target.value})
+                    )}
+                />
+            ));
+        }
 
         const ipcDatabases = ipc.toJS().databases;
         let databases;

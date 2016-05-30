@@ -5,12 +5,14 @@ export default class SequelizeManager {
         this.connectionState = 'none: credentials were not sent';
     }
 
-    login({username, password, database, portNumber, engine}) {
+    login({username, password, database, portNumber, engine, databasePath}) {
         // create new sequelize object
         this.connection = new Sequelize(database, username, password, {
             dialect: engine,
-            port: portNumber
+            port: portNumber,
+            storage: databasePath
         });
+        console.log(this.connection.config);
         // returns a promise of database msg
         return this.connection.authenticate();
     }
@@ -41,7 +43,9 @@ export default class SequelizeManager {
                     error: null,
                     metadata,
                     tables: rows});
+                console.log(rows);
             });
+
     }
 
     sendQuery(event, query) {
