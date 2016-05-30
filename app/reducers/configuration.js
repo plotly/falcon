@@ -7,7 +7,7 @@ const INITIAL_STATE = Immutable.Map({
     password: null,
     database: null,
     engine: null,
-    port: null,
+    portNumber: null,
     databasePath: null
 });
 

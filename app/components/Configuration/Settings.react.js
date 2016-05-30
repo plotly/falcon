@@ -6,7 +6,7 @@ import Select from 'react-select';
 const DB_CREDENTIALS = [
     'username',
     'password',
-    'port'
+    'portNumber'
 ];
 
 const ENGINES = {
