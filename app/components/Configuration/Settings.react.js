@@ -77,11 +77,11 @@ export default class Settings extends Component {
         const logos = Object.keys(ENGINES).map(DB => (
             <div className={classnames(
                     styles.logo, {
-                        [styles.logoSelected]: this.state.selectedDB === DB
+                        [styles.logoSelected]: this.state.selectedDB === ENGINES[DB]
                     }
                 )}
                 onClick={() => {
-                    this.setState({selectedDB: DB});
+                    this.setState({selectedDB: ENGINES[DB]});
                     setValue({
                         key: 'engine',
                         value: ENGINES[DB]
