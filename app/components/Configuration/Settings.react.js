@@ -76,7 +76,7 @@ export default class Settings extends Component {
                     this.setState({selectedDB: DB});
                     setValue({
                         key: 'engine',
-                        value: DB
+                        value: ENGINES[DB]
                     });
                 }}
             >
@@ -112,7 +112,6 @@ export default class Settings extends Component {
         const ipcDatabases = ipc.toJS().databases;
         let databases;
         if (ipcDatabases) {
-            // databases = [{ value: 'Some', label: 'Some Found' }];
             databases = ipcDatabases.map(database => (
                 { value: database.Database, label: database.Database }
             ));
@@ -159,8 +158,6 @@ export default class Settings extends Component {
             setValue({key: 'database', value: database.value});
             ipcActions.useDatabase();
         }
-
-        console.warn('this.state: ', this.state);
 
         return (
             <div style={{width: '100%'}}>
@@ -222,8 +219,3 @@ export default class Settings extends Component {
         );
     }
 }
-
-Component.propTypes = {
-    queries: PropTypes.Array,
-    responses: PropTypes.Array
-};
