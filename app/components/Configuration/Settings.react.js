@@ -46,13 +46,9 @@ export default class Settings extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedDB: ENGINES.MYSQL,
+            selectedDB: null,
             status: APP_STATUS.INITIALIZED
         };
-        props.configActions.setValue({
-            key: 'engine',
-            value: ENGINES.MYSQL
-        });
     }
 
     componentWillReceiveProps(nextProps) {
@@ -73,6 +69,14 @@ export default class Settings extends Component {
     render() {
         const {ipcActions, configActions, configuration, ipc} = this.props;
         const {setValue} = configActions;
+
+        let messageChooseEngine;
+        if (this.state.selectedDB === null) {
+            messageChooseEngine =
+            <h5>Please select a database engine</h5>;
+        } else {
+            messageChooseEngine = <h5></h5>;
+        }
 
         const logos = Object.keys(ENGINES).map(DB => (
             <div className={classnames(
@@ -173,6 +177,7 @@ export default class Settings extends Component {
 
                 <div>
                     <div>
+                        {messageChooseEngine}
                         {logos}
                     </div>
                 </div>
