@@ -5,7 +5,7 @@ import styles from './Configuration.css';
 import Settings from './Configuration/Settings.react';
 import Monitor from './Configuration/Monitor.react';
 
-const tabs = {
+const TABS = {
     SETTINGS: 'SETTINGS',
     MONITOR: 'MONITOR'
 };
@@ -15,14 +15,14 @@ export default class Configuration extends Component {
         super(props);
         this.state = {
             query: '',
-            currentTab: tabs.SETTINGS
+            currentTab: TABS.SETTINGS
         };
     }
 
     render() {
 
         let content;
-        if (this.state.currentTab === tabs.SETTINGS) {
+        if (this.state.currentTab === TABS.SETTINGS) {
             content = <Settings
                 configuration={this.props.configuration}
                 configActions={this.props.configActions}
@@ -56,7 +56,7 @@ export default class Configuration extends Component {
             </button>
             </div>
         */
-        
+
     }
 }
 

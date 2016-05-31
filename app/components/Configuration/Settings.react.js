@@ -10,11 +10,11 @@ const DB_CREDENTIALS = [
 ];
 
 const ENGINES = {
-    MYSQL: 'MYSQL',
-    SQLITE: 'SQLITE',
-    POSTGRES: 'POSTGRES',
-    MARIADB: 'MARIADB',
-    MSSQL: 'MSSQL'
+    MYSQL: 'mysql',
+    SQLITE: 'sqlite',
+    POSTGRES: 'postgres',
+    MARIADB: 'mariadb',
+    MSSQL: 'mssql'
 };
 
 const LOGOS = {
@@ -25,20 +25,25 @@ const LOGOS = {
     SQLITE: './images/sqliteLogo.png'
 };
 
-const DATABASES = [
-    'none found'
-];
+const APP_STATUS = {
+    INITIALIZED: 'INITIALIZED',
+    ERROR: 'ERROR',
+    CONNECTED: 'CONNECTED',
+    CONNECTING: 'CONNECTING',
+    DISCONNECTED: 'DISCONNECTED'
+};
+
 
 export default class Settings extends Component {
     constructor(props) {
         super(props);
         this.state = {
             selectedDB: ENGINES.MYSQL,
-            status: 'INITIALIZED'
+            status: APP_STATUS.INITIALIZED
         };
         props.configActions.setValue({
             key: 'engine',
-            value: ENGINES.MYSQL.toLowerCase()
+            value: ENGINES.MYSQL
         });
     }
 
@@ -46,11 +51,11 @@ export default class Settings extends Component {
         let status;
 
         if (nextProps.ipc.hasIn(['error', 'message'])) {
-            status = 'ERROR';
+            status = APP_STATUS.ERROR;
         } else if (nextProps.ipc.get('databases')) {
-            status = 'SUCCESS';
+            status = APP_STATUS.CONNECTED;
         } else if (!nextProps.ipc.get('databases')) {
-            status = 'DISCONNECTED';
+            status = APP_STATUS.DISCONNECTED;
         }
         if (status) {
             this.setState({status});
@@ -71,7 +76,7 @@ export default class Settings extends Component {
                     this.setState({selectedDB: DB});
                     setValue({
                         key: 'engine',
-                        value: DB.toLowerCase()
+                        value: DB
                     });
                 }}
             >
@@ -118,7 +123,7 @@ export default class Settings extends Component {
         let successMessage = null;
         let errorMessage = null;
         let buttonMessage = 'Connect';
-        if (this.state.status === 'ERROR') {
+        if (this.state.status === APP_STATUS.ERROR) {
             errorMessage = (
                 <pre>
                     {
@@ -127,16 +132,17 @@ export default class Settings extends Component {
                     }
                 </pre>
             );
-        } else if (this.state.status === 'SUCCESS') {
+            buttonMessage = 'Connect';
+        } else if (this.state.status === APP_STATUS.CONNECTED) {
             successMessage = (
                 <pre>
                     {ipc.toJS().log}
                 </pre>
             );
             buttonMessage = 'Connected';
-        } else if (this.state.status === 'LOADING') {
-            buttonMessage = 'Connecting';
-        } else if (this.state.status === 'DISCONNECTED') {
+        } else if (this.state.status === APP_STATUS.LOADING) {
+            buttonMessage = 'Connecting...';
+        } else if (this.state.status === APP_STATUS.DISCONNECTED) {
             successMessage = (
                 <pre>
                     {ipc.toJS().log}
@@ -173,7 +179,7 @@ export default class Settings extends Component {
                 <div className={styles.footer}>
                     <a className={styles.buttonPrimary}
                        onClick={() => {
-                           this.setState({status: 'LOADING'});
+                           this.setState({status: APP_STATUS.CONNECTING});
                            ipcActions.connect(configuration);
                        }}
                     >
