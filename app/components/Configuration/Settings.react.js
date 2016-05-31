@@ -121,14 +121,16 @@ export default class Settings extends Component {
             ));
         }
 
-        const ipcDatabases = ipc.toJS().databases;
-        let databases;
+        const ipcDatabases = ipc.get('databases');
+        let databaseDropdownOptions;
         if (ipcDatabases) {
-            databases = ipcDatabases.map(database => (
+            databaseDropdownOptions = ipcDatabases.toJS().map(database => (
                 { value: database.Database, label: database.Database }
             ));
         } else {
-            databases = [{ value: 'None', label: 'None Found' }];
+            databaseDropdownOptions = [
+                {value: 'None', label: 'None Found', disabled: true }
+            ];
         }
 
         let successMessage = null;
@@ -206,7 +208,7 @@ export default class Settings extends Component {
                     <Select
                         name="form-field-name"
                         placeholder="Select Your Database"
-                        options={databases}
+                        options={databaseDropdownOptions}
                         onChange={onSelectDatabase}
                     />
                 </div>
