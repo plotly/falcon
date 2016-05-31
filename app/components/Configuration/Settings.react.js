@@ -33,6 +33,14 @@ const APP_STATUS = {
     DISCONNECTED: 'DISCONNECTED'
 };
 
+const BUTTON_MESSAGE = {
+    INITIALIZED: 'connect',
+    ERROR: 'try again',
+    CONNECTED: 'connected',
+    CONNECTING: 'connecting...',
+    DISCONNECTED: 'connect'
+};
+
 
 export default class Settings extends Component {
     constructor(props) {
@@ -121,7 +129,7 @@ export default class Settings extends Component {
 
         let successMessage = null;
         let errorMessage = null;
-        let buttonMessage = 'Connect';
+        let buttonMessage = BUTTON_MESSAGE[this.state.status];
         if (this.state.status === APP_STATUS.ERROR) {
             errorMessage = (
                 <pre>
@@ -131,23 +139,23 @@ export default class Settings extends Component {
                     }
                 </pre>
             );
-            buttonMessage = 'Connect';
+            buttonMessage = BUTTON_MESSAGE[this.state.status];
         } else if (this.state.status === APP_STATUS.CONNECTED) {
             successMessage = (
                 <pre>
                     {ipc.toJS().log}
                 </pre>
             );
-            buttonMessage = 'Connected';
+            buttonMessage = BUTTON_MESSAGE[this.state.status];
         } else if (this.state.status === APP_STATUS.LOADING) {
-            buttonMessage = 'Connecting...';
+            buttonMessage = BUTTON_MESSAGE[this.state.status];
         } else if (this.state.status === APP_STATUS.DISCONNECTED) {
             successMessage = (
                 <pre>
                     {ipc.toJS().log}
                 </pre>
             );
-            buttonMessage = 'Connect';
+            buttonMessage = BUTTON_MESSAGE[this.state.status];
         }
 
         const onClickDisconnect = () => {
