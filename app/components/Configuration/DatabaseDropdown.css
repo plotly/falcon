@@ -1,0 +1,8 @@
+.dropdown {
+    text-transform: uppercase;
+    cursor: pointer;
+    width: 200px;
+    padding: 15px;
+    margin-left: auto;
+    margin-right: auto;
+}
