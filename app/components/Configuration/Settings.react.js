@@ -30,7 +30,7 @@ export default class Settings extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedDB: null
+            selectedEngine: null
         };
     }
 
@@ -39,36 +39,36 @@ export default class Settings extends Component {
         const {setValue} = configActions;
 
         let messageChooseEngine;
-        if (this.state.selectedDB === null) {
+        if (this.state.selectedEngine === null) {
             messageChooseEngine =
             <h5>Please select a database engine</h5>;
         } else {
             messageChooseEngine = <h5></h5>;
         }
 
-        const logos = Object.keys(ENGINES).map(DB => (
+        const logos = Object.keys(ENGINES).map(ENGINE => (
             <div className={classnames(
                     styles.logo, {
-                        [styles.logoSelected]: this.state.selectedDB === ENGINES[DB]
+                        [styles.logoSelected]: this.state.selectedEngine === ENGINES[ENGINE]
                     }
                 )}
                 onClick={() => {
-                    this.setState({selectedDB: ENGINES[DB]});
+                    this.setState({selectedEngine: ENGINES[ENGINE]});
                     setValue({
                         key: 'engine',
-                        value: ENGINES[DB]
+                        value: ENGINES[ENGINE]
                     });
                 }}
             >
                 <img
                     className={styles.logoImage}
-                    src={LOGOS[DB]}
+                    src={LOGOS[ENGINE]}
                 />
             </div>
         ));
 
         let inputs;
-        if (this.state.selectedDB === ENGINES.SQLITE) {
+        if (this.state.selectedEngine === ENGINES.SQLITE) {
             inputs =
                 <input
                     placeholder="path to database"
