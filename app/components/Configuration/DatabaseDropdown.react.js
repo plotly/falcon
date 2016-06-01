@@ -8,22 +8,22 @@ export default class DatabaseDropdown extends Component {
     }
 
 	render() {
-        const {ipc, ipcActions, setValue} = this.props;
+        const {ipc, ipcActions, merge} = this.props;
 
         const ipcDatabases = ipc.get('databases');
         let databaseDropdownOptions;
         if (ipcDatabases) {
             databaseDropdownOptions = ipcDatabases.toJS().map(database => (
-                { value: database.Database, label: database.Database }
+                {value: database.Database, label: database.Database}
             ));
         } else {
             databaseDropdownOptions = [
-                {value: 'None', label: 'None Found', disabled: true }
+                {value: 'None', label: 'None Found', disabled: true}
             ];
         }
 
         function onSelectDatabase(database) {
-            setValue({key: 'database', value: database.value});
+            merge({database: database.value});
             ipcActions.useDatabase();
         }
 

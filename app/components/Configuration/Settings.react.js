@@ -36,7 +36,7 @@ export default class Settings extends Component {
 
     render() {
         const {configuration, configActions, ipc, ipcActions} = this.props;
-        const {setValue} = configActions;
+        const {merge} = configActions;
 
         let messageChooseEngine;
         if (this.state.selectedEngine === null) {
@@ -49,15 +49,13 @@ export default class Settings extends Component {
         const logos = Object.keys(ENGINES).map(ENGINE => (
             <div className={classnames(
                     styles.logo, {
-                        [styles.logoSelected]: this.state.selectedEngine === ENGINES[ENGINE]
+                        [styles.logoSelected]:
+                            this.state.selectedEngine === ENGINES[ENGINE]
                     }
                 )}
                 onClick={() => {
                     this.setState({selectedEngine: ENGINES[ENGINE]});
-                    setValue({
-                        key: 'engine',
-                        value: ENGINES[ENGINE]
-                    });
+                    merge({engine: ENGINES[ENGINE]});
                 }}
             >
                 <img
@@ -74,7 +72,7 @@ export default class Settings extends Component {
                     placeholder="path to database"
                     type="text"
                     onChange={e => (
-                        setValue({key: 'databasePath', value: e.target.value})
+                        merge({databasePath: e.target.value})
                     )}
                 />;
         } else {
@@ -83,7 +81,7 @@ export default class Settings extends Component {
                     placeholder={credential}
                     type={credential === 'password' ? 'password' : 'text'}
                     onChange={e => (
-                        setValue({key: credential, value: e.target.value})
+                        merge({[credential]: e.target.value})
                     )}
                 />
             ));
@@ -112,7 +110,7 @@ export default class Settings extends Component {
 
                 <DatabaseDropdown
                     configuration={configuration}
-                    setValue={setValue}
+                    merge={merge}
                     ipcActions={ipcActions}
                     ipc={ipc}
                 />
