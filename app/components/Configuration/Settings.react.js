@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import DatabaseDropdown from './DatabaseDropdown.react';
 import ConnectButton from './ConnectButton.react';
 
-const DB_CREDENTIALS = [
+const USER_CREDENTIALS = [
     'username',
     'password',
     'portNumber'
@@ -76,10 +76,14 @@ export default class Settings extends Component {
                     )}
                 />;
         } else {
-            inputs = DB_CREDENTIALS.map(credential => (
+            inputs = USER_CREDENTIALS.map(credential => (
                 <input
-                    placeholder={credential}
-                    type={credential === 'password' ? 'password' : 'text'}
+                    placeholder={
+                        credential === 'portNumber' ? 'local port' : credential
+                    }
+                    type={
+                        credential === 'password' ? 'password' : 'text'
+                    }
                     onChange={e => (
                         merge({[credential]: e.target.value})
                     )}
@@ -116,7 +120,7 @@ export default class Settings extends Component {
                 />
 
                 <hr/>
-                log
+                config
                 <pre>
                     {JSON.stringify(this.props.configuration.toJS())}
                 </pre>
