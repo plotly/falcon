@@ -85,7 +85,7 @@ export default class ConnectButton extends Component {
 					onClick={() => {
 						this.setState({status: APP_STATUS.CONNECTING});
 						ipcActions.connect(configuration);
-				   }}
+					}}
 				>
 					{buttonMessage}
 				</a>

@@ -12,8 +12,7 @@ export default class SequelizeManager {
             port: portNumber,
             storage: databasePath
         });
-        console.log(this.connection.config);
-        // returns a promise of database msg
+        // returns a message promise from the database
         return this.connection.authenticate();
     }
 
@@ -25,43 +24,52 @@ export default class SequelizeManager {
         event.sender.send('channel', { error });
     }
 
+    // built-in query to show available databases/schemes
     showDatabases(event) {
+        // TODO: make the built in queries vary depending on dialect
+        // TODO: define built-in queries strings at the top
         return this.connection.query('SHOW DATABASES')
-            .spread((rows, metadata) => {
+            .spread((results, metadata) => {
                 event.sender.send('channel', {
-                    databases: rows,
+                    databases: results,
                     error: null,
                     metadata,
+                    /*
+                        if user wants to see all databases/schemes, clear
+                        tables from previously selected database/schemes
+                    */
                     tables: null});
             });
     }
 
+    // built-in query to show available tables in a database/scheme
     showTables(event) {
+        // TODO: make the built in queries vary depending on dialect
+        // TODO: define built-in queries strings at the top
         return this.connection.query('SHOW TABLES')
-            .spread((rows, metadata) => {
+            .spread((results, metadata) => {
                 event.sender.send('channel', {
                     error: null,
                     metadata,
-                    tables: rows});
-                console.log(rows);
+                    tables: results});
             });
 
     }
 
     sendQuery(event, query) {
         return this.connection.query(query)
-            .spread((rows, metadata) => {
+            .spread((results, metadata) => {
                 event.sender.send('channel', {
-                    error: '',
+                    error: null,
                     metadata,
-                    rows
+                    rows: results
                 });
             });
     }
 
     disconnect(event) {
         /*
-            does not return a promise for now but issue is open
+            does not return a promise for now. open issue here:
             https://github.com/sequelize/sequelize/pull/5776
         */
         this.connection.close();
@@ -70,6 +78,7 @@ export default class SequelizeManager {
             error: null,
             metadata: null,
             rows: null,
-            tables: null});
+            tables: null
+        });
     }
 }

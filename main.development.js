@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, crashReporter, shell } from 'electron';
+import { app, BrowserWindow, Menu, shell } from 'electron';
 import restify from 'restify';
 import parse from './parse';
 import SequelizeManager from './sequelizeManager';
@@ -9,13 +9,6 @@ const ipcMain = require('electron').ipcMain;
 let menu;
 let template;
 let mainWindow = null;
-
-crashReporter.start({
-  productName: 'YourName',
-  companyName: 'YourCompany',
-  submitURL: 'https://your-domain.com/url-to-submit',
-  autoSubmit: true
-});
 
 if (process.env.NODE_ENV === 'development') {
     require('electron-debug')();
