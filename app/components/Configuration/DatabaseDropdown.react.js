@@ -17,7 +17,7 @@ export default class DatabaseDropdown extends Component {
     }
 
 	render() {
-        const {ipc, ipcActions, merge} = this.props;
+        const {configuration, ipc, ipcActions, merge} = this.props;
 
         const ipcDatabases = ipc.get('databases');
         let databaseDropdownOptions;
@@ -36,13 +36,17 @@ export default class DatabaseDropdown extends Component {
             ipcActions.useDatabase();
         }
 
+
         return (
             <div className={styles.dropdown}>
                 <Select
                     name="form-field-name"
                     placeholder="Select Your Database"
                     options={databaseDropdownOptions}
-                    onChange={onSelectDatabase}
+                    onValueClick={onSelectDatabase}
+                    value={configuration.get('database')}
+                    resetValue="null"
+                    matchPos="start"
                 />
             </div>
         );
