@@ -2,6 +2,15 @@ import React, {Component, PropTypes} from 'react';
 import styles from './DatabaseDropdown.css';
 import Select from 'react-select';
 
+/*
+    Displays in a dropdown menu all available databases/schemes
+    using `ipc`.
+    Permits to alter the `configuration` database parameter once
+    user selects an option.
+    Sends a preset query to show all tables within a database/
+    scheme that was chosen in the dropdown using `ipcActions`.
+*/
+
 export default class DatabaseDropdown extends Component {
     constructor(props) {
         super(props);

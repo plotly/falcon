@@ -1,0 +1,16 @@
+.logo {
+    display: inline-block;
+    padding: 20px;
+    width: 120px;
+}
+
+.logoImage {
+    width: 100%;
+}
+
+.logo:hover, .logoSelected {
+    cursor: pointer;
+    border-bottom-width: 1px;
+    border-bottom-color: #45A9FF;
+    border-bottom-style: solid;
+}

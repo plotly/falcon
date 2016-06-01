@@ -2,6 +2,14 @@ import React, {Component, PropTypes} from 'react';
 import styles from './ConnectButton.css';
 import Select from 'react-select';
 
+/*
+	Displays a connect button and a disconnect button.
+	Asks sequelize to create a new connection using credentials.
+	Fires preset queries to show available databases/schemes
+	inside the users' account using `ipcActions`.
+	Displays errors and log messages using `ipc`.
+*/
+
 const APP_STATUS = {
     INITIALIZED: 'INITIALIZED',
     ERROR: 'ERROR',

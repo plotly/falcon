@@ -3,108 +3,45 @@ import styles from './Settings.css';
 import classnames from 'classnames';
 import DatabaseDropdown from './DatabaseDropdown.react';
 import ConnectButton from './ConnectButton.react';
-
-const USER_CREDENTIALS = [
-    'username',
-    'password',
-    'portNumber'
-];
-
-const ENGINES = {
-    MYSQL: 'mysql',
-    SQLITE: 'sqlite',
-    POSTGRES: 'postgres',
-    MARIADB: 'mariadb',
-    MSSQL: 'mssql'
-};
-
-const LOGOS = {
-    POSTGRES: './images/postgresqlLogo.png',
-    MYSQL: './images/mysqlLogo.png',
-    MARIADB: './images/mariadbLogo.png',
-    MSSQL: './images/mssqlLogo.png',
-    SQLITE: './images/sqliteLogo.png'
-};
+import UserCredentials from './UserCredentials.react';
+import Logos from './Logos.react';
 
 export default class Settings extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            selectedEngine: null
-        };
     }
 
     render() {
         const {configuration, configActions, ipc, ipcActions} = this.props;
         const {merge} = configActions;
 
+        /*
+            Dissapears once an engine is chosen.
+            TODO: more instruction steps to be added here that are
+            toggled off once met.
+        */
         let messageChooseEngine;
-        if (this.state.selectedEngine === null) {
+        if (configuration.get('engine') === null) {
             messageChooseEngine =
             <h5>Please select a database engine</h5>;
         } else {
             messageChooseEngine = <h5></h5>;
         }
 
-        const logos = Object.keys(ENGINES).map(ENGINE => (
-            <div className={classnames(
-                    styles.logo, {
-                        [styles.logoSelected]:
-                            this.state.selectedEngine === ENGINES[ENGINE]
-                    }
-                )}
-                onClick={() => {
-                    this.setState({selectedEngine: ENGINES[ENGINE]});
-                    merge({engine: ENGINES[ENGINE]});
-                }}
-            >
-                <img
-                    className={styles.logoImage}
-                    src={LOGOS[ENGINE]}
-                />
-            </div>
-        ));
-
-        let inputs;
-        if (this.state.selectedEngine === ENGINES.SQLITE) {
-            inputs =
-                <input
-                    placeholder="path to database"
-                    type="text"
-                    onChange={e => (
-                        merge({databasePath: e.target.value})
-                    )}
-                />;
-        } else {
-            inputs = USER_CREDENTIALS.map(credential => (
-                <input
-                    placeholder={
-                        credential === 'portNumber' ? 'local port' : credential
-                    }
-                    type={
-                        credential === 'password' ? 'password' : 'text'
-                    }
-                    onChange={e => (
-                        merge({[credential]: e.target.value})
-                    )}
-                />
-            ));
-        }
-
         return (
             <div style={{width: '100%'}}>
                 <h2>Configuration</h2>
-
                 <div>
-                    <div>
-                        {messageChooseEngine}
-                        {logos}
-                    </div>
-                </div>
+                    {messageChooseEngine}
 
-                <div className={styles.inputContainer}>
-                    {inputs}
+                    <Logos
+                        merge={merge}
+                    />
                 </div>
+                <UserCredentials
+                    configuration={configuration}
+                    merge={merge}
+                />
 
                 <ConnectButton
                     configuration={configuration}
