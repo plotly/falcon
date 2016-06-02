@@ -52,6 +52,9 @@ export default class SequelizeManager {
             .spread((results, metadata) => {
                 respondEvent.send('channel', {
                     error: null,
+                    tables: results,
+                    metadata
+                });
             });
     }
 
@@ -60,6 +63,8 @@ export default class SequelizeManager {
             .spread((results, metadata) => {
                 respondEvent.send('channel', {
                     error: null,
+                    rows: results,
+                    metadata
                 });
             });
     }
@@ -72,6 +77,8 @@ export default class SequelizeManager {
                 // send updated rows to the app
                 mainWindowContents.send('channel', {
                     error: null,
+                    rows: results,
+                    metadata
                 });
             });
     }
