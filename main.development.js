@@ -49,7 +49,6 @@ app.on('ready', () => {
     });
 
     mainWindow.webContents.on('did-finish-load', () => {
-        ipcMain.on('channel', ipcMessageHandler());
 
         // TODO: clean up the server logic
         server.get('/query', (req, res) => {
@@ -65,6 +64,7 @@ app.on('ready', () => {
                 res.send({error});
             });
         });
+        ipcMain.on('channel', ipcMessageHandler(sequelizeManager));
     });
 
     if (process.env.NODE_ENV === 'development') {

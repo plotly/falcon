@@ -1,8 +1,5 @@
-import SequelizeManager from './sequelizeManager';
 import {IPC_TASKS} from './ipcTasks';
-const sequelizeManager = new SequelizeManager();
 
-export function ipcMessageHandler() {
 	return ((event, payload) => {
 		const {task, message} = payload;
 		switch (task) {
@@ -24,7 +21,6 @@ export function ipcMessageHandler() {
 				break;
 			}
 			case IPC_TASKS.SELECT_DATABASE: {
-				console.log('ipctask executing....');
 				sequelizeManager.login(message)
 				.then(sequelizeManager.updateLog(event, 'database accessed'))
 				.then(sequelizeManager.showTables(event))
