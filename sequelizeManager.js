@@ -52,7 +52,7 @@ export default class SequelizeManager {
                 respondEvent.send('channel', {
                     error: null,
                     metadata,
-                    tables: results});
+                    rows: results});
             });
     }
 
