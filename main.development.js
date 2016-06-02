@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, shell } from 'electron';
+import {app, BrowserWindow, Menu, shell} from 'electron';
 import restify from 'restify';
 import parse from './parse';
 import SequelizeManager from './sequelizeManager';
@@ -81,15 +81,15 @@ app.on('ready', () => {
 
         server.get('/query', (req, res) => {
             const statement = req.query.statement;
-            mainWindow.webContents.send('channel', { log: statement });
+            mainWindow.webContents.send('channel', {log: statement});
             sequelizeManager.connection.query(statement).spread((rows, metadata) => {
                 // Send back to app
-                mainWindow.webContents.send('channel', { rows, metadata, error: '' });
+                mainWindow.webContents.send('channel', {rows, metadata, error: ''});
                 // Send back to plotly 2.0
                 res.send(parse(rows));
             }).catch(error => {
-                event.sender.send('channel', { error });
-                res.send({ error });
+                event.sender.send('channel', {error});
+                res.send({error});
             });
         });
     });
