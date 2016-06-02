@@ -1,4 +1,5 @@
 import Sequelize from 'sequelize';
+import parse from './parse';
 
 export default class SequelizeManager {
     constructor() {
@@ -62,6 +63,20 @@ export default class SequelizeManager {
                     error: null,
                     metadata,
                     rows: results
+                });
+            });
+    }
+
+    receiveServerQuery(respondEvent, mainWindowContents, query) {
+        return this.connection.query(query)
+            .spread((results, metadata) => {
+                // send back to the server event
+                respondEvent.send(parse(results));
+                // send updated rows to the app
+                mainWindowContents.send('channel', {
+                    error: null,
+                    metadata,
+                    tables: results
                 });
             });
     }

@@ -1,8 +1,8 @@
 import {app, BrowserWindow, Menu, shell} from 'electron';
 import restify from 'restify';
-import parse from './parse';
 import SequelizeManager from './sequelizeManager';
 import {ipcMessageHandler} from './ipcMessageHandler';
+import {serverMessageHandler} from './serverMessageHandler';
 
 const sequelizeManager = new SequelizeManager();
 const ipcMain = require('electron').ipcMain;
@@ -49,22 +49,8 @@ app.on('ready', () => {
     });
 
     mainWindow.webContents.on('did-finish-load', () => {
-
-        // TODO: clean up the server logic
-        server.get('/query', (req, res) => {
-            const statement = req.query.statement;
-            mainWindow.webContents.send('channel', {log: statement});
-            sequelizeManager.connection.query(statement).spread((rows, metadata) => {
-                // Send back to app
-                mainWindow.webContents.send('channel', {rows, metadata, error: ''});
-                // Send back to plotly 2.0
-                res.send(parse(rows));
-            }).catch(error => {
-                event.sender.send('channel', {error});
-                res.send({error});
-            });
-        });
         ipcMain.on('channel', ipcMessageHandler(sequelizeManager));
+        server.get('/query', serverMessageHandler(sequelizeManager, mainWindow.webContents));
     });
 
     if (process.env.NODE_ENV === 'development') {
