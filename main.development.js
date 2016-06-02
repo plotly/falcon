@@ -2,6 +2,7 @@ import {app, BrowserWindow, Menu, shell} from 'electron';
 import restify from 'restify';
 import parse from './parse';
 import SequelizeManager from './sequelizeManager';
+import {ipcMessageHandler} from './ipcMessageHandler';
 
 const sequelizeManager = new SequelizeManager();
 const ipcMain = require('electron').ipcMain;
@@ -48,36 +49,7 @@ app.on('ready', () => {
     });
 
     mainWindow.webContents.on('did-finish-load', () => {
-        ipcMain.on('connect', (event, payload) => {
-            sequelizeManager.login(payload)
-            .then(sequelizeManager.updateLog(event, 'you are connected'))
-            .then(sequelizeManager.showDatabases(event))
-            .catch( error => {
-                sequelizeManager.raiseError(event, error);
-            });
-        });
-
-        ipcMain.on('receive', (event, payload) => {
-            const query = payload.statement;
-            sequelizeManager.sendQuery(event, query)
-            .catch( error => {
-                sequelizeManager.raiseError(event, error);
-            });
-        });
-
-        ipcMain.on('useDatabase', (event, payload) => {
-            sequelizeManager.login(payload)
-            .then(sequelizeManager.updateLog(event, 'database accessed'))
-            .then(sequelizeManager.showTables(event))
-            .catch( error => {
-                sequelizeManager.raiseError(event, error);
-            });
-        });
-
-        ipcMain.on('disconnect', (event) => {
-            sequelizeManager.disconnect(event);
-            sequelizeManager.updateLog(event, 'your are disconnected');
-        });
+        ipcMain.on('channel', ipcMessageHandler());
 
         server.get('/query', (req, res) => {
             const statement = req.query.statement;
