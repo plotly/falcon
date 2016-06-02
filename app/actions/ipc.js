@@ -1,4 +1,4 @@
-import { createAction } from 'redux-actions';
+import {createAction} from 'redux-actions';
 import Immutable from 'immutable';
 import {IPC_TASKS} from './../../ipcTasks';
 
@@ -33,11 +33,11 @@ export function disconnect () {
     };
 }
 
-function immutableToJS(thing) {
-    if (Immutable.Iterable.isIterable(thing)) {
-        return thing.toJS();
+function immutableToJS(immutableThing) {
+    if (Immutable.Iterable.isIterable(immutableThing)) {
+        return immutableThing.toJS();
     } else {
-        return thing;
+        return immutableThing;
     }
 }
 

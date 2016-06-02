@@ -51,6 +51,7 @@ app.on('ready', () => {
     mainWindow.webContents.on('did-finish-load', () => {
         ipcMain.on('channel', ipcMessageHandler());
 
+        // TODO: clean up the server logic
         server.get('/query', (req, res) => {
             const statement = req.query.statement;
             mainWindow.webContents.send('channel', {log: statement});
