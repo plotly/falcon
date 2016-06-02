@@ -16,21 +16,21 @@ export default class SequelizeManager {
         return this.connection.authenticate();
     }
 
-    updateLog(event, logMessage) {
-        event.sender.send('channel', { log: logMessage });
+    updateLog(respondEvent, logMessage) {
+        respondEvent.send('channel', { log: logMessage });
     }
 
-    raiseError(event, error) {
-        event.sender.send('channel', { error });
+    raiseError(respondEvent, error) {
+        respondEvent.send('channel', { error });
     }
 
     // built-in query to show available databases/schemes
-    showDatabases(event) {
+    showDatabases(respondEvent) {
         // TODO: make the built in queries vary depending on dialect
         // TODO: define built-in queries strings at the top
         return this.connection.query('SHOW DATABASES')
             .spread((results, metadata) => {
-                event.sender.send('channel', {
+                respondEvent.send('channel', {
                     databases: results,
                     error: null,
                     metadata,
@@ -43,23 +43,22 @@ export default class SequelizeManager {
     }
 
     // built-in query to show available tables in a database/scheme
-    showTables(event) {
+    showTables(respondEvent) {
         // TODO: make the built in queries vary depending on dialect
         // TODO: define built-in queries strings at the top
         return this.connection.query('SHOW TABLES')
             .spread((results, metadata) => {
-                event.sender.send('channel', {
+                respondEvent.send('channel', {
                     error: null,
                     metadata,
                     tables: results});
             });
-
     }
 
-    sendQuery(event, query) {
+    sendQuery(respondEvent, query) {
         return this.connection.query(query)
             .spread((results, metadata) => {
-                event.sender.send('channel', {
+                respondEvent.send('channel', {
                     error: null,
                     metadata,
                     rows: results
