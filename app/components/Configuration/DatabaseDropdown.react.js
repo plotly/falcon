@@ -33,9 +33,8 @@ export default class DatabaseDropdown extends Component {
 
         function onSelectDatabase(database) {
             merge({database: database.value});
-            ipcActions.useDatabase();
+            ipcActions.selectDatabase();
         }
-
 
         return (
             <div className={styles.dropdown}>
@@ -43,7 +42,7 @@ export default class DatabaseDropdown extends Component {
                     name="form-field-name"
                     placeholder="Select Your Database"
                     options={databaseDropdownOptions}
-                    onValueClick={onSelectDatabase}
+                    onChange={onSelectDatabase}
                     value={configuration.get('database')}
                     resetValue="null"
                     matchPos="start"
