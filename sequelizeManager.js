@@ -18,11 +18,11 @@ export default class SequelizeManager {
     }
 
     updateLog(respondEvent, logMessage) {
-        respondEvent.send('channel', { log: logMessage });
+        respondEvent.send('channel', {log: logMessage});
     }
 
     raiseError(respondEvent, error) {
-        respondEvent.send('channel', { error });
+        respondEvent.send('channel', {error});
     }
 
     // built-in query to show available databases/schemes
@@ -33,13 +33,14 @@ export default class SequelizeManager {
             .spread((results, metadata) => {
                 respondEvent.send('channel', {
                     databases: results,
-                    error: null,
                     metadata,
+                    error: null,
                     /*
                         if user wants to see all databases/schemes, clear
                         tables from previously selected database/schemes
                     */
-                    tables: null});
+                    tables: null
+                });
             });
     }
 
@@ -51,8 +52,6 @@ export default class SequelizeManager {
             .spread((results, metadata) => {
                 respondEvent.send('channel', {
                     error: null,
-                    metadata,
-                    rows: results});
             });
     }
 
@@ -61,8 +60,6 @@ export default class SequelizeManager {
             .spread((results, metadata) => {
                 respondEvent.send('channel', {
                     error: null,
-                    metadata,
-                    rows: results
                 });
             });
     }
@@ -75,8 +72,6 @@ export default class SequelizeManager {
                 // send updated rows to the app
                 mainWindowContents.send('channel', {
                     error: null,
-                    metadata,
-                    tables: results
                 });
             });
     }
