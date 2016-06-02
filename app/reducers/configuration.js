@@ -1,4 +1,4 @@
-import { SET_VALUE } from '../actions/configuration.js';
+import { MERGE } from '../actions/configuration.js';
 
 import Immutable from 'immutable';
 
@@ -7,14 +7,15 @@ const INITIAL_STATE = Immutable.Map({
     password: null,
     database: null,
     engine: null,
-    port: null
+    portNumber: null,
+    databasePath: null
 });
 
 export default function configuration(state = INITIAL_STATE, action) {
     switch (action.type) {
-        case SET_VALUE:
+        case MERGE:
             console.warn(`action: ${JSON.stringify(action)}`);
-            return state.set(action.payload.key, action.payload.value);
+            return state.merge(action.payload);
         default:
             return state;
     }

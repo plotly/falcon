@@ -17,7 +17,7 @@ git clone https://github.com/plotly/electron-sql-connector your-project-name
 And then install dependencies.
 
 ```bash
-$ cd your-project-name && npm install
+$ cd your-project-name && npm run install
 ```
 
 

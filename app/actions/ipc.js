@@ -1,5 +1,6 @@
-import { createAction } from 'redux-actions';
+import {createAction} from 'redux-actions';
 import Immutable from 'immutable';
+import {IPC_TASKS} from './../../ipcTasks';
 
 const ipcRenderer = require('electron').ipcRenderer;
 
@@ -9,20 +10,37 @@ export const updateState = createAction(UPDATE_STATE);
 
 export function query (statement) {
     return () => {
-        ipcRenderer.send('receive', {statement});
+        ipcSend(IPC_TASKS.SEND_QUERY, {statement});
     };
 }
 
 export function connect (credentials) {
     return () => {
-        ipcRenderer.send('connect', immutableToJS(credentials));
+        ipcSend(IPC_TASKS.CONNECT, immutableToJS(credentials));
     };
 }
 
-function immutableToJS(thing) {
-    if (Immutable.Iterable.isIterable(thing)) {
-        return thing.toJS();
+export function selectDatabase () {
+    return function (dispatch, getState) {
+        const state = getState();
+        ipcSend(IPC_TASKS.SELECT_DATABASE, state.configuration.toJS());
+    };
+}
+
+export function disconnect () {
+    return () => {
+        ipcSend(IPC_TASKS.DISCONNECT);
+    };
+}
+
+function immutableToJS(immutableThing) {
+    if (Immutable.Iterable.isIterable(immutableThing)) {
+        return immutableThing.toJS();
     } else {
-        return thing;
+        return immutableThing;
     }
+}
+
+function ipcSend(task, message = {}) {
+    ipcRenderer.send('channel', {task, message});
 }
