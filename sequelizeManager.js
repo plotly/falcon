@@ -46,10 +46,8 @@ export default class SequelizeManager {
     // built-in query to show available databases/schemes
     showDatabases(respondEvent) {
         const SHOW_DATABASES = this.getPresetQuery(SHOW_QUERY_SELECTOR.DATABASES);
-        console.log(SHOW_DATABASES);
         return this.connection.query(SHOW_DATABASES)
             .then(results => {
-                console.log(results[0]);
                 respondEvent.send('channel', {
                     databases: results[0], // TODO - why is this nested in an array? can it have multiple arrays of arrays?
                     error: null,
@@ -67,7 +65,6 @@ export default class SequelizeManager {
         this.getPresetQuery(SHOW_QUERY_SELECTOR.TABLES)
             .then(results => {
                 const tables = results.map(result => result[Object.keys(result)]);
-                console.log(tables);
                 respondEvent.send('channel', {
                     error: null,
                     tables
@@ -75,13 +72,10 @@ export default class SequelizeManager {
                 const promises = tables.map(table => {
                     // TODO: SQL Injection security hole
                     const query = `SELECT * FROM ${table} LIMIT 5`;
-                    console.log(query);
                     this.updateLog(respondEvent, query);
                     return this.connection.query(query)
                         .then(selectTableResult => {
-                            console.log(selectTableResult);
                             let parsedRows;
-                            console.log(selectTableResult[0].length);
                             if (selectTableResult[0].length === 0) {
                                 parsedRows = {
                                     columnnames: ['NA'],
@@ -89,7 +83,6 @@ export default class SequelizeManager {
                                     ncols: 1,
                                     nrows: 1
                                 };
-                                console.log('empty table');
                                 this.updateLog(respondEvent, `NOTE: table [${table}] seems to be empty`);
                             } else {
                                 parsedRows = parse(selectTableResult[0]);
@@ -162,6 +155,8 @@ export default class SequelizeManager {
             case SHOW_QUERY_SELECTOR.TABLES:
                 switch (dialect) {
                     case 'mysql':
+                    case 'sqlite':
+                    case 'mssql':
                     case 'mariadb':
                         return this.connection.showAllSchemas();
                     case 'postgres':
