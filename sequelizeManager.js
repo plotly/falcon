@@ -1,6 +1,11 @@
 import Sequelize from 'sequelize';
 import parse from './parse';
 
+const SHOW_QUERY_SELECTOR = {
+    DATABSES: 'DATABASES',
+    TABLES: 'TABLES'
+};
+
 export default class SequelizeManager {
     constructor() {
         this.connectionState = 'none: credentials were not sent';
@@ -29,7 +34,9 @@ export default class SequelizeManager {
     showDatabases(respondEvent) {
         // TODO: make the built in queries vary depending on dialect
         // TODO: define built-in queries strings at the top
-        return this.connection.query('SHOW DATABASES')
+        const SHOW_DATABASES = this.getPresetQuery(SHOW_QUERY_SELECTOR.DATABASES);
+
+        return this.connection.query(SHOW_DATABASES)
             .spread((results, metadata) => {
                 respondEvent.send('channel', {
                     databases: results,
@@ -48,8 +55,8 @@ export default class SequelizeManager {
     showTables(respondEvent) {
         // TODO: make the built in queries vary depending on dialect
         // TODO: define built-in queries strings at the top
-        return this.connection.query('SHOW TABLES')
-            .spread((results, metadata) => {
+        return this.connection.showAllSchemas()
+            .then((results, metadata) => {
                 respondEvent.send('channel', {
                     error: null,
                     tables: results,
@@ -96,5 +103,29 @@ export default class SequelizeManager {
             rows: null,
             tables: null
         });
+    }
+
+    getPresetQuery(showQuerySelector) {
+        const dialect = this.connection.options.dialect;
+        switch (showQuerySelector) {
+            case SHOW_QUERY_SELECTOR.DATABASES:
+                switch (dialect) {
+                    case 'mysql':
+                    case 'mariadb':
+                        return 'SHOW DATABASES';
+                    case 'postgres':
+                        return "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'";
+                    case 'mssql':
+                        return 'SELECT * FROM Sys.Databases';
+                    default:
+                        throw new Error('dialect not detected by getPresetQuery');
+                }
+
+            case SHOW_QUERY_SELECTOR.TABLES:
+                return this.connection.showAllSchemas();
+
+            default:
+                throw new Error('showQuerySelector not detected by getPresetQuery');
+        }
     }
 }
