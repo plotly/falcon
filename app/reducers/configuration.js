@@ -6,7 +6,7 @@ const INITIAL_STATE = Immutable.Map({
     username: null,
     password: null,
     database: null,
-    engine: null,
+    engine: 'mysql', // TODO: don't hardcode this
     portNumber: null,
     databasePath: null
 });

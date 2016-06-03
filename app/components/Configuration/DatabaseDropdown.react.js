@@ -23,7 +23,7 @@ export default class DatabaseDropdown extends Component {
         let databaseDropdownOptions;
         if (ipcDatabases) {
             databaseDropdownOptions = ipcDatabases.toJS().map(database => (
-                {value: database.Database, label: database.Database}
+                {value: database.database, label: database.database}
             ));
         } else {
             databaseDropdownOptions = [
@@ -40,7 +40,7 @@ export default class DatabaseDropdown extends Component {
             <div className={styles.dropdown}>
                 <Select
                     name="form-field-name"
-                    placeholder="Select Your Database"
+                    placeholder="Select a Database"
                     options={databaseDropdownOptions}
                     onChange={onSelectDatabase}
                     value={configuration.get('database')}

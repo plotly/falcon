@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './ConnectButton.css';
 import Select from 'react-select';
+import {APP_STATUS_CONSTANTS} from '../../reducers/connection';
 
 /*
 	Displays a connect button and a disconnect button.
@@ -10,13 +11,6 @@ import Select from 'react-select';
 	Displays errors and log messages using `ipc`.
 */
 
-const APP_STATUS = {
-    INITIALIZED: 'INITIALIZED',
-    ERROR: 'ERROR',
-    CONNECTED: 'CONNECTED',
-    CONNECTING: 'CONNECTING',
-    DISCONNECTED: 'DISCONNECTED'
-};
 
 const BUTTON_MESSAGE = {
     INITIALIZED: 'connect',
@@ -29,84 +23,101 @@ const BUTTON_MESSAGE = {
 export default class ConnectButton extends Component {
     constructor(props) {
         super(props);
+        this.connect = this.connect.bind(this);
+        this.disconnect = this.disconnect.bind(this);
         this.state = {
-            status: APP_STATUS.INITIALIZED
+            hover: false
         };
+    }
+
+
+    connect() {
+        this.props.connectionActions.merge({status: APP_STATUS_CONSTANTS.CONNECTING});
+        this.props.ipcActions.connect(this.props.configuration);
+    }
+
+    disconnect() {
+        this.props.ipcActions.disconnect();
+    }
+
+    onMouseOver() {
+        this.setState({hover: true});
+    }
+
+    onMouseOut() {
+        this.setState({hover: false});
     }
 
     componentWillReceiveProps(nextProps) {
         let status;
 
+        // TODO: now that connection.status is in redux store, move this out.
         if (nextProps.ipc.hasIn(['error', 'message'])) {
-            status = APP_STATUS.ERROR;
+            status = APP_STATUS_CONSTANTS.ERROR;
         } else if (nextProps.ipc.get('databases')) {
-            status = APP_STATUS.CONNECTED;
+            status = APP_STATUS_CONSTANTS.CONNECTED;
         } else if (!nextProps.ipc.get('databases')) {
-            status = APP_STATUS.DISCONNECTED;
+            status = APP_STATUS_CONSTANTS.DISCONNECTED;
         }
         if (status) {
-            this.setState({status});
+            this.props.connectionActions.merge({status});
+            this.setState({
+                buttonMessage: BUTTON_MESSAGE[this.props.connection.get('status')]
+            });
         }
     }
 
 	render() {
-		const {configuration, ipc, ipcActions} = this.props;
+		const {connection, configuration, ipc, ipcActions} = this.props;
+        console.warn('this.props: ', this.props);
+        const status = connection.get('status');
 
-		let successMessage = null;
-		let errorMessage = null;
-		let buttonMessage = BUTTON_MESSAGE[this.state.status];
-		if (this.state.status === APP_STATUS.ERROR) {
+        let errorMessage;
+        let onButtonClick;
+        let buttonMessage = BUTTON_MESSAGE[status];
+        if (this.state.hover && status === APP_STATUS_CONSTANTS.CONNECTED) {
+            buttonMessage = 'disconnect';
+        }
+
+        if (APP_STATUS_CONSTANTS.INITIALIZED === status) {
+            onButtonClick = this.connect;
+        }
+
+		else if (APP_STATUS_CONSTANTS.ERROR === status) {
 			errorMessage = (
-				<pre>
+				<pre style={{color: 'red'}}>
 					{
 						'Hm... there was an error connecting: ' +
 						ipc.getIn(['error', 'message'])
 					}
 				</pre>
 			);
-			buttonMessage = BUTTON_MESSAGE[this.state.status];
-		} else if (this.state.status === APP_STATUS.CONNECTED) {
-			successMessage = (
-				<pre>
-					{ipc.toJS().log}
-				</pre>
-			);
-			buttonMessage = BUTTON_MESSAGE[this.state.status];
-		} else if (this.state.status === APP_STATUS.LOADING) {
-			buttonMessage = BUTTON_MESSAGE[this.state.status];
-		} else if (this.state.status === APP_STATUS.DISCONNECTED) {
-			successMessage = (
-				<pre>
-					{ipc.toJS().log}
-				</pre>
-			);
-			buttonMessage = BUTTON_MESSAGE[this.state.status];
+            onButtonClick = this.connect;
 		}
 
-		const onClickDisconnect = () => {
-			ipcActions.disconnect();
-		};
+        else if (APP_STATUS_CONSTANTS.CONNECTED === status) {
+            onButtonClick = this.disconnect;
+        }
+
+        else if (APP_STATUS_CONSTANTS.LOADING === status) {
+            onButtonClick = () => {};
+		}
+
+        else if (APP_STATUS_CONSTANTS.DISCONNECTED === status) {
+			onButtonClick = this.connect;
+		}
 
 		return (
 			<div className={styles.footer}>
 				<a className={styles.buttonPrimary}
-					onClick={() => {
-						this.setState({status: APP_STATUS.CONNECTING});
-						ipcActions.connect(configuration);
-					}}
+					onClick={onButtonClick}
+                    onMouseOut={() => {this.setState({hover: false});}}
+                    onMouseOver={() => {this.setState({hover: true});}}
 				>
 					{buttonMessage}
 				</a>
-				<a className={styles.buttonSecondary}
-					onClick={onClickDisconnect}
-				>
-					disconnect
-				</a>
-
-				{errorMessage}
-				{successMessage}
+                {errorMessage}
 			</div>
-
 		);
 	}
 }

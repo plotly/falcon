@@ -29,12 +29,19 @@ export default class Logos extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedEngine: null
+            selectedEngine: props.configuration.get('engine')
         };
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.setState({
+            selectedEngine: nextProps.configuration.get('engine')
+        });
+    }
+
 	render() {
-        const {merge} = this.props;
+        const {configActions} = this.props;
+        const {merge} = configActions;
 
 		const logos = Object.keys(ENGINES).map(engine => (
             <div className={classnames(
@@ -55,8 +62,27 @@ export default class Logos extends Component {
             </div>
         ));
 
+        const items = Object.keys(ENGINES).map(engineKey => (
+            <div>
+                <input type="radio"
+                       style={{display: 'inline-block'}}
+                       value={ENGINES[engineKey]}
+                       checked={this.state.selectedEngine === ENGINES[engineKey]}
+                       onChange={e => {
+                           this.setState({selectedEngine: ENGINES[engineKey]});
+                           merge({engine: e.target.value});
+                       }}
+                />
+
+                <label style={{display: 'inline-block'}}>
+                    {engineKey}
+                </label>
+
+            </div>
+        ));
+
 		return (
-			<div>{logos}</div>
+			<div>{items}</div>
 		);
 	}
 }

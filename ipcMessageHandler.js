@@ -7,8 +7,10 @@ export function ipcMessageHandler(sequelizeManager) {
 		switch (task) {
 			case IPC_TASKS.CONNECT: {
 				sequelizeManager.login(message)
-				.then(sequelizeManager.updateLog(respondEvent, 'you are connected'))
-				.then(sequelizeManager.showDatabases(respondEvent))
+				.then(() => {
+					sequelizeManager.updateLog(respondEvent, 'you are connected');
+					return sequelizeManager.showDatabases(respondEvent);
+				})
 				.catch( error => {
 					sequelizeManager.raiseError(respondEvent, error);
 				});
@@ -24,8 +26,10 @@ export function ipcMessageHandler(sequelizeManager) {
 			}
 			case IPC_TASKS.SELECT_DATABASE: {
 				sequelizeManager.login(message)
-				.then(sequelizeManager.updateLog(respondEvent, 'database accessed'))
-				.then(sequelizeManager.showTables(respondEvent))
+				.then(() => {
+					sequelizeManager.updateLog(respondEvent, 'database accessed');
+					return sequelizeManager.showTables(respondEvent);
+				})
 				.catch( error => {
 					sequelizeManager.raiseError(respondEvent, error);
 				});

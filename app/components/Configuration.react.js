@@ -28,35 +28,18 @@ export default class Configuration extends Component {
                 configActions={this.props.configActions}
                 ipcActions={this.props.ipcActions}
                 ipc={this.props.ipc}
+                connection={this.props.connection}
+                connectionActions={this.props.connectionActions}
             />;
         } else {
             content = <Monitor/>;
         }
 
         return (
-            <div className={styles.container}>
+            <div>
                 {content}
             </div>
         );
-
-        /*
-            <h5>Step 5: Enter Query</h5>
-
-            <AceEditor
-            value={this.state.query}
-            onChange={onChangeQuery}
-            mode="sql"
-            theme="tomorrow"
-            height="50"
-            />
-
-            <div className={styles.btnGroupActions}>
-            <button className={styles.btn} onClick={onClickQuery}>
-            query
-            </button>
-            </div>
-        */
-
     }
 }
 
