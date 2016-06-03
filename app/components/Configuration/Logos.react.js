@@ -36,21 +36,21 @@ export default class Logos extends Component {
 	render() {
         const {merge} = this.props;
 
-		const logos = Object.keys(ENGINES).map(ENGINE => (
+		const logos = Object.keys(ENGINES).map(engine => (
             <div className={classnames(
                     styles.logo, {
                         [styles.logoSelected]:
-                            this.state.selectedEngine === ENGINES[ENGINE]
+                            this.state.selectedEngine === ENGINES[engine]
                     }
                 )}
                 onClick={() => {
-                    this.setState({selectedEngine: ENGINES[ENGINE]});
-                    merge({engine: ENGINES[ENGINE]});
+                    this.setState({selectedEngine: ENGINES[engine]});
+                    merge({engine: ENGINES[engine]});
                 }}
             >
                 <img
                     className={styles.logoImage}
-                    src={LOGOS[ENGINE]}
+                    src={LOGOS[engine]}
                 />
             </div>
         ));
