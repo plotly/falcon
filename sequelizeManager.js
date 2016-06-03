@@ -17,7 +17,7 @@ export default class SequelizeManager {
 
     login({username, password, database, portNumber, engine, databasePath}) {
         // create new sequelize object
-        this.connection = new Sequelize('examples', username, password, {
+        this.connection = new Sequelize(database, username, password, {
             dialect: engine,
             port: portNumber,
             storage: databasePath
@@ -45,12 +45,11 @@ export default class SequelizeManager {
 
     // built-in query to show available databases/schemes
     showDatabases(respondEvent) {
-        // TODO: make the built in queries vary depending on dialect
-        // TODO: define built-in queries strings at the top
         const SHOW_DATABASES = this.getPresetQuery(SHOW_QUERY_SELECTOR.DATABASES);
-        this.updateLog(respondEvent, query);
+        console.log(SHOW_DATABASES);
         return this.connection.query(SHOW_DATABASES)
             .then(results => {
+                console.log(results[0]);
                 respondEvent.send('channel', {
                     databases: results[0], // TODO - why is this nested in an array? can it have multiple arrays of arrays?
                     error: null,
@@ -65,12 +64,10 @@ export default class SequelizeManager {
 
     // built-in query to show available tables in a database/scheme
     showTables(respondEvent) {
-        // TODO: make the built in queries vary depending on dialect
-        // TODO: define built-in queries strings at the top
-        this.updateLog(respondEvent, query);
-        return this.connection.showAllSchemas()
+        this.getPresetQuery(SHOW_QUERY_SELECTOR.TABLES)
             .then(results => {
-                const tables = results.map(result => result[0]);
+                const tables = results.map(result => result[Object.keys(result)]);
+                console.log(tables);
                 respondEvent.send('channel', {
                     error: null,
                     tables
@@ -78,17 +75,22 @@ export default class SequelizeManager {
                 const promises = tables.map(table => {
                     // TODO: SQL Injection security hole
                     const query = `SELECT * FROM ${table} LIMIT 5`;
+                    console.log(query);
                     this.updateLog(respondEvent, query);
                     return this.connection.query(query)
                         .then(selectTableResult => {
+                            console.log(selectTableResult);
                             let parsedRows;
-                            if (selectTableResult.rowCount === 0) {
+                            console.log(selectTableResult[0].length);
+                            if (selectTableResult[0].length === 0) {
                                 parsedRows = {
-                                    columnnames: [],
-                                    rows: [[]],
-                                    ncols: 0,
-                                    nrows: 0
+                                    columnnames: ['NA'],
+                                    rows: [['empty table']],
+                                    ncols: 1,
+                                    nrows: 1
                                 };
+                                console.log('empty table');
+                                this.updateLog(respondEvent, `NOTE: table [${table}] seems to be empty`);
                             } else {
                                 parsedRows = parse(selectTableResult[0]);
                             }
@@ -96,7 +98,6 @@ export default class SequelizeManager {
                                 error: null,
                                 [table]: parsedRows
                             });
-
                         });
                 });
                 return Promise.all(promises);
@@ -128,13 +129,13 @@ export default class SequelizeManager {
             });
     }
 
-    disconnect(event) {
+    disconnect(respondEvent) {
         /*
             does not return a promise for now. open issue here:
             https://github.com/sequelize/sequelize/pull/5776
         */
         this.connection.close();
-        event.sender.send('channel', {
+        respondEvent.send('channel', {
             databases: null,
             error: null,
             rows: null,
@@ -151,7 +152,7 @@ export default class SequelizeManager {
                     case 'mariadb':
                         return 'SHOW DATABASES';
                     case 'postgres':
-                        return 'SELECT datname AS Database FROM pg_database WHERE datistemplate = false;';
+                        return 'SELECT datname AS database FROM pg_database WHERE datistemplate = false;';
                     case 'mssql':
                         return 'SELECT * FROM Sys.Databases';
                     default:
@@ -159,10 +160,18 @@ export default class SequelizeManager {
                 }
 
             case SHOW_QUERY_SELECTOR.TABLES:
-                return this.connection.showAllSchemas();
+                switch (dialect) {
+                    case 'mysql':
+                    case 'mariadb':
+                        return this.connection.showAllSchemas();
+                    case 'postgres':
+                        return this.connection.query(
+                            'SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\';'
+                        );
 
-            default:
-                throw new Error('showQuerySelector not detected by getPresetQuery');
+                default:
+                    throw new Error('showQuerySelector not detected by getPresetQuery');
+                }
         }
     }
 }

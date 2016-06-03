@@ -23,7 +23,14 @@ export default class DatabaseDropdown extends Component {
         let databaseDropdownOptions;
         if (ipcDatabases) {
             databaseDropdownOptions = ipcDatabases.toJS().map(database => (
-                {value: database.database, label: database.database}
+                {
+                    /*
+                        the keys of the database object returned differ
+                        by database engines, so use whatever key is there
+                    */    
+                    value: database[Object.keys(database)],
+                    label: database[Object.keys(database)]
+                }
             ));
         } else {
             databaseDropdownOptions = [
