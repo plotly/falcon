@@ -24,22 +24,14 @@ export default class DatabaseDropdown extends Component {
         let databaseDropdownOptions;
         let isDisabled = configuration.get('engine') === ENGINES.SQLITE;
 
-        if (ipcDatabases) {
-            databaseDropdownOptions = ipcDatabases.toJS().map(database => (
-                {
-                    /*
-                        the keys of the database object returned differ
-                        by database engines, so use whatever key is there
-                    */
-                    value: database[Object.keys(database)],
-                    label: database[Object.keys(database)],
-                    disabled: isDisabled
-                }
-            ));
-        } else {
+        if (ipcDatabases === null) {
             databaseDropdownOptions = [
                 {value: 'None', label: 'None Found', disabled: true}
             ];
+        } else {
+            databaseDropdownOptions = ipcDatabases.toJS().map(database => (
+                {value: database, label: database, disabled: isDisabled}
+            ));
         }
 
         function onSelectDatabase(database) {

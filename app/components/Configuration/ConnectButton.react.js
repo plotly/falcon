@@ -50,7 +50,6 @@ export default class ConnectButton extends Component {
 
     componentWillReceiveProps(nextProps) {
         let status;
-
         // TODO: now that connection.status is in redux store, move this out.
         if (nextProps.ipc.hasIn(['error', 'message'])) {
             status = APP_STATUS_CONSTANTS.ERROR;
@@ -69,7 +68,6 @@ export default class ConnectButton extends Component {
 
 	render() {
 		const {connection, configuration, ipc, ipcActions} = this.props;
-        console.warn('this.props: ', this.props);
         const status = connection.get('status');
 
         let errorMessage;

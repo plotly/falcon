@@ -2,6 +2,12 @@ import Sequelize from 'sequelize';
 import parse from './parse';
 import {merge} from 'ramda';
 
+const PREBUILT_QUERY = {
+    SHOW_DATABASES: 'SHOW_DATABASES',
+    SHOW_TABLES: 'SHOW_TABLES',
+    SHOW5ROWS: 'SHOW5ROWS'
+};
+
 const timestamp = () => (new Date()).toTimeString();
 const emptyTableLog = (table) => {
     return `NOTE: table [${table}] seems to be empty`;
@@ -15,11 +21,10 @@ const emptyTable = {
 const isEmpty = (table) => {
     return table.length === 0;
 };
-const PREBUILT_QUERY = {
-    SHOW_DATABSES: 'SHOW_DATABASES',
-    SHOW_TABLES: 'SHOW_TABLES',
-    SHOW5ROWS: 'SHOW5ROWS'
+const intoArray = (objects) => {
+    return objects.map(obj => obj[Object.keys(obj)]);
 };
+
 
 export default class SequelizeManager {
     constructor() {
@@ -28,7 +33,6 @@ export default class SequelizeManager {
 
     login({username, password, database, portNumber, engine, databasePath, server}) {
         // create new sequelize object
-        console.log({username, password, database, portNumber, engine, databasePath, server});
         this.connection = new Sequelize(database, username, password, {
             dialect: engine,
             host: server,
@@ -54,7 +58,6 @@ export default class SequelizeManager {
     }
 
     raiseError(respondEvent, error) {
-        console.error(error);
         respondEvent.send('channel', {
             error: merge(error, {timestamp: timestamp()})
         });
@@ -62,25 +65,25 @@ export default class SequelizeManager {
 
     // built-in query to show available databases/schemes
     showDatabases(respondEvent) {
-        // deal with sqlite that has no databases
-        if (this.connection.options.dialect === 'sqlite') {
-            respondEvent.send('channel', {
-                databases: [{database: 'SQLITE database accessed'}],
-                error: null,
-                tables: null
-            });
-            return;
-        }
-
         // constants for cleaner code
         const noMetaData = this.connection.QueryTypes.SELECT;
         const query = this.getPresetQuery(PREBUILT_QUERY.SHOW_DATABASES);
+        const dialect = this.connection.options.dialect;
+
+        // deal with sqlite that has no databases
+        if (dialect === 'sqlite') {
+            respondEvent.send('channel', {
+                databases: ['SQLITE database accessed'],
+                error: null,
+                tables: null
+            });
+            return this.showTables(respondEvent);
+        }
 
         return this.connection.query(query, {type: noMetaData})
             .then(results => {
-                console.log(results);
                 respondEvent.send('channel', {
-                    databases: results,
+                    databases: intoArray(results),
                     error: null,
                     /*
                         if user wants to see all databases/schemes, clear
@@ -96,8 +99,9 @@ export default class SequelizeManager {
         // constants for cleaner code
         const noMetaData = this.connection.QueryTypes.SELECT;
         const query = this.getPresetQuery(PREBUILT_QUERY.SHOW_TABLES);
+        const dialect = this.connection.options.dialect;
+
         const sendPreviewTable = (table, selectTableResult) => {
-            console.log(selectTableResult);
             let parsedRows;
             if (isEmpty(selectTableResult)) {
                 parsedRows = emptyTable;
@@ -111,19 +115,22 @@ export default class SequelizeManager {
             });
         };
 
-        console.log([query]);
         return this.connection.query(query, {type: noMetaData})
             .then(results => {
-                console.log(results);
-                const tables = results.map(row => row[Object.keys(row)]);
-                // TODO: decide if this should be done here or inside the app
-                console.log(tables);
+                let tables;
+                if (dialect === 'sqlite') {
+                    // sqlite returns an array by default
+                    tables = results;
+                } else {
+                    // others return list of objects
+                    tables = intoArray(results);
+                }
                 respondEvent.send('channel', {
                     error: null,
                     tables
                 });
+
                 const promises = tables.map(table => {
-                    console.log(table);
                     const query = this.getPresetQuery(
                         PREBUILT_QUERY.SHOW5ROWS, table
                     );
@@ -182,6 +189,7 @@ export default class SequelizeManager {
             case PREBUILT_QUERY.SHOW_DATABASES:
                 switch (dialect) {
                     case 'mysql':
+                    case 'sqlite':
                     case 'mariadb':
                         return 'SHOW DATABASES';
                     case 'postgres':
@@ -207,7 +215,7 @@ export default class SequelizeManager {
                             'information_schema.tables';
                     case 'sqlite':
                         return 'SELECT name FROM ' +
-                        'sqlite_master WHERE type = "table"';
+                        'sqlite_master WHERE type="table"';
                     default:
                         throw new Error('could not build a presetQuery');
                 }
