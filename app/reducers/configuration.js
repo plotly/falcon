@@ -1,14 +1,15 @@
-import { MERGE } from '../actions/configuration.js';
-
+import {MERGE} from '../actions/configuration.js';
+import {ENGINES} from '../components/Configuration/SupportedEngines.react';
 import Immutable from 'immutable';
 
 const INITIAL_STATE = Immutable.Map({
     username: null,
     password: null,
     database: null,
-    engine: 'mysql', // TODO: don't hardcode this
+    engine: ENGINES.MYSQL,
     portNumber: null,
-    databasePath: null
+    databasePath: null,
+    server: null
 });
 
 export default function configuration(state = INITIAL_STATE, action) {

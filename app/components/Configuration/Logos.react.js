@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './Logos.css';
 import classnames from 'classnames';
+import {ENGINES} from './SupportedEngines.react';
 
 /*
     Displays interactive database engine logos and alters
@@ -8,14 +9,6 @@ import classnames from 'classnames';
     TODO: take out the selectedEngine variable and use
     `configuration.get('engine')` inestead?
 */
-
-const ENGINES = {
-    MYSQL: 'mysql',
-    SQLITE: 'sqlite',
-    POSTGRES: 'postgres',
-    MARIADB: 'mariadb',
-    MSSQL: 'mssql'
-};
 
 const LOGOS = {
     POSTGRES: './images/postgresqlLogo.png',

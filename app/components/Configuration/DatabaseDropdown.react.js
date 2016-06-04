@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './DatabaseDropdown.css';
 import Select from 'react-select';
+import {ENGINES} from './SupportedEngines.react';
 
 /*
     Displays in a dropdown menu all available databases/schemes
@@ -21,15 +22,18 @@ export default class DatabaseDropdown extends Component {
 
         const ipcDatabases = ipc.get('databases');
         let databaseDropdownOptions;
+        let isDisabled = configuration.get('engine') === ENGINES.SQLITE;
+
         if (ipcDatabases) {
             databaseDropdownOptions = ipcDatabases.toJS().map(database => (
                 {
                     /*
                         the keys of the database object returned differ
                         by database engines, so use whatever key is there
-                    */    
+                    */
                     value: database[Object.keys(database)],
-                    label: database[Object.keys(database)]
+                    label: database[Object.keys(database)],
+                    disabled: isDisabled
                 }
             ));
         } else {

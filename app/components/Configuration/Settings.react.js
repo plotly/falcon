@@ -28,13 +28,6 @@ export default class Settings extends Component {
             TODO: more instruction steps to be added here that are
             toggled off once met.
         */
-        let messageChooseEngine;
-        if (configuration.get('engine') === null) {
-            messageChooseEngine =
-            <h5>Please select a database engine</h5>;
-        } else {
-            messageChooseEngine = <h5></h5>;
-        }
 
         const selectDatabase = (
             <div>
@@ -51,6 +44,7 @@ export default class Settings extends Component {
                 merge={merge}
             />
         );
+
         const connectButton = (
             <ConnectButton
                 configuration={configuration}
@@ -101,7 +95,8 @@ export default class Settings extends Component {
 
         let step2 = null;
         let step3 = null;
-        if (this.props.connection.get('status') === APP_STATUS_CONSTANTS.CONNECTED) {
+
+        if (connection.get('status') === APP_STATUS_CONSTANTS.CONNECTED) {
             step2 = (
                 <div style={{paddingTop: 60}}>
                     <h5>2. Test Connection and Preview Tables</h5>
