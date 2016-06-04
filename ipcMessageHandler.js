@@ -51,7 +51,7 @@ export function ipcMessageHandler(sequelizeManager) {
 				);
 				break;
 			}
-			
+
 			default: {
 				throw new Error('non-existant IPC_TAKS');
 			}

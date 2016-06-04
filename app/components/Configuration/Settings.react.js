@@ -15,7 +15,6 @@ export default class Settings extends Component {
     }
 
     render() {
-        console.warn('settings: ', this.props);
         const {
             configuration, configActions,
             ipc, ipcActions,

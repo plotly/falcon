@@ -32,8 +32,6 @@ export default class PreviewController extends Component {
             return null;
         }
 
-        console.warn('styles: ', styles);
-
         const renderedTables = tables.map(
             tableName => {
                 if (this.props.ipc.has(tableName)) {
