@@ -8,11 +8,11 @@ th, td {
     padding: 0.3125rem 0.625rem;
     color: #828282;
     font-size: 0.875em;
-    font-family: monospace;
     text-align: left;
 }
 
 .tableHeader {
-    font-family: monospace;
-    color: #828282;
+    padding: 10px;
+    margin-left: auto;
+    margin-right: auto;
 }
