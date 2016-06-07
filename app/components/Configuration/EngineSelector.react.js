@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import styles from './Logos.css';
+import styles from './EngineSelector.css';
 import classnames from 'classnames';
 import {ENGINES} from './SupportedEngines.react';
 
@@ -18,7 +18,7 @@ const LOGOS = {
     SQLITE: './images/sqliteLogo.png'
 };
 
-export default class Logos extends Component {
+export default class EngineSelector extends Component {
     constructor(props) {
         super(props);
         this.state = {

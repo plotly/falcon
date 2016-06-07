@@ -5,7 +5,7 @@ import ConnectButton from './ConnectButton.react';
 import UserCredentials from './UserCredentials.react';
 import LoggerController from './LoggerController.react';
 import PreviewController from './PreviewController.react';
-import Logos from './Logos.react';
+import EngineSelector from './EngineSelector.react';
 import {APP_STATUS_CONSTANTS} from '../../reducers/connection';
 
 export default class Settings extends Component {
@@ -21,16 +21,16 @@ export default class Settings extends Component {
         } = this.props;
         const {merge} = configActions;
 
-        const selectDatabase = (
+        const engineSelector = (
             <div>
-                <Logos
+                <EngineSelector
                     configActions={configActions}
                     configuration={configuration}
                 />
             </div>
         );
 
-        const credentials = (
+        const userCredentials = (
             <UserCredentials
                 configuration={configuration}
                 merge={merge}
@@ -47,7 +47,7 @@ export default class Settings extends Component {
             />
         );
 
-        const testConnection = (
+        const databaseDropdown = (
             <div>
 
                 <DatabaseDropdown
@@ -64,7 +64,7 @@ export default class Settings extends Component {
             </div>
         );
 
-        const logs = (
+        const logger = (
             <LoggerController ipc={ipc}/>
         );
 
@@ -73,10 +73,10 @@ export default class Settings extends Component {
                 <h5>1. Connect to Database</h5>
                 <div style={{width: '100%'}}>
                     <div style={{float: 'left', display: 'inline-block'}}>
-                        {selectDatabase}
+                        {engineSelector}
                     </div>
                     <div style={{width: 300, marginLeft: 50, float: 'left', display: 'inline-block'}}>
-                        {credentials}
+                        {userCredentials}
                     </div>
                 </div>
                 <div style={{clear: 'left', paddingTop: 30}}>
@@ -92,7 +92,7 @@ export default class Settings extends Component {
             step2 = (
                 <div style={{paddingTop: 60}}>
                     <h5>2. Test Connection and Preview Tables</h5>
-                    {testConnection}
+                    {databaseDropdown}
                 </div>
             );
 
@@ -111,7 +111,7 @@ export default class Settings extends Component {
             <div style={{marginTop: 40}}>
                 <hr/>
                 <div style={{marginBottom: 100}}>
-                    {logs}
+                    {logger}
                 </div>
             </div>
         );
