@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './DatabaseDropdown.css';
 import Select from 'react-select';
-import {ENGINES} from './SupportedEngines.react';
+import {ENGINES} from '../Constants/SupportedEngines.react';
 
 /*
     Displays in a dropdown menu all available databases/schemes

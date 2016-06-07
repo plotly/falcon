@@ -1,9 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-// import AceEditor from 'react-ace';
 import styles from './Configuration.css';
-import Settings from './Configuration/Settings.react';
-import Monitor from './Configuration/Monitor.react';
+import Settings from './Settings/Settings.react';
+import Monitor from './Monitor/Monitor.react';
 
 const TABS = {
     SETTINGS: 'SETTINGS',

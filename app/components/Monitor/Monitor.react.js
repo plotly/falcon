@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import AceEditor from 'react-ace';
 
 export default class Monitor extends Component {
     render() {

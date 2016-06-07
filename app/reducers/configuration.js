@@ -1,5 +1,5 @@
 import {MERGE} from '../actions/configuration.js';
-import {ENGINES} from '../components/Configuration/SupportedEngines.react';
+import {ENGINES} from '../components/Settings/Constants/SupportedEngines.react';
 import Immutable from 'immutable';
 
 const INITIAL_STATE = Immutable.Map({

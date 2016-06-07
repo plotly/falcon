@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './EngineSelector.css';
 import classnames from 'classnames';
-import {ENGINES} from './SupportedEngines.react';
+import {ENGINES} from '../Constants/SupportedEngines.react';
 
 /*
     Displays interactive database engine logos and alters

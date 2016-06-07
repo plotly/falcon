@@ -1,11 +1,11 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './Settings.css';
-import DatabaseDropdown from './DatabaseDropdown.react';
-import ConnectButton from './ConnectButton.react';
-import UserCredentials from './UserCredentials.react';
-import LoggerController from './LoggerController.react';
-import PreviewController from './PreviewController.react';
-import EngineSelector from './EngineSelector.react';
+import DatabaseDropdown from './DatabaseDropdown/DatabaseDropdown.react';
+import ConnectButton from './ConnectButton/ConnectButton.react';
+import UserCredentials from './UserCredentials/UserCredentials.react';
+import LoggerController from './Logger/LoggerController.react';
+import PreviewController from './Preview/PreviewController.react';
+import EngineSelector from './EngineSelector/EngineSelector.react';
 import {APP_STATUS_CONSTANTS} from '../../reducers/connection';
 
 export default class Settings extends Component {

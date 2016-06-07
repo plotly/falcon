@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './UserCredentials.css';
 import classnames from 'classnames';
-import {ENGINES} from './SupportedEngines.react';
+import {ENGINES} from '../Constants/SupportedEngines.react';
 
 /*
 	Displays and alters user inputs for `configuration`
