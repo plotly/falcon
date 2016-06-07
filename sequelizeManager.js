@@ -51,7 +51,7 @@ export default class SequelizeManager {
     updateLog(respondEvent, message) {
         respondEvent.send('channel', {
             log: {
-                message: logMessage,
+                message,
                 timestamp: timestamp()
             }
         });
