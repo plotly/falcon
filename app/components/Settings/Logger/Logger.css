@@ -1,0 +1,4 @@
+.renderLogs {
+	maxHeight: 200px;
+	overflow-y: scroll;
+}

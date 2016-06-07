@@ -14,3 +14,11 @@
     border-bottom-color: #45A9FF;
     border-bottom-style: solid;
 }
+
+.engineInput {
+    display: inline-block;
+}
+
+.engineLabel {
+    display: inline-block;
+}

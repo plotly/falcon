@@ -82,7 +82,7 @@ export default class ConnectButton extends Component {
 
 		else if (APP_STATUS_CONSTANTS.ERROR === status) {
 			errorMessage = (
-				<pre style={{color: 'red'}}>
+				<pre className={styles.errorMessage}>
 					{
 						'Hm... there was an error connecting: ' +
 						ipc.getIn(['error', 'message'])

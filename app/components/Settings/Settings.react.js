@@ -57,7 +57,7 @@ export default class Settings extends Component {
                     ipc={ipc}
                 />
 
-                <div style={{maxHeight: 500, maxWidth: '100%', overflowY: 'scroll'}}>
+                <div className={styles.previewController}>
                     <PreviewController ipc={ipc}/>
                 </div>
 
@@ -71,15 +71,15 @@ export default class Settings extends Component {
         const step1 = (
             <div>
                 <h5>1. Connect to Database</h5>
-                <div style={{width: '100%'}}>
-                    <div style={{float: 'left', display: 'inline-block'}}>
+                <div className={styles.configurationOptions}>
+                    <div className={styles.engineSelector}>
                         {engineSelector}
                     </div>
-                    <div style={{width: 300, marginLeft: 50, float: 'left', display: 'inline-block'}}>
+                    <div className={styles.userCredentials}>
                         {userCredentials}
                     </div>
                 </div>
-                <div style={{clear: 'left', paddingTop: 30}}>
+                <div className={styles.connectButton}>
                     {connectButton}
                 </div>
             </div>
@@ -90,14 +90,14 @@ export default class Settings extends Component {
 
         if (connection.get('status') === APP_STATUS_CONSTANTS.CONNECTED) {
             step2 = (
-                <div style={{paddingTop: 60}}>
+                <div className={styles.step2Container}>
                     <h5>2. Test Connection and Preview Tables</h5>
                     {databaseDropdown}
                 </div>
             );
 
             step3 = (
-                <div style={{paddingTop: 60}}>
+                <div className={styles.step2Container}>
                     <h5>3. Query from Plotly 2.0</h5>
                     <div>
                         Open <a href="">Plotly 2.0</a> and make queries through this connector.
@@ -108,18 +108,18 @@ export default class Settings extends Component {
         }
 
         const logContainer = (
-            <div style={{marginTop: 40}}>
+            <div className={styles.logContainer}>
                 <hr/>
-                <div style={{marginBottom: 100}}>
+                <div className={styles.log}>
                     {logger}
                 </div>
             </div>
         );
 
         return (
-            <div style={{width: '100%'}}>
+            <div className={styles.containerWrapper}>
 
-                <div style={{width: 600, marginLeft: 'auto', marginRight: 'auto'}}>
+                <div className={styles.container}>
 
                     <h4>Plotly 2.0 Database Connector</h4>
 
