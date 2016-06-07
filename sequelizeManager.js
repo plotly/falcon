@@ -83,7 +83,6 @@ export default class SequelizeManager {
 
         return this.connection.query(query, {type: noMetaData})
             .then(results => {
-                console.log(results);
                 respondEvent.send('channel', {
                     databases: intoArray(results),
                     error: null,
@@ -119,7 +118,6 @@ export default class SequelizeManager {
 
         return this.connection.query(query, {type: noMetaData})
             .then(results => {
-                console.log(results);
                 let tables;
                 if (dialect === 'sqlite') {
                     // sqlite returns an array by default
@@ -140,7 +138,6 @@ export default class SequelizeManager {
                     this.updateLog(respondEvent, query);
                     return this.connection.query(query, {type: noMetaData})
                         .then(selectTableResult => {
-                            console.log(selectTableResult);
                             sendPreviewTable(table, selectTableResult);
                         });
                 });
@@ -232,7 +229,7 @@ export default class SequelizeManager {
                     case 'postgres':
                         return `SELECT * FROM ${table} LIMIT 5`;
                     case 'mssql':
-                        return 'SELECT TOP 5 * FROM' +
+                        return 'SELECT TOP 5 * FROM ' +
                             `${this.connection.config.database}.dbo.${table}`;
                     default:
                         throw new Error('could not build a presetQuery');
