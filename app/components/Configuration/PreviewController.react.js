@@ -1,7 +1,4 @@
 import React, {Component, PropTypes} from 'react';
-import parse from '../../../parse';
-import R from 'ramda';
-import Immutable from 'immutable';
 import styles from './Preview.css';
 
 export default class PreviewController extends Component {

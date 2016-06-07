@@ -47,13 +47,13 @@ export function ipcMessageHandler(sequelizeManager) {
 			case IPC_TASKS.DISCONNECT: {
 				sequelizeManager.disconnect(respondEvent);
 				sequelizeManager.updateLog(
-					respondEvent, 'your are disconnected'
+					respondEvent, 'NOTE: you are disconnected'
 				);
 				break;
 			}
 
 			default: {
-				throw new Error('non-existant IPC_TAKS');
+				throw new Error('non-existant IPC_TASK');
 			}
 		}
 	});

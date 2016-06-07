@@ -48,7 +48,7 @@ export default class SequelizeManager {
         return this.connection.authenticate();
     }
 
-    updateLog(respondEvent, logMessage) {
+    updateLog(respondEvent, message) {
         respondEvent.send('channel', {
             log: {
                 message: logMessage,
@@ -70,18 +70,20 @@ export default class SequelizeManager {
         const query = this.getPresetQuery(PREBUILT_QUERY.SHOW_DATABASES);
         const dialect = this.connection.options.dialect;
 
-        // deal with sqlite that has no databases
+        // deal with sqlite -> has no databases list
         if (dialect === 'sqlite') {
             respondEvent.send('channel', {
                 databases: ['SQLITE database accessed'],
                 error: null,
                 tables: null
             });
+            // skip SHOW_DATABASES query and send SHOW_TABLES query right away
             return this.showTables(respondEvent);
         }
 
         return this.connection.query(query, {type: noMetaData})
             .then(results => {
+                console.log(results);
                 respondEvent.send('channel', {
                     databases: intoArray(results),
                     error: null,
@@ -117,6 +119,7 @@ export default class SequelizeManager {
 
         return this.connection.query(query, {type: noMetaData})
             .then(results => {
+                console.log(results);
                 let tables;
                 if (dialect === 'sqlite') {
                     // sqlite returns an array by default
@@ -137,6 +140,7 @@ export default class SequelizeManager {
                     this.updateLog(respondEvent, query);
                     return this.connection.query(query, {type: noMetaData})
                         .then(selectTableResult => {
+                            console.log(selectTableResult);
                             sendPreviewTable(table, selectTableResult);
                         });
                 });

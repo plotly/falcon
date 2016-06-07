@@ -8,6 +8,7 @@ export default class LoggerController extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+
         if (nextProps.ipc.has('log') &&
             nextProps.ipc.get('log') !== this.props.ipc.get('log')) {
             this.state.logs.unshift(nextProps.ipc.get('log').toJS());
@@ -23,8 +24,8 @@ export default class LoggerController extends Component {
                 message: nextProps.ipc.getIn(errorPath),
                 timestamp: nextProps.ipc.getIn(['error', 'timestamp'])
             });
-            this.setState({logs: this.state.logs});
 
+            this.setState({logs: this.state.logs});
         }
     }
 

@@ -22,8 +22,11 @@ export default class DatabaseDropdown extends Component {
 
         const ipcDatabases = ipc.get('databases');
         let databaseDropdownOptions;
-        let isDisabled = configuration.get('engine') === ENGINES.SQLITE;
-
+        /*
+            disable the selector for sqlite which does not have databases, only
+            tables
+        */
+        const isDisabled = configuration.get('engine') === ENGINES.SQLITE;
         if (ipcDatabases === null) {
             databaseDropdownOptions = [
                 {value: 'None', label: 'None Found', disabled: true}

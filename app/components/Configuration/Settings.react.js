@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './Settings.css';
-import classnames from 'classnames';
 import DatabaseDropdown from './DatabaseDropdown.react';
 import ConnectButton from './ConnectButton.react';
 import UserCredentials from './UserCredentials.react';
@@ -21,12 +20,6 @@ export default class Settings extends Component {
             connection, connectionActions
         } = this.props;
         const {merge} = configActions;
-
-        /*
-            Dissapears once an engine is chosen.
-            TODO: more instruction steps to be added here that are
-            toggled off once met.
-        */
 
         const selectDatabase = (
             <div>
