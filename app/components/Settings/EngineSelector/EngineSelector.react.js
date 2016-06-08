@@ -11,7 +11,7 @@ import {ENGINES} from '../Constants/SupportedEngines.react';
 */
 
 const LOGOS = {
-    POSTGRES: './images/postgresqlLogo.png',
+    POSTGRES: './images/postgresLogo.png',
     MYSQL: './images/mysqlLogo.png',
     MARIADB: './images/mariadbLogo.png',
     MSSQL: './images/mssqlLogo.png',
@@ -37,21 +37,23 @@ export default class EngineSelector extends Component {
         const {merge} = configActions;
 
 		const logos = Object.keys(ENGINES).map(engine => (
-            <div className={classnames(
-                    styles.logo, {
-                        [styles.logoSelected]:
-                            this.state.selectedEngine === ENGINES[engine]
-                    }
-                )}
-                onClick={() => {
-                    this.setState({selectedEngine: ENGINES[engine]});
-                    merge({engine: ENGINES[engine]});
-                }}
-            >
-                <img
-                    className={styles.logoImage}
-                    src={LOGOS[engine]}
-                />
+            <div>
+                <div className={classnames(
+                        styles.logo, {
+                            [styles.logoSelected]:
+                                this.state.selectedEngine === ENGINES[engine]
+                        }
+                    )}
+                    onClick={() => {
+                        this.setState({selectedEngine: ENGINES[engine]});
+                        merge({engine: ENGINES[engine]});
+                    }}
+                >
+                    <img
+                        className={styles.logoImage}
+                        src={LOGOS[engine]}
+                    />
+                </div>
             </div>
         ));
 
@@ -75,7 +77,7 @@ export default class EngineSelector extends Component {
         ));
 
 		return (
-			<div>{items}</div>
+			<div>{logos}</div>
 		);
 	}
 }
