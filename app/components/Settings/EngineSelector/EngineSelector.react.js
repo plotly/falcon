@@ -26,12 +26,6 @@ export default class EngineSelector extends Component {
         };
     }
 
-    componentWillReceiveProps(nextProps) {
-        this.setState({
-            selectedEngine: nextProps.configuration.get('engine')
-        });
-    }
-
 	render() {
         const {configActions} = this.props;
         const {merge} = configActions;
