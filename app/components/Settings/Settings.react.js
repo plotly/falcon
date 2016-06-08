@@ -120,8 +120,14 @@ export default class Settings extends Component {
             <div className={styles.containerWrapper}>
 
                 <div className={styles.container}>
-
-                    <h4>Plotly 2.0 Database Connector</h4>
+                    <img
+                        src="./images/plotlyLogo.png"
+                        className={styles.plotlyLogo}
+        >
+                    </img>
+                    <h4>
+                        Plotly 2.0 Database Connector
+                    </h4>
 
                     {step1}
                     {step2}
