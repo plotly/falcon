@@ -29,9 +29,9 @@ export default class ConnectButton extends Component {
         };
     }
 
-
     connect() {
-        this.props.connectionActions.merge({status: APP_STATUS_CONSTANTS.CONNECTING});
+        console.log('connect');
+        console.log('this.props.configuration');
         this.props.ipcActions.connect(this.props.configuration);
     }
 
@@ -48,20 +48,23 @@ export default class ConnectButton extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        const updateStatus = (status) => {
+            if (status !== this.props.connection.get('status')) {
+                this.props.connectionActions.merge({status});
+                this.setState({
+                    buttonMessage: BUTTON_MESSAGE[status]
+                });
+            }
+        };
+
         let status;
         // TODO: now that connection.status is in redux store, move this out.
         if (nextProps.ipc.hasIn(['error', 'message'])) {
-            status = APP_STATUS_CONSTANTS.ERROR;
+            updateStatus(APP_STATUS_CONSTANTS.ERROR);
         } else if (nextProps.ipc.get('databases')) {
-            status = APP_STATUS_CONSTANTS.CONNECTED;
+            updateStatus(APP_STATUS_CONSTANTS.CONNECTED);
         } else if (!nextProps.ipc.get('databases')) {
-            status = APP_STATUS_CONSTANTS.DISCONNECTED;
-        }
-        if (status) {
-            this.props.connectionActions.merge({status});
-            this.setState({
-                buttonMessage: BUTTON_MESSAGE[this.props.connection.get('status')]
-            });
+            updateStatus(APP_STATUS_CONSTANTS.DISCONNECTED);
         }
     }
 
