@@ -10,6 +10,7 @@ const ipcMain = require('electron').ipcMain;
 let menu;
 let template;
 let mainWindow = null;
+const channel = 'channel';
 
 if (process.env.NODE_ENV === 'development') {
     require('electron-debug')();
@@ -26,31 +27,27 @@ app.on('ready', () => {
         height: 728
     });
 
+    const server = restify.createServer();
+
+    server.use(restify.queryParser());
+    server.use(restify.CORS({
+        origins: ['*'],
+        credentials: false,
+        headers: ['Access-Control-Allow-Origin']
+    })).listen(5000);
+
     mainWindow.loadURL(`file://${__dirname}/app/app.html`);
 
     mainWindow.webContents.on('did-finish-load', () => {
         mainWindow.show();
         mainWindow.focus();
+        ipcMain.removeAllListeners(channel);
+        ipcMain.on(channel, ipcMessageHandler(sequelizeManager));
+        server.get('/query', serverMessageHandler(sequelizeManager, mainWindow.webContents));
     });
 
     mainWindow.on('closed', () => {
         mainWindow = null;
-    });
-
-    const server = restify.createServer();
-    server.use(restify.queryParser());
-    server.use(restify.CORS({
-        origins: ['*'],   // defaults to ['*']
-        credentials: false,                 // defaults to false
-        headers: ['Access-Control-Allow-Origin']  // sets expose-headers
-    }));
-
-    server.listen(5000, () => {
-    });
-
-    mainWindow.webContents.on('did-finish-load', () => {
-        ipcMain.on('channel', ipcMessageHandler(sequelizeManager));
-        server.get('/query', serverMessageHandler(sequelizeManager, mainWindow.webContents));
     });
 
     if (process.env.NODE_ENV === 'development') {
