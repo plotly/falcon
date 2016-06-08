@@ -42,6 +42,7 @@ export default class UserCredentials extends Component {
 				onChange={e => (
 					merge({[credential]: e.target.value})
 				)}
+				value={this.props.configuration.get(credential)}
 			/>
 		));
 

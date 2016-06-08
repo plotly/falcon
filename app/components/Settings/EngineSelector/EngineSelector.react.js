@@ -36,6 +36,17 @@ export default class EngineSelector extends Component {
         const {configActions} = this.props;
         const {merge} = configActions;
 
+        const resetAllToNull = () => {
+            merge({
+                username: null,
+                password: null,
+                database: null,
+                portNumber: null,
+                databasePath: null,
+                server: null
+            });
+        };
+
 		const logos = Object.keys(ENGINES).map(engine => (
             <div>
                 <div className={classnames(
@@ -47,6 +58,7 @@ export default class EngineSelector extends Component {
                     onClick={() => {
                         this.setState({selectedEngine: ENGINES[engine]});
                         merge({engine: ENGINES[engine]});
+                        resetAllToNull();
                     }}
                 >
                     <img
