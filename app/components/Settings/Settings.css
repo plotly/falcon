@@ -13,6 +13,15 @@
 	width: 100%;
 }
 
+.plotlyLogo {
+	height: 50px;
+	width: 50px;
+	display: block;
+	margin-left: auto;
+	margin-right:auto;
+	padding-bottom: 30px;
+}
+
 .userCredentials {
 	width: 300px;
 	margin-left: 50px;
