@@ -47,7 +47,7 @@ export default class SequelizeManager {
         // returns a message promise from the database
         return this.connection.authenticate();
     }
-
+    
     updateLog(respondEvent, message) {
         respondEvent.send('channel', {
             log: {
@@ -158,8 +158,9 @@ export default class SequelizeManager {
 
     receiveServerQuery(respondEvent, mainWindowContents, query) {
         // TODO: SQL Injection security hole
-        return this.connection.query(query)
-            .then((results, metadata) => {
+        const noMetaData = this.connection.QueryTypes.SELECT;
+        return this.connection.query(query, {type: noMetaData})
+            .then(results => {
                 // send back to the server event
                 respondEvent.send(parse(results));
                 // send updated rows to the app
