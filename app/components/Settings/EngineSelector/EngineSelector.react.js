@@ -63,25 +63,6 @@ export default class EngineSelector extends Component {
             </div>
         ));
 
-        const items = Object.keys(ENGINES).map(engineKey => (
-            <div>
-                <input type="radio"
-                    className={styles.engineInput}
-                    value={ENGINES[engineKey]}
-                    checked={this.state.selectedEngine === ENGINES[engineKey]}
-                    onChange={e => {
-                        this.setState({selectedEngine: ENGINES[engineKey]});
-                        merge({engine: e.target.value});
-                    }}
-                />
-
-                <label className={styles.engineLabel}>
-                    {engineKey}
-                </label>
-
-            </div>
-        ));
-
 		return (
 			<div>{logos}</div>
 		);

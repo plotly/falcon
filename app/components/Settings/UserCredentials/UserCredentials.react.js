@@ -22,6 +22,8 @@ export default class UserCredentials extends Component {
     }
 
 	render() {
+		const {configuration, merge} = this.props;
+
 		function getPlaceholder(credential) {
 			if (credential === 'portNumber') {
 				return 'local port number';
@@ -32,7 +34,6 @@ export default class UserCredentials extends Component {
 			}
 		}
 
-		const {configuration, merge} = this.props;
 		let inputs = USER_CREDENTIALS[configuration.get('engine')].map(credential => (
 			<input
 				placeholder={getPlaceholder(credential)}

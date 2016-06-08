@@ -39,7 +39,7 @@ export default class SequelizeManager {
             port: portNumber,
             storage: databasePath
         });
-
+        
         if (this.connection.config.dialect === 'mssql') {
             this.connection.config.dialectOptions = {encrypt: true};
         }
@@ -47,7 +47,7 @@ export default class SequelizeManager {
         // returns a message promise from the database
         return this.connection.authenticate();
     }
-    
+
     updateLog(respondEvent, message) {
         respondEvent.send('channel', {
             log: {
