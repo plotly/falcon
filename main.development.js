@@ -4,7 +4,6 @@ import SequelizeManager from './sequelizeManager';
 import {ipcMessageHandler} from './ipcMessageHandler';
 import {serverMessageHandler} from './serverMessageHandler';
 
-const sequelizeManager = new SequelizeManager();
 const ipcMain = require('electron').ipcMain;
 
 let menu;
@@ -26,6 +25,16 @@ app.on('ready', () => {
         width: 1024,
         height: 728
     });
+    const log = (message) => {
+        mainWindow.webContents.send('channel', {
+            log: {
+                message,
+                timestamp: timestamp()
+            }
+        });
+    };
+
+    const sequelizeManager = new SequelizeManager(log);
 
     const server = restify.createServer();
 

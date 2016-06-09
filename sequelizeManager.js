@@ -27,11 +27,12 @@ const intoArray = (objects) => {
 
 
 export default class SequelizeManager {
-    constructor() {
+    constructor(log) {
         // TODO: can respondEvent be part of the class?
+        this.log = log;
     }
 
-    login({username, password, database, portNumber, engine, databasePath, server}) {
+    login({username, password, database, portNumber, engine, databasePath, server}, callback) {
         // create new sequelize object
         this.connection = new Sequelize(database, username, password, {
             dialect: engine,
@@ -39,32 +40,23 @@ export default class SequelizeManager {
             port: portNumber,
             storage: databasePath
         });
-        
+
         if (this.connection.config.dialect === 'mssql') {
             this.connection.config.dialectOptions = {encrypt: true};
         }
 
         // returns a message promise from the database
-        return this.connection.authenticate();
-    }
-
-    updateLog(respondEvent, message) {
-        respondEvent.send('channel', {
-            log: {
-                message,
-                timestamp: timestamp()
-            }
+        return this.connection.authenticate().then((message) => {
+            callback(message);
         });
     }
 
-    raiseError(respondEvent, error) {
-        respondEvent.send('channel', {
-            error: merge(error, {timestamp: timestamp()})
-        });
+    raiseErrorLog(error) {
+        this.log(merge(error, {timestamp: timestamp()}));
     }
 
     // built-in query to show available databases/schemes
-    showDatabases(respondEvent) {
+    showDatabases(callback) {
         // constants for cleaner code
         const noMetaData = this.connection.QueryTypes.SELECT;
         const query = this.getPresetQuery(PREBUILT_QUERY.SHOW_DATABASES);
@@ -72,18 +64,18 @@ export default class SequelizeManager {
 
         // deal with sqlite -> has no databases list
         if (dialect === 'sqlite') {
-            respondEvent.send('channel', {
+            callback({
                 databases: ['SQLITE database accessed'],
                 error: null,
                 tables: null
             });
             // skip SHOW_DATABASES query and send SHOW_TABLES query right away
-            return this.showTables(respondEvent);
+            return this.showTables(callback);
         }
 
         return this.connection.query(query, {type: noMetaData})
             .then(results => {
-                respondEvent.send('channel', {
+                callback({
                     databases: intoArray(results),
                     error: null,
                     /*
@@ -96,25 +88,11 @@ export default class SequelizeManager {
     }
 
     // built-in query to show available tables in a database/scheme
-    showTables(respondEvent) {
+    showTables(callback) {
         // constants for cleaner code
         const noMetaData = this.connection.QueryTypes.SELECT;
         const query = this.getPresetQuery(PREBUILT_QUERY.SHOW_TABLES);
         const dialect = this.connection.options.dialect;
-
-        const sendPreviewTable = (table, selectTableResult) => {
-            let parsedRows;
-            if (isEmpty(selectTableResult)) {
-                parsedRows = emptyTable;
-                this.updateLog(respondEvent, emptyTableLog(table));
-            } else {
-                parsedRows = parse(selectTableResult);
-            }
-            respondEvent.send('channel', {
-                error: null,
-                [table]: parsedRows
-            });
-        };
 
         return this.connection.query(query, {type: noMetaData})
             .then(results => {
@@ -126,22 +104,32 @@ export default class SequelizeManager {
                     // others return list of objects
                     tables = intoArray(results);
                 }
-                respondEvent.send('channel', {
-                    error: null,
-                    tables
-                });
 
                 const promises = tables.map(table => {
                     const query = this.getPresetQuery(
                         PREBUILT_QUERY.SHOW5ROWS, table
                     );
-                    this.updateLog(respondEvent, query);
-                    return this.connection.query(query, {type: noMetaData})
-                        .then(selectTableResult => {
-                            sendPreviewTable(table, selectTableResult);
-                        });
+                    this.log(ipc, query);
+                    return this.connection.query(query, {type: noMetaData});
                 });
-                return Promise.all(promises);
+
+                return Promise.all(promises).then(selectTableResults => {
+                    let parsedRows;
+                    if (isEmpty(selectTableResults)) {
+                        parsedRows = emptyTable;
+
+                        // we will probably keep this log statements in here
+                        this.log(respondEvent, emptyTableLog(table));
+
+                    } else {
+                        parsedRows = parse(selectTableResults);
+                    }
+                    callback({
+                        error: null,
+                        [table]: parsedRows
+                    });
+
+                });
             });
     }
 
@@ -149,35 +137,20 @@ export default class SequelizeManager {
         // TODO: SQL Injection security hole
         return this.connection.query(query)
             .then((results, metadata) => {
-                respondEvent.send('channel', {
+                callback({
                     error: null,
                     rows: parse(results)
                 });
             });
     }
 
-    receiveServerQuery(respondEvent, mainWindowContents, query) {
-        // TODO: SQL Injection security hole
-        const noMetaData = this.connection.QueryTypes.SELECT;
-        return this.connection.query(query, {type: noMetaData})
-            .then(results => {
-                // send back to the server event
-                respondEvent.send(parse(results));
-                // send updated rows to the app
-                mainWindowContents.send('channel', {
-                    error: null,
-                    rows: parse(results)
-                });
-            });
-    }
-
-    disconnect(respondEvent) {
+    disconnect(respondEvent, callback) {
         /*
             does not return a promise for now. open issue here:
             https://github.com/sequelize/sequelize/pull/5776
         */
         this.connection.close();
-        respondEvent.send('channel', {
+        callback({
             databases: null,
             error: null,
             rows: null,
