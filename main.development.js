@@ -1,8 +1,6 @@
 import {app, BrowserWindow, Menu, shell} from 'electron';
 import restify from 'restify';
 import SequelizeManager from './sequelizeManager';
-import {ipcMessageHandler} from './ipcMessageHandler';
-import {serverMessageHandler} from './serverMessageHandler';
 
 const ipcMain = require('electron').ipcMain;
 
