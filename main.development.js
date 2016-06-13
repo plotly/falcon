@@ -26,14 +26,20 @@ app.on('ready', () => {
         width: 1024,
         height: 728
     });
-    const log = (message) => {
-            log: {
-                message,
-                timestamp: timestamp()
-            }
-        });
-    };
+
+
+    function log(message) {
+        return (new Promise(
+            () => {
                 mainWindow.webContents.send(channel, {
+                    log: {
+                        message,
+                        timestamp: timestamp()
+                    }
+                });
+            }, () => {})
+        );
+    }
 
     const sequelizeManager = new SequelizeManager(log);
 
