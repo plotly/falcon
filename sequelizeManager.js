@@ -9,18 +9,22 @@ const PREBUILT_QUERY = {
 };
 
 const timestamp = () => (new Date()).toTimeString();
+
 const emptyTableLog = (table) => {
     return `NOTE: table [${table}] seems to be empty`;
 };
-const emptyTable = {
+
+const EMPTY_TABLE = {
     columnnames: ['NA'],
     rows: [['empty table']],
     ncols: 1,
     nrows: 1
 };
+
 const isEmpty = (table) => {
     return table.length === 0;
 };
+
 const intoArray = (objects) => {
     return objects.map(obj => obj[Object.keys(obj)]);
 };
@@ -48,7 +52,6 @@ function assembleTablesPreviewMessage(tablePreviews) {
 
 export default class SequelizeManager {
     constructor(log) {
-        // TODO: can respondEvent be part of the class?
         this.log = log;
     }
 
@@ -127,7 +130,7 @@ export default class SequelizeManager {
     // built-in query to show available tables in a database/scheme
     showTables(callback) {
         // constants for cleaner code
-        const query = this.getPresetQuery(PREBUILT_QUERY.SHOW_TABLES);
+        const showtables = this.getPresetQuery(PREBUILT_QUERY.SHOW_TABLES);
         const dialect = this.getDialect();
 
         return this.connection.query(showtables, this.setQueryType('SELECT'))
@@ -135,12 +138,9 @@ export default class SequelizeManager {
                 const tables = this.intoTablesArray(results);
 
                 const promises = tables.map(table => {
-                    const query = this.getPresetQuery(
+                    const show5rows = this.getPresetQuery(
                         PREBUILT_QUERY.SHOW5ROWS, table
                     );
-                    this.log(ipc, query);
-                    return this.connection.query(query, {type: noMetaData});
-                });
 
                     return this.connection.query(show5rows, this.setQueryType('SELECT'))
                         .then((selectTableResults) => {
@@ -172,9 +172,9 @@ export default class SequelizeManager {
             });
     }
 
-    disconnect(respondEvent, callback) {
         /*
-            does not return a promise for now. open issue here:
+            this.connection.close() does not return a promise for now.
+            open issue here:
             https://github.com/sequelize/sequelize/pull/5776
         */
         this.connection.close();
