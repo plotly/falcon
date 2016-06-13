@@ -16,6 +16,19 @@ export function serverMessageHandler(sequelizeManager, mainWindowContents) {
 	return (requestEvent, respondEvent) => {
 
 		const payload = {};
+		const sequelizeSetup = () => {
+			const options = sequelizeManager.connection.options;
+			const config = sequelizeManager.connection.config;
+			const setup = {};
+			Object.keys(options).forEach( key => {
+				setup[key] = options[key];
+			});
+			Object.keys(config).forEach( key => {
+				setup[key] = config[key];
+			});
+			console.log(setup);
+			return setup;
+		};
 
 		switch (requestEvent.route.path) {
 			case '/connect': {
@@ -23,34 +36,40 @@ export function serverMessageHandler(sequelizeManager, mainWindowContents) {
 					remote server does not send credentials,
 					thus when it connects: it simply authenticates the
 					connection already established and asks for the list
-					of databases
+					of databases. thus the GET_DATABASES instead of CONNECT
 				*/
 				payload.task = TASKS.GET_DATABASES;
 				/*
-					no payload required here since connection should already
-					be established by the electron app
+					use connection params as established by the app.
+					no payload required here from remote server to connect
 				*/
-				payload.message = requestEvent.params;
+				payload.message = sequelizeSetup();
 				break;
 			}
 
 			case '/query': {
 				payload.task = TASKS.SEND_QUERY;
+				// need a query statement entry here from remote server
 				payload.message = requestEvent.params.statement;
 				break;
 			}
 
 			case '/tables': {
 				payload.task = TASKS.SELECT_DATABASE;
-				payload.message = requestEvent.params;
-				console.log(payload.message);
+				payload.message = sequelizeSetup();
+				/*
+					use connection params as established by the app.
+					need a database entry here from the server to
+					connect to a new database and receive its tables
+				*/
+				payload.message['database'] = requestEvent.params.database;
 				break;
 			}
 
 			case '/disconnect': {
 				payload.task = TASKS.DISCONNECT;
-				// no payload required here
-				payload.message = requestEvent.params;
+				// no payload required here from remote server
+				payload.message = sequelizeSetup();
 				break;
 			}
 		}
