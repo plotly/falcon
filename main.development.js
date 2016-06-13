@@ -27,7 +27,6 @@ app.on('ready', () => {
         height: 728
     });
 
-
     function log(message) {
         return (new Promise(
             () => {
@@ -59,7 +58,13 @@ app.on('ready', () => {
         mainWindow.focus();
         ipcMain.removeAllListeners(channel);
         ipcMain.on(channel, ipcMessageHandler(sequelizeManager));
+
+        // TODO: simplify this restify server routing code
+        server.get('/connect', serverMessageHandler(sequelizeManager, mainWindow.webContents));
         server.get('/query', serverMessageHandler(sequelizeManager, mainWindow.webContents));
+        server.get('/tables', serverMessageHandler(sequelizeManager, mainWindow.webContents));
+        server.get('/disconnect', serverMessageHandler(sequelizeManager, mainWindow.webContents));
+
     });
 
     mainWindow.on('closed', () => {
