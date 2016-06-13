@@ -76,17 +76,18 @@ export default class SequelizeManager {
         return tables;
     }
 
-    login({username, password, database, portNumber, engine, databasePath, server}) {
+    login({username, password, database, port, dialect, storage, host}) {
         this.connection = new Sequelize(database, username, password, {
-            dialect: engine,
-            host: server,
-            port: portNumber,
-            storage: databasePath
+            dialect,
+            host,
+            port,
+            storage
         });
 
         if (this.connection.config.dialect === 'mssql') {
             this.connection.config.dialectOptions = {encrypt: true};
         }
+
         return this.connection.authenticate();
     }
 

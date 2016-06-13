@@ -43,6 +43,7 @@ export function serverMessageHandler(sequelizeManager, mainWindowContents) {
 			case '/tables': {
 				payload.task = TASKS.SELECT_DATABASE;
 				payload.message = requestEvent.params;
+				console.log(payload.message);
 				break;
 			}
 
@@ -96,7 +97,7 @@ function handleMessage(sequelizeManager, opts) {
 			sequelizeManager.login(message)
 			.then(sequelizeManager.showDatabases(callback))
 			.then(sequelizeManager.log(
-				`NOTE: you are loggend in as [${sequelizeManager.connection.config.username}]`
+				`NOTE: you are logged in as [${sequelizeManager.connection.config.username}]`
 			))
 			.catch( error => {
 				callback(error);

@@ -21,7 +21,7 @@ export default class Settings extends Component {
         } = this.props;
         const {merge} = configActions;
 
-        const engineSelector = (
+        const dialectSelector = (
             <div>
                 <EngineSelector
                     configActions={configActions}
@@ -72,8 +72,8 @@ export default class Settings extends Component {
             <div>
                 <h5>1. Connect to Database</h5>
                 <div className={styles.configurationOptions}>
-                    <div className={styles.engineSelector}>
-                        {engineSelector}
+                    <div className={styles.dialectSelector}>
+                        {dialectSelector}
                     </div>
                     <div className={styles.userCredentials}>
                         {userCredentials}

@@ -6,10 +6,10 @@ const INITIAL_STATE = Immutable.Map({
     username: null,
     password: null,
     database: null,
-    engine: ENGINES.MYSQL,
-    portNumber: null,
-    databasePath: null,
-    server: null
+    dialect: ENGINES.MYSQL,
+    port: null,
+    storage: null,
+    host: null
 });
 
 export default function configuration(state = INITIAL_STATE, action) {

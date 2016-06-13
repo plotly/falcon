@@ -4,10 +4,10 @@ import classnames from 'classnames';
 import {ENGINES} from '../Constants/SupportedEngines.react';
 
 /*
-    Displays interactive database engine logos and alters
-    the chosen `configuration` engine parameter.
+    Displays interactive database dialect logos and alters
+    the chosen `configuration` dialect parameter.
     TODO: take out the selectedEngine variable and use
-    `configuration.get('engine')` inestead?
+    `configuration.get('dialect')` inestead?
 */
 
 const LOGOS = {
@@ -22,7 +22,7 @@ export default class EngineSelector extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedEngine: props.configuration.get('engine')
+            selectedEngine: props.configuration.get('dialect')
         };
     }
 
@@ -35,29 +35,29 @@ export default class EngineSelector extends Component {
                 username: null,
                 password: null,
                 database: null,
-                portNumber: null,
-                databasePath: null,
-                server: null
+                port: null,
+                storage: null,
+                host: null
             });
         };
 
-		const logos = Object.keys(ENGINES).map(engine => (
+		const logos = Object.keys(ENGINES).map(dialect => (
             <div>
                 <div className={classnames(
                         styles.logo, {
                             [styles.logoSelected]:
-                                this.state.selectedEngine === ENGINES[engine]
+                                this.state.selectedEngine === ENGINES[dialect]
                         }
                     )}
                     onClick={() => {
-                        this.setState({selectedEngine: ENGINES[engine]});
-                        merge({engine: ENGINES[engine]});
+                        this.setState({selectedEngine: ENGINES[dialect]});
+                        merge({dialect: ENGINES[dialect]});
                         resetAllToNull();
                     }}
                 >
                     <img
                         className={styles.logoImage}
-                        src={LOGOS[engine]}
+                        src={LOGOS[dialect]}
                     />
                 </div>
             </div>

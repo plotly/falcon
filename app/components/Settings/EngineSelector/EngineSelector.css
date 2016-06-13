@@ -20,10 +20,10 @@
     border-right-style: solid;
 }
 
-.engineInput {
+.dialectInput {
     display: inline-block;
 }
 
-.engineLabel {
+.dialectLabel {
     display: inline-block;
 }

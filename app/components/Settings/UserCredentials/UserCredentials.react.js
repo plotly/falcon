@@ -10,11 +10,11 @@ const {dialog} = require('electron').remote;
 */
 
 const USER_CREDENTIALS = {
-    [ENGINES.MYSQL]: ['username', 'password', 'server', 'portNumber'],
-    [ENGINES.MARIADB]: ['username', 'password', 'server', 'portNumber'],
-	[ENGINES.MSSQL]: ['username', 'password', 'server', 'portNumber'],
-    [ENGINES.POSTGRES]: ['username', 'password', 'server', 'portNumber', 'database'],
-    [ENGINES.SQLITE]: ['databasePath']
+    [ENGINES.MYSQL]: ['username', 'password', 'host', 'port'],
+    [ENGINES.MARIADB]: ['username', 'password', 'host', 'port'],
+	[ENGINES.MSSQL]: ['username', 'password', 'host', 'port'],
+    [ENGINES.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
+    [ENGINES.SQLITE]: ['storage']
 };
 
 export default class UserCredentials extends Component {
@@ -34,9 +34,9 @@ export default class UserCredentials extends Component {
 	}
 
 	getPlaceholder(credential) {
-		if (credential === 'portNumber') {
+		if (credential === 'port') {
 			return 'local port number';
-		} else if (credential === 'databasePath') {
+		} else if (credential === 'storage') {
 			return 'path to database';
 		} else {
 			return credential;
@@ -45,7 +45,7 @@ export default class UserCredentials extends Component {
 
 	getOnClick(credential) {
 		return () => {
-			if (credential === 'databasePath') {
+			if (credential === 'storage') {
 				dialog.showOpenDialog({
 					properties: ['openFile', 'openDirectory']
 				}, (paths) => {
@@ -66,7 +66,7 @@ export default class UserCredentials extends Component {
 	render() {
 		const {configuration, merge} = this.props;
 
-		let inputs = USER_CREDENTIALS[configuration.get('engine')].map(credential => (
+		let inputs = USER_CREDENTIALS[configuration.get('dialect')].map(credential => (
 			<input
 				placeholder={this.getPlaceholder(credential)}
 				type={this.getInputType(credential)}
