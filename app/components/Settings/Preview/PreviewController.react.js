@@ -8,7 +8,7 @@ export default class PreviewController extends Component {
     }
 
     renderTable(table) {
-        const tableHeader = table.get('columnnames').map(
+        const tableHeaders = table.get('columnnames').map(
             column => <th>{column}</th>
         );
         const renderCell = cell => <td>{cell}</td>;
@@ -17,7 +17,7 @@ export default class PreviewController extends Component {
         );
         return (
             <table>
-                <thead>{tableHeader}</thead>
+                <thead>{tableHeaders}</thead>
                 <tbody>{tableRows}</tbody>
             </table>
         );
@@ -25,6 +25,7 @@ export default class PreviewController extends Component {
 
     render() {
         const tables = this.props.ipc.get('tables');
+
         if (!tables) {
             return null;
         }
