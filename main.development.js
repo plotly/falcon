@@ -1,13 +1,16 @@
 import {app, BrowserWindow, Menu, shell} from 'electron';
 import restify from 'restify';
 import SequelizeManager from './sequelizeManager';
+import {ipcMessageHandler,
+        serverMessageHandler,
+        channel,
+        timestamp} from './messageHandler';
 
 const ipcMain = require('electron').ipcMain;
 
 let menu;
 let template;
 let mainWindow = null;
-const channel = 'channel';
 
 if (process.env.NODE_ENV === 'development') {
     require('electron-debug')();
@@ -24,13 +27,13 @@ app.on('ready', () => {
         height: 728
     });
     const log = (message) => {
-        mainWindow.webContents.send('channel', {
             log: {
                 message,
                 timestamp: timestamp()
             }
         });
     };
+                mainWindow.webContents.send(channel, {
 
     const sequelizeManager = new SequelizeManager(log);
 

@@ -6,3 +6,4 @@ export const IPC_TASKS = {
 	SELECT_DATABASE: 'selectDatabase',
 	DISCONNECT: 'disconnect'
 };
+export const channel = 'channel';
