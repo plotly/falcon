@@ -1,4 +1,4 @@
-export const IPC_TASKS = {
+export const TASKS = {
 	CONNECT: 'connect',
 	CHECK_CONNECTION: 'check_connection',
 	GET_DATABASES: 'get_databases',
@@ -25,7 +25,7 @@ export function serverMessageHandler(sequelizeManager, mainWindowContents) {
 					connection already established and asks for the list
 					of databases
 				*/
-				payload.task = IPC_TASKS.GET_DATABASES;
+				payload.task = TASKS.GET_DATABASES;
 				/*
 					no payload required here since connection should already
 					be established by the electron app
@@ -35,19 +35,20 @@ export function serverMessageHandler(sequelizeManager, mainWindowContents) {
 			}
 
 			case '/query': {
-				payload.task = IPC_TASKS.SEND_QUERY;
+				payload.task = TASKS.SEND_QUERY;
 				payload.message = requestEvent.params.statement;
 				break;
 			}
 
 			case '/tables': {
-				payload.task = IPC_TASKS.SELECT_DATABASE;
+				payload.task = TASKS.SELECT_DATABASE;
 				payload.message = requestEvent.params;
 				break;
 			}
 
 			case '/disconnect': {
-				payload.task = IPC_TASKS.DISCONNECT;
+				payload.task = TASKS.DISCONNECT;
+				// no payload required here
 				payload.message = requestEvent.params;
 				break;
 			}
@@ -91,7 +92,7 @@ function handleMessage(sequelizeManager, opts) {
 	const {task, message} = payload;
 
 	switch (task) {
-		case IPC_TASKS.CONNECT: {
+		case TASKS.CONNECT: {
 			sequelizeManager.login(message)
 			.then(sequelizeManager.showDatabases(callback))
 			.then(sequelizeManager.log(
@@ -103,7 +104,7 @@ function handleMessage(sequelizeManager, opts) {
 			break;
 		}
 
-		case IPC_TASKS.SELECT_DATABASE: {
+		case TASKS.SELECT_DATABASE: {
 			sequelizeManager.login(message)
 			.then(sequelizeManager.showTables(callback))
 			.then(sequelizeManager.log(
@@ -115,7 +116,7 @@ function handleMessage(sequelizeManager, opts) {
 			break;
 		}
 
-		case IPC_TASKS.GET_DATABASES: {
+		case TASKS.GET_DATABASES: {
 			sequelizeManager.check_connection(message)
 			.then(sequelizeManager.showDatabases(callback))
 			.then(sequelizeManager.log(
@@ -127,7 +128,7 @@ function handleMessage(sequelizeManager, opts) {
 			break;
 		}
 
-		case IPC_TASKS.SEND_QUERY: {
+		case TASKS.SEND_QUERY: {
 			const query = message;
 			sequelizeManager.sendQuery(query, callback)
 			.then(sequelizeManager.log(
@@ -139,7 +140,7 @@ function handleMessage(sequelizeManager, opts) {
 			break;
 		}
 
-		case IPC_TASKS.DISCONNECT: {
+		case TASKS.DISCONNECT: {
 			sequelizeManager.disconnect(callback)
 			.then(sequelizeManager.log(
 				'NOTE: you logged out'
