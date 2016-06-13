@@ -1,6 +1,6 @@
 import {createAction} from 'redux-actions';
 import Immutable from 'immutable';
-import {IPC_TASKS} from './../../ipcTasks';
+import {IPC_TASKS} from './../../messageHandler';
 
 const ipcRenderer = require('electron').ipcRenderer;
 
