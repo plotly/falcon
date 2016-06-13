@@ -34,6 +34,27 @@ export default class SequelizeManager {
 
     login({username, password, database, portNumber, engine, databasePath, server}, callback) {
         // create new sequelize object
+    getDialect() {
+        return this.connection.options.dialect;
+    }
+
+    setQueryType(type) {
+        // type = SELECT for `SELECT` query
+        return {type: this.connection.QueryTypes[type]};
+    }
+
+    intoTablesArray(results) {
+        let tables;
+        if (this.getDialect() === 'sqlite') {
+            // sqlite returns an array by default
+            tables = results;
+        } else {
+            // others return list of objects
+            tables = intoArray(results);
+        }
+        return tables;
+    }
+
         this.connection = new Sequelize(database, username, password, {
             dialect: engine,
             host: server,
@@ -58,9 +79,8 @@ export default class SequelizeManager {
     // built-in query to show available databases/schemes
     showDatabases(callback) {
         // constants for cleaner code
-        const noMetaData = this.connection.QueryTypes.SELECT;
         const query = this.getPresetQuery(PREBUILT_QUERY.SHOW_DATABASES);
-        const dialect = this.connection.options.dialect;
+        const dialect = this.getDialect();
 
         // deal with sqlite -> has no databases list
         if (dialect === 'sqlite') {
@@ -73,7 +93,7 @@ export default class SequelizeManager {
             return this.showTables(callback);
         }
 
-        return this.connection.query(query, {type: noMetaData})
+        return this.connection.query(query, this.setQueryType('SELECT'))
             .then(results => {
                 callback({
                     databases: intoArray(results),
@@ -90,20 +110,12 @@ export default class SequelizeManager {
     // built-in query to show available tables in a database/scheme
     showTables(callback) {
         // constants for cleaner code
-        const noMetaData = this.connection.QueryTypes.SELECT;
         const query = this.getPresetQuery(PREBUILT_QUERY.SHOW_TABLES);
-        const dialect = this.connection.options.dialect;
+        const dialect = this.getDialect();
 
-        return this.connection.query(query, {type: noMetaData})
+        return this.connection.query(showtables, this.setQueryType('SELECT'))
             .then(results => {
-                let tables;
-                if (dialect === 'sqlite') {
-                    // sqlite returns an array by default
-                    tables = results;
-                } else {
-                    // others return list of objects
-                    tables = intoArray(results);
-                }
+                const tables = this.intoTablesArray(results);
 
                 const promises = tables.map(table => {
                     const query = this.getPresetQuery(
