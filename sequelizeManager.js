@@ -44,8 +44,6 @@ function assembleTablesPreviewMessage(tablePreviews) {
         } else {
             parsedRows = parse(rawData);
         }
-        console.log('tableName: parsedRows');
-        console.log({[tableName]: parsedRows});
         return {[tableName]: parsedRows};
     });
 }
@@ -169,7 +167,6 @@ export default class SequelizeManager {
         // TODO: SQL Injection security hole
         return this.connection.query(query, this.setQueryType('SELECT'))
             .then((results) => {
-                console.log(results);
                 callback(parse(results));
             });
     }

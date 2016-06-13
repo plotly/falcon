@@ -26,7 +26,6 @@ export function serverMessageHandler(sequelizeManager, mainWindowContents) {
 			Object.keys(config).forEach( key => {
 				setup[key] = config[key];
 			});
-			console.log(setup);
 			return setup;
 		};
 
