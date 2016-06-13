@@ -52,8 +52,6 @@ export default class SequelizeManager {
         this.log = log;
     }
 
-    login({username, password, database, portNumber, engine, databasePath, server}, callback) {
-        // create new sequelize object
     getDialect() {
         return this.connection.options.dialect;
     }
@@ -75,6 +73,7 @@ export default class SequelizeManager {
         return tables;
     }
 
+    login({username, password, database, portNumber, engine, databasePath, server}) {
         this.connection = new Sequelize(database, username, password, {
             dialect: engine,
             host: server,
@@ -85,11 +84,9 @@ export default class SequelizeManager {
         if (this.connection.config.dialect === 'mssql') {
             this.connection.config.dialectOptions = {encrypt: true};
         }
+        return this.connection.authenticate();
+    }
 
-        // returns a message promise from the database
-        return this.connection.authenticate().then((message) => {
-            callback(message);
-        });
     }
 
     raiseErrorLog(error) {
