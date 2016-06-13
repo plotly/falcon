@@ -1,7 +1,7 @@
 export const TASKS = {
 	CONNECT: 'connect',
-	CHECK_CONNECTION: 'check_connection',
-	GET_DATABASES: 'get_databases',
+	CHECK_CONNECTION: 'checkConnection',
+	GET_DATABASES: 'getDatabases',
 	SEND_QUERY: 'sendQuery',
 	SELECT_DATABASE: 'selectDatabase',
 	DISCONNECT: 'disconnect'
