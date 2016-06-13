@@ -173,18 +173,28 @@ export default class SequelizeManager {
             });
     }
 
+    disconnect(callback) {
         /*
             this.connection.close() does not return a promise for now.
             open issue here:
             https://github.com/sequelize/sequelize/pull/5776
         */
-        this.connection.close();
-        callback({
-            databases: null,
-            error: null,
-            rows: null,
-            tables: null
-        });
+        const close = () => this.connection.close();
+
+        function closeConnection() {
+            return (new Promise(
+                () => {
+                    close();
+                    callback({
+                        databases: null,
+                        error: null,
+                        tables: null
+                    });
+                }, () => {})
+            );
+        }
+
+        return closeConnection();
     }
 
     getPresetQuery(showQuerySelector, table = null) {
