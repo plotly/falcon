@@ -164,14 +164,12 @@ export default class SequelizeManager {
             });
     }
 
-    sendQuery(respondEvent, query) {
+    sendQuery(query, callback) {
         // TODO: SQL Injection security hole
-        return this.connection.query(query)
-            .then((results, metadata) => {
-                callback({
-                    error: null,
-                    rows: parse(results)
-                });
+        return this.connection.query(query, this.setQueryType('SELECT'))
+            .then((results) => {
+                console.log(results);
+                callback(parse(results));
             });
     }
 
