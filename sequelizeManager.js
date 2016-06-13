@@ -25,6 +25,26 @@ const intoArray = (objects) => {
     return objects.map(obj => obj[Object.keys(obj)]);
 };
 
+function assembleTablesPreviewMessage(tablePreviews) {
+    /*
+        topRows is an array of one or many responses of top 5 rows queries
+        [ {'table1':[top5rows]}, {'table2': [top5rows]} ...]
+    */
+    let parsedRows;
+    return tablePreviews.map( (tablePreview) => {
+        const tableName = Object.keys(tablePreview);
+        const rawData = tablePreview[tableName];
+
+        if (isEmpty(rawData)) {
+            parsedRows = EMPTY_TABLE;
+        } else {
+            parsedRows = parse(rawData);
+        }
+        console.log('tableName: parsedRows');
+        console.log({[tableName]: parsedRows});
+        return {[tableName]: parsedRows};
+    });
+}
 
 export default class SequelizeManager {
     constructor(log) {
@@ -125,21 +145,20 @@ export default class SequelizeManager {
                     return this.connection.query(query, {type: noMetaData});
                 });
 
-                return Promise.all(promises).then(selectTableResults => {
-                    let parsedRows;
-                    if (isEmpty(selectTableResults)) {
-                        parsedRows = emptyTable;
+                    return this.connection.query(show5rows, this.setQueryType('SELECT'))
+                        .then((selectTableResults) => {
+                            return {
+                                [table]: selectTableResults
+                            };
+                        });
+                });
 
-                        // we will probably keep this log statements in here
-                        this.log(respondEvent, emptyTableLog(table));
-
-                    } else {
-                        parsedRows = parse(selectTableResults);
-                    }
-                    callback({
-                        error: null,
-                        [table]: parsedRows
-                    });
+                return Promise.all(promises)
+                    .then(tablePreviews => {
+                        callback({
+                            error: null,
+                            tables: assembleTablesPreviewMessage(tablePreviews)
+                        });
 
                 });
             });
