@@ -90,6 +90,9 @@ export default class SequelizeManager {
         return this.connection.authenticate();
     }
 
+    check_connection() {
+        // when already logged in and simply want to check connection
+        return this.connection.authenticate();
     }
 
     raiseErrorLog(error) {
