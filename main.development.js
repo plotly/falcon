@@ -64,6 +64,10 @@ app.on('ready', () => {
         server.get('/query', serverMessageHandler(sequelizeManager, mainWindow.webContents));
         server.get('/tables', serverMessageHandler(sequelizeManager, mainWindow.webContents));
         server.get('/disconnect', serverMessageHandler(sequelizeManager, mainWindow.webContents));
+        server.get('/v0/connect', serverMessageHandler(sequelizeManager, mainWindow.webContents));
+        server.get('/v0//query', serverMessageHandler(sequelizeManager, mainWindow.webContents));
+        server.get('/v0//tables', serverMessageHandler(sequelizeManager, mainWindow.webContents));
+        server.get('/v0//disconnect', serverMessageHandler(sequelizeManager, mainWindow.webContents));
 
     });
 

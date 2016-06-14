@@ -30,7 +30,8 @@ export function serverMessageHandler(sequelizeManager, mainWindowContents) {
 		};
 
 		switch (requestEvent.route.path) {
-			case '/connect': {
+			case '/connect':
+			case '/v0/connect': {
 				/*
 					remote server does not send credentials,
 					thus when it connects: it simply authenticates the
@@ -46,14 +47,16 @@ export function serverMessageHandler(sequelizeManager, mainWindowContents) {
 				break;
 			}
 
-			case '/query': {
+			case '/query':
+			case '/v0/query': {
 				payload.task = TASKS.SEND_QUERY;
 				// need a query statement entry here from remote server
 				payload.message = requestEvent.params.statement;
 				break;
 			}
 
-			case '/tables': {
+			case '/tables':
+			case '/v0/tables': {
 				payload.task = TASKS.SELECT_DATABASE;
 				payload.message = sequelizeSetup();
 				/*
@@ -65,7 +68,8 @@ export function serverMessageHandler(sequelizeManager, mainWindowContents) {
 				break;
 			}
 
-			case '/disconnect': {
+			case '/disconnect':
+			case '/v0/disconnect': {
 				payload.task = TASKS.DISCONNECT;
 				// no payload required here from remote server
 				payload.message = sequelizeSetup();
