@@ -111,7 +111,7 @@ export default class ConnectButton extends Component {
 					onClick={onButtonClick}
                     onMouseOut={() => {this.setState({hover: false});}}
                     onMouseOver={() => {this.setState({hover: true});}}
-                    value={buttonMessage}
+                    value={APP_STATUS_CONSTANTS[status]}
 				>
 					{buttonMessage}
 				</a>
