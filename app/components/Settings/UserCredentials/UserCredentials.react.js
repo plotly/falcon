@@ -77,6 +77,7 @@ export default class UserCredentials extends Component {
 				)}
 				onClick={this.getOnClick(credential)}
 				value={configuration.get(credential)}
+				id={credential}
 			/>
 		));
 

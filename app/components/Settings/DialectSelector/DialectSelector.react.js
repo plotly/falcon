@@ -54,7 +54,7 @@ export default class DialectSelector extends Component {
                         configActions.update({dialect: DIALECTS[dialect]});
                         resetAllToNull();
                     }}
-                    value={ENGINES[dialect]}
+                    id={ENGINES[dialect] + 'logo'}
                 >
                     <img
                         className={styles.logoImage}
