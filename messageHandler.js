@@ -122,7 +122,7 @@ function handleMessage(sequelizeManager, opts) {
 				`NOTE: you are logged in as [${sequelizeManager.connection.config.username}]`
 			))
 			.catch( error => {
-				callback(error);
+				callback({error});
 			});
 			break;
 		}
@@ -134,7 +134,7 @@ function handleMessage(sequelizeManager, opts) {
 				`NOTE: connected to database [${sequelizeManager.connection.config.database}]`
 			))
 			.catch( error => {
-				callback(error);
+				callback({error});
 			});
 			break;
 		}
@@ -146,7 +146,7 @@ function handleMessage(sequelizeManager, opts) {
 				`NOTE: you are logged in as [${sequelizeManager.connection.config.username}]`
 			))
 			.catch( error => {
-				callback(error);
+				callback({error});
 			});
 			break;
 		}
@@ -158,7 +158,7 @@ function handleMessage(sequelizeManager, opts) {
 				`QUERY EXECUTED: ${query}`
 			))
 			.catch( error => {
-				callback(error);
+				callback({error});
 			});
 			break;
 		}
