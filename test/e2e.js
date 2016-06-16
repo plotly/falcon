@@ -6,7 +6,7 @@ import electronPath from 'electron-prebuilt';
 
 import {APP_STATUS_CONSTANTS} from '../app/reducers/connection';
 import {ENGINES} from '../app/components/Settings/Constants/SupportedEngines.react';
-var credentials = require('./credentials.json');
+import {CREDENTIALS} from './credentials.js';
 
 // import styles to use for tests
 import logoStyles from '../app/components/Settings/EngineSelector/EngineSelector.css';
@@ -36,8 +36,11 @@ describe('main window', function spec() {
 
     // element grabbing functions
     const getLogos = () => this.driver.findElements(webdriver.By.className(logoStyles.logo));
+    const getLogo = (dialect) => this.driver.findElement(webdriver.By.id(ENGINES[dialect.toUpperCase()] + 'logo'));
     const getInputs = () => this.driver.findElements(webdriver.By.xpath('//input'));
     const getBtn = () => this.driver.findElement(webdriver.By.className(btnStyles.buttonPrimary));
+
+    const getIdOf = (element) => element.getAttribute('id');
 
 
     it('should open window', async () => {
@@ -57,7 +60,7 @@ describe('main window', function spec() {
 
     it('should enter text into the first text box', async () => {
         const inputs = await getInputs();
-        const textinput = credentials.mysql.username;
+        const textinput = CREDENTIALS.mysql.username;
         inputs[0].sendKeys(textinput);
         expect(await inputs[0].getAttribute('value')).to.equal(textinput);
     });
@@ -69,25 +72,32 @@ describe('main window', function spec() {
         expect(await inputs[0].getAttribute('value')).to.equal('');
     });
 
+    it('should the state should be disconnected', async () => {
+        const btn = await getBtn();
+        expect(await btn.getAttribute('value')).to.equal(APP_STATUS_CONSTANTS.DISCONNECTED);
+    });
+
     it('should connect to mysql remote database', async () => {
         const testedDialect = ENGINES.MYSQL;
-
-        const logos = await getLogos();
+        const logo = await getLogo(testedDialect);
         const inputs = await getInputs();
         const btn = await getBtn();
 
-        logos.forEach( (logo) => {
-            if (testedDialect === logo.getAttribute('value')) {
-                logo.click();
-                inputs.forEach(input => {
-                    const placeholder = input.getAttribute('placeholder');
-                    input.sendKeys(credentials.testedDialect[placeholder]);
-                });
-            }
-        });
-        
-        btn.click();
-        expect(await btn.getAttribute('value')).to.equal('');
+        // enter credentials into the fields
+        async function fillInputs() {
+            inputs.forEach(input => {
+                getIdOf(input)
+                .then(placeholder => input.sendKeys(CREDENTIALS[testedDialect][placeholder]));
+            });
+        }
+
+        // click on the evaluated dialect logo
+        logo.click()
+        .then(await fillInputs())
+        .then(await delay(1000))
+        .then(await btn.click())
+        .then(await delay(2000));
+        expect(await btn.getAttribute('value')).to.equal(APP_STATUS_CONSTANTS.CONNECTED);
     });
 
     after(async () => {
