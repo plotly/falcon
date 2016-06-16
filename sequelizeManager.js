@@ -115,7 +115,7 @@ export default class SequelizeManager {
             return this.showTables(callback);
         }
 
-        return this.connection.query(query, this.setQueryType('SELECT'))
+        return () => this.connection.query(query, this.setQueryType('SELECT'))
             .then(results => {
                 callback({
                     databases: intoArray(results),
@@ -135,7 +135,7 @@ export default class SequelizeManager {
         const showtables = this.getPresetQuery(PREBUILT_QUERY.SHOW_TABLES);
         const dialect = this.getDialect();
 
-        return this.connection.query(showtables, this.setQueryType('SELECT'))
+        return () => this.connection.query(showtables, this.setQueryType('SELECT'))
             .then(results => {
                 const tables = this.intoTablesArray(results);
 
@@ -145,7 +145,7 @@ export default class SequelizeManager {
                     );
 
                     return this.connection.query(show5rows, this.setQueryType('SELECT'))
-                        .then((selectTableResults) => {
+                        .then(selectTableResults => {
                             return {
                                 [table]: selectTableResults
                             };
