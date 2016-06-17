@@ -2,7 +2,11 @@ import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import styles from './DialectSelector.css';
 import classnames from 'classnames';
+<<<<<<< HEAD:app/components/Settings/DialectSelector/DialectSelector.react.js
 import {DIALECTS} from '../Constants/SupportedDialects.react';
+=======
+import {ENGINES} from '../../../constants/constants';
+>>>>>>> :book: take out constants into its own folder and file:app/components/Settings/EngineSelector/EngineSelector.react.js
 
 /*
     Displays interactive database dialect logos and alters
