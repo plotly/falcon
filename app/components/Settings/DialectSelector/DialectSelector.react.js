@@ -20,16 +20,36 @@ const LOGOS = {
 export default class DialectSelector extends Component {
     constructor(props) {
         super(props);
-        this.resetAllToNull = this.connect.bind(this);
-        this.testClass = this.connect.bind(this);
-        this.isSelected = this.connect.bind(this);
+        this.resetAllToNull = this.resetAllToNull.bind(this);
+        this.testClass = this.testClass.bind(this);
+        this.logoIsSelected = this.logoIsSelected.bind(this);
         this.state = {
             selectedDialect: props.configuration.get('dialect')
         };
     }
 
+    testClass(dialect) {
+        /*
+            Binary success or failure test class.
+            Test if the logo is selected and updated in configuration.
+            `test-selected` as className is set when it is. `test-unselected`
+        */
+
+        const consistency =
+            (DIALECTS[dialect]
+            === this.state.selectedEngine) &&
+            (DIALECTS[dialect]
+            === this.props.configuration.get('dialect'));
+
+        if (consistency) {
+            return 'test-consistent_state';
+        } else {
+            return 'test-nonconsistent_state';
+        }
+    }
+
     logoIsSelected(dialect) {
-        return this.state.selectedEngine === ENGINES[dialect];
+        return this.state.selectedEngine === DIALECTS[dialect];
     }
 
     resetAllToNull() {
@@ -46,41 +66,19 @@ export default class DialectSelector extends Component {
 	render() {
         const {configActions} = this.props;
 
-<<<<<<< HEAD:app/components/Settings/DialectSelector/DialectSelector.react.js
-        const resetAllToNull = () => {
-            configActions.update({
-                username: null,
-                password: null,
-                database: null,
-                port: null,
-                storage: null,
-                host: null
-            });
-        };
-
 		const logos = Object.keys(DIALECTS).map(dialect => (
-=======
-		const logos = Object.keys(ENGINES).map(dialect => (
->>>>>>> :cow2: take out functions out of render:app/components/Settings/EngineSelector/EngineSelector.react.js
             <div>
                 <div className={classnames(
-                        styles.logo, {
-                            [styles.logoSelected]:
-                                this.state.selectedDialect === DIALECTS[dialect]
-                        }
+                        styles.logo,
+                        {[styles.logoSelected]: this.logoIsSelected(dialect)},
+                        [this.testClass(dialect)]
                     )}
                     onClick={() => {
-<<<<<<< HEAD:app/components/Settings/DialectSelector/DialectSelector.react.js
                         this.setState({selectedDialect: DIALECTS[dialect]});
                         configActions.update({dialect: DIALECTS[dialect]});
-                        resetAllToNull();
-=======
-                        this.setState({selectedEngine: ENGINES[dialect]});
-                        merge({dialect: ENGINES[dialect]});
                         this.resetAllToNull();
->>>>>>> :cow2: take out functions out of render:app/components/Settings/EngineSelector/EngineSelector.react.js
                     }}
-                    id={ENGINES[dialect] + 'logo'}
+                    id={DIALECTS[dialect] + 'logo'}
                 >
                     <img
                         className={styles.logoImage}
