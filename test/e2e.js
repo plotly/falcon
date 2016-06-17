@@ -1,11 +1,11 @@
 import path from 'path';
 import chromedriver from 'chromedriver';
 import webdriver from 'selenium-webdriver';
-import { expect } from 'chai';
+import {expect} from 'chai';
 import electronPath from 'electron-prebuilt';
 
-import {APP_STATUS_CONSTANTS} from '../app/reducers/connection';
-import {ENGINES} from '../app/components/Settings/Constants/SupportedEngines.react';
+import {APP_STATUS_CONSTANTS} from '../app/constants/constants';
+import {ENGINES} from '../app/constants/constants.react';
 import {CREDENTIALS} from './credentials.js';
 
 // import styles to use for tests
@@ -96,8 +96,15 @@ describe('main window', function spec() {
         .then(await fillInputs())
         .then(await delay(1000))
         .then(await btn.click())
-        .then(await delay(2000));
+        .then(await delay(1000));
         expect(await btn.getAttribute('value')).to.equal(APP_STATUS_CONSTANTS.CONNECTED);
+    });
+
+    it('should disconnect whenn the disconnect button is pressed', async () => {
+        const btn = await getBtn();
+        await btn.click()
+        .then(await delay(1000));
+        expect(await btn.getAttribute('value')).to.equal(APP_STATUS_CONSTANTS.DISCONNECTED);
     });
 
     after(async () => {

@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './DatabaseDropdown.css';
 import Select from 'react-select';
-import {DIALECTS} from '../Constants/SupportedDialects.react';
+import {DIALECTS} from '../../../constants/constants';
 
 /*
     Displays in a dropdown menu all available databases/schemes

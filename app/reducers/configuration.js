@@ -1,5 +1,5 @@
 import {UPDATE} from '../actions/configuration.js';
-import {DIALECTS} from '../components/Settings/Constants/SupportedDialects.react';
+import {DIALECTS} from '../constants/constants';
 import Immutable from 'immutable';
 
 const INITIAL_STATE = Immutable.Map({
