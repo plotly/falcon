@@ -20,7 +20,7 @@ const LOGOS = {
 export default class DialectSelector extends Component {
     constructor(props) {
         super(props);
-        this.resetAllToNull = this.resetAllToNull.bind(this);
+        this.resetAll = this.resetAll.bind(this);
         this.testClass = this.testClass.bind(this);
         this.logoIsSelected = this.logoIsSelected.bind(this);
         this.state = {
@@ -30,9 +30,8 @@ export default class DialectSelector extends Component {
 
     testClass(dialect) {
         /*
-            Binary success or failure test class.
-            Test if the logo is selected and updated in configuration.
-            `test-selected` as className is set when it is. `test-unselected`
+            Sanity check, to see if the dialect selected by user is consistent
+            with the configuration store.
         */
 
         const consistency =
@@ -52,14 +51,14 @@ export default class DialectSelector extends Component {
         return this.state.selectedEngine === DIALECTS[dialect];
     }
 
-    resetAllToNull() {
-        this.props.merge({
-            username: null,
-            password: null,
-            database: null,
-            port: null,
-            storage: null,
-            host: null
+    resetAll() {
+        this.props.configActions.merge({
+            username: '',
+            password: '',
+            database: '',
+            port: '',
+            storage: '',
+            host: ''
         });
     }
 
@@ -74,15 +73,15 @@ export default class DialectSelector extends Component {
                         [this.testClass(dialect)]
                     )}
                     onClick={() => {
-                        this.setState({selectedDialect: DIALECTS[dialect]});
+                        this.setState({selectedEngine: DIALECTS[dialect]});
                         configActions.update({dialect: DIALECTS[dialect]});
-                        this.resetAllToNull();
+                        this.resetAll();
                     }}
-                    id={DIALECTS[dialect] + 'logo'}
+                    id={`test-logo-${DIALECTS[dialect]}`}
                 >
                     <img
                         className={styles.logoImage}
-                        src={LOGOS[dialect]}
+                        src={DIALECTS[dialect]}
                     />
                 </div>
             </div>
