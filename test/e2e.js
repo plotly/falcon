@@ -208,7 +208,14 @@ describe('main window', function spec() {
     it('should not show a table preview',
     async () => {
 
-        expect(await this.getTables()).to.throw(/NoSuchElementError/);
+        let error;
+        try {
+            error = await this.getTables();
+        }
+        catch (err) {
+            error = err;
+        }
+        expect(error.toString()).to.contain('NoSuchElementError');
 
     });
 
@@ -218,6 +225,7 @@ describe('main window', function spec() {
         // TODO: debug how to get options from react-select
         // TODO: debug how to set a value into the react-select item
         const databaseDropdown = await this.getDatabaseDropdown();
+        // click to open options
         await databaseDropdown.click();
 
         expect(await this.getDatabaseOptions().getAttribute('value')).to.equal('[]');
