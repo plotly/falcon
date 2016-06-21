@@ -41,9 +41,9 @@ export default class DialectSelector extends Component {
             === this.props.configuration.get('dialect'));
 
         if (consistency) {
-            return 'test-consistent_state';
+            return 'test-consistent-state';
         } else {
-            return 'test-nonconsistent_state';
+            return 'test-nonconsistent-state';
         }
     }
 
