@@ -4,8 +4,7 @@ import webdriver from 'selenium-webdriver';
 import {expect} from 'chai';
 import electronPath from 'electron-prebuilt';
 
-import {APP_STATUS_CONSTANTS} from '../app/constants/constants';
-import {ENGINES} from '../app/constants/constants.react';
+import {APP_STATUS_CONSTANTS, ENGINES, USER_INPUT_FIELDS} from '../app/constants/constants';
 import {CREDENTIALS} from './credentials.js';
 
 // import styles to use for tests
