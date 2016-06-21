@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import classnames from 'classnames';
 import styles from './DatabaseDropdown.css';
 import Select from 'react-select';
 import {DIALECTS} from '../../../constants/constants';
@@ -15,10 +16,23 @@ import {DIALECTS} from '../../../constants/constants';
 export default class DatabaseDropdown extends Component {
     constructor(props) {
         super(props);
+        this.testClass = this.testClass.bind(this);
+    }
+
+    testClass(options) {
+        /*
+            'connected' if has enabled database options
+        */
+        return (!options[0]['disabled']) ? 'test-connected' : 'test-disconnected';
+
     }
 
 	render() {
+<<<<<<< HEAD
         const {configuration, configActions, ipc, ipcActions} = this.props;
+=======
+        const {configuration, connection, ipc, ipcActions, merge} = this.props;
+>>>>>>> :wrench: :book: use id's and test-className for tests, more tests
 
         const ipcDatabases = ipc.get('databases');
         let databaseDropdownOptions;
@@ -43,7 +57,12 @@ export default class DatabaseDropdown extends Component {
         }
 
         return (
-            <div className={styles.dropdown}>
+            <div className={classnames(
+                    styles.dropdown,
+                    this.testClass(databaseDropdownOptions)
+                )}
+                id="test-database-dropdown"
+            >
                 <Select
                     name="form-field-name"
                     placeholder="Select a Database"

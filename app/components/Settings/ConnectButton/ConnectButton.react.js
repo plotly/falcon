@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import classnames from 'classnames';
 import styles from './ConnectButton.css';
 import Select from 'react-select';
 import {APP_STATUS_CONSTANTS, BUTTON_MESSAGE} from '../../../constants/constants';
@@ -16,9 +17,20 @@ export default class ConnectButton extends Component {
         super(props);
         this.connect = this.connect.bind(this);
         this.disconnect = this.disconnect.bind(this);
+        this.testClass = this.testClass.bind(this);
         this.state = {
             hover: false
         };
+    }
+
+    testClass() {
+        /*
+            Return the connection state as class-status.
+            Knowing this status and getting the errorMessage and buttonMessage
+            from their respective className tags will suffice to test this
+            comoponent.
+        */
+        return `test-${this.props.connection.get('status')}`;
     }
 
     connect() {
@@ -99,17 +111,26 @@ export default class ConnectButton extends Component {
 
 		return (
 			<div className={styles.footer}>
-				<a className={styles.buttonPrimary}
+				<a className={classnames(
+                        styles.buttonPrimary,
+                        [this.testClass()]
+                    )}
 					onClick={onButtonClick}
                     onMouseOut={() => {this.setState({hover: false});}}
                     onMouseOver={() => {this.setState({hover: true});}}
-                    value={APP_STATUS_CONSTANTS[status]}
+                    id={'test-connect-button'}
 				>
 					{buttonMessage}
 				</a>
+<<<<<<< HEAD
                 <a>
                     {errorMessage}
                 </a>
+=======
+                <pre id={'test-error-message'}>
+                    {errorMessage}
+                </pre>
+>>>>>>> :wrench: :book: use id's and test-className for tests, more tests
 			</div>
 		);
 	}
