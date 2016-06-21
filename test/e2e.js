@@ -31,70 +31,74 @@ describe('main window', function spec() {
         })
         .forBrowser('electron')
         .build();
+
+        const findels = (args) => this.driver.findElements(args);
+        const findel = (args) => this.driver.findElement(args);
+
+        const byClass = (args) => webdriver.By.className(args);
+        const byId = (args) => webdriver.By.id(args);
+        const byCss = (args) => webdriver.By.css(args);
+        const byPath = (args) => webdriver.By.xpath(args);
+
+
+        // grab group of elements
+        this.getLogos = () => findels(byClass(logoStyles.logo));
+        this.getInputs = () => findels(byPath('//input'));
+
+        // grab specific element
+        this.getLogo = (dialect) => findel(
+            byId(`test-logo-${dialect}`)
+        );
+
+        this.getInputField = (credential) => findel(
+            byId(`test-input-${credential}`)
+        );
+
+        this.getConnectBtn = () => findel(
+            byId('test-connect-button')
+        );
+
+        this.getDatabaseDropdown = () => findel(
+            byId('test-database-dropdown')
+        );
+
+        this.getDatabaseOptions = () => findel(
+            byCss('.Select-option')
+        );
+
+        this.getTables = () => findel(
+            byId('test-tables')
+        );
+
+        this.getLogs = () => findel(
+            byId('test-logs')
+        );
+
+        this.getErrorMessage = () => findel(
+            byId('test-error-message')
+        );
+
+        // user inputs
+        this.fillInputs = async (testedDialect) => {
+            USER_INPUT_FIELDS[testedDialect].forEach(credential => {
+                this.getInputField(credential)
+                .then(input => input.sendKeys(CREDENTIALS['local'][credential]));
+            });
+        };
+
+        this.wrongInputs = async (testedDialect) => {
+            USER_INPUT_FIELDS[testedDialect].forEach(credential => {
+                this.getInputField(credential)
+                .then(input => input.sendKeys('blah'));
+            });
+        };
+
     });
 
-    // TODO: simplify the code for these grabbing functions
-
-    // grab group of elements
-    const getLogos = () => this.driver.findElements(
-        webdriver.By.className(logoStyles.logo)
-    );
-    const getInputs = () => this.driver.findElements(
-        webdriver.By.xpath('//input')
-    );
-
-    // grab specific element
-    const getLogo = (dialect) => this.driver.findElement(
-        webdriver.By.id(`test-logo-${dialect}`)
-    );
-    const getInputField = (credential) => this.driver.findElement(
-        webdriver.By.id(`test-input-${credential}`)
-    );
-    const getConnectBtn = () => this.driver.findElement(
-        webdriver.By.id('test-connect-button')
-    );
-    const getDatabaseDropdown = () => this.driver.findElement(
-        webdriver.By.id('test-database-dropdown')
-    );
-    const getDatabaseOptions = () => this.driver.findElement(
-        webdriver.By.css('.Select-option')
-    );
-    const getTables = () => this.driver.findElement(
-        webdriver.By.id('test-tables')
-    );
-    const getLogs = () => this.driver.findElement(
-        webdriver.By.id('test-logs')
-    );
-    const getErrorMessage = () => this.driver.findElement(
-        webdriver.By.id('test-error-message')
-    );
-
-
     // grab property of element
-    const getIdOf = (element) => element.getAttribute('id');
     const getClassOf = (element) => element.getAttribute('class');
 
-
-    // user inputs
-    async function fillInputs(testedDialect) {
-        // enter credentials into the fields
-        USER_INPUT_FIELDS[testedDialect].forEach(credential => {
-            getInputField(credential)
-            .then(input => input.sendKeys(CREDENTIALS['local'][credential]));
-        });
-    }
-    async function wrongInputs(testedDialect) {
-        // enter credentials into the fields
-        USER_INPUT_FIELDS[testedDialect].forEach(credential => {
-            getInputField(credential)
-            .then(input => input.sendKeys('blah'));
-        });
-    }
-
-
-
     // TODO: replace delay times with a functions that waits for a change
-
 
     it('should open window',
     async () => {
@@ -108,7 +112,7 @@ describe('main window', function spec() {
     it('should display five available dialect logos',
     async () => {
 
-        const logos = await getLogos();
+        const logos = await this.getLogos();
 
         expect(logos.length).to.equal(5);
 
@@ -117,7 +121,7 @@ describe('main window', function spec() {
     it('should enter text into the text box',
     async () => {
 
-        const inputs = await getInputs();
+        const inputs = await this.getInputs();
         const textinput = 'this is an input';
 
         inputs[0].sendKeys(textinput);
@@ -128,8 +132,8 @@ describe('main window', function spec() {
     it('should clear input values if a new database dialect is selected',
     async () => {
 
-        const inputs = await getInputs();
-        const logos = await getLogos();
+        const inputs = await this.getInputs();
+        const logos = await this.getLogos();
 
         logos[1].click();
         expect(await inputs[0].getAttribute('value')).to.equal('');
@@ -140,7 +144,7 @@ describe('main window', function spec() {
     async () => {
 
         const expectedClass = `test-${APP_STATUS_CONSTANTS.DISCONNECTED}`;
-        const btn = await getConnectBtn();
+        const btn = await this.getConnectBtn();
 
         const testClass = await getClassOf(btn);
         expect(testClass).to.contain(expectedClass);
@@ -152,7 +156,7 @@ describe('main window', function spec() {
 
         const expectedClass = 'test-consistent-state';
         const testedDialect = ENGINES.MYSQL;
-        const logo = await getLogo(testedDialect);
+        const logo = await this.getLogo(testedDialect);
 
         await logo.click()
         .then(await delay(500));
@@ -166,10 +170,10 @@ describe('main window', function spec() {
 
         const expectedClass = `test-${APP_STATUS_CONSTANTS.CONNECTED}`;
         const testedDialect = ENGINES.MYSQL;
-        const btn = await getConnectBtn();
+        const btn = await this.getConnectBtn();
 
         // click on the evaluated dialect logo
-        fillInputs(testedDialect)
+        this.fillInputs(testedDialect)
         .then(await delay(500))
         // click to connect
         .then(await btn.click())
@@ -183,7 +187,7 @@ describe('main window', function spec() {
     async () => {
 
         const expectedClass = 'test-connected';
-        const databaseDropdown = getDatabaseDropdown();
+        const databaseDropdown = this.getDatabaseDropdown();
 
         const testClass = await getClassOf(databaseDropdown);
         expect(testClass).to.contain(expectedClass);
@@ -194,7 +198,7 @@ describe('main window', function spec() {
     async () => {
 
         const expectedClass = 'test-1-entries';
-        const logs = await getLogs();
+        const logs = await this.getLogs();
 
         const testClass = await getClassOf(logs);
         expect(testClass).to.contain(expectedClass);
@@ -204,7 +208,7 @@ describe('main window', function spec() {
     it('should not show a table preview',
     async () => {
 
-        expect(await getTables()).to.throw(/NoSuchElementError/);
+        expect(await this.getTables()).to.throw(/NoSuchElementError/);
 
     });
 
@@ -213,10 +217,10 @@ describe('main window', function spec() {
 
         // TODO: debug how to get options from react-select
         // TODO: debug how to set a value into the react-select item
-        const databaseDropdown = await getDatabaseDropdown();
-        await databaseDropdown.click()
-        .then(await getDatabaseOptions());
-        expect(await getDatabaseOptions().getAttribute('value')).to.equal('[]');
+        const databaseDropdown = await this.getDatabaseDropdown();
+        await databaseDropdown.click();
+
+        expect(await this.getDatabaseOptions().getAttribute('value')).to.equal('[]');
 
     });
 
@@ -224,7 +228,7 @@ describe('main window', function spec() {
     async () => {
 
         const expectedClass = `test-${APP_STATUS_CONSTANTS.DISCONNECTED}`;
-        const btn = await getConnectBtn();
+        const btn = await this.getConnectBtn();
 
         await btn.click()
         .then(await delay(1000));
@@ -239,15 +243,15 @@ describe('main window', function spec() {
 
         const expectedClass = `test-${APP_STATUS_CONSTANTS.ERROR}`;
         const testedDialect = ENGINES.MYSQL;
-        const btn = await getConnectBtn();
+        const btn = await this.getConnectBtn();
 
-        wrongInputs(testedDialect)
+        this.wrongInputs(testedDialect)
         .then(await delay(500))
         // click to connect
         .then(await btn.click())
         .then(await delay(1000));
 
-        const errorMessage = await getErrorMessage();
+        const errorMessage = await this.getErrorMessage();
         const testClass = await getClassOf(btn);
         expect(testClass.includes(expectedClass)).to.equal(true);
         expect(await errorMessage.getText()).to.have.length.above(0);
