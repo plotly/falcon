@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react';
+import classnames from 'classnames';
 import styles from './Logger.css';
 
 const Logger = props => {
@@ -8,10 +9,19 @@ const Logger = props => {
         <div>{log.timestamp} - {log.description}</div>
     ));
 
+    const testClass = () => {
+        /*
+            Return the number of logs to easily track updates when testing
+        */
+        return `test-${props.logs.length}-entries`;
+    };
+
     return (
         <div>
             <h5>Logs</h5>
-            <pre className={styles.renderLogs}>
+            <pre className={classnames(styles.renderLogs, testClass())}
+                id="test-logs"
+            >
                 {renderLogs}
             </pre>
         </div>

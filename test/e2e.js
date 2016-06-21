@@ -33,77 +33,225 @@ describe('main window', function spec() {
         .build();
     });
 
-    // element grabbing functions
-    const getLogos = () => this.driver.findElements(webdriver.By.className(logoStyles.logo));
-    const getLogo = (dialect) => this.driver.findElement(webdriver.By.id(ENGINES[dialect.toUpperCase()] + 'logo'));
-    const getInputs = () => this.driver.findElements(webdriver.By.xpath('//input'));
-    const getBtn = () => this.driver.findElement(webdriver.By.className(btnStyles.buttonPrimary));
+    // TODO: simplify the code for these grabbing functions
 
+    // grab group of elements
+    const getLogos = () => this.driver.findElements(
+        webdriver.By.className(logoStyles.logo)
+    );
+    const getInputs = () => this.driver.findElements(
+        webdriver.By.xpath('//input')
+    );
+
+    // grab specific element
+    const getLogo = (dialect) => this.driver.findElement(
+        webdriver.By.id(`test-logo-${dialect}`)
+    );
+    const getInputField = (credential) => this.driver.findElement(
+        webdriver.By.id(`test-input-${credential}`)
+    );
+    const getConnectBtn = () => this.driver.findElement(
+        webdriver.By.id('test-connect-button')
+    );
+    const getDatabaseDropdown = () => this.driver.findElement(
+        webdriver.By.id('test-database-dropdown')
+    );
+    const getDatabaseOptions = () => this.driver.findElement(
+        webdriver.By.css('.Select-option')
+    );
+    const getTables = () => this.driver.findElement(
+        webdriver.By.id('test-tables')
+    );
+    const getLogs = () => this.driver.findElement(
+        webdriver.By.id('test-logs')
+    );
+    const getErrorMessage = () => this.driver.findElement(
+        webdriver.By.id('test-error-message')
+    );
+
+
+    // grab property of element
     const getIdOf = (element) => element.getAttribute('id');
+    const getClassOf = (element) => element.getAttribute('class');
 
 
-    it('should open window', async () => {
+    // user inputs
+    async function fillInputs(testedDialect) {
+        // enter credentials into the fields
+        USER_INPUT_FIELDS[testedDialect].forEach(credential => {
+            getInputField(credential)
+            .then(input => input.sendKeys(CREDENTIALS['local'][credential]));
+        });
+    }
+    async function wrongInputs(testedDialect) {
+        // enter credentials into the fields
+        USER_INPUT_FIELDS[testedDialect].forEach(credential => {
+            getInputField(credential)
+            .then(input => input.sendKeys('blah'));
+        });
+    }
+
+
+
+    // TODO: replace delay times with a functions that waits for a change
+
+
+    it('should open window',
+    async () => {
+
         const title = await this.driver.getTitle();
+
         expect(title).to.equal('Plotly Desktop Connector');
+
     });
 
-    it('should display five available databases logos', async () => {
+    it('should display five available dialect logos',
+    async () => {
+
         const logos = await getLogos();
+
         expect(logos.length).to.equal(5);
+
     });
 
-    it('should display four available user text inputs', async () => {
-        const inputs = await getInputs();
-        expect(inputs.length).to.equal(4);
-    });
+    it('should enter text into the text box',
+    async () => {
 
-    it('should enter text into the first text box', async () => {
         const inputs = await getInputs();
-        const textinput = CREDENTIALS.mysql.username;
+        const textinput = 'this is an input';
+
         inputs[0].sendKeys(textinput);
         expect(await inputs[0].getAttribute('value')).to.equal(textinput);
+
     });
 
-    it('should clear input values if a new database dialect is selected', async () => {
-        const logos = await getLogos();
+    it('should clear input values if a new database dialect is selected',
+    async () => {
+
         const inputs = await getInputs();
+        const logos = await getLogos();
+
         logos[1].click();
         expect(await inputs[0].getAttribute('value')).to.equal('');
+
     });
 
-    it('should the state should be disconnected', async () => {
-        const btn = await getBtn();
-        expect(await btn.getAttribute('value')).to.equal(APP_STATUS_CONSTANTS.DISCONNECTED);
+    it('should have an initial state of disconnected',
+    async () => {
+
+        const expectedClass = `test-${APP_STATUS_CONSTANTS.DISCONNECTED}`;
+        const btn = await getConnectBtn();
+
+        const testClass = await getClassOf(btn);
+        expect(testClass).to.contain(expectedClass);
+
     });
 
-    it('should connect to mysql remote database', async () => {
+    it('should have updated the config with new dialect value',
+    async () => {
+
+        const expectedClass = 'test-consistent-state';
         const testedDialect = ENGINES.MYSQL;
         const logo = await getLogo(testedDialect);
-        const inputs = await getInputs();
-        const btn = await getBtn();
 
-        // enter credentials into the fields
-        async function fillInputs() {
-            inputs.forEach(input => {
-                getIdOf(input)
-                .then(placeholder => input.sendKeys(CREDENTIALS[testedDialect][placeholder]));
-            });
-        }
+        await logo.click()
+        .then(await delay(500));
+        const testClass = await getClassOf(logo);
+        expect(testClass).to.contain(expectedClass);
 
-        // click on the evaluated dialect logo
-        logo.click()
-        .then(await fillInputs())
-        .then(await delay(1000))
-        .then(await btn.click())
-        .then(await delay(1000));
-        expect(await btn.getAttribute('value')).to.equal(APP_STATUS_CONSTANTS.CONNECTED);
     });
 
-    it('should disconnect whenn the disconnect button is pressed', async () => {
-        const btn = await getBtn();
+    it('should connect to the database using the inputs and selected dialect',
+    async () => {
+
+        const expectedClass = `test-${APP_STATUS_CONSTANTS.CONNECTED}`;
+        const testedDialect = ENGINES.MYSQL;
+        const btn = await getConnectBtn();
+
+        // click on the evaluated dialect logo
+        fillInputs(testedDialect)
+        .then(await delay(500))
+        // click to connect
+        .then(await btn.click())
+        .then(await delay(1000));
+        const testClass = await getClassOf(btn);
+        expect(testClass).to.contain(expectedClass);
+
+    });
+
+    it('should show the database selector after connection',
+    async () => {
+
+        const expectedClass = 'test-connected';
+        const databaseDropdown = getDatabaseDropdown();
+
+        const testClass = await getClassOf(databaseDropdown);
+        expect(testClass).to.contain(expectedClass);
+
+    });
+
+    it('should show a log with one logged item in the log',
+    async () => {
+
+        const expectedClass = 'test-1-entries';
+        const logs = await getLogs();
+
+        const testClass = await getClassOf(logs);
+        expect(testClass).to.contain(expectedClass);
+
+    });
+
+    it('should not show a table preview',
+    async () => {
+
+        expect(await getTables()).to.throw(/NoSuchElementError/);
+
+    });
+
+    it('should show table previews when database is selected from dropdown',
+    async () => {
+
+        // TODO: debug how to get options from react-select
+        // TODO: debug how to set a value into the react-select item
+        const databaseDropdown = await getDatabaseDropdown();
+        await databaseDropdown.click()
+        .then(await getDatabaseOptions());
+        expect(await getDatabaseOptions().getAttribute('value')).to.equal('[]');
+
+    });
+
+    it('should disconnect when the disconnect button is pressed',
+    async () => {
+
+        const expectedClass = `test-${APP_STATUS_CONSTANTS.DISCONNECTED}`;
+        const btn = await getConnectBtn();
+
         await btn.click()
         .then(await delay(1000));
-        expect(await btn.getAttribute('value')).to.equal(APP_STATUS_CONSTANTS.DISCONNECTED);
+        const testClass = await getClassOf(btn);
+        expect(testClass).to.contain(expectedClass);
+
+    });
+
+    it('should display an error when wrong credentials are enetered and the ' +
+    'button state should be disconnected and the log should not update',
+    async () => {
+
+        const expectedClass = `test-${APP_STATUS_CONSTANTS.ERROR}`;
+        const testedDialect = ENGINES.MYSQL;
+        const btn = await getConnectBtn();
+
+        wrongInputs(testedDialect)
+        .then(await delay(500))
+        // click to connect
+        .then(await btn.click())
+        .then(await delay(1000));
+
+        const errorMessage = await getErrorMessage();
+        const testClass = await getClassOf(btn);
+        expect(testClass.includes(expectedClass)).to.equal(true);
+        expect(await errorMessage.getText()).to.have.length.above(0);
+
     });
 
     after(async () => {

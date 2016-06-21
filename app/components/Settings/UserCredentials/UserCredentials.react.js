@@ -16,7 +16,16 @@ export default class UserCredentials extends Component {
 		this.getPlaceholder = this.getPlaceholder.bind(this);
 		this.getInputType = this.getInputType.bind(this);
 		this.getOnClick = this.getOnClick.bind(this);
+		this.testClass = this.testClass.bind(this);
     }
+
+	testClass() {
+		/*
+			No internal tests for now.
+		*/
+
+		return 'test-input-created';
+	}
 
 	getInputType (credential) {
 		if (credential === 'password') {
@@ -61,7 +70,7 @@ export default class UserCredentials extends Component {
 
 		let inputs = USER_INPUT_FIELDS[configuration.get('dialect')]
 			.map(credential => (
-			<input
+			<input className={this.testClass()}
 				placeholder={this.getPlaceholder(credential)}
 				type={this.getInputType(credential)}
 				onChange={e => (
@@ -69,7 +78,7 @@ export default class UserCredentials extends Component {
 				)}
 				onClick={this.getOnClick(credential)}
 				value={configuration.get(credential)}
-				id={credential}
+				id={`test-input-${credential}`}
 			/>
 		));
 
