@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './ConnectButton.css';
 import Select from 'react-select';
-import {APP_STATUS_CONSTANTS} from '../../../constants/constants';
+import {APP_STATUS_CONSTANTS, BUTTON_MESSAGE} from '../../../constants/constants';
 
 /*
 	Displays a connect button and a disconnect button.
@@ -10,14 +10,6 @@ import {APP_STATUS_CONSTANTS} from '../../../constants/constants';
 	inside the users' account using `ipcActions`.
 	Displays errors and log messages using `ipc`.
 */
-
-const BUTTON_MESSAGE = {
-    INITIALIZED: 'connect',
-    ERROR: 'try again',
-    CONNECTED: 'connected',
-    CONNECTING: 'connecting...',
-    DISCONNECTED: 'connect'
-};
 
 export default class ConnectButton extends Component {
     constructor(props) {

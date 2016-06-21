@@ -2,21 +2,13 @@ import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import styles from './UserCredentials.css';
 import classnames from 'classnames';
-import {DIALECTS} from '../../../constants/constants';
+import {DIALECTS, USER_INPUT_FIELDS} from '../../../constants/constants';
 const {dialog} = require('electron').remote;
 
 /*
 	Displays and alters user inputs for `configuration`
 	username, password, and local port number.
 */
-
-const USER_CREDENTIALS = {
-    [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port'],
-    [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port'],
-	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port'],
-    [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
-    [DIALECTS.SQLITE]: ['storage']
-};
 
 export default class UserCredentials extends Component {
     constructor(props) {
@@ -67,7 +59,7 @@ export default class UserCredentials extends Component {
 	render() {
 		const {configuration, configActions} = this.props;
 
-		let inputs = USER_CREDENTIALS[configuration.get('dialect')]
+		let inputs = USER_INPUT_FIELDS[configuration.get('dialect')]
 			.map(credential => (
 			<input
 				placeholder={this.getPlaceholder(credential)}
