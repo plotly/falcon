@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import styles from './Settings.css';
 import DatabaseDropdown from './DatabaseDropdown/DatabaseDropdown.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
@@ -139,3 +140,12 @@ export default class Settings extends Component {
         );
     }
 }
+
+Settings.propTypes = {
+    configuration: ImmutablePropTypes.map.isRequired,
+    configActions: PropTypes.Object,
+    ipc: ImmutablePropTypes.map.isRequired,
+    ipcActions: PropTypes.Object,
+    connection: ImmutablePropTypes.map.isRequired,
+    connectionActions: PropTypes.Object
+};

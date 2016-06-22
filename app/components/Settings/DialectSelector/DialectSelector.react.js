@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import styles from './DialectSelector.css';
 import classnames from 'classnames';
 import {DIALECTS} from '../Constants/SupportedDialects.react';
@@ -67,3 +68,8 @@ export default class DialectSelector extends Component {
 		);
 	}
 }
+
+DialectSelector.propTypes = {
+    configuration: ImmutablePropTypes.map.isRequired,
+    configActions: PropTypes.Object
+};

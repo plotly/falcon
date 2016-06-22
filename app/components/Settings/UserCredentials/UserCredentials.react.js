@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import styles from './UserCredentials.css';
 import classnames from 'classnames';
 import {DIALECTS} from '../Constants/SupportedDialects.react';
@@ -86,3 +87,8 @@ export default class UserCredentials extends Component {
 		);
 	}
 }
+
+UserCredentials.propTypes = {
+    configuration: ImmutablePropTypes.map.isRequired,
+    configActions: PropTypes.Object
+};

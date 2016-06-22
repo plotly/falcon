@@ -44,8 +44,9 @@ export default class Configuration extends Component {
 
 Configuration.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
-    merge: PropTypes.func.isRequired,
+    configActions: PropTypes.Object,
     ipc: ImmutablePropTypes.map.isRequired,
     ipcActions: PropTypes.Object,
-    configActions: PropTypes.Object
+    connection: ImmutablePropTypes.map.isRequired,
+    connectionActions: PropTypes.Object
 };
