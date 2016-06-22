@@ -1,4 +1,5 @@
 import Sequelize from 'sequelize';
+import {ENGINES} from './app/components/Settings/Constants/SupportedEngines.react';
 import parse from './parse';
 import {merge} from 'ramda';
 
@@ -64,7 +65,7 @@ export default class SequelizeManager {
 
     intoTablesArray(results) {
         let tables;
-        if (this.getDialect() === 'sqlite') {
+        if (this.getDialect() === ENGINES.SQLITE) {
             // sqlite returns an array by default
             tables = results;
         } else {
@@ -105,7 +106,7 @@ export default class SequelizeManager {
         const dialect = this.getDialect();
 
         // deal with sqlite -> has no databases list
-        if (dialect === 'sqlite') {
+        if (dialect === ENGINES.SQLITE) {
             callback({
                 databases: ['SQLITE database accessed'],
                 error: null,
@@ -200,14 +201,14 @@ export default class SequelizeManager {
         switch (showQuerySelector) {
             case PREBUILT_QUERY.SHOW_DATABASES:
                 switch (dialect) {
-                    case 'mysql':
-                    case 'sqlite':
-                    case 'mariadb':
+                    case ENGINES.MYSQL:
+                    case ENGINES.SQLITE:
+                    case ENGINES.MARIADB:
                         return 'SHOW DATABASES';
-                    case 'postgres':
+                    case ENGINES.POSTGRES:
                         return 'SELECT datname AS database FROM ' +
                         'pg_database WHERE datistemplate = false;';
-                    case 'mssql':
+                    case ENGINES.MSSQL:
                         return 'SELECT name FROM Sys.Databases';
                     default:
                         throw new Error('could not build a presetQuery');
@@ -215,17 +216,17 @@ export default class SequelizeManager {
 
             case PREBUILT_QUERY.SHOW_TABLES:
                 switch (dialect) {
-                    case 'mysql':
-                    case 'mariadb':
+                    case ENGINES.MYSQL:
+                    case ENGINES.MARIADB:
                         return 'SHOW TABLES';
-                    case 'postgres':
+                    case ENGINES.POSTGRES:
                         return 'SELECT table_name FROM ' +
                             'information_schema.tables WHERE ' +
                             'table_schema = \'public\'';
-                    case 'mssql':
+                    case ENGINES.MSSQL:
                         return 'SELECT TABLE_NAME FROM ' +
                             'information_schema.tables';
-                    case 'sqlite':
+                    case ENGINES.SQLITE:
                         return 'SELECT name FROM ' +
                         'sqlite_master WHERE type="table"';
                     default:
@@ -234,12 +235,12 @@ export default class SequelizeManager {
 
             case PREBUILT_QUERY.SHOW5ROWS:
                 switch (dialect) {
-                    case 'mysql':
-                    case 'sqlite':
-                    case 'mariadb':
-                    case 'postgres':
+                    case ENGINES.MYSQL:
+                    case ENGINES.SQLITE:
+                    case ENGINES.MARIADB:
+                    case ENGINES.POSTGRES:
                         return `SELECT * FROM ${table} LIMIT 5`;
-                    case 'mssql':
+                    case ENGINES.MSSQL:
                         return 'SELECT TOP 5 * FROM ' +
                             `${this.connection.config.database}.dbo.${table}`;
                     default:
