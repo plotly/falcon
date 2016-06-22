@@ -78,9 +78,8 @@ export function serverMessageHandler(sequelizeManager, mainWindowContents) {
 		}
 
 		const callback = (message) => {
-			// optionally modify message or payload here
 			respondEvent.send(message);
-			// send stuff back to front-end, too
+			// send stuff back to electorn app, too
 			mainWindowContents.send('channel', message);
 		};
 
