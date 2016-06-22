@@ -5,7 +5,7 @@ import ConnectButton from './ConnectButton/ConnectButton.react';
 import UserCredentials from './UserCredentials/UserCredentials.react';
 import LoggerController from './Logger/LoggerController.react';
 import PreviewController from './Preview/PreviewController.react';
-import EngineSelector from './EngineSelector/EngineSelector.react';
+import DialectSelector from './DialectSelector/DialectSelector.react';
 import {APP_STATUS_CONSTANTS} from '../../reducers/connection';
 
 export default class Settings extends Component {
@@ -23,7 +23,7 @@ export default class Settings extends Component {
 
         const dialectSelector = (
             <div>
-                <EngineSelector
+                <DialectSelector
                     configActions={configActions}
                     configuration={configuration}
                 />

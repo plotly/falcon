@@ -1,12 +1,12 @@
 import {MERGE} from '../actions/configuration.js';
-import {ENGINES} from '../components/Settings/Constants/SupportedEngines.react';
+import {DIALECTS} from '../components/Settings/Constants/SupportedDialects.react';
 import Immutable from 'immutable';
 
 const INITIAL_STATE = Immutable.Map({
     username: null,
     password: null,
     database: null,
-    dialect: ENGINES.MYSQL,
+    dialect: DIALECTS.MYSQL,
     port: null,
     storage: null,
     host: null

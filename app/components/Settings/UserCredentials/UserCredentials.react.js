@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './UserCredentials.css';
 import classnames from 'classnames';
-import {ENGINES} from '../Constants/SupportedEngines.react';
+import {DIALECTS} from '../Constants/SupportedDialects.react';
 const {dialog} = require('electron').remote;
 
 /*
@@ -10,11 +10,11 @@ const {dialog} = require('electron').remote;
 */
 
 const USER_CREDENTIALS = {
-    [ENGINES.MYSQL]: ['username', 'password', 'host', 'port'],
-    [ENGINES.MARIADB]: ['username', 'password', 'host', 'port'],
-	[ENGINES.MSSQL]: ['username', 'password', 'host', 'port'],
-    [ENGINES.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
-    [ENGINES.SQLITE]: ['storage']
+    [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port'],
+    [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port'],
+	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port'],
+    [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
+    [DIALECTS.SQLITE]: ['storage']
 };
 
 export default class UserCredentials extends Component {

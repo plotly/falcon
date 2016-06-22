@@ -1,4 +1,4 @@
-export const ENGINES = {
+export const DIALECTS = {
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
     POSTGRES: 'postgres',

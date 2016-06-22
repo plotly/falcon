@@ -1,12 +1,12 @@
 import React, {Component, PropTypes} from 'react';
-import styles from './EngineSelector.css';
+import styles from './DialectSelector.css';
 import classnames from 'classnames';
-import {ENGINES} from '../Constants/SupportedEngines.react';
+import {DIALECTS} from '../Constants/SupportedDialects.react';
 
 /*
     Displays interactive database dialect logos and alters
     the chosen `configuration` dialect parameter.
-    TODO: take out the selectedEngine variable and use
+    TODO: take out the selectedDialect variable and use
     `configuration.get('dialect')` inestead?
 */
 
@@ -18,11 +18,11 @@ const LOGOS = {
     SQLITE: './images/sqliteLogo.png'
 };
 
-export default class EngineSelector extends Component {
+export default class DialectSelector extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedEngine: props.configuration.get('dialect')
+            selectedDialect: props.configuration.get('dialect')
         };
     }
 
@@ -41,17 +41,17 @@ export default class EngineSelector extends Component {
             });
         };
 
-		const logos = Object.keys(ENGINES).map(dialect => (
+		const logos = Object.keys(DIALECTS).map(dialect => (
             <div>
                 <div className={classnames(
                         styles.logo, {
                             [styles.logoSelected]:
-                                this.state.selectedEngine === ENGINES[dialect]
+                                this.state.selectedDialect === DIALECTS[dialect]
                         }
                     )}
                     onClick={() => {
-                        this.setState({selectedEngine: ENGINES[dialect]});
-                        merge({dialect: ENGINES[dialect]});
+                        this.setState({selectedDialect: DIALECTS[dialect]});
+                        merge({dialect: DIALECTS[dialect]});
                         resetAllToNull();
                     }}
                 >

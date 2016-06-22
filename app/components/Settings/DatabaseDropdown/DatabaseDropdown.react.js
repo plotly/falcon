@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './DatabaseDropdown.css';
 import Select from 'react-select';
-import {ENGINES} from '../Constants/SupportedEngines.react';
+import {DIALECTS} from '../Constants/SupportedDialects.react';
 
 /*
     Displays in a dropdown menu all available databases/schemes
@@ -26,7 +26,7 @@ export default class DatabaseDropdown extends Component {
             disable the selector for sqlite which does not have databases, only
             tables
         */
-        const isDisabled = configuration.get('dialect') === ENGINES.SQLITE;
+        const isDisabled = configuration.get('dialect') === DIALECTS.SQLITE;
         if (ipcDatabases === null) {
             databaseDropdownOptions = [
                 {value: 'None', label: 'None Found', disabled: true}
