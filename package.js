@@ -18,7 +18,6 @@ const appName = argv.name || argv.n || pkg.productName;
 const shouldUseAsar = argv.asar || argv.a || false;
 const shouldBuildAll = argv.all || false;
 
-
 const DEFAULT_OPTS = {
     dir: './',
     name: appName,
@@ -28,10 +27,14 @@ const DEFAULT_OPTS = {
         '^/tools($|/)',
         '^/release($|/)',
         '^/main.development.js'
-    ].concat(devDeps.map(name => `/node_modules/${name}($|/)`))
+    ]
     .concat(
-        deps.filter(name => !electronCfg.externals.includes(name))
-        .map(name => `/node_modules/${name}($|/)`)
+        devDeps
+        .map(dep => `/node_modules/${dep}($|/)`))
+    .concat(
+        deps
+        .filter(dep => !Object.keys(electronCfg.externals[0]).includes(dep))
+        .map(dep => `/node_modules/${dep}($|/)`)
     )
 };
 

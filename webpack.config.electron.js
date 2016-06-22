@@ -1,5 +1,6 @@
 import webpack from 'webpack';
 import baseConfig from './webpack.config.base';
+import {merge} from 'ramda';
 
 export default {
     ...baseConfig,
@@ -40,8 +41,10 @@ export default {
     },
 
     externals: [
+        merge(
         ...baseConfig.externals,
-        'font-awesome',
-        'source-map-support'
+        {'font-awesome': 'font-awesome',
+        'source-map-support': 'source-map-support'}
+        )
     ]
 };
