@@ -1,8 +1,8 @@
 import {app, BrowserWindow, Menu, shell} from 'electron';
 import restify from 'restify';
 import SequelizeManager from './sequelizeManager';
-import {ipcMessageHandler,
-        serverMessageHandler,
+import {ipcMessageReceive,
+        serverMessageReceive,
         channel,
         timestamp} from './messageHandler';
 
@@ -55,17 +55,17 @@ app.on('ready', () => {
         mainWindow.show();
         mainWindow.focus();
         ipcMain.removeAllListeners(channel);
-        ipcMain.on(channel, ipcMessageHandler(sequelizeManager));
+        ipcMain.on(channel, ipcMessageReceive(sequelizeManager));
 
         // TODO: simplify this restify server routing code
-        server.get('/connect', serverMessageHandler(sequelizeManager, mainWindow.webContents));
-        server.get('/query', serverMessageHandler(sequelizeManager, mainWindow.webContents));
-        server.get('/tables', serverMessageHandler(sequelizeManager, mainWindow.webContents));
-        server.get('/disconnect', serverMessageHandler(sequelizeManager, mainWindow.webContents));
-        server.get('/v0/connect', serverMessageHandler(sequelizeManager, mainWindow.webContents));
-        server.get('/v0/query', serverMessageHandler(sequelizeManager, mainWindow.webContents));
-        server.get('/v0/tables', serverMessageHandler(sequelizeManager, mainWindow.webContents));
-        server.get('/v0/disconnect', serverMessageHandler(sequelizeManager, mainWindow.webContents));
+        server.get('/connect', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/query', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/tables', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/disconnect', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/v0/connect', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/v0/query', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/v0/tables', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/v0/disconnect', serverMessageReceive(sequelizeManager, mainWindow.webContents));
 
     });
 

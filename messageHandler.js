@@ -13,7 +13,7 @@ export const timestamp = () => (new Date()).toTimeString();
 
 export const channel = 'channel';
 
-export function serverMessageHandler(sequelizeManager, mainWindowContents) {
+export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 
 	return (requestEvent, respondEvent) => {
 
@@ -87,7 +87,7 @@ export function serverMessageHandler(sequelizeManager, mainWindowContents) {
 
 }
 
-export function ipcMessageHandler(sequelizeManager) {
+export function ipcMessageReceive(sequelizeManager) {
 	return (evt, payload) => {
 
 		const callback = (message) => {
