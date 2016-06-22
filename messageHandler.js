@@ -1,3 +1,5 @@
+import {merge} from 'ramda';
+
 export const TASKS = {
 	CONNECT: 'connect',
 	CHECK_CONNECTION: 'checkConnection',
@@ -17,16 +19,10 @@ export function serverMessageHandler(sequelizeManager, mainWindowContents) {
 
 		const payload = {};
 		const sequelizeSetup = () => {
-			const options = sequelizeManager.connection.options;
-			const config = sequelizeManager.connection.config;
-			const setup = {};
-			Object.keys(options).forEach( key => {
-				setup[key] = options[key];
-			});
-			Object.keys(config).forEach( key => {
-				setup[key] = config[key];
-			});
-			return setup;
+			return merge(
+				sequelizeManager.connection.options,
+				sequelizeManager.connection.config
+			);
 		};
 
 		switch (requestEvent.route.path) {
