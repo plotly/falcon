@@ -1,4 +1,4 @@
-import { UPDATE_STATE } from '../actions/ipc.js';
+import {UPDATE_STATE} from '../actions/ipc.js';
 
 import Immutable from 'immutable';
 

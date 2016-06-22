@@ -49,14 +49,14 @@ export default class UserCredentials extends Component {
 				dialog.showOpenDialog({
 					properties: ['openFile', 'openDirectory']
 				}, (paths) => {
-					const lastItemIndicator = paths[0].split('/').length - 1;
-					this.props.merge({
+					// result returned in an array
+					const path = paths[0];
+					// get the filename to use as username in the logs
+					const splitPath = path.split('/');
+					const fileName = splitPath.length - 1;
+					this.props.configActions.update({
 						[credential]: paths[0],
-						/*
-							set the username to database filename such that
-							it appears in the logs for the user to notice
-						*/
-						'username': paths[0].split('/')[lastItemIndicator]
+						'username': splitPath[fileName]
 					});
 				});
 			}
@@ -64,14 +64,15 @@ export default class UserCredentials extends Component {
 	}
 
 	render() {
-		const {configuration, merge} = this.props;
+		const {configuration, configActions} = this.props;
 
-		let inputs = USER_CREDENTIALS[configuration.get('dialect')].map(credential => (
+		let inputs = USER_CREDENTIALS[configuration.get('dialect')]
+			.map(credential => (
 			<input
 				placeholder={this.getPlaceholder(credential)}
 				type={this.getInputType(credential)}
 				onChange={e => (
-					merge({[credential]: e.target.value})
+					configActions.update({[credential]: e.target.value})
 				)}
 				onClick={this.getOnClick(credential)}
 				value={configuration.get(credential)}

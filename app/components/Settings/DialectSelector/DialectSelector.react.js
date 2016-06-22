@@ -28,10 +28,9 @@ export default class DialectSelector extends Component {
 
 	render() {
         const {configActions} = this.props;
-        const {merge} = configActions;
 
         const resetAllToNull = () => {
-            merge({
+            configActions.update({
                 username: null,
                 password: null,
                 database: null,
@@ -51,7 +50,7 @@ export default class DialectSelector extends Component {
                     )}
                     onClick={() => {
                         this.setState({selectedDialect: DIALECTS[dialect]});
-                        merge({dialect: DIALECTS[dialect]});
+                        configActions.update({dialect: DIALECTS[dialect]});
                         resetAllToNull();
                     }}
                 >

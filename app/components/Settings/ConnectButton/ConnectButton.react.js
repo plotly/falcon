@@ -50,7 +50,7 @@ export default class ConnectButton extends Component {
     componentWillReceiveProps(nextProps) {
         const updateStatus = (status) => {
             if (status !== this.props.connection.get('status')) {
-                this.props.connectionActions.merge({status});
+                this.props.connectionActions.update({status});
                 this.setState({
                     buttonMessage: BUTTON_MESSAGE[status]
                 });

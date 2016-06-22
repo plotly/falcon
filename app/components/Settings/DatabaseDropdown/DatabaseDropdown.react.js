@@ -18,7 +18,7 @@ export default class DatabaseDropdown extends Component {
     }
 
 	render() {
-        const {configuration, ipc, ipcActions, merge} = this.props;
+        const {configuration, configActions, ipc, ipcActions} = this.props;
 
         const ipcDatabases = ipc.get('databases');
         let databaseDropdownOptions;
@@ -38,7 +38,7 @@ export default class DatabaseDropdown extends Component {
         }
 
         function onSelectDatabase(database) {
-            merge({database: database.value});
+            configActions.update({database: database.value});
             ipcActions.selectDatabase();
         }
 

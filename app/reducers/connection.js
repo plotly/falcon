@@ -1,4 +1,4 @@
-import { MERGE } from '../actions/connection.js';
+import {UPDATE} from '../actions/connection.js';
 
 import Immutable from 'immutable';
 
@@ -16,8 +16,7 @@ const INITIAL_STATE = Immutable.Map({
 
 export default function connection(state = INITIAL_STATE, action) {
     switch (action.type) {
-        case MERGE:
-            console.warn(`action: ${JSON.stringify(action)}`);
+        case UPDATE:
             return state.merge(action.payload);
         default:
             return state;

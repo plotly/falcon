@@ -1,5 +1,5 @@
-import { createAction } from 'redux-actions';
+import {createAction} from 'redux-actions';
 
-export const MERGE = 'MERGE';
+export const UPDATE = 'UPDATE';
 
-export const merge = createAction(MERGE);
+export const update = createAction(UPDATE);

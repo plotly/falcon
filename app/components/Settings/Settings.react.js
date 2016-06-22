@@ -19,7 +19,6 @@ export default class Settings extends Component {
             ipc, ipcActions,
             connection, connectionActions
         } = this.props;
-        const {merge} = configActions;
 
         const dialectSelector = (
             <div>
@@ -33,7 +32,7 @@ export default class Settings extends Component {
         const userCredentials = (
             <UserCredentials
                 configuration={configuration}
-                merge={merge}
+                configActions={configActions}
             />
         );
 
@@ -52,7 +51,7 @@ export default class Settings extends Component {
 
                 <DatabaseDropdown
                     configuration={configuration}
-                    merge={merge}
+                    configActions={configActions}
                     ipcActions={ipcActions}
                     ipc={ipc}
                 />
