@@ -178,22 +178,9 @@ export default class SequelizeManager {
             open issue here:
             https://github.com/sequelize/sequelize/pull/5776
         */
-        const close = () => this.connection.close();
 
-        function closeConnection() {
-            return (new Promise(
-                () => {
-                    close();
-                    callback({
-                        databases: null,
-                        error: null,
-                        tables: null
-                    });
-                }, () => {})
-            );
-        }
-
-        return closeConnection();
+        this.connection.close();
+        callback({databases: null, error: null, tables: null});
     }
 
     getPresetQuery(showQuerySelector, table = null) {

@@ -9,8 +9,6 @@ export const TASKS = {
 	DISCONNECT: 'disconnect'
 };
 
-export const timestamp = () => (new Date()).toTimeString();
-
 export const channel = 'channel';
 
 export function serverMessageReceive(sequelizeManager, mainWindowContents) {
@@ -113,9 +111,10 @@ function handleMessage(sequelizeManager, opts) {
 		case TASKS.CONNECT: {
 			sequelizeManager.login(message)
 			.then(sequelizeManager.showDatabases(callback))
-			.then(sequelizeManager.log(
-				`NOTE: you are logged in as [${sequelizeManager.connection.config.username}]`
-			))
+			.then(() => {sequelizeManager.log(
+				'NOTE: you are logged in as ' +
+				`[${sequelizeManager.connection.config.username}]`
+			);})
 			.catch( error => {
 				callback({error});
 			});
@@ -125,9 +124,10 @@ function handleMessage(sequelizeManager, opts) {
 		case TASKS.SELECT_DATABASE: {
 			sequelizeManager.login(message)
 			.then(sequelizeManager.showTables(callback))
-			.then(sequelizeManager.log(
-				`NOTE: connected to database [${sequelizeManager.connection.config.database}]`
-			))
+			.then(() => {sequelizeManager.log(
+				'NOTE: you are previewing database ' +
+				`[${sequelizeManager.connection.config.database}]`
+			);})
 			.catch( error => {
 				callback({error});
 			});
@@ -137,9 +137,10 @@ function handleMessage(sequelizeManager, opts) {
 		case TASKS.GET_DATABASES: {
 			sequelizeManager.check_connection(message)
 			.then(sequelizeManager.showDatabases(callback))
-			.then(sequelizeManager.log(
-				`NOTE: you are logged in as [${sequelizeManager.connection.config.username}]`
-			))
+			.then(() => {sequelizeManager.log(
+				'NOTE: you are logged in as ' +
+				`[${sequelizeManager.connection.config.username}]`
+			);})
 			.catch( error => {
 				callback({error});
 			});
@@ -149,9 +150,9 @@ function handleMessage(sequelizeManager, opts) {
 		case TASKS.SEND_QUERY: {
 			const query = message;
 			sequelizeManager.sendQuery(query, callback)
-			.then(sequelizeManager.log(
+			.then(() => {sequelizeManager.log(
 				`QUERY EXECUTED: ${query}`
-			))
+			);})
 			.catch( error => {
 				callback({error});
 			});
@@ -159,11 +160,14 @@ function handleMessage(sequelizeManager, opts) {
 		}
 
 		case TASKS.DISCONNECT: {
-			sequelizeManager.disconnect(callback)
-			.then(sequelizeManager.log(
-				'NOTE: you logged out'
-			));
-			break;
+			try {
+				sequelizeManager.disconnect(callback);
+				sequelizeManager.log(
+					'NOTE: you are logged out as ' +
+					`[${sequelizeManager.connection.config.username}]`
+				);
+			} catch (error) {
+			}
 		}
 	}
 }

@@ -3,8 +3,9 @@ import restify from 'restify';
 import SequelizeManager from './sequelizeManager';
 import {ipcMessageReceive,
         serverMessageReceive,
-        channel,
-        timestamp} from './messageHandler';
+        channel} from './messageHandler';
+
+const timestamp = () => (new Date()).toTimeString();
 
 const ipcMain = require('electron').ipcMain;
 
@@ -27,14 +28,12 @@ app.on('ready', () => {
         height: 728
     });
 
-        return new Promise( (resolve, reject) => {
-            resolve(mainWindow.webContents.send(channel, {
     function log(description) {
+        mainWindow.webContents.send(channel, {
                 log: {
                     description,
                     timestamp: timestamp()
                 }
-            }));
         });
     }
 
