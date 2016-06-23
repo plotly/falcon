@@ -49,9 +49,12 @@ export default class UserCredentials extends Component {
 		return () => {
 			if (credential === 'storage') {
 				dialog.showOpenDialog({
-					properties: ['openFile', 'openDirectory']
+					properties: ['openFile', 'openDirectory'],
+					filters: [{name: 'databases', extensions: ['db']}]
 				}, (paths) => {
 					// result returned in an array
+					// TODO: add length of paths === 0 check
+					// TODO: add path non null check
 					const path = paths[0];
 					// get the filename to use as username in the logs
 					const splitPath = path.split('/');
