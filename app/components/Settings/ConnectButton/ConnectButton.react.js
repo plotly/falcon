@@ -116,7 +116,9 @@ export default class ConnectButton extends Component {
 				>
 					{buttonMessage}
 				</a>
-                {errorMessage}
+                <a>
+                    {errorMessage}
+                </a>
 			</div>
 		);
 	}
