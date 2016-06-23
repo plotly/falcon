@@ -116,7 +116,7 @@ function handleMessage(sequelizeManager, opts) {
 				`[${sequelizeManager.connection.config.username}]`
 			);})
 			.catch( error => {
-				callback({error});
+				sequelizeManager.raiseError(error, callback);
 			});
 			break;
 		}
@@ -129,7 +129,7 @@ function handleMessage(sequelizeManager, opts) {
 				`[${sequelizeManager.connection.config.database}]`
 			);})
 			.catch( error => {
-				callback({error});
+				sequelizeManager.raiseError(error, callback);
 			});
 			break;
 		}
@@ -142,7 +142,7 @@ function handleMessage(sequelizeManager, opts) {
 				`[${sequelizeManager.connection.config.username}]`
 			);})
 			.catch( error => {
-				callback({error});
+				sequelizeManager.raiseError(error, callback);
 			});
 			break;
 		}
@@ -154,7 +154,7 @@ function handleMessage(sequelizeManager, opts) {
 				`QUERY EXECUTED: ${query}`
 			);})
 			.catch( error => {
-				callback({error});
+				sequelizeManager.raiseError(error, callback);
 			});
 			break;
 		}
@@ -167,6 +167,7 @@ function handleMessage(sequelizeManager, opts) {
 					`[${sequelizeManager.connection.config.username}]`
 				);
 			} catch (error) {
+				sequelizeManager.raiseError(error, callback);
 			}
 		}
 	}

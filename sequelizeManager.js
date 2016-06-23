@@ -95,8 +95,9 @@ export default class SequelizeManager {
         return this.connection.authenticate();
     }
 
-    raiseErrorLog(error) {
-        this.log(merge(error, {timestamp: timestamp()}));
+    raiseError(errorMessage, callback) {
+        const errorLog = merge(errorMessage, {timestamp: timestamp()});
+        callback({error: errorLog});
     }
 
     // built-in query to show available databases/schemes
