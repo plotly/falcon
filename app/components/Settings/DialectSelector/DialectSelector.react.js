@@ -36,7 +36,7 @@ export default class DialectSelector extends Component {
 
         const consistency =
             (DIALECTS[dialect]
-            === this.state.selectedEngine) &&
+            === this.state.selectedDialect) &&
             (DIALECTS[dialect]
             === this.props.configuration.get('dialect'));
 
@@ -48,11 +48,11 @@ export default class DialectSelector extends Component {
     }
 
     logoIsSelected(dialect) {
-        return this.state.selectedEngine === DIALECTS[dialect];
+        return this.state.selectedDialect === DIALECTS[dialect];
     }
 
     resetAll() {
-        this.props.configActions.merge({
+        this.props.configActions.update({
             username: '',
             password: '',
             database: '',
@@ -68,12 +68,14 @@ export default class DialectSelector extends Component {
 		const logos = Object.keys(DIALECTS).map(dialect => (
             <div>
                 <div className={classnames(
-                        styles.logo,
-                        {[styles.logoSelected]: this.logoIsSelected(dialect)},
+                        styles.logo, {
+                              [styles.logoSelected]:
+                              this.state.selectedDialect === DIALECTS[dialect]
+                         },
                         [this.testClass(dialect)]
                     )}
                     onClick={() => {
-                        this.setState({selectedEngine: DIALECTS[dialect]});
+                        this.setState({selectedDialect: DIALECTS[dialect]});
                         configActions.update({dialect: DIALECTS[dialect]});
                         this.resetAll();
                     }}
@@ -81,7 +83,7 @@ export default class DialectSelector extends Component {
                 >
                     <img
                         className={styles.logoImage}
-                        src={DIALECTS[dialect]}
+                        src={LOGOS[dialect]}
                     />
                 </div>
             </div>

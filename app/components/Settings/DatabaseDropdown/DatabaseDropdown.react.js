@@ -28,11 +28,7 @@ export default class DatabaseDropdown extends Component {
     }
 
 	render() {
-<<<<<<< HEAD
         const {configuration, configActions, ipc, ipcActions} = this.props;
-=======
-        const {configuration, connection, ipc, ipcActions, merge} = this.props;
->>>>>>> :wrench: :book: use id's and test-className for tests, more tests
 
         const ipcDatabases = ipc.get('databases');
         let databaseDropdownOptions;
