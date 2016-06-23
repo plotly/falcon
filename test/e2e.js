@@ -47,6 +47,9 @@ describe('main window', function spec() {
             byClass(logoStyles.logo)
         );
 
+        this.getHighlightedLogo = () => findels(
+            byClass(logoStyles.logoSelected)
+        );
 
         this.getInputs = () => findels(
             byPath('//input')
@@ -144,6 +147,19 @@ describe('main window', function spec() {
 
         logos[1].click();
         expect(await inputs[0].getAttribute('value')).to.equal('');
+
+    });
+
+    it('should have a single logo highlighted as selected matching the dialect',
+    async () => {
+
+        const testedDialect = DIALECTS.MARIADB;
+        const logo = await this.getLogo(testedDialect);
+        const highlightedLogo = await this.getHighlightedLogo();
+
+        expect(await highlightedLogo.length).to.equal(1);
+        expect(await logo.getAttribute('id')).to.contain(testedDialect);
+        expect(await highlightedLogo[0].getAttribute('id')).to.contain(testedDialect);
 
     });
 
