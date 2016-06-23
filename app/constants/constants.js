@@ -1,4 +1,4 @@
-export const ENGINES = {
+export const DIALECTS = {
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
     POSTGRES: 'postgres',
@@ -15,11 +15,11 @@ export const APP_STATUS_CONSTANTS = {
 };
 
 export const USER_INPUT_FIELDS = {
-    [ENGINES.MYSQL]: ['username', 'password', 'host', 'port'],
-    [ENGINES.MARIADB]: ['username', 'password', 'host', 'port'],
-	[ENGINES.MSSQL]: ['username', 'password', 'host', 'port'],
-    [ENGINES.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
-    [ENGINES.SQLITE]: ['storage']
+    [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port'],
+    [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port'],
+	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port'],
+    [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
+    [DIALECTS.SQLITE]: ['storage']
 };
 
 export const BUTTON_MESSAGE = {

@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize';
-import {DIALECTS} from './app/components/Settings/Constants/SupportedDialects.react';
+import {DIALECTS} from './app/constants/constants';
 import parse from './parse';
 import {merge} from 'ramda';
 

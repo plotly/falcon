@@ -122,15 +122,9 @@ export default class ConnectButton extends Component {
 				>
 					{buttonMessage}
 				</a>
-<<<<<<< HEAD
-                <a>
-                    {errorMessage}
-                </a>
-=======
                 <pre id={'test-error-message'}>
                     {errorMessage}
                 </pre>
->>>>>>> :wrench: :book: use id's and test-className for tests, more tests
 			</div>
 		);
 	}
