@@ -1,7 +1,8 @@
 import React, {Component, PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import styles from './UserCredentials.css';
 import classnames from 'classnames';
-import {ENGINES} from '../Constants/SupportedEngines.react';
+import {DIALECTS} from '../Constants/SupportedDialects.react';
 const {dialog} = require('electron').remote;
 
 /*
@@ -10,64 +11,72 @@ const {dialog} = require('electron').remote;
 */
 
 const USER_CREDENTIALS = {
-    [ENGINES.MYSQL]: ['username', 'password', 'server', 'portNumber'],
-    [ENGINES.MARIADB]: ['username', 'password', 'server', 'portNumber'],
-	[ENGINES.MSSQL]: ['username', 'password', 'server', 'portNumber'],
-    [ENGINES.POSTGRES]: ['username', 'password', 'server', 'portNumber', 'database'],
-    [ENGINES.SQLITE]: ['databasePath']
+    [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port'],
+    [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port'],
+	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port'],
+    [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
+    [DIALECTS.SQLITE]: ['storage']
 };
 
 export default class UserCredentials extends Component {
     constructor(props) {
         super(props);
+		this.getPlaceholder = this.getPlaceholder.bind(this);
+		this.getInputType = this.getInputType.bind(this);
+		this.getOnClick = this.getOnClick.bind(this);
     }
 
-	render() {
-		const {configuration, merge} = this.props;
-
-		function getInputType (credential) {
-			if (credential === 'password') {
-				return 'password';
-			} else if (credential === 'databasePath') {
-				return 'text';
-			} else {
-				return 'text';
-			}
+	getInputType (credential) {
+		if (credential === 'password') {
+			return 'password';
+		} else {
+			return 'text';
 		}
+	}
 
-		function getPlaceholder(credential) {
-			if (credential === 'portNumber') {
-				return 'local port number';
-			} else if (credential === 'databasePath') {
-				return 'path to database';
-			} else {
-				return credential;
-			}
+	getPlaceholder(credential) {
+		if (credential === 'port') {
+			return 'local port number';
+		} else if (credential === 'storage') {
+			return 'path to database';
+		} else {
+			return credential;
 		}
+	}
 
-		function getOnClick(credential) {
-			return () => {
-				if (credential === 'databasePath') {
-					dialog.showOpenDialog({
-						properties: ['openFile', 'openDirectory']
-					}, (paths) => {
-						merge({
-							[credential]: paths[0]
-						});
+	getOnClick(credential) {
+		return () => {
+			if (credential === 'storage') {
+				dialog.showOpenDialog({
+					properties: ['openFile', 'openDirectory']
+				}, (paths) => {
+					// result returned in an array
+					const path = paths[0];
+					// get the filename to use as username in the logs
+					const splitPath = path.split('/');
+					const fileName = splitPath.length - 1;
+					this.props.configActions.update({
+						[credential]: paths[0],
+						'username': splitPath[fileName]
 					});
-				}
-			};
-		}
+				});
+			}
+		};
+	}
 
-		let inputs = USER_CREDENTIALS[configuration.get('engine')].map(credential => (
+	render() {
+		const {configuration, configActions} = this.props;
+
+		let inputs = USER_CREDENTIALS[configuration.get('dialect')]
+			.map(credential => (
 			<input
-				placeholder={getPlaceholder(credential)}
-				type={getInputType(credential)}
+				placeholder={this.getPlaceholder(credential)}
+				type={this.getInputType(credential)}
 				onChange={e => (
-					merge({[credential]: e.target.value})
+					configActions.update({[credential]: e.target.value})
 				)}
-				onClick={getOnClick(credential)}
-				value={this.props.configuration.get(credential)}
+				onClick={this.getOnClick(credential)}
+				value={configuration.get(credential)}
 			/>
 		));
 
@@ -78,3 +87,8 @@ export default class UserCredentials extends Component {
 		);
 	}
 }
+
+UserCredentials.propTypes = {
+    configuration: ImmutablePropTypes.map.isRequired,
+    configActions: PropTypes.Object
+};

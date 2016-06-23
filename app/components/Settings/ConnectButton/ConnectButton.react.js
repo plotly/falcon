@@ -30,8 +30,6 @@ export default class ConnectButton extends Component {
     }
 
     connect() {
-        console.log('connect');
-        console.log('this.props.configuration');
         this.props.ipcActions.connect(this.props.configuration);
     }
 
@@ -50,7 +48,7 @@ export default class ConnectButton extends Component {
     componentWillReceiveProps(nextProps) {
         const updateStatus = (status) => {
             if (status !== this.props.connection.get('status')) {
-                this.props.connectionActions.merge({status});
+                this.props.connectionActions.update({status});
                 this.setState({
                     buttonMessage: BUTTON_MESSAGE[status]
                 });
@@ -116,7 +114,9 @@ export default class ConnectButton extends Component {
 				>
 					{buttonMessage}
 				</a>
-                {errorMessage}
+                <a>
+                    {errorMessage}
+                </a>
 			</div>
 		);
 	}

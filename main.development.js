@@ -1,16 +1,17 @@
 import {app, BrowserWindow, Menu, shell} from 'electron';
 import restify from 'restify';
 import SequelizeManager from './sequelizeManager';
-import {ipcMessageHandler} from './ipcMessageHandler';
-import {serverMessageHandler} from './serverMessageHandler';
+import {ipcMessageReceive,
+        serverMessageReceive,
+        channel} from './messageHandler';
 
-const sequelizeManager = new SequelizeManager();
+const timestamp = () => (new Date()).toTimeString();
+
 const ipcMain = require('electron').ipcMain;
 
 let menu;
 let template;
 let mainWindow = null;
-const channel = 'channel';
 
 if (process.env.NODE_ENV === 'development') {
     require('electron-debug')();
@@ -27,6 +28,17 @@ app.on('ready', () => {
         height: 728
     });
 
+    function log(description) {
+        mainWindow.webContents.send(channel, {
+                log: {
+                    description,
+                    timestamp: timestamp()
+                }
+        });
+    }
+
+    const sequelizeManager = new SequelizeManager(log);
+
     const server = restify.createServer();
 
     server.use(restify.queryParser());
@@ -42,8 +54,18 @@ app.on('ready', () => {
         mainWindow.show();
         mainWindow.focus();
         ipcMain.removeAllListeners(channel);
-        ipcMain.on(channel, ipcMessageHandler(sequelizeManager));
-        server.get('/query', serverMessageHandler(sequelizeManager, mainWindow.webContents));
+        ipcMain.on(channel, ipcMessageReceive(sequelizeManager));
+
+        // TODO: simplify this restify server routing code
+        server.get('/connect', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/query', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/tables', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/disconnect', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/v0/connect', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/v0/query', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/v0/tables', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+        server.get('/v0/disconnect', serverMessageReceive(sequelizeManager, mainWindow.webContents));
+
     });
 
     mainWindow.on('closed', () => {

@@ -1,13 +1,14 @@
 import React, {Component, PropTypes} from 'react';
-import styles from './EngineSelector.css';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import styles from './DialectSelector.css';
 import classnames from 'classnames';
-import {ENGINES} from '../Constants/SupportedEngines.react';
+import {DIALECTS} from '../Constants/SupportedDialects.react';
 
 /*
-    Displays interactive database engine logos and alters
-    the chosen `configuration` engine parameter.
-    TODO: take out the selectedEngine variable and use
-    `configuration.get('engine')` inestead?
+    Displays interactive database dialect logos and alters
+    the chosen `configuration` dialect parameter.
+    TODO: take out the selectedDialect variable and use
+    `configuration.get('dialect')` inestead?
 */
 
 const LOGOS = {
@@ -18,46 +19,45 @@ const LOGOS = {
     SQLITE: './images/sqliteLogo.png'
 };
 
-export default class EngineSelector extends Component {
+export default class DialectSelector extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedEngine: props.configuration.get('engine')
+            selectedDialect: props.configuration.get('dialect')
         };
     }
 
 	render() {
         const {configActions} = this.props;
-        const {merge} = configActions;
 
         const resetAllToNull = () => {
-            merge({
+            configActions.update({
                 username: null,
                 password: null,
                 database: null,
-                portNumber: null,
-                databasePath: null,
-                server: null
+                port: null,
+                storage: null,
+                host: null
             });
         };
 
-		const logos = Object.keys(ENGINES).map(engine => (
+		const logos = Object.keys(DIALECTS).map(dialect => (
             <div>
                 <div className={classnames(
                         styles.logo, {
                             [styles.logoSelected]:
-                                this.state.selectedEngine === ENGINES[engine]
+                                this.state.selectedDialect === DIALECTS[dialect]
                         }
                     )}
                     onClick={() => {
-                        this.setState({selectedEngine: ENGINES[engine]});
-                        merge({engine: ENGINES[engine]});
+                        this.setState({selectedDialect: DIALECTS[dialect]});
+                        configActions.update({dialect: DIALECTS[dialect]});
                         resetAllToNull();
                     }}
                 >
                     <img
                         className={styles.logoImage}
-                        src={LOGOS[engine]}
+                        src={LOGOS[dialect]}
                     />
                 </div>
             </div>
@@ -68,3 +68,8 @@ export default class EngineSelector extends Component {
 		);
 	}
 }
+
+DialectSelector.propTypes = {
+    configuration: ImmutablePropTypes.map.isRequired,
+    configActions: PropTypes.Object
+};

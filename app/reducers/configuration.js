@@ -1,21 +1,20 @@
-import {MERGE} from '../actions/configuration.js';
-import {ENGINES} from '../components/Settings/Constants/SupportedEngines.react';
+import {UPDATE} from '../actions/configuration.js';
+import {DIALECTS} from '../components/Settings/Constants/SupportedDialects.react';
 import Immutable from 'immutable';
 
 const INITIAL_STATE = Immutable.Map({
     username: null,
     password: null,
     database: null,
-    engine: ENGINES.MYSQL,
-    portNumber: null,
-    databasePath: null,
-    server: null
+    dialect: DIALECTS.MYSQL,
+    port: null,
+    storage: null,
+    host: null
 });
 
 export default function configuration(state = INITIAL_STATE, action) {
     switch (action.type) {
-        case MERGE:
-            console.warn(`action: ${JSON.stringify(action)}`);
+        case UPDATE:
             return state.merge(action.payload);
         default:
             return state;

@@ -1,11 +1,12 @@
 import React, {Component, PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import styles from './Settings.css';
 import DatabaseDropdown from './DatabaseDropdown/DatabaseDropdown.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import UserCredentials from './UserCredentials/UserCredentials.react';
 import LoggerController from './Logger/LoggerController.react';
 import PreviewController from './Preview/PreviewController.react';
-import EngineSelector from './EngineSelector/EngineSelector.react';
+import DialectSelector from './DialectSelector/DialectSelector.react';
 import {APP_STATUS_CONSTANTS} from '../../reducers/connection';
 
 export default class Settings extends Component {
@@ -19,11 +20,10 @@ export default class Settings extends Component {
             ipc, ipcActions,
             connection, connectionActions
         } = this.props;
-        const {merge} = configActions;
 
-        const engineSelector = (
+        const dialectSelector = (
             <div>
-                <EngineSelector
+                <DialectSelector
                     configActions={configActions}
                     configuration={configuration}
                 />
@@ -33,7 +33,7 @@ export default class Settings extends Component {
         const userCredentials = (
             <UserCredentials
                 configuration={configuration}
-                merge={merge}
+                configActions={configActions}
             />
         );
 
@@ -52,7 +52,7 @@ export default class Settings extends Component {
 
                 <DatabaseDropdown
                     configuration={configuration}
-                    merge={merge}
+                    configActions={configActions}
                     ipcActions={ipcActions}
                     ipc={ipc}
                 />
@@ -72,8 +72,8 @@ export default class Settings extends Component {
             <div>
                 <h5>1. Connect to Database</h5>
                 <div className={styles.configurationOptions}>
-                    <div className={styles.engineSelector}>
-                        {engineSelector}
+                    <div className={styles.dialectSelector}>
+                        {dialectSelector}
                     </div>
                     <div className={styles.userCredentials}>
                         {userCredentials}
@@ -140,3 +140,12 @@ export default class Settings extends Component {
         );
     }
 }
+
+Settings.propTypes = {
+    configuration: ImmutablePropTypes.map.isRequired,
+    configActions: PropTypes.Object,
+    ipc: ImmutablePropTypes.map.isRequired,
+    ipcActions: PropTypes.Object,
+    connection: ImmutablePropTypes.map.isRequired,
+    connectionActions: PropTypes.Object
+};
