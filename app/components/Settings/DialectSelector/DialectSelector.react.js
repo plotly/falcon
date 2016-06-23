@@ -97,5 +97,5 @@ export default class DialectSelector extends Component {
 
 DialectSelector.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
-    configActions: PropTypes.Object
+    configActions: PropTypes.object
 };

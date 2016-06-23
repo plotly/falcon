@@ -95,5 +95,5 @@ export default class UserCredentials extends Component {
 
 UserCredentials.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
-    configActions: PropTypes.Object
+    configActions: PropTypes.object
 };
