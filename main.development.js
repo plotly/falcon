@@ -27,11 +27,11 @@ app.on('ready', () => {
         height: 728
     });
 
-    function log(message) {
         return new Promise( (resolve, reject) => {
             resolve(mainWindow.webContents.send(channel, {
+    function log(description) {
                 log: {
-                    message,
+                    description,
                     timestamp: timestamp()
                 }
             }));
