@@ -58,7 +58,7 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 					need a database entry here from the server to
 					connect to a new database and receive its tables
 				*/
-				payload.message['database'] = requestEvent.params.database;
+				payload.message.database = requestEvent.params.database;
 				break;
 			}
 
@@ -74,7 +74,7 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 		const callback = (message) => {
 			respondEvent.send(message);
 			// send stuff back to electorn app, too
-			mainWindowContents.send('channel', message);
+			mainWindowContents.send(channel, message);
 		};
 
 		handleMessage(sequelizeManager, {
@@ -89,7 +89,7 @@ export function ipcMessageReceive(sequelizeManager) {
 	return (evt, payload) => {
 
 		const callback = (message) => {
-			evt.sender.send('channel', message);
+			evt.sender.send(channel, message);
 		};
 
 		handleMessage(sequelizeManager, {

@@ -30,8 +30,6 @@ export default class ConnectButton extends Component {
     }
 
     connect() {
-        console.log('connect');
-        console.log('this.props.configuration');
         this.props.ipcActions.connect(this.props.configuration);
     }
 
