@@ -1,0 +1,29 @@
+.logo {
+    display: inline-block;
+    width: 96px;
+    height: 50px;
+    padding-top: 4px;
+    padding-right: 6px;
+    border-right-color: #45A9FF;
+    border-right-width: 1px;
+    border-right-style: hidden;
+}
+
+.logoImage {
+    width: 100%;
+}
+
+.logo:hover, .logoSelected {
+    cursor: pointer;
+    border-right-color: #45A9FF;
+    border-right-width: 1px;
+    border-right-style: solid;
+}
+
+.dialectInput {
+    display: inline-block;
+}
+
+.dialectLabel {
+    display: inline-block;
+}

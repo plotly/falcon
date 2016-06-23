@@ -4,9 +4,7 @@ import App from './containers/App';
 import HomePage from './containers/HomePage';
 import ConfigurationPage from './containers/ConfigurationPage';
 
+// TODO: remove react-router
 export default (
-    <Route path="/" component={App}>
-    <IndexRoute component={HomePage} />
-    <Route path="/configuration" component={ConfigurationPage} />
-    </Route>
+    <Route path="/" component={ConfigurationPage}></Route>
 );

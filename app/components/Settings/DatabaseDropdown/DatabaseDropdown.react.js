@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import styles from './DatabaseDropdown.css';
 import Select from 'react-select';
+import {DIALECTS} from '../Constants/SupportedDialects.react';
 
 /*
     Displays in a dropdown menu all available databases/schemes
@@ -17,22 +18,27 @@ export default class DatabaseDropdown extends Component {
     }
 
 	render() {
-        const {configuration, ipc, ipcActions, merge} = this.props;
+        const {configuration, configActions, ipc, ipcActions} = this.props;
 
         const ipcDatabases = ipc.get('databases');
         let databaseDropdownOptions;
-        if (ipcDatabases) {
-            databaseDropdownOptions = ipcDatabases.toJS().map(database => (
-                {value: database.Database, label: database.Database}
-            ));
-        } else {
+        /*
+            disable the selector for sqlite which does not have databases, only
+            tables
+        */
+        const isDisabled = configuration.get('dialect') === DIALECTS.SQLITE;
+        if (ipcDatabases === null) {
             databaseDropdownOptions = [
                 {value: 'None', label: 'None Found', disabled: true}
             ];
+        } else {
+            databaseDropdownOptions = ipcDatabases.toJS().map(database => (
+                {value: database, label: database, disabled: isDisabled}
+            ));
         }
 
         function onSelectDatabase(database) {
-            merge({database: database.value});
+            configActions.update({database: database.value});
             ipcActions.selectDatabase();
         }
 
@@ -40,7 +46,7 @@ export default class DatabaseDropdown extends Component {
             <div className={styles.dropdown}>
                 <Select
                     name="form-field-name"
-                    placeholder="Select Your Database"
+                    placeholder="Select a Database"
                     options={databaseDropdownOptions}
                     onChange={onSelectDatabase}
                     value={configuration.get('database')}

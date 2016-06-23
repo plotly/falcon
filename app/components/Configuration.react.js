@@ -1,9 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-// import AceEditor from 'react-ace';
 import styles from './Configuration.css';
-import Settings from './Configuration/Settings.react';
-import Monitor from './Configuration/Monitor.react';
+import Settings from './Settings/Settings.react';
+import Monitor from './Monitor/Monitor.react';
 
 const TABS = {
     SETTINGS: 'SETTINGS',
@@ -28,42 +27,26 @@ export default class Configuration extends Component {
                 configActions={this.props.configActions}
                 ipcActions={this.props.ipcActions}
                 ipc={this.props.ipc}
+                connection={this.props.connection}
+                connectionActions={this.props.connectionActions}
             />;
         } else {
             content = <Monitor/>;
         }
 
         return (
-            <div className={styles.container}>
+            <div>
                 {content}
             </div>
         );
-
-        /*
-            <h5>Step 5: Enter Query</h5>
-
-            <AceEditor
-            value={this.state.query}
-            onChange={onChangeQuery}
-            mode="sql"
-            theme="tomorrow"
-            height="50"
-            />
-
-            <div className={styles.btnGroupActions}>
-            <button className={styles.btn} onClick={onClickQuery}>
-            query
-            </button>
-            </div>
-        */
-
     }
 }
 
 Configuration.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
-    merge: PropTypes.func.isRequired,
+    configActions: PropTypes.Object,
     ipc: ImmutablePropTypes.map.isRequired,
     ipcActions: PropTypes.Object,
-    configActions: PropTypes.Object
+    connection: ImmutablePropTypes.map.isRequired,
+    connectionActions: PropTypes.Object
 };

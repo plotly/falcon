@@ -7,7 +7,7 @@ html {
 body {
     position: relative;
     height: 100vh;
-    overflow-y: hidden;
+    overflow-y: scroll;
     font-weight: 200;
     font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
     line-height: 1.6;
@@ -41,3 +41,17 @@ h6 { font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; }
 
 p {
   margin-top: 0; }
+
+
+*::-webkit-scrollbar {
+  width: 3px;
+  height: 1px;
+  border-left: 0;
+  background: rgba(0,0,0,0.1);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.4);
+  border-radius: 0;
+  width: 5px;
+}

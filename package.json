@@ -18,8 +18,7 @@
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
     "package-all": "npm run package -- --all",
     "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
-    "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\"",
-    "install": "sh install.sh"
+    "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\""
   },
   "bin": {
     "electron": "./node_modules/.bin/electron"
@@ -112,6 +111,7 @@
     "pg-hstore": "^2.3.2",
     "pg-native": "^1.10.0",
     "postcss": "^5.0.19",
+    "ramda": "^0.21.0",
     "react": "^15.0.1",
     "react-ace": "^3.4.1",
     "react-dom": "^15.0.1",

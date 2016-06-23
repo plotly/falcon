@@ -1,0 +1,24 @@
+.buttonPrimary {
+    cursor: pointer;
+    width: 100px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 100;
+    background-color: white;
+    border-color: #8d98af;
+    border-width: 1px;
+    border-style: solid;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.errorMessage {
+    color: red;
+    overflow-x: scroll;
+    height: 30px;
+    padding-top: 10px;
+}
+
+.footer {
+    padding-top: 10px;
+}
