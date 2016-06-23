@@ -4,12 +4,12 @@ import webdriver from 'selenium-webdriver';
 import {expect} from 'chai';
 import electronPath from 'electron-prebuilt';
 
-import {APP_STATUS_CONSTANTS, ENGINES, USER_INPUT_FIELDS} from '../app/constants/constants';
+import {APP_STATUS_CONSTANTS,
+    DIALECTS, USER_INPUT_FIELDS} from '../app/constants/constants';
 import {CREDENTIALS} from './credentials.js';
 
 // import styles to use for tests
-import logoStyles from '../app/components/Settings/EngineSelector/EngineSelector.css';
-import btnStyles from '../app/components/Settings/ConnectButton/ConnectButton.css';
+import logoStyles from '../app/components/Settings/DialectSelector/DialectSelector.css';
 
 chromedriver.start(); // on port 9515
 process.on('exit', chromedriver.stop);
@@ -32,18 +32,25 @@ describe('main window', function spec() {
         .forBrowser('electron')
         .build();
 
+        // find element(s) helper functions
         const findels = (args) => this.driver.findElements(args);
         const findel = (args) => this.driver.findElement(args);
 
+        // find by helper functions
         const byClass = (args) => webdriver.By.className(args);
         const byId = (args) => webdriver.By.id(args);
         const byCss = (args) => webdriver.By.css(args);
         const byPath = (args) => webdriver.By.xpath(args);
 
-
         // grab group of elements
-        this.getLogos = () => findels(byClass(logoStyles.logo));
-        this.getInputs = () => findels(byPath('//input'));
+        this.getLogos = () => findels(
+            byClass(logoStyles.logo)
+        );
+
+
+        this.getInputs = () => findels(
+            byPath('//input')
+        );
 
         // grab specific element
         this.getLogo = (dialect) => findel(
@@ -155,7 +162,7 @@ describe('main window', function spec() {
     async () => {
 
         const expectedClass = 'test-consistent-state';
-        const testedDialect = ENGINES.MYSQL;
+        const testedDialect = DIALECTS.MYSQL;
         const logo = await this.getLogo(testedDialect);
 
         await logo.click()
@@ -169,7 +176,7 @@ describe('main window', function spec() {
     async () => {
 
         const expectedClass = `test-${APP_STATUS_CONSTANTS.CONNECTED}`;
-        const testedDialect = ENGINES.MYSQL;
+        const testedDialect = DIALECTS.MYSQL;
         const btn = await this.getConnectBtn();
 
         // click on the evaluated dialect logo
@@ -250,7 +257,7 @@ describe('main window', function spec() {
     async () => {
 
         const expectedClass = `test-${APP_STATUS_CONSTANTS.ERROR}`;
-        const testedDialect = ENGINES.MYSQL;
+        const testedDialect = DIALECTS.MYSQL;
         const btn = await this.getConnectBtn();
 
         this.wrongInputs(testedDialect)
