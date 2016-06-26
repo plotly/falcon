@@ -103,6 +103,13 @@ describe('main window', function spec() {
             });
         };
 
+        // server
+        this.getServerResponse = async (browser) => {
+            const page = await browser.findElement(webdriver.By.xpath('//pre'));
+            const text = await page.getText();
+            return JSON.parse(text);
+        };
+
     });
 
     // grab property of element
@@ -255,6 +262,7 @@ describe('main window', function spec() {
 
     });
 
+
     it('should disconnect when the disconnect button is pressed',
     async () => {
 
@@ -265,6 +273,59 @@ describe('main window', function spec() {
         .then(await delay(1000));
         const testClass = await getClassOf(btn);
         expect(testClass).to.contain(expectedClass);
+
+    });
+
+    it('should receive a post to /connect, /tables, /query, /disconnect',
+    async () => {
+        // TODO: clean this whole thing
+
+        // connect using the app
+        const testedDialect = DIALECTS.MYSQL;
+        const btn = await this.getConnectBtn();
+        const logos = await this.getLogos();
+        const logo = await this.getLogo(testedDialect);
+
+        logos[0].click();
+        logo.click();
+
+        this.fillInputs(testedDialect)
+        .then(await delay(500))
+        // click to connect
+        .then(await btn.click());
+
+        // setup a browser
+        var plotly20 = new webdriver.Builder()
+        .forBrowser('chrome')
+        .build();
+
+        // POST to the 'connect' endpoint
+        await plotly20.get('localhost:5000/connect');
+        // retrieve JSON response
+        const connectResponse = await this.getServerResponse(plotly20);
+
+        expect(connectResponse).to.have.property('error', null);
+
+        // take the last database of the list
+        const database = connectResponse.databases[connectResponse.databases.length - 1];
+        // ask for preview of a database
+        await plotly20.get(`localhost:5000/tables?database=${database}`);
+        const databasePreview = await this.getServerResponse(plotly20);
+
+        expect(databasePreview).to.have.property('error', null);
+        expect(databasePreview).to.have.property('tables');
+
+        await plotly20.get('localhost:5000/query?statement=SELECT * FROM test LIMIT 5');
+        const queryResponse = await this.getServerResponse(plotly20);
+
+        expect(queryResponse.rows.length).to.equal(5);
+
+        await plotly20.get('localhost:5000/disconnect');
+        const quitResponse = await this.getServerResponse(plotly20);
+
+        expect(quitResponse).to.have.property('error', null);
+
+        plotly20.quit();
 
     });
 
@@ -288,6 +349,7 @@ describe('main window', function spec() {
         expect(await errorMessage.getText()).to.have.length.above(0);
 
     });
+
 
     after(async () => {
         await this.driver.quit();
