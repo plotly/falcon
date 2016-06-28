@@ -111,4 +111,4 @@ We use [webpack-target-electron-renderer](https://github.com/chentsulin/webpack-
 > Note: webpack >= 1.12.15 has built-in support for `electron-main` and `electron-renderer` targets.
 
 ## License
-Code released under the MIT © [License](Code released under the [MIT license](https://github.com/plotly/electron-sql-connector/blob/master/LICENSE)
+Code released under the MIT © [License](Code released under the [MIT license](https://github.com/plotly/plotly-sql-connector/blob/master/LICENSE)
