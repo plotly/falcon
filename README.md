@@ -1,14 +1,23 @@
-# electron-sql-connector
+# Plotly Database Connector
 
-[![NPM version][npm-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
-[![Dependency Status][david_img]][david_site]
+The Plotly database connector is a cross-platform desktop application that connects [Plotly 2.0](https://plot.ly/alpha/workspace) to your database.
 
-Based on [electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate)
+![](http://i.imgur.com/Agd1Uat.gif)
 
-## Install
+Plotly 2.0 makes HTTP requests from the local web browser directly to this database connector app. This database connector runs as a server on localhost and forwards queries from the Plotly 2.0 web-application to the database that connect to. Requests are made client-side, so you don't need to open up the connector or your database to the world, you just need to be able to access it from the machine that is running this connector app.
 
-First, clone the repo via git:
+[Learn more in our online documentation](help.plot.ly/database-connectors/).
+
+## Development
+
+This app is built with Electron, React, Redux, and Sequelize.  This was
+
+Originally forked from [electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate).
+
+
+### Installation
+
+clone the repo via git:
 
 ```bash
 git clone https://github.com/plotly/electron-sql-connector your-project-name
@@ -19,9 +28,6 @@ And then install dependencies.
 ```bash
 $ cd your-project-name && npm run install
 ```
-
-
-## Run
 
 Run this two commands __simultaneously__ in different console tabs.
 
@@ -38,29 +44,7 @@ $ npm run dev
 
 *Note: requires a node version >= 4 and an npm version >= 2.*
 
-
-## DevTools
-
-#### Toggle Chrome DevTools
-
-- OS X: <kbd>Cmd</kbd> <kbd>Alt</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
-- Linux: <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
-- Windows: <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
-
-*See [electron-debug](https://github.com/sindresorhus/electron-debug) for more information.*
-
-#### Toggle Redux DevTools
-
-- All platforms: <kbd>Ctrl+H</kbd>
-
-*See [redux-devtools-dock-monitor](https://github.com/gaearon/redux-devtools-dock-monitor) for more information.*
-
-#### Redux Devtools Window
-
-Now you can implement it using [remote-redux-devtools](https://github.com/zalmoxisus/remote-redux-devtools) with a [remote monitor](https://github.com/zalmoxisus/remote-redux-devtools#remote-monitoring) by yourself.
-
-
-## Externals
+### Externals
 
 If you use any 3rd party libraries which can't be built with webpack, you must list them in your `webpack.config.base.js`：
 
@@ -73,7 +57,7 @@ externals: [
 You can find those lines in the file.
 
 
-## CSS Modules
+### CSS Modules
 
 This boilerplate out of the box is configured to use [css-modules](https://github.com/css-modules/css-modules).
 
@@ -83,7 +67,7 @@ If you need global styles, stylesheets with `.global.css` will not go through th
 css-modules loader. e.g. `app.global.css`
 
 
-## Package
+### Packaging
 
 ```bash
 $ npm run package
@@ -120,22 +104,11 @@ We add some module's `peerDependencies` to ignore option as default for applicat
 
 Please checkout [Building windows apps from non-windows platforms](https://github.com/maxogden/electron-packager#building-windows-apps-from-non-windows-platforms).
 
-## How hot-reloading works on Electron
+#### How hot-reloading works on Electron
 
 We use [webpack-target-electron-renderer](https://github.com/chentsulin/webpack-target-electron-renderer) to provide a build target for electron renderer process. Read more information [here](https://github.com/chentsulin/webpack-target-electron-renderer#how-this-module-works).
 
 > Note: webpack >= 1.12.15 has built-in support for `electron-main` and `electron-renderer` targets.
 
-## Native-like UI
-
-If you want to have native-like User Interface (OS X El Capitan and Windows 10), [react-desktop](https://github.com/gabrielbull/react-desktop) may perfect suit for you.
-
 ## License
-Code released under the MIT © [License](Code released under the [MIT license](https://github.com/plotly/electron-sql-connector/blob/master/LICENSE)
-
-[npm-image]: https://img.shields.io/npm/v/electron-react-boilerplate.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/electron-react-boilerplate
-[travis-image]: https://travis-ci.org/chentsulin/electron-react-boilerplate.svg?branch=master
-[travis-url]: https://travis-ci.org/chentsulin/electron-react-boilerplate
-[david_img]: https://img.shields.io/david/chentsulin/electron-react-boilerplate.svg
-[david_site]: https://david-dm.org/chentsulin/electron-react-boilerplate
+Code released under the MIT © [License](Code released under the [MIT license](https://github.com/plotly/plotly-sql-connector/blob/master/LICENSE)
