@@ -8,6 +8,15 @@ Plotly 2.0 makes HTTP requests from the local web browser directly to this datab
 
 [Learn more in our online documentation](help.plot.ly/database-connectors/).
 
+
+#### Status
+
+The database connector is in Alpha release and the Potly 2.0 web interface is currently in a private preview mode. We would love your feedback! [Download the latest release](https://github.com/plotly/plotly-database-connector/releases) and give it a try.
+
+#### Contact
+- Chris - chris@plot.ly
+- Alexandre - alexs@plot.ly
+
 ## Development
 
 This app is built with Electron, React, Redux, and Sequelize.  This was
@@ -15,9 +24,12 @@ This app is built with Electron, React, Redux, and Sequelize.  This was
 Originally forked from [electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate).
 
 
-### Installation
+#### Installation for Development
 
-clone the repo via git:
+These instructions are for developing the code. If you're interested in just running and using the App, [download the latest release.](https://github.com/plotly/plotly-database-connector/releases)
+
+
+For development, start by cloning the repo via git:
 
 ```bash
 git clone https://github.com/plotly/electron-sql-connector your-project-name
@@ -44,7 +56,7 @@ $ npm run dev
 
 *Note: requires a node version >= 4 and an npm version >= 2.*
 
-### Externals
+#### Externals
 
 If you use any 3rd party libraries which can't be built with webpack, you must list them in your `webpack.config.base.js`：
 
