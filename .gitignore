@@ -35,5 +35,5 @@ release
 main.js
 main.js.map
 
-# Personal info
-test/credentials.js
+# Test Databases Info
+test/AWS_RDS_connections.js

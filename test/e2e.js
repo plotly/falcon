@@ -6,7 +6,7 @@ import electronPath from 'electron-prebuilt';
 
 import {APP_STATUS_CONSTANTS,
     DIALECTS, USER_INPUT_FIELDS} from '../app/constants/constants';
-import {CREDENTIALS} from './credentials.js';
+import {CREDENTIALS} from './AWS_RDS_connections.js';
 
 // import styles to use for tests
 import logoStyles from '../app/components/Settings/DialectSelector/DialectSelector.css';
@@ -17,7 +17,7 @@ process.on('exit', chromedriver.stop);
 const delay = time => new Promise(resolve => setTimeout(resolve, time));
 
 describe('main window', function spec() {
-    this.timeout(5000);
+    this.timeout(10000);
 
     before(async () => {
         await delay(1000); // wait chromedriver start time
@@ -72,6 +72,25 @@ describe('main window', function spec() {
             byId('test-database-dropdown')
         );
 
+        // TODO: selenium has not wait for function, need a work around, WIP
+        // this.waitForElement = async(getElementFun) => {
+        //     console.log('waiting.....');
+        //     let element;
+        //     await delay(3000)
+        //     .then( async() => {
+        //         try {
+        //             element = await getElementFun;
+        //         }
+        //         catch (err) {
+        //             // return this.waitForElement until found
+        //         }
+        //         finally {
+        //             return element;
+        //         }
+        //     });
+        // };
+
+
         this.getDatabaseOptions = () => findel(
             byCss('.Select-option')
         );
@@ -92,7 +111,7 @@ describe('main window', function spec() {
         this.fillInputs = async (testedDialect) => {
             USER_INPUT_FIELDS[testedDialect].forEach(credential => {
                 this.getInputField(credential)
-                .then(input => input.sendKeys(CREDENTIALS['local'][credential]));
+                .then(input => input.sendKeys(CREDENTIALS[testedDialect][credential]));
             });
         };
 
@@ -207,7 +226,7 @@ describe('main window', function spec() {
         .then(await delay(500))
         // click to connect
         .then(await btn.click())
-        .then(await delay(1000));
+        .then(await delay(2000));
         const testClass = await getClassOf(btn);
         expect(testClass).to.contain(expectedClass);
 
@@ -286,11 +305,12 @@ describe('main window', function spec() {
         const logos = await this.getLogos();
         const logo = await this.getLogo(testedDialect);
 
-        logos[0].click();
+        // clear inputs
+        logos[4].click();
         logo.click();
 
         this.fillInputs(testedDialect)
-        .then(await delay(500))
+        .then(await delay(2000))
         // click to connect
         .then(await btn.click());
 
@@ -299,30 +319,29 @@ describe('main window', function spec() {
         .forBrowser('chrome')
         .build();
 
-        // POST to the 'connect' endpoint
+        // test -- /connect
         await plotly20.get('localhost:5000/connect');
-        // retrieve JSON response
         const connectResponse = await this.getServerResponse(plotly20);
 
         expect(connectResponse).to.have.property('error', null);
 
-        // take the last database of the list
-        const database = connectResponse.databases[connectResponse.databases.length - 1];
-        // ask for preview of a database
+        // test /tables -- ask for preview of a database
+        const database = 'plotly_datasets';
         await plotly20.get(`localhost:5000/tables?database=${database}`);
         const databasePreview = await this.getServerResponse(plotly20);
 
         expect(databasePreview).to.have.property('error', null);
         expect(databasePreview).to.have.property('tables');
 
-        await plotly20.get('localhost:5000/query?statement=SELECT * FROM test LIMIT 5');
+        // test /query -- choose first table and send a query
+        const table = Object.keys(databasePreview.tables[0])[0];
+        await plotly20.get(`localhost:5000/query?statement=SELECT * FROM ${table} LIMIT 5`);
         const queryResponse = await this.getServerResponse(plotly20);
-
         expect(queryResponse.rows.length).to.equal(5);
 
+        // test /disconnect --  
         await plotly20.get('localhost:5000/disconnect');
         const quitResponse = await this.getServerResponse(plotly20);
-
         expect(quitResponse).to.have.property('error', null);
 
         plotly20.quit();
