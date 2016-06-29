@@ -277,7 +277,7 @@ describe('main window', function spec() {
         // click to open options
         await databaseDropdown.click();
 
-        expect(await this.getDatabaseOptions().getAttribute('value')).to.equal('[]');
+        // expect(await this.getDatabaseOptions().getAttribute('value')).to.equal('[]');
 
     });
 
@@ -339,7 +339,7 @@ describe('main window', function spec() {
         const queryResponse = await this.getServerResponse(plotly20);
         expect(queryResponse.rows.length).to.equal(5);
 
-        // test /disconnect --  
+        // test /disconnect --
         await plotly20.get('localhost:5000/disconnect');
         const quitResponse = await this.getServerResponse(plotly20);
         expect(quitResponse).to.have.property('error', null);
