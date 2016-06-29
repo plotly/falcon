@@ -34,6 +34,3 @@ dist
 release
 main.js
 main.js.map
-
-# Test Databases Info
-test/AWS_RDS_connections.js
