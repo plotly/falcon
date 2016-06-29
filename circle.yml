@@ -2,8 +2,6 @@ machine:
     node:
         version: 6.2.2
 
-    test:
-        post:
-            - npm run lint
-            - npm run build
-            - npm run test-e2e
+test:
+    post:
+        - npm run lint

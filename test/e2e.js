@@ -136,6 +136,10 @@ describe('main window', function spec() {
 
     // TODO: replace delay times with a functions that waits for a change
 
+    it('should have process.env defined', () => {
+        expect(process.env).to.be.defined();
+    });
+
     it('should open window',
     async () => {
 
@@ -223,10 +227,10 @@ describe('main window', function spec() {
 
         // click on the evaluated dialect logo
         this.fillInputs(testedDialect)
-        .then(await delay(500))
+        .then(await delay(1000))
         // click to connect
         .then(await btn.click())
-        .then(await delay(2000));
+        .then(await delay(3000));
         const testClass = await getClassOf(btn);
         expect(testClass).to.contain(expectedClass);
 
@@ -310,9 +314,11 @@ describe('main window', function spec() {
         logo.click();
 
         this.fillInputs(testedDialect)
-        .then(await delay(2000))
+        .then(await delay(1000))
         // click to connect
-        .then(await btn.click());
+        .then(await btn.click())
+        .then(await delay(3000));
+
 
         // setup a browser
         var plotly20 = new webdriver.Builder()
