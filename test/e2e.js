@@ -3,6 +3,7 @@ import chromedriver from 'chromedriver';
 import webdriver from 'selenium-webdriver';
 import {expect} from 'chai';
 import electronPath from 'electron-prebuilt';
+import fetch from 'node-fetch';
 
 import {APP_STATUS_CONSTANTS,
     DIALECTS, USER_INPUT_FIELDS} from '../app/constants/constants';
@@ -17,7 +18,7 @@ process.on('exit', chromedriver.stop);
 const delay = time => new Promise(resolve => setTimeout(resolve, time));
 
 describe('main window', function spec() {
-    this.timeout(10000);
+    this.timeout(20000);
 
     before(async () => {
         await delay(1000); // wait chromedriver start time
@@ -122,23 +123,12 @@ describe('main window', function spec() {
             });
         };
 
-        // server
-        this.getServerResponse = async (browser) => {
-            const page = await browser.findElement(webdriver.By.xpath('//pre'));
-            const text = await page.getText();
-            return JSON.parse(text);
-        };
-
     });
 
     // grab property of element
     const getClassOf = (element) => element.getAttribute('class');
 
     // TODO: replace delay times with a functions that waits for a change
-
-    it('should have process.env defined', () => {
-        expect(process.env).to.be.defined();
-    });
 
     it('should open window',
     async () => {
@@ -299,58 +289,52 @@ describe('main window', function spec() {
 
     });
 
-    it('should receive a post to /connect, /tables, /query, /disconnect',
+    it('should have functional endpoints at /connect, /tables, /query, /disconnect',
     async () => {
-        // TODO: clean this whole thing
-
-        // connect using the app
         const testedDialect = DIALECTS.MYSQL;
         const btn = await this.getConnectBtn();
         const logos = await this.getLogos();
         const logo = await this.getLogo(testedDialect);
+        const baseURL = 'https://localhost:5000';
 
         // clear inputs
         logos[4].click();
         logo.click();
 
+        // connect using the app
         this.fillInputs(testedDialect)
         .then(await delay(1000))
         // click to connect
         .then(await btn.click())
         .then(await delay(3000));
 
-
-        // setup a browser
-        var plotly20 = new webdriver.Builder()
-        .forBrowser('chrome')
-        .build();
-
         // test -- /connect
-        await plotly20.get('localhost:5000/connect');
-        const connectResponse = await this.getServerResponse(plotly20);
+        fetch(`${baseURL}/connect`)
+        .then( (res) => {
+            expect(res).to.have.property('error', null);
+        });
 
-        expect(connectResponse).to.have.property('error', null);
-
+        let table;
         // test /tables -- ask for preview of a database
         const database = 'plotly_datasets';
-        await plotly20.get(`localhost:5000/tables?database=${database}`);
-        const databasePreview = await this.getServerResponse(plotly20);
+        fetch(`${baseURL}/tables?database=${database}`)
+        .then( (res) => {
+            table = Object.keys(res.tables[0])[0];
+            expect(res).to.have.property('error', null);
+            expect(res).to.have.property('tables');
+        });
 
-        expect(databasePreview).to.have.property('error', null);
-        expect(databasePreview).to.have.property('tables');
+        // test /query
+        fetch(`${baseURL}/query?statement=SELECT * FROM ${table} LIMIT 5`)
+        .then( (res) => {
+            expect(res.rows.length).to.equal(5);
+        });
 
-        // test /query -- choose first table and send a query
-        const table = Object.keys(databasePreview.tables[0])[0];
-        await plotly20.get(`localhost:5000/query?statement=SELECT * FROM ${table} LIMIT 5`);
-        const queryResponse = await this.getServerResponse(plotly20);
-        expect(queryResponse.rows.length).to.equal(5);
-
-        // test /disconnect --
-        await plotly20.get('localhost:5000/disconnect');
-        const quitResponse = await this.getServerResponse(plotly20);
-        expect(quitResponse).to.have.property('error', null);
-
-        plotly20.quit();
+        // test /disconnect
+        fetch(`${baseURL}/disconnect`)
+        .then( (res) => {
+            expect(res).to.have.property('error', null);
+        });
 
     });
 
@@ -363,10 +347,10 @@ describe('main window', function spec() {
         const btn = await this.getConnectBtn();
 
         this.wrongInputs(testedDialect)
-        .then(await delay(500))
+        .then(await delay(1000))
         // click to connect
         .then(await btn.click())
-        .then(await delay(1000));
+        .then(await delay(3000));
 
         const errorMessage = await this.getErrorMessage();
         const testClass = await getClassOf(btn);
