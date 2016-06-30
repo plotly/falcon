@@ -220,7 +220,7 @@ describe('main window', function spec() {
         .then(await delay(1000))
         // click to connect
         .then(await btn.click())
-        .then(await delay(5000));
+        .then(await delay(10000));
         const testClass = await getClassOf(btn);
         expect(testClass).to.contain(expectedClass);
 
