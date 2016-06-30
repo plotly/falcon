@@ -3,7 +3,7 @@ import chromedriver from 'chromedriver';
 import webdriver from 'selenium-webdriver';
 import {expect} from 'chai';
 import electronPath from 'electron-prebuilt';
-import fetch from 'node-fetch';
+var fetch = require('node-fetch');
 
 import {APP_STATUS_CONSTANTS,
     DIALECTS, USER_INPUT_FIELDS} from '../app/constants/constants';
@@ -220,7 +220,7 @@ describe('main window', function spec() {
         .then(await delay(1000))
         // click to connect
         .then(await btn.click())
-        .then(await delay(3000));
+        .then(await delay(5000));
         const testClass = await getClassOf(btn);
         expect(testClass).to.contain(expectedClass);
 
@@ -275,6 +275,37 @@ describe('main window', function spec() {
 
     });
 
+    it('should return 404 for a non-existant endpoint',
+    async () => {
+
+        await fetch('http://localhost:5000/blah')
+        .then( res => {
+            expect(res.ok).to.equal.false;
+        });
+
+    });
+
+    it('/connect endpoint returns no error once the app is connected',
+    async() => {
+
+        await fetch('http://localhost:5000/connect')
+        .then( res => res.json())
+        .then(json => {
+            expect(json).to.have.property('error', null);
+        });
+
+    });
+
+    it('/tables endpoint returns no error for plotly_datasets databases',
+    async() => {
+
+        await fetch('http://localhost:5000/tables?database=plotly_datasets')
+        .then( res => res.json())
+        .then(json => {
+            expect(json).to.have.property('error', null);
+        });
+
+    });
 
     it('should disconnect when the disconnect button is pressed',
     async () => {
@@ -289,54 +320,6 @@ describe('main window', function spec() {
 
     });
 
-    it('should have functional endpoints at /connect, /tables, /query, /disconnect',
-    async () => {
-        const testedDialect = DIALECTS.MYSQL;
-        const btn = await this.getConnectBtn();
-        const logos = await this.getLogos();
-        const logo = await this.getLogo(testedDialect);
-        const baseURL = 'https://localhost:5000';
-
-        // clear inputs
-        logos[4].click();
-        logo.click();
-
-        // connect using the app
-        this.fillInputs(testedDialect)
-        .then(await delay(1000))
-        // click to connect
-        .then(await btn.click())
-        .then(await delay(3000));
-
-        // test -- /connect
-        fetch(`${baseURL}/connect`)
-        .then( (res) => {
-            expect(res).to.have.property('error', null);
-        });
-
-        let table;
-        // test /tables -- ask for preview of a database
-        const database = 'plotly_datasets';
-        fetch(`${baseURL}/tables?database=${database}`)
-        .then( (res) => {
-            table = Object.keys(res.tables[0])[0];
-            expect(res).to.have.property('error', null);
-            expect(res).to.have.property('tables');
-        });
-
-        // test /query
-        fetch(`${baseURL}/query?statement=SELECT * FROM ${table} LIMIT 5`)
-        .then( (res) => {
-            expect(res.rows.length).to.equal(5);
-        });
-
-        // test /disconnect
-        fetch(`${baseURL}/disconnect`)
-        .then( (res) => {
-            expect(res).to.have.property('error', null);
-        });
-
-    });
 
     it('should display an error when wrong credentials are enetered and the ' +
     'button state should be disconnected and the log should not update',
