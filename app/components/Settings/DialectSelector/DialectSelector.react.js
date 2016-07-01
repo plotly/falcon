@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import styles from './DialectSelector.css';
+import * as styles from './DialectSelector.css';
 import classnames from 'classnames';
 import {DIALECTS} from '../../../constants/constants';
 

@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import styles from './Settings.css';
+import * as styles from './Settings.css';
 import DatabaseDropdown from './DatabaseDropdown/DatabaseDropdown.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import UserCredentials from './UserCredentials/UserCredentials.react';

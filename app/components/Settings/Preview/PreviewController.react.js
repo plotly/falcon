@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import styles from './Preview.css';
+import * as styles from './Preview.css';
 
 export default class PreviewController extends Component {
     constructor(props) {

@@ -10,14 +10,14 @@ import {APP_STATUS_CONSTANTS,
 import {CREDENTIALS} from './AWS_RDS_connections.js';
 
 // import styles to use for tests
-import logoStyles from '../app/components/Settings/DialectSelector/DialectSelector.css';
+import * as logoStyles from '../app/components/Settings/DialectSelector/DialectSelector.css';
 
 chromedriver.start(); // on port 9515
 process.on('exit', chromedriver.stop);
 
 const delay = time => new Promise(resolve => setTimeout(resolve, time));
 
-describe('main window', function spec() {
+describe('main window', function Spec() {
     this.timeout(20000);
 
     before(async () => {
@@ -72,25 +72,6 @@ describe('main window', function spec() {
         this.getDatabaseDropdown = () => findel(
             byId('test-database-dropdown')
         );
-
-        // TODO: selenium has not wait for function, need a work around, WIP
-        // this.waitForElement = async(getElementFun) => {
-        //     console.log('waiting.....');
-        //     let element;
-        //     await delay(3000)
-        //     .then( async() => {
-        //         try {
-        //             element = await getElementFun;
-        //         }
-        //         catch (err) {
-        //             // return this.waitForElement until found
-        //         }
-        //         finally {
-        //             return element;
-        //         }
-        //     });
-        // };
-
 
         this.getDatabaseOptions = () => findel(
             byCss('.Select-option')
@@ -281,8 +262,6 @@ describe('main window', function spec() {
         // click to open options
         await databaseDropdown.click();
 
-        // expect(await this.getDatabaseOptions().getAttribute('value')).to.equal('[]');
-
     });
 
     it('should return 404 for a non-existant endpoint',
@@ -290,7 +269,7 @@ describe('main window', function spec() {
 
         await fetch('http://localhost:5000/blah')
         .then( res => {
-            expect(res.ok).to.equal.false;
+            expect(res.ok);
         });
 
     });

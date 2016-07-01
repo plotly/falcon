@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import styles from './UserCredentials.css';
+import * as styles from './UserCredentials.css';
 import classnames from 'classnames';
 import {DIALECTS, USER_INPUT_FIELDS} from '../../../constants/constants';
 const {dialog} = require('electron').remote;

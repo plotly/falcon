@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import classnames from 'classnames';
-import styles from './ConnectButton.css';
+import * as styles from './ConnectButton.css';
 import Select from 'react-select';
 import {APP_STATUS_CONSTANTS, BUTTON_MESSAGE} from '../../../constants/constants';
 

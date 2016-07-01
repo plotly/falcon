@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import classnames from 'classnames';
-import styles from './DatabaseDropdown.css';
+import * as styles from './DatabaseDropdown.css';
 import Select from 'react-select';
 import {DIALECTS} from '../../../constants/constants';
 

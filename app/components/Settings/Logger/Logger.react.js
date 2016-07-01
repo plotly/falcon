@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import classnames from 'classnames';
-import styles from './Logger.css';
+import * as styles from './Logger.css';
 
 const Logger = props => {
     if (!props.logs || props.logs.length === 0) return null;

@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import styles from './Configuration.css';
+import * as styles from './Configuration.css';
 import Settings from './Settings/Settings.react';
 import Monitor from './Monitor/Monitor.react';
 
