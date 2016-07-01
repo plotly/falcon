@@ -128,6 +128,17 @@ describe('main window', function spec() {
     // grab property of element
     const getClassOf = (element) => element.getAttribute('class');
 
+    const waitFor = async (expectedClass, element) => {
+        let currentClass = await getClassOf(element);
+
+        while (!currentClass.includes(expectedClass)) {
+            currentClass = await getClassOf(element);
+            console.log(currentClass);
+            await delay(500);
+        }
+
+    };
+
     // TODO: replace delay times with a functions that waits for a change
 
     it('should open window',
@@ -218,11 +229,10 @@ describe('main window', function spec() {
         // click on the evaluated dialect logo
         this.fillInputs(testedDialect)
         .then(await delay(1000))
-        // click to connect
         .then(await btn.click())
-        .then(await delay(10000));
-        const testClass = await getClassOf(btn);
-        expect(testClass).to.contain(expectedClass);
+        .then(await waitFor(expectedClass, btn));
+
+        expect(await getClassOf(btn)).to.contain(expectedClass);
 
     });
 
@@ -305,6 +315,7 @@ describe('main window', function spec() {
             expect(json).to.have.property('error', null);
         });
 
+
     });
 
     it('should disconnect when the disconnect button is pressed',
@@ -314,9 +325,9 @@ describe('main window', function spec() {
         const btn = await this.getConnectBtn();
 
         await btn.click()
-        .then(await delay(1000));
-        const testClass = await getClassOf(btn);
-        expect(testClass).to.contain(expectedClass);
+        .then(await waitFor(expectedClass, btn));
+
+        expect(await getClassOf(btn)).to.contain(expectedClass);
 
     });
 
@@ -333,10 +344,11 @@ describe('main window', function spec() {
         .then(await delay(1000))
         // click to connect
         .then(await btn.click())
-        .then(await delay(3000));
+        .then(await waitFor(expectedClass, btn));
 
         const errorMessage = await this.getErrorMessage();
         const testClass = await getClassOf(btn);
+
         expect(testClass.includes(expectedClass)).to.equal(true);
         expect(await errorMessage.getText()).to.have.length.above(0);
 
