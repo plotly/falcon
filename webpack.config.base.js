@@ -31,7 +31,8 @@ export default {
         'pg-hstore': 'pg-hstore',
         'sqlite3': 'sqlite3',
         'restify': 'commonjs restify',
-        'sequelize': 'commonjs sequelize'
+        'sequelize': 'commonjs sequelize',
+        'tedious': 'tedious'
         }
     ]
 };
