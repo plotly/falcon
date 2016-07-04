@@ -1,7 +1,8 @@
 import React, {Component, PropTypes} from 'react';
-import styles from './DatabaseDropdown.css';
+import classnames from 'classnames';
+import * as styles from './DatabaseDropdown.css';
 import Select from 'react-select';
-import {DIALECTS} from '../Constants/SupportedDialects.react';
+import {DIALECTS} from '../../../constants/constants';
 
 /*
     Displays in a dropdown menu all available databases/schemes
@@ -15,6 +16,15 @@ import {DIALECTS} from '../Constants/SupportedDialects.react';
 export default class DatabaseDropdown extends Component {
     constructor(props) {
         super(props);
+        this.testClass = this.testClass.bind(this);
+    }
+
+    testClass(options) {
+        /*
+            'connected' if has enabled database options
+        */
+        return (!options[0]['disabled']) ? 'test-connected' : 'test-disconnected';
+
     }
 
 	render() {
@@ -43,7 +53,12 @@ export default class DatabaseDropdown extends Component {
         }
 
         return (
-            <div className={styles.dropdown}>
+            <div className={classnames(
+                    styles.dropdown,
+                    this.testClass(databaseDropdownOptions)
+                )}
+                id="test-database-dropdown"
+            >
                 <Select
                     name="form-field-name"
                     placeholder="Select a Database"

@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import styles from './Configuration.css';
+import * as styles from './Configuration.css';
 import Settings from './Settings/Settings.react';
 import Monitor from './Monitor/Monitor.react';
 
@@ -44,9 +44,9 @@ export default class Configuration extends Component {
 
 Configuration.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
-    configActions: PropTypes.Object,
+    configActions: PropTypes.object,
     ipc: ImmutablePropTypes.map.isRequired,
-    ipcActions: PropTypes.Object,
+    ipcActions: PropTypes.object,
     connection: ImmutablePropTypes.map.isRequired,
-    connectionActions: PropTypes.Object
+    connectionActions: PropTypes.object
 };

@@ -1,14 +1,6 @@
 import {UPDATE} from '../actions/connection.js';
-
+import {APP_STATUS_CONSTANTS} from '../constants/constants';
 import Immutable from 'immutable';
-
-export const APP_STATUS_CONSTANTS = {
-    INITIALIZED: 'INITIALIZED',
-    ERROR: 'ERROR',
-    CONNECTED: 'CONNECTED',
-    CONNECTING: 'CONNECTING',
-    DISCONNECTED: 'DISCONNECTED'
-};
 
 const INITIAL_STATE = Immutable.Map({
     status: APP_STATUS_CONSTANTS.DISCONNECTED

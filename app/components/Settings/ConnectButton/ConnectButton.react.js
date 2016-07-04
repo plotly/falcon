@@ -1,7 +1,8 @@
 import React, {Component, PropTypes} from 'react';
-import styles from './ConnectButton.css';
+import classnames from 'classnames';
+import * as styles from './ConnectButton.css';
 import Select from 'react-select';
-import {APP_STATUS_CONSTANTS} from '../../../reducers/connection';
+import {APP_STATUS_CONSTANTS, BUTTON_MESSAGE} from '../../../constants/constants';
 
 /*
 	Displays a connect button and a disconnect button.
@@ -11,22 +12,25 @@ import {APP_STATUS_CONSTANTS} from '../../../reducers/connection';
 	Displays errors and log messages using `ipc`.
 */
 
-const BUTTON_MESSAGE = {
-    INITIALIZED: 'connect',
-    ERROR: 'try again',
-    CONNECTED: 'connected',
-    CONNECTING: 'connecting...',
-    DISCONNECTED: 'connect'
-};
-
 export default class ConnectButton extends Component {
     constructor(props) {
         super(props);
         this.connect = this.connect.bind(this);
         this.disconnect = this.disconnect.bind(this);
+        this.testClass = this.testClass.bind(this);
         this.state = {
             hover: false
         };
+    }
+
+    testClass() {
+        /*
+            Return the connection state as class-status.
+            Knowing this status and getting the errorMessage and buttonMessage
+            from their respective className tags will suffice to test this
+            comoponent.
+        */
+        return `test-${this.props.connection.get('status')}`;
     }
 
     connect() {
@@ -107,16 +111,20 @@ export default class ConnectButton extends Component {
 
 		return (
 			<div className={styles.footer}>
-				<a className={styles.buttonPrimary}
+				<a className={classnames(
+                        styles.buttonPrimary,
+                        [this.testClass()]
+                    )}
 					onClick={onButtonClick}
                     onMouseOut={() => {this.setState({hover: false});}}
                     onMouseOver={() => {this.setState({hover: true});}}
+                    id={'test-connect-button'}
 				>
 					{buttonMessage}
 				</a>
-                <a>
+                <pre id={'test-error-message'}>
                     {errorMessage}
-                </a>
+                </pre>
 			</div>
 		);
 	}

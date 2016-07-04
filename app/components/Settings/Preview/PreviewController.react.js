@@ -1,10 +1,15 @@
 import React, {Component, PropTypes} from 'react';
-import styles from './Preview.css';
+import * as styles from './Preview.css';
 
 export default class PreviewController extends Component {
     constructor(props) {
         super(props);
         this.renderTable = this.renderTable.bind(this);
+        this.testClass = this.testClass.bind(this);
+    }
+
+    testClass() {
+        return 'test-tables-created';
     }
 
     renderTable(table) {
@@ -36,7 +41,9 @@ export default class PreviewController extends Component {
 
                 return (
                     <div>
-                        <div className={styles.tableHeader}>{tableName}</div>
+                        <div className={styles.tableHeader}>
+                            Preview of table: <u>{tableName}</u>
+                        </div>
                         {this.renderTable(table.get(tableName))}
                     </div>
                 );
@@ -44,7 +51,7 @@ export default class PreviewController extends Component {
         );
 
         return (
-            <div>
+            <div id="test-tables">
                 {renderedTables}
             </div>
         );

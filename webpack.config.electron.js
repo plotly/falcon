@@ -1,5 +1,6 @@
 import webpack from 'webpack';
 import baseConfig from './webpack.config.base';
+import {merge} from 'ramda';
 
 export default {
     ...baseConfig,
@@ -27,7 +28,9 @@ export default {
             'process.env': {
                 NODE_ENV: JSON.stringify('production')
             }
-        })
+        }),
+        // https://github.com/felixge/node-formidable/issues/337
+        new webpack.DefinePlugin({ 'global.GENTLY': false })
     ],
 
     target: 'electron-main',
@@ -38,8 +41,10 @@ export default {
     },
 
     externals: [
+        merge(
         ...baseConfig.externals,
-        'font-awesome',
-        'source-map-support'
+        {'font-awesome': 'font-awesome',
+        'source-map-support': 'source-map-support'}
+        )
     ]
 };

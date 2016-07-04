@@ -1,13 +1,13 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import styles from './Settings.css';
+import * as styles from './Settings.css';
 import DatabaseDropdown from './DatabaseDropdown/DatabaseDropdown.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import UserCredentials from './UserCredentials/UserCredentials.react';
 import LoggerController from './Logger/LoggerController.react';
 import PreviewController from './Preview/PreviewController.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
-import {APP_STATUS_CONSTANTS} from '../../reducers/connection';
+import {APP_STATUS_CONSTANTS} from '../../constants/constants';
 
 export default class Settings extends Component {
     constructor(props) {
@@ -143,9 +143,9 @@ export default class Settings extends Component {
 
 Settings.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
-    configActions: PropTypes.Object,
+    configActions: PropTypes.object,
     ipc: ImmutablePropTypes.map.isRequired,
-    ipcActions: PropTypes.Object,
+    ipcActions: PropTypes.object,
     connection: ImmutablePropTypes.map.isRequired,
-    connectionActions: PropTypes.Object
+    connectionActions: PropTypes.object
 };

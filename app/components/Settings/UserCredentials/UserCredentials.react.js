@@ -1,8 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import styles from './UserCredentials.css';
+import * as styles from './UserCredentials.css';
 import classnames from 'classnames';
-import {DIALECTS} from '../Constants/SupportedDialects.react';
+import {DIALECTS, USER_INPUT_FIELDS} from '../../../constants/constants';
 const {dialog} = require('electron').remote;
 
 /*
@@ -10,21 +10,22 @@ const {dialog} = require('electron').remote;
 	username, password, and local port number.
 */
 
-const USER_CREDENTIALS = {
-    [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port'],
-    [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port'],
-	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port'],
-    [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
-    [DIALECTS.SQLITE]: ['storage']
-};
-
 export default class UserCredentials extends Component {
     constructor(props) {
         super(props);
 		this.getPlaceholder = this.getPlaceholder.bind(this);
 		this.getInputType = this.getInputType.bind(this);
 		this.getOnClick = this.getOnClick.bind(this);
+		this.testClass = this.testClass.bind(this);
     }
+
+	testClass() {
+		/*
+			No internal tests for now.
+		*/
+
+		return 'test-input-created';
+	}
 
 	getInputType (credential) {
 		if (credential === 'password') {
@@ -48,9 +49,12 @@ export default class UserCredentials extends Component {
 		return () => {
 			if (credential === 'storage') {
 				dialog.showOpenDialog({
-					properties: ['openFile', 'openDirectory']
+					properties: ['openFile', 'openDirectory'],
+					filters: [{name: 'databases', extensions: ['db']}]
 				}, (paths) => {
 					// result returned in an array
+					// TODO: add length of paths === 0 check
+					// TODO: add path non null check
 					const path = paths[0];
 					// get the filename to use as username in the logs
 					const splitPath = path.split('/');
@@ -67,9 +71,9 @@ export default class UserCredentials extends Component {
 	render() {
 		const {configuration, configActions} = this.props;
 
-		let inputs = USER_CREDENTIALS[configuration.get('dialect')]
+		let inputs = USER_INPUT_FIELDS[configuration.get('dialect')]
 			.map(credential => (
-			<input
+			<input className={this.testClass()}
 				placeholder={this.getPlaceholder(credential)}
 				type={this.getInputType(credential)}
 				onChange={e => (
@@ -77,6 +81,7 @@ export default class UserCredentials extends Component {
 				)}
 				onClick={this.getOnClick(credential)}
 				value={configuration.get(credential)}
+				id={`test-input-${credential}`}
 			/>
 		));
 
@@ -90,5 +95,5 @@ export default class UserCredentials extends Component {
 
 UserCredentials.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
-    configActions: PropTypes.Object
+    configActions: PropTypes.object
 };

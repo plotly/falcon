@@ -1,11 +1,11 @@
 {
   "name": "electron-react-boilerplate",
-  "productName": "ElectronReact",
+  "productName": "Plotly Desktop Connector",
   "version": "0.10.0",
   "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
   "main": "main.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test mocha --compilers js:babel-register --recursive --require ./test/setup.js test/**/*.spec.js",
+    "test": "npm run build && npm run test-e2e",
     "test-watch": "npm test -- --watch",
     "test-e2e": "cross-env NODE_ENV=test mocha --compilers js:babel-register --require ./test/setup.js --require co-mocha ./test/e2e.js",
     "lint": "eslint app test *.js",
@@ -18,7 +18,8 @@
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
     "package-all": "npm run package -- --all",
     "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
-    "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\""
+    "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\"",
+    "rebuild-and-e2e": "npm run build && npm run test-e2e"
   },
   "bin": {
     "electron": "./node_modules/.bin/electron"
@@ -100,11 +101,11 @@
     "classnames": "^2.2.5",
     "css-modules-require-hook": "^4.0.0",
     "electron-debug": "^0.6.0",
-    "electron-prebuilt": "1.2.0",
     "eslint-plugin-import": "^1.8.0",
     "font-awesome": "^4.6.1",
     "immutable": "^3.8.1",
     "mysql": "^2.10.2",
+    "node-fetch": "^1.5.3",
     "node-gyp": "^3.3.1",
     "node-restify": "^0.2.1",
     "pg": "^4.5.5",
@@ -127,8 +128,7 @@
     "restify": "^4.0.4",
     "sequelize": "^3.23.0",
     "source-map-support": "^0.4.0",
-    "sqlite3": "^3.1.3",
-    "tedious": "^1.14.0"
+    "sqlite3": "^3.1.3"
   },
   "devEngines": {
     "node": "4.x || 5.x || 6.x",
