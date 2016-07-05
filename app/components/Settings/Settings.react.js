@@ -7,7 +7,7 @@ import UserCredentials from './UserCredentials/UserCredentials.react';
 import LoggerController from './Logger/LoggerController.react';
 import PreviewController from './Preview/PreviewController.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
-import {APP_STATUS_CONSTANTS} from '../../constants/constants';
+import {APP_STATUS} from '../../constants/constants';
 
 export default class Settings extends Component {
     constructor(props) {
@@ -88,20 +88,20 @@ export default class Settings extends Component {
         let step2 = null;
         let step3 = null;
 
-        if (connection.get('status') === APP_STATUS_CONSTANTS.CONNECTED) {
+        if (connection.get('status') === APP_STATUS.CONNECTED) {
             step2 = (
                 <div className={styles.step2Container}>
-                    <h5>2. Test Connection and Preview Tables</h5>
+                    <h5>2. Select Database and Preview Tables</h5>
                     {databaseDropdown}
                 </div>
             );
 
             step3 = (
-                <div className={styles.step2Container}>
+                <div className={styles.step3Container}>
                     <h5>3. Query from Plotly 2.0</h5>
                     <div>
-                        Open <a href="">Plotly 2.0</a> and make queries through this connector.
-                        {" Remember to keep this app running while you're making queries!"}
+                        Query data by importing data from plot.ly website via SQL.<br/>
+                        Remember to keep this app running while you are making queries!
                     </div>
                 </div>
             );

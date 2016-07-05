@@ -1,13 +1,14 @@
 {
-  "name": "electron-react-boilerplate",
-  "productName": "Plotly Desktop Connector",
-  "version": "0.10.0",
+  "name": "plotly-database-connector",
+  "productName": "Plotly Database Connector",
+  "version": "0.0.2",
   "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
   "main": "main.js",
   "scripts": {
     "test": "npm run build && npm run test-e2e",
     "test-watch": "npm test -- --watch",
     "test-e2e": "cross-env NODE_ENV=test mocha --compilers js:babel-register --require ./test/setup.js --require co-mocha ./test/e2e.js",
+    "local-e2e": "cross-env NODE_ENV=test mocha --compilers js:babel-register --require ./test/setup.js --require co-mocha && source /test/run_e2e.sh",
     "lint": "eslint app test *.js",
     "hot-server": "node -r babel-register server.js",
     "build-main": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.electron.js --progress --profile --colors",

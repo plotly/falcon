@@ -3,11 +3,39 @@ import chromedriver from 'chromedriver';
 import webdriver from 'selenium-webdriver';
 import {expect} from 'chai';
 import electronPath from 'electron-prebuilt';
-var fetch = require('node-fetch');
+import fetch from 'node-fetch';
+import {productName, version} from '../package.json';
 
-import {APP_STATUS_CONSTANTS,
+import {APP_STATUS,
     DIALECTS, USER_INPUT_FIELDS} from '../app/constants/constants';
-import {CREDENTIALS} from './AWS_RDS_connections.js';
+
+const CREDENTIALS = {
+	'mariadb': {
+		'host': process.env.AWS_RDS_MARIADB,
+		'port': '3306',
+		'username': 'masteruser',
+		'password': process.env.PASSWORD_MARIADB
+		},
+	'mssql': {
+		'host': process.env.AWS_RDS_MSSQL,
+		'port': '1433',
+		'username': 'masteruser',
+		'password': process.env.PASSWORD_MSSQL
+		},
+	'mysql': {
+		'host': process.env.AWS_RDS_MYSQL,
+		'port': '3306',
+		'username': 'masteruser',
+		'password': process.env.PASSWORD_MYSQL
+		},
+	'postgres': {
+		'host': process.env.AWS_RDS_POSTGRES,
+		'port': '5432',
+		'username': 'masteruser',
+		'password': process.env.PASSWORD_POSTGRES,
+		'database': 'plotly_datasets'
+		}
+};
 
 // import styles to use for tests
 import * as logoStyles from '../app/components/Settings/DialectSelector/DialectSelector.css';
@@ -120,14 +148,12 @@ describe('main window', function Spec() {
 
     };
 
-    // TODO: replace delay times with a functions that waits for a change
-
     it('should open window',
     async () => {
 
         const title = await this.driver.getTitle();
 
-        expect(title).to.equal('Plotly Desktop Connector');
+        expect(title).to.equal(`${productName} v${version}`);
 
     });
 
@@ -178,7 +204,7 @@ describe('main window', function Spec() {
     it('should have an initial state of disconnected',
     async () => {
 
-        const expectedClass = `test-${APP_STATUS_CONSTANTS.DISCONNECTED}`;
+        const expectedClass = `test-${APP_STATUS.DISCONNECTED}`;
         const btn = await this.getConnectBtn();
 
         const testClass = await getClassOf(btn);
@@ -203,7 +229,7 @@ describe('main window', function Spec() {
     it('should connect to the database using the inputs and selected dialect',
     async () => {
 
-        const expectedClass = `test-${APP_STATUS_CONSTANTS.CONNECTED}`;
+        const expectedClass = `test-${APP_STATUS.CONNECTED}`;
         const testedDialect = DIALECTS.MYSQL;
         const btn = await this.getConnectBtn();
 
@@ -300,7 +326,7 @@ describe('main window', function Spec() {
     it('should disconnect when the disconnect button is pressed',
     async () => {
 
-        const expectedClass = `test-${APP_STATUS_CONSTANTS.DISCONNECTED}`;
+        const expectedClass = `test-${APP_STATUS.DISCONNECTED}`;
         const btn = await this.getConnectBtn();
 
         await btn.click()
@@ -315,7 +341,7 @@ describe('main window', function Spec() {
     'button state should be disconnected and the log should not update',
     async () => {
 
-        const expectedClass = `test-${APP_STATUS_CONSTANTS.ERROR}`;
+        const expectedClass = `test-${APP_STATUS.ERROR}`;
         const testedDialect = DIALECTS.MYSQL;
         const btn = await this.getConnectBtn();
 

@@ -6,7 +6,7 @@ export const DIALECTS = {
     SQLITE: 'sqlite'
 };
 
-export const APP_STATUS_CONSTANTS = {
+export const APP_STATUS = {
     INITIALIZED: 'INITIALIZED',
     ERROR: 'ERROR',
     CONNECTED: 'CONNECTED',
