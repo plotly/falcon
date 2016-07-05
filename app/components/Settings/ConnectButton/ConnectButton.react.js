@@ -107,7 +107,6 @@ export default class ConnectButton extends Component {
                 break;
 
             case APP_STATUS.LOADING:
-                debugger;
                 onButtonClick = () => {};
                 break;
 
