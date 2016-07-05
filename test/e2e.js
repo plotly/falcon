@@ -127,7 +127,7 @@ describe('main window', function Spec() {
 
         const title = await this.driver.getTitle();
 
-        expect(title).to.equal('Plotly Desktop Connector');
+        expect(title).to.equal(`${productName} v${version}`);
 
     });
 
