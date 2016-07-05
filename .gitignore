@@ -34,3 +34,6 @@ dist
 release
 main.js
 main.js.map
+
+# Local tests
+test/run_e2e.sh
