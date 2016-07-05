@@ -6,7 +6,7 @@ import electronPath from 'electron-prebuilt';
 import fetch from 'node-fetch';
 import {productName, version} from '../package.json';
 
-import {APP_STATUS_CONSTANTS,
+import {APP_STATUS,
     DIALECTS, USER_INPUT_FIELDS} from '../app/constants/constants';
 
 const CREDENTIALS = {
@@ -204,7 +204,7 @@ describe('main window', function Spec() {
     it('should have an initial state of disconnected',
     async () => {
 
-        const expectedClass = `test-${APP_STATUS_CONSTANTS.DISCONNECTED}`;
+        const expectedClass = `test-${APP_STATUS.DISCONNECTED}`;
         const btn = await this.getConnectBtn();
 
         const testClass = await getClassOf(btn);
@@ -229,7 +229,7 @@ describe('main window', function Spec() {
     it('should connect to the database using the inputs and selected dialect',
     async () => {
 
-        const expectedClass = `test-${APP_STATUS_CONSTANTS.CONNECTED}`;
+        const expectedClass = `test-${APP_STATUS.CONNECTED}`;
         const testedDialect = DIALECTS.MYSQL;
         const btn = await this.getConnectBtn();
 
@@ -326,7 +326,7 @@ describe('main window', function Spec() {
     it('should disconnect when the disconnect button is pressed',
     async () => {
 
-        const expectedClass = `test-${APP_STATUS_CONSTANTS.DISCONNECTED}`;
+        const expectedClass = `test-${APP_STATUS.DISCONNECTED}`;
         const btn = await this.getConnectBtn();
 
         await btn.click()
@@ -341,7 +341,7 @@ describe('main window', function Spec() {
     'button state should be disconnected and the log should not update',
     async () => {
 
-        const expectedClass = `test-${APP_STATUS_CONSTANTS.ERROR}`;
+        const expectedClass = `test-${APP_STATUS.ERROR}`;
         const testedDialect = DIALECTS.MYSQL;
         const btn = await this.getConnectBtn();
 

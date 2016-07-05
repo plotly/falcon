@@ -7,7 +7,7 @@ import UserCredentials from './UserCredentials/UserCredentials.react';
 import LoggerController from './Logger/LoggerController.react';
 import PreviewController from './Preview/PreviewController.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
-import {APP_STATUS_CONSTANTS} from '../../constants/constants';
+import {APP_STATUS} from '../../constants/constants';
 
 export default class Settings extends Component {
     constructor(props) {
@@ -88,7 +88,7 @@ export default class Settings extends Component {
         let step2 = null;
         let step3 = null;
 
-        if (connection.get('status') === APP_STATUS_CONSTANTS.CONNECTED) {
+        if (connection.get('status') === APP_STATUS.CONNECTED) {
             step2 = (
                 <div className={styles.step2Container}>
                     <h5>2. Test Connection and Preview Tables</h5>

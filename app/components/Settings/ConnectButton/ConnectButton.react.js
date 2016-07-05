@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import classnames from 'classnames';
 import * as styles from './ConnectButton.css';
 import Select from 'react-select';
-import {APP_STATUS_CONSTANTS, BUTTON_MESSAGE} from '../../../constants/constants';
+import {APP_STATUS, BUTTON_MESSAGE} from '../../../constants/constants';
 
 /*
 	Displays a connect button and a disconnect button.
