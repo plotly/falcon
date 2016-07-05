@@ -18,6 +18,7 @@ export default class ConnectButton extends Component {
         this.connect = this.connect.bind(this);
         this.disconnect = this.disconnect.bind(this);
         this.testClass = this.testClass.bind(this);
+        this.updateStatus = this.updateStatus.bind(this);
         this.state = {
             hover: false
         };
@@ -34,6 +35,7 @@ export default class ConnectButton extends Component {
     }
 
     connect() {
+        this.updateStatus(APP_STATUS.CONNECTING);
         this.props.ipcActions.connect(this.props.configuration);
     }
 
@@ -49,24 +51,22 @@ export default class ConnectButton extends Component {
         this.setState({hover: false});
     }
 
-    componentWillReceiveProps(nextProps) {
-        const updateStatus = (status) => {
-            if (status !== this.props.connection.get('status')) {
-                this.props.connectionActions.update({status});
-                this.setState({
-                    buttonMessage: BUTTON_MESSAGE[status]
-                });
-            }
-        };
+    updateStatus(status) {
+        if (status !== this.props.connection.get('status')) {
+            this.props.connectionActions.update({status});
+            this.setState({
+                buttonMessage: BUTTON_MESSAGE[status]
+            });
+        }
+    }
 
-        let status;
-        // TODO: now that connection.status is in redux store, move this out.
+    componentWillReceiveProps(nextProps) {
         if (nextProps.ipc.hasIn(['error', 'message'])) {
-            updateStatus(APP_STATUS_CONSTANTS.ERROR);
+            this.updateStatus(APP_STATUS.ERROR);
         } else if (nextProps.ipc.get('databases')) {
-            updateStatus(APP_STATUS_CONSTANTS.CONNECTED);
+            this.updateStatus(APP_STATUS.CONNECTED);
         } else if (!nextProps.ipc.get('databases')) {
-            updateStatus(APP_STATUS_CONSTANTS.DISCONNECTED);
+            this.updateStatus(APP_STATUS.DISCONNECTED);
         }
     }
 
@@ -76,38 +76,50 @@ export default class ConnectButton extends Component {
 
         let errorMessage;
         let onButtonClick;
+
         let buttonMessage = BUTTON_MESSAGE[status];
-        if (this.state.hover && status === APP_STATUS_CONSTANTS.CONNECTED) {
+        if (this.state.hover && status === APP_STATUS.CONNECTED) {
             buttonMessage = 'disconnect';
         }
 
-        if (APP_STATUS_CONSTANTS.INITIALIZED === status) {
-            onButtonClick = this.connect;
+        // what should the button do depending on the app status?
+        switch (status) {
+
+            case APP_STATUS.INITIALIZED:
+                onButtonClick = this.connect;
+                break;
+
+            case APP_STATUS.ERROR:
+                errorMessage = (
+                    <pre className={styles.errorMessage}>
+                        {
+                            'Hm... there was an error connecting: ' +
+                            ipc.getIn(['error', 'message'])
+                        }
+                    </pre>
+                );
+
+                onButtonClick = this.connect;
+                break;
+
+            case APP_STATUS.CONNECTED:
+                onButtonClick = this.disconnect;
+                break;
+
+            case APP_STATUS.LOADING:
+                debugger;
+                onButtonClick = () => {};
+                break;
+
+            case APP_STATUS.DISCONNECTED:
+                onButtonClick = this.connect;
+                break;
+
+            default:
+                onButtonClick = this.connect;
+
         }
 
-		else if (APP_STATUS_CONSTANTS.ERROR === status) {
-			errorMessage = (
-				<pre className={styles.errorMessage}>
-					{
-						'Hm... there was an error connecting: ' +
-						ipc.getIn(['error', 'message'])
-					}
-				</pre>
-			);
-            onButtonClick = this.connect;
-		}
-
-        else if (APP_STATUS_CONSTANTS.CONNECTED === status) {
-            onButtonClick = this.disconnect;
-        }
-
-        else if (APP_STATUS_CONSTANTS.LOADING === status) {
-            onButtonClick = () => {};
-		}
-
-        else if (APP_STATUS_CONSTANTS.DISCONNECTED === status) {
-			onButtonClick = this.connect;
-		}
 
 		return (
 			<div className={styles.footer}>
