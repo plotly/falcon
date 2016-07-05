@@ -91,17 +91,17 @@ export default class Settings extends Component {
         if (connection.get('status') === APP_STATUS.CONNECTED) {
             step2 = (
                 <div className={styles.step2Container}>
-                    <h5>2. Test Connection and Preview Tables</h5>
+                    <h5>2. Select Database and Preview Tables</h5>
                     {databaseDropdown}
                 </div>
             );
 
             step3 = (
-                <div className={styles.step2Container}>
+                <div className={styles.step3Container}>
                     <h5>3. Query from Plotly 2.0</h5>
                     <div>
-                        Open <a href="">Plotly 2.0</a> and make queries through this connector.
-                        {" Remember to keep this app running while you're making queries!"}
+                        Query data by importing data from plot.ly website via SQL.<br/>
+                        Remember to keep this app running while you are making queries!
                     </div>
                 </div>
             );
