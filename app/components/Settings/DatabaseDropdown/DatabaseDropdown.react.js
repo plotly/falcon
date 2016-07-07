@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import classnames from 'classnames';
 import * as styles from './DatabaseDropdown.css';
 import Select from 'react-select';
@@ -23,7 +24,7 @@ export default class DatabaseDropdown extends Component {
         /*
             'connected' if has enabled database options
         */
-        return (!options[0]['disabled']) ? 'test-connected' : 'test-disconnected';
+        return (!options[0].disabled) ? 'test-connected' : 'test-disconnected';
 
     }
 
@@ -72,3 +73,10 @@ export default class DatabaseDropdown extends Component {
         );
     }
 }
+
+DatabaseDropdown.propTypes = {
+    configuration: ImmutablePropTypes.map.isRequired,
+    configActions: PropTypes.object,
+    ipc: ImmutablePropTypes.map.isRequired,
+    ipcActions: PropTypes.object
+};

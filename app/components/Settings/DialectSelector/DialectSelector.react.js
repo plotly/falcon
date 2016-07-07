@@ -40,11 +40,13 @@ export default class DialectSelector extends Component {
             (DIALECTS[dialect]
             === this.props.configuration.get('dialect'));
 
+        let className = 'test';
         if (consistency) {
-            return 'test-consistent-state';
+            className = 'test-consistent-state';
         } else {
-            return 'test-nonconsistent-state';
+            className = 'test-nonconsistent-state';
         }
+        return className;
     }
 
     logoIsSelected(dialect) {

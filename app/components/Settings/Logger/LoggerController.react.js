@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import Logger from './Logger.react';
 
 export default class LoggerController extends Component {
@@ -35,5 +36,5 @@ export default class LoggerController extends Component {
 }
 
 LoggerController.propTypes = {
-    ipc: PropTypes.object // TODO: Immutable prop types
+    ipc: ImmutablePropTypes.map.isRequired
 };

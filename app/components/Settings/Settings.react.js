@@ -5,7 +5,7 @@ import DatabaseDropdown from './DatabaseDropdown/DatabaseDropdown.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import UserCredentials from './UserCredentials/UserCredentials.react';
 import LoggerController from './Logger/LoggerController.react';
-import PreviewController from './Preview/PreviewController.react';
+import Preview from './Preview/Preview.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import {APP_STATUS} from '../../constants/constants';
 
@@ -47,7 +47,7 @@ export default class Settings extends Component {
             />
         );
 
-        const databaseDropdown = (
+        const databasePreview = (
             <div>
 
                 <DatabaseDropdown
@@ -58,7 +58,7 @@ export default class Settings extends Component {
                 />
 
                 <div className={styles.previewController}>
-                    <PreviewController ipc={ipc}/>
+                    <Preview ipc={ipc}/>
                 </div>
 
             </div>
@@ -92,7 +92,7 @@ export default class Settings extends Component {
             step2 = (
                 <div className={styles.step2Container}>
                     <h5>2. Select Database and Preview Tables</h5>
-                    {databaseDropdown}
+                    {databasePreview}
                 </div>
             );
 
@@ -100,8 +100,10 @@ export default class Settings extends Component {
                 <div className={styles.step3Container}>
                     <h5>3. Query from Plotly 2.0</h5>
                     <div>
-                        Query data by importing data from plot.ly website via SQL.<br/>
-                        Remember to keep this app running while you are making queries!
+                        Query data by importing data from
+                        plot.ly website via SQL.<br/>
+                        Remember to keep this app running
+                        while you are making queries!
                     </div>
                 </div>
             );
@@ -123,7 +125,7 @@ export default class Settings extends Component {
                     <img
                         src="./images/plotlyLogo.png"
                         className={styles.plotlyLogo}
-        >
+                    >
                     </img>
                     <h4>
                         Plotly 2.0 Database Connector

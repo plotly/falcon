@@ -1,7 +1,8 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './Preview.css';
 
-export default class PreviewController extends Component {
+export default class Preview extends Component {
     constructor(props) {
         super(props);
         this.renderTable = this.renderTable.bind(this);
@@ -56,5 +57,8 @@ export default class PreviewController extends Component {
             </div>
         );
     }
-
 }
+
+Preview.propTypes = {
+    ipc: ImmutablePropTypes.map.isRequired
+};

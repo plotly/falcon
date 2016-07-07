@@ -34,11 +34,11 @@ export function disconnect () {
 }
 
 function immutableToJS(immutableThing) {
+    let jsonThing = {};
     if (Immutable.Iterable.isIterable(immutableThing)) {
-        return immutableThing.toJS();
-    } else {
-        return immutableThing;
+        jsonThing = immutableThing.toJS();
     }
+    return jsonThing;
 }
 
 function ipcSend(task, message = {}) {

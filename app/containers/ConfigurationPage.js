@@ -6,7 +6,6 @@ import * as IpcActions from '../actions/ipc';
 import * as ConnectionActions from '../actions/connection';
 
 function mapStateToProps(state) {
-    console.warn('state: ', state);
     return {
         configuration: state.configuration,
         ipc: state.ipc,

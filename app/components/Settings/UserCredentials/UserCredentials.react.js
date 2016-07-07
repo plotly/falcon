@@ -1,8 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './UserCredentials.css';
-import classnames from 'classnames';
-import {DIALECTS, USER_INPUT_FIELDS} from '../../../constants/constants';
+import {USER_INPUT_FIELDS} from '../../../constants/constants';
 const {dialog} = require('electron').remote;
 
 /*
@@ -28,20 +27,17 @@ export default class UserCredentials extends Component {
 	}
 
 	getInputType (credential) {
-		if (credential === 'password') {
-			return 'password';
-		} else {
-			return 'text';
-		}
+		return (credential === 'password') ? 'password' : 'text';
 	}
 
 	getPlaceholder(credential) {
-		if (credential === 'port') {
-			return 'local port number';
-		} else if (credential === 'storage') {
-			return 'path to database';
-		} else {
-			return credential;
+		switch (credential) {
+			case 'port':
+				return 'local port number';
+			case 'storage':
+				return 'path to database';
+			default:
+				return credential;
 		}
 	}
 

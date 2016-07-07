@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import classnames from 'classnames';
 import * as styles from './ConnectButton.css';
-import Select from 'react-select';
 import {APP_STATUS, BUTTON_MESSAGE} from '../../../constants/constants';
 
 /*
@@ -71,7 +71,7 @@ export default class ConnectButton extends Component {
     }
 
 	render() {
-		const {connection, configuration, ipc, ipcActions} = this.props;
+		const {connection, ipc} = this.props;
         const status = connection.get('status');
 
         let errorMessage;
@@ -82,7 +82,7 @@ export default class ConnectButton extends Component {
             buttonMessage = 'disconnect';
         }
 
-        // what should the button do depending on the app status?
+        // what should the button onClick do depending on the app status?
         switch (status) {
 
             case APP_STATUS.INITIALIZED:
@@ -116,9 +116,7 @@ export default class ConnectButton extends Component {
 
             default:
                 onButtonClick = this.connect;
-
         }
-
 
 		return (
 			<div className={styles.footer}>
@@ -140,3 +138,11 @@ export default class ConnectButton extends Component {
 		);
 	}
 }
+
+ConnectButton.propTypes = {
+    configuration: ImmutablePropTypes.map.isRequired,
+    connection: ImmutablePropTypes.map.isRequired,
+    connectionActions: PropTypes.object,
+    ipc: ImmutablePropTypes.map.isRequired,
+    ipcActions: PropTypes.object
+};

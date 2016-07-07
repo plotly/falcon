@@ -38,7 +38,8 @@ const CREDENTIALS = {
 };
 
 // import styles to use for tests
-import * as logoStyles from '../app/components/Settings/DialectSelector/DialectSelector.css';
+import * as logoStyles
+    from '../app/components/Settings/DialectSelector/DialectSelector.css';
 
 chromedriver.start(); // on port 9515
 process.on('exit', chromedriver.stop);
@@ -121,7 +122,9 @@ describe('main window', function Spec() {
         this.fillInputs = async (testedDialect) => {
             USER_INPUT_FIELDS[testedDialect].forEach(credential => {
                 this.getInputField(credential)
-                .then(input => input.sendKeys(CREDENTIALS[testedDialect][credential]));
+                .then(input => {
+                    input.sendKeys(CREDENTIALS[testedDialect][credential]);
+                });
             });
         };
 
@@ -197,7 +200,8 @@ describe('main window', function Spec() {
 
         expect(await highlightedLogo.length).to.equal(1);
         expect(await logo.getAttribute('id')).to.contain(testedDialect);
-        expect(await highlightedLogo[0].getAttribute('id')).to.contain(testedDialect);
+        expect(await highlightedLogo[0].getAttribute('id'))
+            .to.contain(testedDialect);
 
     });
 

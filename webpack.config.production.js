@@ -14,7 +14,7 @@ const config = {
 
         publicPath: '../dist/'
     },
-    
+
     module: {
         ...baseConfig.module,
 
@@ -33,7 +33,8 @@ const config = {
                 test: /^((?!\.global).)*\.css$/,
                 loader: ExtractTextPlugin.extract(
                     'style-loader',
-                    'css-loader?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]'
+                    'css-loader?modules&importLoaders=1&localIdentName=' +
+                        '[name]__[local]___[hash:base64:5]'
                 )
             }
         ]

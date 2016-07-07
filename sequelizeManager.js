@@ -11,10 +11,6 @@ const PREBUILT_QUERY = {
 
 const timestamp = () => (new Date()).toTimeString();
 
-const emptyTableLog = (table) => {
-    return `NOTE: table [${table}] seems to be empty`;
-};
-
 const EMPTY_TABLE = {
     columnnames: ['NA'],
     rows: [['empty table']],
@@ -59,7 +55,7 @@ export default class SequelizeManager {
     }
 
     setQueryType(type) {
-        // type = SELECT for `SELECT` query
+        // set sequelize's query property type
         return {type: this.connection.QueryTypes[type]};
     }
 
@@ -102,7 +98,6 @@ export default class SequelizeManager {
 
     // built-in query to show available databases/schemes
     showDatabases(callback) {
-        // constants for cleaner code
         const query = this.getPresetQuery(PREBUILT_QUERY.SHOW_DATABASES);
         const dialect = this.getDialect();
 
@@ -133,20 +128,21 @@ export default class SequelizeManager {
 
     // built-in query to show available tables in a database/scheme
     showTables(callback) {
-        // constants for cleaner code
         const showtables = this.getPresetQuery(PREBUILT_QUERY.SHOW_TABLES);
-        const dialect = this.getDialect();
 
-        return () => this.connection.query(showtables, this.setQueryType('SELECT'))
+        return () => this.connection
+            .query(showtables, this.setQueryType('SELECT'))
             .then(results => {
                 const tables = this.intoTablesArray(results);
 
+                // construct prmises of table previews (top 5 rows)
                 const promises = tables.map(table => {
                     const show5rows = this.getPresetQuery(
                         PREBUILT_QUERY.SHOW5ROWS, table
                     );
-
-                    return this.connection.query(show5rows, this.setQueryType('SELECT'))
+                    // sends the query for a single table
+                    return this.connection
+                        .query(show5rows, this.setQueryType('SELECT'))
                         .then(selectTableResults => {
                             return {
                                 [table]: selectTableResults
@@ -160,7 +156,6 @@ export default class SequelizeManager {
                             error: null,
                             tables: assembleTablesPreviewMessage(tablePreviews)
                         });
-
                 });
             });
     }
@@ -234,6 +229,10 @@ export default class SequelizeManager {
                     default:
                         throw new Error('could not build a presetQuery');
                 }
+                
+            default: {
+                throw new Error('could not build a presetQuery');
+            }
         }
     }
 }

@@ -69,6 +69,10 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 				payload.message = sequelizeSetup();
 				break;
 			}
+
+			default: {
+				throw new Error('no task provided to messageHandler');
+			}
 		}
 
 		const callback = (message) => {
@@ -80,9 +84,7 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 		handleMessage(sequelizeManager, {
 			callback, payload
 		});
-
 	};
-
 }
 
 export function ipcMessageReceive(sequelizeManager) {
@@ -169,6 +171,11 @@ function handleMessage(sequelizeManager, opts) {
 			} catch (error) {
 				sequelizeManager.raiseError(error, callback);
 			}
+			break;
+		}
+
+		default: {
+			throw new Error('no task provided to messageHandler');
 		}
 	}
 }
