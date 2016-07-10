@@ -47,7 +47,7 @@ process.on('exit', chromedriver.stop);
 const delay = time => new Promise(resolve => setTimeout(resolve, time));
 
 describe('plotly database connector', function Spec() {
-    this.timeout(10000);
+    this.timeout(20000);
 
     const openApp = async () => {
         await delay(1000); // wait chromedriver start time
@@ -145,7 +145,7 @@ describe('plotly database connector', function Spec() {
 
         this.waitFor = async (expectedClass, element) => {
             let currentClass = await this.getClassOf(element);
-
+            console.log(currentClass);
             while (!currentClass.includes(expectedClass)) {
                 currentClass = await this.getClassOf(element);
                 console.log(currentClass);
@@ -465,7 +465,7 @@ describe('plotly database connector', function Spec() {
             .then(await btn.click());
         });
 
-        it('set state to "error" when connecting using wrong credentials',
+        it('set state to "con_error" when connecting using wrong credentials',
         async () => {
             const expectedClass = `test-${APP_STATUS.CON_ERROR}`;
             const btn = await this.getConnectBtn();
