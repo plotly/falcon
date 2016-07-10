@@ -469,10 +469,10 @@ describe('plotly database connector', function Spec() {
         async () => {
             const expectedClass = `test-${APP_STATUS.CON_ERROR}`;
             const btn = await this.getConnectBtn();
-            const testClass = await this.getClassOf(btn);
 
             await this.waitFor(expectedClass, btn);
-
+            
+            const testClass = await this.getClassOf(btn);
             expect(testClass).to.contain(expectedClass);
         });
 
