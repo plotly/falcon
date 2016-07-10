@@ -10,13 +10,14 @@ export default class Preview extends Component {
     }
 
     testClass() {
-        return 'test-tables-created';
+        return 'test-connected';
     }
 
     renderTable(table) {
         const tableHeaders = table.get('columnnames').map(
             column => <th>{column}</th>
         );
+
         const renderCell = cell => <td>{cell}</td>;
         const tableRows = table.get('rows').map(
             row => <tr>{row.map(renderCell)}</tr>
@@ -39,20 +40,21 @@ export default class Preview extends Component {
         const renderedTables = tables.map(
             table => {
                 const tableName = table.keySeq().first();
-
-                return (
-                    <div>
-                        <div className={styles.tableHeader}>
-                            Preview of table: <u>{tableName}</u>
+                if (table.get(tableName)) {
+                    return (
+                        <div>
+                            <div className={styles.tableHeader}>
+                                Preview of table: <u>{tableName}</u>
+                            </div>
+                            {this.renderTable(table.get(tableName))}
                         </div>
-                        {this.renderTable(table.get(tableName))}
-                    </div>
-                );
+                    );
+                }
             }
         );
 
         return (
-            <div id="test-tables">
+            <div id="test-tables" className={this.testClass()}>
                 {renderedTables}
             </div>
         );
