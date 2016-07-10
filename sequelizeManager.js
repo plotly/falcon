@@ -3,6 +3,9 @@ import {DIALECTS} from './app/constants/constants';
 import parse from './parse';
 import {merge} from 'ramda';
 
+const APP_NOT_CONNECTED_MESSAGE = 'There seems to be no connection at the moment.' +
+    ' Please try connecting the application to your database.';
+
 const PREBUILT_QUERY = {
     SHOW_DATABASES: 'SHOW_DATABASES',
     SHOW_TABLES: 'SHOW_TABLES',
@@ -86,9 +89,18 @@ export default class SequelizeManager {
         return this.connection.authenticate();
     }
 
-    check_connection() {
+    check_connection(callback) {
         // when already logged in and simply want to check connection
-        return this.connection.authenticate();
+        if (!this.connection) {
+			this.raiseError(
+                merge(
+                    {message: APP_NOT_CONNECTED_MESSAGE},
+                    {type: 'connection'}),
+                callback
+			);
+		} else {
+            return this.connection.authenticate();
+        }
     }
 
     raiseError(errorMessage, callback) {
@@ -161,11 +173,10 @@ export default class SequelizeManager {
     }
 
     sendQuery(query, callback) {
-        // TODO: SQL Injection security hole
         return this.connection.query(query, this.setQueryType('SELECT'))
-            .then((results) => {
-                callback(parse(results));
-            });
+        .then((results) => {
+            callback(merge(parse(results), {error: null}));
+        });
     }
 
     disconnect(callback) {

@@ -88,7 +88,8 @@ export default class Settings extends Component {
         let step2 = null;
         let step3 = null;
 
-        if (connection.get('status') === APP_STATUS.CONNECTED) {
+        if (connection.get('status') === APP_STATUS.CONNECTED ||
+            connection.get('status') === APP_STATUS.ERROR) {
             step2 = (
                 <div className={styles.step2Container}>
                     <h5>2. Select Database and Preview Tables</h5>

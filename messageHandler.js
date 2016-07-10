@@ -112,6 +112,12 @@ function handleMessage(sequelizeManager, opts) {
 	switch (task) {
 		case TASKS.CONNECT: {
 			sequelizeManager.login(message)
+			.catch( error => {
+				sequelizeManager.raiseError(
+					merge(error, {type: 'connection'}),
+					callback
+				);
+			})
 			.then(sequelizeManager.showDatabases(callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are logged in as ' +
@@ -137,7 +143,13 @@ function handleMessage(sequelizeManager, opts) {
 		}
 
 		case TASKS.GET_DATABASES: {
-			sequelizeManager.check_connection(message)
+			sequelizeManager.check_connection(callback)
+			.catch( error => {
+				sequelizeManager.raiseError(
+					merge(error, {type: 'connection'}),
+					callback
+				);
+			})
 			.then(sequelizeManager.showDatabases(callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are logged in as ' +

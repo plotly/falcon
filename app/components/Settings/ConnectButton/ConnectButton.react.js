@@ -61,12 +61,22 @@ export default class ConnectButton extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.ipc.hasIn(['error', 'message'])) {
-            this.updateStatus(APP_STATUS.ERROR);
-        } else if (nextProps.ipc.get('databases')) {
-            this.updateStatus(APP_STATUS.CONNECTED);
-        } else if (!nextProps.ipc.get('databases')) {
-            this.updateStatus(APP_STATUS.DISCONNECTED);
+        const status = this.props.connection.get('status');
+
+        // if databases and null error, set connected
+
+        if (!nextProps.ipc.get('error')) {
+            if (nextProps.ipc.get('databases')) {
+                this.updateStatus(APP_STATUS.CONNECTED);
+            } else if (!nextProps.ipc.get('databases')) {
+                this.updateStatus(APP_STATUS.DISCONNECTED);
+            }
+        } else {
+            if (nextProps.ipc.getIn(['error', 'type']) === 'connection') {
+                this.updateStatus(APP_STATUS.CON_ERROR);
+            } else if (status !== APP_STATUS.CON_ERROR) {
+                this.updateStatus(APP_STATUS.ERROR);
+            }
         }
     }
 
@@ -78,7 +88,8 @@ export default class ConnectButton extends Component {
         let onButtonClick;
 
         let buttonMessage = BUTTON_MESSAGE[status];
-        if (this.state.hover && status === APP_STATUS.CONNECTED) {
+        if (this.state.hover &&
+            (status === APP_STATUS.CONNECTED || status === APP_STATUS.ERROR)) {
             buttonMessage = 'disconnect';
         }
 
@@ -86,6 +97,18 @@ export default class ConnectButton extends Component {
         switch (status) {
 
             case APP_STATUS.INITIALIZED:
+                onButtonClick = this.connect;
+                break;
+
+            case APP_STATUS.CON_ERROR:
+                errorMessage = (
+                    <pre className={styles.errorMessage}>
+                        {
+                            'Hm... an error occured while you were connected: ' +
+                            ipc.getIn(['error', 'message'])
+                        }
+                    </pre>
+                );
                 onButtonClick = this.connect;
                 break;
 
@@ -98,15 +121,14 @@ export default class ConnectButton extends Component {
                         }
                     </pre>
                 );
-
-                onButtonClick = this.connect;
+                onButtonClick = this.disconnect;
                 break;
 
             case APP_STATUS.CONNECTED:
                 onButtonClick = this.disconnect;
                 break;
 
-            case APP_STATUS.LOADING:
+            case APP_STATUS.CONNECTING:
                 onButtonClick = () => {};
                 break;
 
