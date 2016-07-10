@@ -39,11 +39,8 @@ function assembleTablesPreviewMessage(tablePreviews) {
         const tableName = Object.keys(tablePreview);
         const rawData = tablePreview[tableName];
 
-        if (isEmpty(rawData)) {
-            parsedRows = EMPTY_TABLE;
-        } else {
-            parsedRows = parse(rawData);
-        }
+        parsedRows = (isEmpty(rawData)) ? EMPTY_TABLE : parse(rawData);
+
         return {[tableName]: parsedRows};
     });
 }
@@ -59,10 +56,12 @@ export default class SequelizeManager {
 
     setQueryType(type) {
         // set sequelize's query property type
+        // helps sequelize to predict what kind of response it will get
         return {type: this.connection.QueryTypes[type]};
     }
 
     intoTablesArray(results) {
+        // helper function to
         let tables;
         if (this.getDialect() === DIALECTS.SQLITE) {
             // sqlite returns an array by default
@@ -108,7 +107,6 @@ export default class SequelizeManager {
         callback({error: errorLog});
     }
 
-    // built-in query to show available databases/schemes
     showDatabases(callback) {
         const query = this.getPresetQuery(PREBUILT_QUERY.SHOW_DATABASES);
         const dialect = this.getDialect();
@@ -125,17 +123,17 @@ export default class SequelizeManager {
         }
 
         return () => this.connection.query(query, this.setQueryType('SELECT'))
-            .then(results => {
-                callback({
-                    databases: intoArray(results),
-                    error: null,
-                    /*
-                        if user wants to see all databases/schemes, clear
-                        tables from previously selected database/schemes
-                    */
-                    tables: null
-                });
+        .then(results => {
+            callback({
+                databases: intoArray(results),
+                error: null,
+                /*
+                    if user wants to see all databases/schemes, clear
+                    tables from previously selected database/schemes
+                */
+                tables: null
             });
+        });
     }
 
     // built-in query to show available tables in a database/scheme
@@ -143,33 +141,33 @@ export default class SequelizeManager {
         const showtables = this.getPresetQuery(PREBUILT_QUERY.SHOW_TABLES);
 
         return () => this.connection
-            .query(showtables, this.setQueryType('SELECT'))
-            .then(results => {
-                const tables = this.intoTablesArray(results);
+        .query(showtables, this.setQueryType('SELECT'))
+        .then(results => {
+            const tables = this.intoTablesArray(results);
 
-                // construct prmises of table previews (top 5 rows)
-                const promises = tables.map(table => {
-                    const show5rows = this.getPresetQuery(
-                        PREBUILT_QUERY.SHOW5ROWS, table
-                    );
-                    // sends the query for a single table
-                    return this.connection
-                        .query(show5rows, this.setQueryType('SELECT'))
-                        .then(selectTableResults => {
-                            return {
-                                [table]: selectTableResults
-                            };
-                        });
-                });
-
-                return Promise.all(promises)
-                    .then(tablePreviews => {
-                        callback({
-                            error: null,
-                            tables: assembleTablesPreviewMessage(tablePreviews)
-                        });
+            // construct prmises of table previews (top 5 rows)
+            const promises = tables.map(table => {
+                const show5rows = this.getPresetQuery(
+                    PREBUILT_QUERY.SHOW5ROWS, table
+                );
+                // sends the query for a single table
+                return this.connection
+                .query(show5rows, this.setQueryType('SELECT'))
+                .then(selectTableResults => {
+                    return {
+                        [table]: selectTableResults
+                    };
                 });
             });
+
+            return Promise.all(promises)
+            .then(tablePreviews => {
+                callback({
+                    error: null,
+                    tables: assembleTablesPreviewMessage(tablePreviews)
+                });
+            });
+        });
     }
 
     sendQuery(query, callback) {
@@ -191,7 +189,7 @@ export default class SequelizeManager {
     }
 
     getPresetQuery(showQuerySelector, table = null) {
-        const dialect = this.connection.options.dialect;
+        const dialect = this.getDialect();
         switch (showQuerySelector) {
             case PREBUILT_QUERY.SHOW_DATABASES:
                 switch (dialect) {
@@ -240,7 +238,7 @@ export default class SequelizeManager {
                     default:
                         throw new Error('could not build a presetQuery');
                 }
-                
+
             default: {
                 throw new Error('could not build a presetQuery');
             }

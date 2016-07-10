@@ -16,10 +16,12 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 	return (requestEvent, respondEvent) => {
 
 		const payload = {};
+		const {connection} = sequelizeManager;
 		const sequelizeSetup = () => {
+
 			return merge(
-				sequelizeManager.connection.options,
-				sequelizeManager.connection.config
+				connection ? connection.options : null,
+				connection ? connection.config : null
 			);
 		};
 
