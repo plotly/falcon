@@ -8,6 +8,7 @@ export const DIALECTS = {
 
 export const APP_STATUS = {
     INITIALIZED: 'INITIALIZED',
+    CON_ERROR: 'CON_ERROR',
     ERROR: 'ERROR',
     CONNECTED: 'CONNECTED',
     CONNECTING: 'CONNECTING',
@@ -24,7 +25,8 @@ export const USER_INPUT_FIELDS = {
 
 export const BUTTON_MESSAGE = {
     INITIALIZED: 'connect',
-    ERROR: 'try again',
+    CON_ERROR: 'try again',
+    ERROR: 'connected',
     CONNECTED: 'connected',
     CONNECTING: 'connecting...',
     DISCONNECTED: 'connect'

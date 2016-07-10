@@ -57,15 +57,30 @@ app.on('ready', () => {
         ipcMain.on(channel, ipcMessageReceive(sequelizeManager));
 
         // TODO: simplify this restify server routing code
-        server.get('/connect', serverMessageReceive(sequelizeManager, mainWindow.webContents));
-        server.get('/query', serverMessageReceive(sequelizeManager, mainWindow.webContents));
-        server.get('/tables', serverMessageReceive(sequelizeManager, mainWindow.webContents));
-        server.get('/disconnect', serverMessageReceive(sequelizeManager, mainWindow.webContents));
-        server.get('/v0/connect', serverMessageReceive(sequelizeManager, mainWindow.webContents));
-        server.get('/v0/query', serverMessageReceive(sequelizeManager, mainWindow.webContents));
-        server.get('/v0/tables', serverMessageReceive(sequelizeManager, mainWindow.webContents));
-        server.get('/v0/disconnect', serverMessageReceive(sequelizeManager, mainWindow.webContents));
-
+        server.get('/connect', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/query', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/tables', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/disconnect', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/v0/connect', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/v0/query', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/v0/tables', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/v0/disconnect', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
     });
 
     mainWindow.on('closed', () => {
@@ -191,7 +206,8 @@ app.on('ready', () => {
             }, {
                 label: 'Documentation',
                 click() {
-                    shell.openExternal('https://github.com/atom/electron/tree/master/docs#readme');
+                    shell.openExternal('https://github.com/' +
+                        'atom/electron/tree/master/docs#readme');
                 }
             }, {
                 label: 'Community Discussions',
@@ -201,7 +217,8 @@ app.on('ready', () => {
             }, {
                 label: 'Search Issues',
                 click() {
-                    shell.openExternal('https://github.com/atom/electron/issues');
+                    shell.openExternal('https://github.com/' +
+                        'atom/electron/issues');
                 }
             }]
         }];
@@ -257,7 +274,8 @@ app.on('ready', () => {
             }, {
                 label: 'Documentation',
                 click() {
-                    shell.openExternal('https://github.com/atom/electron/tree/master/docs#readme');
+                    shell.openExternal('https://github.com/' +
+                        'atom/electron/tree/master/docs#readme');
                 }
             }, {
                 label: 'Community Discussions',
@@ -267,7 +285,8 @@ app.on('ready', () => {
             }, {
                 label: 'Search Issues',
                 click() {
-                    shell.openExternal('https://github.com/atom/electron/issues');
+                    shell.openExternal('https://github.com/' +
+                        'atom/electron/issues');
                 }
             }]
         }];

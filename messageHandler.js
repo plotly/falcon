@@ -16,10 +16,12 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 	return (requestEvent, respondEvent) => {
 
 		const payload = {};
+		const {connection} = sequelizeManager;
 		const sequelizeSetup = () => {
+
 			return merge(
-				sequelizeManager.connection.options,
-				sequelizeManager.connection.config
+				connection ? connection.options : null,
+				connection ? connection.config : null
 			);
 		};
 
@@ -69,6 +71,10 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 				payload.message = sequelizeSetup();
 				break;
 			}
+
+			default: {
+				throw new Error('no task provided to messageHandler');
+			}
 		}
 
 		const callback = (message) => {
@@ -80,9 +86,7 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 		handleMessage(sequelizeManager, {
 			callback, payload
 		});
-
 	};
-
 }
 
 export function ipcMessageReceive(sequelizeManager) {
@@ -110,6 +114,12 @@ function handleMessage(sequelizeManager, opts) {
 	switch (task) {
 		case TASKS.CONNECT: {
 			sequelizeManager.login(message)
+			.catch( error => {
+				sequelizeManager.raiseError(
+					merge(error, {type: 'connection'}),
+					callback
+				);
+			})
 			.then(sequelizeManager.showDatabases(callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are logged in as ' +
@@ -135,7 +145,13 @@ function handleMessage(sequelizeManager, opts) {
 		}
 
 		case TASKS.GET_DATABASES: {
-			sequelizeManager.check_connection(message)
+			sequelizeManager.check_connection(callback)
+			.catch( error => {
+				sequelizeManager.raiseError(
+					merge(error, {type: 'connection'}),
+					callback
+				);
+			})
 			.then(sequelizeManager.showDatabases(callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are logged in as ' +
@@ -169,6 +185,11 @@ function handleMessage(sequelizeManager, opts) {
 			} catch (error) {
 				sequelizeManager.raiseError(error, callback);
 			}
+			break;
+		}
+
+		default: {
+			throw new Error('no task provided to messageHandler');
 		}
 	}
 }

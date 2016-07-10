@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import classnames from 'classnames';
 import * as styles from './ConnectButton.css';
-import Select from 'react-select';
 import {APP_STATUS, BUTTON_MESSAGE} from '../../../constants/constants';
 
 /*
@@ -61,31 +61,54 @@ export default class ConnectButton extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.ipc.hasIn(['error', 'message'])) {
-            this.updateStatus(APP_STATUS.ERROR);
-        } else if (nextProps.ipc.get('databases')) {
-            this.updateStatus(APP_STATUS.CONNECTED);
-        } else if (!nextProps.ipc.get('databases')) {
-            this.updateStatus(APP_STATUS.DISCONNECTED);
+        const status = this.props.connection.get('status');
+
+        // if databases and null error, set connected
+
+        if (!nextProps.ipc.get('error')) {
+            if (nextProps.ipc.get('databases')) {
+                this.updateStatus(APP_STATUS.CONNECTED);
+            } else if (!nextProps.ipc.get('databases')) {
+                this.updateStatus(APP_STATUS.DISCONNECTED);
+            }
+        } else {
+            if (nextProps.ipc.getIn(['error', 'type']) === 'connection') {
+                this.updateStatus(APP_STATUS.CON_ERROR);
+            } else if (status !== APP_STATUS.CON_ERROR) {
+                this.updateStatus(APP_STATUS.ERROR);
+            }
         }
     }
 
 	render() {
-		const {connection, configuration, ipc, ipcActions} = this.props;
+		const {connection, ipc} = this.props;
         const status = connection.get('status');
 
         let errorMessage;
         let onButtonClick;
 
         let buttonMessage = BUTTON_MESSAGE[status];
-        if (this.state.hover && status === APP_STATUS.CONNECTED) {
+        if (this.state.hover &&
+            (status === APP_STATUS.CONNECTED || status === APP_STATUS.ERROR)) {
             buttonMessage = 'disconnect';
         }
 
-        // what should the button do depending on the app status?
+        // what should the button onClick do depending on the app status?
         switch (status) {
 
             case APP_STATUS.INITIALIZED:
+                onButtonClick = this.connect;
+                break;
+
+            case APP_STATUS.CON_ERROR:
+                errorMessage = (
+                    <pre className={styles.errorMessage}>
+                        {
+                            'Hm... an error occured while you were connected: ' +
+                            ipc.getIn(['error', 'message'])
+                        }
+                    </pre>
+                );
                 onButtonClick = this.connect;
                 break;
 
@@ -98,15 +121,14 @@ export default class ConnectButton extends Component {
                         }
                     </pre>
                 );
-
-                onButtonClick = this.connect;
+                onButtonClick = this.disconnect;
                 break;
 
             case APP_STATUS.CONNECTED:
                 onButtonClick = this.disconnect;
                 break;
 
-            case APP_STATUS.LOADING:
+            case APP_STATUS.CONNECTING:
                 onButtonClick = () => {};
                 break;
 
@@ -116,9 +138,7 @@ export default class ConnectButton extends Component {
 
             default:
                 onButtonClick = this.connect;
-
         }
-
 
 		return (
 			<div className={styles.footer}>
@@ -140,3 +160,11 @@ export default class ConnectButton extends Component {
 		);
 	}
 }
+
+ConnectButton.propTypes = {
+    configuration: ImmutablePropTypes.map.isRequired,
+    connection: ImmutablePropTypes.map.isRequired,
+    connectionActions: PropTypes.object,
+    ipc: ImmutablePropTypes.map.isRequired,
+    ipcActions: PropTypes.object
+};

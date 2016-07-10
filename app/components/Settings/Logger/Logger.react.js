@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react';
+import React from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import classnames from 'classnames';
 import * as styles from './Logger.css';
 
@@ -26,6 +27,10 @@ const Logger = props => {
             </pre>
         </div>
     );
+};
+
+Logger.propTypes = {
+    logs: ImmutablePropTypes.map.isRequired
 };
 
 export default Logger;

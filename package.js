@@ -55,7 +55,8 @@ if (version) {
         if (err) {
             DEFAULT_OPTS.version = '0.37.6';
         } else {
-            DEFAULT_OPTS.version = stdout.split('electron-prebuilt@')[1].replace(/\s/g, '');
+            DEFAULT_OPTS.version =
+                stdout.split('electron-prebuilt@')[1].replace(/\s/g, '');
         }
 
         startPack();
@@ -124,7 +125,6 @@ function pack(plat, arch, cb) {
 
     packager(opts, cb);
 }
-
 
 function log(plat, arch) {
     return (err, filepath) => {

@@ -6,7 +6,6 @@ import { hashHistory } from 'react-router';
 import { routerMiddleware } from 'react-router-redux';
 import rootReducer from '../reducers';
 import DevTools from '../containers/DevTools';
-import { electronEnhancer } from 'redux-electron-store';
 
 const logger = createLogger({
     level: 'info',
@@ -14,8 +13,6 @@ const logger = createLogger({
 });
 
 const router = routerMiddleware(hashHistory);
-
-console.warn('setting up dev store');
 
 const enhancer = compose(
     applyMiddleware(thunk, router, logger),
