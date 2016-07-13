@@ -2,6 +2,11 @@ import Sequelize from 'sequelize';
 import {DIALECTS} from './app/constants/constants';
 import parse from './parse';
 import {merge} from 'ramda';
+import {ARGS} from './args';
+
+export const OPTIONS = ARGS;
+const CONFIG = require(ARGS.configpath);
+console.log(CONFIG);
 
 const APP_NOT_CONNECTED_MESSAGE = 'There seems to be no connection at the moment.' +
     ' Please try connecting the application to your database.';
@@ -45,7 +50,7 @@ function assembleTablesPreviewMessage(tablePreviews) {
     });
 }
 
-export default class SequelizeManager {
+export class SequelizeManager {
     constructor(log) {
         this.log = log;
     }
@@ -74,6 +79,10 @@ export default class SequelizeManager {
     }
 
     login({username, password, database, port, dialect, storage, host}) {
+        if (OPTIONS.headless) {
+            const {username, password, database,
+            port, dialect, storage, host} = CONFIG;
+        }
         this.connection = new Sequelize(database, username, password, {
             dialect,
             host,
