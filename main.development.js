@@ -60,6 +60,9 @@ app.on('ready', () => {
         server.get('/connect', serverMessageReceive(
             sequelizeManager, mainWindow.webContents)
         );
+        server.get('/login', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
         server.get('/query', serverMessageReceive(
             sequelizeManager, mainWindow.webContents)
         );
@@ -70,6 +73,9 @@ app.on('ready', () => {
             sequelizeManager, mainWindow.webContents)
         );
         server.get('/v0/connect', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/v0/login', serverMessageReceive(
             sequelizeManager, mainWindow.webContents)
         );
         server.get('/v0/query', serverMessageReceive(

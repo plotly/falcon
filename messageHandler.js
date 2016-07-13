@@ -34,7 +34,18 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 					connection already established and asks for the list
 					of databases. thus the GET_DATABASES instead of CONNECT
 				*/
-				payload.task = TASKS.GET_DATABASES;
+				payload.task = TASKS.CHECK_CONNECTION;
+				/*
+					use connection params as established by the app.
+					no payload required here from remote server to connect
+				*/
+				payload.message = sequelizeSetup();
+				break;
+			}
+
+			case '/login':
+			case '/v0/login': {
+				payload.task = TASKS.CONNECT;
 				/*
 					use connection params as established by the app.
 					no payload required here from remote server to connect
@@ -144,7 +155,7 @@ function handleMessage(sequelizeManager, opts) {
 			break;
 		}
 
-		case TASKS.GET_DATABASES: {
+		case TASKS.CHECK_CONNECTION: {
 			sequelizeManager.check_connection(callback)
 			.catch( error => {
 				sequelizeManager.raiseError(
