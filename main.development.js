@@ -1,5 +1,6 @@
 import {app, BrowserWindow, Menu, shell} from 'electron';
 import restify from 'restify';
+import bunyan from 'bunyan';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import {ipcMessageReceive,
         serverMessageReceive,
@@ -28,7 +29,18 @@ app.on('ready', () => {
         height: 728
     });
 
+    const logToFile = bunyan.createLogger({
+        name: 'plotly-database-connector-logger',
+        streams: [
+            {
+                level: 'info',
+                path: OPTIONS.logpath
+            }
+        ]
+    });
+
     function log(description) {
+        logToFile.info(description);
         mainWindow.webContents.send(channel, {
                 log: {
                     description,

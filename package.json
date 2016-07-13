@@ -99,6 +99,7 @@
   },
   "dependencies": {
     "brace": "^0.8.0",
+    "bunyan": "^1.8.1",
     "classnames": "^2.2.5",
     "css-modules-require-hook": "^4.0.0",
     "electron-debug": "^0.6.0",

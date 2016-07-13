@@ -14,8 +14,8 @@ export const options = {
         acceptedValues: range(1, 10000)
     },
     logpath: {
-        defaultValue: './log.txt',
-        acceptedValues: 'path to logpath w/o quotes (ex: path/to/log.txt)'
+        defaultValue: './activity.log',
+        acceptedValues: 'path to logpath w/o quotes (ex: path/to/file.log)'
     },
     configpath: {
         defaultValue: './config.json',
