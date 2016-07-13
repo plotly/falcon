@@ -156,7 +156,7 @@ function handleMessage(sequelizeManager, opts) {
 		}
 
 		case TASKS.CHECK_CONNECTION: {
-			sequelizeManager.check_connection(callback)
+			sequelizeManager.checkConnection(callback)
 			.catch( error => {
 				sequelizeManager.raiseError(
 					merge(error, {type: 'connection'}),

@@ -104,7 +104,7 @@ export class SequelizeManager {
         return this.connection.authenticate();
     }
 
-    check_connection(callback) {
+    checkConnection(callback) {
         // when already logged in and simply want to check connection
         if (!this.connection) {
 			this.raiseError(

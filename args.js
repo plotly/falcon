@@ -1,6 +1,6 @@
 import {contains, isEmpty, merge, mergeAll, range, split} from 'ramda';
 
-export const options = {
+const optionsBook = {
     headless: {
         defaultValue: false,
         acceptedValues: [false, true]
@@ -31,8 +31,8 @@ const optionsToCheck = ['headless', 'large', 'port'];
 
 // returns all the default values from options as a dict {key: default, ...}
 const defaultOptions = () => {
-    return mergeAll(Object.keys(options).map( (key) => {
-        return {[key]: options[key].defaultValue };
+    return mergeAll(Object.keys(optionsBook).map( (key) => {
+        return {[key]: optionsBook[key].defaultValue };
     }));
 };
 
@@ -54,10 +54,10 @@ function mergeArgs (args) {
 
     const wrongFormat = (arg) => arg.length !== 2;
 
-    const wrongArg = (arg) => !contains(arg[0], Object.keys(options));
+    const wrongArg = (arg) => !contains(arg[0], Object.keys(optionsBook));
 
     const wrongValue = (arg) => {
-        const acceptedValues = options[arg[0]].acceptedValues;
+        const acceptedValues = optionsBook[arg[0]].acceptedValues;
         if (contains(arg[0], optionsToCheck)) {
             return !contains(arg[1], acceptedValues);
         }
@@ -70,7 +70,7 @@ function mergeArgs (args) {
 
     const wrongArgError = (arg) => {
         return `Can\'t find \'${arg[0]}\' in the possible options...` +
-        `Here are the options: ${Object.keys(options)}`;
+        `Here are the options: ${Object.keys(optionsBook)}`;
     };
 
     const wrongValueError = (arg) => {
@@ -80,7 +80,7 @@ function mergeArgs (args) {
 
         return `Can\'t find \'${arg[1]}\' in the possible values for` +
         `\'${arg[0]}\'...` +
-        `Valid values for this key are: ${options[arg[0]].acceptedValues}`;
+        `Valid values for this key are: ${optionsBook[arg[0]].acceptedValues}`;
     };
 
     // args are expected to be in ['key=value', 'key1=value2' ...] format
@@ -102,7 +102,6 @@ function mergeArgs (args) {
         }
 
     } catch (error) {
-        console.error(`Error. Please try again... ${error}`);
         process.exit(-1);
 
     } finally {
@@ -115,4 +114,4 @@ const acceptedArgs = () => {
     return process.env.NODE_ENV === 'development' ? {} : process.argv.slice(2);
 };
 
-export const OPTIONS = mergeArgs(acceptedArgs());
+export const ARGS = mergeArgs(acceptedArgs());
