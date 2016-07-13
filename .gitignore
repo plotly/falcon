@@ -37,5 +37,3 @@ main.js.map
 
 # Local tests
 test/set_creds.sh
-
-config.json
