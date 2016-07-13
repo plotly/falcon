@@ -1,15 +1,12 @@
+import * as fs from 'fs';
 import Sequelize from 'sequelize';
 import {DIALECTS} from './app/constants/constants';
 import parse from './parse';
 import {merge} from 'ramda';
 import {ARGS} from './args';
 
-export const OPTIONS = ARGS;
-const CONFIG = require(ARGS.configpath);
-console.log(CONFIG);
-
-const APP_NOT_CONNECTED_MESSAGE = 'There seems to be no connection at the moment.' +
-    ' Please try connecting the application to your database.';
+const APP_NOT_CONNECTED_MESSAGE = 'There seems to be no connection at the ' +
+    'moment. Please try connecting the application to your database.';
 
 const PREBUILT_QUERY = {
     SHOW_DATABASES: 'SHOW_DATABASES',
@@ -78,17 +75,27 @@ export class SequelizeManager {
         return tables;
     }
 
-    login({username, password, database, port, dialect, storage, host}) {
-        if (OPTIONS.headless) {
-            const {username, password, database,
-            port, dialect, storage, host} = CONFIG;
-        }
+    createConnection(configuration) {
+        const {
+            username, password, database, port,
+            dialect, storage, host
+            } = configuration;
+
         this.connection = new Sequelize(database, username, password, {
             dialect,
             host,
             port,
             storage
         });
+    }
+
+    login(configFromApp) {
+        if (ARGS.headless) {
+            const configFromFile = JSON.parse(fs.readFileSync(ARGS.configpath));
+            this.createConnection(configFromFile);
+        } else {
+            this.createConnection(configFromApp);
+        }
 
         if (this.connection.config.dialect === 'mssql') {
             this.connection.config.dialectOptions = {encrypt: true};
@@ -254,3 +261,5 @@ export class SequelizeManager {
         }
     }
 }
+
+export const OPTIONS = ARGS;
