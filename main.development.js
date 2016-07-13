@@ -1,6 +1,6 @@
 import {app, BrowserWindow, Menu, shell} from 'electron';
 import restify from 'restify';
-import SequelizeManager from './sequelizeManager';
+import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import {ipcMessageReceive,
         serverMessageReceive,
         channel} from './messageHandler';
@@ -24,7 +24,7 @@ app.on('window-all-closed', () => {
 app.on('ready', () => {
     mainWindow = new BrowserWindow({
         show: false,
-        width: 1024,
+        width: OPTIONS.large ? 1024 : 728,
         height: 728
     });
 
@@ -46,13 +46,17 @@ app.on('ready', () => {
         origins: ['*'],
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
-    })).listen(5000);
+    })).listen(OPTIONS.port);
 
     mainWindow.loadURL(`file://${__dirname}/app/app.html`);
 
     mainWindow.webContents.on('did-finish-load', () => {
-        mainWindow.show();
-        mainWindow.focus();
+
+        if (!OPTIONS.headless) {
+            mainWindow.show();
+            mainWindow.focus();
+        }
+
         ipcMain.removeAllListeners(channel);
         ipcMain.on(channel, ipcMessageReceive(sequelizeManager));
 
