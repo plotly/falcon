@@ -15,7 +15,7 @@ The database connector is in Alpha release and the Potly 2.0 web interface is cu
 
 #### Contact
 - Chris - chris@plot.ly
-- Alexandre - alexs@plot.ly
+- Alexandre - alexandres@plot.ly
 
 ## Development
 
