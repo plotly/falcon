@@ -21,8 +21,9 @@ const optionsBook = {
         defaultValue: './config.json',
         acceptedValues: 'path to config w/o quotes (ex: path/to/config.json)'
     },
+    // 0 for errors only, 1 adds warnings, 2 adds info
     logdetail: {
-        defaultValue: 0,
+        defaultValue: 1,
         acceptedValues: range(0, 4)
     }
 };

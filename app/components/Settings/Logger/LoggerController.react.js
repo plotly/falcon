@@ -22,7 +22,7 @@ export default class LoggerController extends Component {
             this.props.ipc.getIn(errorPath)) {
 
             this.state.logs.unshift({
-                description: nextProps.ipc.getIn(errorPath),
+                logEntry: nextProps.ipc.getIn(errorPath),
                 timestamp: nextProps.ipc.getIn(['error', 'timestamp'])
             });
 

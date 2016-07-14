@@ -76,10 +76,13 @@ export class SequelizeManager {
     }
 
     createConnection(configuration) {
+
         const {
             username, password, database, port,
             dialect, storage, host
             } = configuration;
+
+        this.log(`Creating a connection for user ${username}`, 1);
 
         this.connection = new Sequelize(database, username, password, {
             dialect,
@@ -87,6 +90,9 @@ export class SequelizeManager {
             port,
             storage
         });
+
+        this.log(`Connection for user ${username} established`, 2);
+
     }
 
     login(configFromApp) {
@@ -114,12 +120,14 @@ export class SequelizeManager {
                 callback
 			);
 		} else {
+            // returns a promise
             return this.connection.authenticate();
         }
     }
 
     raiseError(errorMessage, callback) {
         const errorLog = merge(errorMessage, {timestamp: timestamp()});
+        this.log(errorMessage, 0);
         callback({error: errorLog});
     }
 
@@ -138,8 +146,12 @@ export class SequelizeManager {
             return this.showTables(callback);
         }
 
+        this.log(`Querying: ${query}`, 1);
+
         return () => this.connection.query(query, this.setQueryType('SELECT'))
         .then(results => {
+            this.log('Results recieved.', 1);
+
             callback({
                 databases: intoArray(results),
                 error: null,
@@ -156,9 +168,13 @@ export class SequelizeManager {
     showTables(callback) {
         const showtables = this.getPresetQuery(PREBUILT_QUERY.SHOW_TABLES);
 
+        this.log(`Querying: ${showtables}`, 1);
+
         return () => this.connection
         .query(showtables, this.setQueryType('SELECT'))
         .then(results => {
+            this.log('Results recieved.', 1);
+
             const tables = this.intoTablesArray(results);
 
             // construct prmises of table previews (top 5 rows)
@@ -166,6 +182,8 @@ export class SequelizeManager {
                 const show5rows = this.getPresetQuery(
                     PREBUILT_QUERY.SHOW5ROWS, table
                 );
+                this.log(`Querying: ${show5rows}`, 1);
+
                 // sends the query for a single table
                 return this.connection
                 .query(show5rows, this.setQueryType('SELECT'))
@@ -187,13 +205,19 @@ export class SequelizeManager {
     }
 
     sendQuery(query, callback) {
+        this.log(`Querying: ${query}`, 1);
+
         return this.connection.query(query, this.setQueryType('SELECT'))
         .then((results) => {
+            this.log('Results received.', 1);
+
             callback(merge(parse(results), {error: null}));
         });
     }
 
     disconnect(callback) {
+        this.log('Disconnecting', 1);
+
         /*
             this.connection.close() does not return a promise for now.
             open issue here:
