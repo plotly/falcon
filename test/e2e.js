@@ -185,6 +185,7 @@ describe('plotly database connector', function Spec() {
         before(openApp);
 
         describe('upon starting', () => {
+
             it('should have the correct app title Name and Version',
             async () => {
                 const title = await this.driver.getTitle();
@@ -358,7 +359,7 @@ describe('plotly database connector', function Spec() {
 
             it('should show a log with a new logged item',
             async () => {
-                const expectedClass = 'test-1-entries';
+                const expectedClass = 'test-4-entries';
                 const logs = await this.getLogs();
 
                 const testClass = await this.getClassOf(logs);
@@ -386,7 +387,7 @@ describe('plotly database connector', function Spec() {
 
             it('should show a log with a new logged item',
             async () => {
-                const expectedClass = 'test-2-entries';
+                const expectedClass = 'test-20-entries';
                 const logs = await this.getLogs();
 
                 const testClass = await this.getClassOf(logs);
@@ -437,7 +438,7 @@ describe('plotly database connector', function Spec() {
 
             it('should show a log with a new logged item',
             async () => {
-                const expectedClass = 'test-3-entries';
+                const expectedClass = 'test-22-entries';
                 const logs = await this.getLogs();
 
                 const testClass = await this.getClassOf(logs);
@@ -471,7 +472,7 @@ describe('plotly database connector', function Spec() {
             const btn = await this.getConnectBtn();
 
             await this.waitFor(expectedClass, btn);
-            
+
             const testClass = await this.getClassOf(btn);
             expect(testClass).to.contain(expectedClass);
         });
@@ -511,7 +512,7 @@ describe('plotly database connector', function Spec() {
 
         it('should show a log with a new logged item',
         async () => {
-            const expectedClass = 'test-1-entries';
+            const expectedClass = 'test-5-entries';
             const logs = await this.getLogs();
 
             const testClass = await this.getClassOf(logs);

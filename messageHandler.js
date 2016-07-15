@@ -15,6 +15,10 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 
 	return (requestEvent, respondEvent) => {
 
+		sequelizeManager.log(
+			`Received a server message to ${requestEvent.route.path}`, 2
+		);
+
 		const payload = {};
 		const {connection} = sequelizeManager;
 		const sequelizeSetup = () => {
@@ -34,7 +38,18 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 					connection already established and asks for the list
 					of databases. thus the GET_DATABASES instead of CONNECT
 				*/
-				payload.task = TASKS.GET_DATABASES;
+				payload.task = TASKS.CHECK_CONNECTION;
+				/*
+					use connection params as established by the app.
+					no payload required here from remote server to connect
+				*/
+				payload.message = sequelizeSetup();
+				break;
+			}
+
+			case '/login':
+			case '/v0/login': {
+				payload.task = TASKS.CONNECT;
 				/*
 					use connection params as established by the app.
 					no payload required here from remote server to connect
@@ -73,7 +88,8 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 			}
 
 			default: {
-				throw new Error('no task provided to messageHandler');
+				sequelizeManager.log('Error! This route is not implemented', 0);
+				throw new Error('This route is not implemented!');
 			}
 		}
 
@@ -91,6 +107,8 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 
 export function ipcMessageReceive(sequelizeManager) {
 	return (evt, payload) => {
+
+		sequelizeManager.log(`Received an ipc message to ${payload.task}`, 2);
 
 		const callback = (message) => {
 			evt.sender.send(channel, message);
@@ -111,6 +129,8 @@ function handleMessage(sequelizeManager, opts) {
 	const {callback, payload} = opts;
 	const {task, message} = payload;
 
+	sequelizeManager.log(`Sending task ${task} to squelizeManager`, 2);
+
 	switch (task) {
 		case TASKS.CONNECT: {
 			sequelizeManager.login(message)
@@ -123,7 +143,7 @@ function handleMessage(sequelizeManager, opts) {
 			.then(sequelizeManager.showDatabases(callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are logged in as ' +
-				`[${sequelizeManager.connection.config.username}]`
+				`[${sequelizeManager.connection.config.username}]`, 1
 			);})
 			.catch( error => {
 				sequelizeManager.raiseError(error, callback);
@@ -136,7 +156,7 @@ function handleMessage(sequelizeManager, opts) {
 			.then(sequelizeManager.showTables(callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are previewing database ' +
-				`[${sequelizeManager.connection.config.database}]`
+				`[${sequelizeManager.connection.config.database}]`, 1
 			);})
 			.catch( error => {
 				sequelizeManager.raiseError(error, callback);
@@ -144,8 +164,8 @@ function handleMessage(sequelizeManager, opts) {
 			break;
 		}
 
-		case TASKS.GET_DATABASES: {
-			sequelizeManager.check_connection(callback)
+		case TASKS.CHECK_CONNECTION: {
+			sequelizeManager.checkConnection(callback)
 			.catch( error => {
 				sequelizeManager.raiseError(
 					merge(error, {type: 'connection'}),
@@ -155,7 +175,7 @@ function handleMessage(sequelizeManager, opts) {
 			.then(sequelizeManager.showDatabases(callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are logged in as ' +
-				`[${sequelizeManager.connection.config.username}]`
+				`[${sequelizeManager.connection.config.username}]`, 1
 			);})
 			.catch( error => {
 				sequelizeManager.raiseError(error, callback);
@@ -167,7 +187,7 @@ function handleMessage(sequelizeManager, opts) {
 			const query = message;
 			sequelizeManager.sendQuery(query, callback)
 			.then(() => {sequelizeManager.log(
-				`QUERY EXECUTED: ${query}`
+				`QUERY EXECUTED: ${query}`, 1
 			);})
 			.catch( error => {
 				sequelizeManager.raiseError(error, callback);
@@ -180,7 +200,7 @@ function handleMessage(sequelizeManager, opts) {
 				sequelizeManager.disconnect(callback);
 				sequelizeManager.log(
 					'NOTE: you are logged out as ' +
-					`[${sequelizeManager.connection.config.username}]`
+					`[${sequelizeManager.connection.config.username}]`, 1
 				);
 			} catch (error) {
 				sequelizeManager.raiseError(error, callback);
@@ -189,7 +209,8 @@ function handleMessage(sequelizeManager, opts) {
 		}
 
 		default: {
-			throw new Error('no task provided to messageHandler');
+			sequelizeManager.log('Error! This task is not implemented', 0);
+			throw new Error('Error! This task is not implemented');
 		}
 	}
 }

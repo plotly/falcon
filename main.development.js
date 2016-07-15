@@ -1,6 +1,8 @@
+import * as fs from 'fs';
 import {app, BrowserWindow, Menu, shell} from 'electron';
 import restify from 'restify';
-import SequelizeManager from './sequelizeManager';
+import bunyan from 'bunyan';
+import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import {ipcMessageReceive,
         serverMessageReceive,
         channel} from './messageHandler';
@@ -13,6 +15,9 @@ let menu;
 let template;
 let mainWindow = null;
 
+const clearLog = () => fs.writeFile(OPTIONS.logpath, '');
+
+
 if (process.env.NODE_ENV === 'development') {
     require('electron-debug')();
 }
@@ -24,40 +29,93 @@ app.on('window-all-closed', () => {
 app.on('ready', () => {
     mainWindow = new BrowserWindow({
         show: false,
-        width: 1024,
+        width: OPTIONS.large ? 1024 : 728,
         height: 728
     });
 
-    function log(description) {
-        mainWindow.webContents.send(channel, {
-                log: {
-                    description,
-                    timestamp: timestamp()
-                }
-        });
+
+    const logToFile = bunyan.createLogger({
+        name: 'plotly-database-connector-logger',
+        streams: [
+            {
+                level: 'info',
+                path: OPTIONS.logpath
+            }
+        ]
+    });
+
+    function log(logEntry, code = 2) {
+
+        // default log detail set to 1 (warn level) in ./args.js
+        if (code <= OPTIONS.logdetail) {
+            switch (code) {
+                case 0:
+                    logToFile.error(logEntry);
+                    break;
+                case 1:
+                    logToFile.warn(logEntry);
+                    break;
+                case 2:
+                    logToFile.info(logEntry);
+                    break;
+                default:
+                    logToFile.info(logEntry);
+            }
+
+            if (!OPTIONS.headless) {
+                mainWindow.webContents.send(channel, {
+                    log: {
+                        logEntry,
+                        timestamp: timestamp()
+                    }
+                });
+            }
+
+        }
     }
 
     const sequelizeManager = new SequelizeManager(log);
 
+    // clear the log if the file existed already and had entries
+    clearLog();
+
     const server = restify.createServer();
+
+    sequelizeManager.log(`Setting up server on port ${OPTIONS.port} ...`, 2);
 
     server.use(restify.queryParser());
     server.use(restify.CORS({
         origins: ['*'],
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
-    })).listen(5000);
+    })).listen(OPTIONS.port);
+
+    sequelizeManager.log('Done.', 2);
+
+    sequelizeManager.log('Rendering the app...', 2);
 
     mainWindow.loadURL(`file://${__dirname}/app/app.html`);
 
     mainWindow.webContents.on('did-finish-load', () => {
-        mainWindow.show();
-        mainWindow.focus();
+        sequelizeManager.log('Rendering the app...', 2);
+
+        // show window if it's not running in headless mode
+        if (!OPTIONS.headless) {
+            sequelizeManager.log('Running as headless.', 2);
+            mainWindow.show();
+            mainWindow.focus();
+        }
+
         ipcMain.removeAllListeners(channel);
         ipcMain.on(channel, ipcMessageReceive(sequelizeManager));
 
+        sequelizeManager.log('Setting up routes...', 2);
+
         // TODO: simplify this restify server routing code
         server.get('/connect', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/login', serverMessageReceive(
             sequelizeManager, mainWindow.webContents)
         );
         server.get('/query', serverMessageReceive(
@@ -72,6 +130,9 @@ app.on('ready', () => {
         server.get('/v0/connect', serverMessageReceive(
             sequelizeManager, mainWindow.webContents)
         );
+        server.get('/v0/login', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
         server.get('/v0/query', serverMessageReceive(
             sequelizeManager, mainWindow.webContents)
         );
@@ -81,6 +142,9 @@ app.on('ready', () => {
         server.get('/v0/disconnect', serverMessageReceive(
             sequelizeManager, mainWindow.webContents)
         );
+
+        sequelizeManager.log('Done.', 2);
+
     });
 
     mainWindow.on('closed', () => {
