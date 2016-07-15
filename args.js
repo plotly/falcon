@@ -37,6 +37,7 @@ const defaultOptions = () => {
     }));
 };
 
+// args are expected to be in ['key=value', 'key1=value2' ...] format
 function mergeArgs (args) {
     const userOptions = {};
 
@@ -84,9 +85,8 @@ function mergeArgs (args) {
         `Valid values for this key are: ${optionsBook[arg[0]].acceptedValues}`;
     };
 
-    // args are expected to be in ['key=value', 'key1=value2' ...] format
     try {
-        if (!isEmpty(args)) {
+        if (!isEmpty(args) && !contains('--test-type=webdriver', args)) {
             args.forEach( expression => {
                 const arg = split('=', expression);
                 const parsedArg = parseArgValue(arg);
@@ -101,18 +101,27 @@ function mergeArgs (args) {
                 }
             });
         }
-
     } catch (error) {
+        // keep this console log for the user running it from the CL
+        console.error(error);
         process.exit(-1);
-
-    } finally {
-        return merge(defaultOptions(), userOptions);
     }
+    return merge(defaultOptions(), userOptions);
 }
 
 // if in development mode, just pass in an empty args object => defaults all
 const acceptedArgs = () => {
-    return process.env.NODE_ENV === 'development' ? {} : process.argv.slice(2);
+
+    let argsToMerge = [];
+
+    if (process.env.NODE_ENV === 'development') {
+        argsToMerge = ['logdetail=2'];
+    } else if (!contains('./test/e2e.js', process.argv.slice(2))) {
+        argsToMerge = process.argv.slice(2);
+    }
+
+    return argsToMerge;
+
 };
 
 export const ARGS = mergeArgs(acceptedArgs());

@@ -47,9 +47,6 @@ app.on('ready', () => {
     function log(logEntry, code = 2) {
 
         // default log detail set to 1 (warn level) in ./args.js
-
-        console.log(code, logEntry);
-
         if (code <= OPTIONS.logdetail) {
             switch (code) {
                 case 0:
