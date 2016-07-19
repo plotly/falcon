@@ -4,9 +4,8 @@ import {DIALECTS} from './app/constants/constants';
 import parse from './parse';
 import {merge} from 'ramda';
 import {ARGS} from './args';
+import {APP_NOT_CONNECTED} from './errors';
 
-const APP_NOT_CONNECTED_MESSAGE = 'There seems to be no connection at the ' +
-    'moment. Please try connecting the application to your database.';
 
 const PREBUILT_QUERY = {
     SHOW_DATABASES: 'SHOW_DATABASES',
@@ -14,7 +13,9 @@ const PREBUILT_QUERY = {
     SHOW5ROWS: 'SHOW5ROWS'
 };
 
+
 const timestamp = () => (new Date()).toTimeString();
+
 
 const EMPTY_TABLE = {
     columnnames: ['NA'],
@@ -23,13 +24,16 @@ const EMPTY_TABLE = {
     nrows: 1
 };
 
+
 const isEmpty = (table) => {
     return table.length === 0;
 };
 
+
 const intoArray = (objects) => {
     return objects.map(obj => obj[Object.keys(obj)]);
 };
+
 
 function assembleTablesPreviewMessage(tablePreviews) {
     /*
@@ -47,7 +51,9 @@ function assembleTablesPreviewMessage(tablePreviews) {
     });
 }
 
+
 export class SequelizeManager {
+
     constructor(log) {
         this.log = log;
     }
@@ -57,21 +63,29 @@ export class SequelizeManager {
     }
 
     setQueryType(type) {
-        // set sequelize's query property type
-        // helps sequelize to predict what kind of response it will get
+        /*
+         * set sequelize's query property type
+         * helps sequelize to predict what kind of response it will get
+         */
         return {type: this.connection.QueryTypes[type]};
     }
 
     intoTablesArray(results) {
+        console.log(results);
         // helper function to
         let tables;
         if (this.getDialect() === DIALECTS.SQLITE) {
             // sqlite returns an array by default
             tables = results;
         } else {
-            // others return list of objects
+            /*
+             * others return list of objects such as
+             *  [ { Tables_in_testdb: 'consumercomplaints' },
+             *    { Tables_in_testdb: 'test' } ]
+             */
             tables = intoArray(results);
         }
+        console.log(tables);
         return tables;
     }
 
@@ -95,7 +109,7 @@ export class SequelizeManager {
 
     }
 
-    login(configFromApp) {
+    connect(configFromApp) {
         if (ARGS.headless) {
             const configFromFile = JSON.parse(fs.readFileSync(ARGS.configpath));
             this.createConnection(configFromFile);
@@ -110,13 +124,15 @@ export class SequelizeManager {
         return this.connection.authenticate();
     }
 
-    checkConnection(callback) {
+    authenticate(callback) {
+        console.log('authenticate');
         // when already logged in and simply want to check connection
         if (!this.connection) {
 			this.raiseError(
                 merge(
-                    {message: APP_NOT_CONNECTED_MESSAGE},
-                    {type: 'connection'}),
+                    {message: APP_NOT_CONNECTED},
+                    {type: 'connection'}
+                ),
                 callback
 			);
 		} else {
@@ -174,43 +190,52 @@ export class SequelizeManager {
         .query(showtables, this.setQueryType('SELECT'))
         .then(results => {
             this.log('Results recieved.', 1);
-
-            const tables = this.intoTablesArray(results);
-
-            // construct prmises of table previews (top 5 rows)
-            const promises = tables.map(table => {
-                const show5rows = this.getPresetQuery(
-                    PREBUILT_QUERY.SHOW5ROWS, table
-                );
-                this.log(`Querying: ${show5rows}`, 1);
-
-                // sends the query for a single table
-                return this.connection
-                .query(show5rows, this.setQueryType('SELECT'))
-                .then(selectTableResults => {
-                    return {
-                        [table]: selectTableResults
-                    };
-                });
+            // TODO: when switching fornt end to v1, simply send back an array
+            const tablesObject = this.intoTablesArray(results).map(table => {
+                return {[table]: {}};
             });
-
-            return Promise.all(promises)
-            .then(tablePreviews => {
-                callback({
-                    error: null,
-                    tables: assembleTablesPreviewMessage(tablePreviews)
-                });
+            console.log(tablesObject);
+            callback({
+                error: null,
+                tables: tablesObject
             });
         });
     }
 
-    sendQuery(query, callback) {
+    previewTables(tables, callback) {
+        // TODO: when switching fornt end to v1, simply send back an array
+        const promises = tables.map(table => {
+            const show5rows = this.getPresetQuery(
+                PREBUILT_QUERY.SHOW5ROWS, table
+            );
+            this.log(`Querying: ${show5rows}`, 1);
+
+            // sends the query for a single table
+            return this.connection
+            .query(show5rows, this.setQueryType('SELECT'))
+            .then(selectTableResults => {
+                return {
+                    [table]: selectTableResults
+                };
+            });
+        });
+
+        return Promise.all(promises)
+        .then(tablePreviews => {
+            this.log('Sending tables\' previews.', 1);
+            callback({
+                error: null,
+                previews: assembleTablesPreviewMessage(tablePreviews)
+            });
+        });
+    }
+
+    sendRawQuery(query, callback) {
         this.log(`Querying: ${query}`, 1);
 
         return this.connection.query(query, this.setQueryType('SELECT'))
         .then((results) => {
             this.log('Results received.', 1);
-
             callback(merge(parse(results), {error: null}));
         });
     }
@@ -286,4 +311,5 @@ export class SequelizeManager {
     }
 }
 
+// need this in main, can't import directly due to circular dependancy
 export const OPTIONS = ARGS;
