@@ -19,7 +19,7 @@ export function v0(requestEvent, sequelizeManager, callback) {
     let message;
 
     const endpoint = split('/', requestEvent.route.path)[2];
-
+    console.log(endpoint);
     switch (endpoint) {
 
         case 'connect': {
@@ -36,22 +36,21 @@ export function v0(requestEvent, sequelizeManager, callback) {
 
         case 'query': {
             task = TASKS.QUERY;
-            if (requestEvent.params.statement) {
-                message = requestEvent.params.statement;
-            } else {
-                sequelizeManager.raiseError(QUERY_NOT_FOUND, callback);
-            }
+            message = requestEvent.params.statement;
+            console.log('task and message in api');
+            console.log('task and message');
+            console.log(task);
+            console.log(message);
             break;
         }
 
         case 'tables': {
             task = TASKS.SELECT_DATABASE_AND_SHOW_TABLES;
             message = sequelizeSetup(connection);
-            if (requestEvent.params.database) {
-                message.database = requestEvent.params.database;
-            } else {
-                sequelizeManager.raiseError(DATABASE_NOT_FOUND, callback);
-            }
+            message.database = requestEvent.params.database;
+            console.log('task and message');
+            console.log(task);
+            console.log(message);
             break;
         }
 
@@ -162,8 +161,10 @@ export function v1(requestEvent, sequelizeManager, callback) {
              * returns: query response
              */
              console.log(requestEvent.params);
+             console.log(requestEvent.params.statement);
             task = TASKS.QUERY;
-            if (requestEvent.params.statement) {
+
+            if (requestEvent.params !== {}) {
                 message = requestEvent.params.statement;
             } else {
                 sequelizeManager.raiseError(QUERY_NOT_FOUND, callback);

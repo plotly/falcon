@@ -120,32 +120,28 @@ function handleMessage(sequelizeManager, opts) {
 
 	const {callback, payload} = opts;
 	const {task, message} = payload;
-
+	console.log('task and message in handleMessage');
 	console.log(task);
 	console.log(message);
 
 	sequelizeManager.log(`Sending task ${task} to squelizeManager`, 2);
 
-	const authenticationError = (error) => {
-		sequelizeManager.raiseError(
-			merge(error, {type: 'connection'}),
-			callback
-		);
-	};
-
 	switch (task) {
 
 		case TASKS.CONNECT: {
 			sequelizeManager.connect(message)
+			.catch((error) => {
+				sequelizeManager.raiseError(
+					merge(error, {type: 'connection'}),
+					callback
+				);
+			})
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are logged in as ' +
 				`[${sequelizeManager.connection.config.username}]`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(
-					merge(error, {type: 'connection'}),
-					callback
-				);
+				sequelizeManager.raiseError(error, callback);
 			});
 			break;
 		}
@@ -155,14 +151,12 @@ function handleMessage(sequelizeManager, opts) {
 			.then(() => {sequelizeManager.log(
 				'NOTE: connection authenticated as ' +
 				`[${sequelizeManager.connection.config.username}]`, 1
-			);})
-			.catch( error => authenticationError(error));
+			);});
 			break;
 		}
 
 		case TASKS.DATABASES: {
 			sequelizeManager.authenticate(callback)
-			.catch( error => authenticationError(error))
 			.then(sequelizeManager.showDatabases(callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: fetched the list of databases for user ' +
@@ -176,7 +170,6 @@ function handleMessage(sequelizeManager, opts) {
 
 		case TASKS.TABLES: {
 			sequelizeManager.authenticate(callback)
-			.catch( error => authenticationError(error))
 			.then(sequelizeManager.showTables(message, callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: fetched the list of tables for database' +
@@ -190,7 +183,6 @@ function handleMessage(sequelizeManager, opts) {
 
 		case TASKS.PREVIEW: {
 			sequelizeManager.authenticate(callback)
-			.catch( error => authenticationError(error))
 			.then(sequelizeManager.previewTables(message, callback))
 			.then(() => {sequelizeManager.log(
 				`NOTE: you are previewing table(s) [${message}]`, 1
@@ -203,7 +195,6 @@ function handleMessage(sequelizeManager, opts) {
 
 		case TASKS.QUERY: {
 			sequelizeManager.authenticate(callback)
-			.catch( error => authenticationError(error))
 			.then(sequelizeManager.sendRawQuery(message, callback))
 			.then(() => {sequelizeManager.log(
 				`QUERY EXECUTED: ${message}`, 1
@@ -233,7 +224,12 @@ function handleMessage(sequelizeManager, opts) {
 
 		case TASKS.CONNECT_AND_SHOW_DATABASES: {
 			sequelizeManager.connect(message)
-			.catch( error => authenticationError(error))
+			.catch((error) => {
+				sequelizeManager.raiseError(
+					merge(error, {type: 'connection'}),
+					callback
+				);
+			})
 			.then(sequelizeManager.showDatabases(callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are logged in as ' +
@@ -247,7 +243,6 @@ function handleMessage(sequelizeManager, opts) {
 
 		case TASKS.CHECK_CONNECTION_AND_SHOW_DATABASES: {
 			sequelizeManager.authenticate(callback)
-			.catch( error => authenticationError(error))
 			.then(sequelizeManager.showDatabases(callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are logged in as ' +
@@ -261,7 +256,12 @@ function handleMessage(sequelizeManager, opts) {
 
 		case TASKS.SELECT_DATABASE_AND_SHOW_TABLES: {
 			sequelizeManager.connect(message)
-			.catch( error => authenticationError(error))
+			.catch((error) => {
+				sequelizeManager.raiseError(
+					merge(error, {type: 'connection'}),
+					callback
+				);
+			})
 			.then(sequelizeManager.showTables(callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are previewing database ' +

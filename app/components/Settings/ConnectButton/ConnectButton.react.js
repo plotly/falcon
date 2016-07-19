@@ -62,22 +62,19 @@ export default class ConnectButton extends Component {
 
     componentWillReceiveProps(nextProps) {
         const status = this.props.connection.get('status');
-
-        // if databases and null error, set connected
-
-        if (!nextProps.ipc.get('error')) {
-            if (nextProps.ipc.get('databases')) {
-                this.updateStatus(APP_STATUS.CONNECTED);
-            } else if (!nextProps.ipc.get('databases')) {
-                this.updateStatus(APP_STATUS.DISCONNECTED);
+            if (!nextProps.ipc.get('error')) {
+                if (nextProps.ipc.has('databases') && !nextProps.ipc.get('databases')) {
+                    this.updateStatus(APP_STATUS.DISCONNECTED);
+                } else if (nextProps.ipc.get('databases')) {
+                    this.updateStatus(APP_STATUS.CONNECTED);
+                }
+            } else {
+                if (nextProps.ipc.getIn(['error', 'type']) === 'connection') {
+                    this.updateStatus(APP_STATUS.CON_ERROR);
+                } else if (status !== APP_STATUS.CON_ERROR) {
+                    this.updateStatus(APP_STATUS.ERROR);
+                }
             }
-        } else {
-            if (nextProps.ipc.getIn(['error', 'type']) === 'connection') {
-                this.updateStatus(APP_STATUS.CON_ERROR);
-            } else if (status !== APP_STATUS.CON_ERROR) {
-                this.updateStatus(APP_STATUS.ERROR);
-            }
-        }
     }
 
 	render() {

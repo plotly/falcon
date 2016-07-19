@@ -105,7 +105,10 @@ export class SequelizeManager {
             storage
         });
 
-        this.log(`Connection for user ${username} established`, 2);
+
+        if (this.connection.config.dialect === 'mssql') {
+            this.connection.config.dialectOptions = {encrypt: true};
+        }
 
     }
 
@@ -117,15 +120,11 @@ export class SequelizeManager {
             this.createConnection(configFromApp);
         }
 
-        if (this.connection.config.dialect === 'mssql') {
-            this.connection.config.dialectOptions = {encrypt: true};
-        }
-
         return this.connection.authenticate();
     }
 
     authenticate(callback) {
-        console.log('authenticate');
+        this.log('Authenticating connection.');
         // when already logged in and simply want to check connection
         if (!this.connection) {
 			this.raiseError(
@@ -137,7 +136,13 @@ export class SequelizeManager {
 			);
 		} else {
             // returns a promise
-            return this.connection.authenticate();
+            return this.connection.authenticate()
+            .catch((error) => {
+                this.raiseError(
+                    merge(error, {type: 'connection'}),
+                    callback
+                );
+            });
         }
     }
 
@@ -234,6 +239,9 @@ export class SequelizeManager {
         this.log(`Querying: ${query}`, 1);
 
         return this.connection.query(query, this.setQueryType('SELECT'))
+        .catch( error => {
+            this.raiseError(error, callback);
+        })
         .then((results) => {
             this.log('Results received.', 1);
             callback(merge(parse(results), {error: null}));
