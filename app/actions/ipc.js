@@ -10,13 +10,15 @@ export const updateState = createAction(UPDATE_STATE);
 
 export function query (statement) {
     return () => {
-        ipcSend(TASKS.SEND_QUERY, {statement});
+        ipcSend(TASKS.QUERY, {statement});
     };
 }
 
 export function connect (credentials) {
     return () => {
-        ipcSend(TASKS.CONNECT, immutableToJS(credentials));
+        ipcSend(
+            TASKS.CONNECT_AND_SHOW_DATABASES, immutableToJS(credentials)
+        );
     };
 }
 
