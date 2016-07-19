@@ -1,4 +1,5 @@
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
+import {keys} from 'ramda';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './Preview.css';
 
@@ -7,6 +8,18 @@ export default class Preview extends Component {
         super(props);
         this.renderTable = this.renderTable.bind(this);
         this.testClass = this.testClass.bind(this);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.ipc.has('tables') && nextProps.ipc.get('tables') &&
+            (nextProps.ipc.get('tables') !== this.props.ipc.get('tables'))) {
+                const tables = nextProps.ipc.get('tables');
+
+                this.props.ipcActions.previewTables(
+                    tables.toJS().map(table => keys(table)[0])
+                );
+
+        }
     }
 
     testClass() {
@@ -31,22 +44,23 @@ export default class Preview extends Component {
     }
 
     render() {
-        const tables = this.props.ipc.get('tables');
+        const {ipc} = this.props;
+        const previews = ipc.get('previews');
 
-        if (!tables) {
+        if (!previews) {
             return null;
         }
 
-        const renderedTables = tables.map(
-            table => {
-                const tableName = table.keySeq().first();
-                if (table.get(tableName)) {
+        const renderedTables = previews.map(
+            preview => {
+                const tableName = preview.keySeq().first();
+                if (preview.get(tableName)) {
                     return (
                         <div>
                             <div className={styles.tableHeader}>
                                 Preview of table: <u>{tableName}</u>
                             </div>
-                            {this.renderTable(table.get(tableName))}
+                            {this.renderTable(preview.get(tableName))}
                         </div>
                     );
                 }
@@ -62,5 +76,6 @@ export default class Preview extends Component {
 }
 
 Preview.propTypes = {
+    ipcActions: PropTypes.object,
     ipc: ImmutablePropTypes.map.isRequired
 };

@@ -53,12 +53,15 @@ export default class Settings extends Component {
                 <DatabaseDropdown
                     configuration={configuration}
                     configActions={configActions}
-                    ipcActions={ipcActions}
                     ipc={ipc}
+                    ipcActions={ipcActions}
                 />
 
                 <div className={styles.previewController}>
-                    <Preview ipc={ipc}/>
+                    <Preview
+                        ipcActions={ipcActions}
+                        ipc={ipc}
+                    />
                 </div>
 
             </div>

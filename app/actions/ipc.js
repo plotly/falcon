@@ -23,7 +23,17 @@ export function connect (credentials) {
 export function selectDatabase () {
     return function (dispatch, getState) {
         const state = getState();
-        ipcSend(TASKS.SELECT_DATABASE, state.configuration.toJS());
+        ipcSend(
+            TASKS.SELECT_DATABASE_AND_SHOW_TABLES, state.configuration.toJS()
+        );
+    };
+}
+
+export function previewTables (tables) {
+    return () => {
+        ipcSend(
+            TASKS.PREVIEW, tables
+        );
     };
 }
 
