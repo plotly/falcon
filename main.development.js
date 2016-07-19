@@ -112,21 +112,6 @@ app.on('ready', () => {
         sequelizeManager.log('Setting up routes...', 2);
 
         // TODO: simplify this restify server routing code
-        server.get('/connect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/login', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/query', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/tables', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/disconnect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
         server.get('/v0/connect', serverMessageReceive(
             sequelizeManager, mainWindow.webContents)
         );
@@ -140,6 +125,30 @@ app.on('ready', () => {
             sequelizeManager, mainWindow.webContents)
         );
         server.get('/v0/disconnect', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/v1/connect', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/v1/authenticate', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/v1/databases', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/v1/selectdatabase', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/v1/tables', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/v1/preview', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/v1/query', serverMessageReceive(
+            sequelizeManager, mainWindow.webContents)
+        );
+        server.get('/v1/disconnect', serverMessageReceive(
             sequelizeManager, mainWindow.webContents)
         );
 
