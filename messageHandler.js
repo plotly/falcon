@@ -130,7 +130,7 @@ function handleMessage(sequelizeManager, opts) {
 			.catch((error) => {
 				sequelizeManager.raiseError(
                     merge(
-                        {message: AUTHENTICATION(error)},
+                        {message: AUTHENTICATION({error})},
                         {type: 'connection'}),
                     callback
                 );
@@ -141,7 +141,7 @@ function handleMessage(sequelizeManager, opts) {
 			);})
 			.then(sequelizeManager.getConnection(callback))
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError({error}, callback);
 			});
 			break;
 
@@ -168,7 +168,7 @@ function handleMessage(sequelizeManager, opts) {
 				`[${sequelizeManager.connection.config.username}]`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError({error}, callback);
 			});
 			break;
 
@@ -183,7 +183,7 @@ function handleMessage(sequelizeManager, opts) {
 				`[${sequelizeManager.connection.config.database}]`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError({error}, callback);
 			});
 			break;
 		}
@@ -196,7 +196,7 @@ function handleMessage(sequelizeManager, opts) {
 				`NOTE: you are previewing table(s) [${message}]`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError({error}, callback);
 			});
 			break;
 
@@ -209,7 +209,7 @@ function handleMessage(sequelizeManager, opts) {
 				`QUERY EXECUTED: ${message}`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError({error}, callback);
 			});
 			break;
 
@@ -224,7 +224,7 @@ function handleMessage(sequelizeManager, opts) {
 					`[${sequelizeManager.connection.config.username}]`, 1
 				);
 			} catch (error) {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError({error}, callback);
 			}
 			break;
 		}
@@ -248,7 +248,7 @@ function handleMessage(sequelizeManager, opts) {
 				`[${sequelizeManager.connection.config.username}]`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError({error}, callback);
 			});
 			break;
 
@@ -263,7 +263,7 @@ function handleMessage(sequelizeManager, opts) {
 				`[${sequelizeManager.connection.config.username}]`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError({error}, callback);
 			});
 			break;
 
@@ -284,7 +284,7 @@ function handleMessage(sequelizeManager, opts) {
 				`[${sequelizeManager.connection.config.database}]`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError({error}, callback);
 			});
 			break;
 

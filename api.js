@@ -139,12 +139,10 @@ export function v1(requestEvent, sequelizeManager, callback) {
             message = sequelizeSetup(connection);
 
             if (!foundParams(requestEvent.params, 'database')) {
-                console.log('!foundParams');
                 sequelizeManager.raiseError(
                     {mesasge: DATABASE_PARAM}, callback
                 );
             } else {
-                console.log('foundParams');
                 message.database = requestEvent.params.database;
             }
 
