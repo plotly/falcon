@@ -1,6 +1,6 @@
 import {merge, split} from 'ramda';
 import {v0, v1} from './api';
-import {API_VERSION, TASK} from './errors';
+import {API_VERSION, AUTHENTICATION, TASK} from './errors';
 
 
 	/*
@@ -59,7 +59,6 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 
 		const callback = (response) => {
 			respondEvent.send(response);
-			// send stuff back to electorn app, too
 			mainWindowContents.send(channel, response);
 		};
 
@@ -72,8 +71,8 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 
 		let payload = {};
 
-		// payload will be {task, message}
-		console.log(apiVersion);
+		// payload will be {task, message} as returned from v0(...) or v1(...)
+
 		switch (apiVersion) {
 
 			case 'v0':
@@ -100,13 +99,13 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 export function ipcMessageReceive(sequelizeManager) {
 
 	return (evt, payload) => {
-		sequelizeManager.log(`Received an ipc message to ${payload.task}`, 2);
 
+		sequelizeManager.log(`Received an ipc message to ${payload.task}`, 2);
 		const callback = (response) => {
 			evt.sender.send(channel, response);
 		};
-
 		handleMessage(sequelizeManager, {callback, payload});
+
 	};
 }
 
@@ -120,42 +119,48 @@ function handleMessage(sequelizeManager, opts) {
 
 	const {callback, payload} = opts;
 	const {task, message} = payload;
-	console.log('task and message in handleMessage');
-	console.log(task);
-	console.log(message);
 
 	sequelizeManager.log(`Sending task ${task} to squelizeManager`, 2);
 
 	switch (task) {
 
 		case TASKS.CONNECT: {
+
 			sequelizeManager.connect(message)
 			.catch((error) => {
 				sequelizeManager.raiseError(
-					merge(error, {type: 'connection'}),
-					callback
-				);
+                    merge(
+                        {message: AUTHENTICATION(error)},
+                        {type: 'connection'}),
+                    callback
+                );
 			})
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are logged in as ' +
 				`[${sequelizeManager.connection.config.username}]`, 1
 			);})
+			.then(sequelizeManager.getConnection(callback))
 			.catch( error => {
 				sequelizeManager.raiseError(error, callback);
 			});
 			break;
+
 		}
 
 		case TASKS.AUTHENTICATE: {
+
 			sequelizeManager.authenticate(callback)
+			.then(sequelizeManager.getConnection(callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: connection authenticated as ' +
 				`[${sequelizeManager.connection.config.username}]`, 1
 			);});
 			break;
+
 		}
 
 		case TASKS.DATABASES: {
+
 			sequelizeManager.authenticate(callback)
 			.then(sequelizeManager.showDatabases(callback))
 			.then(() => {sequelizeManager.log(
@@ -166,11 +171,13 @@ function handleMessage(sequelizeManager, opts) {
 				sequelizeManager.raiseError(error, callback);
 			});
 			break;
+
 		}
 
 		case TASKS.TABLES: {
+
 			sequelizeManager.authenticate(callback)
-			.then(sequelizeManager.showTables(message, callback))
+			.then(sequelizeManager.showTables(callback))
 			.then(() => {sequelizeManager.log(
 				'NOTE: fetched the list of tables for database' +
 				`[${sequelizeManager.connection.config.database}]`, 1
@@ -182,6 +189,7 @@ function handleMessage(sequelizeManager, opts) {
 		}
 
 		case TASKS.PREVIEW: {
+
 			sequelizeManager.authenticate(callback)
 			.then(sequelizeManager.previewTables(message, callback))
 			.then(() => {sequelizeManager.log(
@@ -191,6 +199,7 @@ function handleMessage(sequelizeManager, opts) {
 				sequelizeManager.raiseError(error, callback);
 			});
 			break;
+
 		}
 
 		case TASKS.QUERY: {
@@ -203,9 +212,11 @@ function handleMessage(sequelizeManager, opts) {
 				sequelizeManager.raiseError(error, callback);
 			});
 			break;
+
 		}
 
 		case TASKS.DISCONNECT: {
+
 			try {
 				sequelizeManager.disconnect(callback);
 				sequelizeManager.log(
@@ -223,6 +234,7 @@ function handleMessage(sequelizeManager, opts) {
 		 */
 
 		case TASKS.CONNECT_AND_SHOW_DATABASES: {
+
 			sequelizeManager.connect(message)
 			.catch((error) => {
 				sequelizeManager.raiseError(
@@ -239,9 +251,11 @@ function handleMessage(sequelizeManager, opts) {
 				sequelizeManager.raiseError(error, callback);
 			});
 			break;
+
 		}
 
 		case TASKS.CHECK_CONNECTION_AND_SHOW_DATABASES: {
+
 			sequelizeManager.authenticate(callback)
 			.then(sequelizeManager.showDatabases(callback))
 			.then(() => {sequelizeManager.log(
@@ -252,10 +266,12 @@ function handleMessage(sequelizeManager, opts) {
 				sequelizeManager.raiseError(error, callback);
 			});
 			break;
+
 		}
 
 		case TASKS.SELECT_DATABASE_AND_SHOW_TABLES: {
 			sequelizeManager.connect(message)
+
 			.catch((error) => {
 				sequelizeManager.raiseError(
 					merge(error, {type: 'connection'}),
@@ -271,11 +287,13 @@ function handleMessage(sequelizeManager, opts) {
 				sequelizeManager.raiseError(error, callback);
 			});
 			break;
+
 		}
 
 		default: {
 			sequelizeManager.raiseError(TASK(task), callback);
 		}
+
 
 	}
 }

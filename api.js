@@ -1,6 +1,6 @@
 import {TASKS} from './messageHandler';
-import {merge, split} from 'ramda';
-import {QUERY_NOT_FOUND, DATABASE_NOT_FOUND, TABLES_NOT_FOUND} from './errors';
+import {map, merge, split, trim} from 'ramda';
+import {QUERY_PARAM, DATABASE_PARAM, TABLES_PARAM} from './errors';
 
 
 const sequelizeSetup = (connection) => {
@@ -8,6 +8,16 @@ const sequelizeSetup = (connection) => {
         connection ? connection.options : null,
         connection ? connection.config : null
     );
+};
+
+const foundParams = (params, wantedParam) => {
+
+    if (!params) {
+        return false;
+    } else if (!params[wantedParam]) {
+        return false;
+    }
+    return true;
 };
 
 
@@ -19,7 +29,7 @@ export function v0(requestEvent, sequelizeManager, callback) {
     let message;
 
     const endpoint = split('/', requestEvent.route.path)[2];
-    console.log(endpoint);
+
     switch (endpoint) {
 
         case 'connect': {
@@ -37,10 +47,6 @@ export function v0(requestEvent, sequelizeManager, callback) {
         case 'query': {
             task = TASKS.QUERY;
             message = requestEvent.params.statement;
-            console.log('task and message in api');
-            console.log('task and message');
-            console.log(task);
-            console.log(message);
             break;
         }
 
@@ -48,9 +54,6 @@ export function v0(requestEvent, sequelizeManager, callback) {
             task = TASKS.SELECT_DATABASE_AND_SHOW_TABLES;
             message = sequelizeSetup(connection);
             message.database = requestEvent.params.database;
-            console.log('task and message');
-            console.log(task);
-            console.log(message);
             break;
         }
 
@@ -86,107 +89,143 @@ export function v1(requestEvent, sequelizeManager, callback) {
     switch (endpoint) {
 
         case 'connect': {
+
             /*
              * action: establish connection via config file when headless or
              * ipc payload when not
              * returns: connection state
              */
+
             task = TASKS.CONNECT;
             message = sequelizeSetup(connection);
             break;
+
         }
 
         case 'authenticate': {
+
             /*
              * action: checks for existing valid connection
              * returns: connection state
              */
+
             task = TASKS.AUTHENTICATE;
             message = sequelizeSetup(connection);
             break;
+
         }
 
         case 'databases': {
+
             /*
              * action: authenticate, get databases
              * returns: databases list = ['database1', 'database2' ...]
              */
+
             task = TASKS.DATABASES;
             message = sequelizeSetup(connection);
             break;
+
         }
 
         case 'selectdatabase': {
+
             /*
              * action: authenticate, get databases
              * returns: connection state
              */
+
             task = TASKS.CONNECT;
             message = sequelizeSetup(connection);
-            if (requestEvent.params.database) {
-                message.database = requestEvent.params.database;
+
+            if (!foundParams(requestEvent.params, 'database')) {
+                console.log('!foundParams');
+                sequelizeManager.raiseError(
+                    {mesasge: DATABASE_PARAM}, callback
+                );
             } else {
-                sequelizeManager.raiseError(DATABASE_NOT_FOUND, callback);
+                console.log('foundParams');
+                message.database = requestEvent.params.database;
             }
+
             break;
         }
 
         case 'tables': {
+
             /*
              * action: authenticate, get tables
              * returns: tables list
              */
+
             task = TASKS.TABLES;
             message = sequelizeSetup(connection);
             break;
+
         }
 
         case 'preview': {
+
             /*
              * action: authenticate, send top 5 query
              * returns: table preview of 5 rows
              */
+
             task = TASKS.PREVIEW;
-            if (requestEvent.params.tables) {
-                message = requestEvent.params.tables;
+
+            if (!foundParams(requestEvent.params, 'tables')) {
+                sequelizeManager.raiseError(
+                    {mesasge: TABLES_PARAM}, callback
+                );
             } else {
-                sequelizeManager.raiseError(TABLES_NOT_FOUND, callback);
+                message = map(trim(), split(',', requestEvent.params.tables));
             }
+
             break;
+
         }
 
         case 'query': {
+
             /*
              * action: authenticate, send raw query
              * returns: query response
              */
-             console.log(requestEvent.params);
-             console.log(requestEvent.params.statement);
+
             task = TASKS.QUERY;
 
-            if (requestEvent.params !== {}) {
-                message = requestEvent.params.statement;
+            if (!foundParams(requestEvent.params, 'statement')) {
+                sequelizeManager.raiseError(
+                    {mesasge: QUERY_PARAM}, callback
+                );
             } else {
-                sequelizeManager.raiseError(QUERY_NOT_FOUND, callback);
+                message = requestEvent.params.statement;
             }
+
             break;
+
         }
 
         case 'disconnect': {
+
             /*
              * action: disconnect, authenticate
              * return: connection state object
              */
+
             task = TASKS.DISCONNECT;
             message = sequelizeSetup(connection);
             break;
+
         }
 
         default: {
+
             sequelizeManager.raiseError(
                 merge(`Endpoint ${endpoint} is not implemented in API v1.`),
                 callback
             );
+
         }
     }
 
