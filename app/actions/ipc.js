@@ -31,10 +31,10 @@ export function selectDatabase () {
     };
 }
 
-export function previewTables (tables) {
+export function previewTables (tableNames) {
     return () => {
         ipcSend(
-            TASKS.PREVIEW, tables
+            TASKS.PREVIEW, tableNames
         );
     };
 }

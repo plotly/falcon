@@ -101,7 +101,7 @@ app.on('ready', () => {
 
         // show window if it's not running in headless mode
         if (!OPTIONS.headless) {
-            sequelizeManager.log('Running as headless.', 2);
+            sequelizeManager.log('Opening main window.', 2);
             mainWindow.show();
             mainWindow.focus();
         }

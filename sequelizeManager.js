@@ -88,7 +88,7 @@ export class SequelizeManager {
     }
 
     getConnection(callback) {
-        return () => callback({error: null, connectionCode: '200'});
+        return () => callback({error: null});
     }
 
     createConnection(configuration) {
@@ -165,7 +165,7 @@ export class SequelizeManager {
     raiseError(errorMessage, callback) {
         const errorLog = merge(errorMessage, {timestamp: timestamp()});
         this.log(errorMessage, 0);
-        callback({error: errorLog});
+        callback({error: errorLog}, 400);
     }
 
     showDatabases(callback) {
@@ -282,7 +282,7 @@ export class SequelizeManager {
 
         this.log('Disconnecting', 1);
         this.connection.close();
-        callback({databases: null, error: null, tables: null});
+        callback({databases: null, error: null, tables: null, previews: null});
 
     }
 

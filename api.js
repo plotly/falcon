@@ -1,5 +1,5 @@
 import {TASKS} from './messageHandler';
-import {map, merge, split, trim} from 'ramda';
+import {has, map, merge, split, trim} from 'ramda';
 import {QUERY_PARAM, DATABASE_PARAM, TABLES_PARAM} from './errors';
 
 
@@ -12,12 +12,11 @@ const sequelizeSetup = (connection) => {
 
 const foundParams = (params, wantedParam) => {
 
-    if (!params) {
-        return false;
-    } else if (!params[wantedParam]) {
-        return false;
+    if (Boolean(params) && has(wantedParam, params)) {
+        return true;
     }
-    return true;
+
+    return false;
 };
 
 
