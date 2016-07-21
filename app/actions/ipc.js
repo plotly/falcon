@@ -10,20 +10,32 @@ export const updateState = createAction(UPDATE_STATE);
 
 export function query (statement) {
     return () => {
-        ipcSend(TASKS.SEND_QUERY, {statement});
+        ipcSend(TASKS.QUERY, {statement});
     };
 }
 
 export function connect (credentials) {
     return () => {
-        ipcSend(TASKS.CONNECT, immutableToJS(credentials));
+        ipcSend(
+            TASKS.CONNECT_AND_SHOW_DATABASES, immutableToJS(credentials)
+        );
     };
 }
 
 export function selectDatabase () {
     return function (dispatch, getState) {
         const state = getState();
-        ipcSend(TASKS.SELECT_DATABASE, state.configuration.toJS());
+        ipcSend(
+            TASKS.SELECT_DATABASE_AND_SHOW_TABLES, state.configuration.toJS()
+        );
+    };
+}
+
+export function previewTables (tableNames) {
+    return () => {
+        ipcSend(
+            TASKS.PREVIEW, tableNames
+        );
     };
 }
 
