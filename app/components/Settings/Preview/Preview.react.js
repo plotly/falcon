@@ -10,18 +10,6 @@ export default class Preview extends Component {
         this.testClass = this.testClass.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.ipc.has('tables') && nextProps.ipc.get('tables') &&
-            (nextProps.ipc.get('tables') !== this.props.ipc.get('tables'))) {
-                const tables = nextProps.ipc.get('tables');
-
-                this.props.ipcActions.previewTables(
-                    tables.toJS().map(table => keys(table)[0])
-                );
-
-        }
-    }
-
     testClass() {
         return 'test-connected';
     }

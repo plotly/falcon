@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './Settings.css';
 import DatabaseDropdown from './DatabaseDropdown/DatabaseDropdown.react';
+import TableDropdown from './TableDropdown/TableDropdown.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import UserCredentials from './UserCredentials/UserCredentials.react';
 import LoggerController from './Logger/LoggerController.react';
@@ -53,6 +54,11 @@ export default class Settings extends Component {
                 <DatabaseDropdown
                     configuration={configuration}
                     configActions={configActions}
+                    ipc={ipc}
+                    ipcActions={ipcActions}
+                />
+
+                <TableDropdown
                     ipc={ipc}
                     ipcActions={ipcActions}
                 />
