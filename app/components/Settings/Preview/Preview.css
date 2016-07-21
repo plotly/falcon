@@ -12,7 +12,8 @@ th, td {
 }
 
 .tableHeader {
-    padding: 10px;
+    padding-top: 6px;
+    padding-bottom: 6px;
     margin-left: auto;
     margin-right: auto;
 }

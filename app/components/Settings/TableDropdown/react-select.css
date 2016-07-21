@@ -32,13 +32,13 @@
   border-width: 1px;
   border-style: solid;
   border-radius: 4px;
-  color: #333;
+  color: #6D6D6D;
   cursor: default;
   display: table;
   outline: none;
   overflow: hidden;
   padding: 5px;
-  padding-left: 10px;
+  padding-left: 20px;
   position: relative;
   width: 100%;
 }
@@ -67,7 +67,7 @@
 }
 .Select-placeholder,
 .Select--single > .Select-control .Select-value {
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   font-weight: 100;
   line-height: 34px;
   position: absolute;
@@ -77,7 +77,7 @@
 }
 .has-value.Select--single > .Select-control > .Select-value .Select-value-label,
 .has-value.is-pseudo-focused.Select--single > .Select-control > .Select-value .Select-value-label {
-  color: #333;
+  color: #6D6D6D;
 }
 .has-value.Select--single > .Select-control > .Select-value a.Select-value-label,
 .has-value.is-pseudo-focused.Select--single > .Select-control > .Select-value a.Select-value-label {
@@ -88,7 +88,7 @@
 .has-value.is-pseudo-focused.Select--single > .Select-control > .Select-value a.Select-value-label:hover,
 .has-value.Select--single > .Select-control > .Select-value a.Select-value-label:focus,
 .has-value.is-pseudo-focused.Select--single > .Select-control > .Select-value a.Select-value-label:focus {
-  color: #007eff;
+  color: #6D6D6D;
   outline: none;
   text-decoration: underline;
 }
@@ -106,12 +106,12 @@
   cursor: default;
   display: inline-block;
   font-weight: 100;
-  font-family: inherit;
+  font-family: "Open Sans";
   font-size: inherit;
   margin: 0;
   outline: none;
-  line-height: 14px;
-  letter-spacing: 2px;
+  line-height: 40px;
+  letter-spacing: 1px;
   /* For IE 8 compatibility */
   padding: 8px 0 12px;
   /* For IE 8 compatibility */
@@ -152,7 +152,7 @@
   -webkit-animation: Select-animation-fadeIn 200ms;
   -o-animation: Select-animation-fadeIn 200ms;
   animation: Select-animation-fadeIn 200ms;
-  color: #999;
+  color: #6D6D6D;
   cursor: pointer;
   display: table-cell;
   position: relative;
@@ -161,7 +161,7 @@
   width: 17px;
 }
 .Select-clear-zone:hover {
-  color: #D0021B;
+  color: #6D6D6D;
 }
 .Select-clear {
   display: inline-block;
@@ -281,8 +281,6 @@
   border: 1px solid rgba(0, 126, 255, 0.24);
   color: #007eff;
   display: inline-block;
-  font-size: 0.9em;
-  line-height: 1.4;
   margin-left: 5px;
   margin-top: 5px;
   vertical-align: top;

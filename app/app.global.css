@@ -2,7 +2,8 @@
 html is set to 62.5% so that all the REM measurements throughout Skeleton
 are based on 10px sizing. So basically 1.5rem = 15px :) */
 html {
-  font-size: 62.5%; }
+  font-size: 62.5%;
+}
 
 body {
     position: relative;
@@ -12,8 +13,8 @@ body {
     font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
     line-height: 1.6;
     font-weight: 400;
-    font-family: "Open Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #222;
+    font-family: "Open Sans";
+    color: #69738A;
 }
 
 /* Typography
@@ -34,7 +35,7 @@ h6 { font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; }
   h1 { font-size: 5.0rem; }
   h2 { font-size: 4.2rem; }
   h3 { font-size: 3.6rem; }
-  h4 { font-size: 3.0rem; }
+  h4 { font-size: 3.0rem; text-align: center;}
   h5 { font-size: 2.4rem; }
   h6 { font-size: 1.5rem; }
 }
@@ -42,16 +43,24 @@ h6 { font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; }
 p {
   margin-top: 0; }
 
+*::-webkit-input-placeholder {
+     color: #BEC8D9;
+     letter-spacing: 1px;
+     font-size: 15px;
+  }
 
 *::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-left: 0;
-  background: rgba(0,0,0,0.1);
+  background: #F8F8F9;
+  border: 1px solid #BEC8D9;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.4);
-  border-radius: 0;
-  width: 5px;
+  background-color: #818B99;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  border-radius: 5px;
+  width: 12px;
 }
