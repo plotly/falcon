@@ -101,7 +101,7 @@ export default class Settings extends Component {
             connection.get('status') === APP_STATUS.ERROR) {
             step2 = (
                 <div className={styles.step2Container}>
-                    <h5>2. Select Database and Preview Tables</h5>
+                    <h5>2. Preview Database and Tables</h5>
                     {databasePreview}
                 </div>
             );
@@ -110,8 +110,8 @@ export default class Settings extends Component {
                 <div className={styles.step3Container}>
                     <h5>3. Query from Plotly 2.0</h5>
                     <div>
-                        Query data by importing data from
-                        plot.ly website via SQL.<br/>
+                        Query data by clicking on 'import data' on
+                        plot.ly/alpha/workspace and choose the SQL option.<br/>
                         Remember to keep this app running
                         while you are making queries!
                     </div>
