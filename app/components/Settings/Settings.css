@@ -45,7 +45,7 @@
 
 .step3Container {
 	width: 800px;
-	padding-top: 60px;
+	padding-top: 50px;
 }
 
 .previewController {
@@ -55,6 +55,7 @@
 }
 
 .logContainer {
+    max-height: 300px;
 	margin-top: 40px;
 }
 

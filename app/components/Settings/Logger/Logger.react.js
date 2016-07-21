@@ -18,11 +18,12 @@ const Logger = props => {
     };
 
     return (
-        <div>
+        <div
+            className={classnames(styles.renderLogs, testClass())}
+            id="test-logs"
+        >
             <h5>Logs</h5>
-            <pre className={classnames(styles.renderLogs, testClass())}
-                id="test-logs"
-            >
+            <pre>
                 {renderLogs}
             </pre>
         </div>

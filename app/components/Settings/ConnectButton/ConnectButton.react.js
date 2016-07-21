@@ -101,7 +101,7 @@ export default class ConnectButton extends Component {
                 errorMessage = (
                     <pre className={styles.errorMessage}>
                         {
-                            'Hm... an error occured while you were connected: ' +
+                            'Hm... an error occured: ' +
                             ipc.getIn(['error', 'message'])
                         }
                     </pre>
