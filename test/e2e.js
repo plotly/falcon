@@ -65,8 +65,8 @@ describe('plotly database connector', function Spec() {
         .build();
 
         // find element(s) helper functions
-        const findels = (args) => this.driver.findElements(args);
-        const findel = (args) => this.driver.findElement(args);
+        const findEls = (args) => this.driver.findElements(args);
+        const findEl = (args) => this.driver.findElement(args);
 
         // find by helper functions
         const byClass = (args) => webdriver.By.className(args);
@@ -75,53 +75,59 @@ describe('plotly database connector', function Spec() {
         const byPath = (args) => webdriver.By.xpath(args);
 
         // grab group of elements
-        this.getLogos = () => findels(
+        this.getLogos = () => findEls(
             byClass(logoStyles.logo)
         );
 
-        this.getHighlightedLogo = () => findels(
+        this.getHighlightedLogo = () => findEls(
             byClass(logoStyles.logoSelected)
         );
 
-        this.getInputs = () => findels(
+        this.getInputs = () => findEls(
             byPath('//input')
         );
 
+        this.findDropdowns = () => findEls(
+            byCss('.Select-control input'));
+
         // grab specific element
-        this.getLogo = (dialect) => findel(
+        this.getLogo = (dialect) => findEl(
             byId(`test-logo-${dialect}`)
         );
 
-        this.getInputField = (credential) => findel(
+        this.getInputField = (credential) => findEl(
             byId(`test-input-${credential}`)
         );
 
-        this.getConnectBtn = () => findel(
+        this.getConnectBtn = () => findEl(
             byId('test-connect-button')
         );
 
-        this.getDatabaseDropdown = () => findel(
+        this.getDatabaseDropdown = () => findEl(
             byId('test-database-dropdown')
         );
 
-        this.selectDatabase = (database) => this.driver.findElement(
-            webdriver.By.css('.Select-control input')).sendKeys(
-                'plotly_datasets' + webdriver.Key.ENTER
-            );
+        this.getTableDropdown = () => findEl(
+            byId('test-table-dropdown')
+        );
 
-        this.getDatabaseSelect = () => findel(
+        this.reactSelectInputValue = (element, value) => element.sendKeys(
+                value + webdriver.Key.ENTER
+        );
+
+        this.getDatabaseSelect = () => findEl(
             byCss('.Select-control')
         );
 
-        this.getTables = () => findel(
+        this.getTables = () => findEl(
             byId('test-tables')
         );
 
-        this.getLogs = () => findel(
+        this.getLogs = () => findEl(
             byId('test-logs')
         );
 
-        this.getErrorMessage = () => findel(
+        this.getErrorMessage = () => findEl(
             byId('test-error-message')
         );
 
@@ -366,15 +372,20 @@ describe('plotly database connector', function Spec() {
 
                 const testClass = await this.getClassOf(logs);
                 expect(testClass).to.contain(expectedClass);
+
             });
         });
 
-        describe('selecting a database', () => {
+        describe('selecting a database and table', () => {
             it('should show a table preview when database is selected',
             async () => {
+                const dropDowns = await this.findDropdowns();
+                expect(dropDowns.length).to.equal(2);
                 const expectedClass = 'test-connected';
-                await this.selectDatabase();
-                await delay(5000);
+                await this.reactSelectInputValue(dropDowns[0], 'plotly_datasets');
+                await delay(2000);
+                await this.reactSelectInputValue(dropDowns[1], 'ebola_2014');
+                await delay(4000);
                 const tables = await this.getTables();
                 const testClass = await this.getClassOf(tables);
                 expect(testClass).to.contain(expectedClass);
@@ -389,7 +400,7 @@ describe('plotly database connector', function Spec() {
 
             it('should show a log with a new logged item',
             async () => {
-                const expectedClass = 'test-22-entries';
+                const expectedClass = 'test-11-entries';
                 const logs = await this.getLogs();
 
                 const testClass = await this.getClassOf(logs);
@@ -440,12 +451,14 @@ describe('plotly database connector', function Spec() {
 
             it('should show a log with a new logged item',
             async () => {
-                const expectedClass = 'test-24-entries';
+                const expectedClass = 'test-13-entries';
                 const logs = await this.getLogs();
 
                 const testClass = await this.getClassOf(logs);
                 expect(testClass).to.contain(expectedClass);
+
             });
+
         });
 
         after(close);
