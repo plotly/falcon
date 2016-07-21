@@ -4,9 +4,9 @@ import {TASKS} from './../../messageHandler';
 
 const ipcRenderer = require('electron').ipcRenderer;
 
-export const UPDATE_STATE = 'UPDATE_STATE';
+export const UPDATE_IPC = 'UPDATE_IPC';
 
-export const updateState = createAction(UPDATE_STATE);
+export const updateState = createAction(UPDATE_IPC);
 
 export function query (statement) {
     return () => {
