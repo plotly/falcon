@@ -52,6 +52,9 @@
 	max-height: 500px;
 	max-width: 100%;
 	overflow-y: scroll;
+    border: 1px solid #BEC8D9;
+	border-radius: 3px;
+	padding: 10px;
 }
 
 .logContainer {

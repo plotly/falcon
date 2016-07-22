@@ -48,7 +48,19 @@ export default class Settings extends Component {
             />
         );
 
-        const databasePreview = (
+        let tablePreview = null;
+        if (ipc.has('previews')) {
+            tablePreview = (
+                <div className={styles.previewController}>
+                    <Preview
+                        ipcActions={ipcActions}
+                        ipc={ipc}
+                    />
+                </div>
+            );
+        }
+
+        const selectDatabaseTable = (
             <div>
 
                 <DatabaseDropdown
@@ -62,13 +74,6 @@ export default class Settings extends Component {
                     ipc={ipc}
                     ipcActions={ipcActions}
                 />
-
-                <div className={styles.previewController}>
-                    <Preview
-                        ipcActions={ipcActions}
-                        ipc={ipc}
-                    />
-                </div>
 
             </div>
         );
@@ -102,7 +107,8 @@ export default class Settings extends Component {
             step2 = (
                 <div className={styles.step2Container}>
                     <h5>2. Preview Database and Tables</h5>
-                    {databasePreview}
+                    {selectDatabaseTable}
+                    {tablePreview}
                 </div>
             );
 
