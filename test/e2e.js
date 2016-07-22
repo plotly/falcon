@@ -311,13 +311,14 @@ describe('plotly database connector', function Spec() {
 
     });
 
-
-    describe('-> normal connection UE ', () => {
+    const testedDialects = [DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.MSSQL];
+    testedDialects.forEach(dialectUnderTest => {
+    describe.only('-> normal connection UE ', () => {
 
         before(openApp);
 
         describe('connecting', () => {
-            const testedDialect = DIALECTS.MYSQL;
+            const testedDialect = dialectUnderTest;
 
             it('set state to "connect" when coonecting using correct inputs',
             async () => {
@@ -328,7 +329,7 @@ describe('plotly database connector', function Spec() {
 
                 // click on the evaluated dialect logo
                 this.fillInputs(testedDialect)
-                .then(await delay(500))
+                .then(await delay(1000))
                 .then(await btn.click())
                 .then(await this.waitFor(expectedClass, btn));
 
@@ -463,6 +464,7 @@ describe('plotly database connector', function Spec() {
 
         after(close);
 
+    });
     });
 
     describe('-> connection error UE ', () => {
