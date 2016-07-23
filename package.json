@@ -103,6 +103,7 @@
     "classnames": "^2.2.5",
     "css-modules-require-hook": "^4.0.0",
     "electron-debug": "^0.6.0",
+    "electron-sudo": "^3.0.13",
     "eslint-plugin-import": "^1.8.0",
     "font-awesome": "^4.6.1",
     "immutable": "^3.8.1",
