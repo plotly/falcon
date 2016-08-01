@@ -10,8 +10,6 @@ import Preview from './Preview/Preview.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import {APP_STATUS} from '../../constants/constants';
 
-import {shell} from 'electron';
-
 export default class Settings extends Component {
     constructor(props) {
         super(props);
