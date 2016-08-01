@@ -6,7 +6,6 @@ import {merge} from 'ramda';
 import {ARGS} from './args';
 import {APP_NOT_CONNECTED, AUTHENTICATION} from './errors';
 
-
 const PREBUILT_QUERY = {
     SHOW_DATABASES: 'SHOW_DATABASES',
     SHOW_TABLES: 'SHOW_TABLES',
@@ -47,7 +46,6 @@ const assembleTablesPreviewMessage = (tablePreviews) => {
     });
 
 };
-
 
 export class SequelizeManager {
 
