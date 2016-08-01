@@ -1,11 +1,11 @@
 import * as fs from 'fs';
 import {app, BrowserWindow, Menu, shell} from 'electron';
-import restify from 'restify';
-import bunyan from 'bunyan';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
+import bunyan from 'bunyan';
 import {ipcMessageReceive,
         serverMessageReceive,
         channel} from './messageHandler';
+import {setupHTTP, setupHTTPS} from './setupServers';
 
 const timestamp = () => (new Date()).toTimeString();
 
@@ -16,6 +16,48 @@ let template;
 let mainWindow = null;
 
 const clearLog = () => fs.writeFile(OPTIONS.logpath, '');
+
+const logToFile = bunyan.createLogger({
+    name: 'plotly-database-connector-logger',
+    streams: [
+        {
+            level: 'info',
+            path: OPTIONS.logpath
+        }
+    ]
+});
+
+function log(logEntry, code = 2) {
+
+    // default log detail set to 1 (warn level) in ./args.js
+    if (code <= OPTIONS.logdetail) {
+        switch (code) {
+            case 0:
+                logToFile.error(logEntry);
+                break;
+            case 1:
+                logToFile.warn(logEntry);
+                break;
+            case 2:
+                logToFile.info(logEntry);
+                break;
+            default:
+                logToFile.info(logEntry);
+        }
+
+        if (!OPTIONS.headless) {
+            mainWindow.webContents.send(channel, {
+                log: {
+                    logEntry,
+                    timestamp: timestamp()
+                }
+            });
+        }
+
+    }
+}
+
+const sequelizeManager = new SequelizeManager(log);
 
 
 if (process.env.NODE_ENV === 'development') {
@@ -33,66 +75,12 @@ app.on('ready', () => {
         height: 728
     });
 
+    setupHTTP({sequelizeManager, serverMessageReceive, mainWindow, OPTIONS});
 
-    const logToFile = bunyan.createLogger({
-        name: 'plotly-database-connector-logger',
-        streams: [
-            {
-                level: 'info',
-                path: OPTIONS.logpath
-            }
-        ]
-    });
-
-    function log(logEntry, code = 2) {
-
-        // default log detail set to 1 (warn level) in ./args.js
-        if (code <= OPTIONS.logdetail) {
-            switch (code) {
-                case 0:
-                    logToFile.error(logEntry);
-                    break;
-                case 1:
-                    logToFile.warn(logEntry);
-                    break;
-                case 2:
-                    logToFile.info(logEntry);
-                    break;
-                default:
-                    logToFile.info(logEntry);
-            }
-
-            if (!OPTIONS.headless) {
-                mainWindow.webContents.send(channel, {
-                    log: {
-                        logEntry,
-                        timestamp: timestamp()
-                    }
-                });
-            }
-
-        }
-    }
-
-    const sequelizeManager = new SequelizeManager(log);
+    setupHTTPS({sequelizeManager, serverMessageReceive, mainWindow, OPTIONS});
 
     // clear the log if the file existed already and had entries
-    clearLog();
-
-    const server = restify.createServer();
-
-    sequelizeManager.log(`Setting up server on port ${OPTIONS.port} ...`, 2);
-
-    server.use(restify.queryParser());
-    server.use(restify.CORS({
-        origins: ['*'],
-        credentials: false,
-        headers: ['Access-Control-Allow-Origin']
-    })).listen(OPTIONS.port);
-
-    sequelizeManager.log('Done.', 2);
-
-    sequelizeManager.log('Rendering the app...', 2);
+    // clearLog();
 
     mainWindow.loadURL(`file://${__dirname}/app/app.html`);
 
