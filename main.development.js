@@ -97,7 +97,6 @@ app.on('ready', () => {
     mainWindow.loadURL(`file://${__dirname}/app/app.html`);
 
     mainWindow.webContents.on('did-finish-load', () => {
-        sequelizeManager.log('Rendering the app...', 2);
 
         // show window if it's not running in headless mode
         if (!OPTIONS.headless) {
@@ -108,51 +107,6 @@ app.on('ready', () => {
 
         ipcMain.removeAllListeners(channel);
         ipcMain.on(channel, ipcMessageReceive(sequelizeManager));
-
-        sequelizeManager.log('Setting up routes...', 2);
-
-        // TODO: simplify this restify server routing code
-        server.get('/v0/connect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v0/login', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v0/query', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v0/tables', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v0/disconnect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/connect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/authenticate', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/databases', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/selectdatabase', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/tables', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/preview', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/query', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/disconnect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-
-        sequelizeManager.log('Done.', 2);
 
     });
 
