@@ -36,6 +36,7 @@ openssl req -new \
 
 # Sign the request from Device with your Root CA
 openssl x509 \
+  -sha256 \
   -req -in ./ssl/certs/tmp/csr.pem \
   -CA ./ssl/certs/ca/my-root-ca.crt.pem \
   -CAkey ./ssl/certs/ca/my-root-ca.key.pem \
