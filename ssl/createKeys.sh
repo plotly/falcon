@@ -17,19 +17,22 @@ openssl req \
   -key ./ssl/certs/ca/my-root-ca.key.pem \
   -days 1024 \
   -out ./ssl/certs/ca/my-root-ca.crt.pem \
-  -subj "/C=US/ST=Utah/L=Leivi/O=DigiCert/CN=connector.plot.ly"
+  -subj "/C=US/ST=Utah/L=Montreal/O=Plotly/CN=connector.plot.ly"
 
 # Create a Device Certificate
 # NOTE: You MUST match CN to the domain name or ip address you want to use
 openssl genrsa \
   -out ./ssl/certs/server/privkey.pem \
-  2048
+  4096
 
 # Create a request from your Device, which your Root CA will sign
+# http://security.stackexchange.com/questions/65271/can-a-csr-be-created-in-openssl-with-sha2
 openssl req -new \
   -key ./ssl/certs/server/privkey.pem \
   -out ./ssl/certs/tmp/csr.pem \
-  -subj "/C=US/ST=Utah/L=Leivi/O=DigiCert/CN=connector.plot.ly"
+  -new \
+  -sha256 \
+  -subj "/C=US/ST=Utah/L=Montreal/O=Plotly/CN=connector.plot.ly"
 
 # Sign the request from Device with your Root CA
 openssl x509 \
@@ -49,18 +52,3 @@ openssl rsa \
 rsync -a ./ssl/certs/ca/my-root-ca.crt.pem ./ssl/certs/server/chain.pem
 rsync -a ./ssl/certs/ca/my-root-ca.crt.pem ./ssl/certs/client/chain.pem
 cat ./ssl/certs/server/cert.pem ./ssl/certs/server/chain.pem > ./ssl/certs/server/fullchain.pem
-
-# # Generate a private key
-# openssl genrsa -des3 -out ./ssl/certs/server/server.key.pem 1024
-#
-# # Generate a CSR
-# openssl req -new \
-#   -key ./ssl/certs/server/server.key.pem \
-#   -out ./ssl/certs/server/server.csr.pem \
-#   -subj "/C=US/ST=Utah/L=Leivi/O=DigiCert/CN=connector.plot.ly"
-#
-# # Remove Passphrase from key
-# cp ./ssl/certs/server/server.key.pem ./ssl/certs/server/server.key.org.pem openssl rsa -in ./ssl/certs/server/server.key.org.pem -out ./ssl/certs/server/server.key.pem
-#
-# Generate self signed certificate
-# openssl x509 -req -days 365 -in ./ssl/certs/server/server.csr.pem -signkey ./ssl/certs/server/server.key.pem -out ./ssl/certs/server/server.crt.pem

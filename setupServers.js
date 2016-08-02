@@ -10,8 +10,8 @@ import sudo from 'electron-sudo';
 
 const httpsMessage = 'This application will establish an encrypted link ' +
     'between the connector application and plotly 2.0 client. In order to ' +
-    'provide that communication tunnel, a new private key for your device will' +
-    'be generated using the \'openssl\' command which requires administrator\'' +
+    'provide that communication tunnel, a new private key for your device will ' +
+    'be generated using the \'openssl\' command which requires administrator\'s ' +
     'password.';
 
 
@@ -22,7 +22,11 @@ const showSudoMessage = () => {
 };
 
 
-const setupSecureRestifyServer = ({keyFile, csrFile, sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}) => {
+const setupSecureRestifyServer = (
+    {keyFile, csrFile, sequelizeManager,
+    serverMessageReceive, mainWindow, OPTIONS}
+) => {
+
     const https_options = {
         key: fs.readFileSync(keyFile),
         certificate: fs.readFileSync(csrFile)
@@ -42,6 +46,7 @@ const setupSecureRestifyServer = ({keyFile, csrFile, sequelizeManager, serverMes
     setupRoutes(server, serverMessageReceive(
         sequelizeManager, mainWindow.webContents)
     );
+
 };
 
 export function setupHTTP(
@@ -134,5 +139,8 @@ export function setupHTTPS(
                 );
             }
         });
+
     }
+    require('electron').shell.openExternal('http://connector.plot.ly:5000/steps');
+
 }
