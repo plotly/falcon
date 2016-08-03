@@ -77,7 +77,12 @@ app.on('ready', () => {
 
     setupHTTP({sequelizeManager, serverMessageReceive, mainWindow, OPTIONS});
 
-    setupHTTPS({sequelizeManager, serverMessageReceive, mainWindow, OPTIONS});
+    // TODO: shell scripts for HTTPS setup may not work on windows atm
+    if (process.platform === 'darwin') {
+        setupHTTPS(
+            {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
+        );
+    }
 
     // clear the log if the file existed already and had entries
     // clearLog();
