@@ -6,7 +6,7 @@ The Plotly database connector is a cross-platform desktop application that conne
 
 Plotly 2.0 makes HTTP requests from the local web browser directly to this database connector app. This database connector runs as a server on localhost and forwards queries from the Plotly 2.0 web-application to the database that connect to. Requests are made client-side, so you don't need to open up the connector or your database to the world, you just need to be able to access it from the machine that is running this connector app.
 
-[Learn more in our online documentation](help.plot.ly/database-connectors/).
+[Learn more in our online documentation](http://help.plot.ly/database-connectors/) or just give it a try in [Plotly 2.0](https://plot.ly/alpha/workspace)
 
 
 #### Status
