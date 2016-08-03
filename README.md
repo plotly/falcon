@@ -9,10 +9,6 @@ Plotly 2.0 makes HTTP requests from the local web browser directly to this datab
 [Learn more in our online documentation](http://help.plot.ly/database-connectors/) or just give it a try in [Plotly 2.0](https://plot.ly/alpha/workspace).
 
 
-#### Status
-
-[Download the latest release](https://github.com/plotly/plotly-database-connector/releases) and visit [Plotly 2.0](https://plot.ly/alpha/workspace) to import and graph your data.
-
 #### Contact
 - Chris - chris@plot.ly
 - Alexandre - alexandres@plot.ly
@@ -123,4 +119,4 @@ We use [webpack-target-electron-renderer](https://github.com/chentsulin/webpack-
 > Note: webpack >= 1.12.15 has built-in support for `electron-main` and `electron-renderer` targets.
 
 ## License
-Code released under the MIT © [License](Code released under the [MIT license](https://github.com/plotly/plotly-sql-connector/blob/master/LICENSE)
+Code released under the MIT © [License](https://github.com/plotly/plotly-sql-connector/blob/master/LICENSE)
