@@ -39,6 +39,7 @@ export default {
         'sqlite3': 'sqlite3',
         'restify': 'commonjs restify',
         'sequelize': 'commonjs sequelize',
+        'bunyan': 'commonjs bunyan',
         'tedious': 'tedious'
         }
     ]
