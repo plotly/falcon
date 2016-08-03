@@ -11,7 +11,7 @@ Plotly 2.0 makes HTTP requests from the local web browser directly to this datab
 
 #### Status
 
-The database connector is in Alpha release and the Potly 2.0 web interface is currently in a private preview mode. We would love your feedback! [Download the latest release](https://github.com/plotly/plotly-database-connector/releases) and give it a try.
+[Download the latest release](https://github.com/plotly/plotly-database-connector/releases) and visit [Plotly 2.0](https://plot.ly/alpha/workspace) to import and graph your data.
 
 #### Contact
 - Chris - chris@plot.ly
@@ -19,7 +19,7 @@ The database connector is in Alpha release and the Potly 2.0 web interface is cu
 
 ## Development
 
-This app is built with Electron, React, Redux, and Sequelize.  This was
+This app is built with Electron, React, Redux, and Sequelize.
 
 Originally forked from [electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate).
 
