@@ -141,6 +141,7 @@ export function setupHTTPS(
         });
 
     }
+
     require('electron').shell.openExternal('http://connector.plot.ly:5000/steps');
 
 }
