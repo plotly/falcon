@@ -1,11 +1,12 @@
 import * as fs from 'fs';
 import {app, BrowserWindow, Menu, shell} from 'electron';
-import restify from 'restify';
-import bunyan from 'bunyan';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
+import bunyan from 'bunyan';
 import {ipcMessageReceive,
         serverMessageReceive,
         channel} from './messageHandler';
+import {setupHTTP, setupHTTPS} from './setupServers';
+import {contains} from 'ramda';
 
 const timestamp = () => (new Date()).toTimeString();
 
@@ -16,6 +17,48 @@ let template;
 let mainWindow = null;
 
 const clearLog = () => fs.writeFile(OPTIONS.logpath, '');
+
+const logToFile = bunyan.createLogger({
+    name: 'plotly-database-connector-logger',
+    streams: [
+        {
+            level: 'info',
+            path: OPTIONS.logpath
+        }
+    ]
+});
+
+function log(logEntry, code = 2) {
+
+    // default log detail set to 1 (warn level) in ./args.js
+    if (code <= OPTIONS.logdetail) {
+        switch (code) {
+            case 0:
+                logToFile.error(logEntry);
+                break;
+            case 1:
+                logToFile.warn(logEntry);
+                break;
+            case 2:
+                logToFile.info(logEntry);
+                break;
+            default:
+                logToFile.info(logEntry);
+        }
+
+        if (!OPTIONS.headless) {
+            mainWindow.webContents.send(channel, {
+                log: {
+                    logEntry,
+                    timestamp: timestamp()
+                }
+            });
+        }
+
+    }
+}
+
+const sequelizeManager = new SequelizeManager(log);
 
 
 if (process.env.NODE_ENV === 'development') {
@@ -33,71 +76,23 @@ app.on('ready', () => {
         height: 728
     });
 
+    setupHTTP({sequelizeManager, serverMessageReceive, mainWindow, OPTIONS});
 
-    const logToFile = bunyan.createLogger({
-        name: 'plotly-database-connector-logger',
-        streams: [
-            {
-                level: 'info',
-                path: OPTIONS.logpath
-            }
-        ]
-    });
-
-    function log(logEntry, code = 2) {
-
-        // default log detail set to 1 (warn level) in ./args.js
-        if (code <= OPTIONS.logdetail) {
-            switch (code) {
-                case 0:
-                    logToFile.error(logEntry);
-                    break;
-                case 1:
-                    logToFile.warn(logEntry);
-                    break;
-                case 2:
-                    logToFile.info(logEntry);
-                    break;
-                default:
-                    logToFile.info(logEntry);
-            }
-
-            if (!OPTIONS.headless) {
-                mainWindow.webContents.send(channel, {
-                    log: {
-                        logEntry,
-                        timestamp: timestamp()
-                    }
-                });
-            }
-
-        }
+    // TODO: shell scripts for HTTPS setup may not work on windows atm
+    if (process.platform === 'darwin' && !contains(
+        '--test-type=webdriver', process.argv.slice(2))
+    ) {
+        setupHTTPS(
+            {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
+        );
     }
 
-    const sequelizeManager = new SequelizeManager(log);
-
     // clear the log if the file existed already and had entries
-    clearLog();
-
-    const server = restify.createServer();
-
-    sequelizeManager.log(`Setting up server on port ${OPTIONS.port} ...`, 2);
-
-    server.use(restify.queryParser());
-    server.use(restify.CORS({
-        origins: ['*'],
-        credentials: false,
-        headers: ['Access-Control-Allow-Origin']
-    })).listen(OPTIONS.port);
-
-    sequelizeManager.log('Done.', 2);
-
-    sequelizeManager.log('Rendering the app...', 2);
+    // clearLog();
 
     mainWindow.loadURL(`file://${__dirname}/app/app.html`);
 
     mainWindow.webContents.on('did-finish-load', () => {
-        sequelizeManager.log('Rendering the app...', 2);
 
         // show window if it's not running in headless mode
         if (!OPTIONS.headless) {
@@ -108,51 +103,6 @@ app.on('ready', () => {
 
         ipcMain.removeAllListeners(channel);
         ipcMain.on(channel, ipcMessageReceive(sequelizeManager));
-
-        sequelizeManager.log('Setting up routes...', 2);
-
-        // TODO: simplify this restify server routing code
-        server.get('/v0/connect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v0/login', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v0/query', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v0/tables', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v0/disconnect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/connect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/authenticate', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/databases', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/selectdatabase', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/tables', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/preview', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/query', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/disconnect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-
-        sequelizeManager.log('Done.', 2);
 
     });
 

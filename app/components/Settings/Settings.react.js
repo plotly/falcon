@@ -116,8 +116,11 @@ export default class Settings extends Component {
                 <div className={styles.step3Container}>
                     <h5>3. Query from Plotly 2.0</h5>
                     <div>
-                        Query data by clicking on 'import data' on
-                        plot.ly/alpha/workspace and choose the SQL option.<br/>
+                        Query data by clicking on 'import data' from
+                        {" "}
+                        <a href="javascript:require('electron').shell.openExternal('https://plot.ly/alpha/workspace');">plotly workspace</a>
+                        {" "}
+                        and choose the SQL option.<br/>
                         Remember to keep this app running
                         while you are making queries!
                     </div>
@@ -146,7 +149,13 @@ export default class Settings extends Component {
                     <h4>
                         Plotly 2.0 Database Connector
                     </h4>
-
+                    <div>
+                        Learn more
+                        {" "}
+                        <a href="javascript:require('electron').shell.openExternal('https://github.com/plotly/plotly-database-connector/issues/51');">here</a>
+                        {" "}
+                        about setting up a connection using https.
+                    </div>
                     {step1}
                     {step2}
                     {step3}
