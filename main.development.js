@@ -15,7 +15,7 @@ let menu;
 let template;
 let mainWindow = null;
 
-const clearLog = () => fs.writeFile(OPTIONS.logpath, '');
+// const clearLog = () => fs.writeFile(OPTIONS.logpath, '');
 
 
 if (process.env.NODE_ENV === 'development') {
@@ -33,34 +33,34 @@ app.on('ready', () => {
         height: 728
     });
 
-
-    const logToFile = bunyan.createLogger({
-        name: 'plotly-database-connector-logger',
-        streams: [
-            {
-                level: 'info',
-                path: OPTIONS.logpath
-            }
-        ]
-    });
+    // TODO: solve issue #58 before uncommenting this code
+    // const logToFile = bunyan.createLogger({
+    //     name: 'plotly-database-connector-logger',
+    //     streams: [
+    //         {
+    //             level: 'info',
+    //             path: OPTIONS.logpath
+    //         }
+    //     ]
+    // });
 
     function log(logEntry, code = 2) {
 
         // default log detail set to 1 (warn level) in ./args.js
         if (code <= OPTIONS.logdetail) {
-            switch (code) {
-                case 0:
-                    logToFile.error(logEntry);
-                    break;
-                case 1:
-                    logToFile.warn(logEntry);
-                    break;
-                case 2:
-                    logToFile.info(logEntry);
-                    break;
-                default:
-                    logToFile.info(logEntry);
-            }
+            // switch (code) {
+            //     case 0:
+            //         logToFile.error(logEntry);
+            //         break;
+            //     case 1:
+            //         logToFile.warn(logEntry);
+            //         break;
+            //     case 2:
+            //         logToFile.info(logEntry);
+            //         break;
+            //     default:
+            //         logToFile.info(logEntry);
+            // }
 
             if (!OPTIONS.headless) {
                 mainWindow.webContents.send(channel, {
@@ -77,7 +77,7 @@ app.on('ready', () => {
     const sequelizeManager = new SequelizeManager(log);
 
     // clear the log if the file existed already and had entries
-    clearLog();
+    // clearLog();
 
     const server = restify.createServer();
 
