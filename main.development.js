@@ -6,6 +6,7 @@ import {ipcMessageReceive,
         serverMessageReceive,
         channel} from './messageHandler';
 import {setupHTTP, setupHTTPS} from './setupServers';
+import {contains} from 'ramda';
 
 const timestamp = () => (new Date()).toTimeString();
 
@@ -78,7 +79,9 @@ app.on('ready', () => {
     setupHTTP({sequelizeManager, serverMessageReceive, mainWindow, OPTIONS});
 
     // TODO: shell scripts for HTTPS setup may not work on windows atm
-    if (process.platform === 'darwin') {
+    if (process.platform === 'darwin' && !contains(
+        '--test-type=webdriver', process.argv.slice(2))
+    ) {
         setupHTTPS(
             {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
         );
