@@ -79,8 +79,9 @@ app.on('ready', () => {
     setupHTTP({sequelizeManager, serverMessageReceive, mainWindow, OPTIONS});
 
     // TODO: shell scripts for HTTPS setup may not work on windows atm
-    if (process.platform === 'darwin' && !contains(
-        '--test-type=webdriver', process.argv.slice(2))
+    if (
+        process.platform === 'darwin' &&
+        !contains('--test-type=webdriver', process.argv.slice(2))
     ) {
         setupHTTPS(
             {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
