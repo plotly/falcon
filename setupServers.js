@@ -10,9 +10,9 @@ import sudo from 'electron-sudo';
 
 const httpsMessage = 'This application will establish an encrypted link ' +
     'between the connector application and plotly 2.0 client. In order to ' +
-    'provide that communication tunnel, a new private key for your device will ' +
-    'be generated using the \'openssl\' command which requires administrator\'s ' +
-    'password.';
+    'provide that communication tunnel, a new private key for your device ' +
+    'will be generated using the \'openssl\' command which requires ' +
+    'administrator\'s password.';
 
 
 const showSudoMessage = () => {
@@ -70,7 +70,6 @@ export function setupHTTPS(
     {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
     ) {
 
-    console.log('setupHTTPSServer');
     const keyFile = './ssl/certs/server/privkey.pem';
     const csrFile = './ssl/certs/server/fullchain.pem';
 
@@ -96,13 +95,13 @@ export function setupHTTPS(
     try {
         fs.readFile(hosts, function (err, data) {
             if (data.indexOf(connectorURL) < 0) {
-                console.log(`${connectorURL} is not wired to a local port.`);
                 showSudoMessage();
-                sudo.exec('sh ./ssl/redirectConnector.sh', options, function(error) {
+                sudo.exec('sh ./ssl/redirectConnector.sh',
+                    options, function(error) {
                     if (error) {
                         console.log(error);
                     } else {
-                        console.log(`${connectorURL} is now wired to a local port.`);
+                        console.log(`${connectorURL} is now wired to local.`);
                     }
                 });
             } else {
@@ -139,9 +138,7 @@ export function setupHTTPS(
                 );
             }
         });
-
+        require('electron').shell
+            .openExternal('http://connector.plot.ly:5000/steps');
     }
-
-    require('electron').shell.openExternal('http://connector.plot.ly:5000/steps');
-
 }

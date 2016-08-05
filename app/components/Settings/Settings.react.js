@@ -101,7 +101,6 @@ export default class Settings extends Component {
 
         let step2 = null;
         let step3 = null;
-
         if (connection.get('status') === APP_STATUS.CONNECTED ||
             connection.get('status') === APP_STATUS.ERROR) {
             step2 = (
@@ -113,18 +112,25 @@ export default class Settings extends Component {
             );
 
             step3 = (
+                /*eslint-disable */
                 <div className={styles.step3Container}>
                     <h5>3. Query from Plotly 2.0</h5>
                     <div>
                         Query data by clicking on 'import data' from
                         {" "}
-                        <a href="javascript:require('electron').shell.openExternal('https://plot.ly/alpha/workspace');">plotly workspace</a>
+
+                        <a href="javascript:require('electron').shell.openExternal('https://plot.ly/alpha/workspace');">
+                        plotly workspace</a>
+
+
                         {" "}
                         and choose the SQL option.<br/>
                         Remember to keep this app running
                         while you are making queries!
                     </div>
                 </div>
+                /*eslint-disable */
+
             );
         }
 
@@ -136,7 +142,7 @@ export default class Settings extends Component {
                 </div>
             </div>
         );
-
+        /*eslint-disable */
         return (
             <div className={styles.containerWrapper}>
 
@@ -165,6 +171,7 @@ export default class Settings extends Component {
 
             </div>
         );
+        /*eslint-disable */
     }
 }
 

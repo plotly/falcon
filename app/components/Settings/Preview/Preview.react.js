@@ -1,5 +1,4 @@
 import React, {Component, PropTypes} from 'react';
-import {keys} from 'ramda';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './Preview.css';
 

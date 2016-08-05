@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import {app, BrowserWindow, Menu, shell} from 'electron';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import bunyan from 'bunyan';

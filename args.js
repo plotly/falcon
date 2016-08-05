@@ -103,7 +103,9 @@ function mergeArgs (args) {
         }
     } catch (error) {
         // keep this console log for the user running it from the CL
+        /* eslint-disable */
         console.error(error);
+        /* eslint-disable */
         process.exit(-1);
     }
     return merge(defaultOptions(), userOptions);

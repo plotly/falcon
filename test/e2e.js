@@ -153,10 +153,17 @@ describe('plotly database connector', function Spec() {
 
         this.waitFor = async (expectedClass, element) => {
             let currentClass = await this.getClassOf(element);
+            /*eslint-disable */
+            // want this console log to debug quickly tests
             console.log(currentClass);
+            /*eslint-disable */
+
             while (!currentClass.includes(expectedClass)) {
                 currentClass = await this.getClassOf(element);
+                /*eslint-disable */
+                // want this console log to debug quickly tests
                 console.log(currentClass);
+                /*eslint-disable */
                 await delay(500);
             }
         };
@@ -178,7 +185,10 @@ describe('plotly database connector', function Spec() {
             const conerror = `test-${APP_STATUS.CON_ERROR}`;
             const btn = await this.getConnectBtn();
             const testClass = await this.getClassOf(btn);
+            /*eslint-disable */
+            // want this console log to debug quickly tests
             console.log(testClass);
+            /*eslint-disable */
             return !(testClass.includes(disconnected) ||
                     testClass.includes(conerror));
         };
