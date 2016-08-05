@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Basic Page Needs
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title>Steps for Plotly Secure Connector</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Mobile Specific Metas
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FONT
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <!-- CSS
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="ssl/css/normalize.css">
+    <link rel="stylesheet" href="ssl/css/skeleton.css">
+
+    <!-- Favicon
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
+
+</head>
+<body>
+
+    <!-- Primary Page Layout
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <div class="container">
+        <div class="row">
+            <div class="one-half column" style="margin-top: 10%">
+                <h4>Steps on how to configure your https connection.</h4>
+                <body>
+
+                    <p>
+                        Visit the following
+                        <a href="http://blog.getpostman.com/2014/01/28/using-self-signed-certificates-with-postman/">article</a>
+                        for more information and specific steps for other operating systems than OSx.
+                    </p>
+
+                    <div>
+                        <h5>Step 0</h5>
+                        <p style={margin-bottom="100px";}>
+                            This should be the first time you setup up the application.
+                            A pop-message appeared, to let you know that your administrator's rights are
+                            required to create a self-signed certificate.
+                            You were prompted your administrator password which was used to generate
+                            a personal certificate to use to transfer data securely.
+                            Herein, we will ask the web browser to accept this certificate.
+                        </p>
+                            <img src="ssl/images/message.png" alt="some_text">
+                        </div>
+                        <div>
+                        <h5>Step 1</h5>
+                        <p>In a new tab, open the following
+                            <a href="https://connector.plot.ly:5001/secure">page</a>
+                            it should display a privacy error. The certificate generated is not yet
+                            accepted by the browser.</p>
+                            <img src="ssl/images/error.png" height="500">
+                        </div>
+                        <div>
+                            <h5>Step 2</h5>
+                            <p>Click on the icon next to the URL.</p>
+                            <img src="ssl/images/icon.png">
+                        </div>
+                        <div>
+                            <h5>Step 3</h5>
+                            <p>Click on the Details link</p>
+                            <img src="ssl/images/details.png">
+                        </div>
+                        <div>
+                            <h5>Step 4</h5>
+                            <p>Click on View Certificate. A small window with the certificate icon will apear.</p>
+                            <img src="ssl/images/view-certificate.png">
+                        </div>
+                        <div>
+                            <h5>Step 5</h5>
+                            <p>Drag the certificate icon onto your desktop.</p>
+                            <img src="ssl/images/drag-certificate.png">
+                        </div>
+                        <div>
+                            <h5>Step 6</h5>
+                            <p>Double-click on the certificate. This will add it to you keychain as well as launch the keychain tool.</p>
+                            <img src="ssl/images/keychain.png">
+                        </div>
+                        <div>
+                            <h5>Step 7</h5>
+                            <p>
+                            In the keychain tool, double-click on the connector.plot.ly certificate to open
+                            the settings for that certificate. Click on the Trust dropdown and select the
+                            'Always trust' in the 'When Using This Certificate' dropdown.
+                            </p>
+                            <img src="ssl/images/trust-certificate.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <!-- End Document
+        –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    </body>
+</html>
