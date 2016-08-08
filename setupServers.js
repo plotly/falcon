@@ -15,10 +15,10 @@ const httpsMessage = 'This application will establish an encrypted link ' +
 let messageShown = false;
 const showSudoMessage = () => {
     if (!messageShown) {
+        messageShown = true;
         dialog.showMessageBox(
             {type: 'info', buttons: ['OK'], message: httpsMessage}
         );
-        messageShown = true;
     }
 };
 
