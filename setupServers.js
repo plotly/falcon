@@ -3,7 +3,7 @@ import restify from 'restify';
 import {setupRoutes} from './routes';
 const {dialog} = require('electron');
 import sudo from 'electron-sudo';
-
+import {replace} from 'ramda';
 
 const httpsMessage = 'This application will establish an encrypted link ' +
     'between the connector application and plotly 2.0 client. In order to ' +
@@ -130,10 +130,11 @@ export function setupHTTPS(
         console.log('Did not find certs, generating...');
         // if error returned, certs do not exist -- let's create them
         showSudoMessage();
-        sudo.exec(`sh  ${__dirname}/ssl/createKeys.sh`, options, function(error) {
+        const path = replace(/\ /g, '\\ ', `${__dirname}/ssl/createKeys.sh`);
+        sudo.exec(`sh  "${path}"`, options, function(error) {
             if (error) {
                 dialog.showMessageBox(
-                    {type: 'info', buttons: ['OK'], message: 'error'}
+                    {type: 'info', buttons: ['OK'], message: error.toString()}
                 );
                 sequelizeManager.log('Opening main window.', 2);
                 console.log(error);
