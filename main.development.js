@@ -2,7 +2,6 @@ import {app, BrowserWindow, Menu, shell} from 'electron';
 import * as fs from 'fs';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import bunyan from 'bunyan';
-const {dialog} = require('electron');
 
 import {ipcMessageReceive,
         serverMessageReceive,
@@ -91,23 +90,23 @@ app.on('ready', () => {
     }
 
     // clear the log if the file existed already and had entries
-    // clearLog();
+    clearLog();
 
-    // mainWindow.loadURL(`file://${__dirname}/app/app.html`);
-    //
-    // mainWindow.webContents.on('did-finish-load', () => {
-    //
-    //     // show window if it's not running in headless mode
-    //     if (!OPTIONS.headless) {
-    //         sequelizeManager.log('Opening main window.', 2);
-    //         mainWindow.show();
-    //         mainWindow.focus();
-    //     }
-    //
-    //     ipcMain.removeAllListeners(channel);
-    //     ipcMain.on(channel, ipcMessageReceive(sequelizeManager));
-    //
-    // });
+    mainWindow.loadURL(`file://${__dirname}/app/app.html`);
+
+    mainWindow.webContents.on('did-finish-load', () => {
+
+        // show window if it's not running in headless mode
+        if (!OPTIONS.headless) {
+            sequelizeManager.log('Opening main window.', 2);
+            mainWindow.show();
+            mainWindow.focus();
+        }
+
+        ipcMain.removeAllListeners(channel);
+        ipcMain.on(channel, ipcMessageReceive(sequelizeManager));
+
+    });
 
     mainWindow.on('closed', () => {
         mainWindow = null;

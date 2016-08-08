@@ -22,7 +22,6 @@ const showSudoMessage = () => {
     }
 };
 
-
 const setupSecureRestifyServer = (
     {keyFile, csrFile, sequelizeManager,
     serverMessageReceive, mainWindow, OPTIONS}
@@ -91,29 +90,31 @@ export function setupHTTPS(
         }
     };
 
-    // // redirect connectorURL to localhost
-    // try {
-    //     fs.readFile(hosts, function (err, data) {
-    //         if (data.indexOf(connectorURL) < 0) {
-    //             showSudoMessage();
-    //             sudo.exec('sh  ./ssl/redirectConnector.sh',
-    //                 options, function(error) {
-    //                 if (error) {
-    //                     dialog.showMessageBox(
-    //                         {type: 'info', buttons: ['OK'], message: 'error'}
-    //                     );
-    //                     console.log(error);
-    //                 } else {
-    //                     console.log(`${connectorURL} is now wired to local.`);
-    //                 }
-    //             });
-    //         } else {
-    //             console.log(`${connectorURL} is already wired to a local port.`);
-    //         }
-    //     });
-    // } catch (error) {
-    //     console.log(error);
-    // }
+    const scriptsDirectory = replace(/\ /g, '\\ ', `${__dirname}`);
+
+    // redirect connectorURL to localhost
+    try {
+        fs.readFile(hosts, function (err, data) {
+            if (data.indexOf(connectorURL) < 0) {
+                showSudoMessage();
+                sudo.exec(`sh  "${scriptsDirectory}"/ssl/redirectConnector.sh`,
+                    options, function(error) {
+                    if (error) {
+                        dialog.showMessageBox(
+                            {type: 'info', buttons: ['OK'], message: 'error'}
+                        );
+                        console.log(error);
+                    } else {
+                        console.log(`${connectorURL} is now wired to local.`);
+                    }
+                });
+            } else {
+                console.log(`${connectorURL} is already wired to a local port.`);
+            }
+        });
+    } catch (error) {
+        console.log(error);
+    }
 
     // setup HTTPS server with self signed certs
     try {
@@ -130,8 +131,7 @@ export function setupHTTPS(
         console.log('Did not find certs, generating...');
         // if error returned, certs do not exist -- let's create them
         showSudoMessage();
-        const path = replace(/\ /g, '\\ ', `${__dirname}/ssl/createKeys.sh`);
-        sudo.exec(`sh  "${path}"`, options, function(error) {
+        sudo.exec(`sh  "${scriptsDirectory}"/ssl/createKeys.sh`, options, function(error) {
             if (error) {
                 dialog.showMessageBox(
                     {type: 'info', buttons: ['OK'], message: error.toString()}
