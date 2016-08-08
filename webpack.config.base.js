@@ -40,7 +40,8 @@ export default {
         'restify': 'commonjs restify',
         'sequelize': 'commonjs sequelize',
         'bunyan': 'commonjs bunyan',
-        'tedious': 'tedious'
+        'tedious': 'tedious',
+        'electron-sudo': 'commonjs electron-sudo'
         }
     ]
 };

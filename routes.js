@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import restify from 'restify';
 
 function serveAcceptCerSteps(req, res) {
-  fs.readFile('./ssl/index.html', 'utf8', function(err, file) {
+  fs.readFile(`${__dirname}/ssl/index.html`, 'utf8', function(err, file) {
     if (err) {
       res.send(500);
     }
@@ -12,7 +12,7 @@ function serveAcceptCerSteps(req, res) {
 }
 
 function serveFinished(req, res) {
-  fs.readFile('./ssl/finished.html', 'utf8', function(err, file) {
+  fs.readFile(`${__dirname}/ssl/finished.html`, 'utf8', function(err, file) {
     if (err) {
       res.send(500);
     }

@@ -14,7 +14,7 @@ const optionsBook = {
         acceptedValues: range(1, 10000)
     },
     logpath: {
-        defaultValue: './activity.log',
+        defaultValue: `${__dirname}/activity.log`,
         acceptedValues: 'path to logpath w/o quotes (ex: path/to/file.log)'
     },
     configpath: {

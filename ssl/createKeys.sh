@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "this is the script"
 FQDN=$1
 
 # make directories to work from

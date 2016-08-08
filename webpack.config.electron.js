@@ -36,6 +36,7 @@ export default {
     target: 'electron-main',
 
     node: {
+        // https://github.com/automation-stack/electron-sudo#usage-with-webpack
         __dirname: false,
         __filename: false
     },
