@@ -169,7 +169,7 @@ describe('plotly database connector', function Spec() {
 
             // click on the evaluated dialect logo
             this.fillInputs(dialect)
-            .then(await delay(500))
+            .then(await delay(1500))
             .then(await btn.click())
             .then(await this.waitFor(`test-${APP_STATUS.CONNECTED}`, btn));
         };
@@ -179,7 +179,7 @@ describe('plotly database connector', function Spec() {
             const conerror = `test-${APP_STATUS.CON_ERROR}`;
             const btn = await this.getConnectBtn();
             const testClass = await this.getClassOf(btn);
-            console.log(split('test-', currentClass)[1]);
+            console.log(split('test-', testClass)[1]);
             return !(testClass.includes(disconnected) ||
                     testClass.includes(conerror));
         };
@@ -313,21 +313,24 @@ describe('plotly database connector', function Spec() {
     });
 
 /*
-    Loop through all dialects starting here
+    Loop through all dialects starting here, except for SQLITE, which
+    requires a very different `connecting` flow. Tests, done manually for now.
+    TODO: automate tests for SQLITE
 */
 
     const testedDialects = [
-        DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.MSSQL, DIALECTS.POSTGRES
+        DIALECTS.POSTGRES, DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.MSSQL
     ];
 
     testedDialects.forEach(dialectUnderTest => {
     describe(`----- ${dialectUnderTest} is being tested now -----`, () => {
-    describe('-> normal connection UE ', () => {
+    describe('-> normal connection User Exp ', () => {
 
         before(openApp);
 
+        const testedDialect = dialectUnderTest;
+
         describe('connecting', () => {
-            const testedDialect = dialectUnderTest;
 
             it('set state to "connect" when coonecting using correct inputs',
             async () => {
@@ -337,11 +340,7 @@ describe('plotly database connector', function Spec() {
                 await logo.click();
 
                 // click on the evaluated dialect logo
-                this.fillInputs(testedDialect)
-                .then(await delay(1000))
-                .then(await btn.click())
-                .then(await this.waitFor(expectedClass, btn));
-
+                await this.connectDialect(testedDialect);
                 expect(await this.getClassOf(btn)).to.contain(expectedClass);
             });
 
@@ -375,15 +374,6 @@ describe('plotly database connector', function Spec() {
                 expect(error.toString()).to.contain('NoSuchElementError');
             });
 
-            it('should show a log with a new logged item',
-            async () => {
-                const expectedClass = 'test-4-entries';
-                const logs = await this.getLogs();
-
-                const testClass = await this.getClassOf(logs);
-                expect(testClass).to.contain(expectedClass);
-
-            });
         });
 
         describe('selecting a database and table', () => {
@@ -393,7 +383,7 @@ describe('plotly database connector', function Spec() {
                 expect(dropDowns.length).to.equal(2);
                 const expectedClass = 'test-connected';
                 await this.reactSelectInputValue(dropDowns[0], 'plotly_datasets');
-                await delay(2000);
+                await delay(4000);
                 await this.reactSelectInputValue(dropDowns[1], 'ebola_2014');
                 await delay(4000);
                 const tables = await this.getTables();
@@ -406,15 +396,6 @@ describe('plotly database connector', function Spec() {
                 const errorMessage = await this.getErrorMessage();
 
                 expect(await errorMessage.getText()).to.equal('');
-            });
-
-            it('should show a log with a new logged item',
-            async () => {
-                const expectedClass = 'test-11-entries';
-                const logs = await this.getLogs();
-
-                const testClass = await this.getClassOf(logs);
-                expect(testClass).to.contain(expectedClass);
             });
         });
 
@@ -459,42 +440,30 @@ describe('plotly database connector', function Spec() {
                 expect(error.toString()).to.contain('NoSuchElementError');
             });
 
-            it('should show a log with a new logged item',
-            async () => {
-                const expectedClass = 'test-13-entries';
-                const logs = await this.getLogs();
-
-                const testClass = await this.getClassOf(logs);
-                expect(testClass).to.contain(expectedClass);
-
-            });
-
         });
 
         after(close);
 
     });
 
-    describe('-> connection error UE ', () => {
+    describe('-> connection error User Exp ', () => {
 
         before(openApp);
 
         const testedDialect = dialectUnderTest;
 
-        before(async () => {
-            // connect with wrong credentials
+        it('set state to "con_error" when connecting using wrong credentials',
+        async () => {
+            const logo = await this.getLogo(testedDialect);
             const btn = await this.getConnectBtn();
-
+            await logo.click();
+            // connect with wrong credentials
             this.wrongInputs(testedDialect)
             .then(await delay(1000))
             // click to connect
             .then(await btn.click());
-        });
 
-        it('set state to "con_error" when connecting using wrong credentials',
-        async () => {
             const expectedClass = `test-${APP_STATUS.CON_ERROR}`;
-            const btn = await this.getConnectBtn();
 
             await this.waitFor(expectedClass, btn);
 
@@ -505,7 +474,7 @@ describe('plotly database connector', function Spec() {
         it('should have a connection error displayed',
         async() => {
             const errorMessage = await this.getErrorMessage();
-            expect(await errorMessage.getText()).to.contain('connect');
+            expect(await errorMessage.getText()).to.contain('error');
         });
 
         it('should not show the database selector after connection',
@@ -535,23 +504,15 @@ describe('plotly database connector', function Spec() {
             expect(error.toString()).to.contain('NoSuchElementError');
         });
 
-        it('should show a log with a new logged item',
-        async () => {
-            const expectedClass = 'test-5-entries';
-            const logs = await this.getLogs();
-
-            const testClass = await this.getClassOf(logs);
-            expect(testClass).to.contain(expectedClass);
-        });
-
         after(close);
 
     });
 
     describe('-> the API ', () => {
-        const testedDialect = dialectUnderTest;
 
         before(openApp);
+
+        const testedDialect = dialectUnderTest;
 
         describe('/v0/connect', () => {
             it('if app is "initialized", returns an error and no databases',
@@ -761,7 +722,8 @@ describe('plotly database connector', function Spec() {
         });
 
         describe('/v1/databases', () => {
-            it('if app is "initialized", returns no error and a list of databases',
+            it('if app is "connected",' +
+                ' returns no error and a list of databases',
             async() => {
                 const expectedClass = `test-${APP_STATUS.CONNECTED}`;
                 const btn = await this.getConnectBtn();
