@@ -926,6 +926,64 @@ describe('plotly database connector', function Spec() {
             });
         });
 
+        describe('/v1/disconnect', () => {
+            it('returns no error, a null list of databases, previews and tables',
+            async () => {
+                await fetch(`http://${BASE_URL}/v1/disconnect`)
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.equal(null);
+                    expect(json).to.have.property('databases');
+                    expect(json.databases).to.equal(null);
+                    expect(json).to.have.property('tables');
+                    expect(json.tables).to.equal(null);
+                    expect(json).to.have.property('previews');
+                    expect(json.tables).to.equal(null);
+                });
+            });
+
+            it('set the state to "disconnected"',
+            async () => {
+                const expectedClass = `test-${APP_STATUS.DISCONNECTED}`;
+                const btn = await this.getConnectBtn();
+
+                await this.waitFor(expectedClass, btn);
+
+                expect(await this.getClassOf(btn)).to.contain(expectedClass);
+            });
+
+            it('should not show an error message',
+            async() => {
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.equal('');
+            });
+
+            it('should not show the database selector after disconnection',
+            async () => {
+                let error;
+                try {
+                    error = await this.getDatabaseDropdown();
+                }
+                catch (err) {
+                    error = err;
+                }
+                expect(error.toString()).to.contain('NoSuchElementError');
+            });
+
+            it('should not show a table preview',
+            async () => {
+                let error;
+                try {
+                    error = await this.getTables();
+                }
+                catch (err) {
+                    error = err;
+                }
+                expect(error.toString()).to.contain('NoSuchElementError');
+            });
+        });
+
         after(close);
 
         });
