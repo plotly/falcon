@@ -813,6 +813,30 @@ describe('plotly database connector', function Spec() {
                 expect(await errorMessage.getText()).to.equal('');
             });
         });
+
+        describe('/v1/tables', () => {
+            it('if app is "connected",' +
+                ' returns no error and a list of tables',
+            async() => {
+                const expectedClass = `test-${APP_STATUS.CONNECTED}`;
+                const btn = await this.getConnectBtn();
+                const testClass = await this.getClassOf(btn);
+                expect(testClass).to.contain(expectedClass);
+
+                await fetch(`http://${BASE_URL}/v1/databases`)
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.equal(null);
+                    expect(json).to.have.property('tables');
+                    expect(json.databases).to.not.equal(null);
+                });
+                // check app has no error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.equal('');
+            });
+        });
+
         after(close);
 
         });
