@@ -4,6 +4,7 @@ import webdriver from 'selenium-webdriver';
 import {expect} from 'chai';
 import electronPath from 'electron-prebuilt';
 import fetch from 'node-fetch';
+import {split} from 'ramda';
 import {productName, version} from '../package.json';
 
 import {APP_STATUS,
@@ -153,10 +154,10 @@ describe('plotly database connector', function Spec() {
 
         this.waitFor = async (expectedClass, element) => {
             let currentClass = await this.getClassOf(element);
-            console.log(currentClass);
+            console.log(split('test-', currentClass)[1]);
             while (!currentClass.includes(expectedClass)) {
                 currentClass = await this.getClassOf(element);
-                console.log(currentClass);
+                console.log(split('test-', currentClass)[1]);
                 await delay(500);
             }
         };
@@ -178,7 +179,7 @@ describe('plotly database connector', function Spec() {
             const conerror = `test-${APP_STATUS.CON_ERROR}`;
             const btn = await this.getConnectBtn();
             const testClass = await this.getClassOf(btn);
-            console.log(testClass);
+            console.log(split('test-', currentClass)[1]);
             return !(testClass.includes(disconnected) ||
                     testClass.includes(conerror));
         };
