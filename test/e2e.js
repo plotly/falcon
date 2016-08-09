@@ -311,9 +311,17 @@ describe('plotly database connector', function Spec() {
 
     });
 
-    const testedDialects = [DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.MSSQL];
+/*
+    Loop through all dialects starting here
+*/
+
+    const testedDialects = [
+        DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.MSSQL, DIALECTS.POSTGRES
+    ];
+
     testedDialects.forEach(dialectUnderTest => {
-    describe.only('-> normal connection UE ', () => {
+    describe(`----- ${dialectUnderTest} is being tested now -----`, () => {
+        describe('-> normal connection UE ', () => {
 
         before(openApp);
 
@@ -464,7 +472,6 @@ describe('plotly database connector', function Spec() {
 
         after(close);
 
-    });
     });
 
     describe('-> connection error UE ', () => {
@@ -716,5 +723,7 @@ describe('plotly database connector', function Spec() {
 
         after(close);
 
+        });
+    });
     });
 });
