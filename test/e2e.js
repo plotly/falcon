@@ -759,6 +759,28 @@ describe('plotly database connector', function Spec() {
             });
         });
 
+        describe('/v1/databases', () => {
+            it('if app is "initialized", returns no error and a list of databases',
+            async() => {
+                const expectedClass = `test-${APP_STATUS.CONNECTED}`;
+                const btn = await this.getConnectBtn();
+                const testClass = await this.getClassOf(btn);
+                expect(testClass).to.contain(expectedClass);
+
+                await fetch(`http://${BASE_URL}/v1/databases`)
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.equal(null);
+                    expect(json).to.have.property('databases');
+                    expect(json.databases).to.not.equal(null);
+
+                });
+                // check app has error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.equal('');
+            });
+        });
         after(close);
 
         });
