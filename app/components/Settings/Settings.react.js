@@ -115,7 +115,7 @@ export default class Settings extends Component {
                 /*eslint-disable */
                 <div className={styles.step3Container}>
                     <h5>3. Query from Plotly 2.0</h5>
-                    <div>
+                    <div className={styles.futureDirections}>
                         Query data by clicking on 'import data' from
                         {" "}
 
@@ -155,7 +155,7 @@ export default class Settings extends Component {
                     <h4>
                         Plotly 2.0 Database Connector
                     </h4>
-                    <div>
+                    <div className={styles.info}>
                         Learn more
                         {" "}
                         <a href="javascript:require('electron').shell.openExternal('https://github.com/plotly/plotly-database-connector/issues/51');">here</a>

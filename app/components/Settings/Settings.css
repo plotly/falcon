@@ -22,6 +22,10 @@
 	padding-bottom: 30px;
 }
 
+.info {
+	padding: 25px;
+}
+
 .userCredentials {
 	width: 300px;
 	margin-left: 50px;
@@ -37,6 +41,7 @@
 .connectButton {
 	clear: left;
 	padding-top: 30px;
+	padding-left: 25px;
 }
 
 .step2Container {
@@ -48,6 +53,10 @@
 	padding-top: 20px;
 }
 
+.futureDirections {
+	padding-left: 25px;
+}
+
 .previewController {
 	max-height: 500px;
 	max-width: 100%;
@@ -55,6 +64,8 @@
     border: 1px solid #BEC8D9;
 	border-radius: 3px;
 	padding: 10px;
+	margin-left: 25px;
+	margin-right: 25px;
 }
 
 .logContainer {
