@@ -837,6 +837,40 @@ describe('plotly database connector', function Spec() {
             });
         });
 
+
+        describe('/v1/preview', () => {
+            it('if app is "connected", and wrong table entered, returns error',
+            async() => {
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/preview?non-param=non-existant')
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.have.property('message');
+                    expect(json.error).to.not.equal(null);
+                    expect(json.error.message).to.not.equal(null);
+                });
+                // check app has error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.not.equal('');
+            });
+
+            it('if correct table is entered, returns no error',
+            async() => {
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/preview?tables=ebola_2014')
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.equal(null);
+                    expect(json).to.have.property('previews');
+                    expect(json.previews).to.not.equal(null);
+                });
+                // check app has error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.equal('');
+            });
+        });
         after(close);
 
         });
