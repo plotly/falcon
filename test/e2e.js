@@ -775,7 +775,38 @@ describe('plotly database connector', function Spec() {
                     expect(json.error).to.equal(null);
                     expect(json).to.have.property('databases');
                     expect(json.databases).to.not.equal(null);
+                });
+                // check app has no error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.equal('');
+            });
+        });
 
+        describe('/v1/selectdatabase', () => {
+            it('if app is "connected", and wrong database entered, returns error',
+            async() => {
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/selectdatabase?database=non-existant')
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.have.property('message');
+                    expect(json.error).to.not.equal(null);
+                    expect(json.error.message).to.not.equal(null);
+                });
+                // check app has error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.not.equal('');
+            });
+
+            it('if correct database is entered, returns no error',
+            async() => {
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/selectdatabase?database=plotly_datasets')
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.equal(null);
                 });
                 // check app has error message
                 const errorMessage = await this.getErrorMessage();
