@@ -721,6 +721,44 @@ describe('plotly database connector', function Spec() {
             });
         });
 
+        describe('/v1/authenticate', () => {
+            it('if app is "initialized", returns an error and no databases',
+            async() => {
+                const expectedClass = `test-${APP_STATUS.DISCONNECTED}`;
+                const btn = await this.getConnectBtn();
+                const testClass = await this.getClassOf(btn);
+                expect(testClass).to.contain(expectedClass);
+
+                await fetch(`http://${BASE_URL}/v1/authenticate`)
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.not.equal(null);
+                });
+                // check app has error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.not.equal('');
+            });
+
+            it('if app is "connected", returns a null error',
+            async() => {
+                // connect the app
+                await this.connectDialect(testedDialect);
+                expect(await this.checkConnection()).to.equal(true);
+
+                await fetch(`http://${BASE_URL}/v1/authenticate`)
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.equal(null);
+                });
+                // check app is still connected and no error appeared
+                expect(await this.checkConnection()).to.equal(true);
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.equal('');
+            });
+        });
+
         after(close);
 
         });
