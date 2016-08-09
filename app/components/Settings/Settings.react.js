@@ -9,6 +9,7 @@ import LoggerController from './Logger/LoggerController.react';
 import Preview from './Preview/Preview.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import {APP_STATUS} from '../../constants/constants';
+import {OPTIONS} from '../../../sequelizeManager';
 
 export default class Settings extends Component {
     constructor(props) {
@@ -156,6 +157,10 @@ export default class Settings extends Component {
                         Plotly 2.0 Database Connector
                     </h4>
                     <div className={styles.info}>
+                        This application is running on {" "}
+                        <u>http://localhost:{OPTIONS.port}</u> and {" "}
+                        <u>https://connector.plot.ly:{OPTIONS.port + 1}</u>
+                        <br/>
                         Learn more
                         {" "}
                         <a href="javascript:require('electron').shell.openExternal('https://github.com/plotly/plotly-database-connector/issues/51');">here</a>
