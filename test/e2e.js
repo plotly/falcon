@@ -871,6 +871,61 @@ describe('plotly database connector', function Spec() {
                 expect(await errorMessage.getText()).to.equal('');
             });
         });
+
+        describe('/v1/query', () => {
+            it('if app is "connected", and no statement entered, returns error',
+            async() => {
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/query?no-statement=not-a-statement')
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.have.property('message');
+                    expect(json.error).to.not.equal(null);
+                    expect(json.error.message).to.not.equal(null);
+                });
+                // check app has error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.not.equal('');
+            });
+
+            it('if app is "connected", and incrorrect query entered, returns error',
+            async() => {
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/query?statement=not-a-statement')
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.have.property('message');
+                    expect(json.error).to.not.equal(null);
+                    expect(json.error.message).to.not.equal(null);
+                });
+                // check app has error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.not.equal('');
+            });
+
+            it('if correct database is entered, returns no error',
+            async() => {
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/query?statement=SELECT * FROM ebola_2014')
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.equal(null);
+                    expect(json).to.have.property('columnnames');
+                    expect(json).to.have.property('ncols');
+                    expect(json).to.have.property('nrows');
+                    expect(json.columnnames).to.not.equal(null);
+                    expect(json.nrows).to.not.equal(null);
+                    expect(json.ncols).to.not.equal(null);
+                });
+                // check app has error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.equal('');
+            });
+        });
+
         after(close);
 
         });
