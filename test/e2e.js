@@ -13,7 +13,7 @@ import {APP_STATUS,
 import * as logoStyles
     from '../app/components/Settings/DialectSelector/DialectSelector.css';
 
-const BASE_URL = 'localhost:5000/v0';
+const BASE_URL = 'localhost:5000/';
 
 const CREDENTIALS = {
 	'mariadb': {
@@ -321,7 +321,7 @@ describe('plotly database connector', function Spec() {
 
     testedDialects.forEach(dialectUnderTest => {
     describe(`----- ${dialectUnderTest} is being tested now -----`, () => {
-        describe('-> normal connection UE ', () => {
+    describe('-> normal connection UE ', () => {
 
         before(openApp);
 
@@ -478,7 +478,7 @@ describe('plotly database connector', function Spec() {
 
         before(openApp);
 
-        const testedDialect = DIALECTS.MYSQL;
+        const testedDialect = dialectUnderTest;
 
         before(async () => {
             // connect with wrong credentials
@@ -548,11 +548,11 @@ describe('plotly database connector', function Spec() {
     });
 
     describe('-> the API ', () => {
-        const testedDialect = DIALECTS.MYSQL;
+        const testedDialect = dialectUnderTest;
 
         before(openApp);
 
-        describe('/connect', () => {
+        describe('/v0/connect', () => {
             it('if app is "initialized", returns an error and no databases',
             async() => {
                 const expectedClass = `test-${APP_STATUS.INITIALIZED}`;
@@ -560,7 +560,7 @@ describe('plotly database connector', function Spec() {
                 const testClass = await this.getClassOf(btn);
                 expect(testClass).to.contain(expectedClass);
 
-                await fetch(`http://${BASE_URL}/connect`)
+                await fetch(`http://${BASE_URL}/v0/connect`)
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -580,7 +580,7 @@ describe('plotly database connector', function Spec() {
                 await this.connectDialect(testedDialect);
                 expect(await this.checkConnection()).to.equal(true);
 
-                await fetch(`http://${BASE_URL}/connect`)
+                await fetch(`http://${BASE_URL}/v0/connect`)
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -595,11 +595,11 @@ describe('plotly database connector', function Spec() {
             });
         });
 
-        describe('/tables', () => {
+        describe('/v0/tables', () => {
             it('returns an error and no list of tables if ' +
                 'non-existant database was passed; app stays connected',
             async() => {
-                await fetch(`http://${BASE_URL}/tables?` +
+                await fetch(`http://${BASE_URL}/v0/tables?` +
                     'database=nonexistant')
                 .then(res => res.json())
                 .then(json => {
@@ -615,7 +615,7 @@ describe('plotly database connector', function Spec() {
 
             it('returns no error and a list of tables; app stays connected',
             async() => {
-                await fetch(`http://${BASE_URL}/tables?` +
+                await fetch(`http://${BASE_URL}/v0/tables?` +
                     'database=plotly_datasets')
                 .then(res => res.json())
                 .then(json => {
@@ -631,10 +631,10 @@ describe('plotly database connector', function Spec() {
             });
         });
 
-        describe('/query', () => {
+        describe('v0/query', () => {
             it('returns a query error when an invalid query is sent',
             async () => {
-                await fetch(`http://${BASE_URL}/query?` +
+                await fetch(`http://${BASE_URL}/v0/query?` +
                     'statement=SELEC * FROM apple_stock_2014')
                 .then(res => res.json())
                 .then(json => {
@@ -651,7 +651,7 @@ describe('plotly database connector', function Spec() {
 
             it('returns no error if a valid query is sent; app stays connected',
             async () => {
-                await fetch(`http://${BASE_URL}/query?` +
+                await fetch(`http://${BASE_URL}/v0/query?` +
                     'statement=SELECT * FROM apple_stock_2014')
                 .then(res => res.json())
                 .then(json => {
@@ -665,10 +665,10 @@ describe('plotly database connector', function Spec() {
             });
         });
 
-        describe('/disconnect', () => {
+        describe('/v0/disconnect', () => {
             it('returns no error, a null list of databases and tables',
             async () => {
-                await fetch(`http://${BASE_URL}/disconnect`)
+                await fetch(`http://${BASE_URL}/v0/disconnect`)
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
