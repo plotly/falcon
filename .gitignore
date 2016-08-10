@@ -41,3 +41,5 @@ test/set_creds.sh
 *.pem
 
 *.srl
+
+.srl
