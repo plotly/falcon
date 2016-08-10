@@ -25,4 +25,8 @@ test_script:
   - npm run test
   - npm run build
   - npm run test-e2e
+services:
+  - postgresql
+  - mysql
+  
   - npm run package
