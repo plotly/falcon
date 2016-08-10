@@ -49,7 +49,7 @@ openssl x509 \
 # Create a public key
 openssl rsa \
   -in "$DIR1"/certs/server/privkey.pem \
-  -pubout -out $DIR1certs/client/pubkey.pem
+  -pubout -out $DIR1/certs/client/pubkey.pem
 
 # Put things in their proper place
 rsync -a "$DIR1"/certs/ca/my-root-ca.crt.pem "$DIR1"/certs/server/chain.pem
