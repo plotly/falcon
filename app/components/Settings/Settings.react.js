@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import {shell} from 'electron';
 import * as styles from './Settings.css';
 import DatabaseDropdown from './DatabaseDropdown/DatabaseDropdown.react';
 import TableDropdown from './TableDropdown/TableDropdown.react';
@@ -10,6 +11,11 @@ import Preview from './Preview/Preview.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import {APP_STATUS} from '../../constants/constants';
 import {OPTIONS} from '../../../sequelizeManager';
+
+const httpsGithubIssue = 'https://github.com/plotly/' +
+                         'plotly-database-connector/issues/51';
+
+const plotlyWorkspace = 'https://plot.ly/alpha/workspace';
 
 export default class Settings extends Component {
     constructor(props) {
@@ -113,25 +119,21 @@ export default class Settings extends Component {
             );
 
             step3 = (
-                /*eslint-disable */
                 <div className={styles.step3Container}>
                     <h5>3. Query from Plotly 2.0</h5>
                     <div className={styles.futureDirections}>
                         Query data by clicking on 'import data' from
-                        {" "}
-
-                        <a href="javascript:require('electron').shell.openExternal('https://plot.ly/alpha/workspace');">
-                        plotly workspace</a>
-
-
-                        {" "}
+                        <a onClick={() => {
+                            shell.openExternal(plotlyWorkspace);
+                        }}
+                        >
+                        &nbsp;<u>plotly workspace</u>&nbsp;
+                        </a>
                         and choose the SQL option.<br/>
                         Remember to keep this app running
                         while you are making queries!
                     </div>
                 </div>
-                /*eslint-disable */
-
             );
         }
 
@@ -143,7 +145,7 @@ export default class Settings extends Component {
                 </div>
             </div>
         );
-        /*eslint-disable */
+
         return (
             <div className={styles.containerWrapper}>
 
@@ -157,14 +159,17 @@ export default class Settings extends Component {
                         Plotly 2.0 Database Connector
                     </h4>
                     <div className={styles.info}>
-                        This application is running on {" "}
-                        <u>http://localhost:{OPTIONS.port}</u> and {" "}
-                        <u>https://connector.plot.ly:{OPTIONS.port + 1}</u>
+                        This application is running on
+                        <b>&nbsp;http://localhost:{OPTIONS.port}</b> and
+                        <b>&nbsp;https://connector.plot.ly:{OPTIONS.port + 1}</b>
                         <br/>
                         Learn more
-                        {" "}
-                        <a href="javascript:require('electron').shell.openExternal('https://github.com/plotly/plotly-database-connector/issues/51');">here</a>
-                        {" "}
+                        <a onClick={() => {
+                            shell.openExternal(httpsGithubIssue);
+                        }}
+                        >
+                        &nbsp;<u>here</u>&nbsp;
+                        </a>
                         about setting up a connection using https.
                     </div>
                     {step1}
@@ -176,7 +181,6 @@ export default class Settings extends Component {
 
             </div>
         );
-        /*eslint-disable */
     }
 }
 

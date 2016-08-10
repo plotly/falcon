@@ -3,13 +3,12 @@ import restify from 'restify';
 import {setupRoutes} from './routes';
 const {dialog} = require('electron');
 import sudo from 'electron-sudo';
-import {replace} from 'ramda';
+import {replace, splitAt} from 'ramda';
 
-const httpsMessage = 'This application will establish an encrypted link ' +
-    'between the connector application and plotly 2.0 client. In order to ' +
-    'provide that communication tunnel, a new private key for your device ' +
-    'will be generated using the \'openssl\' command which requires ' +
-    'administrator\'s password.';
+const httpsMessage = 'Welcome to the Plotly Database Connector! ' +
+'To get started we\'ll need your administrator password to set up encrypted ' +
+'HTTPS on this app. Behind the scenes we will be running the openssl command ' +
+'to generate a self-signed HTTPS certificate.';
 
 // asking for sudo more than once, but show a dialog window only once
 let messageShown = false;
@@ -27,12 +26,12 @@ const setupSecureRestifyServer = (
     serverMessageReceive, mainWindow, OPTIONS}
 ) => {
 
-    const https_options = {
+    const httpsOptions = {
         key: fs.readFileSync(keyFile),
         certificate: fs.readFileSync(csrFile)
     };
 
-    const server = restify.createServer(https_options);
+    const server = restify.createServer(httpsOptions);
     server.use(restify.queryParser());
     server.use(restify.CORS({
         origins: ['*'],
@@ -50,7 +49,7 @@ const setupSecureRestifyServer = (
 
 export function setupHTTP(
     {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
-    ) {
+) {
 
     const server = restify.createServer();
     server.use(restify.queryParser());
@@ -75,14 +74,14 @@ export function setupHTTPS(
     const hosts = '/etc/hosts';
     const connectorURL = 'connector.plot.ly';
 
-    const options = {
+    const sudoOptions = {
         name: 'Connector',
         process: {
             options: {
                 env: {'VAR': 'VALUE'}
             },
             on: (ps) => {
-                ps.stdout.on('data', function(data) {console.log(data);});
+                ps.stdout.on('data', function() {});
                 setTimeout(function() {
                     ps.kill();
                 }, 50000);
@@ -92,28 +91,44 @@ export function setupHTTPS(
 
     const scriptsDirectory = replace(/\ /g, '\\ ', `${__dirname}`);
 
+    const errorMessageBox = (error) => {
+
+        const shortenedMessage = splitAt(500, error.toString())[0];
+        return {
+            type: 'info',
+            buttons: ['OK'],
+            message: 'Yikes, an error occurred while setting up' +
+                'HTTPS. Create an issue at ' +
+                'https://github.com/plotly/plotly-database-connector/issues' +
+                'and paste a screen shot of this error message:' +
+                `${shortenedMessage}`
+        };
+    };
+
     // redirect connectorURL to localhost
     try {
         fs.readFile(hosts, function (err, data) {
             if (data.indexOf(connectorURL) < 0) {
                 showSudoMessage();
                 sudo.exec(`sh  "${scriptsDirectory}"/ssl/redirectConnector.sh`,
-                    options, function(error) {
+                    sudoOptions, function(error) {
                     if (error) {
-                        dialog.showMessageBox(
-                            {type: 'info', buttons: ['OK'], message: 'error'}
-                        );
-                        console.log(error);
+                        dialog.showMessageBox(errorMessageBox(error));
+                        sequelizeManager.log(error, 0);
                     } else {
-                        console.log(`${connectorURL} is now wired to local.`);
+                        sequelizeManager.log(
+                            `${connectorURL} is now redirected to local.`, 1
+                        );
                     }
                 });
             } else {
-                console.log(`${connectorURL} is already wired to a local port.`);
+                sequelizeManager.log(
+                    `${connectorURL} is already redirected to a local port.`, 1
+                );
             }
         });
     } catch (error) {
-        console.log(error);
+        sequelizeManager.log(error, 0);
     }
 
     // setup HTTPS server with self signed certs
@@ -122,28 +137,24 @@ export function setupHTTPS(
         fs.accessSync(keyFile, fs.F_OK);
         fs.accessSync(csrFile, fs.F_OK);
 
-        console.log('Found certs files.');
+        sequelizeManager.log('Found certificate and private key files.', 1);
         setupSecureRestifyServer(
             {keyFile, csrFile, sequelizeManager,
             serverMessageReceive, mainWindow, OPTIONS}
         );
     } catch (e) {
-        console.log('Did not find certs, generating...');
+        sequelizeManager.log('Did not find certificate, generating...', 1);
         // if error returned, certs do not exist -- let's create them
         showSudoMessage();
-        sudo.exec(`sh  "${scriptsDirectory}"/ssl/createKeys.sh`, options, function(error) {
+        sudo.exec(
+            `sh  "${scriptsDirectory}"/ssl/createKeys.sh`, sudoOptions,
+            function(error) {
+
             if (error) {
-                dialog.showMessageBox(
-                    {type: 'info', buttons: ['OK'], message: error.toString()}
-                );
-                sequelizeManager.log('Opening main window.', 2);
-                console.log(error);
-                dialog.showMessageBox(
-                    {type: 'info', buttons: ['OK'], message: `${__dirname}/ssl/createKeys.sh`}
-                );
+                dialog.showMessageBox(errorMessageBox(error));
+                sequelizeManager.log(error, 0);
             } else {
-                sequelizeManager.log('script ran');
-                console.log('Keys generated.');
+                sequelizeManager.log('New key and certificate generated', 1);
                 // setup server with those keys
                 setupSecureRestifyServer(
                     {keyFile, csrFile, sequelizeManager,
@@ -152,6 +163,7 @@ export function setupHTTPS(
                 require('electron').shell
                     .openExternal('http://connector.plot.ly:5000/steps');
             }
+
         });
     }
 }
