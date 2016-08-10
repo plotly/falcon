@@ -1,66 +1,18 @@
 import {app, BrowserWindow, Menu, shell} from 'electron';
-import * as fs from 'fs';
+import {contains} from 'ramda';
+import {Logger} from './logger';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
-import bunyan from 'bunyan';
-
 import {ipcMessageReceive,
         serverMessageReceive,
         channel} from './messageHandler';
 import {setupHTTP, setupHTTPS} from './setupServers';
-import {contains} from 'ramda';
 
-const timestamp = () => (new Date()).toTimeString();
 
 const ipcMain = require('electron').ipcMain;
 
 let menu;
 let template;
 let mainWindow = null;
-
-const clearLog = () => fs.writeFile(OPTIONS.logpath, '');
-
-const logToFile = bunyan.createLogger({
-    name: 'plotly-database-connector-logger',
-    streams: [
-        {
-            level: 'info',
-            path: OPTIONS.logpath
-        }
-    ]
-});
-
-function log(logEntry, code = 2) {
-
-    // default log detail set to 1 (warn level) in ./args.js
-    if (code <= OPTIONS.logdetail) {
-        switch (code) {
-            case 0:
-                logToFile.error(logEntry);
-                break;
-            case 1:
-                logToFile.warn(logEntry);
-                break;
-            case 2:
-                logToFile.info(logEntry);
-                break;
-            default:
-                logToFile.info(logEntry);
-        }
-
-        if (!OPTIONS.headless) {
-            mainWindow.webContents.send(channel, {
-                log: {
-                    logEntry,
-                    timestamp: timestamp()
-                }
-            });
-        }
-
-    }
-}
-
-const sequelizeManager = new SequelizeManager(log);
-
 
 if (process.env.NODE_ENV === 'development') {
     require('electron-debug')();
@@ -77,6 +29,9 @@ app.on('ready', () => {
         height: 728
     });
 
+    const logger = new Logger(OPTIONS, mainWindow, channel);
+    const sequelizeManager = new SequelizeManager(logger);
+
     setupHTTP({sequelizeManager, serverMessageReceive, mainWindow, OPTIONS});
 
     // TODO: shell scripts for HTTPS setup may not work on windows atm
@@ -89,8 +44,7 @@ app.on('ready', () => {
         );
     }
 
-    // clear the log if the file existed already and had entries
-    clearLog();
+    sequelizeManager.log('Starting Application...', 0);
 
     mainWindow.loadURL(`file://${__dirname}/app/app.html`);
 

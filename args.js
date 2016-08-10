@@ -13,6 +13,10 @@ const optionsBook = {
         defaultValue: 5000,
         acceptedValues: range(1, 10000)
     },
+    clearLog: {
+        defaultValue: false,
+        acceptedValues: [true, false]
+    },
     logpath: {
         defaultValue: `${__dirname}/activity.log`,
         acceptedValues: 'path to logpath w/o quotes (ex: path/to/file.log)'
@@ -28,7 +32,7 @@ const optionsBook = {
     }
 };
 
-const optionsToCheck = ['headless', 'large', 'port'];
+const optionsToCheck = ['headless', 'large', 'port', 'clearLog'];
 
 // returns all the default values from options as a dict {key: default, ...}
 const defaultOptions = () => {

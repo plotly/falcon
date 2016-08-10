@@ -49,8 +49,8 @@ const assembleTablesPreviewMessage = (tablePreviews) => {
 
 export class SequelizeManager {
 
-    constructor(log) {
-        this.log = log;
+    constructor(Logger) {
+        this.log = Logger.log;
     }
 
     getDialect() {
