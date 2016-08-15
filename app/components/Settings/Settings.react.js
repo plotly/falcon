@@ -133,6 +133,11 @@ export default class Settings extends Component {
                         Remember to keep this app running
                         while you are making queries!
                     </div>
+                    <img
+                        src="./images/workspace.png"
+                        className={styles.workspace}
+                    >
+                    </img>
                 </div>
             );
         }
@@ -159,10 +164,6 @@ export default class Settings extends Component {
                         Plotly 2.0 Database Connector
                     </h4>
                     <div className={styles.info}>
-                        This application is running on
-                        <b>&nbsp;http://localhost:{OPTIONS.port}</b> and
-                        <b>&nbsp;https://connector.plot.ly:{OPTIONS.port + 1}</b>
-                        <br/>
                         Learn more
                         <a onClick={() => {
                             shell.openExternal(httpsGithubIssue);

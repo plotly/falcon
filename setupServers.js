@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import restify from 'restify';
 import {setupRoutes} from './routes';
-const {dialog} = require('electron');
+import {dialog} from 'electron';
 import sudo from 'electron-sudo';
 import {replace, splitAt} from 'ramda';
 
@@ -12,12 +12,16 @@ const httpsMessage = 'Welcome to the Plotly Database Connector! ' +
 
 // asking for sudo more than once, but show a dialog window only once
 let messageShown = false;
-const showSudoMessage = () => {
+const showSudoMessage = (sequelizeManager, OPTIONS) => {
     if (!messageShown) {
         messageShown = true;
-        dialog.showMessageBox(
-            {type: 'info', buttons: ['OK'], message: httpsMessage}
-        );
+        if (OPTIONS.headless) {
+            sequelizeManager.log(httpsMessage, 1);
+        } else {
+            dialog.showMessageBox(
+                {type: 'info', buttons: ['OK'], message: httpsMessage}
+            );
+        }
     }
 };
 
@@ -45,6 +49,7 @@ const setupSecureRestifyServer = (
     setupRoutes(server, serverMessageReceive(
         sequelizeManager, mainWindow.webContents)
     );
+
 };
 
 export function setupHTTP(
@@ -62,6 +67,7 @@ export function setupHTTP(
     setupRoutes(server, serverMessageReceive(
         sequelizeManager, mainWindow.webContents)
     );
+
 }
 
 export function setupHTTPS(
@@ -107,9 +113,10 @@ export function setupHTTPS(
 
     // redirect connectorURL to localhost
     try {
+
         fs.readFile(hosts, function (err, data) {
             if (data.indexOf(connectorURL) < 0) {
-                showSudoMessage();
+                showSudoMessage(sequelizeManager, OPTIONS);
                 sudo.exec(`sh  "${scriptsDirectory}"/ssl/redirectConnector.sh`,
                     sudoOptions, function(error) {
                     if (error) {
@@ -127,12 +134,14 @@ export function setupHTTPS(
                 );
             }
         });
+
     } catch (error) {
         sequelizeManager.log(error, 0);
     }
 
     // setup HTTPS server with self signed certs
     try {
+
         // try reading certs
         fs.accessSync(keyFile, fs.F_OK);
         fs.accessSync(csrFile, fs.F_OK);
@@ -142,10 +151,13 @@ export function setupHTTPS(
             {keyFile, csrFile, sequelizeManager,
             serverMessageReceive, mainWindow, OPTIONS}
         );
+
     } catch (e) {
+
         sequelizeManager.log('Did not find certificate, generating...', 1);
+
         // if error returned, certs do not exist -- let's create them
-        showSudoMessage();
+        showSudoMessage(sequelizeManager, OPTIONS);
         sudo.exec(
             `sh  "${scriptsDirectory}"/ssl/createKeys.sh`, sudoOptions,
             function(error) {
@@ -163,7 +175,7 @@ export function setupHTTPS(
                 require('electron').shell
                     .openExternal('http://connector.plot.ly:5000/steps');
             }
-
         });
+
     }
 }

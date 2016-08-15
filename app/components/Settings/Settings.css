@@ -22,8 +22,19 @@
 	padding-bottom: 30px;
 }
 
+.workspace {
+	height: 50%;
+	width: 50%;
+	display: block;
+	margin-left: auto;
+	margin-right:auto;
+	padding-bottom: 30px;
+	padding-top: 30px;
+}
+
 .info {
 	padding: 25px;
+    font-size: 14px;
 }
 
 .userCredentials {

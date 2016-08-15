@@ -36,7 +36,7 @@ app.on('ready', () => {
 
     // TODO: shell scripts for HTTPS setup may not work on windows atm
     if (
-        process.platform === 'darwin' &&
+        (process.platform === 'darwin' || process.platform === 'linux') &&
         !contains('--test-type=webdriver', process.argv.slice(2))
     ) {
         setupHTTPS(
