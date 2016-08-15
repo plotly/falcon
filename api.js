@@ -139,7 +139,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
 
             if (!foundParams(requestEvent.params, 'database')) {
                 sequelizeManager.raiseError(
-                    {mesasge: DATABASE_PARAM}, callback
+                    {message: DATABASE_PARAM}, callback
                 );
             } else {
                 message.database = requestEvent.params.database;
@@ -172,7 +172,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
 
             if (!foundParams(requestEvent.params, 'tables')) {
                 sequelizeManager.raiseError(
-                    {mesasge: TABLES_PARAM}, callback
+                    {message: TABLES_PARAM}, callback
                 );
             } else {
                 message = map(trim(), split(',', requestEvent.params.tables));
@@ -193,7 +193,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
 
             if (!foundParams(requestEvent.params, 'statement')) {
                 sequelizeManager.raiseError(
-                    {mesasge: QUERY_PARAM}, callback
+                    {message: QUERY_PARAM}, callback
                 );
             } else {
                 message = requestEvent.params.statement;

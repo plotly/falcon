@@ -4,6 +4,7 @@ import webdriver from 'selenium-webdriver';
 import {expect} from 'chai';
 import electronPath from 'electron-prebuilt';
 import fetch from 'node-fetch';
+import {split} from 'ramda';
 import {productName, version} from '../package.json';
 
 import {APP_STATUS,
@@ -13,7 +14,7 @@ import {APP_STATUS,
 import * as logoStyles
     from '../app/components/Settings/DialectSelector/DialectSelector.css';
 
-const BASE_URL = 'localhost:5000/v0';
+const BASE_URL = 'localhost:5000/';
 
 const CREDENTIALS = {
 	'mariadb': {
@@ -153,10 +154,10 @@ describe('plotly database connector', function Spec() {
 
         this.waitFor = async (expectedClass, element) => {
             let currentClass = await this.getClassOf(element);
-            console.log(currentClass);
+            console.log(split('test-', currentClass)[1]);
             while (!currentClass.includes(expectedClass)) {
                 currentClass = await this.getClassOf(element);
-                console.log(currentClass);
+                console.log(split('test-', currentClass)[1]);
                 await delay(500);
             }
         };
@@ -168,7 +169,7 @@ describe('plotly database connector', function Spec() {
 
             // click on the evaluated dialect logo
             this.fillInputs(dialect)
-            .then(await delay(500))
+            .then(await delay(1500))
             .then(await btn.click())
             .then(await this.waitFor(`test-${APP_STATUS.CONNECTED}`, btn));
         };
@@ -178,7 +179,7 @@ describe('plotly database connector', function Spec() {
             const conerror = `test-${APP_STATUS.CON_ERROR}`;
             const btn = await this.getConnectBtn();
             const testClass = await this.getClassOf(btn);
-            console.log(testClass);
+            console.log(split('test-', testClass)[1]);
             return !(testClass.includes(disconnected) ||
                     testClass.includes(conerror));
         };
@@ -311,13 +312,25 @@ describe('plotly database connector', function Spec() {
 
     });
 
+/*
+    Loop through all dialects starting here, except for SQLITE, which
+    requires a very different `connecting` flow. Tests, done manually for now.
+    TODO: automate tests for SQLITE
+*/
 
-    describe('-> normal connection UE ', () => {
+    const testedDialects = [
+        DIALECTS.POSTGRES, DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.MSSQL
+    ];
+
+    testedDialects.forEach(dialectUnderTest => {
+    describe(`----- ${dialectUnderTest} is being tested now -----`, () => {
+    describe('-> normal connection User Exp ', () => {
 
         before(openApp);
 
+        const testedDialect = dialectUnderTest;
+
         describe('connecting', () => {
-            const testedDialect = DIALECTS.MYSQL;
 
             it('set state to "connect" when coonecting using correct inputs',
             async () => {
@@ -327,11 +340,7 @@ describe('plotly database connector', function Spec() {
                 await logo.click();
 
                 // click on the evaluated dialect logo
-                this.fillInputs(testedDialect)
-                .then(await delay(500))
-                .then(await btn.click())
-                .then(await this.waitFor(expectedClass, btn));
-
+                await this.connectDialect(testedDialect);
                 expect(await this.getClassOf(btn)).to.contain(expectedClass);
             });
 
@@ -365,15 +374,6 @@ describe('plotly database connector', function Spec() {
                 expect(error.toString()).to.contain('NoSuchElementError');
             });
 
-            it('should show a log with a new logged item',
-            async () => {
-                const expectedClass = 'test-4-entries';
-                const logs = await this.getLogs();
-
-                const testClass = await this.getClassOf(logs);
-                expect(testClass).to.contain(expectedClass);
-
-            });
         });
 
         describe('selecting a database and table', () => {
@@ -383,7 +383,7 @@ describe('plotly database connector', function Spec() {
                 expect(dropDowns.length).to.equal(2);
                 const expectedClass = 'test-connected';
                 await this.reactSelectInputValue(dropDowns[0], 'plotly_datasets');
-                await delay(2000);
+                await delay(4000);
                 await this.reactSelectInputValue(dropDowns[1], 'ebola_2014');
                 await delay(4000);
                 const tables = await this.getTables();
@@ -396,15 +396,6 @@ describe('plotly database connector', function Spec() {
                 const errorMessage = await this.getErrorMessage();
 
                 expect(await errorMessage.getText()).to.equal('');
-            });
-
-            it('should show a log with a new logged item',
-            async () => {
-                const expectedClass = 'test-11-entries';
-                const logs = await this.getLogs();
-
-                const testClass = await this.getClassOf(logs);
-                expect(testClass).to.contain(expectedClass);
             });
         });
 
@@ -449,42 +440,30 @@ describe('plotly database connector', function Spec() {
                 expect(error.toString()).to.contain('NoSuchElementError');
             });
 
-            it('should show a log with a new logged item',
-            async () => {
-                const expectedClass = 'test-13-entries';
-                const logs = await this.getLogs();
-
-                const testClass = await this.getClassOf(logs);
-                expect(testClass).to.contain(expectedClass);
-
-            });
-
         });
 
         after(close);
 
     });
 
-    describe('-> connection error UE ', () => {
+    describe('-> connection error User Exp ', () => {
 
         before(openApp);
 
-        const testedDialect = DIALECTS.MYSQL;
+        const testedDialect = dialectUnderTest;
 
-        before(async () => {
-            // connect with wrong credentials
+        it('set state to "con_error" when connecting using wrong credentials',
+        async () => {
+            const logo = await this.getLogo(testedDialect);
             const btn = await this.getConnectBtn();
-
+            await logo.click();
+            // connect with wrong credentials
             this.wrongInputs(testedDialect)
             .then(await delay(1000))
             // click to connect
             .then(await btn.click());
-        });
 
-        it('set state to "con_error" when connecting using wrong credentials',
-        async () => {
             const expectedClass = `test-${APP_STATUS.CON_ERROR}`;
-            const btn = await this.getConnectBtn();
 
             await this.waitFor(expectedClass, btn);
 
@@ -495,7 +474,7 @@ describe('plotly database connector', function Spec() {
         it('should have a connection error displayed',
         async() => {
             const errorMessage = await this.getErrorMessage();
-            expect(await errorMessage.getText()).to.contain('connect');
+            expect(await errorMessage.getText()).to.contain('error');
         });
 
         it('should not show the database selector after connection',
@@ -525,25 +504,17 @@ describe('plotly database connector', function Spec() {
             expect(error.toString()).to.contain('NoSuchElementError');
         });
 
-        it('should show a log with a new logged item',
-        async () => {
-            const expectedClass = 'test-5-entries';
-            const logs = await this.getLogs();
-
-            const testClass = await this.getClassOf(logs);
-            expect(testClass).to.contain(expectedClass);
-        });
-
         after(close);
 
     });
 
     describe('-> the API ', () => {
-        const testedDialect = DIALECTS.MYSQL;
 
         before(openApp);
 
-        describe('/connect', () => {
+        const testedDialect = dialectUnderTest;
+
+        describe('/v1/authenticate', () => {
             it('if app is "initialized", returns an error and no databases',
             async() => {
                 const expectedClass = `test-${APP_STATUS.INITIALIZED}`;
@@ -551,33 +522,28 @@ describe('plotly database connector', function Spec() {
                 const testClass = await this.getClassOf(btn);
                 expect(testClass).to.contain(expectedClass);
 
-                await fetch(`http://${BASE_URL}/connect`)
+                await fetch(`http://${BASE_URL}/v1/authenticate`)
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
                     expect(json.error).to.not.equal(null);
-                    expect(json).to.not.have.property('databases');
-                    expect(json).to.not.have.property('tables');
                 });
                 // check app has error message
                 const errorMessage = await this.getErrorMessage();
                 expect(await errorMessage.getText()).to.not.equal('');
             });
 
-            it('if app is "connected", returns a databases array and a null ' +
-                'error',
+            it('if app is "connected", returns a null error',
             async() => {
                 // connect the app
                 await this.connectDialect(testedDialect);
                 expect(await this.checkConnection()).to.equal(true);
 
-                await fetch(`http://${BASE_URL}/connect`)
+                await fetch(`http://${BASE_URL}/v1/authenticate`)
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
                     expect(json.error).to.equal(null);
-                    expect(json).to.have.property('databases');
-                    expect(json.databases).to.not.equal(null);
                 });
                 // check app is still connected and no error appeared
                 expect(await this.checkConnection()).to.equal(true);
@@ -586,80 +552,177 @@ describe('plotly database connector', function Spec() {
             });
         });
 
-        describe('/tables', () => {
-            it('returns an error and no list of tables if ' +
-                'non-existant database was passed; app stays connected',
+        describe('/v1/databases', () => {
+            it('if app is "connected",' +
+                ' returns no error and a list of databases',
             async() => {
-                await fetch(`http://${BASE_URL}/tables?` +
-                    'database=nonexistant')
+                const expectedClass = `test-${APP_STATUS.CONNECTED}`;
+                const btn = await this.getConnectBtn();
+                const testClass = await this.getClassOf(btn);
+                expect(testClass).to.contain(expectedClass);
+
+                await fetch(`http://${BASE_URL}/v1/databases`)
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
-                    expect(json.error).to.not.equal(null);
-                    expect(json).to.not.have.property('tables');
+                    expect(json.error).to.equal(null);
+                    expect(json).to.have.property('databases');
+                    expect(json.databases).to.not.equal(null);
                 });
-                // check app is still connected but an error appeared
-                expect(await this.checkConnection()).to.equal(false);
+                // check app has no error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.equal('');
+            });
+        });
+
+        describe('/v1/selectdatabase', () => {
+            it('if app is "connected", and wrong database entered, returns error',
+            async() => {
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/selectdatabase?database=non-existant')
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.have.property('message');
+                    expect(json.error).to.not.equal(null);
+                    expect(json.error.message).to.not.equal(null);
+                });
+                // check app has error message
                 const errorMessage = await this.getErrorMessage();
                 expect(await errorMessage.getText()).to.not.equal('');
             });
 
-            it('returns no error and a list of tables; app stays connected',
+            it('if correct database is entered, returns no error',
             async() => {
-                await fetch(`http://${BASE_URL}/tables?` +
-                    'database=plotly_datasets')
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/selectdatabase?database=plotly_datasets')
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.equal(null);
+                });
+                // check app has error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.equal('');
+            });
+        });
+
+        describe('/v1/tables', () => {
+            it('if app is "connected",' +
+                ' returns no error and a list of tables',
+            async() => {
+                const expectedClass = `test-${APP_STATUS.CONNECTED}`;
+                const btn = await this.getConnectBtn();
+                const testClass = await this.getClassOf(btn);
+                expect(testClass).to.contain(expectedClass);
+
+                await fetch(`http://${BASE_URL}/v1/databases`)
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
                     expect(json.error).to.equal(null);
                     expect(json).to.have.property('tables');
-                    expect(json.tables).to.not.equal(null);
+                    expect(json.databases).to.not.equal(null);
                 });
-                // check app is still connected but an error appeared
-                expect(await this.checkConnection()).to.equal(true);
+                // check app has no error message
                 const errorMessage = await this.getErrorMessage();
                 expect(await errorMessage.getText()).to.equal('');
             });
         });
 
-        describe('/query', () => {
-            it('returns a query error when an invalid query is sent',
-            async () => {
-                await fetch(`http://${BASE_URL}/query?` +
-                    'statement=SELEC * FROM apple_stock_2014')
+
+        describe('/v1/preview', () => {
+            it('if app is "connected", and wrong table entered, returns error',
+            async() => {
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/preview?non-param=non-existant')
                 .then(res => res.json())
                 .then(json => {
-
                     expect(json).to.have.property('error');
+                    expect(json.error).to.have.property('message');
                     expect(json.error).to.not.equal(null);
-                    expect(json).to.not.have.property('rows');
+                    expect(json.error.message).to.not.equal(null);
                 });
-                // check app is still connected but an error appeared
-                expect(await this.checkConnection()).to.equal(true);
+                // check app has error message
                 const errorMessage = await this.getErrorMessage();
                 expect(await errorMessage.getText()).to.not.equal('');
             });
 
-            it('returns no error if a valid query is sent; app stays connected',
-            async () => {
-                await fetch(`http://${BASE_URL}/query?` +
-                    'statement=SELECT * FROM apple_stock_2014')
+            it('if correct table is entered, returns no error',
+            async() => {
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/preview?tables=ebola_2014')
                 .then(res => res.json())
                 .then(json => {
-                    expect(json).to.have.property('rows');
-                    expect(json.rows).to.not.equal(null);
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.equal(null);
+                    expect(json).to.have.property('previews');
+                    expect(json.previews).to.not.equal(null);
                 });
-                // check app is still connected but an error appeared
-                expect(await this.checkConnection()).to.equal(true);
+                // check app has error message
                 const errorMessage = await this.getErrorMessage();
                 expect(await errorMessage.getText()).to.equal('');
             });
         });
 
-        describe('/disconnect', () => {
-            it('returns no error, a null list of databases and tables',
+        describe('/v1/query', () => {
+            it('if app is "connected", and no statement entered, returns error',
+            async() => {
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/query?no-statement=not-a-statement')
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.have.property('message');
+                    expect(json.error).to.not.equal(null);
+                    expect(json.error.message).to.not.equal(null);
+                });
+                // check app has error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.not.equal('');
+            });
+
+            it('if app is "connected", and incrorrect query entered, returns error',
+            async() => {
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/query?statement=not-a-statement')
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.have.property('message');
+                    expect(json.error).to.not.equal(null);
+                    expect(json.error.message).to.not.equal(null);
+                });
+                // check app has error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.not.equal('');
+            });
+
+            it('if correct database is entered, returns no error',
+            async() => {
+                await fetch(`http://${BASE_URL}` +
+                    '/v1/query?statement=SELECT * FROM ebola_2014')
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.equal(null);
+                    expect(json).to.have.property('columnnames');
+                    expect(json).to.have.property('ncols');
+                    expect(json).to.have.property('nrows');
+                    expect(json.columnnames).to.not.equal(null);
+                    expect(json.nrows).to.not.equal(null);
+                    expect(json.ncols).to.not.equal(null);
+                });
+                // check app has error message
+                const errorMessage = await this.getErrorMessage();
+                expect(await errorMessage.getText()).to.equal('');
+            });
+        });
+
+        describe('/v1/disconnect', () => {
+            it('returns no error, a null list of databases, previews and tables',
             async () => {
-                await fetch(`http://${BASE_URL}/disconnect`)
+                await fetch(`http://${BASE_URL}/v1/disconnect`)
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -667,6 +730,8 @@ describe('plotly database connector', function Spec() {
                     expect(json).to.have.property('databases');
                     expect(json.databases).to.equal(null);
                     expect(json).to.have.property('tables');
+                    expect(json.tables).to.equal(null);
+                    expect(json).to.have.property('previews');
                     expect(json.tables).to.equal(null);
                 });
             });
@@ -714,5 +779,7 @@ describe('plotly database connector', function Spec() {
 
         after(close);
 
+        });
+    });
     });
 });
