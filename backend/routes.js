@@ -3,17 +3,19 @@ import restify from 'restify';
 
 function serveHttpsStatus(req, res) {
     if (req.isSecure()) {
-        fs.readFile(`${__dirname}/../ssl/status.html`, 'utf8', function(err, file) {
+        fs.readFile(
+            `${__dirname}/../ssl/status.html`, 'utf8', function(err, file) {
+
             if (err) {
                 res.send(500);
             }
             res.write(file);
             res.end();
+            
         });
     } else {
         res.send(404);
     }
-
 }
 
 export function setupRoutes(server, processMessageFunction) {

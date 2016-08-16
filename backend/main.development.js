@@ -30,9 +30,10 @@ app.on('ready', () => {
     });
 
     const logger = new Logger(OPTIONS, mainWindow, channel);
+
     const sequelizeManager = new SequelizeManager(logger);
 
-    // TODO: shell scripts for HTTPS setup may not work on windows atm
+    // TODO: issue #65 shell scripts for HTTPS setup may not work on windows atm
     const canSetupHTTPS = (
         (process.platform === 'darwin' || process.platform === 'linux') &&
         !contains('--test-type=webdriver', process.argv.slice(2))

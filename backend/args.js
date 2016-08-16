@@ -22,13 +22,13 @@ const optionsBook = {
         acceptedValues: 'path to logpath w/o quotes (ex: path/to/file.log)'
     },
     configpath: {
-        defaultValue: './config.json',
+        defaultValue: `${__dirname}/config.json`,
         acceptedValues: 'path to config w/o quotes (ex: path/to/config.json)'
     },
     // 0 for errors only, 1 adds warnings, 2 adds info
     logdetail: {
         defaultValue: 1,
-        acceptedValues: range(0, 4)
+        acceptedValues: range(0, 2)
     }
 };
 
@@ -43,6 +43,7 @@ const defaultOptions = () => {
 
 // args are expected to be in ['key=value', 'key1=value2' ...] format
 function mergeArgs (args) {
+
     const userOptions = {};
 
     const parseArgValue = (arg) => {
@@ -106,12 +107,14 @@ function mergeArgs (args) {
             });
         }
     } catch (error) {
+
         // keep this console log for the user running it from the CL
         /* eslint-disable */
         console.error(error);
         /* eslint-disable */
         process.exit(-1);
     }
+
     return merge(defaultOptions(), userOptions);
 }
 
@@ -120,10 +123,18 @@ const acceptedArgs = () => {
 
     let argsToMerge = [];
 
+    // throw new Error(JSON.stringify(process.argv));
+
     if (process.env.NODE_ENV === 'development') {
         argsToMerge = ['logdetail=2'];
     } else if (!contains('./test/e2e.js', process.argv.slice(2))) {
-        argsToMerge = process.argv.slice(2);
+        /*
+         * first arg is the path don't need it,
+         * second arg is './' but only when packaged
+         */
+        argsToMerge = process.argv.filter(arg => {
+            return arg !== './'
+        }).slice(1);
     }
 
     return argsToMerge;
