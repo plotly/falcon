@@ -10,7 +10,6 @@ class DetectHttpsServer extends Component {
         };
     }
 
-    // TODO - Maybe make this it's own stateful component
     componentWillMount() {
 
         // TODO - It seems like you need to restart the app in order for the
