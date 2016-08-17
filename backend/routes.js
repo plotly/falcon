@@ -1,24 +1,28 @@
 import * as fs from 'fs';
 import restify from 'restify';
 
-function serveAcceptCerSteps(req, res) {
-  fs.readFile(`${__dirname}/ssl/index.html`, 'utf8', function(err, file) {
-    if (err) {
-      res.send(500);
+function serveHttpsStatus(req, res) {
+    if (req.isSecure()) {
+        fs.readFile(`${__dirname}/../ssl/status.html`, 'utf8', function(err, file) {
+            if (err) {
+                res.send(500);
+            }
+            res.write(file);
+            res.end();
+        });
+    } else {
+        res.send(404);
     }
-    res.write(file);
-    res.end();
-  });
-}
 
 }
 
 export function setupRoutes(server, processMessageFunction) {
     // serve plain html for steps to accept self-signed certificate
     server.get(/\/ssl\/?.*/, restify.serveStatic({
-      directory: __dirname
+        directory: `${__dirname}/../`
     }));
 
+    server.get('/status', serveHttpsStatus);
 
     server.get('/v0/connect', processMessageFunction);
     server.get('/v0/login', processMessageFunction);
