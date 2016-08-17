@@ -5,7 +5,11 @@ import {dialog} from 'electron';
 import sudo from 'electron-sudo';
 import {replace, splitAt} from 'ramda';
 
-const plotlyDomain = 'https://plot.ly';
+const plotlyDomains = [
+    'https://plot.ly',
+    'https://stage.plot.ly',
+    'https://local.plot.ly'
+];
 
 const httpsMessage = 'Welcome to the Plotly Database Connector! ' +
 'To get started we\'ll need your administrator password to set up encrypted ' +
