@@ -3,7 +3,7 @@
   "productName": "Plotly Database Connector",
   "version": "0.0.3",
   "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
-  "main": "main.js",
+  "main": "./backend/main.js",
   "scripts": {
     "test": "npm run build && npm run test-e2e",
     "test-watch": "npm test -- --watch",
@@ -15,7 +15,7 @@
     "build-renderer": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.production.js --progress --profile --colors",
     "build": "npm run build-main && npm run build-renderer",
     "start": "cross-env NODE_ENV=production electron ./",
-    "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./main.development",
+    "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./backend/main.development",
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
     "package-all": "npm run package -- --all",
     "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",

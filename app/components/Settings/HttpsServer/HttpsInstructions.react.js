@@ -1,9 +1,7 @@
 import React from 'react';
+import {shell} from 'electron';
 
-// TODO - Pass platform through here so that we don't have to guess platforms
-
-// TODO - Make this a nice status page like at /status
-const HTML_STATUS_PAGE = 'https://connector.plot.ly:5001';
+const HTML_STATUS_PAGE = 'https://connector.plot.ly:5001/status';
 
 const HttpsInstructions = () => (
     <div>
@@ -11,7 +9,7 @@ const HttpsInstructions = () => (
         <hr/>
 
         <div>
-            We&#39;ve just generated a <i>self-signed certificate</i>
+            We&#39;ve just generated a <i>self-signed certificate </i>
             for you to use with this app.
             This allows your data to be encrypted as it travels
             between your web browser and this connector.

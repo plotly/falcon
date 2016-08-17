@@ -5,7 +5,7 @@ import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import {ipcMessageReceive,
         serverMessageReceive,
         channel} from './messageHandler';
-import {setupHTTP, setupHTTPS, checkHTTPS} from './setupServers';
+import {setupHTTP, setupHTTPS, findSelfSignedCert} from './setupServers';
 
 
 const ipcMain = require('electron').ipcMain;
@@ -32,35 +32,15 @@ app.on('ready', () => {
     const logger = new Logger(OPTIONS, mainWindow, channel);
     const sequelizeManager = new SequelizeManager(logger);
 
-    setupHTTP({sequelizeManager, serverMessageReceive, mainWindow, OPTIONS});
-
     // TODO: shell scripts for HTTPS setup may not work on windows atm
     const canSetupHTTPS = (
         (process.platform === 'darwin' || process.platform === 'linux') &&
         !contains('--test-type=webdriver', process.argv.slice(2))
     );
-    mainWindow.webContents.send('channel', {
-        canSetupHTTPS
-    });
-
-
-    if (canSetupHTTPS) {
-        const hasSelfSignedCert = checkHTTPS();
-        // TODO - use the 'channel' constant
-        mainWindow.webContents.send('channel', {
-                hasSelfSignedCert
-        });
-        if (hasSelfSignedCert) {
-            setupHTTPS(
-                {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
-            );
-        }
-
-    }
 
     sequelizeManager.log('Starting Application...', 0);
 
-    mainWindow.loadURL(`file://${__dirname}/app/app.html`);
+    mainWindow.loadURL(`file://${__dirname}/../app/app.html`);
 
     mainWindow.webContents.on('did-finish-load', () => {
 
@@ -77,6 +57,31 @@ app.on('ready', () => {
             ipcMessageReceive(sequelizeManager, mainWindow, OPTIONS)
         );
 
+        setupHTTP({
+            sequelizeManager, serverMessageReceive,
+            mainWindow, OPTIONS
+        });
+
+        mainWindow.webContents.send(channel, {
+            canSetupHTTPS: true
+        });
+
+        if (canSetupHTTPS) {
+
+            const hasSelfSignedCert = findSelfSignedCert();
+            mainWindow.webContents.send(channel, {
+                    hasSelfSignedCert: true
+            });
+
+            if (hasSelfSignedCert) {
+                setupHTTPS({
+                    sequelizeManager, serverMessageReceive,
+                    mainWindow, OPTIONS
+                });
+            }
+
+        }
+
     });
 
     mainWindow.on('closed', () => {
@@ -87,12 +92,11 @@ app.on('ready', () => {
         mainWindow.openDevTools();
     }
 
-    // TODO - Update these menu items
     if (process.platform === 'darwin') {
         template = [{
-            label: 'Electron',
+            label: 'Plotly Database Connector',
             submenu: [{
-                label: 'About ElectronReact',
+                label: 'About Plotly Database Connector',
                 selector: 'orderFrontStandardAboutPanel:'
             }, {
                 type: 'separator'
@@ -102,7 +106,7 @@ app.on('ready', () => {
             }, {
                 type: 'separator'
             }, {
-                label: 'Hide ElectronReact',
+                label: 'Hide Plotly Database Connector',
                 accelerator: 'Command+H',
                 selector: 'hide:'
             }, {
@@ -266,24 +270,20 @@ app.on('ready', () => {
             submenu: [{
                 label: 'Learn More',
                 click() {
-                    shell.openExternal('http://electron.atom.io');
+                    shell.openExternal('https://github.com/plotly/' +
+                        'plotly-database-connector/blob/master');
                 }
             }, {
                 label: 'Documentation',
                 click() {
-                    shell.openExternal('https://github.com/' +
-                        'atom/electron/tree/master/docs#readme');
-                }
-            }, {
-                label: 'Community Discussions',
-                click() {
-                    shell.openExternal('https://discuss.atom.io/c/electron');
+                    shell.openExternal('https://github.com/plotly/' +
+                        'plotly-database-connector/blob/master/README.md');
                 }
             }, {
                 label: 'Search Issues',
                 click() {
-                    shell.openExternal('https://github.com/' +
-                        'atom/electron/issues');
+                    shell.openExternal('https://github.com/plotly/' +
+                        'plotly-database-connector/issues');
                 }
             }]
         }];

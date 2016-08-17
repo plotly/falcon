@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import Sequelize from 'sequelize';
-import {DIALECTS} from './app/constants/constants';
+import {DIALECTS} from '../app/constants/constants';
 import parse from './parse';
 import {merge} from 'ramda';
 import {ARGS} from './args';
@@ -85,8 +85,8 @@ export class SequelizeManager {
 
     }
 
-    getConnection(callback) {
-        return () => callback({error: null});
+    getConnection(responseSender) {
+        return () => responseSender({error: null});
     }
 
     createConnection(configuration) {
@@ -132,7 +132,7 @@ export class SequelizeManager {
 
     }
 
-    authenticate(callback) {
+    authenticate(responseSender) {
 
         this.log('Authenticating connection.');
         // when already logged in and simply want to check connection
@@ -143,7 +143,7 @@ export class SequelizeManager {
                     {message: APP_NOT_CONNECTED},
                     {type: 'connection'}
                 ),
-                callback
+                responseSender
 			);
 		} else {
             // this.connection.authenticate() returns a promise
@@ -153,33 +153,33 @@ export class SequelizeManager {
                     merge(
                         {mesage: AUTHENTICATION(error)},
                         {type: 'connection'}),
-                    callback
+                    responseSender
                 );
             });
         }
 
     }
 
-    raiseError(errorMessage, callback) {
+    raiseError(errorMessage, responseSender) {
         const errorLog = merge(errorMessage, {timestamp: timestamp()});
         this.log(errorMessage, 0);
-        callback({error: errorLog}, 400);
+        responseSender({error: errorLog}, 400);
     }
 
-    showDatabases(callback) {
+    showDatabases(responseSender) {
 
         const query = this.getPresetQuery(PREBUILT_QUERY.SHOW_DATABASES);
         const dialect = this.getDialect();
 
         // deal with sqlite -> has no databases list
         if (dialect === DIALECTS.SQLITE) {
-            callback({
+            responseSender({
                 databases: ['SQLITE database accessed'],
                 error: null,
                 tables: null
             });
             // skip SHOW_DATABASES query and send SHOW_TABLES query right away
-            return this.showTables(callback);
+            return this.showTables(responseSender);
         }
 
         this.log(`Querying: ${query}`, 1);
@@ -187,7 +187,7 @@ export class SequelizeManager {
         return () => this.connection.query(query, this.setQueryType('SELECT'))
         .then(results => {
             this.log('Results recieved.', 1);
-            callback({
+            responseSender({
                 databases: intoArray(results),
                 error: null,
                 /*
@@ -201,7 +201,7 @@ export class SequelizeManager {
     }
 
     // built-in query to show available tables in a database/scheme
-    showTables(callback) {
+    showTables(responseSender) {
 
         const showtables = this.getPresetQuery(PREBUILT_QUERY.SHOW_TABLES);
         this.log(`Querying: ${showtables}`, 1);
@@ -210,12 +210,12 @@ export class SequelizeManager {
         .query(showtables, this.setQueryType('SELECT'))
         .then(results => {
             this.log('Results recieved.', 1);
-            // TODO: when switching fornt end to v1, simply send back an array
+
             const tablesObject = this.intoTablesArray(results).map(table => {
                 return {[table]: {}};
             });
 
-            callback({
+            responseSender({
                 error: null,
                 tables: tablesObject
             });
@@ -223,9 +223,8 @@ export class SequelizeManager {
 
     }
 
-    previewTables(tables, callback) {
+    previewTables(tables, responseSender) {
 
-        // TODO: when switching fornt end to v1, simply send back an array
         const promises = tables.map(table => {
 
             const show5rows = this.getPresetQuery(
@@ -247,7 +246,7 @@ export class SequelizeManager {
         return Promise.all(promises)
         .then(tablePreviews => {
             this.log('Sending tables\' previews.', 1);
-            callback({
+            responseSender({
                 error: null,
                 previews: assembleTablesPreviewMessage(tablePreviews)
             });
@@ -255,22 +254,22 @@ export class SequelizeManager {
 
     }
 
-    sendRawQuery(query, callback) {
+    sendRawQuery(query, responseSender) {
 
         this.log(`Querying: ${query}`, 1);
 
         return this.connection.query(query, this.setQueryType('SELECT'))
         .catch( error => {
-            this.raiseError(error, callback);
+            this.raiseError(error, responseSender);
         })
         .then((results) => {
             this.log('Results received.', 1);
-            callback(merge(parse(results), {error: null}));
+            responseSender(merge(parse(results), {error: null}));
         });
 
     }
 
-    disconnect(callback) {
+    disconnect(responseSender) {
 
         /*
             this.connection.close() does not return a promise for now.
@@ -280,7 +279,9 @@ export class SequelizeManager {
 
         this.log('Disconnecting', 1);
         this.connection.close();
-        callback({databases: null, error: null, tables: null, previews: null});
+        responseSender({
+            databases: null, error: null, tables: null, previews: null
+        });
 
     }
 

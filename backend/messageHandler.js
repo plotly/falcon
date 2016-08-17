@@ -10,13 +10,13 @@ import {setupHTTPS} from './setupServers';
 	 * 	Depending on the route path's version v0 or v1, a `task` and `message`
 	 *  will be assigned by api.js v0 or v1 functions respectively. They will
 	 *  both return the `task` and `message` as props of variable `payload`.
-	 *  A `callback` will be created that will be prepared to send back the
-	 *  response to the app and to the origin (request) of the event.
+	 *  A `responseSender` will be created that will be prepared to send back
+	 *  the response to the app and to the origin (request) of the event.
 	 *
 	 * - Via ipc channel:
 	 *	A `task` and `message` will be included within the ipc channel message.
 	 *
-	 * - A `payload` and a `callback` will be forwarded to `handleMessage`
+	 * - A `payload` and a `responseSender` will be forwarded to `handleMessage`
 	 * which will decide the combination of sequelizeManager methods to run
 	 * depending on the `task`.
 	 *
@@ -29,6 +29,7 @@ export const TASKS = {
 	CHECK_CONNECTION_AND_SHOW_DATABASES: 'CHECK_CONNECTION_AND_SHOW_DATABASES',
 	CONNECT_AND_SHOW_DATABASES: 'CONNECT_AND_SHOW_DATABASES',
 	SELECT_DATABASE_AND_SHOW_TABLES: 'SELECT_DATABASE_AND_SHOW_TABLES',
+	// used in v1
 	PREVIEW: 'PREVIEW',
 	QUERY: 'QUERY',
 	DISCONNECT: 'DISCONNECT',
@@ -37,7 +38,8 @@ export const TASKS = {
 	AUTHENTICATE: 'AUTHENTICATE',
 	DATABASES: 'DATABASES',
 	SELECT_DATABASE: 'SELECT_DATABASE',
-	TABLES: 'TABLES'
+	TABLES: 'TABLES',
+	SETUP_HTTPS_SERVER: 'SETUP_HTTPS_SERVER'
 };
 
 
@@ -54,11 +56,11 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 		);
 
 		/*
-		 * defines the callback strategy for the message received at the
+		 * defines the responseSender strategy for the message received at the
 		 * given endpoint
 		 */
 
-		const callback = (response, status = 200) => {
+		const responseSender = (response, status = 200) => {
 			respondEvent.status = status;
 			respondEvent.send(response);
 			// Sends over the IPC channel
@@ -68,8 +70,8 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 		const apiVersion = split('/', requestEvent.route.path)[1];
 
 		/*
-		 * defines the payload of the callback for the message received at the
-		 * given endpoint
+		 * defines the payload of the responseSender for the message received
+		 * at the given endpoint
 		 */
 
 		let payload = {};
@@ -79,20 +81,22 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 		switch (apiVersion) {
 
 			case 'v0':
-				payload = v0(requestEvent, sequelizeManager, callback);
+				payload = v0(requestEvent, sequelizeManager, responseSender);
 				break;
 
 			case 'v1':
-				payload = v1(requestEvent, sequelizeManager, callback);
+				payload = v1(requestEvent, sequelizeManager, responseSender);
 				break;
 
 			default:
-				sequelizeManager.raiseError(API_VERSION(apiVersion), callback);
+				sequelizeManager.raiseError(
+					API_VERSION(apiVersion), responseSender
+				);
 
 		}
 
 		handleMessage(sequelizeManager, {
-			callback, payload
+			responseSender, payload
 		});
 
 	};
@@ -104,10 +108,12 @@ export function ipcMessageReceive(sequelizeManager, mainWindow, OPTIONS) {
 	return (evt, payload) => {
 
 		sequelizeManager.log(`Received an ipc message to ${payload.task}`, 2);
-		const callback = (response) => {
+		const responseSender = (response) => {
 			evt.sender.send(channel, response);
 		};
-		handleMessage(sequelizeManager, {callback, payload, mainWindow, OPTIONS});
+		handleMessage(sequelizeManager, {
+			responseSender, payload, mainWindow, OPTIONS
+		});
 
 	};
 }
@@ -116,11 +122,11 @@ export function ipcMessageReceive(sequelizeManager, mainWindow, OPTIONS) {
 function handleMessage(sequelizeManager, opts) {
 
 	/*
-	 *	respond with callback(wantedResponse) in sequelizeManager
+	 *	respond with responseSender(wantedResponse) in sequelizeManager
 	 *	payload used to indentify which task to perform and on what message
 	 */
 
-	const {callback, payload} = opts;
+	const {responseSender, payload} = opts;
 	const {task, message} = payload;
 
 	sequelizeManager.log(`Sending task ${task} to sequelizeManager`, 2);
@@ -130,11 +136,12 @@ function handleMessage(sequelizeManager, opts) {
 		/*
 		 * IPC messages
 		 */
-		case 'SETUP_HTTPS_SERVER': {
+		case TASK.SETUP_HTTPS_SERVER: {
 			// TODO: shell scripts for HTTPS setup don't work on windows
 
 			if (
-				(process.platform === 'darwin' || process.platform === 'linux') &&
+				(process.platform === 'darwin' || process.platform === 'linux')
+				&&
 				!contains('--test-type=webdriver', process.argv.slice(2))
 			) {
 
@@ -144,7 +151,7 @@ function handleMessage(sequelizeManager, opts) {
 					mainWindow: opts.mainWindow,
 					OPTIONS: opts.OPTIONS,
 					onSuccess: () => {
-						callback({hasSelfSignedCert: true});
+						responseSender({hasSelfSignedCert: true});
 					}
 				});
 
@@ -163,16 +170,16 @@ function handleMessage(sequelizeManager, opts) {
                     merge(
                         {message: AUTHENTICATION({error})},
                         {type: 'connection'}),
-                    callback
+                    responseSender
                 );
 			})
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are logged in as ' +
 				`[${sequelizeManager.connection.config.username}]`, 1
 			);})
-			.then(sequelizeManager.getConnection(callback))
+			.then(sequelizeManager.getConnection(responseSender))
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError(error, responseSender);
 			});
 			break;
 
@@ -180,8 +187,8 @@ function handleMessage(sequelizeManager, opts) {
 
 		case TASKS.AUTHENTICATE: {
 
-			sequelizeManager.authenticate(callback)
-			.then(sequelizeManager.getConnection(callback))
+			sequelizeManager.authenticate(responseSender)
+			.then(sequelizeManager.getConnection(responseSender))
 			.then(() => {sequelizeManager.log(
 				'NOTE: connection authenticated as ' +
 				`[${sequelizeManager.connection.config.username}]`, 1
@@ -192,14 +199,14 @@ function handleMessage(sequelizeManager, opts) {
 
 		case TASKS.DATABASES: {
 
-			sequelizeManager.authenticate(callback)
-			.then(sequelizeManager.showDatabases(callback))
+			sequelizeManager.authenticate(responseSender)
+			.then(sequelizeManager.showDatabases(responseSender))
 			.then(() => {sequelizeManager.log(
 				'NOTE: fetched the list of databases for user ' +
 				`[${sequelizeManager.connection.config.username}]`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError(error, responseSender);
 			});
 			break;
 
@@ -207,40 +214,40 @@ function handleMessage(sequelizeManager, opts) {
 
 		case TASKS.TABLES: {
 
-			sequelizeManager.authenticate(callback)
-			.then(sequelizeManager.showTables(callback))
+			sequelizeManager.authenticate(responseSender)
+			.then(sequelizeManager.showTables(responseSender))
 			.then(() => {sequelizeManager.log(
 				'NOTE: fetched the list of tables for database' +
 				`[${sequelizeManager.connection.config.database}]`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError(error, responseSender);
 			});
 			break;
 		}
 
 		case TASKS.PREVIEW: {
 
-			sequelizeManager.authenticate(callback)
-			.then(sequelizeManager.previewTables(message, callback))
+			sequelizeManager.authenticate(responseSender)
+			.then(sequelizeManager.previewTables(message, responseSender))
 			.then(() => {sequelizeManager.log(
 				`NOTE: you are previewing table(s) [${message}]`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError(error, responseSender);
 			});
 			break;
 
 		}
 
 		case TASKS.QUERY: {
-			sequelizeManager.authenticate(callback)
-			.then(sequelizeManager.sendRawQuery(message, callback))
+			sequelizeManager.authenticate(responseSender)
+			.then(sequelizeManager.sendRawQuery(message, responseSender))
 			.then(() => {sequelizeManager.log(
 				`QUERY EXECUTED: ${message}`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError(error, responseSender);
 			});
 			break;
 
@@ -249,13 +256,13 @@ function handleMessage(sequelizeManager, opts) {
 		case TASKS.DISCONNECT: {
 
 			try {
-				sequelizeManager.disconnect(callback);
+				sequelizeManager.disconnect(responseSender);
 				sequelizeManager.log(
 					'NOTE: you are logged out as ' +
 					`[${sequelizeManager.connection.config.username}]`, 1
 				);
 			} catch (error) {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError(error, responseSender);
 			}
 			break;
 		}
@@ -270,16 +277,16 @@ function handleMessage(sequelizeManager, opts) {
 			.catch((error) => {
 				sequelizeManager.raiseError(
 					merge(error, {type: 'connection'}),
-					callback
+					responseSender
 				);
 			})
-			.then(sequelizeManager.showDatabases(callback))
+			.then(sequelizeManager.showDatabases(responseSender))
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are logged in as ' +
 				`[${sequelizeManager.connection.config.username}]`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError(error, responseSender);
 			});
 			break;
 
@@ -287,14 +294,14 @@ function handleMessage(sequelizeManager, opts) {
 
 		case TASKS.CHECK_CONNECTION_AND_SHOW_DATABASES: {
 
-			sequelizeManager.authenticate(callback)
-			.then(sequelizeManager.showDatabases(callback))
+			sequelizeManager.authenticate(responseSender)
+			.then(sequelizeManager.showDatabases(responseSender))
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are logged in as ' +
 				`[${sequelizeManager.connection.config.username}]`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError(error, responseSender);
 			});
 			break;
 
@@ -306,23 +313,23 @@ function handleMessage(sequelizeManager, opts) {
 			.catch((error) => {
 				sequelizeManager.raiseError(
 					merge(error, {type: 'connection'}),
-					callback
+					responseSender
 				);
 			})
-			.then(sequelizeManager.showTables(callback))
+			.then(sequelizeManager.showTables(responseSender))
 			.then(() => {sequelizeManager.log(
 				'NOTE: you are previewing database ' +
 				`[${sequelizeManager.connection.config.database}]`, 1
 			);})
 			.catch( error => {
-				sequelizeManager.raiseError(error, callback);
+				sequelizeManager.raiseError(error, responseSender);
 			});
 			break;
 
 		}
 
 		default: {
-			sequelizeManager.raiseError(TASK(task), callback);
+			sequelizeManager.raiseError(TASK(task), responseSender);
 		}
 
 

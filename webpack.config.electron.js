@@ -7,11 +7,11 @@ export default {
 
     devtool: 'source-map',
 
-    entry: './main.development',
+    entry: './backend/main.development',
 
     output: {
         path: __dirname,
-        filename: './main.js'
+        filename: './backend/main.js'
     },
 
     plugins: [

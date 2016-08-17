@@ -78,7 +78,7 @@ const keyFile = `${__dirname}/ssl/certs/server/privkey.pem`;
 const csrFile = `${__dirname}/ssl/certs/server/fullchain.pem`;
 
 // Check if HTTPS has been setup or not yet
-export function checkHTTPS() {
+export function findSelfSignedCert() {
     try {
         // try reading certs
         fs.accessSync(keyFile, fs.F_OK);
@@ -89,8 +89,12 @@ export function checkHTTPS() {
     return true;
 }
 
-// Run a couple scripts to generate a self-signed cert and then run the https server
-// these scripts require sudo and prompt for an admin password
+/*
+ * Run a couple scripts to generate a self-signed cert
+ * and then run the https server.
+ * These scripts require sudo and prompt for an admin password
+ */
+
 export function setupHTTPS(
     {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
 ) {

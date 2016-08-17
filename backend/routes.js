@@ -12,7 +12,7 @@ function serveAcceptCerSteps(req, res) {
 }
 
 function serveFinished(req, res) {
-  fs.readFile(`${__dirname}/ssl/finished.html`, 'utf8', function(err, file) {
+  fs.readFile(`${__dirname}/ssl/status.html`, 'utf8', function(err, file) {
     if (err) {
       res.send(500);
     }
@@ -28,7 +28,7 @@ export function setupRoutes(server, processMessageFunction) {
     }));
 
     server.get('/steps', serveAcceptCerSteps);
-    server.get('/secure', serveFinished);
+    server.get('/status', serveFinished);
 
     server.get('/v0/connect', processMessageFunction);
     server.get('/v0/login', processMessageFunction);
