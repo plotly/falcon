@@ -23,11 +23,9 @@
 }
 
 .workspace {
-	height: 50%;
-	width: 50%;
-	display: block;
-	margin-left: auto;
-	margin-right:auto;
+	height: 60%;
+	width: 60%;
+	margin-left: 50px;
 	padding-bottom: 30px;
 	padding-top: 30px;
 }
@@ -56,10 +54,16 @@
 }
 
 .step2Container {
+	width: 800px;
 	padding-top: 30px;
 }
 
 .step3Container {
+	width: 800px;
+	padding-top: 20px;
+}
+
+.step4Container {
 	width: 800px;
 	padding-top: 20px;
 }
