@@ -69,6 +69,7 @@ app.on('ready', () => {
         if (canSetupHTTPS) {
 
             const hasSelfSignedCert = findSelfSignedCert();
+
             mainWindow.webContents.send(channel, {
                     hasSelfSignedCert: true
             });

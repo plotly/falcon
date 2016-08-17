@@ -33,9 +33,7 @@ export function selectDatabase () {
 
 export function previewTables (tableNames) {
     return () => {
-        ipcSend(
-            TASKS.PREVIEW, tableNames
-        );
+        ipcSend(TASKS.PREVIEW, tableNames);
     };
 }
 
