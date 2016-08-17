@@ -8,11 +8,9 @@ import ConnectButton from './ConnectButton/ConnectButton.react';
 import UserCredentials from './UserCredentials/UserCredentials.react';
 import LoggerController from './Logger/LoggerController.react';
 import Preview from './Preview/Preview.react';
-import HttpsInstructions from './HttpsInstructions/HttpsInstructions.react';
-import DetectHttpsServer from './DetectHttpsServer/DetectHttpsServer.react';
+import DetectHttpsServer from './HttpsServer/DetectHttpsServer.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import {APP_STATUS} from '../../constants/constants';
-import {OPTIONS} from '../../../sequelizeManager';
 
 const httpsGithubIssue = 'https://github.com/plotly/' +
                          'plotly-database-connector/issues/51';
@@ -22,9 +20,6 @@ const plotlyWorkspace = 'https://plot.ly/alpha/workspace';
 export default class Settings extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            expandInstructions: false
-        };
     }
 
     render() {
@@ -114,6 +109,7 @@ export default class Settings extends Component {
         let step2 = null;
         let step3 = null;
         let step4 = null;
+
         if (connection.get('status') === APP_STATUS.CONNECTED ||
             connection.get('status') === APP_STATUS.ERROR) {
             step2 = (
@@ -125,55 +121,45 @@ export default class Settings extends Component {
             );
 
 
-            // TODO - pass process.platform up and only show this if we're on mac or linux
-            const step3Header = (<h5>3. Secure your connection with HTTPS</h5>);
+            let step3Header = null;
+            let step3HTTPSServerStatus = null;
+            let step3InstallCerts = null;
+            const canConfigureHTTPS = process.platform === 'darwin' ||
+                process.platform === 'linux';
 
-            let step3Certs = null;
-            if (ipc.get('hasSelfSignedCert')) {
-                step3Certs = (
-                    <div>✓ This app is successfully running on HTTPS.</div>
+            if (canConfigureHTTPS) {
+                step3Header = (
+                    <h5>3. Secure your connection with HTTPS</h5>
                 );
-            } else {
-                step3Certs = (
-                    <div>
-                        This app is not running on HTTPS.&nbsp;
-                        <a
-                           onClick={ipcActions.setupHttpsServer}
-                        >
-                            Click to generate HTTPS certificates.
-                        </a>
-                    </div>
+
+                if (ipc.has('hasSelfSignedCert')) {
+                    step3HTTPSServerStatus = (
+                        <div>✓ This app is successfully running on HTTPS.</div>
+                    );
+                } else {
+                    step3HTTPSServerStatus = (
+                        <div>
+                            This app is not running on HTTPS.&nbsp;
+                            <a
+                               onClick={ipcActions.setupHttpsServer}
+                            >
+                                Click to generate HTTPS certificates.
+                            </a>
+                        </div>
+                    );
+                }
+
+                step3InstallCerts = (
+                    <DetectHttpsServer/>
                 );
             }
 
-            const step3InstallCerts = (
-                <DetectHttpsServer
-                    renderSuccess={(
-                        <div>✓ Your certificates are installed on this computer.</div>
-                    )}
-                    renderFailed={(
-                        <div>
-                            <div>
-                                Install your self-signed certificates.&nbsp;
-                                <a onClick={() => this.setState({expandInstructions: !this.state.expandInstructions})}>
-                                    {this.state.expandInstructions ? 'Hide' : 'View'} instructions.
-                                </a>
-                            </div>
-
-                            {
-                                this.state.expandInstructions ? HttpsInstructions() : null
-                            }
-                        </div>
-                    )}
-                />
-            );
-
             step3 = (
-                <div>
+                <div className={styles.step3Container}>
                     {step3Header}
                     <ul>
                         {
-                            [step3Certs, step3InstallCerts].map(
+                            [step3HTTPSServerStatus, step3InstallCerts].map(
                                 step => step ? <li>{step}</li> : null
                             )
                         }
@@ -194,8 +180,8 @@ export default class Settings extends Component {
             );
 
             step4 = (
-                <div className={styles.step3Container}>
-                    <h5>4. Query from Plotly 2.0</h5>
+                <div className={styles.step4Container}>
+                    <h5>{canConfigureHTTPS ? 4 : 3}. Query from Plotly 2.0</h5>
                     <div className={styles.futureDirections}>
                         Query data by clicking on 'import data' from
                         <a onClick={() => {
