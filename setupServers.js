@@ -37,6 +37,7 @@ const setupSecureRestifyServer = (
 
     const server = restify.createServer(httpsOptions);
     server.use(restify.queryParser());
+    sequelizeManager.log('Starting HTTPS Server', 1);
     server.use(restify.CORS({
         origins: ['*'],
         credentials: false,
@@ -52,30 +53,47 @@ const setupSecureRestifyServer = (
 
 };
 
+
 export function setupHTTP(
     {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
 ) {
 
-    const server = restify.createServer();
-    server.use(restify.queryParser());
-    server.use(restify.CORS({
+    const httpServer = restify.createServer();
+    httpServer.use(restify.queryParser());
+    httpServer.use(restify.CORS({
         origins: ['*'],
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
     })).listen(OPTIONS.port);
 
-    setupRoutes(server, serverMessageReceive(
+    setupRoutes(httpServer, serverMessageReceive(
         sequelizeManager, mainWindow.webContents)
     );
 
 }
 
+// https
+
+const keyFile = `${__dirname}/ssl/certs/server/privkey.pem`;
+const csrFile = `${__dirname}/ssl/certs/server/fullchain.pem`;
+
+// Check if HTTPS has been setup or not yet
+export function checkHTTPS() {
+    try {
+        // try reading certs
+        fs.accessSync(keyFile, fs.F_OK);
+        fs.accessSync(csrFile, fs.F_OK);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+// Run a couple scripts to generate a self-signed cert and then run the https server
+// these scripts require sudo and prompt for an admin password
 export function setupHTTPS(
     {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
 ) {
-
-    const keyFile = `${__dirname}/ssl/certs/server/privkey.pem`;
-    const csrFile = `${__dirname}/ssl/certs/server/fullchain.pem`;
 
     const hosts = '/etc/hosts';
     const connectorURL = 'connector.plot.ly';
@@ -114,9 +132,20 @@ export function setupHTTPS(
     // redirect connectorURL to localhost
     try {
 
+        sequelizeManager.log(
+            `checking if ${connectorURL} is in /etc/hosts`, 1
+        );
+
         fs.readFile(hosts, function (err, data) {
             if (data.indexOf(connectorURL) < 0) {
+
                 showSudoMessage(sequelizeManager, OPTIONS);
+                sequelizeManager.log(
+                    `${connectorURL} is not in /etc/hosts.`, 1
+                );
+                sequelizeManager.log(
+                    `Writing ${connectorURL} to /etc/hosts.`, 1
+                );
                 sudo.exec(`sh  "${scriptsDirectory}"/ssl/redirectConnector.sh`,
                     sudoOptions, function(error) {
                     if (error) {
@@ -130,7 +159,7 @@ export function setupHTTPS(
                 });
             } else {
                 sequelizeManager.log(
-                    `${connectorURL} is already redirected to a local port.`, 1
+                    `${connectorURL} is already in /etc/hosts`, 1
                 );
             }
         });
@@ -142,20 +171,25 @@ export function setupHTTPS(
     // setup HTTPS server with self signed certs
     try {
 
+        sequelizeManager.log('Checking if HTTPS certificate and key files already exist', 1);
         // try reading certs
         fs.accessSync(keyFile, fs.F_OK);
         fs.accessSync(csrFile, fs.F_OK);
 
-        sequelizeManager.log('Found certificate and private key files.', 1);
+        sequelizeManager.log('Certificate and key files already exist.', 1);
         setupSecureRestifyServer(
             {keyFile, csrFile, sequelizeManager,
             serverMessageReceive, mainWindow, OPTIONS}
         );
 
+        mainWindow.webContents.send('channel', {
+            hasSelfSignedCert: true
+        });
+
     } catch (e) {
 
-        sequelizeManager.log('Did not find certificate, generating...', 1);
-
+        sequelizeManager.log('Certificate and key files do not exist.', 1);
+        sequelizeManager.log('Genearting certificate and key files.', 1);
         // if error returned, certs do not exist -- let's create them
         showSudoMessage(sequelizeManager, OPTIONS);
         sudo.exec(
@@ -167,13 +201,17 @@ export function setupHTTPS(
                 sequelizeManager.log(error, 0);
             } else {
                 sequelizeManager.log('New key and certificate generated', 1);
+                sequelizeManager.log('Closing HTTP Server', 1);
+
+                mainWindow.webContents.send('channel', {
+                    hasSelfSignedCert: true,
+                    firstTimeRunningHttps: true
+                });
                 // setup server with those keys
                 setupSecureRestifyServer(
                     {keyFile, csrFile, sequelizeManager,
                     serverMessageReceive, mainWindow, OPTIONS}
                 );
-                require('electron').shell
-                    .openExternal('http://connector.plot.ly:5000/steps');
             }
         });
 

@@ -5,7 +5,7 @@ import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import {ipcMessageReceive,
         serverMessageReceive,
         channel} from './messageHandler';
-import {setupHTTP, setupHTTPS} from './setupServers';
+import {setupHTTP, setupHTTPS, checkHTTPS} from './setupServers';
 
 
 const ipcMain = require('electron').ipcMain;
@@ -35,13 +35,27 @@ app.on('ready', () => {
     setupHTTP({sequelizeManager, serverMessageReceive, mainWindow, OPTIONS});
 
     // TODO: shell scripts for HTTPS setup may not work on windows atm
-    if (
+    const canSetupHTTPS = (
         (process.platform === 'darwin' || process.platform === 'linux') &&
         !contains('--test-type=webdriver', process.argv.slice(2))
-    ) {
-        setupHTTPS(
-            {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
-        );
+    );
+    mainWindow.webContents.send('channel', {
+        canSetupHTTPS
+    });
+
+
+    if (canSetupHTTPS) {
+        const hasSelfSignedCert = checkHTTPS();
+        // TODO - use the 'channel' constant
+        mainWindow.webContents.send('channel', {
+                hasSelfSignedCert
+        });
+        if (hasSelfSignedCert) {
+            setupHTTPS(
+                {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
+            );
+        }
+
     }
 
     sequelizeManager.log('Starting Application...', 0);
@@ -58,7 +72,10 @@ app.on('ready', () => {
         }
 
         ipcMain.removeAllListeners(channel);
-        ipcMain.on(channel, ipcMessageReceive(sequelizeManager));
+        ipcMain.on(
+            channel,
+            ipcMessageReceive(sequelizeManager, mainWindow, OPTIONS)
+        );
 
     });
 
@@ -70,6 +87,7 @@ app.on('ready', () => {
         mainWindow.openDevTools();
     }
 
+    // TODO - Update these menu items
     if (process.platform === 'darwin') {
         template = [{
             label: 'Electron',

@@ -120,7 +120,6 @@ export default class Settings extends Component {
 
             step3 = (
                 <div className={styles.step3Container}>
-                    <h5>3. Query from Plotly 2.0</h5>
                     <div className={styles.futureDirections}>
                         Query data by clicking on 'import data' from
                         <a onClick={() => {
@@ -163,16 +162,6 @@ export default class Settings extends Component {
                     <h4>
                         Plotly 2.0 Database Connector
                     </h4>
-                    <div className={styles.info}>
-                        Learn more
-                        <a onClick={() => {
-                            shell.openExternal(httpsGithubIssue);
-                        }}
-                        >
-                        &nbsp;<u>here</u>&nbsp;
-                        </a>
-                        about setting up a connection using https.
-                    </div>
                     {step1}
                     {step2}
                     {step3}

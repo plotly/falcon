@@ -1,7 +1,7 @@
-import {merge, split} from 'ramda';
+import {merge, split, contains} from 'ramda';
 import {v0, v1} from './api';
 import {API_VERSION, AUTHENTICATION, TASK} from './errors';
-
+import {setupHTTPS} from './setupServers';
 
 	/*
 	 * - An event is received via either the ipc channel or an endpoint.
@@ -41,6 +41,7 @@ export const TASKS = {
 };
 
 
+// can we make this CHANNEL?
 export const channel = 'channel';
 
 
@@ -60,6 +61,7 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 		const callback = (response, status = 200) => {
 			respondEvent.status = status;
 			respondEvent.send(response);
+			// Sends over the IPC channel
 			mainWindowContents.send(channel, response);
 		};
 
@@ -97,7 +99,7 @@ export function serverMessageReceive(sequelizeManager, mainWindowContents) {
 }
 
 
-export function ipcMessageReceive(sequelizeManager) {
+export function ipcMessageReceive(sequelizeManager, mainWindow, OPTIONS) {
 
 	return (evt, payload) => {
 
@@ -105,7 +107,7 @@ export function ipcMessageReceive(sequelizeManager) {
 		const callback = (response) => {
 			evt.sender.send(channel, response);
 		};
-		handleMessage(sequelizeManager, {callback, payload});
+		handleMessage(sequelizeManager, {callback, payload, mainWindow, OPTIONS});
 
 	};
 }
@@ -121,10 +123,38 @@ function handleMessage(sequelizeManager, opts) {
 	const {callback, payload} = opts;
 	const {task, message} = payload;
 
-	sequelizeManager.log(`Sending task ${task} to squelizeManager`, 2);
+	sequelizeManager.log(`Sending task ${task} to sequelizeManager`, 2);
 
 	switch (task) {
 
+		/*
+		 * IPC messages
+		 */
+		case 'SETUP_HTTPS_SERVER': {
+			// TODO: shell scripts for HTTPS setup don't work on windows
+
+			if (
+				(process.platform === 'darwin' || process.platform === 'linux') &&
+				!contains('--test-type=webdriver', process.argv.slice(2))
+			) {
+
+				setupHTTPS({
+					sequelizeManager,
+					serverMessageReceive,
+					mainWindow: opts.mainWindow,
+					OPTIONS: opts.OPTIONS,
+					onSuccess: () => {
+						callback({hasSelfSignedCert: true});
+					}
+				});
+
+			}
+			break;
+		}
+
+		/*
+		 * v1 API
+		 */
 		case TASKS.CONNECT: {
 
 			sequelizeManager.connect(message)

@@ -6,6 +6,7 @@ const ipcRenderer = require('electron').ipcRenderer;
 
 export const UPDATE_IPC = 'UPDATE_IPC';
 
+// TODO: Rename this to updateIpcState and rename `UPDATE_IPC` to UPDATE_IPC_STATE
 export const updateState = createAction(UPDATE_IPC);
 
 export function query (statement) {
@@ -42,6 +43,13 @@ export function previewTables (tableNames) {
 export function disconnect () {
     return () => {
         ipcSend(TASKS.DISCONNECT);
+    };
+}
+
+export function setupHttpsServer () {
+    return () => {
+        // TODO - make this a constant
+        ipcSend('SETUP_HTTPS_SERVER');
     };
 }
 
