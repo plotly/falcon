@@ -26,7 +26,7 @@ export default class TableDropdown extends Component {
             this.props.ipcActions.previewTables([table.value]);
         } else {
             this.setState({table: ''});
-            this.props.ipcActions.updateState({previews: null});
+            this.props.ipcActions.updateIpcState({previews: null});
         }
     }
 

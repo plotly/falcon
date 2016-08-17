@@ -4,10 +4,9 @@ import {TASKS} from './../../backend/messageHandler';
 
 const ipcRenderer = require('electron').ipcRenderer;
 
-export const UPDATE_IPC = 'UPDATE_IPC';
+export const UPDATE_IPC_STATE = 'UPDATE_IPC_STATE';
 
-// TODO: Rename this to updateIpcState and rename `UPDATE_IPC` to UPDATE_IPC_STATE
-export const updateState = createAction(UPDATE_IPC);
+export const updateIpcState = createAction(UPDATE_IPC_STATE);
 
 export function query (statement) {
     return () => {
@@ -48,8 +47,7 @@ export function disconnect () {
 
 export function setupHttpsServer () {
     return () => {
-        // TODO - make this a constant
-        ipcSend('SETUP_HTTPS_SERVER');
+        ipcSend(TASKS.UPDATE_IPC_STATE);
     };
 }
 
