@@ -5,6 +5,8 @@ import {dialog} from 'electron';
 import sudo from 'electron-sudo';
 import {replace, splitAt} from 'ramda';
 
+const plotlyDomain = 'https://plot.ly';
+
 const httpsMessage = 'Welcome to the Plotly Database Connector! ' +
 'To get started we\'ll need your administrator password to set up encrypted ' +
 'HTTPS on this app. Behind the scenes we will be running the openssl command ' +
@@ -39,7 +41,7 @@ const setupSecureRestifyServer = (
     server.use(restify.queryParser());
     sequelizeManager.log('Starting HTTPS Server', 1);
     server.use(restify.CORS({
-        origins: ['*'],
+        origins: [plotlyDomain],
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
     })).listen(OPTIONS.port + 1);
@@ -61,7 +63,7 @@ export function setupHTTP(
     const httpServer = restify.createServer();
     httpServer.use(restify.queryParser());
     httpServer.use(restify.CORS({
-        origins: ['*'],
+        origins: [plotlyDomain],
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
     })).listen(OPTIONS.port);
@@ -74,8 +76,8 @@ export function setupHTTP(
 
 // https
 
-const keyFile = `${__dirname}/ssl/certs/server/privkey.pem`;
-const csrFile = `${__dirname}/ssl/certs/server/fullchain.pem`;
+const keyFile = `${__dirname}/../ssl/certs/server/privkey.pem`;
+const csrFile = `${__dirname}/../ssl/certs/server/fullchain.pem`;
 
 // Check if HTTPS has been setup or not yet
 export function findSelfSignedCert() {
@@ -150,7 +152,7 @@ export function setupHTTPS(
                 sequelizeManager.log(
                     `Writing ${connectorURL} to /etc/hosts.`, 1
                 );
-                sudo.exec(`sh  "${scriptsDirectory}"/ssl/redirectConnector.sh`,
+                sudo.exec(`sh  "${scriptsDirectory}"/../ssl/redirectConnector.sh`,
                     sudoOptions, function(error) {
                     if (error) {
                         dialog.showMessageBox(errorMessageBox(error));
@@ -197,7 +199,7 @@ export function setupHTTPS(
         // if error returned, certs do not exist -- let's create them
         showSudoMessage(sequelizeManager, OPTIONS);
         sudo.exec(
-            `sh  "${scriptsDirectory}"/ssl/createKeys.sh`, sudoOptions,
+            `sh  "${scriptsDirectory}"/../ssl/createKeys.sh`, sudoOptions,
             function(error) {
 
             if (error) {

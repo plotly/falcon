@@ -11,14 +11,6 @@ function serveAcceptCerSteps(req, res) {
   });
 }
 
-function serveFinished(req, res) {
-  fs.readFile(`${__dirname}/ssl/status.html`, 'utf8', function(err, file) {
-    if (err) {
-      res.send(500);
-    }
-    res.write(file);
-    res.end();
-  });
 }
 
 export function setupRoutes(server, processMessageFunction) {
@@ -27,8 +19,6 @@ export function setupRoutes(server, processMessageFunction) {
       directory: __dirname
     }));
 
-    server.get('/steps', serveAcceptCerSteps);
-    server.get('/status', serveFinished);
 
     server.get('/v0/connect', processMessageFunction);
     server.get('/v0/login', processMessageFunction);
