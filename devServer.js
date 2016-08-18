@@ -12,13 +12,16 @@ const compiler = webpack(config);
 const PORT = 3000;
 
 app.use(webpackDevMiddleware(compiler, {
+    quiet: true,
     publicPath: config.output.publicPath,
     stats: {
         colors: true
     }
 }));
 
-app.use(webpackHotMiddleware(compiler));
+app.use(webpackHotMiddleware(compiler, {
+    log: () => {}
+}));
 
 app.listen(PORT, 'localhost', err => {
     if (err) {
