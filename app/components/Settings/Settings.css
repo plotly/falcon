@@ -22,6 +22,19 @@
 	padding-bottom: 30px;
 }
 
+.workspace {
+	height: 60%;
+	width: 60%;
+	margin-left: 50px;
+	padding-bottom: 30px;
+	padding-top: 30px;
+}
+
+.info {
+	padding: 25px;
+    font-size: 14px;
+}
+
 .userCredentials {
 	width: 300px;
 	margin-left: 50px;
@@ -37,15 +50,26 @@
 .connectButton {
 	clear: left;
 	padding-top: 30px;
+	padding-left: 25px;
 }
 
 .step2Container {
+	width: 800px;
 	padding-top: 30px;
 }
 
 .step3Container {
 	width: 800px;
 	padding-top: 20px;
+}
+
+.step4Container {
+	width: 800px;
+	padding-top: 20px;
+}
+
+.futureDirections {
+	padding-left: 25px;
 }
 
 .previewController {
@@ -55,6 +79,8 @@
     border: 1px solid #BEC8D9;
 	border-radius: 3px;
 	padding: 10px;
+	margin-left: 25px;
+	margin-right: 25px;
 }
 
 .logContainer {

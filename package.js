@@ -26,7 +26,7 @@ const DEFAULT_OPTS = {
         '^/test($|/)',
         '^/tools($|/)',
         '^/release($|/)',
-        '^/main.development.js'
+        '^/backend/main.development.js'
     ]
     .concat(
         devDeps

@@ -1,22 +1,18 @@
-import * as fs from 'fs';
 import {app, BrowserWindow, Menu, shell} from 'electron';
-import restify from 'restify';
-import bunyan from 'bunyan';
+import {contains} from 'ramda';
+import {Logger} from './logger';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import {ipcMessageReceive,
         serverMessageReceive,
         channel} from './messageHandler';
+import {setupHTTP, setupHTTPS, findSelfSignedCert} from './setupServers';
 
-const timestamp = () => (new Date()).toTimeString();
 
 const ipcMain = require('electron').ipcMain;
 
 let menu;
 let template;
 let mainWindow = null;
-
-// const clearLog = () => fs.writeFile(OPTIONS.logpath, '');
-
 
 if (process.env.NODE_ENV === 'development') {
     require('electron-debug')();
@@ -33,71 +29,21 @@ app.on('ready', () => {
         height: 728
     });
 
-    // TODO: solve issue #58 before uncommenting this code
-    // const logToFile = bunyan.createLogger({
-    //     name: 'plotly-database-connector-logger',
-    //     streams: [
-    //         {
-    //             level: 'info',
-    //             path: OPTIONS.logpath
-    //         }
-    //     ]
-    // });
+    const logger = new Logger(OPTIONS, mainWindow, channel);
 
-    function log(logEntry, code = 2) {
+    const sequelizeManager = new SequelizeManager(logger);
 
-        // default log detail set to 1 (warn level) in ./args.js
-        if (code <= OPTIONS.logdetail) {
-            // switch (code) {
-            //     case 0:
-            //         logToFile.error(logEntry);
-            //         break;
-            //     case 1:
-            //         logToFile.warn(logEntry);
-            //         break;
-            //     case 2:
-            //         logToFile.info(logEntry);
-            //         break;
-            //     default:
-            //         logToFile.info(logEntry);
-            // }
+    // TODO: issue #65 shell scripts for HTTPS setup may not work on windows atm
+    const canSetupHTTPS = (
+        (process.platform === 'darwin' || process.platform === 'linux') &&
+        !contains('--test-type=webdriver', process.argv.slice(2))
+    );
 
-            if (!OPTIONS.headless) {
-                mainWindow.webContents.send(channel, {
-                    log: {
-                        logEntry,
-                        timestamp: timestamp()
-                    }
-                });
-            }
+    sequelizeManager.log('Starting Application...', 0);
 
-        }
-    }
-
-    const sequelizeManager = new SequelizeManager(log);
-
-    // clear the log if the file existed already and had entries
-    // clearLog();
-
-    const server = restify.createServer();
-
-    sequelizeManager.log(`Setting up server on port ${OPTIONS.port} ...`, 2);
-
-    server.use(restify.queryParser());
-    server.use(restify.CORS({
-        origins: ['*'],
-        credentials: false,
-        headers: ['Access-Control-Allow-Origin']
-    })).listen(OPTIONS.port);
-
-    sequelizeManager.log('Done.', 2);
-
-    sequelizeManager.log('Rendering the app...', 2);
-
-    mainWindow.loadURL(`file://${__dirname}/app/app.html`);
+    mainWindow.loadURL(`file://${__dirname}/../app/app.html`);
 
     mainWindow.webContents.on('did-finish-load', () => {
-        sequelizeManager.log('Rendering the app...', 2);
 
         // show window if it's not running in headless mode
         if (!OPTIONS.headless) {
@@ -107,52 +53,36 @@ app.on('ready', () => {
         }
 
         ipcMain.removeAllListeners(channel);
-        ipcMain.on(channel, ipcMessageReceive(sequelizeManager));
-
-        sequelizeManager.log('Setting up routes...', 2);
-
-        // TODO: simplify this restify server routing code
-        server.get('/v0/connect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v0/login', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v0/query', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v0/tables', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v0/disconnect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/connect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/authenticate', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/databases', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/selectdatabase', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/tables', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/preview', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/query', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
-        );
-        server.get('/v1/disconnect', serverMessageReceive(
-            sequelizeManager, mainWindow.webContents)
+        ipcMain.on(
+            channel,
+            ipcMessageReceive(sequelizeManager, mainWindow, OPTIONS)
         );
 
-        sequelizeManager.log('Done.', 2);
+        setupHTTP({
+            sequelizeManager, serverMessageReceive,
+            mainWindow, OPTIONS
+        });
+
+        mainWindow.webContents.send(channel, {
+            canSetupHTTPS: true
+        });
+
+        if (canSetupHTTPS) {
+
+            const hasSelfSignedCert = findSelfSignedCert();
+
+            mainWindow.webContents.send(channel, {
+                    hasSelfSignedCert: true
+            });
+
+            if (hasSelfSignedCert) {
+                setupHTTPS({
+                    sequelizeManager, serverMessageReceive,
+                    mainWindow, OPTIONS
+                });
+            }
+
+        }
 
     });
 
@@ -166,9 +96,9 @@ app.on('ready', () => {
 
     if (process.platform === 'darwin') {
         template = [{
-            label: 'Electron',
+            label: 'Plotly Database Connector',
             submenu: [{
-                label: 'About ElectronReact',
+                label: 'About Plotly Database Connector',
                 selector: 'orderFrontStandardAboutPanel:'
             }, {
                 type: 'separator'
@@ -178,7 +108,7 @@ app.on('ready', () => {
             }, {
                 type: 'separator'
             }, {
-                label: 'Hide ElectronReact',
+                label: 'Hide Plotly Database Connector',
                 accelerator: 'Command+H',
                 selector: 'hide:'
             }, {
@@ -342,24 +272,20 @@ app.on('ready', () => {
             submenu: [{
                 label: 'Learn More',
                 click() {
-                    shell.openExternal('http://electron.atom.io');
+                    shell.openExternal('https://github.com/plotly/' +
+                        'plotly-database-connector/blob/master');
                 }
             }, {
                 label: 'Documentation',
                 click() {
-                    shell.openExternal('https://github.com/' +
-                        'atom/electron/tree/master/docs#readme');
-                }
-            }, {
-                label: 'Community Discussions',
-                click() {
-                    shell.openExternal('https://discuss.atom.io/c/electron');
+                    shell.openExternal('https://github.com/plotly/' +
+                        'plotly-database-connector/blob/master/README.md');
                 }
             }, {
                 label: 'Search Issues',
                 click() {
-                    shell.openExternal('https://github.com/' +
-                        'atom/electron/issues');
+                    shell.openExternal('https://github.com/plotly/' +
+                        'plotly-database-connector/issues');
                 }
             }]
         }];

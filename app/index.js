@@ -5,7 +5,7 @@ import {Router, hashHistory} from 'react-router';
 import {syncHistoryWithStore} from 'react-router-redux';
 import routes from './routes';
 import configureStore from './store/configureStore';
-import {updateState} from './actions/ipc';
+import {updateIpcState} from './actions/ipc';
 import {productName, version} from '../package.json';
 import './app.global.css';
 
@@ -14,7 +14,7 @@ const history = syncHistoryWithStore(hashHistory, store);
 
 const ipcRenderer = require('electron').ipcRenderer;
 ipcRenderer.on('channel', function(event, message) {
-    store.dispatch(updateState(message));
+    store.dispatch(updateIpcState(message));
 });
 
 window.document.title = `${productName} v${version}`;

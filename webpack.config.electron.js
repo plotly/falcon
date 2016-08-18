@@ -7,11 +7,11 @@ export default {
 
     devtool: 'source-map',
 
-    entry: './main.development',
+    entry: './backend/main.development',
 
     output: {
         path: __dirname,
-        filename: './main.js'
+        filename: './backend/main.js'
     },
 
     plugins: [
@@ -36,6 +36,7 @@ export default {
     target: 'electron-main',
 
     node: {
+        // https://github.com/automation-stack/electron-sudo#usage-with-webpack
         __dirname: false,
         __filename: false
     },

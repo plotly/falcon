@@ -63,7 +63,10 @@ export default class ConnectButton extends Component {
     componentWillReceiveProps(nextProps) {
         const status = this.props.connection.get('status');
             if (!nextProps.ipc.get('error')) {
-                if (nextProps.ipc.has('databases') && !nextProps.ipc.get('databases')) {
+                if (
+                    nextProps.ipc.has('databases') &&
+                    !nextProps.ipc.get('databases')
+                ) {
                     this.updateStatus(APP_STATUS.DISCONNECTED);
                 } else if (nextProps.ipc.get('databases')) {
                     this.updateStatus(APP_STATUS.CONNECTED);

@@ -32,15 +32,16 @@ export default {
     ],
     externals: [
         {
-        'mysql': 'mysql',
-        'pg': 'pg',
-        'pg-native': 'pg-native',
-        'pg-hstore': 'pg-hstore',
-        'sqlite3': 'sqlite3',
-        'restify': 'commonjs restify',
-        'sequelize': 'commonjs sequelize',
-        'bunyan': 'commonjs bunyan',
-        'tedious': 'tedious'
+            'mysql': 'mysql',
+            'pg': 'pg',
+            'pg-native': 'pg-native',
+            'pg-hstore': 'pg-hstore',
+            'sqlite3': 'sqlite3',
+            'restify': 'commonjs restify',
+            'sequelize': 'commonjs sequelize',
+            'bunyan': 'commonjs bunyan',
+            'tedious': 'tedious',
+            'electron-sudo': 'commonjs electron-sudo'
         }
     ]
 };
