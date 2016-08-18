@@ -209,8 +209,8 @@ export class SequelizeManager {
         return () => this.connection
         .query(showtables, this.setQueryType('SELECT'))
         .then(results => {
-            this.log('Results recieved.', 1);
-
+            this.log('Results received', 1);
+            // TODO: when switching fornt end to v1, simply send back an array
             const tablesObject = this.intoTablesArray(results).map(table => {
                 return {[table]: {}};
             });

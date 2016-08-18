@@ -56,7 +56,7 @@ export default class Settings extends Component {
         );
 
         let tablePreview = null;
-        if (ipc.has('previews')) {
+        if (ipc.has('previews') && ipc.get('previews')) {
             tablePreview = (
                 <div className={styles.previewController}>
                     <Preview
@@ -112,6 +112,7 @@ export default class Settings extends Component {
 
         if (connection.get('status') === APP_STATUS.CONNECTED ||
             connection.get('status') === APP_STATUS.ERROR) {
+
             step2 = (
                 <div className={styles.step2Container}>
                     <h5>2. Preview Database and Tables</h5>
@@ -201,6 +202,7 @@ export default class Settings extends Component {
                     </img>
                 </div>
             );
+
         }
 
         const logContainer = (
