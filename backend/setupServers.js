@@ -45,7 +45,7 @@ const setupSecureRestifyServer = (
     server.use(restify.queryParser());
     sequelizeManager.log('Starting HTTPS Server', 1);
     server.use(restify.CORS({
-        origins: [plotlyDomains],
+        origins: plotlyDomains,
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
     })).listen(OPTIONS.port + 1);
@@ -67,7 +67,7 @@ export function setupHTTP(
     const httpServer = restify.createServer();
     httpServer.use(restify.queryParser());
     httpServer.use(restify.CORS({
-        origins: [plotlyDomains],
+        origins: plotlyDomains,
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
     })).listen(OPTIONS.port);
