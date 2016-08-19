@@ -41,19 +41,24 @@ const setupSecureRestifyServer = (
         certificate: fs.readFileSync(csrFile)
     };
 
-    const server = restify.createServer(httpsOptions);
-    server.use(restify.queryParser());
+    const httpsServer = restify.createServer(httpsOptions);
+    /*
+     * parsed content will always be available in req.query,
+     * additionally params are merged into req.params
+     */
+    httpsServer.use(restify.queryParser());
+    httpsServer.use(restify.bodyParser({ mapParams: true }));
     sequelizeManager.log('Starting HTTPS Server', 1);
-    server.use(restify.CORS({
+    httpsServer.use(restify.CORS({
         origins: plotlyDomains,
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
     })).listen(OPTIONS.port + 1);
 
     // https://github.com/restify/node-restify/issues/664
-    server.opts( /.*/, (req, res) => res.send(204));
+    httpsServer.opts( /.*/, (req, res) => res.send(204));
 
-    setupRoutes(server, serverMessageReceive(
+    setupRoutes(httpsServer, serverMessageReceive(
         sequelizeManager, mainWindow.webContents)
     );
 
@@ -66,6 +71,7 @@ export function setupHTTP(
 
     const httpServer = restify.createServer();
     httpServer.use(restify.queryParser());
+    httpServer.use(restify.bodyParser({ mapParams: true }));
     httpServer.use(restify.CORS({
         origins: plotlyDomains,
         credentials: false,

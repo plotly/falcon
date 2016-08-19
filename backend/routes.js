@@ -11,7 +11,7 @@ function serveHttpsStatus(req, res) {
             }
             res.write(file);
             res.end();
-            
+
         });
     } else {
         res.send(404);
@@ -39,4 +39,19 @@ export function setupRoutes(server, processMessageFunction) {
     server.get('/v1/preview', processMessageFunction);
     server.get('/v1/query', processMessageFunction);
     server.get('/v1/disconnect', processMessageFunction);
+
+    server.post('/v0/connect', processMessageFunction);
+    server.post('/v0/login', processMessageFunction);
+    server.post('/v0/query', processMessageFunction);
+    server.post('/v0/tables', processMessageFunction);
+    server.post('/v0/disconnect', processMessageFunction);
+    server.post('/v1/connect', processMessageFunction);
+    server.post('/v1/authenticate', processMessageFunction);
+    server.post('/v1/databases', processMessageFunction);
+    server.post('/v1/selectdatabase', processMessageFunction);
+    server.post('/v1/tables', processMessageFunction);
+    server.post('/v1/preview', processMessageFunction);
+    server.post('/v1/query', processMessageFunction);
+    server.post('/v1/disconnect', processMessageFunction);
+
 }

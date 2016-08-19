@@ -188,7 +188,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
              * action: authenticate, send raw query
              * returns: query response
              */
-
+             
             task = TASKS.QUERY;
 
             if (!foundParams(requestEvent.params, 'statement')) {
