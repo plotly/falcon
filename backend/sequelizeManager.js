@@ -1,10 +1,10 @@
-import * as fs from 'fs';
 import Sequelize from 'sequelize';
 import {DIALECTS} from '../app/constants/constants';
 import parse from './parse';
 import {merge} from 'ramda';
 import {ARGS} from './args';
 import {APP_NOT_CONNECTED, AUTHENTICATION} from './errors';
+import YAML from 'yamljs';
 
 const PREBUILT_QUERY = {
     SHOW_DATABASES: 'SHOW_DATABASES',
@@ -115,7 +115,7 @@ export class SequelizeManager {
     connect(configFromApp) {
 
         if (ARGS.headless) {
-            const configFromFile = JSON.parse(fs.readFileSync(ARGS.configpath));
+            const configFromFile = YAML.load(ARGS.configpath);
             /*
              * if server is sending a headless app a new database,
              * use that one instead of the one in the config file
