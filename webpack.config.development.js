@@ -2,6 +2,9 @@
 import webpack from 'webpack';
 import baseConfig from './webpack.config.base';
 
+// Import the plugin:
+var DashboardPlugin = require('webpack-dashboard/plugin');
+
 const config = {
     ...baseConfig,
 
@@ -44,6 +47,7 @@ const config = {
 
     plugins: [
         ...baseConfig.plugins,
+        new DashboardPlugin(),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin(),
         new webpack.DefinePlugin({
