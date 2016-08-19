@@ -22,7 +22,7 @@ const optionsBook = {
         acceptedValues: 'path to logpath w/o quotes (ex: path/to/file.log)'
     },
     configpath: {
-        defaultValue: `${__dirname}/config.json`,
+        defaultValue: `${__dirname}/config.yaml`,
         acceptedValues: 'path to config w/o quotes (ex: path/to/config.json)'
     },
     // 0 for errors only, 1 adds warnings, 2 adds info
