@@ -133,7 +133,9 @@ export default class Settings extends Component {
                     <h5>3. Secure your connection with HTTPS</h5>
                 );
 
-                if (ipc.has('hasSelfSignedCert')) {
+                if (ipc.has('hasSelfSignedCert') &&
+                    ipc.get('hasSelfSignedCert')
+                ) {
                     step3HTTPSServerStatus = (
                         <div>✓ This app is successfully running on HTTPS.</div>
                     );

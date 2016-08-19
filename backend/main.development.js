@@ -72,7 +72,7 @@ app.on('ready', () => {
             const hasSelfSignedCert = findSelfSignedCert();
 
             mainWindow.webContents.send(channel, {
-                    hasSelfSignedCert: true
+                    hasSelfSignedCert: hasSelfSignedCert
             });
 
             if (hasSelfSignedCert) {
