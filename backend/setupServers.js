@@ -4,12 +4,9 @@ import {setupRoutes} from './routes';
 import {dialog} from 'electron';
 import sudo from 'electron-sudo';
 import {replace, splitAt} from 'ramda';
+import YAML from 'yamljs';
 
-const plotlyDomains = [
-    'https://plot.ly',
-    'https://stage.plot.ly',
-    'https://local.plot.ly'
-];
+const acceptRequestsFrom = YAML.load(`${__dirname}/acceptedDomains.yaml`);
 
 const httpsMessage = 'Welcome to the Plotly Database Connector! ' +
 'To get started we\'ll need your administrator password to set up encrypted ' +
@@ -50,7 +47,7 @@ const setupSecureRestifyServer = (
     httpsServer.use(restify.bodyParser({ mapParams: true }));
     sequelizeManager.log('Starting HTTPS Server', 1);
     httpsServer.use(restify.CORS({
-        origins: plotlyDomains,
+        origins: acceptRequestsFrom.domains,
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
     })).listen(OPTIONS.port + 1);
@@ -68,12 +65,11 @@ const setupSecureRestifyServer = (
 export function setupHTTP(
     {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
 ) {
-
     const httpServer = restify.createServer();
     httpServer.use(restify.queryParser());
     httpServer.use(restify.bodyParser({ mapParams: true }));
     httpServer.use(restify.CORS({
-        origins: plotlyDomains,
+        origins: acceptRequestsFrom.domains,
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
     })).listen(OPTIONS.port);
