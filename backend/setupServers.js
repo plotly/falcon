@@ -4,12 +4,9 @@ import {setupRoutes} from './routes';
 import {dialog} from 'electron';
 import sudo from 'electron-sudo';
 import {replace, splitAt} from 'ramda';
+import YAML from 'yamljs';
 
-const plotlyDomains = [
-    'https://plot.ly',
-    'https://stage.plot.ly',
-    'https://local.plot.ly'
-];
+const acceptRequestsFrom = YAML.load(`${__dirname}/acceptedDomains.yaml`);
 
 const httpsMessage = 'Welcome to the Plotly Database Connector! ' +
 'To get started we\'ll need your administrator password to set up encrypted ' +
@@ -41,19 +38,24 @@ const setupSecureRestifyServer = (
         certificate: fs.readFileSync(csrFile)
     };
 
-    const server = restify.createServer(httpsOptions);
-    server.use(restify.queryParser());
+    const httpsServer = restify.createServer(httpsOptions);
+    /*
+     * parsed content will always be available in req.query,
+     * additionally params are merged into req.params
+     */
+    httpsServer.use(restify.queryParser());
+    httpsServer.use(restify.bodyParser({ mapParams: true }));
     sequelizeManager.log('Starting HTTPS Server', 1);
-    server.use(restify.CORS({
-        origins: plotlyDomains,
+    httpsServer.use(restify.CORS({
+        origins: acceptRequestsFrom.domains,
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
     })).listen(OPTIONS.port + 1);
 
     // https://github.com/restify/node-restify/issues/664
-    server.opts( /.*/, (req, res) => res.send(204));
+    httpsServer.opts( /.*/, (req, res) => res.send(204));
 
-    setupRoutes(server, serverMessageReceive(
+    setupRoutes(httpsServer, serverMessageReceive(
         sequelizeManager, mainWindow.webContents)
     );
 
@@ -63,11 +65,11 @@ const setupSecureRestifyServer = (
 export function setupHTTP(
     {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
 ) {
-
     const httpServer = restify.createServer();
     httpServer.use(restify.queryParser());
+    httpServer.use(restify.bodyParser({ mapParams: true }));
     httpServer.use(restify.CORS({
-        origins: plotlyDomains,
+        origins: acceptRequestsFrom.domains,
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
     })).listen(OPTIONS.port);

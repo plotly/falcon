@@ -19,63 +19,6 @@ const foundParams = (params, wantedParam) => {
     return false;
 };
 
-
-export function v0(requestEvent, sequelizeManager, callback) {
-
-    const {connection} = sequelizeManager;
-
-    let task;
-    let message;
-
-    const endpoint = split('/', requestEvent.route.path)[2];
-
-    switch (endpoint) {
-
-        case 'connect': {
-            task = TASKS.CHECK_CONNECTION_AND_SHOW_DATABASES;
-            message = sequelizeSetup(connection);
-            break;
-        }
-
-        case 'login': {
-            task = TASKS.CONNECT_AND_SHOW_DATABASES;
-            message = sequelizeSetup(connection);
-            break;
-        }
-
-        case 'query': {
-            task = TASKS.QUERY;
-            message = requestEvent.params.statement;
-            break;
-        }
-
-        case 'tables': {
-            task = TASKS.SELECT_DATABASE_AND_SHOW_TABLES;
-            message = sequelizeSetup(connection);
-            message.database = requestEvent.params.database;
-            break;
-        }
-
-        case 'disconnect': {
-            task = TASKS.DISCONNECT;
-            message = sequelizeSetup(connection);
-            break;
-        }
-
-        default: {
-            sequelizeManager.raiseError(
-                merge(`Endpoint ${endpoint} is not implemented in API v0.`),
-                callback
-            );
-        }
-
-    }
-
-    return {task, message};
-
-}
-
-
 export function v1(requestEvent, sequelizeManager, callback) {
 
     const {connection} = sequelizeManager;

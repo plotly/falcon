@@ -1,7 +1,21 @@
 import * as fs from 'fs';
 import restify from 'restify';
 
+const ENDPOINTS = {
+    v1: [
+        'connect',
+        'authenticate',
+        'databases',
+        'selectdatabase',
+        'tables',
+        'preview',
+        'query',
+        'disconnect'
+    ]
+};
+
 function serveHttpsStatus(req, res) {
+
     if (req.isSecure()) {
         fs.readFile(
             `${__dirname}/../ssl/status.html`, 'utf8', function(err, file) {
@@ -11,11 +25,12 @@ function serveHttpsStatus(req, res) {
             }
             res.write(file);
             res.end();
-            
+
         });
     } else {
         res.send(404);
     }
+    
 }
 
 export function setupRoutes(server, processMessageFunction) {
@@ -26,17 +41,10 @@ export function setupRoutes(server, processMessageFunction) {
 
     server.get('/status', serveHttpsStatus);
 
-    server.get('/v0/connect', processMessageFunction);
-    server.get('/v0/login', processMessageFunction);
-    server.get('/v0/query', processMessageFunction);
-    server.get('/v0/tables', processMessageFunction);
-    server.get('/v0/disconnect', processMessageFunction);
-    server.get('/v1/connect', processMessageFunction);
-    server.get('/v1/authenticate', processMessageFunction);
-    server.get('/v1/databases', processMessageFunction);
-    server.get('/v1/selectdatabase', processMessageFunction);
-    server.get('/v1/tables', processMessageFunction);
-    server.get('/v1/preview', processMessageFunction);
-    server.get('/v1/query', processMessageFunction);
-    server.get('/v1/disconnect', processMessageFunction);
+    // setup v1 endpoints
+    ENDPOINTS.v1.forEach (endpoint => {
+        server.get(`/v1/${endpoint}`, processMessageFunction);
+        server.post(`/v1/${endpoint}`, processMessageFunction);
+    });
+
 }

@@ -1,0 +1,6 @@
+---
+# add a domain from which API requests are to be accepted
+domains:
+    - https://plot.ly
+    - https://stage.plot.ly
+    - https://local.plot.ly
