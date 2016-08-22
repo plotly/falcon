@@ -52,7 +52,10 @@ const setupSecureRestifyServer = (
         headers: ['Access-Control-Allow-Origin']
     })).listen(OPTIONS.port + 1);
 
-    // https://github.com/restify/node-restify/issues/664
+    /*
+     * https://github.com/restify/node-restify/issues/664
+     * Handle all OPTIONS requests to a deadend (Allows CORS to work them out)
+     */ 
     httpsServer.opts( /.*/, (req, res) => res.send(204));
 
     setupRoutes(httpsServer, serverMessageReceive(
