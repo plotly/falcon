@@ -94,6 +94,28 @@ app.on('ready', () => {
         mainWindow.openDevTools();
     }
 
+    const help = {
+        label: 'Help',
+        submenu: [{
+            label: 'Documentation',
+            click() {
+                shell.openExternal('https://help.plot.ly/database-connectors/');
+            }
+        }, {
+            label: 'View Repository',
+            click() {
+                shell.openExternal('https://github.com/plotly/' +
+                    'plotly-database-connector');
+            }
+        }, {
+            label: 'Search Issues',
+            click() {
+                shell.openExternal('https://github.com/plotly/' +
+                    'plotly-database-connector/issues');
+            }
+        }]
+    };
+
     if (process.platform === 'darwin') {
         template = [{
             label: 'Plotly Database Connector',
@@ -130,14 +152,6 @@ app.on('ready', () => {
         }, {
             label: 'Edit',
             submenu: [{
-                label: 'Undo',
-                accelerator: 'Command+Z',
-                selector: 'undo:'
-            }, {
-                label: 'Redo',
-                accelerator: 'Shift+Command+Z',
-                selector: 'redo:'
-            }, {
                 type: 'separator'
             }, {
                 label: 'Cut',
@@ -199,32 +213,7 @@ app.on('ready', () => {
                 label: 'Bring All to Front',
                 selector: 'arrangeInFront:'
             }]
-        }, {
-            label: 'Help',
-            submenu: [{
-                label: 'Learn More',
-                click() {
-                    shell.openExternal('http://electron.atom.io');
-                }
-            }, {
-                label: 'Documentation',
-                click() {
-                    shell.openExternal('https://github.com/' +
-                        'atom/electron/tree/master/docs#readme');
-                }
-            }, {
-                label: 'Community Discussions',
-                click() {
-                    shell.openExternal('https://discuss.atom.io/c/electron');
-                }
-            }, {
-                label: 'Search Issues',
-                click() {
-                    shell.openExternal('https://github.com/' +
-                        'atom/electron/issues');
-                }
-            }]
-        }];
+        }, help];
         menu = Menu.buildFromTemplate(template);
         Menu.setApplicationMenu(menu);
     } else {
@@ -267,28 +256,7 @@ app.on('ready', () => {
                     mainWindow.setFullScreen(!mainWindow.isFullScreen());
                 }
             }]
-        }, {
-            label: 'Help',
-            submenu: [{
-                label: 'Learn More',
-                click() {
-                    shell.openExternal('https://github.com/plotly/' +
-                        'plotly-database-connector/blob/master');
-                }
-            }, {
-                label: 'Documentation',
-                click() {
-                    shell.openExternal('https://github.com/plotly/' +
-                        'plotly-database-connector/blob/master/README.md');
-                }
-            }, {
-                label: 'Search Issues',
-                click() {
-                    shell.openExternal('https://github.com/plotly/' +
-                        'plotly-database-connector/issues');
-                }
-            }]
-        }];
+        }, help];
         menu = Menu.buildFromTemplate(template);
         mainWindow.setMenu(menu);
     }
