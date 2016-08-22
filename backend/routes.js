@@ -15,6 +15,7 @@ const ENDPOINTS = {
 };
 
 function serveHttpsStatus(req, res) {
+
     if (req.isSecure()) {
         fs.readFile(
             `${__dirname}/../ssl/status.html`, 'utf8', function(err, file) {
@@ -29,6 +30,7 @@ function serveHttpsStatus(req, res) {
     } else {
         res.send(404);
     }
+    
 }
 
 export function setupRoutes(server, processMessageFunction) {
