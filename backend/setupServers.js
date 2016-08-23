@@ -6,6 +6,8 @@ import sudo from 'electron-sudo';
 import {replace, splitAt} from 'ramda';
 import YAML from 'yamljs';
 
+const connectorURL = 'connector.plot.ly';
+
 const acceptRequestsFrom = YAML.load(`${__dirname}/acceptedDomains.yaml`);
 
 const httpsMessage = 'Welcome to the Plotly Database Connector! ' +
@@ -27,6 +29,8 @@ const showSudoMessage = (sequelizeManager, OPTIONS) => {
         }
     }
 };
+
+// https
 
 const setupSecureRestifyServer = (
     {keyFile, csrFile, sequelizeManager,
@@ -64,6 +68,7 @@ const setupSecureRestifyServer = (
 
 };
 
+// http
 
 export function setupHTTP(
     {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
@@ -83,7 +88,7 @@ export function setupHTTP(
 
 }
 
-// https
+// certificates setup
 
 const keyFile = `${__dirname}/../ssl/certs/server/privkey.pem`;
 const csrFile = `${__dirname}/../ssl/certs/server/fullchain.pem`;
@@ -111,7 +116,6 @@ export function setupHTTPS(
 ) {
 
     const hosts = '/etc/hosts';
-    const connectorURL = 'connector.plot.ly';
 
     const sudoOptions = {
         name: 'Connector',
