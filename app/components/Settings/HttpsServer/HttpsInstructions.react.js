@@ -1,7 +1,7 @@
 import React from 'react';
 import {shell} from 'electron';
 
-const HTML_STATUS_PAGE = 'https://connector.plot.ly:5001/status';
+const HTML_STATUS_PAGE = 'https://connector.plot.ly:5000/status';
 
 const HttpsInstructions = () => (
     <div>

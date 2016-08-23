@@ -15,7 +15,7 @@ class DetectHttpsServer extends Component {
     componentWillMount() {
 
         INTERVAL_ID = setInterval(() => {
-            fetch('https://connector.plot.ly:5001/status')
+            fetch('https://connector.plot.ly:5000/status')
             .then(request => {
                 console.warn('successfulFetch: true');
                 this.setState({successfulFetch: true});
@@ -52,7 +52,7 @@ class DetectHttpsServer extends Component {
                                 expandInstructions: !this.state.expandInstructions
                             });
                         }}
-            >
+                        >
                             {this.state.expandInstructions ? 'Hide ' : 'View '}
                             instructions.
                         </a>

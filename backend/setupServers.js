@@ -6,6 +6,9 @@ import sudo from 'electron-sudo';
 import {replace, splitAt} from 'ramda';
 import YAML from 'yamljs';
 
+export let httpServer;
+export let httpsServer;
+
 const connectorURL = 'connector.plot.ly';
 
 const acceptRequestsFrom = YAML.load(`${__dirname}/acceptedDomains.yaml`);
@@ -42,7 +45,10 @@ const setupSecureRestifyServer = (
         certificate: fs.readFileSync(csrFile)
     };
 
-    const httpsServer = restify.createServer(httpsOptions);
+    sequelizeManager.log('Closing http server.', 1);
+    httpServer.close();
+
+    httpsServer = restify.createServer(httpsOptions);
     /*
      * parsed content will always be available in req.query,
      * additionally params are merged into req.params
@@ -54,12 +60,12 @@ const setupSecureRestifyServer = (
         origins: acceptRequestsFrom.domains,
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
-    })).listen(OPTIONS.port + 1);
+    })).listen(OPTIONS.port);
 
     /*
      * https://github.com/restify/node-restify/issues/664
      * Handle all OPTIONS requests to a deadend (Allows CORS to work them out)
-     */ 
+     */
     httpsServer.opts( /.*/, (req, res) => res.send(204));
 
     setupRoutes(httpsServer, serverMessageReceive(
@@ -73,7 +79,7 @@ const setupSecureRestifyServer = (
 export function setupHTTP(
     {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
 ) {
-    const httpServer = restify.createServer();
+    httpServer = restify.createServer();
     httpServer.use(restify.queryParser());
     httpServer.use(restify.bodyParser({ mapParams: true }));
     httpServer.use(restify.CORS({
