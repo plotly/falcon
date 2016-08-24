@@ -1,7 +1,7 @@
-import {OPTIONS} from './../../backend/sequelizeManager';
-import {CONNECTOR_URL} from './../../backend/setupServers';
-
-export const BACKEND = {OPTIONS, CONNECTOR_URL};
+export const BACKEND = {
+    CONNECTOR_URL: 'connector.plot.ly',
+    OPTIONS: {port: 5000}
+};
 
 export const DIALECTS = {
     MYSQL: 'mysql',
