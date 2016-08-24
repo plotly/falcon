@@ -1,7 +1,8 @@
 import React from 'react';
 import {shell} from 'electron';
+import {BACKEND} from '../../../constants/constants';
 
-const HTML_STATUS_PAGE = 'https://connector.plot.ly:5000/status';
+const HTML_STATUS_PAGE = `https://${BACKEND.CONNECTOR_URL}:${BACKEND.OPTIONS.port}/status`;
 
 const HttpsInstructions = () => (
     <div>

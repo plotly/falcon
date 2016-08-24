@@ -1,3 +1,8 @@
+import {OPTIONS} from './../../backend/sequelizeManager';
+import {CONNECTOR_URL} from './../../backend/setupServers';
+
+export const BACKEND = {OPTIONS, CONNECTOR_URL};
+
 export const DIALECTS = {
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
