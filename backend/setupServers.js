@@ -9,7 +9,7 @@ import YAML from 'yamljs';
 export let httpServer;
 export let httpsServer;
 
-const connectorURL = 'connector.plot.ly';
+export const CONNECTOR_URL = 'connector.plot.ly';
 
 const acceptRequestsFrom = YAML.load(`${__dirname}/acceptedDomains.yaml`);
 
@@ -154,22 +154,22 @@ export function setupHTTPS(
         };
     };
 
-    // redirect connectorURL to localhost
+    // redirect CONNECTOR_URL to localhost
     try {
 
         sequelizeManager.log(
-            `checking if ${connectorURL} is in /etc/hosts`, 1
+            `checking if ${CONNECTOR_URL} is in /etc/hosts`, 1
         );
 
         fs.readFile(hosts, function (err, data) {
-            if (data.indexOf(connectorURL) < 0) {
+            if (data.indexOf(CONNECTOR_URL) < 0) {
 
                 showSudoMessage(sequelizeManager, OPTIONS);
                 sequelizeManager.log(
-                    `${connectorURL} is not in /etc/hosts.`, 1
+                    `${CONNECTOR_URL} is not in /etc/hosts.`, 1
                 );
                 sequelizeManager.log(
-                    `Writing ${connectorURL} to /etc/hosts.`, 1
+                    `Writing ${CONNECTOR_URL} to /etc/hosts.`, 1
                 );
                 sudo.exec(`sh  "${scriptsDirectory}"/../ssl/redirectConnector.sh`,
                     sudoOptions, function(error) {
@@ -178,13 +178,13 @@ export function setupHTTPS(
                         sequelizeManager.log(error, 0);
                     } else {
                         sequelizeManager.log(
-                            `${connectorURL} is now redirected to local.`, 1
+                            `${CONNECTOR_URL} is now redirected to local.`, 1
                         );
                     }
                 });
             } else {
                 sequelizeManager.log(
-                    `${connectorURL} is already in /etc/hosts`, 1
+                    `${CONNECTOR_URL} is already in /etc/hosts`, 1
                 );
             }
         });
