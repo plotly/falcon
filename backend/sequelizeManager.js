@@ -98,17 +98,32 @@ export class SequelizeManager {
 
         this.log(`Creating a connection for user ${username}`, 1);
 
+        let redshiftOptions = null;
+        if (this.connection.config.dialect === 'redshift') {
+            // http://stackoverflow.com/questions/32037385/using-sequelize-with-redshift
+            // avoid auto-detection and typarray/pg_type error
+            Sequelize.HSTORE.types.postgres.oids.push('dummy');
+            this.connection.config.dialect = 'postgres';
+            redshiftOptions = {
+                pool: false,
+                keepDefaultTimezone: true, // avoid SET TIMEZONE
+                databaseVersion: '8.0.2' // avoid SHOW SERVER_VERSION
+            };
+        }
+
         this.connection = new Sequelize(database, username, password, {
             dialect,
             host,
             port,
             storage
-        });
+        }, redshiftOptions);
 
 
         if (this.connection.config.dialect === 'mssql') {
             this.connection.config.dialectOptions = {encrypt: true};
         }
+
+
 
     }
 

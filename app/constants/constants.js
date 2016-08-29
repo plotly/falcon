@@ -3,6 +3,7 @@ export const DIALECTS = {
     MARIADB: 'mariadb',
     POSTGRES: 'postgres',
     MSSQL: 'mssql',
+    REDSHIFT: 'redshift',
     SQLITE: 'sqlite'
 };
 
@@ -20,6 +21,7 @@ export const USER_INPUT_FIELDS = {
     [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port'],
 	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port'],
     [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
+    [DIALECTS.REDSHIFT]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.SQLITE]: ['storage']
 };
 
