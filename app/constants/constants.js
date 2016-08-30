@@ -38,3 +38,18 @@ export const BUTTON_MESSAGE = {
     CONNECTING: 'connecting...',
     DISCONNECTED: 'connect'
 };
+
+export const NEW_SESSION =
+{
+    CONFIG: {
+        username: '',
+        password: '',
+        database: '',
+        dialect: DIALECTS.POSTGRES,
+        port: '',
+        storage: '',
+        host: ''
+    },
+    CONNECTION: {status: APP_STATUS.INITIALIZED},
+    IPC: {}
+};
