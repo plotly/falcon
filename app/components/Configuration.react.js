@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Settings from './Settings/Settings.react';
-
+import Rolladex from './Rolladex/Rolladex.react';
+import * as styles from './Configuration.css';
 
 export default class Configuration extends Component {
     constructor(props) {
@@ -36,6 +37,18 @@ export default class Configuration extends Component {
 
         return (
             <div>
+
+                <img
+                    src="./images/plotly-logo.png"
+                    className={styles.plotlyLogo}
+                >
+                </img>
+
+                <h4>
+                    Plotly 2.0 Database Connector
+                </h4>
+                {settings}
+
             </div>
 
         );
