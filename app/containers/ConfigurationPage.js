@@ -1,23 +1,15 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Configuration from '../components/Configuration.react';
-import * as ConfigurationActions from '../actions/configuration';
-import * as IpcActions from '../actions/ipc';
-import * as ConnectionActions from '../actions/connection';
+import * as SessionsActions from '../actions/sessions';
 
 function mapStateToProps(state) {
-    return {
-        configuration: state.configuration,
-        ipc: state.ipc,
-        connection: state.connection
-    };
+    return {sessions: state.sessions};
 }
 
 function mapDispatchToProps(dispatch) {
-    const configActions = bindActionCreators(ConfigurationActions, dispatch);
-    const ipcActions = bindActionCreators(IpcActions, dispatch);
-    const connectionActions = bindActionCreators(ConnectionActions, dispatch);
-    return {configActions, ipcActions, connectionActions};
+    const sessionsActions = bindActionCreators(SessionsActions, dispatch);
+    return {sessionsActions};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Configuration);

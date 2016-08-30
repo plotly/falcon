@@ -9,26 +9,40 @@ export default class Configuration extends Component {
     }
 
     render() {
+        let settings = null;
+        const {
+            sessionsActions,
+            sessions
+        } = this.props;
+        // debugger;
+        const sessionSelected = sessions.getIn(
+            ['list', `${this.props.sessions.get('sessionSelected')}`]
+        );
+        console.warn(sessionSelected);
+
+        if (this.props.sessions.get('list').size > 0) {
+            console.warn('rendering settings');
+
+            settings = (
+                <Settings
+                    configuration={sessionSelected.get('configuration')}
+                    connection={sessionSelected.get('connection')}
+                    ipc={sessionSelected.get('ipc')}
+
+                    sessionsActions={sessionsActions}
+                />
+            );
+        }
+
         return (
             <div>
-                <Settings
-                    configuration={this.props.configuration}
-                    configActions={this.props.configActions}
-                    ipcActions={this.props.ipcActions}
-                    ipc={this.props.ipc}
-                    connection={this.props.connection}
-                    connectionActions={this.props.connectionActions}
-                />;
             </div>
+
         );
     }
 }
 
 Configuration.propTypes = {
-    configuration: ImmutablePropTypes.map.isRequired,
-    configActions: PropTypes.object,
-    ipc: ImmutablePropTypes.map.isRequired,
-    ipcActions: PropTypes.object,
-    connection: ImmutablePropTypes.map.isRequired,
-    connectionActions: PropTypes.object
+    sessionsActions: PropTypes.object,
+    sessions: ImmutablePropTypes.map.isRequired
 };
