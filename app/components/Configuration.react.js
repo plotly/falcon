@@ -47,6 +47,12 @@ export default class Configuration extends Component {
                 <h4>
                     Plotly 2.0 Database Connector
                 </h4>
+
+                <Rolladex
+                    sessionsActions={this.props.sessionsActions}
+                    sessions={this.props.sessions}
+                />
+
                 {settings}
 
             </div>
