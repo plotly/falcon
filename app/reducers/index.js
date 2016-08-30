@@ -1,13 +1,9 @@
 import { combineReducers } from 'redux';
 import { routerReducer as routing } from 'react-router-redux';
-import configuration from './configuration';
-import ipc from './ipc';
-import connection from './connection';
+import sessions from './sessions';
 
 const rootReducer = combineReducers({
-    configuration,
-    ipc,
-    connection,
+    sessions,
     routing
 });
 
