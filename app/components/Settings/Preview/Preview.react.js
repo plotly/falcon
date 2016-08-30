@@ -63,6 +63,6 @@ export default class Preview extends Component {
 }
 
 Preview.propTypes = {
-    ipcActions: PropTypes.object,
+    sessionsActions: PropTypes.object,
     ipc: ImmutablePropTypes.map.isRequired
 };

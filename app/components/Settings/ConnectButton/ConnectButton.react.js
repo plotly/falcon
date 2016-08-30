@@ -8,7 +8,7 @@ import {APP_STATUS, BUTTON_MESSAGE} from '../../../constants/constants';
 	Displays a connect button and a disconnect button.
 	Asks sequelize to create a new connection using credentials.
 	Fires preset queries to show available databases/schemes
-	inside the users' account using `ipcActions`.
+	inside the users' account using `sessionsActions`.
 	Displays errors and log messages using `ipc`.
 */
 
@@ -36,11 +36,11 @@ export default class ConnectButton extends Component {
 
     connect() {
         this.updateStatus(APP_STATUS.CONNECTING);
-        this.props.ipcActions.connect(this.props.configuration);
+        this.props.sessionsActions.connect(this.props.configuration);
     }
 
     disconnect() {
-        this.props.ipcActions.disconnect();
+        this.props.sessionsActions.disconnect();
     }
 
     onMouseOver() {
@@ -53,7 +53,7 @@ export default class ConnectButton extends Component {
 
     updateStatus(status) {
         if (status !== this.props.connection.get('status')) {
-            this.props.connectionActions.update({status});
+            this.props.sessionsActions.updateConnection({status});
             this.setState({
                 buttonMessage: BUTTON_MESSAGE[status]
             });
@@ -93,7 +93,7 @@ export default class ConnectButton extends Component {
             buttonMessage = 'disconnect';
         }
 
-        // what should the button onClick do depending on the app status?
+        // what should the button onClick do depending on the app status
         switch (status) {
 
             case APP_STATUS.INITIALIZED:
@@ -164,7 +164,6 @@ export default class ConnectButton extends Component {
 ConnectButton.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
     connection: ImmutablePropTypes.map.isRequired,
-    connectionActions: PropTypes.object,
-    ipc: ImmutablePropTypes.map.isRequired,
-    ipcActions: PropTypes.object
+    sessionsActions: PropTypes.object,
+    ipc: ImmutablePropTypes.map.isRequired
 };

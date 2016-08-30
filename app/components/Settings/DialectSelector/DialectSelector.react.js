@@ -55,7 +55,8 @@ export default class DialectSelector extends Component {
     }
 
     resetAll() {
-        this.props.configActions.update({
+        this.props.sessionsActions.updateConfiguration(
+        {
             username: '',
             password: '',
             database: '',
@@ -66,7 +67,7 @@ export default class DialectSelector extends Component {
     }
 
 	render() {
-        const {configActions} = this.props;
+        const {sessionsActions} = this.props;
 
 		const logos = Object.keys(DIALECTS).map(dialect => (
             <div>
@@ -79,7 +80,7 @@ export default class DialectSelector extends Component {
                     )}
                     onClick={() => {
                         this.setState({selectedDialect: DIALECTS[dialect]});
-                        configActions.update({dialect: DIALECTS[dialect]});
+                        sessionsActions.updateConfiguration({dialect: DIALECTS[dialect]});
                         this.resetAll();
                     }}
                     id={`test-logo-${DIALECTS[dialect]}`}
@@ -100,5 +101,5 @@ export default class DialectSelector extends Component {
 
 DialectSelector.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
-    configActions: PropTypes.object
+    sessionsActions: PropTypes.object
 };

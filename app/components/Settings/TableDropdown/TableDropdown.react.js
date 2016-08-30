@@ -9,7 +9,7 @@ import Select from 'react-select';
  *    Displays in a dropdown menu all available tables
  *    using `ipc`.
  *    Sends a preset query to show all tables within a database/
- *    scheme that was chosen in the dropdown using `ipcActions`.
+ *    scheme that was chosen in the dropdown using `sessionsActions`.
  */
 
 export default class TableDropdown extends Component {
@@ -23,10 +23,10 @@ export default class TableDropdown extends Component {
     onSelectTable(table) {
         if (table.value) {
             this.setState({table: table.value});
-            this.props.ipcActions.previewTables([table.value]);
+            this.props.sessionsActions.previewTables([table.value]);
         } else {
             this.setState({table: ''});
-            this.props.ipcActions.updateIpcState({previews: null});
+            this.props.sessionsActions.updateIpcState({previews: null});
         }
     }
 
@@ -85,5 +85,5 @@ export default class TableDropdown extends Component {
 
 TableDropdown.propTypes = {
     ipc: ImmutablePropTypes.map.isRequired,
-    ipcActions: PropTypes.object
+    sessionsActions: PropTypes.object
 };

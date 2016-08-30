@@ -24,16 +24,17 @@ export default class Settings extends Component {
 
     render() {
         const {
-            configuration, configActions,
-            ipc, ipcActions,
-            connection, connectionActions
+            configuration,
+            ipc,
+            connection,
+            sessionsActions
         } = this.props;
 
         const dialectSelector = (
             <div>
                 <DialectSelector
-                    configActions={configActions}
                     configuration={configuration}
+                    sessionsActions={sessionsActions}
                 />
             </div>
         );
@@ -41,7 +42,7 @@ export default class Settings extends Component {
         const userCredentials = (
             <UserCredentials
                 configuration={configuration}
-                configActions={configActions}
+                sessionsActions={sessionsActions}
             />
         );
 
@@ -49,9 +50,8 @@ export default class Settings extends Component {
             <ConnectButton
                 configuration={configuration}
                 connection={connection}
-                connectionActions={connectionActions}
                 ipc={ipc}
-                ipcActions={ipcActions}
+                sessionsActions={sessionsActions}
             />
         );
 
@@ -60,8 +60,8 @@ export default class Settings extends Component {
             tablePreview = (
                 <div className={styles.previewController}>
                     <Preview
-                        ipcActions={ipcActions}
                         ipc={ipc}
+                        sessionsActions={sessionsActions}
                     />
                 </div>
             );
@@ -72,14 +72,13 @@ export default class Settings extends Component {
 
                 <DatabaseDropdown
                     configuration={configuration}
-                    configActions={configActions}
                     ipc={ipc}
-                    ipcActions={ipcActions}
+                    sessionsActions={sessionsActions}
                 />
 
                 <TableDropdown
                     ipc={ipc}
-                    ipcActions={ipcActions}
+                    sessionsActions={sessionsActions}
                 />
 
             </div>
@@ -162,7 +161,7 @@ export default class Settings extends Component {
                         <div>
                             This app is not running on HTTPS.&nbsp;
                             <a
-                               onClick={ipcActions.setupHttpsServer}
+                               onClick={sessionsActions.setupHttpsServer}
                             >
                                 Click to generate HTTPS certificates.
                             </a>
@@ -269,9 +268,7 @@ export default class Settings extends Component {
 
 Settings.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
-    configActions: PropTypes.object,
+    sessionsActions: PropTypes.object,
     ipc: ImmutablePropTypes.map.isRequired,
-    ipcActions: PropTypes.object,
-    connection: ImmutablePropTypes.map.isRequired,
-    connectionActions: PropTypes.object
+    connection: ImmutablePropTypes.map.isRequired
 };

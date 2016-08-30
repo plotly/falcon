@@ -55,7 +55,7 @@ export default class UserCredentials extends Component {
 					// get the filename to use as username in the logs
 					const splitPath = path.split('/');
 					const fileName = splitPath.length - 1;
-					this.props.configActions.update({
+					this.props.sessionsActions.updateConfiguration({
 						[credential]: paths[0],
 						'username': splitPath[fileName]
 					});
@@ -65,7 +65,7 @@ export default class UserCredentials extends Component {
 	}
 
 	render() {
-		const {configuration, configActions} = this.props;
+		const {configuration, sessionsActions} = this.props;
 
 		let inputs = USER_INPUT_FIELDS[configuration.get('dialect')]
 			.map(credential => (
@@ -73,7 +73,7 @@ export default class UserCredentials extends Component {
 				placeholder={this.getPlaceholder(credential)}
 				type={this.getInputType(credential)}
 				onChange={e => (
-					configActions.update({[credential]: e.target.value})
+					sessionsActions.updateConfiguration({[credential]: e.target.value})
 				)}
 				onClick={this.getOnClick(credential)}
 				value={configuration.get(credential)}
@@ -91,5 +91,5 @@ export default class UserCredentials extends Component {
 
 UserCredentials.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
-    configActions: PropTypes.object
+    sessionsActions: PropTypes.object
 };
