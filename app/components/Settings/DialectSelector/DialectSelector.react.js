@@ -10,12 +10,12 @@ import {DIALECTS} from '../../../constants/constants';
 */
 
 const LOGOS = {
-    POSTGRES: './images/postgresLogo.png',
-    MYSQL: './images/mysqlLogo.png',
-    MARIADB: './images/mariadbLogo.png',
-    MSSQL: './images/mssqlLogo.png',
     REDSHIFT: './images/redshift-logo.png',
-    SQLITE: './images/sqliteLogo.png'
+    POSTGRES: './images/postgres-logo.png',
+    MYSQL: './images/mysql-logo.png',
+    MARIADB: './images/mariadb-logo.png',
+    MSSQL: './images/mssql-logo.png',
+    SQLITE: './images/sqlite-logo.png'
 };
 
 export default class DialectSelector extends Component {
