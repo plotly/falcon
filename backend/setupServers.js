@@ -6,6 +6,11 @@ import sudo from 'electron-sudo';
 import {replace, splitAt} from 'ramda';
 import YAML from 'yamljs';
 
+export let httpServer;
+export let httpsServer;
+
+export const CONNECTOR_URL = 'connector.plot.ly';
+
 const acceptRequestsFrom = YAML.load(`${__dirname}/acceptedDomains.yaml`);
 
 const httpsMessage = 'Welcome to the Plotly Database Connector! ' +
@@ -28,6 +33,8 @@ const showSudoMessage = (sequelizeManager, OPTIONS) => {
     }
 };
 
+// https
+
 const setupSecureRestifyServer = (
     {keyFile, csrFile, sequelizeManager,
     serverMessageReceive, mainWindow, OPTIONS}
@@ -38,7 +45,10 @@ const setupSecureRestifyServer = (
         certificate: fs.readFileSync(csrFile)
     };
 
-    const httpsServer = restify.createServer(httpsOptions);
+    sequelizeManager.log('Closing http server.', 1);
+    httpServer.close();
+
+    httpsServer = restify.createServer(httpsOptions);
     /*
      * parsed content will always be available in req.query,
      * additionally params are merged into req.params
@@ -50,9 +60,12 @@ const setupSecureRestifyServer = (
         origins: acceptRequestsFrom.domains,
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
-    })).listen(OPTIONS.port + 1);
+    })).listen(OPTIONS.port);
 
-    // https://github.com/restify/node-restify/issues/664
+    /*
+     * https://github.com/restify/node-restify/issues/664
+     * Handle all OPTIONS requests to a deadend (Allows CORS to work them out)
+     */
     httpsServer.opts( /.*/, (req, res) => res.send(204));
 
     setupRoutes(httpsServer, serverMessageReceive(
@@ -61,11 +74,12 @@ const setupSecureRestifyServer = (
 
 };
 
+// http
 
 export function setupHTTP(
     {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
 ) {
-    const httpServer = restify.createServer();
+    httpServer = restify.createServer();
     httpServer.use(restify.queryParser());
     httpServer.use(restify.bodyParser({ mapParams: true }));
     httpServer.use(restify.CORS({
@@ -80,7 +94,7 @@ export function setupHTTP(
 
 }
 
-// https
+// certificates setup
 
 const keyFile = `${__dirname}/../ssl/certs/server/privkey.pem`;
 const csrFile = `${__dirname}/../ssl/certs/server/fullchain.pem`;
@@ -108,7 +122,6 @@ export function setupHTTPS(
 ) {
 
     const hosts = '/etc/hosts';
-    const connectorURL = 'connector.plot.ly';
 
     const sudoOptions = {
         name: 'Connector',
@@ -141,22 +154,22 @@ export function setupHTTPS(
         };
     };
 
-    // redirect connectorURL to localhost
+    // redirect CONNECTOR_URL to localhost
     try {
 
         sequelizeManager.log(
-            `checking if ${connectorURL} is in /etc/hosts`, 1
+            `checking if ${CONNECTOR_URL} is in /etc/hosts`, 1
         );
 
         fs.readFile(hosts, function (err, data) {
-            if (data.indexOf(connectorURL) < 0) {
+            if (data.indexOf(CONNECTOR_URL) < 0) {
 
                 showSudoMessage(sequelizeManager, OPTIONS);
                 sequelizeManager.log(
-                    `${connectorURL} is not in /etc/hosts.`, 1
+                    `${CONNECTOR_URL} is not in /etc/hosts.`, 1
                 );
                 sequelizeManager.log(
-                    `Writing ${connectorURL} to /etc/hosts.`, 1
+                    `Writing ${CONNECTOR_URL} to /etc/hosts.`, 1
                 );
                 sudo.exec(`sh  "${scriptsDirectory}"/../ssl/redirectConnector.sh`,
                     sudoOptions, function(error) {
@@ -165,13 +178,13 @@ export function setupHTTPS(
                         sequelizeManager.log(error, 0);
                     } else {
                         sequelizeManager.log(
-                            `${connectorURL} is now redirected to local.`, 1
+                            `${CONNECTOR_URL} is now redirected to local.`, 1
                         );
                     }
                 });
             } else {
                 sequelizeManager.log(
-                    `${connectorURL} is already in /etc/hosts`, 1
+                    `${CONNECTOR_URL} is already in /etc/hosts`, 1
                 );
             }
         });

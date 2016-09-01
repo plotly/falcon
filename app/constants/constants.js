@@ -1,3 +1,8 @@
+export const BACKEND = {
+    CONNECTOR_URL: 'connector.plot.ly',
+    OPTIONS: {port: 5000}
+};
+
 export const DIALECTS = {
     MYSQL: 'mysql',
     MARIADB: 'mariadb',

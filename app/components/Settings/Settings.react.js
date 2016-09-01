@@ -12,10 +12,10 @@ import DetectHttpsServer from './HttpsServer/DetectHttpsServer.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import {APP_STATUS} from '../../constants/constants';
 
-const httpsGithubIssue = 'https://github.com/plotly/' +
+const httpsGithubIssueLink = 'https://github.com/plotly/' +
                          'plotly-database-connector/issues/51';
 
-const plotlyWorkspace = 'https://plot.ly/alpha/workspace';
+const plotlyWorkspaceLink = 'https://plot.ly/alpha/workspace';
 
 export default class Settings extends Component {
     constructor(props) {
@@ -125,20 +125,38 @@ export default class Settings extends Component {
             let step3Header = null;
             let step3HTTPSServerStatus = null;
             let step3InstallCerts = null;
+            let httpNote = null;
+            let importDataScreenShot = null;
+
             const canConfigureHTTPS = process.platform === 'darwin' ||
                 process.platform === 'linux';
 
+            const hasSelfSignedCert = ipc.has('hasSelfSignedCert') &&
+                ipc.get('hasSelfSignedCert');
+
             if (canConfigureHTTPS) {
+
                 step3Header = (
                     <h5>3. Secure your connection with HTTPS</h5>
                 );
 
-                if (ipc.has('hasSelfSignedCert') &&
-                    ipc.get('hasSelfSignedCert')
-                ) {
+                if (hasSelfSignedCert) {
+
                     step3HTTPSServerStatus = (
                         <div>✓ This app is successfully running on HTTPS.</div>
                     );
+
+                    importDataScreenShot = (
+                        <img
+                             src="./images/import-modal-https.png"
+                             className={styles.workspace}
+                        >
+                        </img>
+                    );
+
+                    // reset to null if user creates https certs during runtime
+                    httpNote = null;
+
                 } else {
                     step3HTTPSServerStatus = (
                         <div>
@@ -150,11 +168,34 @@ export default class Settings extends Component {
                             </a>
                         </div>
                     );
+
+                    importDataScreenShot = (
+                        <img
+                             src="./images/import-modal-http.png"
+                             className={styles.workspace}
+                        >
+                        </img>
+                    );
+
+                    httpNote = (
+                        <div style={{fontSize: '0.8em'}}>
+                            Alternatively, you can run the connector without
+                            HTTPS and allow your browser to make insecure
+                            requests.&nbsp;
+                            <a onClick={() => {
+                                shell.openExternal(httpsGithubIssueLink);
+                            }}
+                            >
+                                Here&#39;s how
+                            </a>.
+                        </div>
+                    );
                 }
 
                 step3InstallCerts = (
                     <DetectHttpsServer/>
                 );
+
             }
 
             step3 = (
@@ -167,18 +208,7 @@ export default class Settings extends Component {
                             )
                         }
                     </ul>
-                    <div style={{fontSize: '0.8em'}}>
-
-                        Alternatively, you can run the connector without
-                        HTTPS and allow your browser to make insecure requests.
-                        &nbsp;
-                        <a onClick={() => {
-                            shell.openExternal(httpsGithubIssue);
-                        }}
-                        >
-                            Here&#39;s how
-                        </a>.
-                    </div>
+                    {httpNote}
                 </div>
             );
 
@@ -188,7 +218,7 @@ export default class Settings extends Component {
                     <div className={styles.futureDirections}>
                         Query data by clicking on 'import data' from
                         <a onClick={() => {
-                            shell.openExternal(plotlyWorkspace);
+                            shell.openExternal(plotlyWorkspaceLink);
                         }}
                         >
                         &nbsp;<u>plotly workspace</u>&nbsp;
@@ -197,11 +227,7 @@ export default class Settings extends Component {
                         Remember to keep this app running
                         while you are making queries!
                     </div>
-                    <img
-                        src="./images/workspace.png"
-                        className={styles.workspace}
-                    >
-                    </img>
+                    {importDataScreenShot}
                 </div>
             );
 
