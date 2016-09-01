@@ -329,7 +329,7 @@ describe('plotly database connector', function Spec() {
 */
 
     const testedDialects = [
-        DIALECTS.REDSHIFT,
+        // DIALECTS.REDSHIFT,
         DIALECTS.POSTGRES,
         DIALECTS.MYSQL,
         DIALECTS.MARIADB,
