@@ -215,7 +215,7 @@ describe('plotly database connector', function Spec() {
             async () => {
                 const logos = await this.getLogos();
 
-                expect(logos.length).to.equal(5);
+                expect(logos.length).to.equal(6);
             });
 
             it('should not show an error message',
