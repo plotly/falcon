@@ -7,8 +7,11 @@ import fetch from 'node-fetch';
 import {split} from 'ramda';
 import {productName, version} from '../package.json';
 
-import {APP_STATUS,
-    DIALECTS, USER_INPUT_FIELDS} from '../app/constants/constants';
+import {
+    APP_STATUS,
+    DIALECTS,
+    USER_INPUT_FIELDS
+} from '../app/constants/constants';
 
 // import styles to use for tests
 import * as logoStyles
@@ -22,26 +25,33 @@ const CREDENTIALS = {
 		'port': '3306',
 		'username': 'masteruser',
 		'password': process.env.PASSWORD_MARIADB
-		},
+	},
 	'mssql': {
 		'host': process.env.AWS_RDS_MSSQL,
 		'port': '1433',
 		'username': 'masteruser',
 		'password': process.env.PASSWORD_MSSQL
-		},
+	},
 	'mysql': {
 		'host': process.env.AWS_RDS_MYSQL,
 		'port': '3306',
 		'username': 'masteruser',
 		'password': process.env.PASSWORD_MYSQL
-		},
+	},
 	'postgres': {
 		'host': process.env.AWS_RDS_POSTGRES,
 		'port': '5432',
 		'username': 'masteruser',
 		'password': process.env.PASSWORD_POSTGRES,
 		'database': 'plotly_datasets'
-		}
+    },
+	'redshift': {
+		'host': process.env.AWS_RDS_REDSHIFT,
+		'port': '5439',
+		'username': 'plotly',
+		'password': process.env.PASSWORD_REDSHIFT,
+		'database': 'plotly_datasets'
+	}
 };
 
 chromedriver.start(); // on port 9515
@@ -319,7 +329,11 @@ describe('plotly database connector', function Spec() {
 */
 
     const testedDialects = [
-        DIALECTS.POSTGRES, DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.MSSQL
+        DIALECTS.REDSHIFT,
+        DIALECTS.POSTGRES,
+        DIALECTS.MYSQL,
+        DIALECTS.MARIADB,
+        DIALECTS.MSSQL
     ];
 
     testedDialects.forEach(dialectUnderTest => {
