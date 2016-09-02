@@ -20,21 +20,24 @@ export const updateConfiguration = createAction(UPDATE_CONFIGURATION);
 export const updateIpcState = createAction(UPDATE_IPC_STATE);
 
 // ipc specific ->
+
 export function query (statement) {
     return (_, getState) => {
         const state = getState();
         const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.QUERY, statement);
+        ipcSend(TASKS.QUERY, sessionSelected, statement);
     };
 }
 
 export function connect (credentials) {
-    console.warn('connect action dispatched');
+    // TODO: use getState here
     return (_, getState) => {
         const state = getState();
         const sessionSelected = state.sessions.get('sessionSelected');
         ipcSend(
-            TASKS.CONNECT_AND_SHOW_DATABASES, immutableToJS(credentials)
+            TASKS.CONNECT_AND_SHOW_DATABASES,
+            sessionSelected,
+            immutableToJS(credentials)
         );
     };
 }
@@ -43,28 +46,38 @@ export function selectDatabase () {
     return (_, getState) => {
         const state = getState();
         const sessionSelected = state.sessions.get('sessionSelected');
-        const configuration = state.sessions.getIn(['list', `${sessionSelected}`, 'configuration']);
+        const configuration = state.sessions.getIn(
+            ['list', `${sessionSelected}`, 'configuration']
+        );
         ipcSend(
-            TASKS.SELECT_DATABASE_AND_SHOW_TABLES, configuration.toJS()
+            TASKS.SELECT_DATABASE_AND_SHOW_TABLES,
+            sessionSelected,
+            configuration.toJS()
         );
     };
 }
 
 export function previewTables (tableNames) {
-    return () => {
-        ipcSend(TASKS.PREVIEW, tableNames);
+    return (_, getState) => {
+        const state = getState();
+        const sessionSelected = state.sessions.get('sessionSelected');
+        ipcSend(TASKS.PREVIEW, sessionSelected, tableNames);
     };
 }
 
 export function disconnect () {
-    return () => {
-        ipcSend(TASKS.DISCONNECT);
+    return (_, getState) => {
+        const state = getState();
+        const sessionSelected = state.sessions.get('sessionSelected');
+        ipcSend(TASKS.DISCONNECT, sessionSelected);
     };
 }
 
 export function setupHttpsServer () {
-    return () => {
-        ipcSend(TASKS.UPDATE_IPC_STATE);
+    return (__, getState) => {
+        const state = getState();
+        const sessionSelected = state.sessions.get('sessionSelected');
+        ipcSend(TASKS.UPDATE_IPC_STATE, sessionSelected);
     };
 }
 
@@ -76,7 +89,8 @@ function immutableToJS(immutableThing) {
     return jsonThing;
 }
 
-function ipcSend(task, message = {}) {
-    ipcRenderer.send('channel', {task, message});
+function ipcSend(task, sessionSelected, message = {}) {
+    ipcRenderer.send('channel', {task, sessionSelected, message});
 }
+
 // <- ipc specific

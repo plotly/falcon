@@ -28,6 +28,15 @@ export function v1(requestEvent, sequelizeManager, callback) {
 
     const endpoint = split('/', requestEvent.route.path)[2];
 
+    let sessionSelected = null;
+    if (!foundParams(requestEvent.params, 'session')) {
+        sequelizeManager.raiseError(
+            {message: QUERY_PARAM}, callback
+        );
+    } else {
+        sessionSelected = requestEvent.params.session;
+    }
+
     switch (endpoint) {
 
         case 'connect': {
@@ -169,6 +178,6 @@ export function v1(requestEvent, sequelizeManager, callback) {
         }
     }
 
-    return {task, message};
+return {task, sessionSelected, message};
 
 }
