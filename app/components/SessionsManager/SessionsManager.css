@@ -1,4 +1,4 @@
-.rolladexContainer {
+.sessionsManagerContainer {
     display: block;
     height: 50px;
     border-width: 1px;
@@ -16,6 +16,17 @@
 .connection {
     display: inline-block;
     height: 46px;
+    width: 80px;
+    margin: 1px;
+    border-width: 1px;
+    border-color: #BEC8D9;
+    border-style: solid;
+    border-radius: 23px;
+}
+
+.connectionPlus {
+    display: inline-block;
+    height: 46px;
     width: 46px;
     margin: 1px;
     border-width: 1px;
@@ -28,11 +39,11 @@
     border-color: red;
 }
 
+.connectionPlus:hover, connection:focus{
+    border-color: red;
+}
+
 .connectionSelected {
-    display: inline-block;
-    height: 46px;
-    width: 46px;
-    margin:1px;
     border-width: 1px;
     border-color: red;
     border-style: solid;

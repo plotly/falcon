@@ -1,18 +1,19 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import * as styles from './Rolladex.css';
+import * as styles from './SessionsManager.css';
 import classnames from 'classnames';
 import {NEW_SESSION} from '../../constants/constants';
 
 const LOGOS = {
-    postgres: './images/postgres-logo-small.png',
-    mysql: './images/mysql-logo-small.png',
-    mariadb: './images/mariadb-logo-small.png',
-    mssql: './images/mssql-logo-small.png',
-    sqlite: './images/sqlite-logo-small.png'
+    postgres: './images/postgres-logo.png',
+    mysql: './images/mysql-logo.png',
+    mariadb: './images/mariadb-logo.png',
+    mssql: './images/mssql-logo.png',
+    sqlite: './images/sqlite-logo.png',
+    redshift: './images/redshift-logo.png'
 };
 
-export default class Rolladex extends Component {
+export default class SessionsManager extends Component {
     constructor(props) {
         super(props);
     }
@@ -49,10 +50,10 @@ export default class Rolladex extends Component {
         );}
 
         return (
-            <div className={styles.rolladexContainer}>
+            <div className={styles.sessionsManagerContainer}>
                 {sessionsIcons}
                 <img
-                    className={styles.connection}
+                    className={styles.connectionPlus}
                     onClick={() => {
 
                         this.props.sessionsActions.newSession(
@@ -73,7 +74,7 @@ export default class Rolladex extends Component {
     }
 }
 
-Rolladex.propTypes = {
+SessionsManager.propTypes = {
     sessionsActions: PropTypes.object,
     sessions: ImmutablePropTypes.map.isRequired
 };

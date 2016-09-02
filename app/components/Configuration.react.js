@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Settings from './Settings/Settings.react';
-import Rolladex from './Rolladex/Rolladex.react';
+import SessionsManager from './SessionsManager/SessionsManager.react';
 import * as styles from './Configuration.css';
 
 export default class Configuration extends Component {
@@ -48,7 +48,7 @@ export default class Configuration extends Component {
                     Plotly 2.0 Database Connector
                 </h4>
 
-                <Rolladex
+                <SessionsManager
                     sessionsActions={this.props.sessionsActions}
                     sessions={this.props.sessions}
                 />
