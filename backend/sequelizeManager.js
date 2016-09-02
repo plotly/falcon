@@ -96,17 +96,23 @@ export class SequelizeManager {
     }
 
     createConnection(configuration) {
-
         let {
             username, password, database, port,
             dialect, storage, host
             } = configuration;
 
+        let options = {
+            dialect,
+            host,
+            port,
+            storage
+        };
+
         this.log(`Creating a connection for user ${username}`, 1);
 
         let subDialect = null;
-        if (this.connection) {
-            subDialect = this.connection.config.subDialect || null;
+        if (this.sessions[this.sessionSelected]) {
+            subDialect = this.sessions[this.sessionSelected].config.subDialect || null;
         }
         let redshiftOptions = null;
 
@@ -124,14 +130,14 @@ export class SequelizeManager {
             options = merge(options, redshiftOptions);
         }
 
-        this.connection = new Sequelize(database, username, password, options);
+        this.sessions[this.sessionSelected] = new Sequelize(database, username, password, options);
 
         if (this.sessions[this.sessionSelected].config.dialect === 'mssql') {
             this.sessions[this.sessionSelected].config.dialectOptions = {encrypt: true};
         }
 
         if (subDialect) {
-            this.connection.config = merge(this.connection.config, {subDialect: 'redshift'});
+            this.sessions[this.sessionSelected].config = merge(this.sessions[this.sessionSelected].config, {subDialect: 'redshift'});
         }
 
     }
