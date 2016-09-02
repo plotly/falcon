@@ -90,24 +90,48 @@ export class SequelizeManager {
     }
 
     createConnection(configuration) {
-
-        const {
+        let {
             username, password, database, port,
             dialect, storage, host
             } = configuration;
 
-        this.log(`Creating a connection for user ${username}`, 1);
-
-        this.connection = new Sequelize(database, username, password, {
+        let options = {
             dialect,
             host,
             port,
             storage
-        });
+        };
 
+        this.log(`Creating a connection for user ${username}`, 1);
+
+        let subDialect = null;
+        if (this.connection) {
+            subDialect = this.connection.config.subDialect || null;
+        }
+        let redshiftOptions = null;
+
+        if ((dialect === 'redshift') || (subDialect === 'redshift')) {
+            subDialect = 'redshift';
+            // http://stackoverflow.com/questions/32037385/using-sequelize-with-redshift
+            Sequelize.HSTORE.types.postgres.oids.push('dummy');
+            redshiftOptions = {
+                dialect: 'postgres',
+                pool: false,
+                keepDefaultTimezone: true, // avoid SET TIMEZONE
+                databaseVersion: '8.0.2' // avoid SHOW SERVER_VERSION
+            };
+
+            options = merge(options, redshiftOptions);
+        }
+
+        this.connection = new Sequelize(database, username, password, options);
 
         if (this.connection.config.dialect === 'mssql') {
             this.connection.config.dialectOptions = {encrypt: true};
+        }
+
+        if (subDialect) {
+            this.connection.config = merge(this.connection.config, {subDialect: 'redshift'});
         }
 
     }
@@ -115,6 +139,7 @@ export class SequelizeManager {
     connect(configFromApp) {
 
         if (ARGS.headless) {
+
             const configFromFile = YAML.load(ARGS.configpath);
             /*
              * if server is sending a headless app a new database,
@@ -127,7 +152,6 @@ export class SequelizeManager {
         } else {
             this.createConnection(configFromApp);
         }
-
         return this.connection.authenticate();
 
     }
@@ -315,6 +339,7 @@ export class SequelizeManager {
                         return 'SELECT table_name FROM ' +
                             'information_schema.tables WHERE ' +
                             'table_schema = \'public\'';
+
                     case DIALECTS.MSSQL:
                         return 'SELECT TABLE_NAME FROM ' +
                             'information_schema.tables';

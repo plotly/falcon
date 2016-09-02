@@ -14,6 +14,7 @@ const LOGOS = {
     MYSQL: './images/mysqlLogo.png',
     MARIADB: './images/mariadbLogo.png',
     MSSQL: './images/mssqlLogo.png',
+    REDSHIFT: './images/redshift-logo.png',
     SQLITE: './images/sqliteLogo.png'
 };
 
