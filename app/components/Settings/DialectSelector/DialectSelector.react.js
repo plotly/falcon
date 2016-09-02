@@ -3,13 +3,14 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './DialectSelector.css';
 import classnames from 'classnames';
 import {DIALECTS} from '../../../constants/constants';
+import {dissoc} from 'ramda';
 
 /*
     Displays interactive database dialect logos and alters
     the chosen `configuration` dialect parameter.
 */
 
-const LOGOS = {
+let LOGOS = {
     REDSHIFT: './images/redshift-logo.png',
     POSTGRES: './images/postgres-logo.png',
     MYSQL: './images/mysql-logo.png',
@@ -17,6 +18,10 @@ const LOGOS = {
     MSSQL: './images/mssql-logo.png',
     SQLITE: './images/sqlite-logo.png'
 };
+// TODO: remove when #$40 is resolved
+if (process.platform !== 'darwin') {
+    LOGOS = dissoc('SQLITE', LOGOS);
+}
 
 export default class DialectSelector extends Component {
     constructor(props) {
