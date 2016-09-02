@@ -45,7 +45,7 @@ export const NEW_SESSION =
         username: '',
         password: '',
         database: '',
-        dialect: DIALECTS.POSTGRES,
+        dialect: DIALECTS.MYSQL,
         port: '',
         storage: '',
         host: ''
