@@ -51,24 +51,26 @@ export default class SessionsManager extends Component {
 
         return (
             <div className={styles.sessionsManagerContainer}>
-                {sessionsIcons}
-                <img
-                    className={styles.connectionPlus}
-                    onClick={() => {
+                <div className={styles.sessionsManagerWrapper}>
+                    {sessionsIcons}
+                    <img
+                        className={styles.connectionPlus}
+                        onClick={() => {
 
-                        this.props.sessionsActions.newSession(
-                            {
-                                id: sessionsNB,
-                                configuration: NEW_SESSION.CONFIG,
-                                ipc: NEW_SESSION.IPC,
-                                connection: NEW_SESSION.CONNECTION
-                            }
-                        );
+                            this.props.sessionsActions.newSession(
+                                {
+                                    id: sessionsNB,
+                                    configuration: NEW_SESSION.CONFIG,
+                                    ipc: NEW_SESSION.IPC,
+                                    connection: NEW_SESSION.CONNECTION
+                                }
+                            );
 
-                    }}
-                    src="./images/add.png"
-                >
-                </img>
+                        }}
+                        src="./images/add.png"
+                    >
+                    </img>
+                </div>
             </div>
         );
     }

@@ -75,7 +75,6 @@ export default class DialectSelector extends Component {
         const {sessionsActions} = this.props;
 
 		const logos = Object.keys(DIALECTS).map(dialect => (
-            <div>
                 <div className={classnames(
                         styles.logo, {
                               [styles.logoSelected]:
@@ -95,7 +94,6 @@ export default class DialectSelector extends Component {
                         src={LOGOS[dialect]}
                     />
                 </div>
-            </div>
         ));
 
 		return (

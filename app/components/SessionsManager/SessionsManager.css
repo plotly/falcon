@@ -1,15 +1,17 @@
 .sessionsManagerContainer {
-    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    display: table;
+}
+
+.sessionsManagerWrapper {
+    display: inline-block;
     height: 50px;
-    border-width: 1px;
+    border-width: 1.5px;
     border-color: #BEC8D9;
     border-style: solid;
     border-radius: 25px;
     margin: 20px;
-    text-align: center;
-}
-
-.connectionContainer {
     text-align: center;
 }
 
@@ -18,7 +20,7 @@
     height: 46px;
     width: 80px;
     margin: 1px;
-    border-width: 1px;
+    border-width: 1.5px;
     border-color: #BEC8D9;
     border-style: solid;
     border-radius: 23px;
@@ -29,7 +31,7 @@
     height: 46px;
     width: 46px;
     margin: 1px;
-    border-width: 1px;
+    border-width: 1.5px;
     border-color: #BEC8D9;
     border-style: solid;
     border-radius: 23px;
@@ -44,7 +46,7 @@
 }
 
 .connectionSelected {
-    border-width: 1px;
+    border-width: 1.5px;
     border-color: red;
     border-style: solid;
     border-radius: 23px;

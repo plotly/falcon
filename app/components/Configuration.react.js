@@ -39,7 +39,7 @@ export default class Configuration extends Component {
             <div>
 
                 <img
-                    src="./images/plotly-logo.png"
+                    src="./images/plotly-logo-no-name.png"
                     className={styles.plotlyLogo}
                 >
                 </img>

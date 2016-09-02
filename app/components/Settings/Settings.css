@@ -11,14 +11,14 @@
 
 .configurationOptions {
 	width: 100%;
+	text-align: center;
 }
 
 .workspace {
-	height: 60%;
-	width: 60%;
-	margin-left: 50px;
-	padding-bottom: 30px;
-	padding-top: 30px;
+    height: 60%;
+    width: 60%;
+    padding: 30px;
+    margin-left: 85px;
 }
 
 .info {
@@ -27,21 +27,17 @@
 }
 
 .userCredentials {
-	width: 300px;
-	margin-left: 50px;
-	float: left;
-	display: inline-block;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .dialectSelector {
-	float: left;
 	display: inline-block;
 }
 
 .connectButton {
-	clear: left;
 	padding-top: 30px;
-	padding-left: 25px;
+	text-align: center;
 }
 
 .step2Container {
