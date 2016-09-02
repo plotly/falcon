@@ -140,7 +140,8 @@ export class SequelizeManager {
 
         if (ARGS.headless) {
 
-            const configFromFile = YAML.load(ARGS.configpath);
+            // read locally stored configuration for sessionSelected
+            const configFromFile = YAML.load(ARGS.configpath)[this.sessionSelected];
             /*
              * if server is sending a headless app a new database,
              * use that one instead of the one in the config file
@@ -152,7 +153,8 @@ export class SequelizeManager {
         } else {
             this.createConnection(configFromApp);
         }
-        return this.connection.authenticate();
+
+        return this.sessions[this.sessionSelected].authenticate();
 
     }
 

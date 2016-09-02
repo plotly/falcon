@@ -1,7 +1,8 @@
-username: root
-password: MyPassword1
-database: null
-port: null
-dialect: mysql
-storage: null
-host: null
+0:
+    username: root
+    password: MyPassword1
+    database: null
+    port: null
+    dialect: mysql
+    storage: null
+    host: null
