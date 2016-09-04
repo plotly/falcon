@@ -1,6 +1,7 @@
 import {
     NEW_SESSION,
     SWITCH_SESSION,
+    DELETE_SESSION,
     UPDATE_CONNECTION,
     UPDATE_CONFIGURATION,
     UPDATE_IPC_STATE
@@ -18,8 +19,6 @@ export default function sessions(state = INITIAL_STATE, action) {
     console.warn(state);
     console.warn(action.type);
     console.warn(action.payload);
-            // debugger;
-
 
     switch (action.type) {
 
@@ -44,6 +43,9 @@ export default function sessions(state = INITIAL_STATE, action) {
 
         case SWITCH_SESSION:
             return state.merge({sessionSelected: action.payload});
+
+        case DELETE_SESSION:
+            return state.deleteIn(['list', `${action.payload}`]);
 
         case UPDATE_CONFIGURATION:
             return state.mergeIn(

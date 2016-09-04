@@ -6,31 +6,48 @@
 
 .sessionsManagerWrapper {
     display: inline-block;
-    height: 50px;
+    height: 60px;
     border-width: 1.5px;
     border-color: #BEC8D9;
     border-style: solid;
     border-radius: 25px;
     margin: 20px;
     text-align: center;
+    vertical-align: middle;
+}
+
+.connectionWrapper {
+    display: inherit;
 }
 
 .connection {
-    display: inline-block;
     height: 46px;
     width: 80px;
-    margin: 1px;
+    margin: 5px;
     border-width: 1.5px;
     border-color: #BEC8D9;
     border-style: solid;
     border-radius: 23px;
 }
 
-.connectionPlus {
+.connectionAdd {
     display: inline-block;
     height: 46px;
     width: 46px;
-    margin: 1px;
+    margin: 5px;
+    border-width: 1.5px;
+    border-color: #BEC8D9;
+    border-style: solid;
+    border-radius: 23px;
+}
+
+.connectionDelete {
+    display: inline-block;
+    position: relative;
+    right: 10px;
+    bottom: 35px;
+    height: 15px;
+    width: 15px;
     border-width: 1.5px;
     border-color: #BEC8D9;
     border-style: solid;
@@ -38,10 +55,17 @@
 }
 
 .connection:hover, connection:focus{
+    cursor: pointer;
     border-color: red;
 }
 
-.connectionPlus:hover, connection:focus{
+.connectionAdd:hover, connection:focus{
+    cursor: pointer;
+    border-color: red;
+}
+
+.connectionDelete:hover, connection:focus{
+    cursor: pointer;
     border-color: red;
 }
 
@@ -50,8 +74,4 @@
     border-color: red;
     border-style: solid;
     border-radius: 23px;
-}
-
-.connection:hover{
-    cursor: pointer;
 }

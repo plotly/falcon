@@ -5,10 +5,11 @@ const ipcRenderer = require('electron').ipcRenderer;
 
 export const NEW_SESSION = 'NEW_SESSION';
 export const SWITCH_SESSION = 'SWITCH_SESSION';
+export const DELETE_SESSION = 'DELETE_SESSION';
 
 export const newSession = createAction(NEW_SESSION);
-
 export const switchSession = createAction(SWITCH_SESSION);
+export const deleteSession = createAction(DELETE_SESSION);
 
 // update calls
 export const UPDATE_CONNECTION = 'UPDATE_CONNECTION';

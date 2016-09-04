@@ -20,32 +20,47 @@ export default class SessionsManager extends Component {
 
     render() {
         const {sessions, sessionsActions} = this.props;
-        const sessionsNB = sessions.get('list').size;
+        const sessionsIds = Object.keys(sessions.get('list').toJS());
+        const sessionsNB = sessionsIds.length;
 
         let sessionsIcons = null;
-        // debugger;
         if (sessionsNB > 0) {
 
             sessionsIcons = Object.keys(sessions.get('list').toJS()).map(
                 sessionKey => (
-                    <img
-                        className={classnames(
-                            styles.connection, {
-                                [styles.connectionSelected]:
-                                    `${sessions.get('sessionSelected')}` === sessionKey
-                            }
-                        )}
+                    <div className={styles.connectionWrapper}>
+                        <img
+                            className={classnames(
+                                styles.connection, {
+                                    [styles.connectionSelected]:
+                                        `${sessions.get('sessionSelected')}` === sessionKey
+                                }
+                            )}
 
-                        onClick={() => {
-                            console.warn(`change to session ${sessionKey}`);
-                            sessionsActions.switchSession(sessionKey);
-                        }}
+                            onClick={() => {
+                                sessionsActions.switchSession(sessionKey);
+                            }}
 
-                        src={LOGOS[sessions.getIn([
-                            'list', sessionKey, 'configuration', 'dialect'
-                        ])]}
-                    >
-                    </img>
+                            src={LOGOS[sessions.getIn([
+                                'list', sessionKey, 'configuration', 'dialect'
+                            ])]}
+                        >
+                        </img>
+                        <img
+                            className={styles.connectionDelete}
+                            onClick={() => {
+                                const indexOfId = sessionsIds.indexOf(sessionKey);
+                                if (sessionKey !== '0') {
+                                    sessionsActions.switchSession(sessionsIds[indexOfId - 1]);
+                                } else {
+                                    sessionsActions.switchSession(sessionsIds[indexOfId + 1]);
+                                }
+                                    sessionsActions.deleteSession(sessionKey);
+                            }}
+                            src="./images/delete.png"
+                        >
+                        </img>
+                    </div>
                 )
         );}
 
@@ -54,9 +69,8 @@ export default class SessionsManager extends Component {
                 <div className={styles.sessionsManagerWrapper}>
                     {sessionsIcons}
                     <img
-                        className={styles.connectionPlus}
+                        className={styles.connectionAdd}
                         onClick={() => {
-
                             this.props.sessionsActions.newSession(
                                 {
                                     id: sessionsNB,
@@ -65,7 +79,7 @@ export default class SessionsManager extends Component {
                                     connection: NEW_SESSION.CONNECTION
                                 }
                             );
-
+                            sessionsActions.switchSession(sessionsNB);
                         }}
                         src="./images/add.png"
                     >
