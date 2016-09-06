@@ -7,6 +7,7 @@ import {
     UPDATE_IPC_STATE
 } from '../actions/sessions.js';
 import Immutable from 'immutable';
+import {EMPTY_SESSION} from '../constants/constants';
 
 // see end of file for `list` description
 const INITIAL_STATE = Immutable.Map({
@@ -31,11 +32,15 @@ export default function sessions(state = INITIAL_STATE, action) {
         case NEW_SESSION:
             return state.mergeIn(['list'],
                 {
-                    [action.payload.id]: {
+                    [action.payload]: {
                         configuration:
-                            Immutable.Map (action.payload.configuration),
+                            Immutable.Map (EMPTY_SESSION.CONFIGURATION),
                         connection:
-                            Immutable.Map(action.payload.connection),
+                            Immutable.Map(EMPTY_SESSION.CONNECTION),
+                        /*
+                         * include startup inter process communcation
+                         * into each session
+                         */
                         ipc:
                             state.get('startupIPC')
                     }

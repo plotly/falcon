@@ -2,7 +2,6 @@ import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './SessionsManager.css';
 import classnames from 'classnames';
-import {NEW_SESSION} from '../../constants/constants';
 import ReactTooltip from 'react-tooltip';
 
 
@@ -106,14 +105,7 @@ export default class SessionsManager extends Component {
                         <img
                             className={styles.connectionAdd}
                             onClick={() => {
-                                this.props.sessionsActions.newSession(
-                                    {
-                                        id: sessionsNB,
-                                        configuration: NEW_SESSION.CONFIG,
-                                        ipc: NEW_SESSION.IPC,
-                                        connection: NEW_SESSION.CONNECTION
-                                    }
-                                );
+                                this.props.sessionsActions.newSession(sessionsNB);
                                 sessionsActions.switchSession(sessionsNB);
                             }}
                             src="./images/add.png"

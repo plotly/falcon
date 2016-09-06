@@ -39,9 +39,9 @@ export const BUTTON_MESSAGE = {
     DISCONNECTED: 'connect'
 };
 
-export const NEW_SESSION =
+export const EMPTY_SESSION =
 {
-    CONFIG: {
+    CONFIGURATION: {
         username: '',
         password: '',
         database: '',
@@ -50,6 +50,5 @@ export const NEW_SESSION =
         storage: '',
         host: ''
     },
-    CONNECTION: {status: APP_STATUS.INITIALIZED},
-    IPC: {}
+    CONNECTION: {status: APP_STATUS.INITIALIZED}
 };
