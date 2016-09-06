@@ -7,7 +7,6 @@
     border-bottom-width: 1.5px;
     border-bottom-color: #BEC8D9;
     border-bottom-style: solid;
-    border-radius: 5px;
 }
 
 .sessionsManagerWrapper {
@@ -18,52 +17,58 @@
 
 .connectionWrapper {
     display: inherit;
-    border-width: 1.5px 0px 0px 1.5px;
+    border-width: 1.5px 0px 1.5px 1.5px;
     border-color: #BEC8D9;
     border-style: solid;
-    border-radius: 5px;
-    padding: 5px 30px 5px 10px;
+    padding: 5px 10px 5px 10px;
+    vertical-align: middle;
+    max-width: 175px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .connection {
     height: 20px;
+    display: inline;
+    vertical-align: middle;
+    padding-right: 5px;
 }
 
-.connectionAdd {
-    display: inline-block;
-    height: 20px;
-    width: 20px;
+.connectionIndex {
+    margin: 0px;
+    display: inline;
+    vertical-align: middle;
+}
+
+.connectionDelete {
+    width: 12px;
+    padding-right: 5px;
+    vertical-align: middle;
     /*border-width: 1.5px;
     border-color: #BEC8D9;
     border-style: solid;
     border-radius: 23px;*/
+}
+
+.connectionAdd {
+    width: 20px;
+    padding: 8px;
 }
 
 .connectionAddWrapper {
     display: inline-block;
-    border-width: 1.5px 1.5px 0px 1.5px;
+    border-width: 1.5px;
     border-color: #BEC8D9;
     border-style: solid;
-    border-radius: 5px;
-    padding: 5px 20px 5px 20px;
-}
-
-.connectionDelete {
-    display: inline-block;
-    position: relative;
-    right: -27px;
-    bottom: 10px;
-    height: 12px;
-    width: 12px;
-    /*border-width: 1.5px;
-    border-color: #BEC8D9;
-    border-style: solid;
-    border-radius: 23px;*/
+    vertical-align: middle;
+    height: 36px;
+    width: 36px;
 }
 
 .connectionWrapper:hover, connectionWrapper:focus{
     cursor: pointer;
-    border-color: red;
+    border-color: #8BB5FE;
 }
 
 .connectionAdd:hover, connection:focus{
@@ -75,6 +80,6 @@
 }
 
 .connectionWrapperSelected {
-    border-width: 1.5px;
-    border-color: red;
+    border-right-width: 1.5px;
+    border-color: #8BB5FE;
 }
