@@ -28,14 +28,14 @@ export default class SessionsManager extends Component {
 
             sessionsIcons = Object.keys(sessions.get('list').toJS()).map(
                 sessionKey => (
-                    <div className={styles.connectionWrapper}>
+                    <div className={classnames(styles.connectionWrapper, {
+                        [styles.connectionWrapperSelected]:
+                            `${sessions.get('sessionSelected')}` === sessionKey
+                        }
+                    )}
+            >
                         <img
-                            className={classnames(
-                                styles.connection, {
-                                    [styles.connectionSelected]:
-                                        `${sessions.get('sessionSelected')}` === sessionKey
-                                }
-                            )}
+                            className={styles.connection}
 
                             onClick={() => {
                                 sessionsActions.switchSession(sessionKey);
@@ -68,22 +68,24 @@ export default class SessionsManager extends Component {
             <div className={styles.sessionsManagerContainer}>
                 <div className={styles.sessionsManagerWrapper}>
                     {sessionsIcons}
-                    <img
-                        className={styles.connectionAdd}
-                        onClick={() => {
-                            this.props.sessionsActions.newSession(
-                                {
-                                    id: sessionsNB,
-                                    configuration: NEW_SESSION.CONFIG,
-                                    ipc: NEW_SESSION.IPC,
-                                    connection: NEW_SESSION.CONNECTION
-                                }
-                            );
-                            sessionsActions.switchSession(sessionsNB);
-                        }}
-                        src="./images/add.png"
-                    >
-                    </img>
+                    <div className={styles.connectionAddWrapper}>
+                        <img
+                            className={styles.connectionAdd}
+                            onClick={() => {
+                                this.props.sessionsActions.newSession(
+                                    {
+                                        id: sessionsNB,
+                                        configuration: NEW_SESSION.CONFIG,
+                                        ipc: NEW_SESSION.IPC,
+                                        connection: NEW_SESSION.CONNECTION
+                                    }
+                                );
+                                sessionsActions.switchSession(sessionsNB);
+                            }}
+                            src="./images/add.png"
+                        >
+                        </img>
+                    </div>
                 </div>
             </div>
         );
