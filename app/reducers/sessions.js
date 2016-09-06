@@ -11,7 +11,8 @@ import Immutable from 'immutable';
 // see end of file for `list` description
 const INITIAL_STATE = Immutable.Map({
     list: Immutable.Map({}),
-    sessionSelected: 0
+    sessionSelected: 0,
+    startupIPC: Immutable.Map({})
 });
 
 export default function sessions(state = INITIAL_STATE, action) {
@@ -36,7 +37,7 @@ export default function sessions(state = INITIAL_STATE, action) {
                         connection:
                             Immutable.Map(action.payload.connection),
                         ipc:
-                            Immutable.Map(action.payload.ipc)
+                            state.get('startupIPC')
                     }
                 }
             );
@@ -66,7 +67,10 @@ export default function sessions(state = INITIAL_STATE, action) {
                     Immutable.fromJS(action.payload)
                 );
             } else {
-                return state;
+                return state.mergeIn(
+                    ['startupIPC'],
+                    Immutable.fromJS(action.payload)
+                );
             }
 
         default:
