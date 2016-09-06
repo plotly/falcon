@@ -17,10 +17,6 @@ const INITIAL_STATE = Immutable.Map({
 });
 
 export default function sessions(state = INITIAL_STATE, action) {
-    console.warn('sessionsReducer');
-    console.warn(state);
-    console.warn(action.type);
-    console.warn(action.payload);
 
     switch (action.type) {
 

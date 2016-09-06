@@ -19,10 +19,8 @@ export default class Configuration extends Component {
         const sessionSelected = sessions.getIn(
             ['list', `${this.props.sessions.get('sessionSelected')}`]
         );
-        console.warn(sessionSelected);
 
         if (this.props.sessions.get('list').size > 0) {
-            console.warn('rendering settings');
 
             settings = (
                 <Settings
