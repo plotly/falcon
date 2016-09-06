@@ -21,19 +21,15 @@ const foundParams = (params, wantedParam) => {
 
 export function v1(requestEvent, sequelizeManager, callback) {
 
-    const {connection} = sequelizeManager;
+    const {sessions} = sequelizeManager;
 
     let task;
     let message;
 
     const endpoint = split('/', requestEvent.route.path)[2];
 
-    let sessionSelected = null;
-    if (!foundParams(requestEvent.params, 'session')) {
-        sequelizeManager.raiseError(
-            {message: QUERY_PARAM}, callback
-        );
-    } else {
+    let sessionSelected = sequelizeManager.sessionSelected;
+    if (foundParams(requestEvent.params, 'session')) {
         sessionSelected = requestEvent.params.session;
     }
 
@@ -48,7 +44,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.CONNECT;
-            message = sequelizeSetup(connection);
+            message = sequelizeSetup(sessions[sessionSelected]);
             break;
 
         }
@@ -61,7 +57,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.AUTHENTICATE;
-            message = sequelizeSetup(connection);
+            message = sequelizeSetup(sessions[sessionSelected]);
             break;
 
         }
@@ -74,7 +70,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.DATABASES;
-            message = sequelizeSetup(connection);
+            message = sequelizeSetup(sessions[sessionSelected]);
             break;
 
         }
@@ -87,7 +83,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.CONNECT;
-            message = sequelizeSetup(connection);
+            message = sequelizeSetup(sessions[sessionSelected]);
 
             if (!foundParams(requestEvent.params, 'database')) {
                 sequelizeManager.raiseError(
@@ -96,6 +92,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
             } else {
                 message.database = requestEvent.params.database;
             }
+
 
             break;
         }
@@ -108,7 +105,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.TABLES;
-            message = sequelizeSetup(connection);
+            message = sequelizeSetup(sessions[sessionSelected]);
             break;
 
         }
@@ -163,7 +160,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.DISCONNECT;
-            message = sequelizeSetup(connection);
+            message = sequelizeSetup(sessions[sessionSelected]);
             break;
 
         }

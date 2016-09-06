@@ -67,19 +67,19 @@ export default class SessionsManager extends Component {
                                     sessionsActions.deleteSession(sessionKey);
                             }}
                             src="./images/delete.png"
+                            id={`test-session-delete-${sessionKey}`}
                         >
                         </img>
 
                         <img
                             className={styles.connection}
-
                             onClick={() => {
                                 sessionsActions.switchSession(sessionKey);
                             }}
-
                             src={LOGOS[sessions.getIn([
                                 'list', sessionKey, 'configuration', 'dialect'
                             ])]}
+                            id={`test-session-id-${sessionKey}`}
                         >
                         </img>
 
@@ -109,6 +109,7 @@ export default class SessionsManager extends Component {
                                 sessionsActions.switchSession(sessionsNB);
                             }}
                             src="./images/add.png"
+                            id="test-session-add"
                         >
                         </img>
                     </div>

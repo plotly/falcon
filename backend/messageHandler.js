@@ -130,13 +130,16 @@ function handleMessage(sequelizeManager, opts) {
 	// TODO: decide what the default should be for sessionSelected
 	// right now its the previously selected session
 	const {
-		task, sessionSelected = sequelizeManager.sessionSelected, message
+		task, sessionSelected, message
 	} = payload;
 
 	/*
 	 * update current session before doing any tasks
 	 * this will use the correct connection credentials
 	 */
+
+	console.log('handleMessage');
+	console.log({task, sessionSelected, message});
 
 	sequelizeManager.setSessionSelected(sessionSelected);
 	sequelizeManager.log(`Sending task ${task} to sequelizeManager`, 2);

@@ -142,6 +142,18 @@ describe('plotly database connector', function Spec() {
             byId('test-error-message')
         );
 
+        this.addSession = () => findEl(
+            byId('test-session-add')
+        );
+
+        this.deleteSession = (sessionKey) => findEl(
+            byId(`test-session-delete-${sessionKey}`)
+        );
+
+        this.selectSession = (sessionKey) => findEl(
+            byId(`test-session-id-${sessionKey}`)
+        );
+
         // user inputs
         this.fillInputs = async (testedDialect) => {
             USER_INPUT_FIELDS[testedDialect].forEach(credential => {
@@ -193,6 +205,11 @@ describe('plotly database connector', function Spec() {
             return !(testClass.includes(disconnected) ||
                     testClass.includes(conerror));
         };
+
+
+        // when app opens, add a single session
+
+        await this.addSession().click();
     };
 
     const close = async () => {
@@ -221,7 +238,7 @@ describe('plotly database connector', function Spec() {
                 expect(testClass).to.contain(expectedClass);
             });
 
-            it('should display five SQL database logos',
+            it('should display six SQL database logos',
             async () => {
                 const logos = await this.getLogos();
 
