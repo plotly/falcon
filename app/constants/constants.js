@@ -7,8 +7,8 @@ export const DIALECTS = {
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
     POSTGRES: 'postgres',
-    MSSQL: 'mssql',
     REDSHIFT: 'redshift',
+    MSSQL: 'mssql',
     SQLITE: 'sqlite'
 };
 

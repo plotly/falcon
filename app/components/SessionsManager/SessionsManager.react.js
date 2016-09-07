@@ -59,6 +59,7 @@ export default class SessionsManager extends Component {
                             className={styles.connectionDelete}
                             onClick={() => {
                                 const indexOfId = sessionsIds.indexOf(sessionKey);
+                                // can't go into negative indexes
                                 if (sessionKey !== '0') {
                                     sessionsActions.switchSession(sessionsIds[indexOfId - 1]);
                                 } else {

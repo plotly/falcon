@@ -71,6 +71,13 @@ export default class DialectSelector extends Component {
         });
     }
 
+    componentWillReceiveProps(nextProps) {
+        const nextDialect = nextProps.configuration.get('dialect');
+        if (this.state.selectedDialect !== nextDialect) {
+            this.setState({selectedDialect: nextDialect});
+        }
+    }
+
 	render() {
         const {sessionsActions} = this.props;
 
