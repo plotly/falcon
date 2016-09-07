@@ -206,19 +206,28 @@ describe('plotly database connector', function Spec() {
                     testClass.includes(conerror));
         };
 
-
-        // when app opens, add a single session
-
-        await this.addSession().click();
     };
 
     const close = async () => {
         await this.driver.quit();
     };
 
+    const newSession = async () => {
+        await this.addSession().click();
+    };
+
+    const testedDialects = [
+        // DIALECTS.REDSHIFT,
+        DIALECTS.POSTGRES,
+        DIALECTS.MYSQL,
+        DIALECTS.MARIADB,
+        DIALECTS.MSSQL
+    ];
+
     describe('-> local application ', () => {
 
         before(openApp);
+        before(newSession);
 
         describe('upon starting', () => {
 
@@ -345,19 +354,13 @@ describe('plotly database connector', function Spec() {
     TODO: automate tests for SQLITE
 */
 
-    const testedDialects = [
-        // DIALECTS.REDSHIFT,
-        DIALECTS.POSTGRES,
-        DIALECTS.MYSQL,
-        DIALECTS.MARIADB,
-        DIALECTS.MSSQL
-    ];
-
     testedDialects.forEach(dialectUnderTest => {
     describe(`----- ${dialectUnderTest} is being tested now -----`, () => {
+
     describe('-> normal connection User Exp ', () => {
 
         before(openApp);
+        before(newSession);
 
         const testedDialect = dialectUnderTest;
 
@@ -480,6 +483,7 @@ describe('plotly database connector', function Spec() {
     describe('-> connection error User Exp ', () => {
 
         before(openApp);
+        before(newSession);
 
         const testedDialect = dialectUnderTest;
 
@@ -542,6 +546,7 @@ describe('plotly database connector', function Spec() {
     describe('-> the API ', () => {
 
         before(openApp);
+        before(newSession);
 
         const testedDialect = dialectUnderTest;
 
@@ -813,4 +818,184 @@ describe('plotly database connector', function Spec() {
         });
     });
     });
+
+    describe('-> multiple connections ', () => {
+        before(openApp);
+
+        let id = 0;
+        describe('setting up several connections', () => {
+        testedDialects.forEach(dialectUnderTest => {
+
+            describe(`setting up session ${id}`, () => {
+
+                it('should show the database selector after connection',
+                async () => {
+                    await newSession();
+                    await this.connectDialect(dialectUnderTest);
+
+                    const expectedClass = 'test-connected';
+                    const databaseDropdown = this.getDatabaseDropdown();
+
+                    const testClass = await this.getClassOf(databaseDropdown);
+                    expect(testClass).to.contain(expectedClass);
+                });
+
+                it('should show a table preview when database is selected',
+                async () => {
+                    const dropDowns = await this.findDropdowns();
+                    expect(dropDowns.length).to.equal(2);
+                    const expectedClass = 'test-connected';
+                    await this.reactSelectInputValue(dropDowns[0], 'plotly_datasets');
+                    await delay(5000);
+                    await this.reactSelectInputValue(dropDowns[1], 'ebola_2014');
+                    await delay(4000);
+                    const tables = await this.getTables();
+                    const testClass = await this.getClassOf(tables);
+                    expect(testClass).to.contain(expectedClass);
+                });
+
+                it('should not show an error',
+                async () => {
+                    const errorMessage = await this.getErrorMessage();
+
+                    expect(await errorMessage.getText()).to.equal('');
+                });
+
+            });
+
+            id += 1;
+
+        });
+        });
+
+        describe('switching between connections', () => {
+
+            describe('switch to the first connection and change the table', () => {
+                it('should show the right dialect selected',
+                async() => {
+                    const testedDialect = testedDialects[0];
+                    const otherSession = await this.selectSession(0);
+                    await otherSession.click();
+                    await delay(500);
+                    const highlightedLogo = await this.getHighlightedLogo();
+
+                    expect(await highlightedLogo.length).to.equal(1);
+                    expect(await highlightedLogo[0].getAttribute('id'))
+                        .to.contain(testedDialect);
+                });
+
+                it('change table after switching connection successfully',
+                async() => {
+                    const dropDowns = await this.findDropdowns();
+                    expect(dropDowns.length).to.equal(2);
+                    const expectedClass = 'test-connected';
+                    await this.reactSelectInputValue(dropDowns[1], 'apple_stock_2014');
+                    await delay(4000);
+                    const tables = await this.getTables();
+                    const testClass = await this.getClassOf(tables);
+                    expect(testClass).to.contain(expectedClass);
+                });
+
+                it('shows no error',
+                async() => {
+                    const errorMessage = await this.getErrorMessage();
+
+                    expect(await errorMessage.getText()).to.equal('');
+                });
+            });
+        });
+
+
+        describe('deleting connections', () => {
+
+            describe(`deleting session 3 for ${testedDialects[id]}`, () => {
+
+                it('should not show session 3 anymore',
+                async () => {
+                    const deleteButton = await this.deleteSession(3);
+                    await deleteButton.click();
+                    await delay(500);
+
+                    let error;
+                    try {
+                        error = await this.selectSession(3);
+                    }
+                    catch (err) {
+                        error = err;
+                    }
+                    expect(error.toString()).to.contain('NoSuchElementError');
+
+                });
+
+            });
+
+            describe(`deleting session 2 for ${testedDialects[2]}`, () => {
+
+                it('should not show session 2 anymore',
+                async () => {
+                    const deleteButton = await this.deleteSession(2);
+                    await deleteButton.click();
+                    await delay(500);
+
+                    let error;
+                    try {
+                        error = await this.selectSession(2);
+                    }
+                    catch (err) {
+                        error = err;
+                    }
+                    expect(error.toString()).to.contain('NoSuchElementError');
+
+                });
+
+            });
+
+            describe(`deleting session 1 for ${testedDialects[1]}`, () => {
+
+                it('should not show session 1 anymore',
+                async () => {
+                    const deleteButton = await this.deleteSession(1);
+                    await deleteButton.click();
+                    await delay(500);
+
+                    let error;
+                    try {
+                        error = await this.selectSession(1);
+                    }
+                    catch (err) {
+                        error = err;
+                    }
+                    expect(error.toString()).to.contain('NoSuchElementError');
+
+                });
+
+            });
+
+            describe(`deleting session 0 for ${testedDialects[0]}`, () => {
+
+                it('should not show session 0 anymore',
+                async () => {
+                    const deleteButton = await this.deleteSession(0);
+                    await deleteButton.click();
+                    await delay(500);
+
+                    let error;
+                    try {
+                        error = await this.selectSession(0);
+                    }
+                    catch (err) {
+                        error = err;
+                    }
+                    expect(error.toString()).to.contain('NoSuchElementError');
+
+                });
+
+            });
+
+        });
+
+        after(close);
+
+    });
+
 });
