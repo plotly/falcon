@@ -206,6 +206,7 @@ describe('plotly database connector', function Spec() {
                     testClass.includes(conerror));
         };
 
+        await this.addSession().click();
     };
 
     const close = async () => {
@@ -227,7 +228,6 @@ describe('plotly database connector', function Spec() {
     describe('-> local application ', () => {
 
         before(openApp);
-        before(newSession);
 
         describe('upon starting', () => {
 
@@ -360,7 +360,6 @@ describe('plotly database connector', function Spec() {
     describe('-> normal connection User Exp ', () => {
 
         before(openApp);
-        before(newSession);
 
         const testedDialect = dialectUnderTest;
 
@@ -483,7 +482,6 @@ describe('plotly database connector', function Spec() {
     describe('-> connection error User Exp ', () => {
 
         before(openApp);
-        before(newSession);
 
         const testedDialect = dialectUnderTest;
 
@@ -546,7 +544,6 @@ describe('plotly database connector', function Spec() {
     describe('-> the API ', () => {
 
         before(openApp);
-        before(newSession);
 
         const testedDialect = dialectUnderTest;
 
@@ -831,6 +828,7 @@ describe('plotly database connector', function Spec() {
                 it('should show the database selector after connection',
                 async () => {
                     await newSession();
+
                     await this.connectDialect(dialectUnderTest);
 
                     const expectedClass = 'test-connected';
@@ -859,6 +857,7 @@ describe('plotly database connector', function Spec() {
                     const errorMessage = await this.getErrorMessage();
 
                     expect(await errorMessage.getText()).to.equal('');
+
                 });
 
             });
@@ -874,7 +873,7 @@ describe('plotly database connector', function Spec() {
                 it('should show the right dialect selected',
                 async() => {
                     const testedDialect = testedDialects[0];
-                    const otherSession = await this.selectSession(0);
+                    const otherSession = await this.selectSession(1);
                     await otherSession.click();
                     await delay(500);
                     const highlightedLogo = await this.getHighlightedLogo();
