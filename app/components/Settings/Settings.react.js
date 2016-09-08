@@ -20,6 +20,7 @@ const plotlyWorkspaceLink = 'https://plot.ly/alpha/workspace';
 export default class Settings extends Component {
     constructor(props) {
         super(props);
+        this.state = {httpVideoShow: false};
     }
 
     render() {
@@ -28,6 +29,24 @@ export default class Settings extends Component {
             ipc, ipcActions,
             connection, connectionActions
         } = this.props;
+
+        let httpVideo;
+        let httpVideoLinkWording;
+        if (this.state.httpVideoShow) {
+            httpVideo =
+                <iframe
+                    width="560"
+                    height="315"
+                    src="https://www.youtube.com/embed/S4TXMMn9mh0?rel=0&amp;showinfo=0"
+                    frameBorder="0"
+                    allowFullScreen
+                ></iframe>;
+            httpVideoLinkWording = 'Hide Video.';
+        } else {
+            httpVideo = null;
+            httpVideoLinkWording = 'Click to see how.';
+
+        }
 
         const dialectSelector = (
             <div>
@@ -182,12 +201,16 @@ export default class Settings extends Component {
                             Alternatively, you can run the connector without
                             HTTPS and allow your browser to make insecure
                             requests.&nbsp;
-                            <a onClick={() => {
-                                shell.openExternal(httpsGithubIssueLink);
-                            }}
+                            <a
+                                onClick={() => {this.setState(
+                                    {httpVideoShow: !this.state.httpVideoShow}
+                                );}}
                             >
-                                Here&#39;s how
-                            </a>.
+                            {httpVideoLinkWording}
+                            </a>
+                            <div>
+                            {httpVideo}
+                            </div>
                         </div>
                     );
                 }
