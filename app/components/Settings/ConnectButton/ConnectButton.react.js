@@ -36,7 +36,7 @@ export default class ConnectButton extends Component {
 
     connect() {
         this.updateStatus(APP_STATUS.CONNECTING);
-        this.props.sessionsActions.connect(this.props.configuration);
+        this.props.sessionsActions.connect();
     }
 
     disconnect() {

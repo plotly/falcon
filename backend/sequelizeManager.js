@@ -14,6 +14,22 @@ const PREBUILT_QUERY = {
 
 const timestamp = () => (new Date()).toTimeString();
 
+// http://stackoverflow.com/questions/32037385/using-sequelize-with-redshift
+const REDSHIFT_OPTIONS = {
+    dialect: 'postgres',
+    pool: false,
+    keepDefaultTimezone: true, // avoid SET TIMEZONE
+    databaseVersion: '8.0.2' // avoid SHOW SERVER_VERSION
+};
+
+const setupMSSQLOptions = (connection) => {
+    connection.config.dialectOptions = {encrypt: true};
+};
+
+const rememberSubdialect = (connection, subDialect) => {
+    connection.config = merge(connection.config, {subDialect});
+};
+
 const EMPTY_TABLE = {
     columnnames: ['NA'],
     rows: [['empty table']],
@@ -91,76 +107,43 @@ export class SequelizeManager {
 
     }
 
+    raiseError(errorMessage, responseSender) {
+        const errorLog = merge(errorMessage, {timestamp: timestamp()});
+        this.log(errorMessage, 0);
+        responseSender({error: errorLog}, 400);
+    }
+
     getConnection(responseSender) {
         return () => responseSender({error: null});
     }
 
     createConnection(configuration) {
-        let {
-            username, password, database, port,
-            dialect, storage, host
+        const {
+            username, password, database, port, dialect, storage, host
             } = configuration;
 
-        let options = {
-            dialect,
-            host,
-            port,
-            storage
-        };
+        let options = {dialect, host, port, storage};
 
         this.log(`Creating a connection for user ${username}`, 1);
 
-        let subDialect = null;
-        if (this.sessions[this.sessionSelected]) {
-            subDialect = this.sessions[this.sessionSelected].config.subDialect || null;
-        }
-        let redshiftOptions = null;
+        const subDialect = dialect;
 
-        if ((dialect === 'redshift') || (subDialect === 'redshift')) {
-            subDialect = 'redshift';
-            // http://stackoverflow.com/questions/32037385/using-sequelize-with-redshift
+        if (dialect === 'redshift') {
+            // avoid auto-dection
             Sequelize.HSTORE.types.postgres.oids.push('dummy');
-            redshiftOptions = {
-                dialect: 'postgres',
-                pool: false,
-                keepDefaultTimezone: true, // avoid SET TIMEZONE
-                databaseVersion: '8.0.2' // avoid SHOW SERVER_VERSION
-            };
-
-            options = merge(options, redshiftOptions);
+            // dialect will be changed to 'postgres' by REDSHIFT_OPTIONS
+            options = merge(options, REDSHIFT_OPTIONS);
         }
 
-        this.sessions[this.sessionSelected] = new Sequelize(database, username, password, options);
+        this.sessions[this.sessionSelected] = new Sequelize(
+            database, username, password, options
+        );
 
-        if (this.sessions[this.sessionSelected].config.dialect === 'mssql') {
-            this.sessions[this.sessionSelected].config.dialectOptions = {encrypt: true};
+        if (subDialect === 'mssql') {
+            setupMSSQLOptions(this.sessions[this.sessionSelected]);
         }
 
-        if (subDialect) {
-            this.sessions[this.sessionSelected].config = merge(this.sessions[this.sessionSelected].config, {subDialect: 'redshift'});
-        }
-
-    }
-
-    connect(configFromApp) {
-
-        if (ARGS.headless) {
-
-            // read locally stored configuration for sessionSelected
-            const configFromFile = YAML.load(ARGS.configpath)[this.sessionSelected];
-            /*
-             * if server is sending a headless app a new database,
-             * use that one instead of the one in the config file
-             */
-            if (configFromApp.database) {
-                configFromFile.database = configFromApp.database;
-            }
-            this.createConnection(configFromFile);
-        } else {
-            this.createConnection(configFromApp);
-        }
-
-        return this.sessions[this.sessionSelected].authenticate();
+        rememberSubdialect(this.sessions[this.sessionSelected], subDialect);
 
     }
 
@@ -192,10 +175,78 @@ export class SequelizeManager {
 
     }
 
-    raiseError(errorMessage, responseSender) {
-        const errorLog = merge(errorMessage, {timestamp: timestamp()});
-        this.log(errorMessage, 0);
-        responseSender({error: errorLog}, 400);
+    connect(configFromApp) {
+
+        if (ARGS.headless) {
+
+            // read locally stored configuration for sessionSelected
+            const configFromFile = YAML.load(ARGS.configpath)[this.sessionSelected];
+
+            this.createConnection(configFromFile);
+
+        } else {
+
+            this.createConnection(configFromApp);
+
+        }
+        console.log('authenticating');
+        return this.sessions[this.sessionSelected].authenticate();
+
+    }
+
+    selectDatabase(databaseToUse) {
+        // take database entry check if its the same as in current connection
+        const needToSwitchDatabases =
+            databaseToUse !== this.sessions[this.sessionSelected].config.database;
+
+        console.log('needToSwitchDatabases');
+        console.log(needToSwitchDatabases);
+        /*
+         * if not, make a new one to the other database,
+         * replacing the current one
+         * simply changing the database parameter manually without rebuilding
+         * the object does not work
+         */
+
+        if (needToSwitchDatabases) {
+
+            const currentSetup = merge(
+                this.sessions[this.sessionSelected].options,
+                this.sessions[this.sessionSelected].config
+            );
+
+            const {
+                username, password, port,
+                dialect, storage, host, subDialect
+            } = currentSetup;
+
+            let options = {dialect, host, port, storage};
+
+            this.log(`Switchin to a new database ${databaseToUse}`, 1);
+
+            if (subDialect === 'redshift') {
+                // avoid auto-dection
+                Sequelize.HSTORE.types.postgres.oids.push('dummy');
+                options = merge(options, REDSHIFT_OPTIONS);
+            }
+            this.sessions[this.sessionSelected] = new Sequelize(
+                databaseToUse, username, password, options
+            );
+
+            if (subDialect === 'mssql') {
+                setupMSSQLOptions(this.sessions[this.sessionSelected]);
+            }
+
+            if (subDialect === 'redshift') {
+                rememberSubdialect(this.sessions[this.sessionSelected],
+                subDialect);
+            }
+
+        }
+
+        this.log('Authenticating connection.');
+        return this.sessions[this.sessionSelected].authenticate();
+
     }
 
     showDatabases(responseSender) {
@@ -241,6 +292,7 @@ export class SequelizeManager {
         return () => this.sessions[this.sessionSelected]
         .query(showtables, this.setQueryType('SELECT'))
         .then(results => {
+
             this.log('Results received', 1);
             // TODO: when switching fornt end to v1, simply send back an array
             const tablesObject = this.intoTablesArray(results).map(table => {

@@ -1,5 +1,4 @@
 import {createAction} from 'redux-actions';
-import Immutable from 'immutable';
 import {TASKS} from './../../backend/messageHandler';
 const ipcRenderer = require('electron').ipcRenderer;
 
@@ -30,15 +29,17 @@ export function query (statement) {
     };
 }
 
-export function connect (credentials) {
-    // TODO: use getState here
+export function connect () {
     return (_, getState) => {
         const state = getState();
         const sessionSelected = state.sessions.get('sessionSelected');
+        const configuration = state.sessions.getIn(
+            ['list', `${sessionSelected}`, 'configuration']
+        );
         ipcSend(
             TASKS.CONNECT_AND_SHOW_DATABASES,
             sessionSelected,
-            immutableToJS(credentials)
+            configuration.toJS()
         );
     };
 }
@@ -53,7 +54,7 @@ export function selectDatabase () {
         ipcSend(
             TASKS.SELECT_DATABASE_AND_SHOW_TABLES,
             sessionSelected,
-            configuration.toJS()
+            configuration.toJS().database
         );
     };
 }
@@ -80,14 +81,6 @@ export function setupHttpsServer () {
         const sessionSelected = state.sessions.get('sessionSelected');
         ipcSend(TASKS.UPDATE_IPC_STATE, sessionSelected);
     };
-}
-
-function immutableToJS(immutableThing) {
-    let jsonThing = {};
-    if (Immutable.Iterable.isIterable(immutableThing)) {
-        jsonThing = immutableThing.toJS();
-    }
-    return jsonThing;
 }
 
 function ipcSend(task, sessionSelected, message = {}) {

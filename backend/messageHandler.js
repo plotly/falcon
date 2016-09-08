@@ -127,21 +127,29 @@ function handleMessage(sequelizeManager, opts) {
 
 	// TODO: use mainWindow by extracting it here instead of opts.mainWindow
 	const {responseSender, payload} = opts;
-	// TODO: decide what the default should be for sessionSelected
-	// right now its the previously selected session
+
 	const {
-		task, sessionSelected, message
+		task,
+		sessionSelected = sequelizeManager.sessionSelected,
+		message = null // optional for some tasks
 	} = payload;
+
+	let {database = null} = payload; // optional for some tasks
+	// check if there is a current database in use
+	if (!database) {
+		if (sequelizeManager.sessions[sessionSelected]) {
+			database = sequelizeManager.sessions[sessionSelected].config.database;
+		}
+	}
 
 	/*
 	 * update current session before doing any tasks
 	 * this will use the correct connection credentials
 	 */
 
-	console.log('handleMessage');
-	console.log({task, sessionSelected, message});
-
 	sequelizeManager.setSessionSelected(sessionSelected);
+
+
 	sequelizeManager.log(`Sending task ${task} to sequelizeManager`, 2);
 
 	switch (task) {
@@ -196,6 +204,7 @@ function handleMessage(sequelizeManager, opts) {
 			.catch( error => {
 				sequelizeManager.raiseError(error, responseSender);
 			});
+
 			break;
 
 		}
@@ -227,9 +236,33 @@ function handleMessage(sequelizeManager, opts) {
 
 		}
 
+		case TASKS.SELECT_DATABASE: {
+
+			sequelizeManager.selectDatabase(database)
+			.catch((error) => {
+				sequelizeManager.raiseError(
+					merge(
+						{message: AUTHENTICATION({error})},
+						{type: 'connection'}),
+					responseSender
+				);
+			})
+			.then(() => {sequelizeManager.log(
+				'NOTE: you are logged into database ' +
+				`[${sequelizeManager.sessions[sessionSelected].config.username}]`, 1
+			);})
+			.then(sequelizeManager.getConnection(responseSender))
+			.catch( error => {
+				sequelizeManager.raiseError(error, responseSender);
+			});
+			break;
+
+		}
+
 		case TASKS.TABLES: {
 
 			sequelizeManager.authenticate(responseSender)
+			.then(sequelizeManager.selectDatabase(database))
 			.then(sequelizeManager.showTables(responseSender))
 			.then(() => {sequelizeManager.log(
 				'NOTE: fetched the list of tables for database' +
@@ -239,11 +272,13 @@ function handleMessage(sequelizeManager, opts) {
 				sequelizeManager.raiseError(error, responseSender);
 			});
 			break;
+
 		}
 
 		case TASKS.PREVIEW: {
 
 			sequelizeManager.authenticate(responseSender)
+			.then(sequelizeManager.selectDatabase(database))
 			.then(sequelizeManager.previewTables(message, responseSender))
 			.then(() => {sequelizeManager.log(
 				`NOTE: you are previewing table(s) [${message}]`, 1
@@ -256,7 +291,9 @@ function handleMessage(sequelizeManager, opts) {
 		}
 
 		case TASKS.QUERY: {
+
 			sequelizeManager.authenticate(responseSender)
+			.then(sequelizeManager.selectDatabase(database))
 			.then(sequelizeManager.sendRawQuery(message, responseSender))
 			.then(() => {sequelizeManager.log(
 				`QUERY EXECUTED: ${message}`, 1
@@ -287,6 +324,9 @@ function handleMessage(sequelizeManager, opts) {
 		 */
 
 		case TASKS.CONNECT_AND_SHOW_DATABASES: {
+			/*
+			 * @param {object} message - configuration for connecting a session
+			 */
 
 			sequelizeManager.connect(message)
 			.catch((error) => {
@@ -308,6 +348,9 @@ function handleMessage(sequelizeManager, opts) {
 		}
 
 		case TASKS.CHECK_CONNECTION_AND_SHOW_DATABASES: {
+			/*
+			 * no message required here
+			 */
 
 			sequelizeManager.authenticate(responseSender)
 			.then(sequelizeManager.showDatabases(responseSender))
@@ -323,8 +366,12 @@ function handleMessage(sequelizeManager, opts) {
 		}
 
 		case TASKS.SELECT_DATABASE_AND_SHOW_TABLES: {
-			sequelizeManager.connect(message)
+			/*
+			 * @param {string} message - database to selectDatabase
+			 */
 
+			sequelizeManager.authenticate(responseSender)
+			.then(sequelizeManager.selectDatabase(message))
 			.catch((error) => {
 				sequelizeManager.raiseError(
 					merge(error, {type: 'connection'}),
