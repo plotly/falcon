@@ -20,6 +20,7 @@
     border-width: 1.5px 0px 1.5px 1.5px;
     border-color: #BEC8D9;
     border-style: solid;
+    border-radius: 5px;
     padding: 5px 10px 5px 10px;
     vertical-align: middle;
     max-width: 175px;
@@ -61,6 +62,7 @@
     border-width: 1.5px;
     border-color: #BEC8D9;
     border-style: solid;
+    border-radius: 5px;
     vertical-align: middle;
     height: 36px;
     width: 36px;
