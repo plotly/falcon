@@ -19,6 +19,14 @@ import * as logoStyles
 
 const BASE_URL = 'localhost:5000/';
 
+const testedDialects = [
+    // DIALECTS.REDSHIFT,
+    DIALECTS.POSTGRES,
+    DIALECTS.MYSQL,
+    DIALECTS.MARIADB,
+    DIALECTS.MSSQL
+];
+
 const CREDENTIALS = {
 	'mariadb': {
 		'host': process.env.AWS_RDS_MARIADB,
@@ -216,14 +224,6 @@ describe('plotly database connector', function Spec() {
     const newSession = async () => {
         await this.addSession().click();
     };
-
-    const testedDialects = [
-        // DIALECTS.REDSHIFT,
-        DIALECTS.POSTGRES,
-        DIALECTS.MYSQL,
-        DIALECTS.MARIADB,
-        DIALECTS.MSSQL
-    ];
 
     describe('-> local application ', () => {
 
