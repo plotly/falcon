@@ -51,6 +51,14 @@ export default class TableDropdown extends Component {
 
         if (tableNames === null) {
             tablesDropdownOptions = [
+                {
+                    value: 'Please Select a Database',
+                    label: 'Please Select a Database',
+                    disabled: true
+                }
+            ];
+        } else if (tableNames.length === 0) {
+            tablesDropdownOptions = [
                 {value: 'None', label: 'None Found', disabled: true}
             ];
         } else {
