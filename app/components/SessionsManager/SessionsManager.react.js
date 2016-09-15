@@ -22,6 +22,7 @@ export default class SessionsManager extends Component {
     render() {
         const {sessions, sessionsActions} = this.props;
         const sessionsIds = Object.keys(sessions.get('list').toJS());
+        const numberOfActiveSessions = sessionsIds.length;
         const ID = (sessionKey) => {
             return (
                 <span>
@@ -48,12 +49,13 @@ export default class SessionsManager extends Component {
         };
 
         let sessionsIcons = null;
-
+        if (numberOfActiveSessions > 0) {
+            debugger;
             sessionsIcons = Object.keys(sessions.get('list').toJS()).map(
                 sessionKey => (
                     <div className={classnames(styles.connectionWrapper, {
                             [styles.connectionWrapperSelected]:
-                                `${sessions.get('sessionSelected')}` === sessionKey
+                                sessions.get('sessionSelected') === sessionKey
                             }
                         )}
                     >
@@ -112,6 +114,8 @@ export default class SessionsManager extends Component {
                         <img
                             className={styles.connectionAdd}
                             onClick={() => {
+                                sessionsActions.newSession(`${numberOfActiveSessions}`);
+                                sessionsActions.switchSession(`${numberOfActiveSessions}`);
                             }}
                             src="./images/add.png"
                             id="test-session-add"

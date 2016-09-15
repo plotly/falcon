@@ -34,7 +34,7 @@ export function connect () {
         const state = getState();
         const sessionSelected = state.sessions.get('sessionSelected');
         const configuration = state.sessions.getIn(
-            ['list', `${sessionSelected}`, 'configuration']
+            ['list', sessionSelected, 'configuration']
         );
         ipcSend(
             TASKS.CONNECT_AND_SHOW_DATABASES,
@@ -49,7 +49,7 @@ export function selectDatabase () {
         const state = getState();
         const sessionSelected = state.sessions.get('sessionSelected');
         const configuration = state.sessions.getIn(
-            ['list', `${sessionSelected}`, 'configuration']
+            ['list', sessionSelected, 'configuration']
         );
         ipcSend(
             TASKS.SELECT_DATABASE_AND_SHOW_TABLES,

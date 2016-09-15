@@ -12,7 +12,7 @@ import {EMPTY_SESSION} from '../constants/constants';
 // see end of file for `list` description
 const INITIAL_STATE = Immutable.Map({
     list: Immutable.Map({}),
-    sessionSelected: 0,
+    sessionSelected: '0',
     startupIPC: Immutable.Map({})
 });
 
@@ -51,20 +51,20 @@ export default function sessions(state = INITIAL_STATE, action) {
 
         case UPDATE_CONFIGURATION:
             return state.mergeIn(
-                ['list', `${state.get('sessionSelected')}`, 'configuration'],
+                ['list', state.get('sessionSelected'), 'configuration'],
                 action.payload
             );
 
         case UPDATE_CONNECTION:
             return state.mergeIn(
-                ['list', `${state.get('sessionSelected')}`, 'connection'],
+                ['list', state.get('sessionSelected'), 'connection'],
                 action.payload
             );
 
         case UPDATE_IPC_STATE:
             if (state.get('list').size > 0) {
                 return state.mergeIn(
-                    ['list', `${state.get('sessionSelected')}`, 'ipc'],
+                    ['list', state.get('sessionSelected'), 'ipc'],
                     Immutable.fromJS(action.payload)
                 );
             } else {
@@ -82,24 +82,29 @@ export default function sessions(state = INITIAL_STATE, action) {
 
 
 /*
- * where the 'list' will hold several sessions such as
+where the 'list' will hold several sessions such as
    {
-       session1 : {
+        0 : { // randoml
+            ipc: {} // ipc related info (see below)
+            connection: {} // status of the app related info
+            configuration: {} // info required for user connection
+        },
+        1 : { // randoml
             ipc: {} // ipc related info (see below)
             connection: {} // status of the app related info
             configuration: {} // info required for user connection
         },
     ...
     }
- *
- * ipc is a generic key-value store that stores state from
- * back-end messages.
- *
- * the backend (messageHandler.js) sends objects over the ipc channel and these
- * objects get merged into this IPC state. fully populated,
- * this state looks like:
 
-    0: {
+ipc is a generic key-value store that stores state from
+back-end messages.
+
+the backend (messageHandler.js) sends objects over the ipc channel and these
+objects get merged into this IPC state. fully populated,
+this state looks like:
+
+    ipc: {
         databases: {
             [
                 database1, database2
@@ -111,55 +116,26 @@ export default function sessions(state = INITIAL_STATE, action) {
                 table2: {}
             }
         },
-    },
-    1: {
-        databases: {
-            [
-                database1, database2
-            ]
-        },
-        tables: {
+        previews: {
             {
-                table1: {},
+                table1: {
+                    nrows: 3,
+                    ncols: 2,
+                    colnames: ['col1', 'col2', 'col3']
+                    rows: [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+                },
                 table2: {}
             }
         },
+        log: {
+            [
+                {logEntry: 'something happened'},
+                {timestamp: "17:45:52 GMT-0400 (EDT)"}
+            ]
+        },
+        canSetupHttps: true,
+        hasSelfSignedCert: true,
+        error: 'something bad happened'
+        }
     }
-
-{
-    databases: {
-        [
-            database1, database2
-        ]
-    },
-    tables: {
-        {
-            table1: {},
-            table2: {}
-        }
-    },
-    previews: {
-        {
-            table1: {
-                nrows: 3,
-                ncols: 2,
-                colnames: ['col1', 'col2', 'col3']
-                rows: [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-            },
-            table2: {}
-        }
-    },
-    log: {
-        [
-            {logEntry: 'something happened'},
-            {timestamp: "17:45:52 GMT-0400 (EDT)"}
-        ]
-    },
-    canSetupHttps: true,
-    hasSelfSignedCert: true,
-    error: 'something bad happened'
-}
-
- *
- *
- */
+*/
