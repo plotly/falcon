@@ -22,15 +22,18 @@ export default class SessionsManager extends Component {
     render() {
         const {sessions, sessionsActions} = this.props;
         const sessionsIds = Object.keys(sessions.get('list').toJS());
-        const sessionsNB = sessionsIds.length;
         const ID = (sessionKey) => {
             return (
                 <span>
-            {sessions.getIn(['list', sessionKey, 'configuration', 'username'])}
-            @
-            {sessions.getIn(['list', sessionKey, 'configuration', 'host']) || 'localhost'}
-            &nbsp;
-            </span>
+                    {sessions.getIn(
+                        ['list', sessionKey, 'configuration', 'username']
+                    )}
+                    @
+                    {sessions.getIn(
+                        ['list', sessionKey, 'configuration', 'host']
+                    ) || 'localhost'}
+                    &nbsp;
+                </span>
         );
         };
 
@@ -45,7 +48,6 @@ export default class SessionsManager extends Component {
         };
 
         let sessionsIcons = null;
-        if (sessionsNB > 0) {
 
             sessionsIcons = Object.keys(sessions.get('list').toJS()).map(
                 sessionKey => (
@@ -61,9 +63,13 @@ export default class SessionsManager extends Component {
                                 const indexOfId = sessionsIds.indexOf(sessionKey);
                                 // can't go into negative indexes
                                 if (sessionKey !== '0') {
-                                    sessionsActions.switchSession(sessionsIds[indexOfId - 1]);
+                                    sessionsActions.switchSession(
+                                        sessionsIds[indexOfId - 1]
+                                    );
                                 } else {
-                                    sessionsActions.switchSession(sessionsIds[indexOfId + 1]);
+                                    sessionsActions.switchSession(
+                                        sessionsIds[indexOfId + 1]
+                                    );
                                 }
                                     sessionsActions.deleteSession(sessionKey);
                             }}
@@ -106,8 +112,6 @@ export default class SessionsManager extends Component {
                         <img
                             className={styles.connectionAdd}
                             onClick={() => {
-                                this.props.sessionsActions.newSession(sessionsNB);
-                                sessionsActions.switchSession(sessionsNB);
                             }}
                             src="./images/add.png"
                             id="test-session-add"
