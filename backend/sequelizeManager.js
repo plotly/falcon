@@ -118,7 +118,10 @@ export class SequelizeManager {
                 dialect: 'postgres',
                 pool: false,
                 keepDefaultTimezone: true, // avoid SET TIMEZONE
-                databaseVersion: '8.0.2' // avoid SHOW SERVER_VERSION
+                databaseVersion: '8.0.2', // avoid SHOW SERVER_VERSION
+                dialectOptions: {
+                    ssl: true
+                }
             };
 
             options = merge(options, redshiftOptions);
