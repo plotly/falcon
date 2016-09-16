@@ -2,26 +2,23 @@ import {TASKS} from './messageHandler';
 import {has, map, merge, split, trim} from 'ramda';
 import {QUERY_PARAM, DATABASE_PARAM, TABLES_PARAM} from './errors';
 
+
 const foundParams = (params, wantedParam) => {
-
-    if (Boolean(params) && has(wantedParam, params)) {
-        return true;
-    }
-
-    return false;
+    return Boolean(params) && has(wantedParam, params);
 };
+
 
 const obtainDatabaseForTask = (
     requestEvent, sequelizeManager, sessionSelected, callback
 ) => {
     let database = null;
+    // TODO: stricter database check form workspace message
     if (foundParams(requestEvent.params, 'database')) {
-        // check if there is a current database in use
         database = requestEvent.params.database;
     } else if (sequelizeManager.sessions[sessionSelected]) {
         database = sequelizeManager.sessions[sessionSelected].config.database;
     } else {
-        // means can't figure out whih database to use, send an error back
+        // means can't figure out which database to use, send an error back
         sequelizeManager.raiseError(
             {message: DATABASE_PARAM}, callback
         );

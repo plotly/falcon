@@ -79,12 +79,12 @@ export default function sessions(state = INITIAL_STATE, action) {
 /*
 where the 'list' will hold several sessions such as
    {
-        0 : { // randoml
+        1182736409810 : { // where this index is a timestamp
             ipc: {} // ipc related info (see below)
             connection: {} // status of the app related info
             configuration: {} // info required for user connection
         },
-        1 : { // randoml
+        1182736409815 : { // where this index is a timestamp
             ipc: {} // ipc related info (see below)
             connection: {} // status of the app related info
             configuration: {} // info required for user connection
@@ -92,6 +92,7 @@ where the 'list' will hold several sessions such as
     ...
     }
 
+------ ipc ------
 ipc is a generic key-value store that stores state from
 back-end messages.
 
@@ -133,4 +134,23 @@ this state looks like:
         error: 'something bad happened'
         }
     }
+------ end ipc ------
+
+------ configuration ------
+    configuration: {
+        username: some_username,
+        password: somepassword!%5,
+        database: plotly_datasets,
+        dialect: mysql,
+        port: 3306,
+        storage: ~/Path/to/my/local/sqlite/database.db,
+        host: server-faraway.com
+    }
+------ end configuration------
+
+------ connection ------
+    connection: {
+        status: connected
+    }
+------ end connection------
 */
