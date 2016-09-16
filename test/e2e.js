@@ -154,12 +154,12 @@ describe('plotly database connector', function Spec() {
             byId('test-session-add')
         );
 
-        this.deleteSession = (sessionKey) => findEl(
-            byId(`test-session-delete-${sessionKey}`)
+        this.deleteSession = (sessionId) => findEl(
+            byId(`test-session-delete-${sessionId}`)
         );
 
-        this.selectSession = (sessionKey) => findEl(
-            byId(`test-session-id-${sessionKey}`)
+        this.selectSession = (sessionId) => findEl(
+            byId(`test-session-id-${sessionId}`)
         );
 
         // user inputs

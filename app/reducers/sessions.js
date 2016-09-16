@@ -20,11 +20,6 @@ export default function sessions(state = INITIAL_STATE, action) {
 
     switch (action.type) {
 
-        /*
-         * TODO: make this action take a new random index
-         * instead of pushing to the list
-         */
-
         case NEW_SESSION:
             return state.mergeIn(['list'],
                 {

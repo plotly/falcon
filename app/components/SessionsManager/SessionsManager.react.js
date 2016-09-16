@@ -3,7 +3,24 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './SessionsManager.css';
 import classnames from 'classnames';
 import ReactTooltip from 'react-tooltip';
+import {last, contains} from 'ramda';
 
+const timestamp = () => Math.floor(Date.now() / 1000);
+
+const getNewId = (sessionsIds) => {
+    let tries = 0;
+    let newId = null;
+    while (
+        !newId || contains(newId, sessionsIds)
+    ) {
+        newId = timestamp();
+        tries += 1;
+        if (tries > 10) {
+            debugger;
+        }
+    }
+    return `${newId}`;
+};
 
 const LOGOS = {
     postgres: './images/postgres-logo.png',
@@ -23,84 +40,134 @@ export default class SessionsManager extends Component {
         const {sessions, sessionsActions} = this.props;
         const sessionsIds = Object.keys(sessions.get('list').toJS());
         const numberOfActiveSessions = sessionsIds.length;
-        const ID = (sessionKey) => {
+        const newId = getNewId(sessionsIds);
+
+        const ID = (sessionId) => {
             return (
                 <span>
                     {sessions.getIn(
-                        ['list', sessionKey, 'configuration', 'username']
+                        ['list', sessionId, 'configuration', 'username']
                     )}
                     @
                     {sessions.getIn(
-                        ['list', sessionKey, 'configuration', 'host']
+                        ['list', sessionId, 'configuration', 'host']
                     ) || 'localhost'}
                     &nbsp;
                 </span>
         );
         };
 
-        const tooltip = (sessionKey) => {
+        // display the full `username@host` identifier
+        const tooltip = (sessionId) => {
             return (
-                <ReactTooltip id={sessionKey} type="warning" effect="solid">
+                <ReactTooltip id={sessionId} type="warning" effect="solid">
                     <span>
-                        {ID(sessionKey)}
+                        {ID(sessionId)}
                     </span>
                 </ReactTooltip>
             );
         };
 
+        // deletes upon click the session from this.props.sessions.list
+        const sessionDeleteIcon = (sessionId) => {
+            return (
+                <img
+                    className={styles.connectionDelete}
+                    onClick={() => {
+                        const indexOfId = sessionsIds.indexOf(
+                            sessions.get('sessionSelected')
+                        );
+                        // are we deleting currently open session?
+                        if (sessionId === sessions.get('sessionSelected')) {
+                            // have to switch before deleting
+                            if (indexOfId === '0') {
+                                // cant have a negative index in an array
+                                sessionsActions.switchSession(
+                                    sessionsIds[indexOfId + 1]
+                                );
+                            } else {
+                                // if its not the first index, switch to next
+                                sessionsActions.switchSession(
+                                    sessionsIds[indexOfId + 1]
+                                );
+                            }
+                        }
+                        // delete it
+                        sessionsActions.deleteSession(sessionId);
+                    }}
+                    src="./images/delete.png"
+                    id={`test-session-delete-${sessionId}`}
+                >
+                </img>
+            );
+        };
+
+        // displays that sessions currently selected database logo
+        const sessionLogoIcon = (sessionId) => {
+            return (
+                <img
+                    className={styles.connection}
+                    onClick={() => {
+                        sessionsActions.switchSession(sessionId);
+                    }}
+                    src={LOGOS[sessions.getIn([
+                        'list', sessionId, 'configuration', 'dialect'
+                    ])]}
+                    id={`test-session-id-${sessionId}`}
+                >
+                </img>
+            );
+        };
+
+        // displays (shortened if too long) session identifier `username@host`
+        const sessionIdentifierText = (sessionId) => {
+            return (
+                <p data-tip data-for={sessionId}
+                    className={styles.connectionIndex}
+                    onClick={() => {
+                        sessionsActions.switchSession(sessionId);
+                    }}
+                >
+                    {ID(sessionId)}
+                    {tooltip(sessionId)}
+                </p>
+            );
+        };
+
+        // displays a (+) icon and creates a new session upon click
+        const connectionAddIcon = () => {
+            return (
+                <img
+                    className={styles.connectionAdd}
+                    onClick={() => {
+                        sessionsActions.newSession(newId);
+                        sessionsActions.switchSession(newId);
+                    }}
+                    src="./images/add.png"
+                    id="test-session-add"
+                >
+                </img>
+            );
+        };
+
         let sessionsIcons = null;
         if (numberOfActiveSessions > 0) {
-            debugger;
             sessionsIcons = Object.keys(sessions.get('list').toJS()).map(
-                sessionKey => (
+                /*
+                    returns three UI items for each session
+                    a delete (x) icon, a database logo,
+                    and sessionIdentifierText (`username@host`)
+                */
+                sessionId => (
                     <div className={classnames(styles.connectionWrapper, {
                             [styles.connectionWrapperSelected]:
-                                sessions.get('sessionSelected') === sessionKey
+                                sessions.get('sessionSelected') === sessionId
                             }
                         )}
                     >
-                        <img
-                            className={styles.connectionDelete}
-                            onClick={() => {
-                                const indexOfId = sessionsIds.indexOf(sessionKey);
-                                // can't go into negative indexes
-                                if (sessionKey !== '0') {
-                                    sessionsActions.switchSession(
-                                        sessionsIds[indexOfId - 1]
-                                    );
-                                } else {
-                                    sessionsActions.switchSession(
-                                        sessionsIds[indexOfId + 1]
-                                    );
-                                }
-                                    sessionsActions.deleteSession(sessionKey);
-                            }}
-                            src="./images/delete.png"
-                            id={`test-session-delete-${sessionKey}`}
-                        >
-                        </img>
-
-                        <img
-                            className={styles.connection}
-                            onClick={() => {
-                                sessionsActions.switchSession(sessionKey);
-                            }}
-                            src={LOGOS[sessions.getIn([
-                                'list', sessionKey, 'configuration', 'dialect'
-                            ])]}
-                            id={`test-session-id-${sessionKey}`}
-                        >
-                        </img>
-
-                        <p data-tip data-for={sessionKey}
-                            className={styles.connectionIndex}
-                            onClick={() => {
-                                sessionsActions.switchSession(sessionKey);
-                            }}
-                        >
-                            {ID(sessionKey)}
-                            {tooltip(sessionKey)}
-                        </p>
+                        {sessionDeleteIcon(sessionId)}
+                        {sessionLogoIcon(sessionId)}
+                        {sessionIdentifierText(sessionId)}
 
                     </div>
                 )
@@ -111,16 +178,7 @@ export default class SessionsManager extends Component {
                 <div className={styles.sessionsManagerWrapper}>
                     {sessionsIcons}
                     <div className={styles.connectionAddWrapper}>
-                        <img
-                            className={styles.connectionAdd}
-                            onClick={() => {
-                                sessionsActions.newSession(`${numberOfActiveSessions}`);
-                                sessionsActions.switchSession(`${numberOfActiveSessions}`);
-                            }}
-                            src="./images/add.png"
-                            id="test-session-add"
-                        >
-                        </img>
+                        {connectionAddIcon()}
                     </div>
                 </div>
             </div>
