@@ -15,9 +15,6 @@ const getNewId = (sessionsIds) => {
     ) {
         newId = timestamp();
         tries += 1;
-        if (tries > 10) {
-            debugger;
-        }
     }
     return `${newId}`;
 };
@@ -54,13 +51,20 @@ export default class SessionsManager extends Component {
                     ) || 'localhost'}
                     &nbsp;
                 </span>
-        );
+            );
         };
 
         // display the full `username@host` identifier
         const tooltip = (sessionId) => {
             return (
-                <ReactTooltip id={sessionId} type="warning" effect="solid">
+                <ReactTooltip
+                    className={styles.reactTooltip}
+                    id={sessionId}
+                    type="warning"
+                    effect="solid"
+                    place="bottom"
+                    offset="{'bottom': 15, 'right': 20}"
+                >
                     <span>
                         {ID(sessionId)}
                     </span>
@@ -72,7 +76,7 @@ export default class SessionsManager extends Component {
         const sessionDeleteIcon = (sessionId) => {
             return (
                 <img
-                    className={styles.connectionDelete}
+                    className={styles.sessionDelete}
                     onClick={() => {
                         const indexOfId = sessionsIds.indexOf(
                             sessions.get('sessionSelected')
@@ -80,7 +84,7 @@ export default class SessionsManager extends Component {
                         // are we deleting currently open session?
                         if (sessionId === sessions.get('sessionSelected')) {
                             // have to switch before deleting
-                            if (indexOfId === '0') {
+                            if (indexOfId === 0) {
                                 // cant have a negative index in an array
                                 sessionsActions.switchSession(
                                     sessionsIds[indexOfId + 1]
@@ -88,7 +92,7 @@ export default class SessionsManager extends Component {
                             } else {
                                 // if its not the first index, switch to next
                                 sessionsActions.switchSession(
-                                    sessionsIds[indexOfId + 1]
+                                    sessionsIds[indexOfId - 1]
                                 );
                             }
                         }
@@ -106,7 +110,7 @@ export default class SessionsManager extends Component {
         const sessionLogoIcon = (sessionId) => {
             return (
                 <img
-                    className={styles.connection}
+                    className={styles.sessionLogo}
                     onClick={() => {
                         sessionsActions.switchSession(sessionId);
                     }}
@@ -123,32 +127,48 @@ export default class SessionsManager extends Component {
         const sessionIdentifierText = (sessionId) => {
             return (
                 <p data-tip data-for={sessionId}
-                    className={styles.connectionIndex}
+                    className={styles.sessionIdentifier}
                     onClick={() => {
                         sessionsActions.switchSession(sessionId);
                     }}
                 >
                     {ID(sessionId)}
-                    {tooltip(sessionId)}
                 </p>
             );
         };
 
         // displays a (+) icon and creates a new session upon click
-        const connectionAddIcon = () => {
-            return (
-                <img
-                    className={styles.connectionAdd}
-                    onClick={() => {
-                        sessionsActions.newSession(newId);
-                        sessionsActions.switchSession(newId);
-                    }}
-                    src="./images/add.png"
-                    id="test-session-add"
-                >
-                </img>
+        let sessionAddIcon = null;
+        if (numberOfActiveSessions > 0) {
+            sessionAddIcon = (
+                <div className={styles.sessionAddWrapper}>
+                    <img
+                        className={styles.sessionAdd}
+                        onClick={() => {
+                            sessionsActions.newSession(newId);
+                            sessionsActions.switchSession(newId);
+                        }}
+                        src="./images/add.png"
+                        id="test-session-add"
+                    >
+                    </img>
+                </div>
             );
-        };
+        }
+
+        let sessionAddText = (
+            <a className={styles.sessionAddText}
+                onClick={() => {
+                    sessionsActions.newSession(newId);
+                    sessionsActions.switchSession(newId);
+                }}
+            >
+                Open New Session
+            </a>
+           );
+        if (numberOfActiveSessions > 0) {
+            sessionAddText = null;
+        }
 
         let sessionsIcons = null;
         if (numberOfActiveSessions > 0) {
@@ -159,8 +179,8 @@ export default class SessionsManager extends Component {
                     and sessionIdentifierText (`username@host`)
                 */
                 sessionId => (
-                    <div className={classnames(styles.connectionWrapper, {
-                            [styles.connectionWrapperSelected]:
+                    <div className={classnames(styles.sessionWrapper, {
+                            [styles.sessionWrapperSelected]:
                                 sessions.get('sessionSelected') === sessionId
                             }
                         )}
@@ -168,19 +188,23 @@ export default class SessionsManager extends Component {
                         {sessionDeleteIcon(sessionId)}
                         {sessionLogoIcon(sessionId)}
                         {sessionIdentifierText(sessionId)}
-
                     </div>
                 )
-        );}
+            );
+        }
 
         return (
             <div className={styles.sessionsManagerContainer}>
-                <div className={styles.sessionsManagerWrapper}>
+                <div
+                    className={classnames(
+                        styles.sessionsManagerWrapper, styles.Flipped
+                    )}
+                >
                     {sessionsIcons}
-                    <div className={styles.connectionAddWrapper}>
-                        {connectionAddIcon()}
-                    </div>
+                    {sessionAddIcon}
+                    {sessionAddText}
                 </div>
+
             </div>
         );
     }

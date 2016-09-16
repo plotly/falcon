@@ -3,85 +3,105 @@
     margin-right: auto;
     margin-bottom: 30px;
     width: 800px;
-    display: table;
-    border-bottom-width: 1.5px;
-    border-bottom-color: #BEC8D9;
-    border-bottom-style: solid;
 }
 
 .sessionsManagerWrapper {
-    display: inline-block;
-    text-align: center;
-    vertical-align: middle;
+    /* display: inline-block; */
+    /* vertical-align: middle; */
+     text-align: center;
+    width: 100%;
+    /* margin-left: auto; */
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
-.connectionWrapper {
-    display: inherit;
-    border-width: 1.5px 0px 1.5px 1.5px;
-    border-color: #BEC8D9;
-    border-style: solid;
-    border-radius: 5px;
+.sessionWrapper {
+    display: inline-block;
+    cursor: pointer;
+    /*margin: 0px;
+    margin-bottom: -1px;*/
+    border-left: 1px solid #E7E8E9;
+    border-bottom: 1px solid #E7E8E9;
+    border-top: 1px solid #E7E8E9;
+    background-color: white;
+    color: #687ba6;
     padding: 5px 10px 5px 10px;
     vertical-align: middle;
-    max-width: 175px;
+    max-width: 200px;
     white-space: nowrap;
-    overflow: hidden;
+    overflow-x: hidden;
     text-overflow: ellipsis;
+    /*padding-top: 50px;
+    padding-bottom: 50px;*/
 }
 
-.connection {
+.sessionLogo {
     height: 20px;
     display: inline;
     vertical-align: middle;
     padding-right: 5px;
 }
 
-.connectionIndex {
+.sessionIdentifier {
     margin: 0px;
     display: inline;
     vertical-align: middle;
 }
 
-.connectionDelete {
+.sessionDelete {
     width: 12px;
     padding-right: 5px;
     vertical-align: middle;
-    /*border-width: 1.5px;
-    border-color: #BEC8D9;
-    border-style: solid;
-    border-radius: 23px;*/
 }
 
-.connectionAdd {
+.sessionAdd {
     width: 20px;
     padding: 8px;
 }
 
-.connectionAddWrapper {
+.sessionAddWrapper {
     display: inline-block;
-    border-width: 1.5px;
-    border-color: #BEC8D9;
+    border-width: 1px 0px 0px 1px;
+    border-color: #E7E8E9;
     border-style: solid;
-    border-radius: 5px;
     vertical-align: middle;
     height: 36px;
     width: 36px;
 }
 
-.connectionWrapper:hover, connectionWrapper:focus{
-    cursor: pointer;
-    border-color: #8BB5FE;
-}
-
-.connectionAdd:hover, connection:focus{
+.sessionWrapper:hover, sessionWrapper:focus{
     cursor: pointer;
 }
 
-.connectionDelete:hover, connection:focus{
+.sessionAdd:hover, session:focus{
     cursor: pointer;
 }
 
-.connectionWrapperSelected {
-    border-right-width: 1.5px;
-    border-color: #8BB5FE;
+.sessionDelete:hover, session:focus{
+    cursor: pointer;
+}
+
+.sessionWrapperSelected {
+    border-bottom: 1px solid #fff;
+}
+
+.sessionAddText {
+    display: inline-block;;
+    padding: 5px 20px 5px 20px;
+    color: #8BB5FE
+}
+
+.Flipped, .Flipped .sessionWrapper
+{
+    transform:rotateX(180deg);
+    -ms-transform:rotateX(180deg); /* IE 9 */
+    -webkit-transform:rotateX(180deg); /* Safari and Chrome */
+}
+
+.sessionAddText
+{
+    transform:rotateX(180deg);
+    -ms-transform:rotateX(180deg); /* IE 9 */
+    -webkit-transform:rotateX(180deg); /* Safari and Chrome */
 }
