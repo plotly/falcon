@@ -25,8 +25,8 @@ app.on('window-all-closed', () => {
 app.on('ready', () => {
     mainWindow = new BrowserWindow({
         show: false,
-        width: OPTIONS.large ? 1024 : 728,
-        height: 728
+        width: 1024,
+        height: OPTIONS.large ? 1024 : 728
     });
 
     const logger = new Logger(OPTIONS, mainWindow, channel);
@@ -46,7 +46,8 @@ app.on('ready', () => {
     mainWindow.webContents.on('did-finish-load', () => {
 
         // show window if it's not running in headless mode
-        if (!OPTIONS.headless) {
+        if (!OPTIONS.headless &&
+            !contains('--test-type=webdriver', process.argv.slice(2))) {
             sequelizeManager.log('Opening main window.', 2);
             mainWindow.show();
             mainWindow.focus();

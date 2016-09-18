@@ -20,12 +20,10 @@ class DetectHttpsServer extends Component {
                 `https://${BACKEND.CONNECTOR_URL}:${BACKEND.OPTIONS.port}/status`
             )
             .then(() => {
-                console.warn('successfulFetch: true');
                 this.setState({successfulFetch: true});
             })
             .catch(err => {
                 if (err.message === 'failed to fetch') {
-                    console.warn('successfulFetch: false');
                     this.setState({successfulFetch: false});
                 }
             });

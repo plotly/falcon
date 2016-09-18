@@ -3,20 +3,25 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './DialectSelector.css';
 import classnames from 'classnames';
 import {DIALECTS} from '../../../constants/constants';
+import {dissoc} from 'ramda';
 
 /*
     Displays interactive database dialect logos and alters
     the chosen `configuration` dialect parameter.
 */
 
-const LOGOS = {
-    POSTGRES: './images/postgresLogo.png',
-    MYSQL: './images/mysqlLogo.png',
-    MARIADB: './images/mariadbLogo.png',
-    MSSQL: './images/mssqlLogo.png',
+let LOGOS = {
     REDSHIFT: './images/redshift-logo.png',
-    SQLITE: './images/sqliteLogo.png'
+    POSTGRES: './images/postgres-logo.png',
+    MYSQL: './images/mysql-logo.png',
+    MARIADB: './images/mariadb-logo.png',
+    MSSQL: './images/mssql-logo.png',
+    SQLITE: './images/sqlite-logo.png'
 };
+// TODO: remove when #$40 is resolved
+if (process.platform !== 'darwin') {
+    LOGOS = dissoc('SQLITE', LOGOS);
+}
 
 export default class DialectSelector extends Component {
     constructor(props) {
@@ -55,7 +60,8 @@ export default class DialectSelector extends Component {
     }
 
     resetAll() {
-        this.props.configActions.update({
+        this.props.sessionsActions.updateConfiguration(
+        {
             username: '',
             password: '',
             database: '',
@@ -65,11 +71,17 @@ export default class DialectSelector extends Component {
         });
     }
 
+    componentWillReceiveProps(nextProps) {
+        const nextDialect = nextProps.configuration.get('dialect');
+        if (this.state.selectedDialect !== nextDialect) {
+            this.setState({selectedDialect: nextDialect});
+        }
+    }
+
 	render() {
-        const {configActions} = this.props;
+        const {sessionsActions} = this.props;
 
 		const logos = Object.keys(DIALECTS).map(dialect => (
-            <div>
                 <div className={classnames(
                         styles.logo, {
                               [styles.logoSelected]:
@@ -79,7 +91,7 @@ export default class DialectSelector extends Component {
                     )}
                     onClick={() => {
                         this.setState({selectedDialect: DIALECTS[dialect]});
-                        configActions.update({dialect: DIALECTS[dialect]});
+                        sessionsActions.updateConfiguration({dialect: DIALECTS[dialect]});
                         this.resetAll();
                     }}
                     id={`test-logo-${DIALECTS[dialect]}`}
@@ -89,7 +101,6 @@ export default class DialectSelector extends Component {
                         src={LOGOS[dialect]}
                     />
                 </div>
-            </div>
         ));
 
 		return (
@@ -100,5 +111,5 @@ export default class DialectSelector extends Component {
 
 DialectSelector.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
-    configActions: PropTypes.object
+    sessionsActions: PropTypes.object
 };

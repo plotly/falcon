@@ -1,0 +1,107 @@
+.sessionsManagerContainer {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+    width: 800px;
+}
+
+.sessionsManagerWrapper {
+    /* display: inline-block; */
+    /* vertical-align: middle; */
+     text-align: center;
+    width: 100%;
+    /* margin-left: auto; */
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.sessionWrapper {
+    display: inline-block;
+    cursor: pointer;
+    /*margin: 0px;
+    margin-bottom: -1px;*/
+    border-left: 1px solid #E7E8E9;
+    border-bottom: 1px solid #E7E8E9;
+    border-top: 1px solid #E7E8E9;
+    background-color: white;
+    color: #687ba6;
+    padding: 5px 10px 5px 10px;
+    vertical-align: middle;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    /*padding-top: 50px;
+    padding-bottom: 50px;*/
+}
+
+.sessionLogo {
+    height: 20px;
+    display: inline;
+    vertical-align: middle;
+    padding-right: 5px;
+}
+
+.sessionIdentifier {
+    margin: 0px;
+    display: inline;
+    vertical-align: middle;
+}
+
+.sessionDelete {
+    width: 12px;
+    padding-right: 5px;
+    vertical-align: middle;
+}
+
+.sessionAdd {
+    width: 20px;
+    padding: 8px;
+}
+
+.sessionAddWrapper {
+    display: inline-block;
+    border-width: 1px 0px 0px 1px;
+    border-color: #E7E8E9;
+    border-style: solid;
+    vertical-align: middle;
+    height: 36px;
+    width: 36px;
+}
+
+.sessionWrapper:hover, sessionWrapper:focus{
+    cursor: pointer;
+}
+
+.sessionAdd:hover, session:focus{
+    cursor: pointer;
+}
+
+.sessionDelete:hover, session:focus{
+    cursor: pointer;
+}
+
+.sessionWrapperSelected {
+    border-bottom: 1px solid #fff;
+}
+
+.sessionAddText {
+    display: inline-block;;
+    padding: 5px 20px 5px 20px;
+    color: #8BB5FE
+}
+
+.Flipped, .Flipped .sessionWrapper
+{
+    transform:rotateX(180deg);
+    -ms-transform:rotateX(180deg); /* IE 9 */
+    -webkit-transform:rotateX(180deg); /* Safari and Chrome */
+}
+
+.sessionAddText
+{
+    transform:rotateX(180deg);
+    -ms-transform:rotateX(180deg); /* IE 9 */
+    -webkit-transform:rotateX(180deg); /* Safari and Chrome */
+}

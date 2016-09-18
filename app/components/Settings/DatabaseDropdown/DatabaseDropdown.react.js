@@ -11,7 +11,7 @@ import {DIALECTS} from '../../../constants/constants';
     Permits to alter the `configuration` database parameter once
     user selects an option.
     Sends a preset query to show all tables within a database/
-    scheme that was chosen in the dropdown using `ipcActions`.
+    scheme that was chosen in the dropdown using `sessionsActions`.
 */
 
 export default class DatabaseDropdown extends Component {
@@ -29,7 +29,7 @@ export default class DatabaseDropdown extends Component {
     }
 
 	render() {
-        const {configuration, configActions, ipc, ipcActions} = this.props;
+        const {configuration, sessionsActions, ipc} = this.props;
 
         const ipcDatabases = ipc.get('databases');
         let databaseDropdownOptions;
@@ -49,8 +49,8 @@ export default class DatabaseDropdown extends Component {
         }
 
         function onSelectDatabase(database) {
-            configActions.update({database: database.value});
-            ipcActions.selectDatabase();
+            sessionsActions.updateConfiguration({database: database.value});
+            sessionsActions.selectDatabase();
         }
 
         return (
@@ -76,7 +76,6 @@ export default class DatabaseDropdown extends Component {
 
 DatabaseDropdown.propTypes = {
     configuration: ImmutablePropTypes.map.isRequired,
-    configActions: PropTypes.object,
-    ipc: ImmutablePropTypes.map.isRequired,
-    ipcActions: PropTypes.object
+    sessionsActions: PropTypes.object,
+    ipc: ImmutablePropTypes.map.isRequired
 };

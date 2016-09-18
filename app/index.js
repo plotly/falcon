@@ -5,7 +5,7 @@ import {Router, hashHistory} from 'react-router';
 import {syncHistoryWithStore} from 'react-router-redux';
 import routes from './routes';
 import configureStore from './store/configureStore';
-import {updateIpcState} from './actions/ipc';
+import {updateIpcState} from './actions/sessions';
 import {productName, version} from '../package.json';
 import './app.global.css';
 

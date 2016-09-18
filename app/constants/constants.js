@@ -7,8 +7,8 @@ export const DIALECTS = {
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
     POSTGRES: 'postgres',
-    MSSQL: 'mssql',
     REDSHIFT: 'redshift',
+    MSSQL: 'mssql',
     SQLITE: 'sqlite'
 };
 
@@ -37,4 +37,18 @@ export const BUTTON_MESSAGE = {
     CONNECTED: 'connected',
     CONNECTING: 'connecting...',
     DISCONNECTED: 'connect'
+};
+
+export const EMPTY_SESSION =
+{
+    CONFIGURATION: {
+        username: '',
+        password: '',
+        database: '',
+        dialect: DIALECTS.MYSQL,
+        port: '',
+        storage: '',
+        host: ''
+    },
+    CONNECTION: {status: APP_STATUS.INITIALIZED}
 };
