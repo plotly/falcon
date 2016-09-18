@@ -100,7 +100,7 @@ export default class SessionsManager extends Component {
                         sessionsActions.deleteSession(sessionId);
                     }}
                     src="./images/delete.png"
-                    id={`test-session-delete-${sessionId}`}
+                    id={`test-session-delete-${sessionsIds.indexOf(sessionId)}`}
                 >
                 </img>
             );
@@ -117,7 +117,7 @@ export default class SessionsManager extends Component {
                     src={LOGOS[sessions.getIn([
                         'list', sessionId, 'configuration', 'dialect'
                     ])]}
-                    id={`test-session-id-${sessionId}`}
+                    id={`test-session-id-${sessionsIds.indexOf(sessionId)}`}
                 >
                 </img>
             );
@@ -162,6 +162,7 @@ export default class SessionsManager extends Component {
                     sessionsActions.newSession(newId);
                     sessionsActions.switchSession(newId);
                 }}
+                id="test-session-add"
             >
                 Open New Session
             </a>

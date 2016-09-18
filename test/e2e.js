@@ -873,7 +873,7 @@ describe('plotly database connector', function Spec() {
                 it('should show the right dialect selected',
                 async() => {
                     const testedDialect = testedDialects[0];
-                    const otherSession = await this.selectSession(1);
+                    const otherSession = await this.selectSession(0);
                     await otherSession.click();
                     await delay(500);
                     const highlightedLogo = await this.getHighlightedLogo();

@@ -25,8 +25,8 @@ app.on('window-all-closed', () => {
 app.on('ready', () => {
     mainWindow = new BrowserWindow({
         show: false,
-        width: OPTIONS.large ? 1024 : 728,
-        height: 728
+        width: 1024,
+        height: OPTIONS.large ? 1024 : 728
     });
 
     const logger = new Logger(OPTIONS, mainWindow, channel);
