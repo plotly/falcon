@@ -72,7 +72,7 @@ export default class ConnectButton extends Component {
                     this.updateStatus(APP_STATUS.CONNECTED);
                 }
             } else {
-                if (nextProps.ipc.getIn(['error', 'type']) === 'connection') {
+                if (nextProps.ipc.getIn(['error', 'name']) === 'ConnectionError') {
                     this.updateStatus(APP_STATUS.CON_ERROR);
                 } else if (status !== APP_STATUS.CON_ERROR) {
                     this.updateStatus(APP_STATUS.ERROR);
