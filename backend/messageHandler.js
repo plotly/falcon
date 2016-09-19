@@ -192,7 +192,7 @@ function handleMessage(sequelizeManager, opts) {
 				sequelizeManager.raiseError(
                     merge(
                         {message: AUTHENTICATION({error})},
-                        {type: 'connection'}),
+                        {name: 'ConnectionError'}),
                     responseSender
                 );
 			})
@@ -243,7 +243,7 @@ function handleMessage(sequelizeManager, opts) {
 				sequelizeManager.raiseError(
 					merge(
 						{message: AUTHENTICATION({error})},
-						{type: 'connection'}),
+						{name: 'ConnectionError'}),
 					responseSender
 				);
 			})
@@ -331,7 +331,7 @@ function handleMessage(sequelizeManager, opts) {
 			sequelizeManager.connect(message)
 			.catch((error) => {
 				sequelizeManager.raiseError(
-					merge(error, {type: 'connection'}),
+					merge(error, {name: 'ConnectionError'}),
 					responseSender
 				);
 			})
@@ -374,7 +374,7 @@ function handleMessage(sequelizeManager, opts) {
 			.then(sequelizeManager.selectDatabase(message))
 			.catch((error) => {
 				sequelizeManager.raiseError(
-					merge(error, {type: 'connection'}),
+					merge(error, {name: 'ConnectionError'}),
 					responseSender
 				);
 			})

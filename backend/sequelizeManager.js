@@ -156,7 +156,7 @@ export class SequelizeManager {
 			this.raiseError(
                 merge(
                     {message: APP_NOT_CONNECTED},
-                    {type: 'connection'}
+                    {name: 'ConnectionError'}
                 ),
                 responseSender
 			);
@@ -166,8 +166,8 @@ export class SequelizeManager {
             .catch((error) => {
                 this.raiseError(
                     merge(
-                        {mesage: AUTHENTICATION(error)},
-                        {type: 'connection'}),
+                        {message: AUTHENTICATION(error)},
+                        {name: 'ConnectionError'}),
                     responseSender
                 );
             });
