@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadata>
+	<idinfo>
+		<citation>
+			<citeinfo>
+				<origin>U.S. Department of Commerce, U.S. Census Bureau, Geography Division</origin>
+				<pubdate>2010</pubdate>
+				<title>TIGER/Line Shapefile, 2010, 2010 county, District of Columbia, DC, 2010 Census  Census Tract County-based</title>
+				<edition>2010</edition>
+				<geoform>vector digital data</geoform>
+				<onlink>http://www.census.gov/geo/www/tiger</onlink>
+			</citeinfo>
+		</citation>
+		<descript>
+			<abstract>The TIGER/Line Files are shapefiles and related database files (.dbf) that are an extract of selected geographic and cartographic information from the U.S. Census Bureau's Master Address File / Topologically Integrated Geographic Encoding and Referencing (MAF/TIGER) Database (MTDB).  The MTDB represents a seamless national file with no overlaps or gaps between parts, however, each TIGER/Line File is designed to stand alone as an independent data set, or they can be combined to cover the entire nation.  Census tracts are small, relatively permanent statistical subdivisions of a county or equivalent entity, and were defined by local participants as part of the 2010 Census Participant Statistical Areas Program.  The Census Bureau delineated the census tracts in situations where no local participant existed or where all the potential participants declined to participate.  The primary purpose of census tracts is to provide a stable set of geographic units for the presentation of census data and comparison back to previous decennial censuses.  Census tracts generally have a population size between 1,200 and 8,000 people, with an optimum size of 4,000 people.  When first delineated, census tracts were designed to be homogeneous with respect to population characteristics, economic status, and living conditions.  The spatial size of census tracts varies widely depending on the density of settlement.  Physical changes in street patterns caused by highway construction, new development, and so forth, may require boundary revisions.  In addition, census tracts occasionally are split due to population growth, or combined as a result of substantial population decline.  Census tract boundaries generally follow visible and identifiable features.  They may follow legal boundaries such as minor civil division (MCD) or incorporated place boundaries in some States and situations to allow for census tract-to-governmental unit relationships where the governmental boundaries tend to remain unchanged between censuses.  State and county boundaries always are census tract boundaries in the standard census geographic hierarchy.  In a few rare instances, a census tract may consist of noncontiguous areas.  These noncontiguous areas may occur where the census tracts are coextensive with all or parts of legal entities that are themselves noncontiguous.  For the 2010 Census, the census tract code range of 9400 through 9499 was enforced for census tracts that include a majority American Indian population according to Census 2000 data and/or their area was primarily covered by federally recognized American Indian reservations and/or off-reservation trust lands; the code range 9800 through 9899 was enforced for those census tracts that contained little or no population and represented a relatively large special land use area such as a National Park, military installation, or a business/industrial park; and the code range 9900 through 9998 was enforced for those census tracts that contained only water area, no land area.  
+</abstract>
+			<purpose>In order for others to use the information in the Census MAF/TIGER database in a geographic information system (GIS) or for other geographic applications, the Census Bureau releases to the public extracts of the database in the form of TIGER/Line Shapefiles.</purpose>
+			<Subject_Entity>District of Columbia, DC, (11001)</Subject_Entity>
+		</descript>
+		<timeperd>
+			<timeinfo>
+				<rngdates>
+					<begdate>201001</begdate>
+					<enddate>201007</enddate>
+				</rngdates>
+			</timeinfo>
+			<current>Publication Date</current>
+		</timeperd>
+		<status>
+			<progress>Complete</progress>
+			<update>TIGER/Line Shapefiles are extracted from the Census MAF/TIGER database.  No changes or updates will be made to this version of the TIGER/Line Shapefiles.  Future releases of TIGER/Line Shapefiles will reflect updates made to the Census MAF/TIGER database.</update>
+		</status>
+		<spdom>
+			<bounding>
+				<westbc>-77.119759</westbc>
+				<eastbc>-76.909393</eastbc>
+				<northbc>38.995548</northbc>
+				<southbc>38.791645</southbc>
+			</bounding>
+		</spdom>
+		<keywords>
+			<theme>
+				<themekt>ISO 19115 Topic Categories</themekt>
+				<themekey>boundaries</themekey>
+			</theme>
+			<theme>
+				<themekt>None</themekt>
+				
+				<themekey>County or equivalent entity</themekey>
+				<themekey>Polygon</themekey>
+				<themekey>Census Tract</themekey>
+				<themekey>Tract</themekey>
+			</theme>
+			<place>
+				<placekt>INCITS.38-200x (R2004),INCITS.31-200x (R2007),INCITS.454-200x,INCITS 455-200x,INCITS 446-2008</placekt>
+				<placekey>United States</placekey>
+				<placekey>U.S.</placekey>
+				<placekey>County or Equivalent Entity</placekey>
+				<placekey>District of Columbia</placekey>
+				<placekey>11001</placekey>	
+			</place>
+		</keywords>
+		<accconst>None</accconst>
+		<useconst>The TIGER/Line Shapefile products are not copyrighted however TIGER/Line and Census TIGER are registered trademarks of the U.S. Census Bureau.  These products are free to use in a product or publication, however acknowledgement must be given to the U.S. Census Bureau as the source.
+The boundary information in the TIGER/Line Shapefiles are for statistical data collection and tabulation purposes only; their depiction and designation for statistical purposes does not constitute a determination of jurisdictional authority or rights of ownership or entitlement and they are not legal land descriptions.Coordinates in the TIGER/Line shapefiles have six implied decimal places, but the positional accuracy of these coordinates is not as great as the six decimal places suggest.</useconst>
+		<Title_13_Restrictions>Yes, the data are free from Title 13 restrictions</Title_13_Restrictions>
+		<ptcontac>
+			<cntinfo>
+				<cntorgp>
+					<cntorg>U.S. Department of Commerce, U.S. Census Bureau, Geography Division, Geographic Products Branch</cntorg>
+				</cntorgp>
+				<cntaddr>
+					<addrtype>Mailing address</addrtype>
+					<address>4600 Silver Hill Road, Stop 7400</address>
+					<city>Washington</city>
+					<state>DC</state>
+					<postal>20233-7400</postal>
+					<country>United States</country>
+				</cntaddr>
+				<cntvoice>301-763-1128</cntvoice>
+				<cntfax>301-763-4710</cntfax>
+				<cntemail>geo.tiger@census.gov</cntemail>
+			</cntinfo>
+		</ptcontac>
+	</idinfo>
+	<Data_Set_Character_Set>8859part1</Data_Set_Character_Set>
+	<Data_Set_Language>eng</Data_Set_Language>
+	<dataqual>
+		<attracc>
+			<attraccr>Accurate against Federal Information Processing Standards (FIPS), FIPS Publication 6-4, and FIPS-55 at the 100% level for the codes and base names.  The remaining attribute information has been examined but has not been fully tested for accuracy.</attraccr>
+		</attracc>
+		<logic>The Census Bureau performed automated tests to ensure logical consistency and limits of shapefiles.  Segments making up the outer and inner boundaries of a polygon tie end-to-end to completely enclose the area.  All polygons are tested for closure.
+The Census Bureau uses its internally developed geographic update system to enhance and modify spatial and attribute data in the Census MAF/TIGER database.  Standard geographic codes, such as FIPS codes for states, counties, municipalities, county subdivisions, places, American Indian/Alaska Native/Native Hawaiian areas, and congressional districts are used when encoding spatial entities.  The Census Bureau performed spatial data tests for logical consistency of the codes during the compilation of the original Census MAF/TIGER database files.  Most of the codes for geographic entities except states, counties, urban areas, Core Based Statistical Areas (CBSAs), American Indian Areas (AIAs), and congressional districts were provided to the Census Bureau by the USGS, the agency responsible for maintaining FIPS 55.  Feature attribute information has been examined but has not been fully tested for consistency.
+For the TIGER/Line Shapefiles, the Point and Vector Object Count for the G-polygon SDTS Point and Vector Object Type reflects the number of records in the shapefile attribute table.  For multi-polygon features, only one attribute record exists for each multi-polygon rather than one attribute record per individual G-polygon component of the multi-polygon feature.  TIGER/Line Shapefile multi-polygons are an exception to the G-polygon object type classification.  Therefore, when multi-polygons exist in a shapefile, the object count will be less than the actual number of G-polygons.</logic>
+		<complete>Data completeness of the TIGER/Line Shapefiles reflects the contents of the Census MAF/TIGER database at the time the TIGER/Line Shapefiles were created.</complete>
+		<lineage>
+			<srcinfo>
+				<srccite>
+					<citeinfo>
+						<origin>U.S. Department of Commerce, U.S. Census Bureau, Geography Division</origin>
+						<pubdate>Unpublished material</pubdate>
+						<title>Census MAF/TIGER database</title>
+					</citeinfo>
+				</srccite>
+				<typesrc>online</typesrc>
+				<srctime>
+					<timeinfo>
+						<rngdates>
+							<begdate>201001</begdate>
+							<enddate>201007</enddate>
+						</rngdates>
+					</timeinfo>
+					<srccurr>Publication Date</srccurr>
+				</srctime>
+				<srccitea>MAF/TIGER</srccitea>
+				<srccontr>The selected geographic and cartographic information (line segments) are derived from the U.S. Census Bureau&apos;s Master Address File Topologically Integrated Geographic Encoding and Referencing (MAF/TIGER) database.</srccontr>
+			</srcinfo>
+			<procstep>
+				<procdesc>TIGER/Line Shapefiles are extracted from the Census MAF/TIGER database by nation, state, county, and entity.  Census MAF/TIGER data for all of the aforementioned geographic entities are then distributed among the shapefiles each containing attributes for line, polygon, or landmark geographic data. </procdesc>
+				<srcused>Census MAF/TIGER</srcused>
+				<procdate>2010</procdate>
+			</procstep>
+		</lineage>
+	</dataqual>
+	<spdoinfo>
+		<indspref>Federal Information Processing Standards (FIPS), ANSI, and feature names.</indspref>
+		<direct>Vector</direct>
+		<ptvctinf>
+			<sdtsterm>
+				<sdtstype>G-polygon</sdtstype>
+				<ptvctcnt>179</ptvctcnt>
+			</sdtsterm>
+		</ptvctinf>
+	</spdoinfo>
+	<spref>
+		<horizsys>
+			<geograph>
+				<latres>0.000458</latres>
+				<longres>0.000458</longres>
+				<geogunit>Decimal degrees</geogunit>
+			</geograph>
+			<geodetic>
+				<horizdn>North American Datum of 1983 in the 48 contiguous states, the District of Columbia, Alaska, Hawaii, Puerto Rico, the Virgin Islands of the United States, and the Pacific Island Areas.</horizdn>
+				<ellips>Geodetic Reference System 80</ellips>
+				<semiaxis>6378137</semiaxis>
+				<denflat>298257</denflat>
+			</geodetic>
+		</horizsys>
+	</spref>
+	<eainfo>
+    <detailed>
+      <enttyp>
+        <enttypl>TRACT10.shp</enttypl>
+        <enttypd>2010 Census Census Tract County-based</enttypd>
+        <enttypds>U.S. Census Bureau</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>STATEFP10</attrlabl>
+        <attrdef>2010 Census state Federal Information Processing Standards
+                 (FIPS) codes</attrdef>
+        <attrdefs>U.S. Census Bureau</attrdefs>
+        <attrdomv>
+          <codesetd>
+            <codesetn>INCITS.38-200x (R2004), Codes for the Identification of
+                      the States, the District of Columbia, Puerto Rico, and the
+                      Insular Areas of the United States (Formerly FIPS 5-2)</codesetn>
+            <codesets>U.S. Census Bureau</codesets>
+          </codesetd>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>COUNTYFP10</attrlabl>
+        <attrdef>2010 Census county Federal Information Processing Standards
+                 (FIPS) code</attrdef>
+        <attrdefs>U.S. Census Bureau</attrdefs>
+        <attrdomv>
+          <codesetd>
+            <codesetn>INCITS.31-200x (R2007), Codes for the Identification of
+                      the Counties and Equivalent Areas of the United States,
+                      Puerto Rico, and the Insular Areas of the United States
+                      (Formerly FIPS 6-4)</codesetn>
+            <codesets>U.S. Census Bureau</codesets>
+          </codesetd>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>TRACTCE10</attrlabl>
+        <attrdef>2010 Census census tract code</attrdef>
+        <attrdefs>U.S. Census Bureau</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>000000</edomv>
+            <edomvd>Water tract in some coastal and Great Lakes water and
+                    territorial sea</edomvd>
+            <edomvds>U.S. Census</edomvds>
+          </edom>
+          <edom>
+            <edomv>000100 to 998999</edomv>
+            <edomvd>Census tract number</edomvd>
+            <edomvds>U.S. Census Bureau</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>GEOID10</attrlabl>
+        <attrdef>Census tract identifier; a concatenation of 2010 Census state
+                 FIPS code, county FIPS code, and census tract code</attrdef>
+        <attrdefs>U.S. Census Bureau</attrdefs>
+        <attrdomv>
+          <codesetd>
+            <codesetn>INCITS.38-200x (R2004), Codes for the Identification of
+                      the States, the District of Columbia, Puerto Rico, and the
+                      Insular Areas of the United States (Formerly FIPS 5-2),
+                      INCITS.31-200x (R2007), Codes for the Identification of
+                      the Counties and Equivalent Areas of the United States,
+                      Puerto Rico, and the Insular Areas of the United States
+                      (Formerly FIPS 6-4), and the census tract code found in
+                      TRACTCE10</codesetn>
+            <codesets>U.S. Census Bureau</codesets>
+          </codesetd>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>NAME10</attrlabl>
+        <attrdef>2010 Census census tract name, this is the census tract code
+                 converted to an integer or integer plus two-digit decimal if
+                 the last two characters of the code are not both zeros.</attrdef>
+        <attrdefs>U.S. Census Bureau</attrdefs>
+        <attrdomv>
+          <codesetd>
+            <codesetn>Refer to the online census tract gazetteer file at URL:
+                      http://www.census.gov/geo/www/gazetteer/gazette.html</codesetn>
+            <codesets>U.S. Census Bureau</codesets>
+          </codesetd>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>NAMELSAD10</attrlabl>
+        <attrdef>Census 2010 translated legal/statistical area description and
+                 the census tract name</attrdef>
+        <attrdefs>U.S. Census Bureau</attrdefs>
+        <attrdomv>
+          <codesetd>
+            <codesetn>Refer to the online census tract gazetteer file at URL:
+                      http://www.census.gov/geo/www/gazetteer/gazette.html and
+                      translated legal/statistical area description code CT,
+                      Census Tract</codesetn>
+            <codesets>U.S. Census Bureau</codesets>
+          </codesetd>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>MTFCC10</attrlabl>
+        <attrdef>MAF/TIGER feature class code</attrdef>
+        <attrdefs>U.S. Census Bureau</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>G5020</edomv>
+            <edomvd>Census Tract</edomvd>
+            <edomvds>U.S. Census Bureau</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>FUNCSTAT10</attrlabl>
+        <attrdef>2010 Census functional status</attrdef>
+        <attrdefs>U.S. Census Bureau</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>S</edomv>
+            <edomvd>Statistical entity</edomvd>
+            <edomvds>U.S. Census Bureau</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>ALAND10</attrlabl>
+        <attrdef>2010 Census land area (square meters)</attrdef>
+        <attrdefs>U.S. Census Bureau</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>0 to 9,999,999,999,999</edomv>
+            <edomvd>Blank</edomvd>
+            <edomvds>U.S. Census Bureau</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>AWATER10</attrlabl>
+        <attrdef>2010 Census water area (square meters)</attrdef>
+        <attrdefs>U.S. Census Bureau</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>0 to 9,999,999,999,999</edomv>
+            <edomvd>Blank</edomvd>
+            <edomvds>U.S. Census Bureau</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>INTPTLAT10</attrlabl>
+        <attrdef>2010 Census latitude of the internal point</attrdef>
+        <attrdefs>U.S. Census Bureau</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>00</edomv>
+            <edomvd>Blank</edomvd>
+            <edomvds>U.S. Census Bureau</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>INTPTLON10</attrlabl>
+        <attrdef>2010 Census longitude of the internal point</attrdef>
+        <attrdefs>U.S. Census Bureau</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>00</edomv>
+            <edomvd>Blank</edomvd>
+            <edomvds>U.S. Census Bureau</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+    </detailed>
+  </eainfo>
+	<distinfo>
+		<distrib>
+			<cntinfo>
+				<cntorgp>
+					<cntorg>U.S. Department of Commerce, U.S. Census Bureau, Geography Division, Geographic Products Branch</cntorg>
+				</cntorgp>
+				<cntaddr>
+					<addrtype>Mailing address</addrtype>
+					<address>4600 Silver Hill Road, Stop 7400</address>
+					<city>Washington</city>
+					<state>DC</state>
+					<postal>20233-7400</postal>
+					<country>United States</country>
+				</cntaddr>
+				<cntvoice>301-763-1128</cntvoice>
+				<cntfax>301-763-4710</cntfax>
+				<cntemail>geo.tiger@census.gov</cntemail>
+			</cntinfo>
+		</distrib>
+		<distliab>No warranty, expressed or implied is made with regard to the accuracy of these data, and no liability is assumed by the U.S. Government in general or the U.S. Census Bureau in specific as to the spatial or attribute accuracy of the data.  The act of distribution shall not constitute any such warranty and no responsibility is assumed by the U.S. government in the use of these files.  The boundary information in the TIGER/Line Shapefiles is for statistical data collection and tabulation purposes only; their depiction and designation for statistical purposes do not constitute a determination of jurisdictional authority or rights of ownership or entitlement and they are not legal land descriptions.</distliab>
+		<stdorder>
+			<digform>
+				<digtinfo>
+					<formname>TGRSHP (compressed)</formname>
+					<filedec>PK-ZIP, version 1.93 A or higher</filedec>
+				</digtinfo>
+				<digtopt>
+					<onlinopt>
+						<computer>
+							<networka>
+								<networkr>http://www.census.gov/geo/www/tiger</networkr>
+							</networka>
+						</computer>
+					</onlinopt>
+					<offoptn>
+						<offmedia>DVD-ROM (Only if offered offline)</offmedia>
+						<recfmt>ISO 9660</recfmt>
+					</offoptn>
+				</digtopt>
+			</digform>
+			<fees>The online copy of the TIGER/Line files may be accessed without charge.</fees>
+			<ordering>To obtain more information about ordering TIGER/Line shapefiles visit http://www.census.gov/geo/www/tiger </ordering>
+		</stdorder>
+		<techpreq>The TIGER/Line shapefiles contain geographic data only and do not include display mapping software or statistical data.  For information on how to use the TIGER/Line shapefile data with specific software package users shall contact the company that produced the software.</techpreq>
+	</distinfo>
+	<metainfo>
+		<metd>20100507</metd>
+		<metc>
+			<cntinfo>
+				<cntorgp>
+					<cntorg>U.S. Department of Commerce, U.S. Census Bureau, Geography Division, Geographic Products Branch</cntorg>
+				</cntorgp>
+				<cntaddr>
+					<addrtype>Mailing address</addrtype>
+					<address>4600 Silver Hill Road, Stop 7400</address>
+					<city>Washington</city>
+					<state>DC</state>
+					<postal>20233-7400</postal>
+					<country>United States</country>
+				</cntaddr>
+				<cntvoice>301-763-1128</cntvoice>
+				<cntfax>301-763-4710</cntfax>
+				<cntemail>geo.tiger@census.gov</cntemail>
+			</cntinfo>
+		</metc>
+		<metstdn>FGDC Content Standards for Digital Geospatial Metadata</metstdn>
+		<metstdv>FGDC-STD-001-1998</metstdv>
+		<Metadata_Character_Set>8859part1</Metadata_Character_Set>
+		<Metadata_File_Identifier>tl_2010_11001_tract10.shp.xml</Metadata_File_Identifier>
+		<Metadata_Language>eng</Metadata_Language>
+	</metainfo>
+</metadata>
