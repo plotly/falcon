@@ -48,7 +48,6 @@ export default class TableDropdown extends Component {
             disable the selector for sqlite which does not have databases, only
             tables
         */
-        debugger;
         if (tableNames === null) {
             tablesDropdownOptions = [
                 {
