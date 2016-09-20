@@ -24,5 +24,5 @@ export default function (data) {
             rows.push(row);
         }
     }
-    return { columnnames: keys, ncols, nrows, rows };
+    return { columnnames: keys, ncols, nrows, rows, raw: data};
 }
