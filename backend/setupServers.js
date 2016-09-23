@@ -33,6 +33,29 @@ const showSudoMessage = (sequelizeManager, OPTIONS) => {
     }
 };
 
+const addAcceptedDomain = (domain) => {
+    acceptRequestsFrom.domains.push(`https://${domain}`);
+};
+
+export const newOnPremSession = (
+    domain,
+    {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
+) => {
+    sequelizeManager.log(`Adding domain ${domain} to CORS`, 1);
+    addAcceptedDomain(domain);
+    if (httpServer) {
+        httpServer.close();
+        setupHTTP(
+            {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
+        );
+    } else {
+        httpsServer.close();
+        setupHTTPS(
+            {sequelizeManager, serverMessageReceive, mainWindow, OPTIONS}
+        );
+    }
+};
+
 // https
 
 const setupSecureRestifyServer = (
@@ -46,8 +69,11 @@ const setupSecureRestifyServer = (
     };
 
     sequelizeManager.log('Closing http server.', 1);
-    httpServer.close();
+    if (httpServer) {
+        httpServer.close();
+    }
 
+    httpServer = null;
     httpsServer = restify.createServer(httpsOptions);
     /*
      * parsed content will always be available in req.query,
@@ -196,7 +222,9 @@ export function setupHTTPS(
     // setup HTTPS server with self signed certs
     try {
 
-        sequelizeManager.log('Checking if HTTPS certificate and key files already exist', 1);
+        sequelizeManager.log(
+            'Checking if HTTPS certificate and key files already exist', 1
+        );
         // try reading certs
         fs.accessSync(keyFile, fs.F_OK);
         fs.accessSync(csrFile, fs.F_OK);

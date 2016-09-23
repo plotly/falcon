@@ -27,7 +27,7 @@ const optionsBook = {
     },
     // 0 for errors only, 1 adds warnings, 2 adds info
     logdetail: {
-        defaultValue: 1,
+        defaultValue: 2,
         acceptedValues: range(0, 2)
     }
 };
