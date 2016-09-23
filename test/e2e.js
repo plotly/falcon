@@ -162,6 +162,10 @@ describe('plotly database connector', function Spec() {
             byId(`test-session-id-${sessionId}`)
         );
 
+        this.openSessionManager = () => findEl(
+            byId('test-session-open')
+        );
+
         // user inputs
         this.fillInputs = async (testedDialect) => {
             USER_INPUT_FIELDS[testedDialect].forEach(credential => {
@@ -213,7 +217,7 @@ describe('plotly database connector', function Spec() {
             return !(testClass.includes(disconnected) ||
                     testClass.includes(conerror));
         };
-
+        await this.openSessionManager().click();
         await this.addSession().click();
     };
 

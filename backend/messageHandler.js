@@ -1,7 +1,7 @@
 import {merge, split, contains} from 'ramda';
 import {v1} from './api';
 import {API_VERSION, AUTHENTICATION, TASK} from './errors';
-import {setupHTTPS} from './setupServers';
+import {setupHTTPS, newOnPremSession} from './setupServers';
 
 	/*
 	 * - An event is received via either the ipc channel or an endpoint.
@@ -39,11 +39,13 @@ export const TASKS = {
 	DATABASES: 'DATABASES',
 	SELECT_DATABASE: 'SELECT_DATABASE',
 	TABLES: 'TABLES',
+    // OTHER
+    NEW_ON_PREM_SESSION: 'NEW_ON_PREM_SESSION',
 	SETUP_HTTPS_SERVER: 'SETUP_HTTPS_SERVER'
 };
 
 
-// can we make this CHANNEL?
+// TODO: can we make this CHANNEL?
 export const channel = 'channel';
 
 
@@ -127,7 +129,7 @@ function handleMessage(sequelizeManager, opts) {
 
 	// TODO: use mainWindow by extracting it here instead of opts.mainWindow
 	const {responseSender, payload} = opts;
-
+    // exactly action's payload from the front end
 	const {
 		task,
 		sessionSelected = sequelizeManager.sessionSelected,
@@ -150,7 +152,8 @@ function handleMessage(sequelizeManager, opts) {
 	sequelizeManager.setSessionSelected(sessionSelected);
 
 
-	sequelizeManager.log(`Sending task ${task} to sequelizeManager`, 2);
+	sequelizeManager.log(`Sending task ${task} to sequelizeManager`, 1);
+    sequelizeManager.log(`Sending message ${message} to sequelizeManager`, 1);
 
 	switch (task) {
 
@@ -158,7 +161,7 @@ function handleMessage(sequelizeManager, opts) {
 		 * https task -->
 		 */
 
-		case TASK.SETUP_HTTPS_SERVER: {
+		case TASKS.SETUP_HTTPS_SERVER: {
 			// TODO: shell scripts for HTTPS setup don't work on windows
 
 			if (
@@ -178,6 +181,23 @@ function handleMessage(sequelizeManager, opts) {
 				});
 
 			}
+			break;
+		}
+
+		/*
+		 * On-Prem task -->
+		 */
+
+		case TASKS.NEW_ON_PREM_SESSION: {
+            sequelizeManager.log('messageHandler', 1);
+			newOnPremSession(
+                message, {
+				sequelizeManager,
+				serverMessageReceive,
+				mainWindow: opts.mainWindow,
+				OPTIONS: opts.OPTIONS
+                }
+            );
 			break;
 		}
 

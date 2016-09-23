@@ -79,7 +79,16 @@ export function setupHttpsServer () {
     return (__, getState) => {
         const state = getState();
         const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.UPDATE_IPC_STATE, sessionSelected);
+        ipcSend(TASKS.SETUP_HTTPS_SERVER, sessionSelected);
+    };
+}
+
+export function newOnPremSession (domain) {
+    return (__, getState) => {
+        console.warn(`new on prem session ${domain}`);
+        const state = getState();
+        const sessionSelected = state.sessions.get('sessionSelected');
+        ipcSend(TASKS.NEW_ON_PREM_SESSION, sessionSelected, domain);
     };
 }
 

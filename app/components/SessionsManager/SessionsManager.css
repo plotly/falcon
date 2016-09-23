@@ -3,6 +3,7 @@
     margin-right: auto;
     margin-bottom: 30px;
     width: 800px;
+    text-align: center;
 }
 
 .sessionsManagerWrapper {
@@ -88,20 +89,27 @@
 
 .sessionAddText {
     display: inline-block;;
-    padding: 5px 20px 5px 20px;
-    color: #8BB5FE
+    padding: 10px 20px 10px 20px;
+    color: #8BB5FE;
 }
 
-.Flipped, .Flipped .sessionWrapper
+/* this flips the scroll y bar from bottom to up of the session tabs */
+.Flipped, .Flipped .sessionWrapper, .Flipped .sessionAddText
 {
     transform:rotateX(180deg);
     -ms-transform:rotateX(180deg); /* IE 9 */
     -webkit-transform:rotateX(180deg); /* Safari and Chrome */
 }
 
-.sessionAddText
-{
-    transform:rotateX(180deg);
-    -ms-transform:rotateX(180deg); /* IE 9 */
-    -webkit-transform:rotateX(180deg); /* Safari and Chrome */
+.onPremForm {
+    text-align: center;
+}
+
+.onPremDomainInput {
+    text-align: center;
+}
+
+.addOnPremLink {
+    cursor: grab;
+    text-align: center;
 }

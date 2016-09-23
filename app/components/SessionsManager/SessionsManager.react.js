@@ -3,7 +3,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './SessionsManager.css';
 import classnames from 'classnames';
 import ReactTooltip from 'react-tooltip';
-import {last, contains} from 'ramda';
+import {contains} from 'ramda';
 
 const timestamp = () => Math.floor(Date.now() / 1000);
 
@@ -31,6 +31,10 @@ const LOGOS = {
 export default class SessionsManager extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            showOnPremDomainInput: false,
+            onPremDomain: ''
+        };
     }
 
     render() {
@@ -156,18 +160,61 @@ export default class SessionsManager extends Component {
             );
         }
 
+        let onPremDomainInput = null;
+        if (this.state.showOnPremDomainInput) {
+            onPremDomainInput = (
+                <div className={styles.onPremForm}>
+                    <input
+                        className={styles.onPremDomainInput}
+                        type="text"
+                        placeholder="Your On-Prem Domain (ex. mycompany.plot.ly)"
+                        onChange={e => (
+                            this.setState({onPremDomain: e.target.value})
+                        )}
+                    >
+                    </input>
+                    <br></br>
+                    <a
+                        className={styles.addOnPremLink}
+                        onClick={() => {
+                            console.log(`submit motherfucker! ${this.state.onPremDomain}`);
+                            sessionsActions.newOnPremSession(this.state.onPremDomain);
+                            sessionsActions.newSession(newId);
+                            sessionsActions.switchSession(newId);
+                            this.setState({showOnPremDomainInput: false});
+                        }}
+                    >
+                        Click here to submit the domain
+                    </a>
+                </div>
+            );
+        }
+
         let sessionAddText = (
-            <a className={styles.sessionAddText}
-                onClick={() => {
-                    sessionsActions.newSession(newId);
-                    sessionsActions.switchSession(newId);
-                }}
-                id="test-session-add"
-            >
-                Open New Session
-            </a>
+            <div>
+                <div>
+                    <a className={styles.sessionAddText}
+                        onClick={() => {
+                            sessionsActions.newSession(newId);
+                            sessionsActions.switchSession(newId);
+                        }}
+                        id="test-session-open"
+                    >
+                    Open Session
+                    </a>
+                </div>
+                <div>
+                    <a className={styles.sessionAddText}
+                        onClick={() => {
+                            this.setState({showOnPremDomainInput: true});
+                        }}
+                    >
+                        Open On-Premise Session
+                    </a>
+                </div>
+            </div>
            );
-        if (numberOfActiveSessions > 0) {
+        if (numberOfActiveSessions > 0 || this.state.showOnPremDomainInput) {
             sessionAddText = null;
         }
 
@@ -196,6 +243,8 @@ export default class SessionsManager extends Component {
 
         return (
             <div className={styles.sessionsManagerContainer}>
+                {sessionAddText}
+                {onPremDomainInput}
                 <div
                     className={classnames(
                         styles.sessionsManagerWrapper, styles.Flipped
@@ -203,7 +252,6 @@ export default class SessionsManager extends Component {
                 >
                     {sessionsIcons}
                     {sessionAddIcon}
-                    {sessionAddText}
                 </div>
 
             </div>
