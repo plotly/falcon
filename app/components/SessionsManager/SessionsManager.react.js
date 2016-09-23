@@ -198,6 +198,7 @@ export default class SessionsManager extends Component {
                             sessionsActions.newSession(newId);
                             sessionsActions.switchSession(newId);
                         }}
+                        id="test-session-open"
                     >
                     Open Session
                     </a>
