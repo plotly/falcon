@@ -37,6 +37,7 @@ export const TASKS = {
 	CONNECT: 'CONNECT',
 	AUTHENTICATE: 'AUTHENTICATE',
 	SESSIONS: 'SESSIONS',
+    DELETE_SESSION: 'DELETE_SESSION',
 	DATABASES: 'DATABASES',
 	SELECT_DATABASE: 'SELECT_DATABASE',
 	TABLES: 'TABLES',
@@ -249,12 +250,27 @@ function handleMessage(sequelizeManager, opts) {
 			.then(() => {sequelizeManager.log(
 				'NOTE: fetched the list of sessions', 1
 			);})
-			.catch( error => {
+			.catch((error) => {
 				sequelizeManager.raiseError(error, responseSender);
 			});
 			break;
 
 		}
+
+        case TASKS.DELETE_SESSION: {
+
+            sequelizeManager.authenticate(responseSender)
+            .then(sequelizeManager.deleteSession(message))
+            .then(() => {sequelizeManager.log(
+                `NOTE: delete session ${message}`, 1
+            );})
+            .then(sequelizeManager.showSessions(responseSender))
+            .catch((error) => {
+				sequelizeManager.raiseError(error, responseSender);
+			});
+            break;
+
+        }
 
 		case TASKS.DATABASES: {
 

@@ -189,8 +189,15 @@ export class SequelizeManager {
             this.createConnection(configFromApp);
 
         }
-        console.log('authenticating');
         return this.sessions[this.sessionSelected].authenticate();
+
+    }
+
+    deleteSession(sessionId) {
+
+        return () => {
+            delete this.sessions[`${sessionId}`];
+        };
 
     }
 
@@ -199,8 +206,6 @@ export class SequelizeManager {
         const needToSwitchDatabases =
             databaseToUse !== this.sessions[this.sessionSelected].config.database;
 
-        console.log('needToSwitchDatabases');
-        console.log(needToSwitchDatabases);
         /*
          * if not, make a new one to the other database,
          * replacing the current one
