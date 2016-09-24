@@ -1,6 +1,6 @@
 import {TASKS} from './messageHandler';
 import {has, map, merge, split, trim} from 'ramda';
-import {QUERY_PARAM, DATABASE_PARAM, TABLES_PARAM} from './errors';
+import {QUERY_PARAM, DATABASE_PARAM, TABLES_PARAM, SESSION_PARAM} from './errors';
 
 
 const foundParams = (params, wantedParam) => {
@@ -69,11 +69,30 @@ export function v1(requestEvent, sequelizeManager, callback) {
         case 'sessions': {
 
             /*
-             * action: authenticate, get databases
-             * returns: databases list = ['database1', 'database2' ...]
+             * action: authenticate, get sessions
+             * returns: sessions list as [ {id: dialect:username@host}, ... ]
              */
 
             task = TASKS.SESSIONS;
+            break;
+
+        }
+
+        case 'deletesession': {
+
+            /*
+             * action: authenticate, delete session, get sessions
+             * returns: sessions list as [ {id: dialect:username@host}, ... ]
+             */
+
+            task = TASKS.DELETE_SESSION;
+            if (!foundParams(requestEvent.params, 'session')) {
+                sequelizeManager.raiseError(
+                    {message: SESSION_PARAM}, callback
+                );
+            } else {
+                message = requestEvent.params.session;
+            }
             break;
 
         }

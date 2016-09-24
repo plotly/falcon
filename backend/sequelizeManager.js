@@ -206,6 +206,8 @@ export class SequelizeManager {
         const needToSwitchDatabases =
             databaseToUse !== this.sessions[this.sessionSelected].config.database;
 
+        console.log('needToSwitchDatabases');
+        console.log(needToSwitchDatabases);
         /*
          * if not, make a new one to the other database,
          * replacing the current one
