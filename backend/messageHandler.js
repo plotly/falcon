@@ -36,6 +36,7 @@ export const TASKS = {
 	// added in v1
 	CONNECT: 'CONNECT',
 	AUTHENTICATE: 'AUTHENTICATE',
+	SESSIONS: 'SESSIONS',
 	DATABASES: 'DATABASES',
 	SELECT_DATABASE: 'SELECT_DATABASE',
 	TABLES: 'TABLES',
@@ -237,6 +238,20 @@ function handleMessage(sequelizeManager, opts) {
 				'NOTE: connection authenticated as ' +
 				`[${sequelizeManager.sessions[sessionSelected].config.username}]`, 1
 			);});
+			break;
+
+		}
+
+		case TASKS.SESSIONS: {
+
+			sequelizeManager.authenticate(responseSender)
+			.then(sequelizeManager.showSessions(responseSender))
+			.then(() => {sequelizeManager.log(
+				'NOTE: fetched the list of sessions', 1
+			);})
+			.catch( error => {
+				sequelizeManager.raiseError(error, responseSender);
+			});
 			break;
 
 		}

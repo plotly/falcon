@@ -66,6 +66,18 @@ export function v1(requestEvent, sequelizeManager, callback) {
 
         }
 
+        case 'sessions': {
+
+            /*
+             * action: authenticate, get databases
+             * returns: databases list = ['database1', 'database2' ...]
+             */
+
+            task = TASKS.SESSIONS;
+            break;
+
+        }
+
         case 'databases': {
 
             /*

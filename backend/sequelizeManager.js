@@ -249,6 +249,25 @@ export class SequelizeManager {
 
     }
 
+
+    showSessions(responseSender) {
+        return () => {
+            const sessionKeys = Object.keys(this.sessions);
+
+            responseSender({
+                error: null,
+                sessions: sessionKeys.map((key) => {
+                    const dialect = this.sessions[key].options.dialect;
+                    const username = this.sessions[key].config.username;
+                    let host = this.sessions[key].config.host;
+                    if (!host) {host = 'localhost';}
+                    return {[key]: `${dialect}:${username}@${host}`};
+                })
+            });
+        };
+    }
+
+
     showDatabases(responseSender) {
 
         const query = this.getPresetQuery(PREBUILT_QUERY.SHOW_DATABASES);
