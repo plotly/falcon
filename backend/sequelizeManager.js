@@ -19,7 +19,10 @@ const REDSHIFT_OPTIONS = {
     dialect: 'postgres',
     pool: false,
     keepDefaultTimezone: true, // avoid SET TIMEZONE
-    databaseVersion: '8.0.2' // avoid SHOW SERVER_VERSION
+    databaseVersion: '8.0.2', // avoid SHOW SERVER_VERSION
+    dialectOptions: {
+        ssl: true
+    }
 };
 
 const setupMSSQLOptions = (connection) => {
@@ -119,10 +122,13 @@ export class SequelizeManager {
 
     createConnection(configuration) {
         const {
-            username, password, database, port, dialect, storage, host
+            username, password, database, port, dialect, storage, host, ssl
             } = configuration;
 
-        let options = {dialect, host, port, storage};
+        let options = {
+            dialect, host, port, storage,
+            dialectOptions: {ssl}
+        };
 
         this.log(`Creating a connection for user ${username}`, 1);
 

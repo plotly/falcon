@@ -21,12 +21,21 @@ export const APP_STATUS = {
     DISCONNECTED: 'DISCONNECTED'
 };
 
-export const USER_INPUT_FIELDS = {
+export const CONNETION_CONFIG = {
     [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port'],
     [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port'],
 	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port'],
     [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.REDSHIFT]: ['username', 'password', 'host', 'port', 'database'],
+    [DIALECTS.SQLITE]: ['storage']
+};
+
+export const CONNETION_OPTIONS = {
+    [DIALECTS.MYSQL]: ['ssl'],
+    [DIALECTS.MARIADB]: ['ssl'],
+	[DIALECTS.MSSQL]: ['ssl'],
+    [DIALECTS.POSTGRES]: ['ssl'],
+    [DIALECTS.REDSHIFT]: ['ssl'],
     [DIALECTS.SQLITE]: ['storage']
 };
 
@@ -48,7 +57,8 @@ export const EMPTY_SESSION =
         dialect: DIALECTS.MYSQL,
         port: '',
         storage: '',
-        host: ''
+        host: '',
+        ssl: false
     },
     CONNECTION: {status: APP_STATUS.INITIALIZED}
 };

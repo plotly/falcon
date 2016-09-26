@@ -1,7 +1,9 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './UserCredentials.css';
-import {USER_INPUT_FIELDS} from '../../../constants/constants';
+import {
+    CONNETION_CONFIG, CONNETION_OPTIONS
+} from '../../../constants/constants';
 const {dialog} = require('electron').remote;
 
 /*
@@ -16,6 +18,7 @@ export default class UserCredentials extends Component {
 		this.getInputType = this.getInputType.bind(this);
 		this.getOnClick = this.getOnClick.bind(this);
 		this.testClass = this.testClass.bind(this);
+        this.state = {showOptions: false};
     }
 
 	testClass() {
@@ -67,7 +70,7 @@ export default class UserCredentials extends Component {
 	render() {
 		const {configuration, sessionsActions} = this.props;
 
-		let inputs = USER_INPUT_FIELDS[configuration.get('dialect')]
+		let inputs = CONNETION_CONFIG[configuration.get('dialect')]
 			.map(credential => (
 			<input className={this.testClass()}
 				placeholder={this.getPlaceholder(credential)}
@@ -81,9 +84,54 @@ export default class UserCredentials extends Component {
 			/>
 		));
 
+        let options = CONNETION_OPTIONS[configuration.get('dialect')]
+            .map(credential => (
+            <div className={styles.options}>
+                <label className={styles.label}><input
+                    className={styles.checkbox}
+                    type="checkbox"
+                    onChange={() => {
+                        sessionsActions.updateConfiguration(
+                            {[credential]: !configuration.get(credential)}
+                        );
+                    }}
+                    id={`test-option-${credential}`}
+                />
+                {credential}
+                </label>
+            </div>
+        ));
+
+        const databaseOptions = () => {
+            if (this.state.showOptions) {
+                return (
+                    <div className={styles.databaseOptionsContainer}>
+                        <a className={styles.databaseOptions}
+                            onClick={() => {this.setState({showOptions: false});}}
+                        >
+                            Hide Database Options
+                        </a>
+                        {options}
+                    </div>
+                );
+            } else {
+                return (
+                    <div className={styles.databaseOptionsContainer}>
+                        <a className={styles.databaseOptions}
+                            onClick={() => {this.setState({showOptions: true});}}
+                        >
+                            Show Database Options
+                        </a>
+                    </div>
+                );
+            }
+        };
+
+
 		return (
 			<div className={styles.inputContainer}>
 				{inputs}
+                {databaseOptions()}
 			</div>
 		);
 	}
