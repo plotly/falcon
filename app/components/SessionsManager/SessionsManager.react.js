@@ -101,6 +101,8 @@ export default class SessionsManager extends Component {
                             }
                         }
                         // delete it
+                        // TODO: this should probably be a single action?
+                        sessionsActions.forgetSession(sessionId); // for backend
                         sessionsActions.deleteSession(sessionId);
                     }}
                     src="./images/delete.png"

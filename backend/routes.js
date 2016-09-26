@@ -5,6 +5,9 @@ const ENDPOINTS = {
     v1: [
         'connect',
         'authenticate',
+        'sessions',
+        'deletesession',
+        'addsession',
         'databases',
         'selectdatabase',
         'tables',
@@ -30,7 +33,7 @@ function serveHttpsStatus(req, res) {
     } else {
         res.send(404);
     }
-    
+
 }
 
 export function setupRoutes(server, processMessageFunction) {

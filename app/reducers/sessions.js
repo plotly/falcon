@@ -1,7 +1,7 @@
 import {
     NEW_SESSION,
     SWITCH_SESSION,
-    DELETE_SESSION,
+    FORGET_SESSION,
     UPDATE_CONNECTION,
     UPDATE_CONFIGURATION,
     UPDATE_IPC_STATE
@@ -19,7 +19,6 @@ const INITIAL_STATE = Immutable.Map({
 export default function sessions(state = INITIAL_STATE, action) {
 
     switch (action.type) {
-
         case NEW_SESSION:
             return state.mergeIn(['list'],
                 {
@@ -41,7 +40,7 @@ export default function sessions(state = INITIAL_STATE, action) {
         case SWITCH_SESSION:
             return state.merge({sessionSelected: action.payload});
 
-        case DELETE_SESSION:
+        case FORGET_SESSION:
             return state.deleteIn(['list', `${action.payload}`]);
 
         case UPDATE_CONFIGURATION:
