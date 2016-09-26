@@ -21,7 +21,7 @@ export const APP_STATUS = {
     DISCONNECTED: 'DISCONNECTED'
 };
 
-export const USER_INPUT_FIELDS = {
+export const CONNETION_CONFIG = {
     [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port'],
     [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port'],
 	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port'],

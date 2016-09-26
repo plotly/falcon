@@ -10,7 +10,7 @@ import {productName, version} from '../package.json';
 import {
     APP_STATUS,
     DIALECTS,
-    USER_INPUT_FIELDS
+    CONNETION_CONFIG
 } from '../app/constants/constants';
 
 // import styles to use for tests
@@ -168,7 +168,7 @@ describe('plotly database connector', function Spec() {
 
         // user inputs
         this.fillInputs = async (testedDialect) => {
-            USER_INPUT_FIELDS[testedDialect].forEach(credential => {
+            CONNETION_CONFIG[testedDialect].forEach(credential => {
                 this.getInputField(credential)
                 .then(input => {
                     input.sendKeys(CREDENTIALS[testedDialect][credential]);
@@ -177,7 +177,7 @@ describe('plotly database connector', function Spec() {
         };
 
         this.wrongInputs = async (testedDialect) => {
-            USER_INPUT_FIELDS[testedDialect].forEach(credential => {
+            CONNETION_CONFIG[testedDialect].forEach(credential => {
                 this.getInputField(credential)
                 .then(input => input.sendKeys('blah'));
             });

@@ -1,7 +1,9 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './UserCredentials.css';
-import {USER_INPUT_FIELDS} from '../../../constants/constants';
+import {
+    CONNETION_CONFIG, CONNETION_OPTIONS
+} from '../../../constants/constants';
 const {dialog} = require('electron').remote;
 
 /*
@@ -68,7 +70,7 @@ export default class UserCredentials extends Component {
 	render() {
 		const {configuration, sessionsActions} = this.props;
 
-		let inputs = USER_INPUT_FIELDS[configuration.get('dialect')]
+		let inputs = CONNETION_CONFIG[configuration.get('dialect')]
 			.map(credential => (
 			<input className={this.testClass()}
 				placeholder={this.getPlaceholder(credential)}
