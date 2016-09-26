@@ -38,6 +38,7 @@ export const TASKS = {
 	AUTHENTICATE: 'AUTHENTICATE',
 	SESSIONS: 'SESSIONS',
     DELETE_SESSION: 'DELETE_SESSION',
+    ADD_SESSION: 'ADD_SESSION',
 	DATABASES: 'DATABASES',
 	SELECT_DATABASE: 'SELECT_DATABASE',
 	TABLES: 'TABLES',
@@ -245,8 +246,7 @@ function handleMessage(sequelizeManager, opts) {
 
 		case TASKS.SESSIONS: {
 
-			sequelizeManager.authenticate(responseSender)
-			.then(sequelizeManager.showSessions(responseSender))
+			sequelizeManager.showSessions(responseSender)
 			.then(() => {sequelizeManager.log(
 				'NOTE: fetched the list of sessions', 1
 			);})
@@ -259,10 +259,24 @@ function handleMessage(sequelizeManager, opts) {
 
         case TASKS.DELETE_SESSION: {
 
-            sequelizeManager.authenticate(responseSender)
-            .then(sequelizeManager.deleteSession(message))
+            sequelizeManager.deleteSession(message)
             .then(() => {sequelizeManager.log(
                 `NOTE: delete session ${message}`, 1
+            );})
+            .then(sequelizeManager.showSessions(responseSender))
+            .catch((error) => {
+				sequelizeManager.raiseError(error, responseSender);
+			});
+            break;
+
+        }
+
+        case TASKS.ADD_SESSION: {
+
+            sequelizeManager.authenticate(responseSender)
+            .then(sequelizeManager.addSession(message))
+            .then(() => {sequelizeManager.log(
+                `NOTE: added session ${message}`, 1
             );})
             .then(sequelizeManager.showSessions(responseSender))
             .catch((error) => {
@@ -442,7 +456,7 @@ function handleMessage(sequelizeManager, opts) {
 		}
 
 		default: {
-			sequelizeManager.raiseError(TASK(task), responseSender);
+			sequelizeManager.raiseError({message: TASK(task)}, responseSender);
 		}
 
 

@@ -148,10 +148,8 @@ export class SequelizeManager {
     }
 
     authenticate(responseSender) {
-
         this.log('Authenticating connection.');
         // when already logged in and simply want to check connection
-
         if (!this.sessions[this.sessionSelected]) {
 			this.raiseError(
                 merge(
@@ -172,7 +170,6 @@ export class SequelizeManager {
                 );
             });
         }
-
     }
 
     connect(configFromApp) {
@@ -193,13 +190,53 @@ export class SequelizeManager {
 
     }
 
-    deleteSession(sessionId) {
 
-        return () => {
-            delete this.sessions[`${sessionId}`];
-        };
 
+    showSessions(responseSender) {
+        const sessionKeys = Object.keys(this.sessions);
+        return new Promise(
+            (resolve, reject) => {
+                resolve(responseSender({
+                    error: null,
+                    sessions: sessionKeys.map((key) => {
+                        if (this.sessions[key]) {
+                            const dialect = this.sessions[key].options.dialect;
+                            const username = this.sessions[key].config.username;
+                            let host = this.sessions[key].config.host;
+                            if (!host) {host = 'localhost';}
+                            return {[key]: `${dialect}:${username}@${host}`};
+                        } else {
+                            // if session created (with API) but not connected yet.
+                            return {[key]: 'Session currently empty.'};
+                        }
+                    })
+                }));
+            }
+        );
     }
+
+
+    deleteSession(sessionId) {
+        let setSessionTo = null;
+        if (Object.keys(this.sessions).length > 0) {
+            setSessionTo = Object.keys(this.sessions)[0];
+        }
+        this.log(`${setSessionTo}`, 1);
+        return new Promise(
+            (resolve, reject) => {
+                this.setSessionSelected(Object.keys(this.sessions)[0]);
+                resolve(delete this.sessions[`${sessionId}`]);
+            });
+    }
+
+
+    addSession(sessionId) {
+        return new Promise(
+            (resolve, reject) => {
+                resolve(this.sessions[`${sessionId}`] = null);
+            });
+    }
+
 
     selectDatabase(databaseToUse) {
         // take database entry check if its the same as in current connection
@@ -254,24 +291,6 @@ export class SequelizeManager {
         this.log('Authenticating connection.');
         return this.sessions[this.sessionSelected].authenticate();
 
-    }
-
-
-    showSessions(responseSender) {
-        return () => {
-            const sessionKeys = Object.keys(this.sessions);
-
-            responseSender({
-                error: null,
-                sessions: sessionKeys.map((key) => {
-                    const dialect = this.sessions[key].options.dialect;
-                    const username = this.sessions[key].config.username;
-                    let host = this.sessions[key].config.host;
-                    if (!host) {host = 'localhost';}
-                    return {[key]: `${dialect}:${username}@${host}`};
-                })
-            });
-        };
     }
 
 

@@ -1,12 +1,27 @@
 import {TASKS} from './messageHandler';
-import {has, map, merge, split, trim} from 'ramda';
-import {QUERY_PARAM, DATABASE_PARAM, TABLES_PARAM, SESSION_PARAM} from './errors';
+import {has, map, merge, contains, split, trim} from 'ramda';
+import {
+    APP_NOT_CONNECTED, QUERY_PARAM, DATABASE_PARAM, TABLES_PARAM, SESSION_PARAM
+} from './errors';
 
 
 const foundParams = (params, wantedParam) => {
     return Boolean(params) && has(wantedParam, params);
 };
 
+const timestamp = () => Math.floor(Date.now() / 1000);
+
+const getNewId = (sessionsIds) => {
+    let tries = 0;
+    let newId = null;
+    while (
+        !newId || contains(newId, sessionsIds)
+    ) {
+        newId = timestamp();
+        tries += 1;
+    }
+    return `${newId}`;
+};
 
 const obtainDatabaseForTask = (
     requestEvent, sequelizeManager, sessionSelected, callback
@@ -93,6 +108,24 @@ export function v1(requestEvent, sequelizeManager, callback) {
             } else {
                 message = requestEvent.params.session;
             }
+            if (!contains(message, Object.keys(sequelizeManager.sessions))) {
+                sequelizeManager.raiseError(
+                    {message: APP_NOT_CONNECTED}, callback
+                );
+            }
+            break;
+
+        }
+
+        case 'addsession': {
+
+            /*
+             * action: authenticate, delete session, get sessions
+             * returns: sessions list as [ {id: dialect:username@host}, ... ]
+             */
+
+            task = TASKS.ADD_SESSION;
+            message = getNewId(Object.keys(sequelizeManager.sessions));
             break;
 
         }

@@ -7,6 +7,7 @@ const ENDPOINTS = {
         'authenticate',
         'sessions',
         'deletesession',
+        'addsession',
         'databases',
         'selectdatabase',
         'tables',

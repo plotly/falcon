@@ -545,7 +545,7 @@ describe('plotly database connector', function Spec() {
 
     });
 
-    describe('-> the API ', () => {
+    describe.only('-> the API ', () => {
 
         before(openApp);
 
@@ -753,6 +753,62 @@ describe('plotly database connector', function Spec() {
                 // check app has error message
                 const errorMessage = await this.getErrorMessage();
                 expect(await errorMessage.getText()).to.equal('');
+            });
+        });
+
+        describe('/v1/sessions', () => {
+            it('returns no error, list of sessions',
+            async() => {
+                await fetch(`http://${BASE_URL}/v1/sessions`)
+                .then(res => res.json())
+                .then(json => {
+                    console.log();
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.equal(null);
+                    expect(json).to.have.property('sessions');
+                    expect(json.sessions).to.not.equal(null);
+                });
+            });
+        });
+
+        describe('/v1/addsession', () => {
+            it('returns no error, list of sessions that contains two entries',
+            async() => {
+                await fetch(`http://${BASE_URL}/v1/addsession`)
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.equal(null);
+                    expect(json).to.have.property('sessions');
+                    expect(json.sessions).to.not.equal(null);
+                    expect(json.sessions).to.have.lengthOf(2);
+                });
+            });
+        });
+
+        describe('/v1/deletesession', () => {
+            it('returns no error, list of sessions that contains one entry',
+            async() => {
+                let sessions;
+                await fetch(`http://${BASE_URL}/v1/sessions`)
+                .then(res => res.json())
+                .then(json => {
+                    sessions = json.sessions.map((session) => {
+                        return parseInt(Object.keys(session)[0], 10);
+                    });
+                });
+
+                await fetch(
+                    `http://${BASE_URL}/v1/deletesession?session=${sessions[1]}`
+                )
+                .then(res => res.json())
+                .then(json => {
+                    expect(json).to.have.property('error');
+                    expect(json.error).to.equal(null);
+                    expect(json).to.have.property('sessions');
+                    expect(json.sessions).to.not.equal(null);
+                    expect(json.sessions).to.have.lengthOf(1);
+                });
             });
         });
 
