@@ -30,6 +30,15 @@ export const USER_INPUT_FIELDS = {
     [DIALECTS.SQLITE]: ['storage']
 };
 
+export const CONNETION_OPTIONS = {
+    [DIALECTS.MYSQL]: ['ssl'],
+    [DIALECTS.MARIADB]: ['ssl'],
+	[DIALECTS.MSSQL]: ['ssl'],
+    [DIALECTS.POSTGRES]: ['ssl'],
+    [DIALECTS.REDSHIFT]: ['ssl'],
+    [DIALECTS.SQLITE]: ['storage']
+};
+
 export const BUTTON_MESSAGE = {
     INITIALIZED: 'connect',
     CON_ERROR: 'try again',
@@ -48,7 +57,8 @@ export const EMPTY_SESSION =
         dialect: DIALECTS.MYSQL,
         port: '',
         storage: '',
-        host: ''
+        host: '',
+        ssl: false
     },
     CONNECTION: {status: APP_STATUS.INITIALIZED}
 };

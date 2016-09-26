@@ -18,6 +18,10 @@
     margin-right:auto;
 }
 
+.buttonPrimary:hover {
+    border-color: #8BB5FE
+}
+
 .errorMessage {
     color: red;
     overflow-x: scroll;
