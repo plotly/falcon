@@ -1,28 +1,124 @@
-export default function (data) {
-    let keys;
-    let ncols;
-    let rows;
+function parseGeoJSON(rows) {
 
-    let nrows = data.length;
-
-    // repsonse is 'command executed' if database callback is empty
-    if (typeof nrows === 'undefined' || nrows === null) {
-        keys = ['message'];
-        nrows = 1;
-        ncols = 1;
-        rows = [['command executed']];
-    } else {
-        rows = [];
-        ncols = Object.keys(data[0]).length;
-        keys = Object.keys(data[0]);
-
-        for (let i = 0; i < nrows; i++) {
-            const row = [];
-            for (let j = 0; j < ncols; j++) {
-                row.push(data[i][keys[j]]);
-            }
-            rows.push(row);
+    /*
+    input...
+    rows: [
+        [1, 1, {"type":"Point","coordinates":[-77.027429,38.951868]}]
+    ]
+    output...
+    rows: [
+        [1, 1, GeoJSON 1]
+    ],
+    geojson: [{
+        "1": {
+            "type": "FeatureCollection",
+            "features": [{
+                "properties": {},
+                "type": "Feature"
+                "geometry": {
+                    "type": "GeometryCollection",
+                    "geometries": [
+                        {
+                            "coordinates": [-77.027429, 38.951868],
+                            "type": "Point"
+                        }
+                    ]
+                }
+            }]
         }
-    }
-    return { columnnames: keys, ncols, nrows, rows, raw: data};
+    }]
+    */
+
+    const toGeoJSON = (obj) => {
+        return {
+            type: 'FeatureCollection',
+            features: [{
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                    type: 'GeometryCollection',
+                    geometries: [obj]
+                    }
+            }]
+        };
+    };
+
+    // id's to identify GeoJSON objects
+    let id = 1;
+
+    const GeoJSONs = [];
+    const newRows = rows.map((row) => {
+        return row.map((el) => {
+            if (el !== null && typeof el === 'object') {
+                // push the object to GeoJSONs and replace it with an id
+                GeoJSONs.push(
+                    {[id]: toGeoJSON(el)}
+                );
+                id += 1;
+                return `GeoJSON ${id - 1}`;
+            }
+            return el;
+        });
+    });
+    // if response has no geojson, the geojson is returned as empty array
+    return {rows: newRows, geojson: GeoJSONs};
+
+}
+
+export default function (data) {
+
+    /*
+        data received from database format ...
+
+        data = [
+            {
+            firstColumn: 1,
+            secondColumn: 1,
+            thirdColumn: "one"
+            },
+            {
+            firstColumn: 2,
+            secondColumn: 2,
+            thirdColumn: "two"
+            },
+            {
+            firstColumn: 3,
+            secondColumn: 3,
+            thirdColumn: "three"
+            },
+            {
+            firstColumn: 4,
+            secondColumn: 4,
+            thirdColumn: "four"
+            },
+            {
+            firstColumn: 5,
+            secondColumn: 5,
+            thirdColumn: "five"
+            }
+        ]
+    */
+
+    // get column names of the first object (repeated for all objects)
+    const columnnames = Object.keys(data[0]);
+    const ncols = Object.keys(data[0]).length;
+    const nrows = data.length;
+
+    // iterate over eaech object (each object becomes a row)
+    // returns: a row of rows (table)
+    const table = data.map((obj) => {
+        // get the value for each column => put them into an array
+        // returns: a row
+        return Object.keys(obj).map((columnname) => {
+            // returns: a column's values
+            return obj[columnname];
+        });
+    });
+
+    const {rows, geojson} = parseGeoJSON(table);
+
+    // plotly workspace requires keys (columnnames, ncols, nrows, rows)
+    // and they should be in this format
+    // TODO: keys geojson and raw are currently optional
+    return {columnnames, ncols, nrows, rows, geojson, raw: data};
 }
