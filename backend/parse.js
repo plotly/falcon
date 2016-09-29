@@ -66,7 +66,7 @@ function parseGeoJSON(rows) {
 }
 
 export default function (data) {
-
+    console.log(data);
     /*
         data received from database format ...
 

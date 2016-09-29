@@ -371,6 +371,8 @@ export class SequelizeManager {
             return this.sessions[this.sessionSelected]
             .query(show5rows, this.setQueryType('SELECT'))
             .then(selectTableResults => {
+                console.log('selectTableResults');
+                console.log(selectTableResults);
                 return {
                     [table]: selectTableResults
                 };
