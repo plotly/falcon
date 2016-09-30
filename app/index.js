@@ -13,7 +13,7 @@ const store = configureStore();
 const history = syncHistoryWithStore(hashHistory, store);
 
 const ipcRenderer = require('electron').ipcRenderer;
-ipcRenderer.on('channel', function(event, message) {
+ipcRenderer.on('CHANNEL', function(event, message) {
     store.dispatch(updateIpcState(message));
 });
 

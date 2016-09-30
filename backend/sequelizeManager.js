@@ -197,7 +197,6 @@ export class SequelizeManager {
     }
 
 
-
     showSessions(responseSender) {
         const sessionKeys = Object.keys(this.sessions);
         return new Promise(

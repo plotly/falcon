@@ -67,6 +67,8 @@ process.on('exit', chromedriver.stop);
 
 const delay = time => new Promise(resolve => setTimeout(resolve, time));
 
+after(() => {console.log('finished running tests');});
+
 describe('plotly database connector', function Spec() {
     this.timeout(20000);
 
@@ -545,7 +547,7 @@ describe('plotly database connector', function Spec() {
 
     });
 
-    describe.only('-> the API ', () => {
+    describe('-> the API ', () => {
 
         before(openApp);
 
@@ -1052,6 +1054,7 @@ describe('plotly database connector', function Spec() {
             });
 
         });
+
 
         after(close);
 

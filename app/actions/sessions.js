@@ -1,5 +1,5 @@
 import {createAction} from 'redux-actions';
-import {TASKS} from './../../backend/messageHandler';
+import {TASKS, CHANNEL} from './../../backend/messageHandler';
 const ipcRenderer = require('electron').ipcRenderer;
 
 export const NEW_SESSION = 'NEW_SESSION';
@@ -101,7 +101,7 @@ export function newOnPremSession (domain) {
 }
 
 function ipcSend(task, sessionSelected, message = {}) {
-    ipcRenderer.send('channel', {task, sessionSelected, message});
+    ipcRenderer.send(CHANNEL, {task, sessionSelected, message});
 }
 
 // <- ipc specific
