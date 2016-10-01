@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import HttpsInstructions from './HttpsInstructions.react';
+import Instructions from './Instructions.react';
 import {BACKEND} from '../../../constants/constants';
 
 let INTERVAL_ID;
@@ -69,7 +69,7 @@ class DetectHttpsServer extends Component {
 
                     {
                         this.state.expandInstructions
-                        ? HttpsInstructions()
+                        ? Instructions()
                         : null
                     }
 

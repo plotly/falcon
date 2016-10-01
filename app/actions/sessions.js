@@ -1,5 +1,6 @@
 import {createAction} from 'redux-actions';
-import {TASKS, CHANNEL} from './../../backend/messageHandler';
+import {CHANNEL} from './../../backend/messageHandler';
+import {TASKS} from './../../backend/tasks';
 const ipcRenderer = require('electron').ipcRenderer;
 
 export const NEW_SESSION = 'NEW_SESSION';

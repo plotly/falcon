@@ -14,13 +14,6 @@
 	text-align: center;
 }
 
-.workspace {
-    height: 60%;
-    width: 60%;
-    padding: 30px;
-    margin-left: 85px;
-}
-
 .info {
 	padding: 25px;
     font-size: 14px;
@@ -53,10 +46,6 @@
 .step4Container {
 	width: 800px;
 	padding-top: 20px;
-}
-
-.futureDirections {
-	padding-left: 25px;
 }
 
 .previewController {

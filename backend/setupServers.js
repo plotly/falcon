@@ -6,6 +6,7 @@ import {replace, splitAt} from 'ramda';
 import YAML from 'yamljs';
 
 import {setupRoutes} from './routes';
+import {CHANNEL} from './messageHandler';
 
 // generic directories
 const HOSTS = '/etc/hosts';
@@ -211,7 +212,7 @@ export function setupHTTPS(serverMessageReceive, responseTools) {
         setupSecureRestifyServer(
             {keyFile, csrFile, serverMessageReceive, responseTools}
         );
-        mainWindow.webContents.send('CHANNEL', {hasSelfSignedCert: true});
+        mainWindow.webContents.send(CHANNEL, {hasSelfSignedCert: true});
 
     } catch (e) {
         // if error returned, certs do not exist -- let's create them
@@ -226,7 +227,7 @@ export function setupHTTPS(serverMessageReceive, responseTools) {
                 } else {
                     log('New key and certificate generated', 1);
                     log('Closing HTTP Server', 1);
-                    mainWindow.webContents.send('CHANNEL', {
+                    mainWindow.webContents.send(CHANNEL, {
                         hasSelfSignedCert: true
                     });
                     // setup server with those keys

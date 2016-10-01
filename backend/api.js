@@ -1,4 +1,4 @@
-import {TASKS} from './messageHandler';
+import {TASKS} from './tasks';
 import {has, map, merge, contains, split, trim} from 'ramda';
 import {
     APP_NOT_CONNECTED, QUERY_PARAM, DATABASE_PARAM, TABLES_PARAM, SESSION_PARAM
