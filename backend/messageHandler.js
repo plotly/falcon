@@ -136,6 +136,8 @@ function handleMessage(responseTools, responseSender, payload) {
 	} = payload;
 
 	log(`Sending task ${task} to sequelizeManager`, 1);
+	log(`Sending session ${sessionSelected} to sequelizeManager`, 1);
+	log(`Sending database ${database} to sequelizeManager`, 1);
     log(`Sending message ${message} to sequelizeManager`, 1);
 
 	/*
@@ -146,6 +148,16 @@ function handleMessage(responseTools, responseSender, payload) {
     sequelizeManager.setSessionSelected(sessionSelected);
     const currentSession = () => {
         return sequelizeManager.sessions[sequelizeManager.sessionSelected];
+    };
+
+    const raiseConnectionError = (error) => {
+        sequelizeManager.log('raising connection error', 1);
+        return sequelizeManager.raiseError(
+            merge(
+                {message: AUTHENTICATION(error)},
+                {name: 'ConnectionError'}),
+            responseSender
+        );
     };
 
     // check if there is a current database in use
@@ -163,6 +175,7 @@ function handleMessage(responseTools, responseSender, payload) {
 		 */
 
 		case TASKS.SETUP_HTTPS_SERVER: {
+            log('Setting up https server...', 1);
             setupHTTPS(serverMessageReceive, responseTools);
 			break;
 		}
@@ -184,23 +197,13 @@ function handleMessage(responseTools, responseSender, payload) {
 		case TASKS.CONNECT: {
 
 			sequelizeManager.connect(message)
-			.catch((error) => {
-				log(
-                    merge(
-                        {message: AUTHENTICATION({error})},
-                        {name: 'ConnectionError'}),
-                    responseSender
-                );
-			})
+            .catch((error) => raiseConnectionError(error))
 			.then(() => {log(
 				'NOTE: you are logged in as ' +
 				`[${currentSession().config.username}]`, 1
 			);})
 			.then(sequelizeManager.getConnection(responseSender))
-			.catch( error => {
-				raiseError(error, responseSender);
-			});
-
+			.catch((error) => raiseError(error, responseSender));
 			break;
 
 		}
@@ -223,9 +226,7 @@ function handleMessage(responseTools, responseSender, payload) {
 			.then(() => {log(
 				'NOTE: fetched the list of sessions', 1
 			);})
-			.catch((error) => {
-				raiseError(error, responseSender);
-			});
+            .catch((error) => raiseError(error, responseSender));
 			break;
 
 		}
@@ -234,12 +235,10 @@ function handleMessage(responseTools, responseSender, payload) {
 
             sequelizeManager.deleteSession(message)
             .then(() => {log(
-                `NOTE: delete session ${message}`, 1
+                `NOTE: deleted session ${message}`, 1
             );})
             .then(sequelizeManager.showSessions(responseSender))
-            .catch((error) => {
-				raiseError(error, responseSender);
-			});
+            .catch((error) => raiseError(error, responseSender));
             break;
 
         }
@@ -251,10 +250,8 @@ function handleMessage(responseTools, responseSender, payload) {
             .then(() => {log(
                 `NOTE: added session ${message}`, 1
             );})
-            .then(sequelizeManager.showSessions(responseSender))
-            .catch((error) => {
-				raiseError(error, responseSender);
-			});
+            .then(() => sequelizeManager.showSessions(responseSender))
+            .catch((error) => raiseError(error, responseSender));
             break;
 
         }
@@ -267,9 +264,7 @@ function handleMessage(responseTools, responseSender, payload) {
 				'NOTE: fetched the list of databases for user ' +
 				`[${currentSession().config.username}]`, 1
 			);})
-			.catch( error => {
-				raiseError(error, responseSender);
-			});
+            .catch((error) => raiseError(error, responseSender));
 			break;
 
 		}
@@ -287,12 +282,10 @@ function handleMessage(responseTools, responseSender, payload) {
 			})
 			.then(() => {log(
 				'NOTE: you are logged into database ' +
-				`[${currentSession().config.username}]`, 1
+				`[${currentSession().config.database}]`, 1
 			);})
 			.then(sequelizeManager.getConnection(responseSender))
-			.catch( error => {
-				raiseError(error, responseSender);
-			});
+            .catch((error) => raiseError(error, responseSender));
 			break;
 
 		}
@@ -306,9 +299,7 @@ function handleMessage(responseTools, responseSender, payload) {
 				'NOTE: fetched the list of tables for database' +
 				`[${currentSession().config.database}]`, 1
 			);})
-			.catch( error => {
-				raiseError(error, responseSender);
-			});
+            .catch((error) => raiseError(error, responseSender));
 			break;
 
 		}
@@ -321,9 +312,7 @@ function handleMessage(responseTools, responseSender, payload) {
 			.then(() => {log(
 				`NOTE: you are previewing table(s) [${message}]`, 1
 			);})
-			.catch( error => {
-				raiseError(error, responseSender);
-			});
+            .catch((error) => raiseError(error, responseSender));
 			break;
 
 		}
@@ -336,9 +325,7 @@ function handleMessage(responseTools, responseSender, payload) {
 			.then(() => {log(
 				`QUERY EXECUTED: ${message}`, 1
 			);})
-			.catch( error => {
-				raiseError(error, responseSender);
-			});
+            .catch((error) => raiseError(error, responseSender));
 			break;
 
 		}
@@ -367,20 +354,13 @@ function handleMessage(responseTools, responseSender, payload) {
 			 */
 
 			sequelizeManager.connect(message)
-			.catch((error) => {
-				raiseError(
-					merge(error, {name: 'ConnectionError'}),
-					responseSender
-				);
-			})
+            .catch((error) => raiseConnectionError(error))
 			.then(sequelizeManager.showDatabases(responseSender))
 			.then(() => {log(
 				'NOTE: you are logged in as ' +
 				`[${currentSession().config.username}]`, 1
 			);})
-			.catch( error => {
-				raiseError(error, responseSender);
-			});
+            .catch((error) => raiseError(error, responseSender));
 			break;
 
 		}
@@ -396,9 +376,7 @@ function handleMessage(responseTools, responseSender, payload) {
 				'NOTE: you are logged in as ' +
 				`[${currentSession().config.username}]`, 1
 			);})
-			.catch( error => {
-				raiseError(error, responseSender);
-			});
+            .catch((error) => raiseError(error, responseSender));
 			break;
 
 		}
@@ -421,9 +399,7 @@ function handleMessage(responseTools, responseSender, payload) {
 				'NOTE: you are previewing database ' +
 				`[${currentSession().config.database}]`, 1
 			);})
-			.catch( error => {
-				raiseError(error, responseSender);
-			});
+            .catch((error) => raiseError(error, responseSender));
 			break;
 
 		}

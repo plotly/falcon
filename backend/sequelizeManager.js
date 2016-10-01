@@ -248,8 +248,6 @@ export class SequelizeManager {
         const needToSwitchDatabases =
             databaseToUse !== this.sessions[this.sessionSelected].config.database;
 
-        console.log('needToSwitchDatabases');
-        console.log(needToSwitchDatabases);
         /*
          * if not, make a new one to the other database,
          * replacing the current one
@@ -315,11 +313,11 @@ export class SequelizeManager {
             return this.showTables(responseSender);
         }
 
-        this.log(`Querying: ${query}`, 1);
+        this.log(`Querying: ${query}`, 2);
 
         return () => this.sessions[this.sessionSelected].query(query, this.setQueryType('SELECT'))
         .then(results => {
-            this.log('Results recieved.', 1);
+            this.log('Results recieved.', 2);
             responseSender({
                 databases: intoArray(results),
                 error: null,
@@ -337,13 +335,13 @@ export class SequelizeManager {
     showTables(responseSender) {
 
         const showtables = this.getPresetQuery(PREBUILT_QUERY.SHOW_TABLES);
-        this.log(`Querying: ${showtables}`, 1);
+        this.log(`Querying: ${showtables}`, 2);
 
         return () => this.sessions[this.sessionSelected]
         .query(showtables, this.setQueryType('SELECT'))
         .then(results => {
 
-            this.log('Results received', 1);
+            this.log('Results received', 2);
             // TODO: when switching fornt end to v1, simply send back an array
             const tablesObject = this.intoTablesArray(results).map(table => {
                 return {[table]: {}};
@@ -364,7 +362,7 @@ export class SequelizeManager {
             const show5rows = this.getPresetQuery(
                 PREBUILT_QUERY.SHOW5ROWS, table
             );
-            this.log(`Querying: ${show5rows}`, 1);
+            this.log(`Querying: ${show5rows}`, 2);
 
             // sends the query for a single table
             return this.sessions[this.sessionSelected]
@@ -381,7 +379,7 @@ export class SequelizeManager {
 
         return Promise.all(promises)
         .then(tablePreviews => {
-            this.log('Sending tables\' previews.', 1);
+            this.log('Sending tables\' previews.', 2);
             responseSender({
                 error: null,
                 previews: assembleTablesPreviewMessage(tablePreviews)
@@ -392,14 +390,14 @@ export class SequelizeManager {
 
     sendRawQuery(query, responseSender) {
 
-        this.log(`Querying: ${query}`, 1);
+        this.log(`Querying: ${query}`, 2);
 
         return this.sessions[this.sessionSelected].query(query, this.setQueryType('SELECT'))
         .catch( error => {
             this.raiseError(error, responseSender);
         })
         .then((results) => {
-            this.log('Results received.', 1);
+            this.log('Results received.', 2);
             responseSender(merge(parse(results), {error: null}));
         });
 
@@ -413,7 +411,7 @@ export class SequelizeManager {
             https://github.com/sequelize/sequelize/pull/5776
         */
 
-        this.log('Disconnecting', 1);
+        this.log('Disconnecting', 2);
         this.sessions[this.sessionSelected].close();
         responseSender({
             databases: null, error: null, tables: null, previews: null
