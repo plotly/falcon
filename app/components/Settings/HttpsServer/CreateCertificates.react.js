@@ -1,16 +1,16 @@
-import React, {Component} from 'react';
-import Instructions from './Instructions.react';
-import {BACKEND} from '../../../constants/constants';
+import React, {Component, PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 
 const httpVideoLink = 'https://www.youtube.com/embed/S4TXMMn9mh0?rel=0&amp;showinfo=0';
 
-class Https extends Component {
+export default class CreateCertificates extends Component {
     constructor(props) {
         super(props);
         this.state = {httpVideoShow: false};
     }
 
     render() {
+        const {sessionsActions, ipc} = this.props;
 
         const hasSelfSignedCert = ipc.has('hasSelfSignedCert') &&
             ipc.get('hasSelfSignedCert');
@@ -32,20 +32,34 @@ class Https extends Component {
             httpVideoLinkWording = 'Click to see how.';
         }
 
-        let step3HTTPSServerStatus = null;
         let httpNote = null;
+        httpNote = (
+            <div style={{fontSize: '0.8em'}}>
+                Alternatively, you can run the connector without
+                HTTPS and allow your browser to make insecure
+                requests.&nbsp;
+                <a
+                    onClick={() => {this.setState(
+                        {httpVideoShow: !this.state.httpVideoShow}
+                    );}}
+                >
+                {httpVideoLinkWording}
+                </a>
+                <div>
+                {httpVideo}
+                </div>
+            </div>
+        );
 
+        let httpsServerStatus = null;
         if (hasSelfSignedCert) {
-
-            step3HTTPSServerStatus = (
+            httpsServerStatus = (
                 <div>✓ This app is successfully running on HTTPS.</div>
             );
-
             // reset to null if user creates https certs during runtime
             httpNote = null;
-
         } else {
-            step3HTTPSServerStatus = (
+            httpsServerStatus = (
                 <div>
                     This app is not running on HTTPS.&nbsp;
                     <a
@@ -59,9 +73,16 @@ class Https extends Component {
 
         return (
             <div>
-            {step3HTTPSServerStatus}
+                {httpsServerStatus}
+                {httpNote}
             </div>
         );
 
     }
 }
+
+
+CreateCertificates.propTypes = {
+    sessionsActions: PropTypes.object,
+    ipc: ImmutablePropTypes.map.isRequired
+};

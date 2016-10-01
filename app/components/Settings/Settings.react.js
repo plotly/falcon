@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import {shell} from 'electron';
 import * as styles from './Settings.css';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import UserCredentials from './UserCredentials/UserCredentials.react';
@@ -8,8 +7,8 @@ import ConnectButton from './ConnectButton/ConnectButton.react';
 import DatabaseDropdown from './DatabaseDropdown/DatabaseDropdown.react';
 import TableDropdown from './TableDropdown/TableDropdown.react';
 import Preview from './Preview/Preview.react';
-import DetectHttpsServer from './HttpsServer/DetectHttpsServer.react';
-// import Https from './HttpsServer/Https.reac';
+import CreateCertificates from './HttpsServer/CreateCertificates.react';
+import DetectCertificates from './HttpsServer/DetectCertificates.react';
 import ImportModal from './ImportModal/ImportModal.react';
 import LoggerController from './Logger/LoggerController.react';
 
@@ -23,7 +22,7 @@ export default class Settings extends Component {
         super(props);
         this.state = {
             showStep1: true,
-            showStep2: false,
+            showStep2: true,
             showStep3: false,
             showStep4: false
         };
@@ -165,11 +164,17 @@ export default class Settings extends Component {
                 </h5>
             );
             if (this.state.showStep3) {
-                step3InstallCerts = (
-                    <a>DetectHttpsServer</a>
-                );
                 step3HTTPSServerStatus = (
-                    <a>step3InstallCerts</a>
+                    <CreateCertificates
+                        ipc={ipc}
+                        sessionsActions={sessionsActions}
+                    />
+                );
+                step3InstallCerts = (
+                    <DetectCertificates
+                        ipc={ipc}
+                        sessionsActions={sessionsActions}
+                    />
                 );
             }
         }
@@ -208,6 +213,8 @@ export default class Settings extends Component {
             </div>
         );
 
+
+        // #ASSEMBLE
         let settings = (
             <div>
                 {step1}
@@ -218,11 +225,11 @@ export default class Settings extends Component {
             connection.get('status') === APP_STATUS.ERROR) {
             settings = (
                 <div>
-                {step1}
-                {step2}
-                {step3}
-                {step4}
-                {logger}
+                    {step1}
+                    {step2}
+                    {step3}
+                    {step4}
+                    {logger}
                 </div>
             );
         }
