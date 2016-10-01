@@ -37,16 +37,6 @@ export default class Settings extends Component {
             sessionsActions
         } = this.props;
 
-        // if (connection.get('status') === APP_STATUS.CONNECTED ||
-        //     connection.get('status') === APP_STATUS.ERROR) {
-        //     this.setState({
-        //         showStep1: false,
-        //         showStep2: true,
-        //         showStep3: false,
-        //         showStep4: false
-        //     });
-        // }
-
         const dialectSelector = (
             <div>
                 <DialectSelector
@@ -200,8 +190,9 @@ export default class Settings extends Component {
         let importModal = null;
         if (this.state.showStep4 && canConfigureHTTPS) {
             importModal = (
-                ImportModal(ipc.has('hasSelfSignedCert') &&
-                    ipc.get('hasSelfSignedCert'))
+                <ImportModal
+                    ipc={ipc}
+                />
             );
         }
         const step4 = (
@@ -217,14 +208,29 @@ export default class Settings extends Component {
             </div>
         );
 
+        let settings = (
+            <div>
+                {step1}
+                {logger}
+            </div>
+        );
+        if (connection.get('status') === APP_STATUS.CONNECTED ||
+            connection.get('status') === APP_STATUS.ERROR) {
+            settings = (
+                <div>
+                {step1}
+                {step2}
+                {step3}
+                {step4}
+                {logger}
+                </div>
+            );
+        }
+
         return (
             <div className={styles.containerWrapper}>
                 <div className={styles.container}>
-                    {step1}
-                    {step2}
-                    {step3}
-                    {step4}
-                    {logger}
+                    {settings}
                 </div>
             </div>
         );

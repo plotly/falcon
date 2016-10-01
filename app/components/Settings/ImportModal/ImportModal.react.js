@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {Component} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import {shell} from 'electron';
 import * as styles from './ImportModal.css';
 
@@ -7,8 +8,8 @@ const httpsGithubIssueLink = 'https://github.com/plotly/' +
 
 const plotlyWorkspaceLink = 'https://plot.ly/alpha/workspace';
 
-const importDataScreenShot = (secure) => {
-    if (secure) {
+const importDataScreenShot = (secured) => {
+    if (secured) {
         return (
             <img
                  src="./images/import-modal-https.png"
@@ -27,21 +28,35 @@ const importDataScreenShot = (secure) => {
     }
 };
 
-const ImportModal = (secure) => (
+export default class ImportModal extends Component {
+    constructor(props) {
+        super(props);
+    }
 
-    <div className={styles.futureDirections}>
-        Query data by clicking on 'import data' from
-        <a onClick={() => {
-            shell.openExternal(plotlyWorkspaceLink);
-        }}
-        >
-        &nbsp;<u>plotly workspace</u>&nbsp;
-        </a>
-        and choose the SQL option.<br/>
-        Remember to keep this app running
-        while you are making queries!
-        {importDataScreenShot(secure)}
-    </div>
-);
+    render() {
+        const {ipc} = this.props;
 
-export default ImportModal;
+        const secured = ipc.has('hasSelfSignedCert') &&
+            ipc.get('hasSelfSignedCert');
+
+        return (
+            <div className={styles.futureDirections}>
+                Query data by clicking on 'import data' from
+                <a onClick={() => {
+                    shell.openExternal(plotlyWorkspaceLink);
+                }}
+                >
+                &nbsp;<u>plotly workspace</u>&nbsp;
+                </a>
+                and choose the SQL option.<br/>
+                Remember to keep this app running
+                while you are making queries!
+                {importDataScreenShot(secured)}
+            </div>
+        );
+    }
+}
+
+ImportModal.propTypes = {
+    ipc: ImmutablePropTypes.map.isRequired
+};

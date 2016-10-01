@@ -61,6 +61,7 @@ class Https extends Component {
             <div>
             {step3HTTPSServerStatus}
             </div>
-        )
+        );
 
     }
+}
