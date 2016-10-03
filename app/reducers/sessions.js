@@ -95,7 +95,7 @@ where the 'list' will hold several sessions such as
 ipc is a generic key-value store that stores state from
 back-end messages.
 
-the backend (messageHandler.js) sends objects over the ipc channel and these
+the backend (messageHandler.js) sends objects over the ipc CHANNEL and these
 objects get merged into this IPC state. fully populated,
 this state looks like:
 

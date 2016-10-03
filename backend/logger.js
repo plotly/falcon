@@ -4,11 +4,11 @@ import * as fs from 'fs';
 const timestamp = () => (new Date()).toTimeString();
 
 export class Logger {
-    constructor(OPTIONS, mainWindow, channel) {
+    constructor(OPTIONS, mainWindow, CHANNEL) {
 
         this.logdetail = OPTIONS.logdetail;
         this.headless = OPTIONS.headless;
-        this.channel = channel;
+        this.CHANNEL = CHANNEL;
         this.mainWindow = mainWindow;
         this.logToFile = bunyan.createLogger({
             name: 'plotly-database-connector-logger',
@@ -43,7 +43,7 @@ export class Logger {
 
                 if (!this.headless) {
 
-                    this.mainWindow.webContents.send(this.channel, {
+                    this.mainWindow.webContents.send(this.CHANNEL, {
                         log: {
                             logEntry,
                             timestamp: timestamp()

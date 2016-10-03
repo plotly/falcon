@@ -36,7 +36,7 @@ function serveHttpsStatus(req, res) {
 
 }
 
-export function setupRoutes(server, processMessageFunction) {
+export function setupRoutes(server, serverRespondMethod) {
     // serve plain html for steps to accept self-signed certificate
     server.get(/\/ssl\/?.*/, restify.serveStatic({
         directory: `${__dirname}/../`
@@ -46,8 +46,8 @@ export function setupRoutes(server, processMessageFunction) {
 
     // setup v1 endpoints
     ENDPOINTS.v1.forEach (endpoint => {
-        server.get(`/v1/${endpoint}`, processMessageFunction);
-        server.post(`/v1/${endpoint}`, processMessageFunction);
+        server.get(`/v1/${endpoint}`, serverRespondMethod);
+        server.post(`/v1/${endpoint}`, serverRespondMethod);
     });
 
 }

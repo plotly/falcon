@@ -1,10 +1,11 @@
-import React, {Component} from 'react';
-import HttpsInstructions from './HttpsInstructions.react';
+import React, {Component, PropTypes} from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import Instructions from './Instructions.react';
 import {BACKEND} from '../../../constants/constants';
 
 let INTERVAL_ID;
 
-class DetectHttpsServer extends Component {
+export default class DetectCertificates extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -12,7 +13,6 @@ class DetectHttpsServer extends Component {
             expandInstructions: false
         };
     }
-
     componentWillMount() {
 
         INTERVAL_ID = setInterval(() => {
@@ -37,18 +37,14 @@ class DetectHttpsServer extends Component {
 
     render() {
 
-        let httpsServerState;
+        let httpsServerStatus;
         if (this.state.successfulFetch) {
-
-            httpsServerState = (
+            httpsServerStatus = (
                 <div>✓ Your certificates are installed on this computer.</div>
             );
-
         } else {
-
-            httpsServerState = (
+            httpsServerStatus = (
                 <div>
-
                     <div>
                         Install your self-signed certificates.&nbsp;
                         <a onClick={() => {
@@ -66,25 +62,26 @@ class DetectHttpsServer extends Component {
                             instructions.
                         </a>
                     </div>
-
                     {
                         this.state.expandInstructions
-                        ? HttpsInstructions()
+                        ? Instructions()
                         : null
                     }
-
                 </div>
             );
-
         }
 
         return (
             <div>
-                {httpsServerState}
+                {httpsServerStatus}
             </div>
         );
     }
 
 }
 
-export default DetectHttpsServer;
+
+DetectCertificates.propTypes = {
+    sessionsActions: PropTypes.object,
+    ipc: ImmutablePropTypes.map.isRequired
+};

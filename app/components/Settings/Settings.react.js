@@ -1,26 +1,31 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import {shell} from 'electron';
 import * as styles from './Settings.css';
+import DialectSelector from './DialectSelector/DialectSelector.react';
+import UserCredentials from './UserCredentials/UserCredentials.react';
+import ConnectButton from './ConnectButton/ConnectButton.react';
 import DatabaseDropdown from './DatabaseDropdown/DatabaseDropdown.react';
 import TableDropdown from './TableDropdown/TableDropdown.react';
-import ConnectButton from './ConnectButton/ConnectButton.react';
-import UserCredentials from './UserCredentials/UserCredentials.react';
-import LoggerController from './Logger/LoggerController.react';
 import Preview from './Preview/Preview.react';
-import DetectHttpsServer from './HttpsServer/DetectHttpsServer.react';
-import DialectSelector from './DialectSelector/DialectSelector.react';
+import CreateCertificates from './HttpsServer/CreateCertificates.react';
+import DetectCertificates from './HttpsServer/DetectCertificates.react';
+import ImportModal from './ImportModal/ImportModal.react';
+import LoggerController from './Logger/LoggerController.react';
+
 import {APP_STATUS} from '../../constants/constants';
 
-const httpsGithubIssueLink = 'https://github.com/plotly/' +
-                         'plotly-database-connector/issues/51';
-
-const plotlyWorkspaceLink = 'https://plot.ly/alpha/workspace';
+const canConfigureHTTPS = process.platform === 'darwin' ||
+    process.platform === 'linux';
 
 export default class Settings extends Component {
     constructor(props) {
         super(props);
-        this.state = {httpVideoShow: false};
+        this.state = {
+            showStep1: true,
+            showStep2: true,
+            showStep3: false,
+            showStep4: false
+        };
     }
 
     render() {
@@ -30,24 +35,6 @@ export default class Settings extends Component {
             connection,
             sessionsActions
         } = this.props;
-
-        let httpVideo;
-        let httpVideoLinkWording;
-        if (this.state.httpVideoShow) {
-            httpVideo =
-                <iframe
-                    width="560"
-                    height="315"
-                    src="https://www.youtube.com/embed/S4TXMMn9mh0?rel=0&amp;showinfo=0"
-                    frameBorder="0"
-                    allowFullScreen
-                ></iframe>;
-            httpVideoLinkWording = 'Hide Video.';
-        } else {
-            httpVideo = null;
-            httpVideoLinkWording = 'Click to see how.';
-
-        }
 
         const dialectSelector = (
             <div>
@@ -86,30 +73,33 @@ export default class Settings extends Component {
             );
         }
 
-        const selectDatabaseTable = (
+        const selectDatabaseAndTable = (
             <div>
-
                 <DatabaseDropdown
                     configuration={configuration}
                     ipc={ipc}
                     sessionsActions={sessionsActions}
                 />
-
                 <TableDropdown
                     ipc={ipc}
                     sessionsActions={sessionsActions}
                 />
-
             </div>
         );
 
         const logger = (
-            <LoggerController ipc={ipc}/>
+            <div className={styles.logContainer}>
+                <hr/>
+                <div className={styles.log}>
+                    <LoggerController ipc={ipc}/>
+                </div>
+            </div>
         );
 
-        const step1 = (
-            <div>
-                <h5>1. Connect to Database</h5>
+        // #STEP1
+        let userConfiguration = null;
+        if (this.state.showStep1) {
+            userConfiguration = (
                 <div className={styles.configurationOptions}>
                     <div className={styles.dialectSelector}>
                         {dialectSelector}
@@ -118,165 +108,137 @@ export default class Settings extends Component {
                         {userCredentials}
                     </div>
                 </div>
+            );
+        }
+        const step1 = (
+            <div>
+                <h5>
+                    <a
+                        onClick={() => this.setState({showStep1: !this.state.showStep1})}
+                    >
+                        1. Connect to Database
+                    </a>
+                </h5>
+                {userConfiguration}
                 <div className={styles.connectButton}>
                     {connectButton}
                 </div>
             </div>
         );
 
-        let step2 = null;
-        let step3 = null;
-        let step4 = null;
-
-        if (connection.get('status') === APP_STATUS.CONNECTED ||
-            connection.get('status') === APP_STATUS.ERROR) {
-
-            step2 = (
-                <div className={styles.step2Container}>
-                    <h5>2. Preview Database and Tables</h5>
-                    {selectDatabaseTable}
+        // #STEP2
+        let dropDowns = null;
+        if (this.state.showStep2) {
+            dropDowns = (
+                <div>
+                    {selectDatabaseAndTable}
                     {tablePreview}
                 </div>
             );
-
-
-            let step3Header = null;
-            let step3HTTPSServerStatus = null;
-            let step3InstallCerts = null;
-            let httpNote = null;
-            let importDataScreenShot = null;
-
-            const canConfigureHTTPS = process.platform === 'darwin' ||
-                process.platform === 'linux';
-
-            const hasSelfSignedCert = ipc.has('hasSelfSignedCert') &&
-                ipc.get('hasSelfSignedCert');
-
-            if (canConfigureHTTPS) {
-
-                step3Header = (
-                    <h5>3. Secure your connection with HTTPS</h5>
-                );
-
-                if (hasSelfSignedCert) {
-
-                    step3HTTPSServerStatus = (
-                        <div>✓ This app is successfully running on HTTPS.</div>
-                    );
-
-                    importDataScreenShot = (
-                        <img
-                             src="./images/import-modal-https.png"
-                             className={styles.workspace}
-                        >
-                        </img>
-                    );
-
-                    // reset to null if user creates https certs during runtime
-                    httpNote = null;
-
-                } else {
-                    step3HTTPSServerStatus = (
-                        <div>
-                            This app is not running on HTTPS.&nbsp;
-                            <a
-                               onClick={sessionsActions.setupHttpsServer}
-                            >
-                                Click to generate HTTPS certificates.
-                            </a>
-                        </div>
-                    );
-
-                    importDataScreenShot = (
-                        <img
-                             src="./images/import-modal-http.png"
-                             className={styles.workspace}
-                        >
-                        </img>
-                    );
-
-                    httpNote = (
-                        <div style={{fontSize: '0.8em'}}>
-                            Alternatively, you can run the connector without
-                            HTTPS and allow your browser to make insecure
-                            requests.&nbsp;
-                            <a
-                                onClick={() => {this.setState(
-                                    {httpVideoShow: !this.state.httpVideoShow}
-                                );}}
-                            >
-                            {httpVideoLinkWording}
-                            </a>
-                            <div>
-                            {httpVideo}
-                            </div>
-                        </div>
-                    );
-                }
-
-                step3InstallCerts = (
-                    <DetectHttpsServer/>
-                );
-
-            }
-
-            step3 = (
-                <div className={styles.step3Container}>
-                    {step3Header}
-                    <ul>
-                        {
-                            [step3HTTPSServerStatus, step3InstallCerts].map(
-                                step => step ? <li>{step}</li> : null
-                            )
-                        }
-                    </ul>
-                    {httpNote}
-                </div>
-            );
-
-            step4 = (
-                <div className={styles.step4Container}>
-                    <h5>{canConfigureHTTPS ? 4 : 3}. Query from Plotly 2.0</h5>
-                    <div className={styles.futureDirections}>
-                        Query data by clicking on 'import data' from
-                        <a onClick={() => {
-                            shell.openExternal(plotlyWorkspaceLink);
-                        }}
-                        >
-                        &nbsp;<u>plotly workspace</u>&nbsp;
-                        </a>
-                        and choose the SQL option.<br/>
-                        Remember to keep this app running
-                        while you are making queries!
-                    </div>
-                    {importDataScreenShot}
-                </div>
-            );
-
         }
-
-        const logContainer = (
-            <div className={styles.logContainer}>
-                <hr/>
-                <div className={styles.log}>
-                    {logger}
-                </div>
+        const step2 = (
+            <div className={styles.step2Container}>
+                <h5>
+                    <a
+                        onClick={() => this.setState({showStep2: !this.state.showStep2})}
+                    >
+                        2. Preview Database and Tables
+                    </a>
+                </h5>
+                {dropDowns}
             </div>
         );
 
-        return (
-            <div className={styles.containerWrapper}>
+        // #STEP3
+        let step3Header = null;
+        let step3InstallCerts = null;
+        let step3HTTPSServerStatus = null;
+        if (canConfigureHTTPS) {
+            step3Header = (
+                <h5>
+                    <a
+                        onClick={() => this.setState({showStep3: !this.state.showStep3})}
+                    >
+                        3. Secure your connection with HTTPS
+                    </a>
+                </h5>
+            );
+            if (this.state.showStep3) {
+                step3HTTPSServerStatus = (
+                    <CreateCertificates
+                        ipc={ipc}
+                        sessionsActions={sessionsActions}
+                    />
+                );
+                step3InstallCerts = (
+                    <DetectCertificates
+                        ipc={ipc}
+                        sessionsActions={sessionsActions}
+                    />
+                );
+            }
+        }
+        const step3 = (
+            <div className={styles.step3Container}>
+                {step3Header}
+                <ul>
+                    {
+                        [step3HTTPSServerStatus, step3InstallCerts].map(
+                            step => step ? <li>{step}</li> : null
+                        )
+                    }
+                </ul>
+            </div>
+        );
 
-                <div className={styles.container}>
+        // #STEP4
+        let importModal = null;
+        if (this.state.showStep4 && canConfigureHTTPS) {
+            importModal = (
+                <ImportModal
+                    ipc={ipc}
+                />
+            );
+        }
+        const step4 = (
+            <div className={styles.step4Container}>
+                <h5>
+                    <a
+                        onClick={() => this.setState({showStep4: !this.state.showStep4})}
+                    >
+                        {canConfigureHTTPS ? 4 : 3}. Query from Plotly 2.0
+                    </a>
+                </h5>
+                {importModal}
+            </div>
+        );
 
+
+        // #ASSEMBLE
+        let settings = (
+            <div>
+                {step1}
+                {logger}
+            </div>
+        );
+        if (connection.get('status') === APP_STATUS.CONNECTED ||
+            connection.get('status') === APP_STATUS.ERROR) {
+            settings = (
+                <div>
                     {step1}
                     {step2}
                     {step3}
                     {step4}
-                    {logContainer}
-
+                    {logger}
                 </div>
+            );
+        }
 
+        return (
+            <div className={styles.containerWrapper}>
+                <div className={styles.container}>
+                    {settings}
+                </div>
             </div>
         );
     }

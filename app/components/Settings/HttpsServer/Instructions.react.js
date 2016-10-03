@@ -4,7 +4,7 @@ import {BACKEND} from '../../../constants/constants';
 
 const HTML_STATUS_PAGE = `https://${BACKEND.CONNECTOR_URL}:${BACKEND.OPTIONS.port}/status`;
 
-const HttpsInstructions = () => (
+const Instructions = () => (
     <div>
 
         <hr/>
@@ -50,4 +50,4 @@ const HttpsInstructions = () => (
     </div>
 );
 
-export default HttpsInstructions;
+export default Instructions;
