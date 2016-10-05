@@ -115,7 +115,7 @@ const setupSecureRestifyServer = (responseTools) => {
         certificate: fs.readFileSync(csrFile)
     };
 
-    sequelizeManager.log('Closing http server.', 1);
+    sequelizeManager.log('Closing HTTP server.', 1);
     if (httpServer) {
         httpServer.close();
     }
@@ -224,7 +224,6 @@ export function setupHTTPS(responseTools) {
                     log(error, 0);
                 } else {
                     log('New key and certificate generated', 1);
-                    log('Closing HTTP Server', 1);
                     mainWindow.webContents.send(CHANNEL, {
                         hasSelfSignedCert: true
                     });
