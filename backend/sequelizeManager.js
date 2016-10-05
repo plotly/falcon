@@ -130,7 +130,7 @@ export class SequelizeManager {
             dialectOptions: {ssl}
         };
 
-        this.log(`Creating a connection for user ${username}`, 1);
+        this.log(`Creating a connection for user ${username}`, 2);
 
         const subDialect = dialect;
 
@@ -226,7 +226,7 @@ export class SequelizeManager {
         if (Object.keys(this.sessions).length > 0) {
             setSessionTo = Object.keys(this.sessions)[0];
         }
-        this.log(`${setSessionTo}`, 1);
+        this.log(`Selecting session ${setSessionTo}`, 2);
         return new Promise(
             (resolve, reject) => {
                 this.setSessionSelected(Object.keys(this.sessions)[0]);
@@ -269,7 +269,7 @@ export class SequelizeManager {
 
             let options = {dialect, host, port, storage};
 
-            this.log(`Switchin to a new database ${databaseToUse}`, 1);
+            this.log(`Switching to a new database ${databaseToUse}`, 2);
 
             if (subDialect === 'redshift') {
                 // avoid auto-dection

@@ -89,7 +89,7 @@ export function executeTask(responseTools, responseSender, payload) {
 
 		case TASKS.SETUP_HTTPS_SERVER: {
             log('Setting up https server...', 1);
-            setupHTTPS(serverMessageReceive, responseTools);
+            setupHTTPS(responseTools);
 			break;
 		}
 
@@ -99,7 +99,7 @@ export function executeTask(responseTools, responseSender, payload) {
 
 		case TASKS.NEW_ON_PREM_SESSION: {
             log(`Adding domain ${message} to CORS`, 1);
-			newOnPremSession(message, serverMessageReceive, responseTools);
+			newOnPremSession(message, responseTools);
 			break;
 		}
 
