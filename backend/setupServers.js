@@ -6,7 +6,7 @@ import {replace, splitAt} from 'ramda';
 import YAML from 'yamljs';
 
 import {setupRoutes} from './routes';
-import {CHANNEL} from './messageHandler';
+import {serverMessageReceive, CHANNEL} from './messageHandler';
 
 // generic directories
 const HOSTS = '/etc/hosts';
@@ -93,20 +93,20 @@ let httpServer;
 let httpsServer;
 
 export const newOnPremSession = (
-    domain, serverMessageReceive, responseTools
+    domain, responseTools
 ) => {
     addAcceptedDomain(domain);
     if (httpServer) {
         httpServer.close();
-        setupHTTP(serverMessageReceive, responseTools);
+        setupHTTP(responseTools);
     } else {
         httpsServer.close();
-        setupHTTPS(serverMessageReceive, responseTools);
+        setupHTTPS(responseTools);
     }
 };
 
 // sets up the server itself, called by setupHTTPS() function
-const setupSecureRestifyServer = ({serverMessageReceive, responseTools}) => {
+const setupSecureRestifyServer = (responseTools) => {
 
     const {sequelizeManager, OPTIONS} = responseTools;
 
@@ -147,7 +147,7 @@ const setupSecureRestifyServer = ({serverMessageReceive, responseTools}) => {
 
 // http
 
-export function setupHTTP(serverMessageReceive, responseTools) {
+export function setupHTTP(responseTools) {
 
     httpServer = restify.createServer();
     httpServer.use(restify.queryParser());
@@ -171,7 +171,7 @@ export function setupHTTP(serverMessageReceive, responseTools) {
  * These scripts require sudo and prompt for an admin password
  */
 
-export function setupHTTPS(serverMessageReceive, responseTools) {
+export function setupHTTPS(responseTools) {
 
     const {sequelizeManager, mainWindow, OPTIONS} = responseTools;
     const log = (args) => sequelizeManager.log(args);
@@ -209,9 +209,7 @@ export function setupHTTPS(serverMessageReceive, responseTools) {
         fs.accessSync(keyFile, fs.F_OK);
         fs.accessSync(csrFile, fs.F_OK);
         log('Certificate and key files already exist.', 1);
-        setupSecureRestifyServer(
-            {keyFile, csrFile, serverMessageReceive, responseTools}
-        );
+        setupSecureRestifyServer(responseTools);
         mainWindow.webContents.send(CHANNEL, {hasSelfSignedCert: true});
 
     } catch (e) {
@@ -231,9 +229,7 @@ export function setupHTTPS(serverMessageReceive, responseTools) {
                         hasSelfSignedCert: true
                     });
                     // setup server with those keys
-                    setupSecureRestifyServer(
-                        {keyFile, csrFile, serverMessageReceive, responseTools}
-                    );
+                    setupSecureRestifyServer(responseTools);
                 }
         });
 

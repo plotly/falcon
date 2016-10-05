@@ -4,7 +4,6 @@ import {contains} from 'ramda';
 import {Logger} from './logger';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import {ipcMessageReceive,
-        serverMessageReceive,
         CHANNEL} from './messageHandler';
 import {setupHTTP, setupHTTPS, findSelfSignedCert} from './setupServers';
 import {setupMenus} from './menus';
@@ -60,7 +59,7 @@ app.on('ready', () => {
         // what to do when a message through IPC is received
         ipcMain.on(CHANNEL, ipcMessageReceive(responseTools));
         // what to do when a message through API is received
-        setupHTTP(serverMessageReceive, responseTools);
+        setupHTTP(responseTools);
 
         mainWindow.webContents.send(CHANNEL, {canSetupHTTPS});
 
@@ -69,7 +68,7 @@ app.on('ready', () => {
             mainWindow.webContents.send(CHANNEL, {hasSelfSignedCert});
             // if user has certificates, setup the HTTPS server right away
             if (hasSelfSignedCert) {
-                setupHTTPS(serverMessageReceive, responseTools);
+                setupHTTPS(responseTools);
             }
         }
 
