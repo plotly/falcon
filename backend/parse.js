@@ -65,8 +65,7 @@ function parseGeoJSON(rows) {
 
 }
 
-export default function (data) {
-    console.log(data);
+export function parseSQL(data) {
     /*
         data received from database format ...
 
@@ -101,7 +100,7 @@ export default function (data) {
 
     // get column names of the first object (repeated for all objects)
     const columnnames = Object.keys(data[0]);
-    const ncols = Object.keys(data[0]).length;
+    const ncols = columnnames.length;
     const nrows = data.length;
 
     // iterate over eaech object (each object becomes a row)
@@ -120,5 +119,57 @@ export default function (data) {
     // plotly workspace requires keys (columnnames, ncols, nrows, rows)
     // and they should be in this format
     // TODO: keys geojson and raw are currently optional
+    return {columnnames, ncols, nrows, rows, geojson, raw: data};
+}
+
+
+export function parseES(data) {
+
+    /*
+    recieves data as
+    [
+        {
+            _index: 'indexName',
+            _type: 'documentName',
+            _id: '1234',
+            _score: 1,
+            _source:
+                {
+                    columnName1: 'blah',
+                    columnName2: 'fiz',
+                    columnName3: 'baz'
+                }
+        },
+        {
+            _index: 'indexName',
+            _type: 'documentName',
+            _id: '1235',
+            _score: 1,
+            _source:
+                {
+                    columnName1: 'beep',
+                    columnName2: 'foo',
+                    columnName3: 'bar'
+                }
+        }
+    ]
+
+    */
+
+    const columnnames = Object.keys(data[0]._source);
+    const ncols = columnnames.length;
+    const nrows = data.length;
+
+    const table = data.map((obj) => {
+        // get the value for each column => put them into an array
+        // returns: a row
+        return Object.keys(obj._source).map((columnname) => {
+            // returns: a column's values
+            return obj._source[columnname];
+        });
+    });
+
+    const {rows, geojson} = parseGeoJSON(table);
+
     return {columnnames, ncols, nrows, rows, geojson, raw: data};
 }

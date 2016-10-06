@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import {DIALECTS} from '../app/constants/constants';
-import parse from './parse';
+import {parseSQL} from './parse';
 import {merge} from 'ramda';
 import {ARGS} from './args';
 import {APP_NOT_CONNECTED, AUTHENTICATION} from './errors';
@@ -58,7 +58,7 @@ const assembleTablesPreviewMessage = (tablePreviews) => {
     return tablePreviews.map( (tablePreview) => {
         const tableName = Object.keys(tablePreview);
         const rawData = tablePreview[tableName];
-        parsedRows = (isEmpty(rawData)) ? EMPTY_TABLE : parse(rawData);
+        parsedRows = (isEmpty(rawData)) ? EMPTY_TABLE : parseSQL(rawData);
         return {[tableName]: parsedRows};
     });
 
@@ -391,7 +391,7 @@ export class SequelizeManager {
         })
         .then((results) => {
             this.log('Results received.', 2);
-            responseSender(merge(parse(results), {error: null}));
+            responseSender(merge(parseSQL(results), {error: null}));
         });
 
     }
