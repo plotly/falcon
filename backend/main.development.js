@@ -3,6 +3,7 @@ import {contains} from 'ramda';
 
 import {Logger} from './logger';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
+import {ElasticManager} from './elasticManager';
 import {ipcMessageReceive,
         CHANNEL} from './messageHandler';
 import {setupHTTP, setupHTTPS, findSelfSignedCert} from './setupServers';
@@ -34,12 +35,15 @@ app.on('ready', () => {
 
     const logger = new Logger(OPTIONS, mainWindow, CHANNEL);
     const sequelizeManager = new SequelizeManager(logger);
+    const elasticManager = new ElasticManager(logger);
     /*
         'responseTools' is generic for the things required to handle
         responses from either the app through IPC CHANNEL or from a API
         request
     */
-    const responseTools = {sequelizeManager, mainWindow, OPTIONS};
+    const responseTools = {
+        sequelizeManager, elasticManager, mainWindow, OPTIONS
+    };
 
     sequelizeManager.log('Starting Application...', 0);
 
