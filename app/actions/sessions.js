@@ -26,7 +26,8 @@ export function query (statement) {
     return (_, getState) => {
         const state = getState();
         const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.QUERY, sessionSelected, statement);
+        const database = state.sessions[sessionSelected].configuration.database;
+        ipcSend(TASKS.QUERY, sessionSelected, database, statement);
     };
 }
 
@@ -36,20 +37,19 @@ export function connect () {
         const sessionSelected = state.sessions.get('sessionSelected');
         const configuration = state.sessions.getIn(
             ['list', sessionSelected, 'configuration']
-        );
+        ).toJS();
         ipcSend(
             TASKS.CONNECT_AND_SHOW_DATABASES,
             sessionSelected,
-            configuration.toJS()
+            configuration.database,
+            configuration
         );
     };
 }
 
 export function deleteSession (sessionId) {
     return (_, getState) => {
-        const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.DELETE_SESSION, sessionSelected, sessionId);
+        ipcSend(TASKS.DELETE_SESSION, sessionId, null, sessionId);
     };
 }
 
@@ -59,11 +59,12 @@ export function selectDatabase () {
         const sessionSelected = state.sessions.get('sessionSelected');
         const configuration = state.sessions.getIn(
             ['list', sessionSelected, 'configuration']
-        );
+        ).toJS();
         ipcSend(
             TASKS.SELECT_DATABASE_AND_SHOW_TABLES,
             sessionSelected,
-            configuration.toJS().database
+            configuration.database,
+            configuration.database
         );
     };
 }
@@ -72,7 +73,10 @@ export function previewTables (tableNames) {
     return (_, getState) => {
         const state = getState();
         const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.PREVIEW, sessionSelected, tableNames);
+        const database = state.sessions.getIn(
+            ['list', sessionSelected, 'configuration']
+        ).toJS().database;
+        ipcSend(TASKS.PREVIEW, sessionSelected, database, tableNames);
     };
 }
 
@@ -80,7 +84,10 @@ export function disconnect () {
     return (_, getState) => {
         const state = getState();
         const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.DISCONNECT, sessionSelected);
+        const database = state.sessions.getIn(
+            ['list', sessionSelected, 'configuration']
+        ).toJS().database;
+        ipcSend(TASKS.DISCONNECT, sessionSelected, database);
     };
 }
 
@@ -94,15 +101,14 @@ export function setupHttpsServer () {
 
 export function newOnPremSession (domain) {
     return (__, getState) => {
-        console.warn(`new on prem session ${domain}`);
         const state = getState();
         const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.NEW_ON_PREM_SESSION, sessionSelected, domain);
+        ipcSend(TASKS.NEW_ON_PREM_SESSION, sessionSelected, null, domain);
     };
 }
 
-function ipcSend(task, sessionSelected, message = {}) {
-    ipcRenderer.send(CHANNEL, {task, sessionSelected, message});
+function ipcSend(task, sessionSelected, database, message = {}) {
+    ipcRenderer.send(CHANNEL, {task, sessionSelected, database, message});
 }
 
 // <- ipc specific
