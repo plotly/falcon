@@ -17,6 +17,7 @@
 
 .logo:hover, .logoSelected {
     border-color: #8BB5FE;
+    cursor: -webkit-grab;
 }
 
 .dialectInput {

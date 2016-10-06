@@ -13,12 +13,13 @@ import {dissoc} from 'ramda';
 let LOGOS = {
     REDSHIFT: './images/redshift-logo.png',
     POSTGRES: './images/postgres-logo.png',
+    ELASTICSEARCH: './images/elastic-logo.png',
     MYSQL: './images/mysql-logo.png',
     MARIADB: './images/mariadb-logo.png',
     MSSQL: './images/mssql-logo.png',
     SQLITE: './images/sqlite-logo.png'
 };
-// TODO: remove when #$40 is resolved
+// TODO: remove when #40 is resolved
 if (process.platform !== 'darwin') {
     LOGOS = dissoc('SQLITE', LOGOS);
 }

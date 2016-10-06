@@ -25,6 +25,7 @@ const LOGOS = {
     mariadb: './images/mariadb-logo.png',
     mssql: './images/mssql-logo.png',
     sqlite: './images/sqlite-logo.png',
+    elasticsearch: './images/elastic-logo.png',
     redshift: './images/redshift-logo.png'
 };
 
