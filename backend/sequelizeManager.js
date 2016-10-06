@@ -12,8 +12,6 @@ const PREBUILT_QUERY = {
     SHOW5ROWS: 'SHOW5ROWS'
 };
 
-const timestamp = () => (new Date()).toTimeString();
-
 // http://stackoverflow.com/questions/32037385/using-sequelize-with-redshift
 const REDSHIFT_OPTIONS = {
     dialect: 'postgres',
@@ -70,6 +68,7 @@ export class SequelizeManager {
 
     constructor(Logger) {
         this.log = Logger.log;
+        this.raiseError = Logger.raiseError;
         this.sessionSelected = 0;
         this.sessions = {};
     }
@@ -110,12 +109,6 @@ export class SequelizeManager {
 
     }
 
-    raiseError(errorMessage, responseSender) {
-        const errorLog = merge(errorMessage, {timestamp: timestamp()});
-        this.log(errorMessage, 0);
-        responseSender({error: errorLog}, 400);
-    }
-
     getConnection(responseSender) {
         return () => responseSender({error: null});
     }
@@ -130,7 +123,7 @@ export class SequelizeManager {
             dialectOptions: {ssl}
         };
 
-        this.log(`Creating a connection for user ${username}`, 2);
+        this.log(`Creating a connection for user ${username}`, 1);
 
         const subDialect = dialect;
 
@@ -226,7 +219,7 @@ export class SequelizeManager {
         if (Object.keys(this.sessions).length > 0) {
             setSessionTo = Object.keys(this.sessions)[0];
         }
-        this.log(`Selecting session ${setSessionTo}`, 2);
+        this.log(`${setSessionTo}`, 1);
         return new Promise(
             (resolve, reject) => {
                 this.setSessionSelected(Object.keys(this.sessions)[0]);
@@ -269,7 +262,7 @@ export class SequelizeManager {
 
             let options = {dialect, host, port, storage};
 
-            this.log(`Switching to a new database ${databaseToUse}`, 2);
+            this.log(`Switchin to a new database ${databaseToUse}`, 1);
 
             if (subDialect === 'redshift') {
                 // avoid auto-dection
