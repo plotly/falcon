@@ -66,19 +66,16 @@ const assembleTablesPreviewMessage = (tablePreviews) => {
 
 export class SequelizeManager {
 
-    constructor(Logger) {
+    constructor(Logger, Sessions) {
         this.log = Logger.log;
         this.raiseError = Logger.raiseError;
-        this.sessionSelected = 0;
-        this.sessions = {};
-    }
-
-    setSessionSelected(sessionSelected) {
-        this.sessionSelected = sessionSelected;
-    }
-
-    getDialect() {
-        return this.sessions[this.sessionSelected].options.dialect;
+        this.setSessionSelected = Sessions.setSessionSelected;
+        this.getDialect = Sessions.getDialect;
+        this.sessionSelected = Sessions.sessionSelected;
+        this.sessions = Sessions.sessions;
+        this.showSessions = Sessions.showSessions;
+        this.deleteSession = Sessions.deleteSession;
+        this.addSession = Sessions.addSession;
     }
 
     setQueryType(type) {
@@ -147,6 +144,7 @@ export class SequelizeManager {
     }
 
     authenticate(responseSender) {
+
         this.log('Authenticating connection.');
         // when already logged in and simply want to check connection
         if (!this.sessions[this.sessionSelected]) {
@@ -169,70 +167,20 @@ export class SequelizeManager {
                 );
             });
         }
+
     }
 
     connect(configFromApp) {
 
         if (ARGS.headless) {
-
             // read locally stored configuration for sessionSelected
             const configFromFile = YAML.load(ARGS.configpath)[this.sessionSelected];
-
             this.createConnection(configFromFile);
-
         } else {
-
             this.createConnection(configFromApp);
-
         }
         return this.sessions[this.sessionSelected].authenticate();
 
-    }
-
-
-    showSessions(responseSender) {
-        const sessionKeys = Object.keys(this.sessions);
-        return new Promise(
-            (resolve, reject) => {
-                resolve(responseSender({
-                    error: null,
-                    sessions: sessionKeys.map((key) => {
-                        if (this.sessions[key]) {
-                            const dialect = this.sessions[key].options.dialect;
-                            const username = this.sessions[key].config.username;
-                            let host = this.sessions[key].config.host;
-                            if (!host) {host = 'localhost';}
-                            return {[key]: `${dialect}:${username}@${host}`};
-                        } else {
-                            // if session created (with API) but not connected yet.
-                            return {[key]: 'Session currently empty.'};
-                        }
-                    })
-                }));
-            }
-        );
-    }
-
-
-    deleteSession(sessionId) {
-        let setSessionTo = null;
-        if (Object.keys(this.sessions).length > 0) {
-            setSessionTo = Object.keys(this.sessions)[0];
-        }
-        this.log(`${setSessionTo}`, 1);
-        return new Promise(
-            (resolve, reject) => {
-                this.setSessionSelected(Object.keys(this.sessions)[0]);
-                resolve(delete this.sessions[`${sessionId}`]);
-            });
-    }
-
-
-    addSession(sessionId) {
-        return new Promise(
-            (resolve, reject) => {
-                resolve(this.sessions[`${sessionId}`] = null);
-            });
     }
 
 
@@ -415,6 +363,7 @@ export class SequelizeManager {
     getPresetQuery(showQuerySelector, table = null) {
 
         const dialect = this.getDialect();
+        const errorMessage = 'Could not build a presetQuery';
 
         switch (showQuerySelector) {
 
@@ -430,7 +379,7 @@ export class SequelizeManager {
                     case DIALECTS.MSSQL:
                         return 'SELECT name FROM Sys.Databases';
                     default:
-                        throw new Error('could not build a presetQuery');
+                        throw new Error(errorMessage);
                 }
 
             case PREBUILT_QUERY.SHOW_TABLES:
@@ -450,7 +399,7 @@ export class SequelizeManager {
                         return 'SELECT name FROM ' +
                         'sqlite_master WHERE type="table"';
                     default:
-                        throw new Error('could not build a presetQuery');
+                        throw new Error(errorMessage);
                 }
 
             case PREBUILT_QUERY.SHOW5ROWS:
@@ -464,11 +413,11 @@ export class SequelizeManager {
                         return 'SELECT TOP 5 * FROM ' +
                             `${this.sessions[this.sessionSelected].config.database}.dbo.${table}`;
                     default:
-                        throw new Error('could not build a presetQuery');
+                        throw new Error(errorMessage);
                 }
 
             default: {
-                throw new Error('could not build a presetQuery');
+                throw new Error(errorMessage);
             }
 
         }

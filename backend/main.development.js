@@ -1,6 +1,7 @@
 import {app, BrowserWindow, ipcMain} from 'electron';
 import {contains} from 'ramda';
 
+import {Sessions} from './sessions';
 import {Logger} from './logger';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import {ElasticManager} from './elasticManager';
@@ -34,8 +35,9 @@ app.on('ready', () => {
     });
 
     const logger = new Logger(OPTIONS, mainWindow, CHANNEL);
-    const sequelizeManager = new SequelizeManager(logger);
-    const elasticManager = new ElasticManager(logger);
+    const sessions = new Sessions();
+    const sequelizeManager = new SequelizeManager(logger, sessions);
+    const elasticManager = new ElasticManager(logger, sessions);
     /*
         'responseTools' is generic for the things required to handle
         responses from either the app through IPC CHANNEL or from a API

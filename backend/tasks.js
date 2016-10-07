@@ -1,6 +1,8 @@
 import {merge, contains} from 'ramda';
 import {AUTHENTICATION, TASK} from './errors';
 import {setupHTTPS, newOnPremSession} from './setupServers';
+import {DIALECTS} from '../app/constants/constants';
+
 
 export const TASKS = {
 	// v0
@@ -45,33 +47,43 @@ export function executeTask(responseTools, responseSender, payload) {
 	} = payload;
 
     // unpack sessionSelected and decide which responseManager to use
-    console.log(sessionSelected);
-    const sequelizeSessions = Object.keys(sequelizeManager.sessions);
-    const elasticSessions = Object.keys(elasticManager.sessions);
-    const isElasticSession = contains(sessionSelected, elasticSessions);
-    const isSequelizeSession = contains(sessionSelected, sequelizeSessions);
-    console.log(sequelizeSessions);
-    console.log(elasticSessions);
-    console.log(isElasticSession);
-    console.log(isSequelizeSession);
+    const sessions = sequelizeManager.sessions;
+    const sessionsList = Object.keys(sessions);
+    // sessions should point to the same object for sequelize and elastic
+    // Managers, see sequelizeManager and elasticManager constructors
+    const isNewSession = !contains(sessionSelected, sessionsList);
 
-    let responseManager;
-    if (isElasticSession && !isSequelizeSession) {
-        console.log('using elasticManager');
-        responseManager = elasticManager;
-    } else if (!isElasticSession && isSequelizeSession) {
-        console.log('using sequelize');
-        responseManager = sequelizeManager;
-    } else if (!isElasticSession && !isSequelizeSession) {
-        console.log('session does not exist');
-        // see if new elasticSearch session
-        if (message) {
-            if (message.dialect) {
-                console.log(message.dialect);
-                responseManager = message.dialect === 'elasticsearch' ? elasticManager : sequelizeManager;
-            }
+    // if new session, check dialect in the message
+    let dialect = null;
+    if (isNewSession && message) {
+        dialect = message.dialect;
+    } else if (sessionSelected) {
+        dialect = sessions[sessionSelected].options.dialect;
+    }
+
+    let responseManager = null;
+    // choose responseManager (current choices: elastic and sequelize)
+    switch (dialect) {
+        // can add more cases here as more languages are supported
+        case DIALECTS.ELASTICSEARCH:
+            responseManager = elasticManager;
+            break;
+
+        case DIALECTS.MYSQL:
+        case DIALECTS.MARIADB:
+        case DIALECTS.POSTGRES:
+        case DIALECTS.REDSHIFT:
+        case DIALECTS.MSSQL:
+        case DIALECTS.SQLITE:
+            responseManager = sequelizeManager;
+            break;
+
+        default: {
+            responseManager = sequelizeManager;
         }
     }
+
+
 
     // from now on responseManager should be used
 
@@ -79,21 +91,6 @@ export function executeTask(responseTools, responseSender, payload) {
 	 * update current session before doing any tasks
 	 * this will use the correct connection credentials
 	 */
-
-
-    responseManager.setSessionSelected(sessionSelected);
-    const currentSession = () => {
-        return responseManager.sessions[responseManager.sessionSelected];
-    };
-
-    // check if there is a current database in use
-    let {database = null} = payload; // optional for some tasks
-    console.log(database);
-    if (!database) {
-        if (currentSession()) {
-            database = currentSession().config.database;
-        }
-    }
 
     // shorthands
     let connError = false;
@@ -115,6 +112,22 @@ export function executeTask(responseTools, responseSender, payload) {
             responseSender
         );
     };
+
+    responseManager.setSessionSelected(sessionSelected);
+    const currentSession = () => {
+        return responseManager.sessions[responseManager.sessionSelected];
+    };
+
+
+    // check if there is a current database in use
+    // TODO: move workspace to stricter API use that requires a database entry
+    // and remove this code
+    let {database = null} = payload; // optional for some tasks
+    if (!database) {
+        if (currentSession()) {
+            database = currentSession().config.database;
+        }
+    }
 
 	log(`Sending task ${task} to responseManager`, 1);
 	log(`Sending session ${sessionSelected} to responseManager`, 1);
@@ -196,8 +209,7 @@ export function executeTask(responseTools, responseSender, payload) {
 
         case TASKS.ADD_SESSION: {
 
-            responseManager.authenticate(responseSender)
-            .then(responseManager.addSession(message))
+            responseManager.addSession(message)
             .then(() => {log(
                 `TASK: added session ${message}`, 1
             );})
