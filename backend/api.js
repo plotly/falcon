@@ -1,7 +1,8 @@
 import {TASKS} from './tasks';
 import {has, map, merge, contains, split, trim} from 'ramda';
 import {
-    APP_NOT_CONNECTED, QUERY_PARAM, DATABASE_PARAM, TABLES_PARAM, SESSION_PARAM
+    APP_NOT_CONNECTED, QUERY_PARAM, DATABASE_PARAM,
+    TABLES_PARAM, SESSION_PARAM, DIALECT_PARAM
 } from './errors';
 
 
@@ -108,6 +109,8 @@ export function v1(requestEvent, sequelizeManager, callback) {
             } else {
                 message = requestEvent.params.session;
             }
+
+
             if (!contains(message, Object.keys(sequelizeManager.sessions))) {
                 sequelizeManager.raiseError(
                     {message: APP_NOT_CONNECTED}, callback
@@ -125,7 +128,27 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.ADD_SESSION;
-            message = getNewId(Object.keys(sequelizeManager.sessions));
+            let dialect;
+            if (!foundParams(requestEvent.params, 'dialect')) {
+                sequelizeManager.raiseError(
+                    {message: DIALECT_PARAM}, callback
+                );
+            } else {
+                dialect = requestEvent.params.dialect;
+            }
+            if (!foundParams(requestEvent.params, 'database')) {
+                sequelizeManager.raiseError(
+                    {message: DATABASE_PARAM}, callback
+                );
+            } else {
+                database = requestEvent.params.database;
+            }
+            message = {
+                sessionId: getNewId(Object.keys(sequelizeManager.sessions)),
+                dialect,
+                database
+            };
+
             break;
 
         }
@@ -201,9 +224,9 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.QUERY;
-            database = obtainDatabaseForTask(
-                requestEvent, sequelizeManager, sessionSelected, callback
-            );
+            // database = obtainDatabaseForTask(
+            //     requestEvent, sequelizeManager, sessionSelected, callback
+            // );
             if (!foundParams(requestEvent.params, 'statement')) {
                 sequelizeManager.raiseError(
                     {message: QUERY_PARAM}, callback

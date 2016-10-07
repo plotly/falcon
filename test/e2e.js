@@ -6,6 +6,8 @@ import electronPath from 'electron-prebuilt';
 import fetch from 'node-fetch';
 import {split} from 'ramda';
 import {productName, version} from '../package.json';
+var FormData = require('form-data');
+
 
 import {
     APP_STATUS,
@@ -257,7 +259,7 @@ describe('plotly database connector', function Spec() {
             async () => {
                 const logos = await this.getLogos();
 
-                expect(logos.length).to.equal(6);
+                expect(logos.length).to.equal(7);
             });
 
             it('should not show an error message',
@@ -776,7 +778,14 @@ describe('plotly database connector', function Spec() {
         describe('/v1/addsession', () => {
             it('returns no error, list of sessions that contains two entries',
             async() => {
-                await fetch(`http://${BASE_URL}/v1/addsession`)
+                const data = new FormData();
+                data.append('database', 'postgis');
+                data.append('dialect', 'postgres');
+
+                await fetch(
+                    `http://${BASE_URL}/v1/addsession`,
+                    {method: 'POST', body: data}
+                )
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');

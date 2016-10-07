@@ -103,8 +103,8 @@ export default class SessionsManager extends Component {
                         }
                         // delete it
                         // TODO: this should probably be a single action?
-                        sessionsActions.forgetSession(sessionId); // for backend
-                        sessionsActions.deleteSession(sessionId);
+                        sessionsActions.deleteSession(sessionId); // for backend
+                        sessionsActions.forgetSession(sessionId);
                     }}
                     src="./images/delete.png"
                     id={`test-session-delete-${sessionsIds.indexOf(sessionId)}`}
@@ -180,7 +180,6 @@ export default class SessionsManager extends Component {
                     <a
                         className={styles.addOnPremLink}
                         onClick={() => {
-                            console.log(`submit motherfucker! ${this.state.onPremDomain}`);
                             sessionsActions.newOnPremSession(this.state.onPremDomain);
                             sessionsActions.newSession(newId);
                             sessionsActions.switchSession(newId);
