@@ -6,6 +6,7 @@ import electronPath from 'electron-prebuilt';
 import fetch from 'node-fetch';
 import {split} from 'ramda';
 import {productName, version} from '../package.json';
+var FormData = require('form-data');
 
 import {
     APP_STATUS,
@@ -17,7 +18,7 @@ import {
 import * as logoStyles
     from '../app/components/Settings/DialectSelector/DialectSelector.css';
 
-const BASE_URL = 'localhost:5000/';
+const BASE_URL = 'localhost:5000';
 
 const testedDialects = [
     // DIALECTS.REDSHIFT,
@@ -60,6 +61,20 @@ const CREDENTIALS = {
 		'password': process.env.PASSWORD_REDSHIFT,
 		'database': 'plotly_datasets'
 	}
+};
+
+const fetchPOST = (endpoint, obj) => {
+    const data = new FormData();
+    console.log(endpoint);
+    console.log(obj);
+    Object.keys(obj).forEach( (key) => {
+        data.append(key, obj[key]);
+    });
+
+    return fetch(endpoint, {
+        method: 'POST',
+        body: data
+    });
 };
 
 chromedriver.start(); // on port 9515
@@ -561,7 +576,7 @@ describe('plotly database connector', function Spec() {
                 const testClass = await this.getClassOf(btn);
                 expect(testClass).to.contain(expectedClass);
 
-                await fetch(`http://${BASE_URL}/v1/authenticate`)
+                await fetchPOST(`http://${BASE_URL}/v1/authenticate`, {})
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -600,7 +615,7 @@ describe('plotly database connector', function Spec() {
                 const testClass = await this.getClassOf(btn);
                 expect(testClass).to.contain(expectedClass);
 
-                await fetch(`http://${BASE_URL}/v1/databases`)
+                await fetchPOST(`http://${BASE_URL}/v1/databases`, {})
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -617,8 +632,9 @@ describe('plotly database connector', function Spec() {
         describe('/v1/selectdatabase', () => {
             it('if app is "connected", and wrong database entered, returns error',
             async() => {
-                await fetch(`http://${BASE_URL}` +
-                    '/v1/selectdatabase?database=non-existant')
+                await fetchPOST(`http://${BASE_URL}/v1/selectdatabase`, {
+                    database: 'non-existant'
+                })
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -633,8 +649,9 @@ describe('plotly database connector', function Spec() {
 
             it('if correct database is entered, returns no error',
             async() => {
-                await fetch(`http://${BASE_URL}` +
-                    '/v1/selectdatabase?database=plotly_datasets')
+                await fetchPOST(`http://${BASE_URL}/v1/selectdatabase`, {
+                    database: 'plotly_datasets'
+                })
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -655,7 +672,7 @@ describe('plotly database connector', function Spec() {
                 const testClass = await this.getClassOf(btn);
                 expect(testClass).to.contain(expectedClass);
 
-                await fetch(`http://${BASE_URL}/v1/databases`)
+                await fetchPOST(`http://${BASE_URL}/v1/databases`, {})
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -673,8 +690,9 @@ describe('plotly database connector', function Spec() {
         describe('/v1/preview', () => {
             it('if app is "connected", and wrong table entered, returns error',
             async() => {
-                await fetch(`http://${BASE_URL}` +
-                    '/v1/preview?non-param=non-existant')
+                await fetchPOST(`http://${BASE_URL}/v1/preview`, {
+                    nonparam: 'non-existants'
+                })
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -689,8 +707,9 @@ describe('plotly database connector', function Spec() {
 
             it('if correct table is entered, returns no error',
             async() => {
-                await fetch(`http://${BASE_URL}` +
-                    '/v1/preview?tables=ebola_2014')
+                await fetchPOST(`http://${BASE_URL}/v1/preview`, {
+                    tables: 'ebola_2014'
+                })
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -707,8 +726,7 @@ describe('plotly database connector', function Spec() {
         describe('/v1/query', () => {
             it('if app is "connected", and no statement entered, returns error',
             async() => {
-                await fetch(`http://${BASE_URL}` +
-                    '/v1/query?no-statement=not-a-statement')
+                await fetchPOST(`http://${BASE_URL}/v1/query`, {})
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -723,8 +741,9 @@ describe('plotly database connector', function Spec() {
 
             it('if app is "connected", and incrorrect query entered, returns error',
             async() => {
-                await fetch(`http://${BASE_URL}` +
-                    '/v1/query?statement=not-a-statement')
+                await fetchPOST(`http://${BASE_URL}/v1/query`, {
+                    statement: 'not-a-good-query'
+                })
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -739,8 +758,9 @@ describe('plotly database connector', function Spec() {
 
             it('if correct database is entered, returns no error',
             async() => {
-                await fetch(`http://${BASE_URL}` +
-                    '/v1/query?statement=SELECT * FROM ebola_2014')
+                await fetchPOST(`http://${BASE_URL}/v1/query`, {
+                    statement: 'SELECT * FROM ebola_2014'
+                })
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -761,7 +781,7 @@ describe('plotly database connector', function Spec() {
         describe('/v1/sessions', () => {
             it('returns no error, list of sessions',
             async() => {
-                await fetch(`http://${BASE_URL}/v1/sessions`)
+                await fetchPOST(`http://${BASE_URL}/v1/sessions`, {})
                 .then(res => res.json())
                 .then(json => {
                     console.log();
@@ -776,7 +796,7 @@ describe('plotly database connector', function Spec() {
         describe('/v1/addsession', () => {
             it('returns no error, list of sessions that contains two entries',
             async() => {
-                await fetch(`http://${BASE_URL}/v1/addsession`)
+                await fetchPOST(`http://${BASE_URL}/v1/addsession`, {})
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -792,17 +812,16 @@ describe('plotly database connector', function Spec() {
             it('returns no error, list of sessions that contains one entry',
             async() => {
                 let sessions;
-                await fetch(`http://${BASE_URL}/v1/sessions`)
+                await fetchPOST(`http://${BASE_URL}/v1/sessions`, {})
                 .then(res => res.json())
                 .then(json => {
                     sessions = json.sessions.map((session) => {
                         return parseInt(Object.keys(session)[0], 10);
                     });
                 });
-
-                await fetch(
-                    `http://${BASE_URL}/v1/deletesession?session=${sessions[1]}`
-                )
+                await fetchPOST(`http://${BASE_URL}/v1/deletesession`, {
+                    session: sessions[1]
+                })
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
@@ -817,7 +836,7 @@ describe('plotly database connector', function Spec() {
         describe('/v1/disconnect', () => {
             it('returns no error, a null list of databases, previews and tables',
             async () => {
-                await fetch(`http://${BASE_URL}/v1/disconnect`)
+                await fetchPOST(`http://${BASE_URL}/v1/disconnect`, {})
                 .then(res => res.json())
                 .then(json => {
                     expect(json).to.have.property('error');
