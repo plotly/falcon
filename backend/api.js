@@ -31,13 +31,6 @@ const obtainDatabaseForTask = (
     // TODO: stricter database check form workspace message
     if (foundParams(requestEvent.params, 'database')) {
         database = requestEvent.params.database;
-    } else if (sequelizeManager.sessions[sessionSelected]) {
-        database = sequelizeManager.sessions[sessionSelected].config.database;
-    } else {
-        // means can't figure out which database to use, send an error back
-        sequelizeManager.raiseError(
-            {message: DATABASE_PARAM}, callback
-        );
     }
     return database;
 };

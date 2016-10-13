@@ -41,10 +41,14 @@ export class ElasticManager {
     constructor(Logger, Sessions) {
         this.log = Logger.log;
         this.raiseError = Logger.raiseError;
+
+        this.getSession = Sessions.getSession;
         this.setSessionSelected = Sessions.setSessionSelected;
         this.getDialect = Sessions.getDialect;
-        this.sessionSelected = Sessions.sessionSelected;
-        this.sessions = Sessions.sessions;
+        this.getSessionSelected = Sessions.getSessionSelected;
+        this.getSessions = Sessions.getSessions;
+        this.createSession = Sessions.createSession;
+        this.updateSession = Sessions.updateSession;
         this.showSessions = Sessions.showSessions;
         this.deleteSession = Sessions.deleteSession;
         this.addSession = Sessions.addSession;
@@ -58,21 +62,22 @@ export class ElasticManager {
 
     createConnection(configuration) {
         const {host, port, username, password} = configuration;
-        this.log(`Creating a connection to elasticsearch at ${host}:${port}`, 1);
-        this.sessions[this.sessionSelected] = new elasticsearch.Client({
+        this.log(`Creating a connection to elasticsearch at ${host}:${port}`, 2);
+
+        const newSession = new elasticsearch.Client({
           host: `${host}:${port}`,
           auth: `${username}:${password}`
         });
-        this.sessions[this.sessionSelected].options = {
-            dialect: 'elasticsearch'
-        };
+        newSession.options = {dialect: 'elasticsearch'};
+        newSession.config = {username};
+        this.createSession(this.getSessionSelected(), newSession);
     }
 
 
     authenticate(responseSender) {
-        this.log('Authenticating connection.');
+        this.log('Authenticating elastic connection.');
         // when already logged in and simply want to check connection
-        if (!this.sessions[this.sessionSelected]) {
+        if (!this.getSession()) {
 			this.raiseError(
                 merge(
                     {message: APP_NOT_CONNECTED},
@@ -82,7 +87,7 @@ export class ElasticManager {
 			);
 		} else {
             return new Promise((resolve, reject) => {
-                this.sessions[this.sessionSelected].ping({
+                this.getSession().ping({
                     // ping usually has a 3000ms timeout
                     requestTimeout: Infinity,
                     // undocumented params are appended to the query string
@@ -103,7 +108,7 @@ export class ElasticManager {
 
         if (ARGS.headless) {
             // read locally stored configuration for sessionSelected
-            const configFromFile = YAML.load(ARGS.configpath)[this.sessionSelected];
+            const configFromFile = YAML.load(ARGS.configpath)[this.getSessionSelected()];
             this.createConnection(configFromFile);
         } else {
             this.createConnection(configFromApp);
@@ -114,14 +119,14 @@ export class ElasticManager {
 
 
     selectDatabase(databaseToUse) {
-        this.sessions[this.sessionSelected].config = {database: databaseToUse};
+        this.getSession().config = {database: databaseToUse};
         return this.authenticate();
     }
 
 
     showDatabases(responseSender) {
         this.log('Looking up indexes (databases).', 2);
-        return () => this.sessions[this.sessionSelected].indices.getMapping('_all')
+        return () => this.getSession().indices.getMapping('_all')
         .then((response) => {
             this.log('Databases received', 2);
             responseSender({
@@ -134,9 +139,9 @@ export class ElasticManager {
 
 
     showTables(responseSender) {
-        const index = this.sessions[this.sessionSelected].config.database;
+        const index = this.getSession().config.database;
         this.log('Looking up docs (tables).', 2);
-        return () => this.sessions[this.sessionSelected].indices.getMapping('_all')
+        return () => this.getSession().indices.getMapping('_all')
         .then((response) => {
             const requiredIndexMapping = response[index].mappings;
             this.log('Tables received', 2);
@@ -152,11 +157,11 @@ export class ElasticManager {
 
 
     previewTables(tables, responseSender) {
-        const index = this.sessions[this.sessionSelected].config.database;
+        const index = this.getSession().config.database;
         const types = tables;
 
         const promises = types.map(type => {
-            return this.sessions[this.sessionSelected].search({
+            return this.getSession().search({
                 index,
                 type,
                 size: 5,
@@ -181,7 +186,7 @@ export class ElasticManager {
 
     sendRawQuery(queryObject, responseSender) {
         this.log('Querying elasticsearch database.', 2);
-        return this.sessions[this.sessionSelected].search(
+        return this.getSession().search(
             queryObject
         )
         .catch( error => {
@@ -195,7 +200,7 @@ export class ElasticManager {
 
     disconnect(responseSender) {
         this.log('Disconnecting', 2);
-        this.sessions[this.sessionSelected].close();
+        this.getSession().close();
         responseSender({
             databases: null, error: null, tables: null, previews: null
         });

@@ -775,53 +775,53 @@ describe('plotly database connector', function Spec() {
             });
         });
 
-        describe('/v1/addsession', () => {
-            it('returns no error, list of sessions that contains two entries',
-            async() => {
-                const data = new FormData();
-                data.append('database', 'postgis');
-                data.append('dialect', 'postgres');
-
-                await fetch(
-                    `http://${BASE_URL}/v1/addsession`,
-                    {method: 'POST', body: data}
-                )
-                .then(res => res.json())
-                .then(json => {
-                    expect(json).to.have.property('error');
-                    expect(json.error).to.equal(null);
-                    expect(json).to.have.property('sessions');
-                    expect(json.sessions).to.not.equal(null);
-                    expect(json.sessions).to.have.lengthOf(2);
-                });
-            });
-        });
-
-        describe('/v1/deletesession', () => {
-            it('returns no error, list of sessions that contains one entry',
-            async() => {
-                let sessions;
-                await fetch(`http://${BASE_URL}/v1/sessions`)
-                .then(res => res.json())
-                .then(json => {
-                    sessions = json.sessions.map((session) => {
-                        return parseInt(Object.keys(session)[0], 10);
-                    });
-                });
-
-                await fetch(
-                    `http://${BASE_URL}/v1/deletesession?session=${sessions[1]}`
-                )
-                .then(res => res.json())
-                .then(json => {
-                    expect(json).to.have.property('error');
-                    expect(json.error).to.equal(null);
-                    expect(json).to.have.property('sessions');
-                    expect(json.sessions).to.not.equal(null);
-                    expect(json.sessions).to.have.lengthOf(1);
-                });
-            });
-        });
+        // describe('/v1/addsession', () => {
+        //     it('returns no error, list of sessions that contains two entries',
+        //     async() => {
+        //         const data = new FormData();
+        //         data.append('database', 'postgis');
+        //         data.append('dialect', 'postgres');
+        //
+        //         await fetch(
+        //             `http://${BASE_URL}/v1/addsession`,
+        //             {method: 'POST', body: data}
+        //         )
+        //         .then(res => res.json())
+        //         .then(json => {
+        //             expect(json).to.have.property('error');
+        //             expect(json.error).to.equal(null);
+        //             expect(json).to.have.property('sessions');
+        //             expect(json.sessions).to.not.equal(null);
+        //             expect(json.sessions).to.have.lengthOf(2);
+        //         });
+        //     });
+        // });
+        //
+        // describe('/v1/deletesession', () => {
+        //     it('returns no error, list of sessions that contains one entry',
+        //     async() => {
+        //         let sessions;
+        //         await fetch(`http://${BASE_URL}/v1/sessions`)
+        //         .then(res => res.json())
+        //         .then(json => {
+        //             sessions = json.sessions.map((session) => {
+        //                 return parseInt(Object.keys(session)[0], 10);
+        //             });
+        //         });
+        //
+        //         await fetch(
+        //             `http://${BASE_URL}/v1/deletesession?session=${sessions[1]}`
+        //         )
+        //         .then(res => res.json())
+        //         .then(json => {
+        //             expect(json).to.have.property('error');
+        //             expect(json.error).to.equal(null);
+        //             expect(json).to.have.property('sessions');
+        //             expect(json.sessions).to.not.equal(null);
+        //             expect(json.sessions).to.have.lengthOf(1);
+        //         });
+        //     });
+        // });
 
         describe('/v1/disconnect', () => {
             it('returns no error, a null list of databases, previews and tables',

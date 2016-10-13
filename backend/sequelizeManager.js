@@ -69,10 +69,13 @@ export class SequelizeManager {
     constructor(Logger, Sessions) {
         this.log = Logger.log;
         this.raiseError = Logger.raiseError;
+        this.getSession = Sessions.getSession;
         this.setSessionSelected = Sessions.setSessionSelected;
         this.getDialect = Sessions.getDialect;
-        this.sessionSelected = Sessions.sessionSelected;
-        this.sessions = Sessions.sessions;
+        this.getSessionSelected = Sessions.getSessionSelected;
+        this.getSessions = Sessions.getSessions;
+        this.createSession = Sessions.createSession;
+        this.updateSession = Sessions.updateSession;
         this.showSessions = Sessions.showSessions;
         this.deleteSession = Sessions.deleteSession;
         this.addSession = Sessions.addSession;
@@ -83,7 +86,7 @@ export class SequelizeManager {
          * set sequelize's query property type
          * helps sequelize to predict what kind of response it will get
          */
-        return {type: this.sessions[this.sessionSelected].QueryTypes[type]};
+        return {type: this.getSession().QueryTypes[type]};
     }
 
     intoTablesArray(results) {
@@ -120,7 +123,7 @@ export class SequelizeManager {
             dialectOptions: {ssl}
         };
 
-        this.log(`Creating a connection for user ${username}`, 1);
+        this.log(`Creating a connection for user ${username}`, 2);
 
         const subDialect = dialect;
 
@@ -131,23 +134,27 @@ export class SequelizeManager {
             options = merge(options, REDSHIFT_OPTIONS);
         }
 
-        this.sessions[this.sessionSelected] = new Sequelize(
+        const newSession = new Sequelize(
             database, username, password, options
         );
 
         if (subDialect === 'mssql') {
-            setupMSSQLOptions(this.sessions[this.sessionSelected]);
+            setupMSSQLOptions(newSession);
         }
 
-        rememberSubdialect(this.sessions[this.sessionSelected], subDialect);
+        rememberSubdialect(newSession, subDialect);
 
+        this.createSession(
+            this.getSessionSelected(),
+            newSession
+        );
     }
 
     authenticate(responseSender) {
 
         this.log('Authenticating connection.');
         // when already logged in and simply want to check connection
-        if (!this.sessions[this.sessionSelected]) {
+        if (!this.getSession()) {
 			this.raiseError(
                 merge(
                     {message: APP_NOT_CONNECTED},
@@ -156,8 +163,8 @@ export class SequelizeManager {
                 responseSender
 			);
 		} else {
-            // this.sessions[this.sessionSelected].authenticate() returns a promise
-            return this.sessions[this.sessionSelected].authenticate()
+            // this.getSession().authenticate() returns a promise
+            return this.getSession().authenticate()
             .catch((error) => {
                 this.raiseError(
                     merge(
@@ -174,12 +181,12 @@ export class SequelizeManager {
 
         if (ARGS.headless) {
             // read locally stored configuration for sessionSelected
-            const configFromFile = YAML.load(ARGS.configpath)[this.sessionSelected];
+            const configFromFile = YAML.load(ARGS.configpath)[this.getSessionSelected()];
             this.createConnection(configFromFile);
         } else {
             this.createConnection(configFromApp);
         }
-        return this.sessions[this.sessionSelected].authenticate();
+        return this.getSession().authenticate();
 
     }
 
@@ -187,7 +194,7 @@ export class SequelizeManager {
     selectDatabase(databaseToUse) {
         // take database entry check if its the same as in current connection
         const needToSwitchDatabases =
-            databaseToUse !== this.sessions[this.sessionSelected].config.database;
+            databaseToUse !== this.getSession().config.database;
 
         /*
          * if not, make a new one to the other database,
@@ -199,8 +206,8 @@ export class SequelizeManager {
         if (needToSwitchDatabases) {
 
             const currentSetup = merge(
-                this.sessions[this.sessionSelected].options,
-                this.sessions[this.sessionSelected].config
+                this.getSession().options,
+                this.getSession().config
             );
 
             const {
@@ -210,30 +217,32 @@ export class SequelizeManager {
 
             let options = {dialect, host, port, storage};
 
-            this.log(`Switchin to a new database ${databaseToUse}`, 1);
+            this.log(`Switchin to a new database ${databaseToUse}`, 2);
 
             if (subDialect === 'redshift') {
                 // avoid auto-dection
                 Sequelize.HSTORE.types.postgres.oids.push('dummy');
                 options = merge(options, REDSHIFT_OPTIONS);
             }
-            this.sessions[this.sessionSelected] = new Sequelize(
+
+            const newSession = new Sequelize(
                 databaseToUse, username, password, options
             );
 
             if (subDialect === 'mssql') {
-                setupMSSQLOptions(this.sessions[this.sessionSelected]);
+                setupMSSQLOptions(newSession);
             }
 
             if (subDialect === 'redshift') {
-                rememberSubdialect(this.sessions[this.sessionSelected],
-                subDialect);
+                rememberSubdialect(newSession, subDialect);
             }
+
+            this.createSession(this.getSessionSelected(), newSession);
 
         }
 
         this.log('Authenticating connection.');
-        return this.sessions[this.sessionSelected].authenticate();
+        return this.getSession().authenticate();
 
     }
 
@@ -256,7 +265,7 @@ export class SequelizeManager {
 
         this.log(`Querying: ${query}`, 2);
 
-        return () => this.sessions[this.sessionSelected].query(query, this.setQueryType('SELECT'))
+        return () => this.getSession().query(query, this.setQueryType('SELECT'))
         .then(results => {
             this.log('Results recieved.', 2);
             responseSender({
@@ -278,7 +287,7 @@ export class SequelizeManager {
         const showtables = this.getPresetQuery(PREBUILT_QUERY.SHOW_TABLES);
         this.log(`Querying: ${showtables}`, 2);
 
-        return () => this.sessions[this.sessionSelected]
+        return () => this.getSession()
         .query(showtables, this.setQueryType('SELECT'))
         .then(results => {
 
@@ -306,11 +315,9 @@ export class SequelizeManager {
             this.log(`Querying: ${show5rows}`, 2);
 
             // sends the query for a single table
-            return this.sessions[this.sessionSelected]
+            return this.getSession()
             .query(show5rows, this.setQueryType('SELECT'))
             .then(selectTableResults => {
-                console.log('selectTableResults');
-                console.log(selectTableResults);
                 return {
                     [table]: selectTableResults
                 };
@@ -333,7 +340,7 @@ export class SequelizeManager {
 
         this.log(`Querying: ${query}`, 2);
 
-        return this.sessions[this.sessionSelected].query(query, this.setQueryType('SELECT'))
+        return this.getSession().query(query, this.setQueryType('SELECT'))
         .catch( error => {
             this.raiseError(error, responseSender);
         })
@@ -347,13 +354,13 @@ export class SequelizeManager {
     disconnect(responseSender) {
 
         /*
-            this.sessions[this.sessionSelected].close() does not return a promise for now.
+            this.getSession().close() does not return a promise for now.
             open issue here:
             https://github.com/sequelize/sequelize/pull/5776
         */
 
         this.log('Disconnecting', 2);
-        this.sessions[this.sessionSelected].close();
+        this.getSession().close();
         responseSender({
             databases: null, error: null, tables: null, previews: null
         });
@@ -411,7 +418,7 @@ export class SequelizeManager {
                         return `SELECT * FROM ${table} LIMIT 5`;
                     case DIALECTS.MSSQL:
                         return 'SELECT TOP 5 * FROM ' +
-                            `${this.sessions[this.sessionSelected].config.database}.dbo.${table}`;
+                            `${this.getSession().config.database}.dbo.${table}`;
                     default:
                         throw new Error(errorMessage);
                 }

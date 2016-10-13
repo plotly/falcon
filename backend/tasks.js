@@ -42,24 +42,53 @@ export function executeTask(responseTools, responseSender, payload) {
     // unpack payload
 	const {
 		task,
-		sessionSelected = null,
 		message = null // optional for some tasks
 	} = payload;
 
+    let {
+        sessionSelected = null,
+        database = null
+    } = payload;
+
+    sequelizeManager.log(task);
+    sequelizeManager.log(message);
+    sequelizeManager.log(sessionSelected);
+    sequelizeManager.log(database);
+
     // unpack sessionSelected and decide which responseManager to use
-    const sessions = sequelizeManager.sessions;
+    const sessions = sequelizeManager.getSessions();
+    const oldSessionSelected = sequelizeManager.getSessionSelected();
     const sessionsList = Object.keys(sessions);
+    const setSessionSelected = sequelizeManager.setSessionSelected;
+
     // sessions should point to the same object for sequelize and elastic
     // Managers, see sequelizeManager and elasticManager constructors
+
+
     const isNewSession = !contains(sessionSelected, sessionsList);
 
-    // if new session, check dialect in the message
+    // here we want to establish which dialect and database to use for the task
     let dialect = null;
-    if (isNewSession && message) {
+    // new session
+    if (isNewSession && sessionSelected && message) {
         dialect = message.dialect;
+        sequelizeManager.setSessionSelected(sessionSelected);
+    // session is not new and was passed
     } else if (sessionSelected) {
         dialect = sessions[sessionSelected].options.dialect;
+        database = sessions[sessionSelected].config.database;
+        setSessionSelected(sessionSelected);
+    // no session? use current one
+    } else if (!sessionSelected) {
+        sessionSelected = oldSessionSelected;
+        if (sessions[sessionSelected]) {
+            dialect = sessions[sessionSelected].options.dialect;
+        }
+        if (!database && sessions[sessionSelected]) {
+            database = sessions[sessionSelected].config.database;
+        }
     }
+
 
     let responseManager = null;
     // choose responseManager (current choices: elastic and sequelize)
@@ -83,7 +112,9 @@ export function executeTask(responseTools, responseSender, payload) {
         }
     }
 
-
+    responseManager.log(`Using session ${sessionSelected}`, 1);
+    responseManager.log(`Using database ${database}`, 1);
+    responseManager.log(`Using dialect ${dialect}`, 1);
 
     // from now on responseManager should be used
 
@@ -112,27 +143,6 @@ export function executeTask(responseTools, responseSender, payload) {
             responseSender
         );
     };
-
-    responseManager.setSessionSelected(sessionSelected);
-    const currentSession = () => {
-        return responseManager.sessions[responseManager.sessionSelected];
-    };
-
-
-    // check if there is a current database in use
-    // TODO: move workspace to stricter API use that requires a database entry
-    // and remove this code
-    let {database = null} = payload; // optional for some tasks
-    if (!database) {
-        if (currentSession()) {
-            database = currentSession().config.database;
-        }
-    }
-
-	log(`Sending task ${task} to responseManager`, 1);
-	log(`Sending session ${sessionSelected} to responseManager`, 1);
-	log(`Sending database ${database} to responseManager`, 1);
-    log(`Sending message ${message} to responseManager`, 1);
 
 	switch (task) {
 
