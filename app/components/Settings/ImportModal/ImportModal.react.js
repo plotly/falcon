@@ -6,7 +6,15 @@ import * as styles from './ImportModal.css';
 const httpsGithubIssueLink = 'https://github.com/plotly/' +
                          'plotly-database-connector/issues/51';
 
-const plotlyWorkspaceLink = 'https://plot.ly/alpha/workspace';
+const plotlyWorkspaceLink = 'https://plot.ly/alpha/workspace/?upload=sql';
+
+const connectorURL = (secured) => {
+    if (secured) {
+        return 'Enter \'https://connector.plot.ly:5000\' into the input box as shown below.';
+    } else {
+        return 'Enter \'http://localhost:5000\' into the input box as shown below.';
+    }
+};
 
 const importDataScreenShot = (secured) => {
     if (secured) {
@@ -49,6 +57,7 @@ export default class ImportModal extends Component {
                 &nbsp;<u>plotly workspace</u>&nbsp;
                 </a>
                 and choose the SQL option.<br/>
+                {connectorURL(secured)}<br/>
                 Remember to keep this app running
                 while you are making queries!
                 {importDataScreenShot(secured)}

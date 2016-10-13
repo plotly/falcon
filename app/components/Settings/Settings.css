@@ -4,7 +4,7 @@
 
 .container {
 	width: 100%;
-	max-width: 700px;
+	max-width: 800px;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -31,6 +31,10 @@
 .connectButton {
 	padding-top: 30px;
 	text-align: center;
+}
+
+.step1Container {
+    width: 800px;
 }
 
 .step2Container {
@@ -66,4 +70,10 @@
 
 .log {
 	margin-bottom: 100px;
+}
+
+.unfoldIcon {
+    height: 18px;
+    width: 18px;
+    padding-left: 20px;
 }

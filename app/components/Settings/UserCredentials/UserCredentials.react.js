@@ -103,27 +103,36 @@ export default class UserCredentials extends Component {
         ));
 
         const databaseOptions = () => {
-            if (this.state.showOptions) {
-                return (
-                    <div className={styles.databaseOptionsContainer}>
-                        <a className={styles.databaseOptions}
-                            onClick={() => {this.setState({showOptions: false});}}
-                        >
-                            Hide Database Options
-                        </a>
-                        {options}
-                    </div>
-                );
+            // return only if there are connection_options for that database
+            if (CONNETION_OPTIONS[configuration.get('dialect')].length !== 0) {
+                if (this.state.showOptions) {
+                    return (
+                        <div className={styles.databaseOptionsContainer}>
+                            <a className={styles.databaseOptions}
+                                onClick={() => {this.setState(
+                                    {showOptions: false});}
+                                }
+                            >
+                                Hide Database Options
+                            </a>
+                            {options}
+                        </div>
+                    );
+                } else {
+                    return (
+                        <div className={styles.databaseOptionsContainer}>
+                            <a className={styles.databaseOptions}
+                                onClick={() => {this.setState(
+                                    {showOptions: true});}
+                                }
+                            >
+                                Show Database Options
+                            </a>
+                        </div>
+                    );
+                }
             } else {
-                return (
-                    <div className={styles.databaseOptionsContainer}>
-                        <a className={styles.databaseOptions}
-                            onClick={() => {this.setState({showOptions: true});}}
-                        >
-                            Show Database Options
-                        </a>
-                    </div>
-                );
+                return null;
             }
         };
 
