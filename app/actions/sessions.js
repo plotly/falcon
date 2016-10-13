@@ -25,45 +25,46 @@ export const updateIpcState = createAction(UPDATE_IPC_STATE);
 export function query (statement) {
     return (_, getState) => {
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.QUERY, sessionSelected, statement);
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
+        const database = state.sessions[sessionSelectedId].configuration.database;
+        ipcSend(TASKS.QUERY, sessionSelectedId, database, statement);
     };
 }
 
 export function connect () {
     return (_, getState) => {
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
         const configuration = state.sessions.getIn(
-            ['list', sessionSelected, 'configuration']
-        );
+            ['list', sessionSelectedId, 'configuration']
+        ).toJS();
         ipcSend(
             TASKS.CONNECT_AND_SHOW_DATABASES,
-            sessionSelected,
-            configuration.toJS()
+            sessionSelectedId,
+            configuration.database,
+            configuration
         );
     };
 }
 
 export function deleteSession (sessionId) {
     return (_, getState) => {
-        const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.DELETE_SESSION, sessionSelected, sessionId);
+        ipcSend(TASKS.DELETE_SESSION, sessionId, null, sessionId);
     };
 }
 
 export function selectDatabase () {
     return (_, getState) => {
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
         const configuration = state.sessions.getIn(
-            ['list', sessionSelected, 'configuration']
-        );
+            ['list', sessionSelectedId, 'configuration']
+        ).toJS();
         ipcSend(
             TASKS.SELECT_DATABASE_AND_SHOW_TABLES,
-            sessionSelected,
-            configuration.toJS().database
+            sessionSelectedId,
+            configuration.database,
+            configuration.database
         );
     };
 }
@@ -71,38 +72,41 @@ export function selectDatabase () {
 export function previewTables (tableNames) {
     return (_, getState) => {
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.PREVIEW, sessionSelected, tableNames);
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
+        const database = state.sessions.getIn(
+            ['list', sessionSelectedId, 'configuration', 'database']);
+        ipcSend(TASKS.PREVIEW, sessionSelectedId, database, tableNames);
     };
 }
 
 export function disconnect () {
     return (_, getState) => {
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.DISCONNECT, sessionSelected);
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
+        const database = state.sessions.getIn(
+            ['list', sessionSelectedId, 'configuration', 'database']);
+        ipcSend(TASKS.DISCONNECT, sessionSelectedId, database);
     };
 }
 
 export function setupHttpsServer () {
     return (__, getState) => {
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.SETUP_HTTPS_SERVER, sessionSelected);
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
+        ipcSend(TASKS.SETUP_HTTPS_SERVER, sessionSelectedId);
     };
 }
 
 export function newOnPremSession (domain) {
     return (__, getState) => {
-        console.warn(`new on prem session ${domain}`);
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.NEW_ON_PREM_SESSION, sessionSelected, domain);
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
+        ipcSend(TASKS.NEW_ON_PREM_SESSION, sessionSelectedId, null, domain);
     };
 }
 
-function ipcSend(task, sessionSelected, message = {}) {
-    ipcRenderer.send(CHANNEL, {task, sessionSelected, message});
+function ipcSend(task, sessionSelectedId, database, message = {}) {
+    ipcRenderer.send(CHANNEL, {task, sessionSelectedId, database, message});
 }
 
 // <- ipc specific

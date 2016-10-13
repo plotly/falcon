@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import {DIALECTS} from '../app/constants/constants';
-import parse from './parse';
+import {parseSQL} from './parse';
 import {merge} from 'ramda';
 import {ARGS} from './args';
 import {APP_NOT_CONNECTED, AUTHENTICATION} from './errors';
@@ -11,8 +11,6 @@ const PREBUILT_QUERY = {
     SHOW_TABLES: 'SHOW_TABLES',
     SHOW5ROWS: 'SHOW5ROWS'
 };
-
-const timestamp = () => (new Date()).toTimeString();
 
 // http://stackoverflow.com/questions/32037385/using-sequelize-with-redshift
 const REDSHIFT_OPTIONS = {
@@ -60,7 +58,7 @@ const assembleTablesPreviewMessage = (tablePreviews) => {
     return tablePreviews.map( (tablePreview) => {
         const tableName = Object.keys(tablePreview);
         const rawData = tablePreview[tableName];
-        parsedRows = (isEmpty(rawData)) ? EMPTY_TABLE : parse(rawData);
+        parsedRows = (isEmpty(rawData)) ? EMPTY_TABLE : parseSQL(rawData);
         return {[tableName]: parsedRows};
     });
 
@@ -68,18 +66,19 @@ const assembleTablesPreviewMessage = (tablePreviews) => {
 
 export class SequelizeManager {
 
-    constructor(Logger) {
+    constructor(Logger, Sessions) {
         this.log = Logger.log;
-        this.sessionSelected = 0;
-        this.sessions = {};
-    }
-
-    setSessionSelected(sessionSelected) {
-        this.sessionSelected = sessionSelected;
-    }
-
-    getDialect() {
-        return this.sessions[this.sessionSelected].options.dialect;
+        this.raiseError = Logger.raiseError;
+        this.getSession = Sessions.getSession;
+        this.setSessionSelectedId = Sessions.setSessionSelectedId;
+        this.getDialect = Sessions.getDialect;
+        this.getSessionSelectedId = Sessions.getSessionSelectedId;
+        this.getSessions = Sessions.getSessions;
+        this.createSession = Sessions.createSession;
+        this.updateSession = Sessions.updateSession;
+        this.showSessions = Sessions.showSessions;
+        this.deleteSession = Sessions.deleteSession;
+        this.addSession = Sessions.addSession;
     }
 
     setQueryType(type) {
@@ -87,7 +86,7 @@ export class SequelizeManager {
          * set sequelize's query property type
          * helps sequelize to predict what kind of response it will get
          */
-        return {type: this.sessions[this.sessionSelected].QueryTypes[type]};
+        return {type: this.getSession().QueryTypes[type]};
     }
 
     intoTablesArray(results) {
@@ -108,12 +107,6 @@ export class SequelizeManager {
 
         return tables;
 
-    }
-
-    raiseError(errorMessage, responseSender) {
-        const errorLog = merge(errorMessage, {timestamp: timestamp()});
-        this.log(errorMessage, 0);
-        responseSender({error: errorLog}, 400);
     }
 
     getConnection(responseSender) {
@@ -141,22 +134,27 @@ export class SequelizeManager {
             options = merge(options, REDSHIFT_OPTIONS);
         }
 
-        this.sessions[this.sessionSelected] = new Sequelize(
+        const newSession = new Sequelize(
             database, username, password, options
         );
 
         if (subDialect === 'mssql') {
-            setupMSSQLOptions(this.sessions[this.sessionSelected]);
+            setupMSSQLOptions(newSession);
         }
 
-        rememberSubdialect(this.sessions[this.sessionSelected], subDialect);
+        rememberSubdialect(newSession, subDialect);
 
+        this.createSession(
+            this.getSessionSelectedId(),
+            newSession
+        );
     }
 
     authenticate(responseSender) {
+
         this.log('Authenticating connection.');
         // when already logged in and simply want to check connection
-        if (!this.sessions[this.sessionSelected]) {
+        if (!this.getSession()) {
 			this.raiseError(
                 merge(
                     {message: APP_NOT_CONNECTED},
@@ -165,8 +163,8 @@ export class SequelizeManager {
                 responseSender
 			);
 		} else {
-            // this.sessions[this.sessionSelected].authenticate() returns a promise
-            return this.sessions[this.sessionSelected].authenticate()
+            // this.getSession().authenticate() returns a promise
+            return this.getSession().authenticate()
             .catch((error) => {
                 this.raiseError(
                     merge(
@@ -176,77 +174,27 @@ export class SequelizeManager {
                 );
             });
         }
+
     }
 
     connect(configFromApp) {
 
         if (ARGS.headless) {
-
-            // read locally stored configuration for sessionSelected
-            const configFromFile = YAML.load(ARGS.configpath)[this.sessionSelected];
-
+            // read locally stored configuration for sessionSelectedId
+            const configFromFile = YAML.load(ARGS.configpath)[this.getSessionSelectedId()];
             this.createConnection(configFromFile);
-
         } else {
-
             this.createConnection(configFromApp);
-
         }
-        return this.sessions[this.sessionSelected].authenticate();
+        return this.getSession().authenticate();
 
-    }
-
-
-    showSessions(responseSender) {
-        const sessionKeys = Object.keys(this.sessions);
-        return new Promise(
-            (resolve, reject) => {
-                resolve(responseSender({
-                    error: null,
-                    sessions: sessionKeys.map((key) => {
-                        if (this.sessions[key]) {
-                            const dialect = this.sessions[key].options.dialect;
-                            const username = this.sessions[key].config.username;
-                            let host = this.sessions[key].config.host;
-                            if (!host) {host = 'localhost';}
-                            return {[key]: `${dialect}:${username}@${host}`};
-                        } else {
-                            // if session created (with API) but not connected yet.
-                            return {[key]: 'Session currently empty.'};
-                        }
-                    })
-                }));
-            }
-        );
-    }
-
-
-    deleteSession(sessionId) {
-        let setSessionTo = null;
-        if (Object.keys(this.sessions).length > 0) {
-            setSessionTo = Object.keys(this.sessions)[0];
-        }
-        this.log(`Selecting session ${setSessionTo}`, 2);
-        return new Promise(
-            (resolve, reject) => {
-                this.setSessionSelected(Object.keys(this.sessions)[0]);
-                resolve(delete this.sessions[`${sessionId}`]);
-            });
-    }
-
-
-    addSession(sessionId) {
-        return new Promise(
-            (resolve, reject) => {
-                resolve(this.sessions[`${sessionId}`] = null);
-            });
     }
 
 
     selectDatabase(databaseToUse) {
         // take database entry check if its the same as in current connection
         const needToSwitchDatabases =
-            databaseToUse !== this.sessions[this.sessionSelected].config.database;
+            databaseToUse !== this.getSession().config.database;
 
         /*
          * if not, make a new one to the other database,
@@ -258,8 +206,8 @@ export class SequelizeManager {
         if (needToSwitchDatabases) {
 
             const currentSetup = merge(
-                this.sessions[this.sessionSelected].options,
-                this.sessions[this.sessionSelected].config
+                this.getSession().options,
+                this.getSession().config
             );
 
             const {
@@ -269,30 +217,32 @@ export class SequelizeManager {
 
             let options = {dialect, host, port, storage};
 
-            this.log(`Switching to a new database ${databaseToUse}`, 2);
+            this.log(`Switchin to a new database ${databaseToUse}`, 2);
 
             if (subDialect === 'redshift') {
                 // avoid auto-dection
                 Sequelize.HSTORE.types.postgres.oids.push('dummy');
                 options = merge(options, REDSHIFT_OPTIONS);
             }
-            this.sessions[this.sessionSelected] = new Sequelize(
+
+            const newSession = new Sequelize(
                 databaseToUse, username, password, options
             );
 
             if (subDialect === 'mssql') {
-                setupMSSQLOptions(this.sessions[this.sessionSelected]);
+                setupMSSQLOptions(newSession);
             }
 
             if (subDialect === 'redshift') {
-                rememberSubdialect(this.sessions[this.sessionSelected],
-                subDialect);
+                rememberSubdialect(newSession, subDialect);
             }
+
+            this.createSession(this.getSessionSelectedId(), newSession);
 
         }
 
         this.log('Authenticating connection.');
-        return this.sessions[this.sessionSelected].authenticate();
+        return this.getSession().authenticate();
 
     }
 
@@ -315,7 +265,7 @@ export class SequelizeManager {
 
         this.log(`Querying: ${query}`, 2);
 
-        return () => this.sessions[this.sessionSelected].query(query, this.setQueryType('SELECT'))
+        return () => this.getSession().query(query, this.setQueryType('SELECT'))
         .then(results => {
             this.log('Results recieved.', 2);
             responseSender({
@@ -337,7 +287,7 @@ export class SequelizeManager {
         const showtables = this.getPresetQuery(PREBUILT_QUERY.SHOW_TABLES);
         this.log(`Querying: ${showtables}`, 2);
 
-        return () => this.sessions[this.sessionSelected]
+        return () => this.getSession()
         .query(showtables, this.setQueryType('SELECT'))
         .then(results => {
 
@@ -365,11 +315,9 @@ export class SequelizeManager {
             this.log(`Querying: ${show5rows}`, 2);
 
             // sends the query for a single table
-            return this.sessions[this.sessionSelected]
+            return this.getSession()
             .query(show5rows, this.setQueryType('SELECT'))
             .then(selectTableResults => {
-                console.log('selectTableResults');
-                console.log(selectTableResults);
                 return {
                     [table]: selectTableResults
                 };
@@ -392,13 +340,13 @@ export class SequelizeManager {
 
         this.log(`Querying: ${query}`, 2);
 
-        return this.sessions[this.sessionSelected].query(query, this.setQueryType('SELECT'))
+        return this.getSession().query(query, this.setQueryType('SELECT'))
         .catch( error => {
             this.raiseError(error, responseSender);
         })
         .then((results) => {
             this.log('Results received.', 2);
-            responseSender(merge(parse(results), {error: null}));
+            responseSender(merge(parseSQL(results), {error: null}));
         });
 
     }
@@ -406,13 +354,13 @@ export class SequelizeManager {
     disconnect(responseSender) {
 
         /*
-            this.sessions[this.sessionSelected].close() does not return a promise for now.
+            this.getSession().close() does not return a promise for now.
             open issue here:
             https://github.com/sequelize/sequelize/pull/5776
         */
 
         this.log('Disconnecting', 2);
-        this.sessions[this.sessionSelected].close();
+        this.getSession().close();
         responseSender({
             databases: null, error: null, tables: null, previews: null
         });
@@ -422,6 +370,7 @@ export class SequelizeManager {
     getPresetQuery(showQuerySelector, table = null) {
 
         const dialect = this.getDialect();
+        const errorMessage = 'Could not build a presetQuery';
 
         switch (showQuerySelector) {
 
@@ -437,7 +386,7 @@ export class SequelizeManager {
                     case DIALECTS.MSSQL:
                         return 'SELECT name FROM Sys.Databases';
                     default:
-                        throw new Error('could not build a presetQuery');
+                        throw new Error(errorMessage);
                 }
 
             case PREBUILT_QUERY.SHOW_TABLES:
@@ -457,7 +406,7 @@ export class SequelizeManager {
                         return 'SELECT name FROM ' +
                         'sqlite_master WHERE type="table"';
                     default:
-                        throw new Error('could not build a presetQuery');
+                        throw new Error(errorMessage);
                 }
 
             case PREBUILT_QUERY.SHOW5ROWS:
@@ -469,13 +418,13 @@ export class SequelizeManager {
                         return `SELECT * FROM ${table} LIMIT 5`;
                     case DIALECTS.MSSQL:
                         return 'SELECT TOP 5 * FROM ' +
-                            `${this.sessions[this.sessionSelected].config.database}.dbo.${table}`;
+                            `${this.getSession().config.database}.dbo.${table}`;
                     default:
-                        throw new Error('could not build a presetQuery');
+                        throw new Error(errorMessage);
                 }
 
             default: {
-                throw new Error('could not build a presetQuery');
+                throw new Error(errorMessage);
             }
 
         }

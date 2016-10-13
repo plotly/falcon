@@ -9,6 +9,8 @@ export const TABLES_PARAM = 'No tables entry found. Please provide' +
 	' a tables entry such as \'/preview?tables=table1,table2... ]';
 export const SESSION_PARAM = 'No session entry found. Please provide' +
 	' a session entry such as \'/deletesession?session=sessionID';
+export const DIALECT_PARAM = 'No dialect entry found. Please provide' +
+	' a dialect entry such as \'/endpoint?dialect=postgres';
 export const NON_EXISTENT_SESSION = 'No such session entry found. Please' +
 	' provide a session value that has been created. You can obtain the list' +
     ' of available sessions at the end poitn /v1/sessions';

@@ -9,7 +9,7 @@
 .sessionsManagerWrapper {
     /* display: inline-block; */
     /* vertical-align: middle; */
-     text-align: center;
+    text-align: left;
     width: 100%;
     /* margin-left: auto; */
     white-space: nowrap;
@@ -29,7 +29,7 @@
     color: #687ba6;
     padding: 5px 10px 5px 10px;
     vertical-align: middle;
-    max-width: 200px;
+    max-width: 300px;
     white-space: nowrap;
     overflow-x: hidden;
     text-overflow: ellipsis;
@@ -110,6 +110,6 @@
 }
 
 .addOnPremLink {
-    cursor: grab;
+    cursor: pointer;
     text-align: center;
 }

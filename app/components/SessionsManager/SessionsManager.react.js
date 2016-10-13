@@ -25,6 +25,7 @@ const LOGOS = {
     mariadb: './images/mariadb-logo.png',
     mssql: './images/mssql-logo.png',
     sqlite: './images/sqlite-logo.png',
+    elasticsearch: './images/elastic-logo.png',
     redshift: './images/redshift-logo.png'
 };
 
@@ -83,10 +84,10 @@ export default class SessionsManager extends Component {
                     className={styles.sessionDelete}
                     onClick={() => {
                         const indexOfId = sessionsIds.indexOf(
-                            sessions.get('sessionSelected')
+                            sessions.get('sessionSelectedId')
                         );
                         // are we deleting currently open session?
-                        if (sessionId === sessions.get('sessionSelected')) {
+                        if (sessionId === sessions.get('sessionSelectedId')) {
                             // have to switch before deleting
                             if (indexOfId === 0) {
                                 // cant have a negative index in an array
@@ -102,8 +103,8 @@ export default class SessionsManager extends Component {
                         }
                         // delete it
                         // TODO: this should probably be a single action?
-                        sessionsActions.forgetSession(sessionId); // for backend
-                        sessionsActions.deleteSession(sessionId);
+                        sessionsActions.deleteSession(sessionId); // for backend
+                        sessionsActions.forgetSession(sessionId);
                     }}
                     src="./images/delete.png"
                     id={`test-session-delete-${sessionsIds.indexOf(sessionId)}`}
@@ -179,7 +180,6 @@ export default class SessionsManager extends Component {
                     <a
                         className={styles.addOnPremLink}
                         onClick={() => {
-                            console.log(`submit motherfucker! ${this.state.onPremDomain}`);
                             sessionsActions.newOnPremSession(this.state.onPremDomain);
                             sessionsActions.newSession(newId);
                             sessionsActions.switchSession(newId);
@@ -231,7 +231,7 @@ export default class SessionsManager extends Component {
                 sessionId => (
                     <div className={classnames(styles.sessionWrapper, {
                             [styles.sessionWrapperSelected]:
-                                sessions.get('sessionSelected') === sessionId
+                                sessions.get('sessionSelectedId') === sessionId
                             }
                         )}
                     >

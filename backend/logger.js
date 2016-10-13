@@ -1,5 +1,6 @@
 import bunyan from 'bunyan';
 import * as fs from 'fs';
+import {merge} from 'ramda';
 
 const timestamp = () => (new Date()).toTimeString();
 
@@ -19,7 +20,7 @@ export class Logger {
                 }
             ]
         });
-        
+
         if (OPTIONS.clearLog) {
             fs.writeFile(OPTIONS.logpath, '');
         }
@@ -51,6 +52,12 @@ export class Logger {
                     });
                 }
             }
+        };
+
+        this.raiseError = (errorMessage, responseSender) => {
+            const errorLog = merge(errorMessage, {timestamp: timestamp()});
+            this.log(errorMessage, 0);
+            responseSender({error: errorLog}, 400);
         };
     }
 }

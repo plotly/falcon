@@ -8,6 +8,7 @@ export const DIALECTS = {
     MARIADB: 'mariadb',
     POSTGRES: 'postgres',
     REDSHIFT: 'redshift',
+    ELASTICSEARCH: 'elasticsearch',
     MSSQL: 'mssql',
     SQLITE: 'sqlite'
 };
@@ -27,6 +28,7 @@ export const CONNETION_CONFIG = {
 	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port'],
     [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.REDSHIFT]: ['username', 'password', 'host', 'port', 'database'],
+    [DIALECTS.ELASTICSEARCH]: ['username', 'password', 'host', 'port'],
     [DIALECTS.SQLITE]: ['storage']
 };
 
@@ -36,7 +38,8 @@ export const CONNETION_OPTIONS = {
 	[DIALECTS.MSSQL]: ['ssl'],
     [DIALECTS.POSTGRES]: ['ssl'],
     [DIALECTS.REDSHIFT]: ['ssl'],
-    [DIALECTS.SQLITE]: ['storage']
+    [DIALECTS.ELASTICSEARCH]: [],
+    [DIALECTS.SQLITE]: []
 };
 
 export const BUTTON_MESSAGE = {

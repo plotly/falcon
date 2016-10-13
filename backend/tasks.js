@@ -1,6 +1,8 @@
-import {merge} from 'ramda';
+import {merge, contains} from 'ramda';
 import {AUTHENTICATION, TASK} from './errors';
 import {setupHTTPS, newOnPremSession} from './setupServers';
+import {DIALECTS} from '../app/constants/constants';
+
 
 export const TASKS = {
 	// v0
@@ -30,56 +32,117 @@ export const TASKS = {
 export function executeTask(responseTools, responseSender, payload) {
 
 	/*
-	 *	respond with responseSender(wantedResponse) in sequelizeManager
+	 *	respond with responseSender(wantedResponse)
 	 *	payload used to indentify which task to perform and on what message
 	 */
 
     // unpack tools
-	const {sequelizeManager} = responseTools;
-
-    // shorthands
-    const log = (mes, lvl) => sequelizeManager.log(mes, lvl);
-    const raiseError = (err, res) => sequelizeManager.raiseError(err, res);
+    const {sequelizeManager, elasticManager} = responseTools;
 
     // unpack payload
 	const {
 		task,
-		sessionSelected = sequelizeManager.sessionSelected,
 		message = null // optional for some tasks
 	} = payload;
 
-	/*
+    let {
+        sessionSelectedId = null,
+        database = null
+    } = payload;
+
+    sequelizeManager.log(task);
+    sequelizeManager.log(message);
+    sequelizeManager.log(sessionSelectedId);
+    sequelizeManager.log(database);
+
+    // unpack sessionSelectedId and decide which responseManager to use
+    const sessions = sequelizeManager.getSessions();
+    const oldSessionSelectedId = sequelizeManager.getSessionSelectedId();
+    const sessionsList = Object.keys(sessions);
+    const setSessionSelectedId = sequelizeManager.setSessionSelectedId;
+
+    // sessions should point to the same object for sequelize and elastic
+    // Managers, see sequelizeManager and elasticManager constructors
+
+
+    const isNewSession = !contains(sessionSelectedId, sessionsList);
+
+    // here we want to establish which dialect and database to use for the task
+    let dialect = null;
+    // new session
+    if (isNewSession && sessionSelectedId && message) {
+        dialect = message.dialect;
+        sequelizeManager.setSessionSelectedId(sessionSelectedId);
+    // session is not new and was passed
+    } else if (sessionSelectedId) {
+        dialect = sessions[sessionSelectedId].options.dialect;
+        database = sessions[sessionSelectedId].config.database;
+        setSessionSelectedId(sessionSelectedId);
+    // no session? use current one
+    } else if (!sessionSelectedId) {
+        sessionSelectedId = oldSessionSelectedId;
+        if (sessions[sessionSelectedId]) {
+            dialect = sessions[sessionSelectedId].options.dialect;
+        }
+        if (!database && sessions[sessionSelectedId]) {
+            database = sessions[sessionSelectedId].config.database;
+        }
+    }
+
+
+    let responseManager = null;
+    // choose responseManager (current choices: elastic and sequelize)
+    switch (dialect) {
+        // can add more cases here as more languages are supported
+        case DIALECTS.ELASTICSEARCH:
+            responseManager = elasticManager;
+            break;
+
+        case DIALECTS.MYSQL:
+        case DIALECTS.MARIADB:
+        case DIALECTS.POSTGRES:
+        case DIALECTS.REDSHIFT:
+        case DIALECTS.MSSQL:
+        case DIALECTS.SQLITE:
+            responseManager = sequelizeManager;
+            break;
+
+        default: {
+            responseManager = sequelizeManager;
+        }
+    }
+
+    responseManager.log(`Using session ${sessionSelectedId}`, 1);
+    responseManager.log(`Using database ${database}`, 1);
+    responseManager.log(`Using dialect ${dialect}`, 1);
+
+    // from now on responseManager should be used
+
+    /*
 	 * update current session before doing any tasks
 	 * this will use the correct connection credentials
 	 */
 
-    sequelizeManager.setSessionSelected(sessionSelected);
-    const currentSession = () => {
-        return sequelizeManager.sessions[sequelizeManager.sessionSelected];
+    // shorthands
+    let connError = false;
+    const log = (mes, lvl) => {
+        return responseManager.log(mes, lvl);
     };
-
+    const raiseError = (err, res) => {
+        if (!connError) {
+            responseManager.raiseError(err, res);
+        }
+    };
     const raiseConnectionError = (error) => {
-        sequelizeManager.log('raising connection error', 1);
-        return sequelizeManager.raiseError(
+        connError = true;
+        responseManager.log('Raising connection error.', 1);
+        return responseManager.raiseError(
             merge(
                 {message: AUTHENTICATION(error)},
                 {name: 'ConnectionError'}),
             responseSender
         );
     };
-
-    // check if there is a current database in use
-    let {database = null} = payload; // optional for some tasks
-    if (!database) {
-        if (currentSession()) {
-            database = currentSession().config.database;
-        }
-    }
-
-	log(`Sending task ${task} to sequelizeManager`, 1);
-	log(`Sending session ${sessionSelected} to sequelizeManager`, 1);
-	log(`Sending database ${database} to sequelizeManager`, 1);
-    log(`Sending message ${message} to sequelizeManager`, 1);
 
 	switch (task) {
 
@@ -109,13 +172,12 @@ export function executeTask(responseTools, responseSender, payload) {
 
 		case TASKS.CONNECT: {
 
-			sequelizeManager.connect(message)
+			responseManager.connect(message, responseSender)
             .catch((error) => raiseConnectionError(error))
 			.then(() => {log(
-				'NOTE: you are logged in as ' +
-				`[${currentSession().config.username}]`, 1
+				'TASK: you are logged in.', 1
 			);})
-			.then(sequelizeManager.getConnection(responseSender))
+			.then(responseManager.getConnection(responseSender))
 			.catch((error) => raiseError(error, responseSender));
 			break;
 
@@ -123,11 +185,10 @@ export function executeTask(responseTools, responseSender, payload) {
 
 		case TASKS.AUTHENTICATE: {
 
-			sequelizeManager.authenticate(responseSender)
-			.then(sequelizeManager.getConnection(responseSender))
+			responseManager.authenticate(responseSender)
+			.then(responseManager.getConnection(responseSender))
 			.then(() => {log(
-				'NOTE: connection authenticated as ' +
-				`[${currentSession().config.username}]`, 1
+				'TASK: connection authenticated.', 1
 			);});
 			break;
 
@@ -135,9 +196,9 @@ export function executeTask(responseTools, responseSender, payload) {
 
 		case TASKS.SESSIONS: {
 
-			sequelizeManager.showSessions(responseSender)
+			responseManager.showSessions(responseSender)
 			.then(() => {log(
-				'NOTE: fetched the list of sessions', 1
+				'TASK: fetched the list of sessions.', 1
 			);})
             .catch((error) => raiseError(error, responseSender));
 			break;
@@ -146,11 +207,11 @@ export function executeTask(responseTools, responseSender, payload) {
 
         case TASKS.DELETE_SESSION: {
 
-            sequelizeManager.deleteSession(message)
+            responseManager.deleteSession(message)
             .then(() => {log(
-                `NOTE: deleted session ${message}`, 1
+                `TASK: deleted session ${message}`, 1
             );})
-            .then(sequelizeManager.showSessions(responseSender))
+            .then(responseManager.showSessions(responseSender))
             .catch((error) => raiseError(error, responseSender));
             break;
 
@@ -158,12 +219,11 @@ export function executeTask(responseTools, responseSender, payload) {
 
         case TASKS.ADD_SESSION: {
 
-            sequelizeManager.authenticate(responseSender)
-            .then(sequelizeManager.addSession(message))
+            responseManager.addSession(message)
             .then(() => {log(
-                `NOTE: added session ${message}`, 1
+                `TASK: added session ${message}`, 1
             );})
-            .then(() => sequelizeManager.showSessions(responseSender))
+            .then(() => responseManager.showSessions(responseSender))
             .catch((error) => raiseError(error, responseSender));
             break;
 
@@ -171,11 +231,10 @@ export function executeTask(responseTools, responseSender, payload) {
 
 		case TASKS.DATABASES: {
 
-			sequelizeManager.authenticate(responseSender)
-			.then(sequelizeManager.showDatabases(responseSender))
+			responseManager.authenticate(responseSender)
+			.then(responseManager.showDatabases(responseSender))
 			.then(() => {log(
-				'NOTE: fetched the list of databases for user ' +
-				`[${currentSession().config.username}]`, 1
+				'TASK: fetched the list of databases.', 1
 			);})
             .catch((error) => raiseError(error, responseSender));
 			break;
@@ -184,13 +243,12 @@ export function executeTask(responseTools, responseSender, payload) {
 
 		case TASKS.SELECT_DATABASE: {
 
-			sequelizeManager.selectDatabase(database)
+			responseManager.selectDatabase(database)
             .catch((error) => raiseConnectionError(error))
 			.then(() => {log(
-				'NOTE: you are logged into database ' +
-				`[${currentSession().config.database}]`, 1
+				'TASK: you are logged in.', 1
 			);})
-			.then(sequelizeManager.getConnection(responseSender))
+			.then(responseManager.getConnection(responseSender))
             .catch((error) => raiseError(error, responseSender));
 			break;
 
@@ -198,12 +256,11 @@ export function executeTask(responseTools, responseSender, payload) {
 
 		case TASKS.TABLES: {
 
-			sequelizeManager.authenticate(responseSender)
-			.then(sequelizeManager.selectDatabase(database))
-			.then(sequelizeManager.showTables(responseSender))
+			responseManager.authenticate(responseSender)
+			.then(responseManager.selectDatabase(database))
+			.then(responseManager.showTables(responseSender))
 			.then(() => {log(
-				'NOTE: fetched the list of tables for database' +
-				`[${currentSession().config.database}]`, 1
+				`TASK: fetched the list of tables for database ${database}`, 1
 			);})
             .catch((error) => raiseError(error, responseSender));
 			break;
@@ -212,11 +269,11 @@ export function executeTask(responseTools, responseSender, payload) {
 
 		case TASKS.PREVIEW: {
 
-			sequelizeManager.authenticate(responseSender)
-			.then(sequelizeManager.selectDatabase(database))
-			.then(sequelizeManager.previewTables(message, responseSender))
+			responseManager.authenticate(responseSender)
+			.then(responseManager.selectDatabase(database))
+			.then(responseManager.previewTables(message, responseSender))
 			.then(() => {log(
-				`NOTE: you are previewing table(s) [${message}]`, 1
+				`TASK: you are previewing table(s) [${message}]`, 1
 			);})
             .catch((error) => raiseError(error, responseSender));
 			break;
@@ -225,11 +282,11 @@ export function executeTask(responseTools, responseSender, payload) {
 
 		case TASKS.QUERY: {
 
-			sequelizeManager.authenticate(responseSender)
-			.then(sequelizeManager.selectDatabase(database))
-			.then(sequelizeManager.sendRawQuery(message, responseSender))
+			responseManager.authenticate(responseSender)
+			.then(responseManager.selectDatabase(database))
+			.then(responseManager.sendRawQuery(message, responseSender))
 			.then(() => {log(
-				`QUERY EXECUTED: ${message}`, 1
+				`TASK: query executed "${message}"`, 1
 			);})
             .catch((error) => raiseError(error, responseSender));
 			break;
@@ -239,10 +296,9 @@ export function executeTask(responseTools, responseSender, payload) {
 		case TASKS.DISCONNECT: {
 
 			try {
-				sequelizeManager.disconnect(responseSender);
+				responseManager.disconnect(responseSender);
 				log(
-					'NOTE: you are logged out as ' +
-					`[${currentSession().config.username}]`, 1
+					'TASK: you are logged out.', 1
 				);
 			} catch (error) {
 				raiseError(error, responseSender);
@@ -259,14 +315,15 @@ export function executeTask(responseTools, responseSender, payload) {
 			 * @param {object} message - configuration for connecting a session
 			 */
 
-			sequelizeManager.connect(message)
+			responseManager.connect(message, responseSender)
             .catch((error) => raiseConnectionError(error))
-			.then(sequelizeManager.showDatabases(responseSender))
+			.then(responseManager.showDatabases(responseSender))
 			.then(() => {log(
-				'NOTE: you are logged in as ' +
-				`[${currentSession().config.username}]`, 1
+				'TASK: you are logged in.', 1
 			);})
-            .catch((error) => raiseError(error, responseSender));
+            .catch((error) => {
+                raiseError(error, responseSender);
+            });
 			break;
 
 		}
@@ -276,11 +333,10 @@ export function executeTask(responseTools, responseSender, payload) {
 			 * no message required here
 			 */
 
-			sequelizeManager.authenticate(responseSender)
-			.then(sequelizeManager.showDatabases(responseSender))
+			responseManager.authenticate(responseSender)
+			.then(responseManager.showDatabases(responseSender))
 			.then(() => {log(
-				'NOTE: you are logged in as ' +
-				`[${currentSession().config.username}]`, 1
+				'TASK: you are logged in.', 1
 			);})
             .catch((error) => raiseError(error, responseSender));
 			break;
@@ -292,13 +348,12 @@ export function executeTask(responseTools, responseSender, payload) {
 			 * @param {string} message - database to selectDatabase
 			 */
 
-			sequelizeManager.authenticate(responseSender)
-			.then(sequelizeManager.selectDatabase(message))
+			responseManager.authenticate(responseSender)
+			.then(responseManager.selectDatabase(message))
             .catch((error) => raiseConnectionError(error))
-			.then(sequelizeManager.showTables(responseSender))
+			.then(responseManager.showTables(responseSender))
 			.then(() => {log(
-				'NOTE: you are previewing database ' +
-				`[${currentSession().config.database}]`, 1
+				`TASK: you are previewing database ${message}.`, 1
 			);})
             .catch((error) => raiseError(error, responseSender));
 			break;

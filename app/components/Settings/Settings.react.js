@@ -98,6 +98,7 @@ export default class Settings extends Component {
 
         // #STEP1
         let userConfiguration = null;
+        let unfoldStep1 = null;
         if (this.state.showStep1) {
             userConfiguration = (
                 <div className={styles.configurationOptions}>
@@ -109,15 +110,24 @@ export default class Settings extends Component {
                     </div>
                 </div>
             );
+        } else {
+            unfoldStep1 = (
+                <img
+                    src="./images/unfold.png"
+                    className={styles.unfoldIcon}
+                >
+                </img>
+            );
         }
         const step1 = (
-            <div>
+            <div className={styles.step1Container}>
                 <h5>
                     <a
                         onClick={() => this.setState({showStep1: !this.state.showStep1})}
                     >
                         1. Connect to Database
                     </a>
+                    {unfoldStep1}
                 </h5>
                 {userConfiguration}
                 <div className={styles.connectButton}>
@@ -128,6 +138,7 @@ export default class Settings extends Component {
 
         // #STEP2
         let dropDowns = null;
+        let unfoldStep2 = null;
         if (this.state.showStep2) {
             dropDowns = (
                 <div>
@@ -135,15 +146,24 @@ export default class Settings extends Component {
                     {tablePreview}
                 </div>
             );
+        } else {
+            unfoldStep2 = (
+                <img
+                    src="./images/unfold.png"
+                    className={styles.unfoldIcon}
+                >
+                </img>
+            );
         }
         const step2 = (
             <div className={styles.step2Container}>
-                <h5>
-                    <a
-                        onClick={() => this.setState({showStep2: !this.state.showStep2})}
-                    >
+                <h5
+                    onClick={() => this.setState({showStep2: !this.state.showStep2})}
+                >
+                    <a>
                         2. Preview Database and Tables
                     </a>
+                    {unfoldStep2}
                 </h5>
                 {dropDowns}
             </div>
@@ -153,16 +173,8 @@ export default class Settings extends Component {
         let step3Header = null;
         let step3InstallCerts = null;
         let step3HTTPSServerStatus = null;
+        let unfoldStep3 = null;
         if (canConfigureHTTPS) {
-            step3Header = (
-                <h5>
-                    <a
-                        onClick={() => this.setState({showStep3: !this.state.showStep3})}
-                    >
-                        3. Secure your connection with HTTPS
-                    </a>
-                </h5>
-            );
             if (this.state.showStep3) {
                 step3HTTPSServerStatus = (
                     <CreateCertificates
@@ -176,7 +188,25 @@ export default class Settings extends Component {
                         sessionsActions={sessionsActions}
                     />
                 );
+            } else {
+                unfoldStep3 = (
+                    <img
+                        src="./images/unfold.png"
+                        className={styles.unfoldIcon}
+                    >
+                    </img>
+                );
             }
+            step3Header = (
+                <h5>
+                    <a
+                        onClick={() => this.setState({showStep3: !this.state.showStep3})}
+                    >
+                        3. Secure your connection with HTTPS
+                    </a>
+                    {unfoldStep3}
+                </h5>
+            );
         }
         const step3 = (
             <div className={styles.step3Container}>
@@ -193,11 +223,20 @@ export default class Settings extends Component {
 
         // #STEP4
         let importModal = null;
-        if (this.state.showStep4 && canConfigureHTTPS) {
+        let unfoldStep4 = null;
+        if (this.state.showStep4) {
             importModal = (
                 <ImportModal
                     ipc={ipc}
                 />
+            );
+        } else {
+            unfoldStep4 = (
+                <img
+                    src="./images/unfold.png"
+                    className={styles.unfoldIcon}
+                >
+                </img>
             );
         }
         const step4 = (
@@ -208,6 +247,7 @@ export default class Settings extends Component {
                     >
                         {canConfigureHTTPS ? 4 : 3}. Query from Plotly 2.0
                     </a>
+                    {unfoldStep4}
                 </h5>
                 {importModal}
             </div>
