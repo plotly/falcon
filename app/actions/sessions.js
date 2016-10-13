@@ -74,8 +74,7 @@ export function previewTables (tableNames) {
         const state = getState();
         const sessionSelected = state.sessions.get('sessionSelected');
         const database = state.sessions.getIn(
-            ['list', sessionSelected, 'configuration']
-        ).toJS().database;
+            ['list', sessionSelected, 'configuration', 'database']);
         ipcSend(TASKS.PREVIEW, sessionSelected, database, tableNames);
     };
 }
@@ -85,8 +84,7 @@ export function disconnect () {
         const state = getState();
         const sessionSelected = state.sessions.get('sessionSelected');
         const database = state.sessions.getIn(
-            ['list', sessionSelected, 'configuration']
-        ).toJS().database;
+            ['list', sessionSelected, 'configuration', 'database']);
         ipcSend(TASKS.DISCONNECT, sessionSelected, database);
     };
 }
