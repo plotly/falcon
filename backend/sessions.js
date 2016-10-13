@@ -1,12 +1,12 @@
 export class Sessions {
     constructor() {
-        this.sessionSelected = null;
+        this.sessionSelectedId = null;
         this.sessions = {};
         this.getSession = this.getSession.bind(this);
         this.createSession = this.createSession.bind(this);
         this.getSessions = this.getSessions.bind(this);
-        this.getSessionSelected = this.getSessionSelected.bind(this);
-        this.setSessionSelected = this.setSessionSelected.bind(this);
+        this.getSessionSelectedId = this.getSessionSelectedId.bind(this);
+        this.setSessionSelectedId = this.setSessionSelectedId.bind(this);
         this.getDialect = this.getDialect.bind(this);
         this.showSessions = this.showSessions.bind(this);
         this.deleteSession = this.deleteSession.bind(this);
@@ -18,23 +18,23 @@ export class Sessions {
     }
 
     getSession() {
-        return this.sessions[this.sessionSelected];
+        return this.sessions[this.sessionSelectedId];
     }
 
     getSessions() {
         return this.sessions;
     }
 
-    getSessionSelected() {
-        return this.sessionSelected;
+    getSessionSelectedId() {
+        return this.sessionSelectedId;
     }
 
-    setSessionSelected(sessionSelected) {
-        this.sessionSelected = sessionSelected;
+    setSessionSelectedId(sessionSelectedId) {
+        this.sessionSelectedId = sessionSelectedId;
     }
 
     getDialect() {
-        return this.sessions[this.sessionSelected].options.dialect;
+        return this.sessions[this.sessionSelectedId].options.dialect;
     }
 
 
@@ -69,7 +69,7 @@ export class Sessions {
         }
         return new Promise(
             (resolve, reject) => {
-                this.setSessionSelected(Object.keys(this.sessions)[0]);
+                this.setSessionSelectedId(Object.keys(this.sessions)[0]);
                 resolve(delete this.sessions[`${sessionId}`]);
             });
     }

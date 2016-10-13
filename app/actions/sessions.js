@@ -25,22 +25,22 @@ export const updateIpcState = createAction(UPDATE_IPC_STATE);
 export function query (statement) {
     return (_, getState) => {
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
-        const database = state.sessions[sessionSelected].configuration.database;
-        ipcSend(TASKS.QUERY, sessionSelected, database, statement);
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
+        const database = state.sessions[sessionSelectedId].configuration.database;
+        ipcSend(TASKS.QUERY, sessionSelectedId, database, statement);
     };
 }
 
 export function connect () {
     return (_, getState) => {
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
         const configuration = state.sessions.getIn(
-            ['list', sessionSelected, 'configuration']
+            ['list', sessionSelectedId, 'configuration']
         ).toJS();
         ipcSend(
             TASKS.CONNECT_AND_SHOW_DATABASES,
-            sessionSelected,
+            sessionSelectedId,
             configuration.database,
             configuration
         );
@@ -56,13 +56,13 @@ export function deleteSession (sessionId) {
 export function selectDatabase () {
     return (_, getState) => {
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
         const configuration = state.sessions.getIn(
-            ['list', sessionSelected, 'configuration']
+            ['list', sessionSelectedId, 'configuration']
         ).toJS();
         ipcSend(
             TASKS.SELECT_DATABASE_AND_SHOW_TABLES,
-            sessionSelected,
+            sessionSelectedId,
             configuration.database,
             configuration.database
         );
@@ -72,41 +72,41 @@ export function selectDatabase () {
 export function previewTables (tableNames) {
     return (_, getState) => {
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
         const database = state.sessions.getIn(
-            ['list', sessionSelected, 'configuration', 'database']);
-        ipcSend(TASKS.PREVIEW, sessionSelected, database, tableNames);
+            ['list', sessionSelectedId, 'configuration', 'database']);
+        ipcSend(TASKS.PREVIEW, sessionSelectedId, database, tableNames);
     };
 }
 
 export function disconnect () {
     return (_, getState) => {
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
         const database = state.sessions.getIn(
-            ['list', sessionSelected, 'configuration', 'database']);
-        ipcSend(TASKS.DISCONNECT, sessionSelected, database);
+            ['list', sessionSelectedId, 'configuration', 'database']);
+        ipcSend(TASKS.DISCONNECT, sessionSelectedId, database);
     };
 }
 
 export function setupHttpsServer () {
     return (__, getState) => {
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.SETUP_HTTPS_SERVER, sessionSelected);
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
+        ipcSend(TASKS.SETUP_HTTPS_SERVER, sessionSelectedId);
     };
 }
 
 export function newOnPremSession (domain) {
     return (__, getState) => {
         const state = getState();
-        const sessionSelected = state.sessions.get('sessionSelected');
-        ipcSend(TASKS.NEW_ON_PREM_SESSION, sessionSelected, null, domain);
+        const sessionSelectedId = state.sessions.get('sessionSelectedId');
+        ipcSend(TASKS.NEW_ON_PREM_SESSION, sessionSelectedId, null, domain);
     };
 }
 
-function ipcSend(task, sessionSelected, database, message = {}) {
-    ipcRenderer.send(CHANNEL, {task, sessionSelected, database, message});
+function ipcSend(task, sessionSelectedId, database, message = {}) {
+    ipcRenderer.send(CHANNEL, {task, sessionSelectedId, database, message});
 }
 
 // <- ipc specific

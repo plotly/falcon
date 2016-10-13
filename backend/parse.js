@@ -123,7 +123,7 @@ export function parseSQL(data) {
 }
 
 
-export function parseES(data) {
+export function parseElasticsearch(data) {
 
     /*
     recieves data as

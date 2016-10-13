@@ -12,7 +12,7 @@ import {EMPTY_SESSION} from '../constants/constants';
 // see end of file for `list` description
 const INITIAL_STATE = Immutable.Map({
     list: Immutable.Map({}),
-    sessionSelected: '0',
+    sessionSelectedId: '0',
     startupIPC: Immutable.Map({})
 });
 
@@ -38,27 +38,27 @@ export default function sessions(state = INITIAL_STATE, action) {
             );
 
         case SWITCH_SESSION:
-            return state.merge({sessionSelected: action.payload});
+            return state.merge({sessionSelectedId: action.payload});
 
         case FORGET_SESSION:
             return state.deleteIn(['list', `${action.payload}`]);
 
         case UPDATE_CONFIGURATION:
             return state.mergeIn(
-                ['list', state.get('sessionSelected'), 'configuration'],
+                ['list', state.get('sessionSelectedId'), 'configuration'],
                 action.payload
             );
 
         case UPDATE_CONNECTION:
             return state.mergeIn(
-                ['list', state.get('sessionSelected'), 'connection'],
+                ['list', state.get('sessionSelectedId'), 'connection'],
                 action.payload
             );
 
         case UPDATE_IPC_STATE:
             if (state.get('list').size > 0) {
                 return state.mergeIn(
-                    ['list', state.get('sessionSelected'), 'ipc'],
+                    ['list', state.get('sessionSelectedId'), 'ipc'],
                     Immutable.fromJS(action.payload)
                 );
             } else {

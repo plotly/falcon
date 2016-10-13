@@ -25,7 +25,7 @@ const getNewId = (sessionsIds) => {
 };
 
 const obtainDatabaseForTask = (
-    requestEvent, sequelizeManager, sessionSelected, callback
+    requestEvent, sequelizeManager, sessionSelectedId, callback
 ) => {
     let database = null;
     // TODO: stricter database check form workspace message
@@ -43,9 +43,9 @@ export function v1(requestEvent, sequelizeManager, callback) {
 
     const endpoint = split('/', requestEvent.route.path)[2];
 
-    let sessionSelected = sequelizeManager.sessionSelected;
+    let sessionSelectedId = sequelizeManager.sessionSelectedId;
     if (foundParams(requestEvent.params, 'session')) {
-        sessionSelected = requestEvent.params.session;
+        sessionSelectedId = requestEvent.params.session;
     }
 
     switch (endpoint) {
@@ -167,7 +167,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
 
             task = TASKS.SELECT_DATABASE;
             database = obtainDatabaseForTask(
-                requestEvent, sequelizeManager, sessionSelected, callback
+                requestEvent, sequelizeManager, sessionSelectedId, callback
             );
             break;
         }
@@ -181,7 +181,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
 
             task = TASKS.TABLES;
             database = obtainDatabaseForTask(
-                requestEvent, sequelizeManager, sessionSelected, callback
+                requestEvent, sequelizeManager, sessionSelectedId, callback
             );
             break;
 
@@ -196,7 +196,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
 
             task = TASKS.PREVIEW;
             database = obtainDatabaseForTask(
-                requestEvent, sequelizeManager, sessionSelected, callback
+                requestEvent, sequelizeManager, sessionSelectedId, callback
             );
             if (!foundParams(requestEvent.params, 'tables')) {
                 sequelizeManager.raiseError(
@@ -218,7 +218,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
 
             task = TASKS.QUERY;
             // database = obtainDatabaseForTask(
-            //     requestEvent, sequelizeManager, sessionSelected, callback
+            //     requestEvent, sequelizeManager, sessionSelectedId, callback
             // );
             if (!foundParams(requestEvent.params, 'statement')) {
                 sequelizeManager.raiseError(
@@ -254,6 +254,6 @@ export function v1(requestEvent, sequelizeManager, callback) {
         }
     }
 
-return {task, sessionSelected, database, message};
+return {task, sessionSelectedId, database, message};
 
 }

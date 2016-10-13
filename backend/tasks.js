@@ -46,46 +46,46 @@ export function executeTask(responseTools, responseSender, payload) {
 	} = payload;
 
     let {
-        sessionSelected = null,
+        sessionSelectedId = null,
         database = null
     } = payload;
 
     sequelizeManager.log(task);
     sequelizeManager.log(message);
-    sequelizeManager.log(sessionSelected);
+    sequelizeManager.log(sessionSelectedId);
     sequelizeManager.log(database);
 
-    // unpack sessionSelected and decide which responseManager to use
+    // unpack sessionSelectedId and decide which responseManager to use
     const sessions = sequelizeManager.getSessions();
-    const oldSessionSelected = sequelizeManager.getSessionSelected();
+    const oldSessionSelectedId = sequelizeManager.getSessionSelectedId();
     const sessionsList = Object.keys(sessions);
-    const setSessionSelected = sequelizeManager.setSessionSelected;
+    const setSessionSelectedId = sequelizeManager.setSessionSelectedId;
 
     // sessions should point to the same object for sequelize and elastic
     // Managers, see sequelizeManager and elasticManager constructors
 
 
-    const isNewSession = !contains(sessionSelected, sessionsList);
+    const isNewSession = !contains(sessionSelectedId, sessionsList);
 
     // here we want to establish which dialect and database to use for the task
     let dialect = null;
     // new session
-    if (isNewSession && sessionSelected && message) {
+    if (isNewSession && sessionSelectedId && message) {
         dialect = message.dialect;
-        sequelizeManager.setSessionSelected(sessionSelected);
+        sequelizeManager.setSessionSelectedId(sessionSelectedId);
     // session is not new and was passed
-    } else if (sessionSelected) {
-        dialect = sessions[sessionSelected].options.dialect;
-        database = sessions[sessionSelected].config.database;
-        setSessionSelected(sessionSelected);
+    } else if (sessionSelectedId) {
+        dialect = sessions[sessionSelectedId].options.dialect;
+        database = sessions[sessionSelectedId].config.database;
+        setSessionSelectedId(sessionSelectedId);
     // no session? use current one
-    } else if (!sessionSelected) {
-        sessionSelected = oldSessionSelected;
-        if (sessions[sessionSelected]) {
-            dialect = sessions[sessionSelected].options.dialect;
+    } else if (!sessionSelectedId) {
+        sessionSelectedId = oldSessionSelectedId;
+        if (sessions[sessionSelectedId]) {
+            dialect = sessions[sessionSelectedId].options.dialect;
         }
-        if (!database && sessions[sessionSelected]) {
-            database = sessions[sessionSelected].config.database;
+        if (!database && sessions[sessionSelectedId]) {
+            database = sessions[sessionSelectedId].config.database;
         }
     }
 
@@ -112,7 +112,7 @@ export function executeTask(responseTools, responseSender, payload) {
         }
     }
 
-    responseManager.log(`Using session ${sessionSelected}`, 1);
+    responseManager.log(`Using session ${sessionSelectedId}`, 1);
     responseManager.log(`Using database ${database}`, 1);
     responseManager.log(`Using dialect ${dialect}`, 1);
 

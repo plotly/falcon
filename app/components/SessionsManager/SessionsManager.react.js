@@ -84,10 +84,10 @@ export default class SessionsManager extends Component {
                     className={styles.sessionDelete}
                     onClick={() => {
                         const indexOfId = sessionsIds.indexOf(
-                            sessions.get('sessionSelected')
+                            sessions.get('sessionSelectedId')
                         );
                         // are we deleting currently open session?
-                        if (sessionId === sessions.get('sessionSelected')) {
+                        if (sessionId === sessions.get('sessionSelectedId')) {
                             // have to switch before deleting
                             if (indexOfId === 0) {
                                 // cant have a negative index in an array
@@ -231,7 +231,7 @@ export default class SessionsManager extends Component {
                 sessionId => (
                     <div className={classnames(styles.sessionWrapper, {
                             [styles.sessionWrapperSelected]:
-                                sessions.get('sessionSelected') === sessionId
+                                sessions.get('sessionSelectedId') === sessionId
                             }
                         )}
                     >

@@ -2,7 +2,7 @@ import elasticsearch from 'elasticsearch';
 import {merge} from 'ramda';
 import YAML from 'yamljs';
 
-import {parseES} from './parse';
+import {parseElasticsearch} from './parse';
 import {ARGS} from './args';
 import {APP_NOT_CONNECTED, AUTHENTICATION} from './errors';
 
@@ -26,10 +26,10 @@ const assembleTablesPreviewMessage = (tablePreviews) => {
 
     let parsedRows;
 
-    return tablePreviews.map( (tablePreview) => {
+    return tablePreviews.map((tablePreview) => {
         const tableName = Object.keys(tablePreview);
         const rawData = tablePreview[tableName];
-        parsedRows = (isEmpty(rawData)) ? EMPTY_TABLE : parseES(rawData);
+        parsedRows = (isEmpty(rawData)) ? EMPTY_TABLE : parseElasticsearch(rawData);
         return {[tableName]: parsedRows};
     });
 
@@ -43,9 +43,9 @@ export class ElasticManager {
         this.raiseError = Logger.raiseError;
 
         this.getSession = Sessions.getSession;
-        this.setSessionSelected = Sessions.setSessionSelected;
+        this.setSessionSelectedId = Sessions.setSessionSelectedId;
         this.getDialect = Sessions.getDialect;
-        this.getSessionSelected = Sessions.getSessionSelected;
+        this.getSessionSelectedId = Sessions.getSessionSelectedId;
         this.getSessions = Sessions.getSessions;
         this.createSession = Sessions.createSession;
         this.updateSession = Sessions.updateSession;
@@ -70,7 +70,7 @@ export class ElasticManager {
         });
         newSession.options = {dialect: 'elasticsearch'};
         newSession.config = {username};
-        this.createSession(this.getSessionSelected(), newSession);
+        this.createSession(this.getSessionSelectedId(), newSession);
     }
 
 
@@ -89,7 +89,7 @@ export class ElasticManager {
             return new Promise((resolve, reject) => {
                 this.getSession().ping({
                     // ping usually has a 3000ms timeout
-                    requestTimeout: Infinity,
+                    requestTimeout: 10000,
                     // undocumented params are appended to the query string
                     hello: 'hello elasticsearch!'
                 }, (error) => {
@@ -107,8 +107,8 @@ export class ElasticManager {
     connect(configFromApp, responseSender) {
 
         if (ARGS.headless) {
-            // read locally stored configuration for sessionSelected
-            const configFromFile = YAML.load(ARGS.configpath)[this.getSessionSelected()];
+            // read locally stored configuration for sessionSelectedId
+            const configFromFile = YAML.load(ARGS.configpath)[this.getSessionSelectedId()];
             this.createConnection(configFromFile);
         } else {
             this.createConnection(configFromApp);
@@ -194,7 +194,7 @@ export class ElasticManager {
         })
         .then((results) => {
             this.log('Results received.', 2);
-            responseSender(merge(parseES(results), {error: null}));
+            responseSender(merge(parseElasticsearch(results), {error: null}));
         }); }
 
 

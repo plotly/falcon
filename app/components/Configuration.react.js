@@ -16,17 +16,17 @@ export default class Configuration extends Component {
             sessions
         } = this.props;
         // debugger;
-        const sessionSelected = sessions.getIn(
-            ['list', `${this.props.sessions.get('sessionSelected')}`]
+        const sessionSelectedId = sessions.getIn(
+            ['list', `${this.props.sessions.get('sessionSelectedId')}`]
         );
 
         if (this.props.sessions.get('list').size > 0) {
 
             settings = (
                 <Settings
-                    configuration={sessionSelected.get('configuration')}
-                    connection={sessionSelected.get('connection')}
-                    ipc={sessionSelected.get('ipc')}
+                    configuration={sessionSelectedId.get('configuration')}
+                    connection={sessionSelectedId.get('connection')}
+                    ipc={sessionSelectedId.get('ipc')}
 
                     sessionsActions={sessionsActions}
                 />

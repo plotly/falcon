@@ -70,9 +70,9 @@ export class SequelizeManager {
         this.log = Logger.log;
         this.raiseError = Logger.raiseError;
         this.getSession = Sessions.getSession;
-        this.setSessionSelected = Sessions.setSessionSelected;
+        this.setSessionSelectedId = Sessions.setSessionSelectedId;
         this.getDialect = Sessions.getDialect;
-        this.getSessionSelected = Sessions.getSessionSelected;
+        this.getSessionSelectedId = Sessions.getSessionSelectedId;
         this.getSessions = Sessions.getSessions;
         this.createSession = Sessions.createSession;
         this.updateSession = Sessions.updateSession;
@@ -145,7 +145,7 @@ export class SequelizeManager {
         rememberSubdialect(newSession, subDialect);
 
         this.createSession(
-            this.getSessionSelected(),
+            this.getSessionSelectedId(),
             newSession
         );
     }
@@ -180,8 +180,8 @@ export class SequelizeManager {
     connect(configFromApp) {
 
         if (ARGS.headless) {
-            // read locally stored configuration for sessionSelected
-            const configFromFile = YAML.load(ARGS.configpath)[this.getSessionSelected()];
+            // read locally stored configuration for sessionSelectedId
+            const configFromFile = YAML.load(ARGS.configpath)[this.getSessionSelectedId()];
             this.createConnection(configFromFile);
         } else {
             this.createConnection(configFromApp);
@@ -237,7 +237,7 @@ export class SequelizeManager {
                 rememberSubdialect(newSession, subDialect);
             }
 
-            this.createSession(this.getSessionSelected(), newSession);
+            this.createSession(this.getSessionSelectedId(), newSession);
 
         }
 
