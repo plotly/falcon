@@ -75,11 +75,6 @@ export function executeTask(responseTools, responseSender, payload) {
         database = null
     } = payload;
 
-    sequelizeManager.log(task);
-    sequelizeManager.log(message);
-    sequelizeManager.log(sessionSelectedId);
-    sequelizeManager.log(database);
-
     // unpack sessionSelectedId and decide which responseManager to use
     const sessions = sequelizeManager.getSessions();
     const oldSessionSelectedId = sequelizeManager.getSessionSelectedId();
@@ -136,10 +131,6 @@ export function executeTask(responseTools, responseSender, payload) {
             responseManager = sequelizeManager;
         }
     }
-
-    responseManager.log(`Using session ${sessionSelectedId}`, 1);
-    responseManager.log(`Using database ${database}`, 1);
-    responseManager.log(`Using dialect ${dialect}`, 1);
 
     // from now on responseManager should be used
 
