@@ -60,10 +60,8 @@ export function executeTask(responseTools, responseSender, payload) {
     const oldSessionSelectedId = sequelizeManager.getSessionSelectedId();
     const sessionsList = Object.keys(sessions);
     const setSessionSelectedId = sequelizeManager.setSessionSelectedId;
-
     // sessions should point to the same object for sequelize and elastic
     // Managers, see sequelizeManager and elasticManager constructors
-
 
     const isNewSession = !contains(sessionSelectedId, sessionsList);
 
@@ -76,7 +74,9 @@ export function executeTask(responseTools, responseSender, payload) {
     // session is not new and was passed
     } else if (sessionSelectedId) {
         dialect = sessions[sessionSelectedId].options.dialect;
-        database = sessions[sessionSelectedId].config.database;
+        if (!database) {
+            database = sessions[sessionSelectedId].config.database;
+        }
         setSessionSelectedId(sessionSelectedId);
     // no session? use current one
     } else if (!sessionSelectedId) {

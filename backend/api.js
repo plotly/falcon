@@ -24,17 +24,6 @@ const getNewId = (sessionsIds) => {
     return `${newId}`;
 };
 
-const obtainDatabaseForTask = (
-    requestEvent, sequelizeManager, sessionSelectedId, callback
-) => {
-    let database = null;
-    // TODO: stricter database check form workspace message
-    if (foundParams(requestEvent.params, 'database')) {
-        database = requestEvent.params.database;
-    }
-    return database;
-};
-
 export function v1(requestEvent, sequelizeManager, callback) {
 
     let task = null;
@@ -81,7 +70,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
              * action: authenticate, get sessions
              * returns: sessions list as [ {id: dialect:username@host}, ... ]
              */
-
+            task = TASKS.DELETE_SESSION;
             task = TASKS.SESSIONS;
             break;
 
@@ -102,8 +91,6 @@ export function v1(requestEvent, sequelizeManager, callback) {
             } else {
                 message = requestEvent.params.session;
             }
-
-
             if (!contains(message, Object.keys(sequelizeManager.sessions))) {
                 sequelizeManager.raiseError(
                     {message: APP_NOT_CONNECTED}, callback
@@ -152,7 +139,9 @@ export function v1(requestEvent, sequelizeManager, callback) {
              * action: authenticate, get databases
              * returns: databases list = ['database1', 'database2' ...]
              */
-
+            if (foundParams(requestEvent.params, 'session')) {
+                sessionSelectedId = requestEvent.params.session;
+            }
             task = TASKS.DATABASES;
             break;
 
@@ -166,9 +155,16 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.SELECT_DATABASE;
-            database = obtainDatabaseForTask(
-                requestEvent, sequelizeManager, sessionSelectedId, callback
-            );
+            if (foundParams(requestEvent.params, 'session')) {
+                sessionSelectedId = requestEvent.params.session;
+            }
+            if (!foundParams(requestEvent.params, 'database')) {
+                sequelizeManager.raiseError(
+                    {message: DATABASE_PARAM}, callback
+                );
+            } else {
+                database = requestEvent.params.database;
+            }
             break;
         }
 
@@ -180,9 +176,12 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.TABLES;
-            database = obtainDatabaseForTask(
-                requestEvent, sequelizeManager, sessionSelectedId, callback
-            );
+            if (foundParams(requestEvent.params, 'session')) {
+                sessionSelectedId = requestEvent.params.session;
+            }
+            if (foundParams(requestEvent.params, 'database')) {
+                database = requestEvent.params.database;
+            }
             break;
 
         }
@@ -195,9 +194,12 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.PREVIEW;
-            database = obtainDatabaseForTask(
-                requestEvent, sequelizeManager, sessionSelectedId, callback
-            );
+            if (foundParams(requestEvent.params, 'session')) {
+                sessionSelectedId = requestEvent.params.session;
+            }
+            if (foundParams(requestEvent.params, 'database')) {
+                database = requestEvent.params.database;
+            }
             if (!foundParams(requestEvent.params, 'tables')) {
                 sequelizeManager.raiseError(
                     {message: TABLES_PARAM}, callback
@@ -217,9 +219,12 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.QUERY;
-            // database = obtainDatabaseForTask(
-            //     requestEvent, sequelizeManager, sessionSelectedId, callback
-            // );
+            if (foundParams(requestEvent.params, 'session')) {
+                sessionSelectedId = requestEvent.params.session;
+            }
+            if (foundParams(requestEvent.params, 'database')) {
+                database = requestEvent.params.database;
+            }
             if (!foundParams(requestEvent.params, 'statement')) {
                 sequelizeManager.raiseError(
                     {message: QUERY_PARAM}, callback
@@ -238,7 +243,12 @@ export function v1(requestEvent, sequelizeManager, callback) {
              * action: disconnect, authenticate
              * return: connection state object
              */
-
+             if (foundParams(requestEvent.params, 'session')) {
+                 sessionSelectedId = requestEvent.params.session;
+             }
+             if (foundParams(requestEvent.params, 'database')) {
+                 database = requestEvent.params.database;
+             }
             task = TASKS.DISCONNECT;
             break;
 
