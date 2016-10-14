@@ -9,6 +9,7 @@ import {ipcMessageReceive,
         CHANNEL} from './messageHandler';
 import {setupHTTP, setupHTTPS, findSelfSignedCert} from './setupServers';
 import {setupMenus} from './menus';
+import {trackStartup} from './mixpanel';
 
 if (process.env.NODE_ENV === 'development') {
     require('electron-debug')();
@@ -22,27 +23,12 @@ const isTestRun = () => {
     return (contains('--test-type=webdriver', process.argv.slice(2)));
 };
 
-/* ----------MIXPANEL----------*/
-var Mixpanel = require('mixpanel');
-
-const isDevEnv = () => {
-    return process.env.NODE_ENV === 'development';
-};
-
-const isTrackingOn = !isTestRun() && !isDevEnv();
-const mixpanel = Mixpanel.init('a700ac2c3ec94256f03375835f60a920');
-if (isTrackingOn) {
-    mixpanel.track('Connector-Start', {
-        platform: process.platform
-    });
-}
-/* ----------MIXPANEL----------*/
-
 // TODO: issue #65 shell scripts for HTTPS setup may not work on windows atm
 const canSetupHTTPS = isUnix() && !isTestRun();
 
 
 app.on('ready', () => {
+    trackStartup();
 
     let mainWindow = new BrowserWindow({
         show: false,

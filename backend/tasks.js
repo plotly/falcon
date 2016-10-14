@@ -2,31 +2,7 @@ import {merge, contains} from 'ramda';
 import {AUTHENTICATION, TASK} from './errors';
 import {setupHTTPS, newOnPremSession} from './setupServers';
 import {DIALECTS} from '../app/constants/constants';
-
-/* ----------MIXPANEL----------*/
-var Mixpanel = require('mixpanel');
-
-const isDevEnv = () => {
-    return process.env.NODE_ENV === 'development';
-};
-
-const isTestRun = () => {
-    return (contains('--test-type=webdriver', process.argv.slice(2)));
-};
-
-const isTrackingOn = !isTestRun() && !isDevEnv();
-
-const mixpanel = Mixpanel.init('a700ac2c3ec94256f03375835f60a920');
-
-const mixpanelTrack = (task, parameters = {}) => {
-    if (isTrackingOn) {
-        mixpanel.track(task, merge(
-            {platform: process.platform},
-            parameters
-        ));
-    }
-};
-// /* ----------MIXPANEL----------*/
+import {trackEvent} from './mixpanel';
 
 
 export const TASKS = {
@@ -166,7 +142,7 @@ export function executeTask(responseTools, responseSender, payload) {
 		 */
 
 		case TASKS.SETUP_HTTPS_SERVER: {
-            mixpanelTrack(task);
+            trackEvent(task);
             log('Setting up https server...', 1);
             setupHTTPS(responseTools);
 			break;
@@ -177,7 +153,7 @@ export function executeTask(responseTools, responseSender, payload) {
 		 */
 
 		case TASKS.NEW_ON_PREM_SESSION: {
-            mixpanelTrack(task);
+            trackEvent(task);
             log(`Adding domain ${message} to CORS`, 1);
 			newOnPremSession(message, responseTools);
 			break;
@@ -297,14 +273,14 @@ export function executeTask(responseTools, responseSender, payload) {
 		}
 
 		case TASKS.QUERY: {
-            mixpanelTrack(task, {databaseType: dialect});
+            trackEvent(task, {databaseType: dialect});
 			responseManager.authenticate(responseSender)
 			.then(responseManager.selectDatabase(database))
 			.then(responseManager.sendRawQuery(message, responseSender))
 			.then(() => {log(
                 `TASK: query executed "${message}"`, 1
             );})
-            .then(() => {mixpanelTrack(`${task}-success`, {databaseType: dialect});})
+            .then(() => {trackEvent(`${task}-success`, {databaseType: dialect});})
             .catch((error) => raiseError(error, responseSender));
 			break;
 
@@ -331,14 +307,14 @@ export function executeTask(responseTools, responseSender, payload) {
 			/*
 			 * @param {object} message - configuration for connecting a session
 			 */
-            mixpanelTrack('CONNECTION', {databaseType: dialect});
+            trackEvent('CONNECTION', {databaseType: dialect});
 			responseManager.connect(message, responseSender)
             .catch((error) => raiseConnectionError(error))
 			.then(responseManager.showDatabases(responseSender))
 			.then(() => {log(
                 'TASK: you are logged in.', 1
             );})
-            .then(() => {mixpanelTrack('CONNECTION-success', {databaseType: dialect});})
+            .then(() => {trackEvent('CONNECTION-success', {databaseType: dialect});})
             .catch((error) => {
                 raiseError(error, responseSender);
             });

@@ -41,7 +41,6 @@ export default {
             'sequelize': 'commonjs sequelize',
             'bunyan': 'commonjs bunyan',
             'tedious': 'tedious',
-            'mixpanel': 'commonjs mixpanel',
             'electron-sudo': 'commonjs electron-sudo'
         }
     ]
