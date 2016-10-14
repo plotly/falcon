@@ -9,6 +9,7 @@ import {ipcMessageReceive,
         CHANNEL} from './messageHandler';
 import {setupHTTP, setupHTTPS, findSelfSignedCert} from './setupServers';
 import {setupMenus} from './menus';
+import {trackStartup} from './mixpanel';
 
 if (process.env.NODE_ENV === 'development') {
     require('electron-debug')();
@@ -27,6 +28,7 @@ const canSetupHTTPS = isUnix() && !isTestRun();
 
 
 app.on('ready', () => {
+    trackStartup();
 
     let mainWindow = new BrowserWindow({
         show: false,

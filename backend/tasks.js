@@ -2,6 +2,7 @@ import {merge, contains} from 'ramda';
 import {AUTHENTICATION, TASK} from './errors';
 import {setupHTTPS, newOnPremSession} from './setupServers';
 import {DIALECTS} from '../app/constants/constants';
+import {trackEvent} from './mixpanel';
 
 
 export const TASKS = {
@@ -49,11 +50,6 @@ export function executeTask(responseTools, responseSender, payload) {
         sessionSelectedId = null,
         database = null
     } = payload;
-
-    sequelizeManager.log(task);
-    sequelizeManager.log(message);
-    sequelizeManager.log(sessionSelectedId);
-    sequelizeManager.log(database);
 
     // unpack sessionSelectedId and decide which responseManager to use
     const sessions = sequelizeManager.getSessions();
@@ -112,10 +108,6 @@ export function executeTask(responseTools, responseSender, payload) {
         }
     }
 
-    responseManager.log(`Using session ${sessionSelectedId}`, 1);
-    responseManager.log(`Using database ${database}`, 1);
-    responseManager.log(`Using dialect ${dialect}`, 1);
-
     // from now on responseManager should be used
 
     /*
@@ -145,12 +137,12 @@ export function executeTask(responseTools, responseSender, payload) {
     };
 
 	switch (task) {
-
 		/*
 		 * https tasks -->
 		 */
 
 		case TASKS.SETUP_HTTPS_SERVER: {
+            trackEvent(task);
             log('Setting up https server...', 1);
             setupHTTPS(responseTools);
 			break;
@@ -161,6 +153,7 @@ export function executeTask(responseTools, responseSender, payload) {
 		 */
 
 		case TASKS.NEW_ON_PREM_SESSION: {
+            trackEvent(task);
             log(`Adding domain ${message} to CORS`, 1);
 			newOnPremSession(message, responseTools);
 			break;
@@ -171,7 +164,6 @@ export function executeTask(responseTools, responseSender, payload) {
 		 */
 
 		case TASKS.CONNECT: {
-
 			responseManager.connect(message, responseSender)
             .catch((error) => raiseConnectionError(error))
 			.then(() => {log(
@@ -281,13 +273,14 @@ export function executeTask(responseTools, responseSender, payload) {
 		}
 
 		case TASKS.QUERY: {
-
+            trackEvent(task, {databaseType: dialect});
 			responseManager.authenticate(responseSender)
 			.then(responseManager.selectDatabase(database))
 			.then(responseManager.sendRawQuery(message, responseSender))
 			.then(() => {log(
-				`TASK: query executed "${message}"`, 1
-			);})
+                `TASK: query executed "${message}"`, 1
+            );})
+            .then(() => {trackEvent(`${task}-success`, {databaseType: dialect});})
             .catch((error) => raiseError(error, responseSender));
 			break;
 
@@ -314,13 +307,14 @@ export function executeTask(responseTools, responseSender, payload) {
 			/*
 			 * @param {object} message - configuration for connecting a session
 			 */
-
+            trackEvent('CONNECTION', {databaseType: dialect});
 			responseManager.connect(message, responseSender)
             .catch((error) => raiseConnectionError(error))
 			.then(responseManager.showDatabases(responseSender))
 			.then(() => {log(
-				'TASK: you are logged in.', 1
-			);})
+                'TASK: you are logged in.', 1
+            );})
+            .then(() => {trackEvent('CONNECTION-success', {databaseType: dialect});})
             .catch((error) => {
                 raiseError(error, responseSender);
             });
