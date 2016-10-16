@@ -64,6 +64,18 @@ export function v1(requestEvent, sequelizeManager, callback) {
 
         }
 
+        case 'getmappings': {
+
+            /*
+             * action: checks for existing valid connection
+             * returns: connection state
+             */
+
+            task = TASKS.GET_MAPPINGS;
+            break;
+
+        }
+
         case 'sessions': {
 
             /*

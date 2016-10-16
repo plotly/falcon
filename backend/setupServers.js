@@ -153,7 +153,7 @@ export function setupHTTP(responseTools) {
     httpServer.use(restify.queryParser());
     httpServer.use(restify.bodyParser({ mapParams: true }));
     httpServer.use(restify.CORS({
-        origins: acceptRequestsFrom.domains,
+        origins: ['*'],
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
     })).listen(responseTools.OPTIONS.port);

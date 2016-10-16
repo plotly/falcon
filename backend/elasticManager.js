@@ -124,6 +124,19 @@ export class ElasticManager {
     }
 
 
+    getMappings(responseSender) {
+        this.log('Looking up mappings (databases).', 2);
+        return () => this.getSession().indices.getMapping('_all')
+        .then((response) => {
+            this.log('Mappings received', 2);
+            responseSender({
+                mappings: response,
+                error: null
+            });
+        });
+    }
+
+
     showDatabases(responseSender) {
         this.log('Looking up indexes (databases).', 2);
         return () => this.getSession().indices.getMapping('_all')
@@ -184,17 +197,15 @@ export class ElasticManager {
     }
 
 
-    sendRawQuery(queryObject, responseSender) {
+    sendRawQuery(statement, responseSender) {
         this.log('Querying elasticsearch database.', 2);
-        return this.getSession().search(
-            queryObject
-        )
+        return this.getSession().search(JSON.parse(statement))
         .catch( error => {
             this.raiseError(error, responseSender);
         })
         .then((results) => {
             this.log('Results received.', 2);
-            responseSender(merge(parseElasticsearch(results), {error: null}));
+            responseSender(merge({results}, {error: null}));
         }); }
 
 

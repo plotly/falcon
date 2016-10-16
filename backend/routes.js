@@ -13,7 +13,8 @@ const ENDPOINTS = {
         'tables',
         'preview',
         'query',
-        'disconnect'
+        'disconnect',
+        'getmappings'
     ]
 };
 
