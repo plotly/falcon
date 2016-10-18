@@ -61,7 +61,7 @@ function parseGeoJSON(rows) {
         });
     });
     // if response has no geojson, the geojson is returned as empty array
-    return {rows: newRows, geojson: GeoJSONs};
+    return {rowsWithGeoJSON: newRows, geojson: GeoJSONs};
 
 }
 
@@ -123,7 +123,7 @@ export function parseSQL(data) {
 }
 
 
-export function parseElasticsearch(data) {
+export function parseElasticsearch(outputJson) {
 
     /*
     recieves data as
@@ -155,10 +155,42 @@ export function parseElasticsearch(data) {
     ]
 
     */
+    let columnnames = [];
+    let rows = [[]];
+    let nrows = 0;
+    let ncols = 0;
+    let data = {};
 
-    const columnnames = Object.keys(data[0]._source);
-    const ncols = columnnames.length;
-    const nrows = data.length;
+    if (!outputJson) return {columnnames, rows, nrows, ncols};
+
+    if (outputJson.aggregations) {
+        console.log('aggregations');
+        const aggregation = outputJson.aggregations.agg1;
+        const buckets = aggregation.buckets;
+        if (buckets.length !== 0) {
+            columnnames = [
+                'aggregationColumn',
+                'metricType by metricCollumn'
+            ];
+            ncols = 2;
+            rows = buckets.map(bucket => [bucket.key, bucket.agg2.value]);
+            nrows = rows.length;
+            console.log('with buckets');
+
+        }
+        return {columnnames, rows, nrows, ncols};
+
+    } else if (outputJson.hits && outputJson.hits.hits) {
+        console.log('hits hits');
+        data = outputJson.hits.hits;
+    } else {
+        console.log('normal');
+        data = outputJson;
+    }
+
+    columnnames = Object.keys(data[0]._source);
+    ncols = columnnames.length;
+    nrows = data.length;
 
     const table = data.map((obj) => {
         // get the value for each column => put them into an array
@@ -169,7 +201,7 @@ export function parseElasticsearch(data) {
         });
     });
 
-    const {rows, geojson} = parseGeoJSON(table);
+    const {rowsWithGeoJSON, geojson} = parseGeoJSON(table);
 
-    return {columnnames, ncols, nrows, rows, geojson, raw: data};
+    return {columnnames, ncols, nrows, rows: rowsWithGeoJSON, geojson, raw: outputJson};
 }

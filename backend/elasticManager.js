@@ -205,7 +205,7 @@ export class ElasticManager {
         })
         .then((results) => {
             this.log('Results received.', 2);
-            responseSender(merge({results}, {error: null}));
+            responseSender(merge(parseElasticsearch(results), {error: null}));
         }); }
 
 
