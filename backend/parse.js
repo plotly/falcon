@@ -114,12 +114,12 @@ export function parseSQL(data) {
         });
     });
 
-    const {rows, geojson} = parseGeoJSON(table);
-
     // plotly workspace requires keys (columnnames, ncols, nrows, rows)
     // and they should be in this format
     // TODO: keys geojson and raw are currently optional
-    return {columnnames, ncols, nrows, rows, geojson, raw: data};
+    const {rowsWithGeoJSON, geojson} = parseGeoJSON(table);
+
+    return {columnnames, ncols, nrows, rows: rowsWithGeoJSON, geojson, raw: data};
 }
 
 
@@ -200,6 +200,8 @@ export function parseElasticsearch(outputJson) {
             return obj._source[columnname];
         });
     });
+
+
 
     const {rowsWithGeoJSON, geojson} = parseGeoJSON(table);
 
