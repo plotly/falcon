@@ -13,7 +13,9 @@ const ENDPOINTS = {
         'tables',
         'preview',
         'query',
-        'disconnect'
+        'disconnect',
+        'register',
+        'connections'
     ]
 };
 
