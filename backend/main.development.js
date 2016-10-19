@@ -5,6 +5,7 @@ import {Sessions} from './sessions';
 import {Logger} from './logger';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import {ElasticManager} from './elasticManager';
+import QueryScheduler from './persistent/QueryScheduler';
 import {ipcMessageReceive,
         CHANNEL} from './messageHandler';
 import {setupHTTP, setupHTTPS, findSelfSignedCert} from './setupServers';
@@ -38,13 +39,15 @@ app.on('ready', () => {
     const sessions = new Sessions();
     const sequelizeManager = new SequelizeManager(logger, sessions);
     const elasticManager = new ElasticManager(logger, sessions);
+    const queryScheduler = new QueryScheduler();
+
     /*
         'responseTools' is generic for the things required to handle
         responses from either the app through IPC CHANNEL or from a API
         request
     */
     const responseTools = {
-        sequelizeManager, elasticManager, mainWindow, OPTIONS
+        sequelizeManager, elasticManager, mainWindow, OPTIONS, queryScheduler
     };
 
     sequelizeManager.log('Starting Application...', 0);

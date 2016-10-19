@@ -1,7 +1,9 @@
-import {merge, contains} from 'ramda';
+import {merge, contains, dissoc} from 'ramda';
 import {AUTHENTICATION, TASK} from './errors';
 import {setupHTTPS, newOnPremSession} from './setupServers';
 import {DIALECTS} from '../app/constants/constants';
+import fs from 'fs';
+import {CREDENTIALS_FILE} from './QueryScheduler.js';
 
 
 export const TASKS = {
@@ -26,6 +28,8 @@ export const TASKS = {
     // OTHER
     NEW_ON_PREM_SESSION: 'NEW_ON_PREM_SESSION',
 	SETUP_HTTPS_SERVER: 'SETUP_HTTPS_SERVER'
+	REGISTER: 'REGISTER',
+	CONNECTIONS: 'CONNECTIONS'
 };
 
 
@@ -36,8 +40,12 @@ export function executeTask(responseTools, responseSender, payload) {
 	 *	payload used to indentify which task to perform and on what message
 	 */
 
-    // unpack tools
-    const {sequelizeManager, elasticManager} = responseTools;
+    // unpack tools defined in main.development.js
+    const {
+		sequelizeManager,
+		elasticManager,
+		queryScheduler
+	} = responseTools;
 
     // unpack payload
 	const {
@@ -358,6 +366,40 @@ export function executeTask(responseTools, responseSender, payload) {
             .catch((error) => raiseError(error, responseSender));
 			break;
 
+		}
+
+		// TODO - maybe rename to like REGISTER_QUERY
+		case TASKS.REGISTER: {
+			const actualPayload = JSON.parse(payload.message);
+			const scheduleQueryArguments = {
+				fid: actualPayload.fid,
+				uids: actualPayload.uids,
+				refreshRate: actualPayload.refreshRate,
+				query: actualPayload.query,
+				serializedConfiguration: actualPayload.serializedConfiguration
+			};
+			console.warn('scheduleQueryArguments: ', scheduleQueryArguments);
+			queryScheduler.scheduleQuery(scheduleQueryArguments);
+
+			responseSender({});
+			break;
+
+		}
+
+		case TASKS.CONNECTIONS: {
+			console.warn('CONNECTIONS task');
+			const credentialsOnFile = JSON.parse(
+				fs.readFileSync(CREDENTIALS_FILE).toString()
+			);
+			// TODO ^^ protect this
+
+			const sanitizedCredentials = credentialsOnFile.map(
+				cred => dissoc('password', cred)
+			);
+			responseSender({
+				connections: sanitizedCredentials
+			});
+			break;
 		}
 
 		default: {

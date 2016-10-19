@@ -244,6 +244,24 @@ export function v1(requestEvent, sequelizeManager, callback) {
 
         }
 
+        case 'register': {
+            task = TASKS.REGISTER;
+            console.warn(
+                'register.requestEvent: ',
+                requestEvent
+            );
+            message = requestEvent.body;
+            // TODO - the server should be using the json-ified
+            // body of the request sent `Content-Type` application/json.
+            // restify really should be doing this automatically for us.
+            break;
+        }
+
+        case 'connections': {
+            task = TASKS.CONNECTIONS;
+            break;
+        }
+
         default: {
 
             sequelizeManager.raiseError(
