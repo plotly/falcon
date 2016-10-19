@@ -59,6 +59,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.CONNECT;
+            message = requestEvent.params.dialect;
             break;
 
         }
@@ -119,6 +120,8 @@ export function v1(requestEvent, sequelizeManager, callback) {
              * action: authenticate, delete session, get sessions
              * returns: sessions list as [ {id: dialect:username@host}, ... ]
              */
+             // TODO - ^^ what is this comment referring to? what is "action"?
+             // and why are we "deleting session" in the add session case?
 
             task = TASKS.ADD_SESSION;
             let dialect;
@@ -217,9 +220,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.QUERY;
-            // database = obtainDatabaseForTask(
-            //     requestEvent, sequelizeManager, sessionSelectedId, callback
-            // );
+            // TODO - is this necessary?
             if (!foundParams(requestEvent.params, 'statement')) {
                 sequelizeManager.raiseError(
                     {message: QUERY_PARAM}, callback
@@ -272,6 +273,6 @@ export function v1(requestEvent, sequelizeManager, callback) {
         }
     }
 
-return {task, sessionSelectedId, database, message};
+    return {task, sessionSelectedId, database, message};
 
 }

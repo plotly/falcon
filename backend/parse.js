@@ -169,7 +169,5 @@ export function parseElasticsearch(data) {
         });
     });
 
-    const {rows, geojson} = parseGeoJSON(table);
-
-    return {columnnames, ncols, nrows, rows, geojson, raw: data};
+    return {columnnames, ncols, nrows, rows: table};
 }

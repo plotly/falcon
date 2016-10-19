@@ -1,18 +1,37 @@
 import fs from 'fs';
 
-export const CREDENTIALS_FILE = '/Users/chriddyp/Repos/plotly-database-connector/credentials.json';
+import {
+    CONNECTOR_FOLDER_PATH,
+    CREDENTIALS_PATH,
+    createConnectorFolder
+} from '../utils/homeFiles';
 
-export function lookUpCredentials(serializedConfiguration) {
+export function getCredentials() {
+    if (fs.existsSync(CREDENTIALS_PATH)) {
+        return JSON.parse(fs.readFileSync(CREDENTIALS_PATH).toString());
+    } else {
+        return [];
+    }
+}
+
+export function saveCredential(credentialObject) {
+    const credentials = getCredentials();
+    credentials.push(credentialObject);
+    if (!fs.existsSync(CONNECTOR_FOLDER_PATH)) {
+        createConnectorFolder();
+    }
+    fs.writeFileSync(CREDENTIALS_PATH, JSON.stringify(credentials));
+}
+
+
+export function lookUpCredentials(configuration) {
     // Look up the password from a configuration file
-    const requestedDBConfiguration = JSON.parse(serializedConfiguration);
-    const savedDBCredentials = JSON.parse(
-        fs.readFileSync(CREDENTIALS_FILE).toString()
-    );
+    const savedDBCredentials = getCredentials();
     const requestedDBCredentials = savedDBCredentials.find(savedCredential => {
         let credentialsMatch = false;
-        Object.keys(requestedDBConfiguration).forEach(credKey => (
+        Object.keys(configuration).forEach(credKey => (
             credentialsMatch = (
-                requestedDBConfiguration[credKey] === savedCredential[credKey]
+                configuration[credKey] === savedCredential[credKey]
             )
         ));
         return credentialsMatch;

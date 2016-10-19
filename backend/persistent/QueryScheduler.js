@@ -1,20 +1,21 @@
-import fs from 'fs';
-import {queryDatabase} from './Query';
+import * as Connections from './connections/Connections';
 import {updateGrid} from './PlotlyAPI';
 import {lookUpCredentials} from './Credentials';
+import {getQueries, saveQuery} from './Queries';
 
-// TODO - Make generic
-export const QUERY_FILE = '/Users/chriddyp/Repos/plotly-database-connector/queue.json';
-
-function queryAndUpdateGrid (fid, uids, queryString, serializedConfiguration) {
-    const requestedDBCredentials = lookUpCredentials(serializedConfiguration);
-    queryDatabase(queryString, requestedDBCredentials).then(rowsAndColumns => {
-        updateGrid(rowsAndColumns.rows, fid, uids, serializedConfiguration);
+function queryAndUpdateGrid (fid, uids, queryString, configuration) {
+    const requestedDBCredentials = lookUpCredentials(configuration);
+    Connections.query(queryString, requestedDBCredentials).then(
+        rowsAndColumns => updateGrid(
+            rowsAndColumns.rows,
+            fid,
+            uids
+        )
         // TODO - ^^ Error handling.
         // - throttling
         // - API keys
         // - 404 -> remove query
-    });
+    );
 }
 
 
@@ -22,9 +23,6 @@ class QueryScheduler {
     constructor(job = queryAndUpdateGrid) {
         this.scheduleQuery = this.scheduleQuery.bind(this);
         this.loadQueries = this.loadQueries.bind(this);
-
-        this._readQueries = this._readQueries.bind(this);
-        this._saveQuery = this._saveQuery.bind(this);
 
         this.job = job;
         this.queryJobs = {};
@@ -36,19 +34,20 @@ class QueryScheduler {
         uids: uids,
         refreshRate: refreshRate,
         query: query,
-        serializedConfiguration: serializedConfiguration
+        configuration: configuration
     }) {
 
-        this._saveQuery({
+        // Save query to a file
+        saveQuery({
             fid,
             uids,
             refreshRate,
             query,
-            serializedConfiguration
+            configuration
         });
 
         this.queryJobs[fid] = setInterval(
-            () => this.job(fid, uids, query, serializedConfiguration),
+            () => this.job(fid, uids, query, configuration),
             refreshRate
         );
 
@@ -56,36 +55,9 @@ class QueryScheduler {
 
     // Load and schedule queries - To be run on app start.
     loadQueries() {
-        const queries = this._readQueries();
-        Object.keys(queries).forEach(
-            serializedConfiguration => {
-                this.scheduleQuery(queries[serializedConfiguration]);
-            }
-        );
-    }
-
-    // Read queries from a file and return them
-    _readQueries() {
-        let queriesOnFile;
-        try {
-            queriesOnFile = fs.readFileSync(QUERY_FILE).toString();
-        } catch (e) {
-            queriesOnFile = '{}';
-        }
-        return JSON.parse(queriesOnFile);
-    }
-
-    // Save queries to a file
-    _saveQuery(queryOptions) {
-        const queries = this._readQueries();
-        if (queries[queryOptions.serializedConfiguration]) {
-            queries[queryOptions.serializedConfiguration].push(queryOptions);
-        } else {
-            queries[queryOptions.serializedConfiguration] = [queryOptions];
-        }
-
-        fs.writeFileSync(QUERY_FILE, JSON.stringify(queries));
-
+        // read queries from a file
+        const queries = this.getQueries();
+        queries.forEach(this.scheduleQuery);
     }
 }
 
