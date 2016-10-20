@@ -26,7 +26,8 @@ export const TASKS = {
 	TABLES: 'TABLES',
     // OTHER
     NEW_ON_PREM_SESSION: 'NEW_ON_PREM_SESSION',
-	SETUP_HTTPS_SERVER: 'SETUP_HTTPS_SERVER'
+	SETUP_HTTPS_SERVER: 'SETUP_HTTPS_SERVER',
+    GET_MAPPINGS: 'GET_MAPPINGS'
 };
 
 
@@ -181,6 +182,17 @@ export function executeTask(responseTools, responseSender, payload) {
 			.then(responseManager.getConnection(responseSender))
 			.then(() => {log(
 				'TASK: connection authenticated.', 1
+			);});
+			break;
+
+		}
+
+		case TASKS.GET_MAPPINGS: {
+
+			responseManager.authenticate(responseSender)
+			.then(responseManager.getMappings(responseSender))
+			.then(() => {log(
+				'TASK: gettings mappings.', 1
 			);});
 			break;
 
