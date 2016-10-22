@@ -1,10 +1,11 @@
 import * as Connections from './connections/Connections';
 import {updateGrid} from './PlotlyAPI';
-import {lookUpCredentials} from './Credentials';
+import {getCredentialById} from './Credentials';
 import {getQueries, saveQuery} from './Queries';
 
-function queryAndUpdateGrid (fid, uids, queryString, configuration) {
-    const requestedDBCredentials = lookUpCredentials(configuration);
+function queryAndUpdateGrid (fid, uids, queryString, credentialId) {
+    const requestedDBCredentials = getCredentialById(credentialId);
+    console.warn('requestedDBCredentials: ', requestedDBCredentials);
     Connections.query(queryString, requestedDBCredentials).then(
         rowsAndColumns => updateGrid(
             rowsAndColumns.rows,
@@ -34,7 +35,7 @@ class QueryScheduler {
         uids: uids,
         refreshRate: refreshRate,
         query: query,
-        configuration: configuration
+        credentialId: credentialId
     }) {
 
         // Save query to a file
@@ -43,11 +44,15 @@ class QueryScheduler {
             uids,
             refreshRate,
             query,
-            configuration
+            credentialId
         });
 
+        if (this.queryJobs[fid]) {
+            clearInterval(this.queryJobs[fid]);
+        }
+
         this.queryJobs[fid] = setInterval(
-            () => this.job(fid, uids, query, configuration),
+            () => this.job(fid, uids, query, credentialId),
             refreshRate
         );
 
@@ -58,6 +63,14 @@ class QueryScheduler {
         // read queries from a file
         const queries = this.getQueries();
         queries.forEach(this.scheduleQuery);
+    }
+
+    // Clear out setInterval queries from memory - used to clean up tests
+    clearQueries() {
+        Object.keys(this.queryJobs).forEach(fid => {
+            clearInterval(this.queryJobs[fid]);
+            delete this.queryJobs[fid];
+        });
     }
 }
 

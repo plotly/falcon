@@ -14,8 +14,8 @@ import * as Elasticsearch from './Elasticsearch';
  * But for other connections like elasticsearch will be an object.
  *
  * The type of connection is specified in "dialect" of the configuration.
- * Add new connection types to files in this folder that export a
- * `query` and a `connect` function. Their interfaces are described below.
+ * Add new connection types by creating new files in this folder that export a
+ * `query`, `connect`, `tables` function. Their interfaces are described below.
  */
 
 function getConnection(credentials) {
@@ -47,5 +47,28 @@ export function query(queryObject, credentials) {
  */
 export function connect(credentials) {
     return getConnection(credentials).connect(credentials);
+}
 
+
+/*
+ * return a promise with the available tables from a database
+ *
+ * this can have flexible meaning for other datastores.
+ * e.g., for elasticsearch, this means return the available
+ * "documents" per an "index"
+ */
+export function databases(credentials) {
+    return getConnection(credentials).databases(credentials);
+}
+
+
+/*
+ * return a promise with the available tables from a database
+ *
+ * this can have flexible meaning for other datastores.
+ * e.g., for elasticsearch, this means return the available
+ * "documents" per an "index"
+ */
+export function tables(credentials) {
+    return getConnection(credentials).tables(credentials);
 }

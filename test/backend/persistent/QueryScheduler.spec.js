@@ -15,7 +15,7 @@ import {getQueries} from '../../../backend/persistent/Queries.js';
 import {
     PlotlyAPIRequest
 } from '../../../backend/persistent/PlotlyAPI.js';
-import {createGrid, names, credentials, configuration} from '../utils.js';
+import {createGrid, names, credentials} from '../utils.js';
 
 describe('QueryScheduler', () => {
     beforeEach(() => {
@@ -37,7 +37,7 @@ describe('QueryScheduler', () => {
             fid: '...',
             uids: '...',
             query: '...',
-            configuration
+            credentialId: '...'
         });
         setTimeout(function() {
             expect(spy).to.have.been.called();
@@ -56,7 +56,7 @@ describe('QueryScheduler', () => {
             fid: 'test-fid',
             uids: '',
             query: '',
-            configuration
+            credentialId: 'unique-id'
         };
         queryScheduler.scheduleQuery(queryObject);
         let queriesFromFile = getQueries();
@@ -73,29 +73,29 @@ describe('QueryScheduler', () => {
     it('queries a database and updates a plotly grid on an interval', function(done) {
         const refreshRate = 15 * 1000;
         this.timeout(120 * 1000);
+
         /*
          * Save the credentials to a file.
          * This is done by the UI or by the user.
         */
-        saveCredential(credentials);
+        const credentialId = saveCredential(credentials);
+        console.warn('getCredentials(): ', getCredentials());
         /*
          * Create a grid that we want to update with new data
          * Note that the scheduler doesn't ever actually create grids,
          * it only updates them
          */
-
          createGrid('test interval').then(json => {
              const fid = json.file.fid;
              const uids = json.file.cols.map(col => col.uid);
-
 
              const queryScheduler = new QueryScheduler();
              queryScheduler.scheduleQuery({
                  fid,
                  uids,
                  refreshRate,
-                 query: 'SELECT * from ebola_2014 LIMIT 2',
-                 configuration: configuration
+                 credentialId,
+                 query: 'SELECT * from ebola_2014 LIMIT 2'
              });
 
              /*
