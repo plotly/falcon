@@ -62,7 +62,7 @@ export default class Settings extends Component {
         );
 
         let tablePreview = null;
-        if (ipc.has('previews') && ipc.get('previews')) {
+        if (ipc && ipc.has('previews') && ipc.get('previews')) {
             tablePreview = (
                 <div className={styles.previewController}>
                     <Preview

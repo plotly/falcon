@@ -63,7 +63,7 @@ export const updateState = createAction('UPDATE_STATE');
 
 // API calls
 function fetchSessionData(dispatch, credentialId) {
-    POST(`connect/${credentialId}`)
+    return POST(`connect/${credentialId}`)
     .then(res => {
         if (res.status === 200) {
             dispatch(updateConnection({status: APP_STATUS.CONNECTED}));
@@ -100,7 +100,9 @@ export function initializeSessions () {
         .then(credentials => {
             credentials.forEach(credential => {
                 dispatch(newSession(credential.id));
+                dispatch(updateConfiguration(credential));
             });
+            dispatch(switchSession(credentials[0].id));
             return Promise.all(credentials.map(
                 credential => fetchSessionData(dispatch, credential.id)
             ));

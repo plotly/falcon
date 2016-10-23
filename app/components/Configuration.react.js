@@ -9,6 +9,10 @@ export default class Configuration extends Component {
         super(props);
     }
 
+    componentDidMount() {
+        this.props.sessionsActions.initializeSessions();
+    }
+
     render() {
         let settings = null;
         const {
