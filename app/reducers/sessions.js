@@ -4,23 +4,37 @@ import {
     FORGET_SESSION,
     UPDATE_CONNECTION,
     UPDATE_CONFIGURATION,
-    UPDATE_IPC_STATE
+    UPDATE_IPC_STATE,
+    SWAP_SESSION_ID
 } from '../actions/sessions.js';
 import Immutable from 'immutable';
 import {EMPTY_SESSION} from '../constants/constants';
+import {dissoc} from 'ramda';
 
 // see end of file for `list` description
 const INITIAL_STATE = Immutable.Map({
-    list: Immutable.Map({}),
+    list: Immutable.OrderedMap({}),
     sessionSelectedId: '0',
     startupIPC: Immutable.Map({})
 });
 
 export default function sessions(state = INITIAL_STATE, action) {
 
+    let nextState;
+
+    let id, update;
+    if (action.payload && action.payload.id) {
+        id = action.payload.id;
+        update = dissoc('id', action.payload);
+    } else {
+        id = state.get('sessionSelectedId');
+        update = action.payload;
+    }
+    // TODO - Remove sessionSelectedId from all of the actions
+
     switch (action.type) {
-        case NEW_SESSION:
-            return state.mergeIn(['list'],
+        case NEW_SESSION: {
+            nextState = state.mergeIn(['list'],
                 {
                     [action.payload]: {
                         configuration:
@@ -36,41 +50,74 @@ export default function sessions(state = INITIAL_STATE, action) {
                     }
                 }
             );
+            break;
+        }
 
-        case SWITCH_SESSION:
-            return state.merge({sessionSelectedId: action.payload});
+        case SWITCH_SESSION: {
+            nextState = state.merge({sessionSelectedId: action.payload});
+            break;
+        }
 
-        case FORGET_SESSION:
-            return state.deleteIn(['list', `${action.payload}`]);
+        case FORGET_SESSION: {
+            nextState = state.deleteIn(['list', `${action.payload}`]);
+            break;
+        }
 
-        case UPDATE_CONFIGURATION:
-            return state.mergeIn(
-                ['list', state.get('sessionSelectedId'), 'configuration'],
-                action.payload
+        case UPDATE_CONFIGURATION: {
+            nextState = state.mergeIn(
+                ['list', id, 'configuration'],
+                update
             );
+            break;
+        }
 
-        case UPDATE_CONNECTION:
-            return state.mergeIn(
-                ['list', state.get('sessionSelectedId'), 'connection'],
-                action.payload
+        case UPDATE_CONNECTION: {
+            nextState = state.mergeIn(
+                ['list', id, 'connection'],
+                update
             );
+            break;
+        }
 
-        case UPDATE_IPC_STATE:
+        case SWAP_SESSION_ID: {
+            const newSessionId = action.payload;
+            const currentSessionId = state.get('sessionSelectedId');
+
+            nextState = state.setIn(
+                ['list', newSessionId],
+                state.getIn(['list', currentSessionId])
+            );
+            nextState = nextState.deleteIn(['list', String(currentSessionId)]);
+            nextState = nextState.set('sessionSelectedId', newSessionId);
+            break;
+        }
+
+        case UPDATE_IPC_STATE: {
             if (state.get('list').size > 0) {
-                return state.mergeIn(
-                    ['list', state.get('sessionSelectedId'), 'ipc'],
-                    Immutable.fromJS(action.payload)
+                nextState = state.mergeIn(
+                    ['list', id, 'ipc'],
+                    Immutable.fromJS(update)
                 );
             } else {
-                return state.mergeIn(
+                nextState = state.mergeIn(
                     ['startupIPC'],
                     Immutable.fromJS(action.payload)
                 );
             }
+            break;
+        }
 
         default:
-            return state;
+            nextState = state;
     }
+
+    console.group();
+    console.warn(action.type, action.payload);
+    console.warn('Previous: ', state.toJS());
+    console.warn('Next: ', nextState.toJS());
+    console.groupEnd();
+
+    return nextState;
 }
 
 

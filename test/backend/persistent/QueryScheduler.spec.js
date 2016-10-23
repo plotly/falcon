@@ -79,7 +79,7 @@ describe('QueryScheduler', () => {
          * This is done by the UI or by the user.
         */
         const credentialId = saveCredential(credentials);
-        console.warn('getCredentials(): ', getCredentials());
+
         /*
          * Create a grid that we want to update with new data
          * Note that the scheduler doesn't ever actually create grids,

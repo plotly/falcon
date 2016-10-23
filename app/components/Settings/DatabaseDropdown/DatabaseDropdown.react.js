@@ -30,7 +30,9 @@ export default class DatabaseDropdown extends Component {
 
 	render() {
         const {configuration, sessionsActions, ipc} = this.props;
-
+        if (!ipc.has('databases')) {
+            return null;
+        }
         const ipcDatabases = ipc.get('databases');
         let databaseDropdownOptions;
         /*

@@ -10,6 +10,7 @@ import {
     getCredentialById
 } from './Credentials.js';
 import QueryScheduler from './QueryScheduler.js';
+import {dissoc} from 'ramda';
 
 export default class Server {
     constructor() {
@@ -51,7 +52,9 @@ export default class Server {
              * to this exact same set of credentials don't get
              * overwritten.
              */
-            const credentialsOnFile = lookUpCredentials();
+            const credentialsOnFile = lookUpCredentials(
+                dissoc('password', req.params)
+            );
             if (credentialsOnFile) {
                 res.send(409, {credentialId: credentialsOnFile.id});
             } else {

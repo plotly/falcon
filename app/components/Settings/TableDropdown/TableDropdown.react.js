@@ -23,7 +23,7 @@ export default class TableDropdown extends Component {
     onSelectTable(table) {
         if (table.value) {
             this.setState({table: table.value});
-            this.props.sessionsActions.previewTables([table.value]);
+            this.props.sessionsActions.previewTable(table.value);
         } else {
             this.setState({table: ''});
             this.props.sessionsActions.updateIpcState({previews: null});
@@ -40,7 +40,9 @@ export default class TableDropdown extends Component {
 
 	render() {
         const {ipc} = this.props;
-
+        if (!ipc.has('tables')) {
+            return null;
+        }
         const tableNames = ipc.get('tables');
 
         let tablesDropdownOptions;

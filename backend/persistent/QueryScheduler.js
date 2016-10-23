@@ -5,7 +5,6 @@ import {getQueries, saveQuery} from './Queries';
 
 function queryAndUpdateGrid (fid, uids, queryString, credentialId) {
     const requestedDBCredentials = getCredentialById(credentialId);
-    console.warn('requestedDBCredentials: ', requestedDBCredentials);
     Connections.query(queryString, requestedDBCredentials).then(
         rowsAndColumns => updateGrid(
             rowsAndColumns.rows,
@@ -29,7 +28,6 @@ class QueryScheduler {
         this.queryJobs = {};
     }
 
-    // TODO - also type of the database
     scheduleQuery({
         fid: fid,
         uids: uids,

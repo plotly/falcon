@@ -15,8 +15,7 @@ export default class Configuration extends Component {
             sessionsActions,
             sessions
         } = this.props;
-        // debugger;
-        const sessionSelectedId = sessions.getIn(
+        const sessionSelected = sessions.getIn(
             ['list', `${this.props.sessions.get('sessionSelectedId')}`]
         );
 
@@ -24,9 +23,9 @@ export default class Configuration extends Component {
 
             settings = (
                 <Settings
-                    configuration={sessionSelectedId.get('configuration')}
-                    connection={sessionSelectedId.get('connection')}
-                    ipc={sessionSelectedId.get('ipc')}
+                    configuration={sessionSelected.get('configuration')}
+                    connection={sessionSelected.get('connection')}
+                    ipc={sessionSelected.get('ipc')}
 
                     sessionsActions={sessionsActions}
                 />

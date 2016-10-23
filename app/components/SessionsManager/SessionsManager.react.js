@@ -79,38 +79,21 @@ export default class SessionsManager extends Component {
 
         // deletes upon click the session from this.props.sessions.list
         const sessionDeleteIcon = (sessionId) => {
-            return (
-                <img
-                    className={styles.sessionDelete}
-                    onClick={() => {
-                        const indexOfId = sessionsIds.indexOf(
-                            sessions.get('sessionSelectedId')
-                        );
-                        // are we deleting currently open session?
-                        if (sessionId === sessions.get('sessionSelectedId')) {
-                            // have to switch before deleting
-                            if (indexOfId === 0) {
-                                // cant have a negative index in an array
-                                sessionsActions.switchSession(
-                                    sessionsIds[indexOfId + 1]
-                                );
-                            } else {
-                                // if its not the first index, switch to next
-                                sessionsActions.switchSession(
-                                    sessionsIds[indexOfId - 1]
-                                );
-                            }
-                        }
-                        // delete it
-                        // TODO: this should probably be a single action?
-                        sessionsActions.deleteSession(sessionId); // for backend
-                        sessionsActions.forgetSession(sessionId);
-                    }}
-                    src="./images/delete.png"
-                    id={`test-session-delete-${sessionsIds.indexOf(sessionId)}`}
-                >
-                </img>
-            );
+            if (sessionsIds.length <= 1) {
+                return null;
+            } else {
+                return (
+                    <img
+                        className={styles.sessionDelete}
+                        onClick={() => {
+                            sessionsActions.deleteSession(sessionId);
+                        }}
+                        src="./images/delete.png"
+                        id={`test-session-delete-${sessionsIds.indexOf(sessionId)}`}
+                    >
+                    </img>
+                );
+            }
         };
 
         // displays that sessions currently selected database logo
@@ -222,13 +205,13 @@ export default class SessionsManager extends Component {
 
         let sessionsIcons = null;
         if (numberOfActiveSessions > 0) {
-            sessionsIcons = Object.keys(sessions.get('list').toJS()).map(
+            sessionsIcons = sessions.get('list').map(
                 /*
                     returns three UI items for each session
                     a delete (x) icon, a database logo,
                     and sessionIdentifierText (`username@host`)
                 */
-                sessionId => (
+                (_, sessionId) => (
                     <div className={classnames(styles.sessionWrapper, {
                             [styles.sessionWrapperSelected]:
                                 sessions.get('sessionSelectedId') === sessionId

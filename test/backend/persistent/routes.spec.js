@@ -153,7 +153,7 @@ describe('Server', function () {
     });
 
     // Credentials
-    it('saves credentials to a file', function(done) {
+    it('saves credentials to a file if they do not exist', function(done) {
         fs.unlinkSync(CREDENTIALS_PATH);
         assert.deepEqual(getCredentials(), []);
         POST('credentials', credentials)
@@ -165,6 +165,14 @@ describe('Server', function () {
             );
             done();
         }).catch(done);
+    });
+
+    it("doesn't save credentials if they already exist", function(done) {
+        POST('credentials', credentials)
+        .then(res => {
+            assert.equal(res.status, 409);
+            assert.deepEqual(res.credentialId, credentialId);
+        });
     });
 
     it('returns sanitized credentials', function(done) {

@@ -56,13 +56,25 @@ export function saveCredential(credentialObject) {
 }
 
 
+/*
+ * Find a pair of credentials from the disk by looking up each
+ * of the keys in the configuration object.
+ *
+ * Note that the objects don't need to match exactly -
+ * they only need to match in the keys that are provided by the
+ * configuration object.
+ *
+ * This is used to find the unsanitized credentials (with the password)
+ * saved on the disk given a set of sanitized
+ * credentials (without the password)
+ */
 export function lookUpCredentials(configuration) {
-    // Look up the password from a configuration file
+
     const savedDBCredentials = getCredentials();
     const requestedDBCredentials = savedDBCredentials.find(savedCredential => {
-        let credentialsMatch = false;
+        let credentialsMatch = true;
         Object.keys(configuration).forEach(credKey => (
-            credentialsMatch = (
+            credentialsMatch = credentialsMatch && (
                 configuration[credKey] === savedCredential[credKey]
             )
         ));
