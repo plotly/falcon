@@ -1,5 +1,7 @@
 import * as Sql from './Sql';
 import * as Elasticsearch from './Elasticsearch';
+import * as S3 from './S3';
+import * as ApacheDrill from './ApacheDrill';
 
 /*
  * Switchboard to all of the different types of connections
@@ -22,6 +24,10 @@ function getConnection(credentials) {
     const {dialect} = credentials;
     if (dialect === 'elasticsearch') {
         return Elasticsearch;
+    } else if (dialect === 's3') {
+        return S3;
+    } else if (dialect === 'apache drill') {
+        return ApacheDrill;
     } else {
         return Sql;
     }

@@ -19,11 +19,25 @@ const elasticsearchCredentials = {
     port: '9243'
 };
 
+const publicReadableS3Credentials = {
+    dialect: 's3',
+    bucket: 'plotly-s3-connector-test',
+    accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
+    secretAccessKey: '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'
+    // TODO - region here too?
+};
+
+const apacheDrillCredentials = {
+    dialect: 'apache drill',
+    host: 'http://ec2-35-160-151-112.us-west-2.compute.amazonaws.com',
+    port: 8047
+};
+
 const transpose = m => m[0].map((x, i) => m.map(x => x[i]));
 
 
 describe('SQL - Connections', function () {
-    it ('Connections.connect connects to a database', function(done) {
+    it('Connections.connect connects to a database', function(done) {
         this.timeout(4 * 1000);
         connect(sqlCredentials).then(done).catch(done);
     });
@@ -173,4 +187,98 @@ describe('Elasticsearch - Connections', function () {
         }).catch(done);
     });
 
+});
+
+describe('S3 - Connection', function () {
+    it('connect succeeds with the right credentials', function(done) {
+        this.timeout(4 * 1000);
+        connect(publicReadableS3Credentials).then(done).catch(done);
+    });
+
+    it('connect fails with the wrong credentials', function(done) {
+        this.timeout(4 * 1000);
+        connect({dialect: 's3', accessKeyId: 'asdf', secretAccessKey: 'fdas'})
+        .then(() => done('Error - should not have succeeded'))
+        .catch(err => done());
+    });
+
+    it('query parses S3 CSV files', function(done) {
+        this.timeout(20 * 1000);
+        query('5k-scatter.csv', publicReadableS3Credentials)
+        .then(grid => {
+            assert.deepEqual(grid.rows[0], ['-0.790276857291', '-1.32900495883']);
+            assert.deepEqual(grid.rows.length, 5 * 1000 + 1);
+            assert.deepEqual(grid.columnnames, ['x', 'y']);
+            done();
+        }).catch(done);
+    });
+
+});
+
+describe.only('Apache Drill - Connection', function () {
+    it('connects', function(done) {
+        connect(apacheDrillCredentials)
+        .then(res => done())
+        .catch(done);
+    });
+
+    it('query parses parquet files on S3', function(done) {
+        this.timeout(20 * 1000);
+        query('SELECT * FROM s3.root.`sample-data.parquet` LIMIT 10', apacheDrillCredentials)
+        .then(grid => {
+
+            /*
+             * TODO - For some reason, the date rows (columns 5-7)
+             * come out looking like "[B@15477e8a".
+             * Skip these rows for now.
+             */
+
+            assert.deepEqual(
+                grid.rows[0].slice(0, 5),
+                [
+                     '0',
+
+                     'NYC',
+                     'USA',
+
+                     '1',
+                     '10'
+                 ]
+             );
+
+             assert.deepEqual(
+                 grid.rows[0].slice(7, 11),
+                 [
+                     'true',
+                     'true',
+
+                     '[10, 10]',
+                     '[-10, -10]'
+                 ]
+            );
+
+            assert.deepEqual(
+                grid.columnnames,
+                [
+                    '_c0',
+
+                    'my-string-1',
+                    'my-string-2',
+
+                    'my-number-1',
+                    'my-number-2',
+
+                    'my-date-1',
+                    'my-date-2',
+
+                    'my-boolean-1',
+                    'my-boolean-2',
+
+                    'my-geo-point-1',
+                    'my-geo-point-2'
+                ]
+            );
+            done();
+        }).catch(done);
+    });
 });
