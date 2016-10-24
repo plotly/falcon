@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './UserCredentials.css';
+import {shell} from 'electron';
 import {
     CONNETION_CONFIG, CONNETION_OPTIONS
 } from '../../../constants/constants';
@@ -10,6 +11,10 @@ const {dialog} = require('electron').remote;
 	Displays and alters user inputs for `configuration`
 	username, password, and local port number.
 */
+
+const documentationLink = (dialect) => {
+    return `http://help.plot.ly/database-connectors/${dialect}/`;
+};
 
 export default class UserCredentials extends Component {
     constructor(props) {
@@ -36,9 +41,11 @@ export default class UserCredentials extends Component {
 	getPlaceholder(credential) {
 		switch (credential) {
 			case 'port':
-				return 'local port number';
+				return 'server port number (e.g. 3306)';
 			case 'storage':
 				return 'path to database';
+            case 'host':
+                return 'server name (e.g. localhost)';
 			default:
 				return credential;
 		}
@@ -70,34 +77,43 @@ export default class UserCredentials extends Component {
 	render() {
 		const {configuration, sessionsActions} = this.props;
 
+        let inputNames = CONNETION_CONFIG[configuration.get('dialect')].map(credential => {
+            return (
+                <div>
+                    <span className ={styles.inputName}>{credential}</span>
+                </div>
+            );
+        });
 		let inputs = CONNETION_CONFIG[configuration.get('dialect')]
 			.map(credential => (
-			<input className={this.testClass()}
-				placeholder={this.getPlaceholder(credential)}
-				type={this.getInputType(credential)}
-				onChange={e => (
-					sessionsActions.updateConfiguration({[credential]: e.target.value})
-				)}
-				onClick={this.getOnClick(credential)}
-				value={configuration.get(credential)}
-				id={`test-input-${credential}`}
-			/>
+            <div>
+                <input className={this.testClass()}
+                    placeholder={this.getPlaceholder(credential)}
+                    type={this.getInputType(credential)}
+                    onChange={e => (
+                        sessionsActions.updateConfiguration({[credential]: e.target.value})
+                    )}
+                    onClick={this.getOnClick(credential)}
+                    value={configuration.get(credential)}
+                    id={`test-input-${credential}`}
+                />
+            </div>
 		));
 
         let options = CONNETION_OPTIONS[configuration.get('dialect')]
-            .map(credential => (
+            .map((option) => (
             <div className={styles.options}>
                 <label className={styles.label}><input
                     className={styles.checkbox}
                     type="checkbox"
                     onChange={() => {
                         sessionsActions.updateConfiguration(
-                            {[credential]: !configuration.get(credential)}
+                            {[option]: !configuration.get(option)}
                         );
                     }}
-                    id={`test-option-${credential}`}
+                    id={`test-option-${option}`}
                 />
-                {credential}
+                {option}
                 </label>
             </div>
         ));
@@ -139,8 +155,21 @@ export default class UserCredentials extends Component {
 
 		return (
 			<div className={styles.inputContainer}>
+                <div className={styles.inputNamesContainer}>
+                    <span className ={styles.inputName}>{'Documentation'}</span>
+                    {inputNames}
+                </div>
+                <div className={styles.inputFieldsContainer}>
+                    <a className={styles.documentationLink}
+                        onClick={() => {
+                        shell.openExternal(documentationLink(configuration.get('dialect')));
+                    }}
+                    >
+                    plotly &nbsp;{configuration.get('dialect')}&nbsp; documentation
+                    </a>
 				{inputs}
                 {databaseOptions()}
+                </div>
 			</div>
 		);
 	}

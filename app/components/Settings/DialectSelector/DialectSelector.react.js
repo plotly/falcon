@@ -105,7 +105,7 @@ export default class DialectSelector extends Component {
         ));
 
 		return (
-			<div>{logos}</div>
+			<div className={styles.logoContainer}>{logos}</div>
 		);
 	}
 }

@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Settings from './Settings/Settings.react';
+import {shell} from 'electron';
 import SessionsManager from './SessionsManager/SessionsManager.react';
 import * as styles from './Configuration.css';
 
@@ -37,24 +38,55 @@ export default class Configuration extends Component {
         }
 
         return (
-            <div>
+            <div className={styles.fullApp}>
+                <div className={styles.header}>
+                    <div className={styles.logoAndTitle}>
+                        <img className={styles.plotlyLogo}
+                            src="./images/plotly-connector-logo.svg"
+                        >
+                        </img>
+                        <h5 className={styles.applicationTitle}>
+                            Plotly Database Connector
+                        </h5>
+                    </div>
 
-                <img
-                    src="./images/plotly-logo-no-name.png"
-                    className={styles.plotlyLogo}
-                >
-                </img>
+                    <div className={styles.supportLinks}>
+                        <div className={styles.externalLinkContainer}>
+                            <span className={styles.externalLink}
+                                onClick={() => {
+                                shell.openExternal('http://plot.ly/plans/');
+                            }}
+                            >
+                            Upgrade&nbsp;for&nbsp;Support
+                            </span>
 
-                <h4>
-                    Plotly 2.0 Database Connector
-                </h4>
+                            <span className={styles.externalLink}
+                                onClick={() => {
+                                shell.openExternal('http://help.plot.ly/database-connectors/');
+                            }}
+                            >
+                            Documentation
+                            </span>
+
+                            <span className={styles.externalLink}
+                                onClick={() => {
+                                shell.openExternal('https://plotly.typeform.com/to/KUiCSl');
+                            }}
+                            >
+                            Request&nbsp;a&nbsp;Connector
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
                 <SessionsManager
                     sessionsActions={this.props.sessionsActions}
                     sessions={this.props.sessions}
                 />
 
-                {settings}
+                <div className={styles.settings}>
+                    {settings}
+                </div>
 
             </div>
 
