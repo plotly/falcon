@@ -32,7 +32,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
 
     const endpoint = split('/', requestEvent.route.path)[2];
 
-    let sessionSelectedId = sequelizeManager.sessionSelectedId;
+    let sessionSelectedId = null;
     if (foundParams(requestEvent.params, 'session')) {
         sessionSelectedId = requestEvent.params.session;
     }
@@ -48,6 +48,7 @@ export function v1(requestEvent, sequelizeManager, callback) {
              */
 
             task = TASKS.CONNECT;
+            message = requestEvent.params;
             break;
 
         }
@@ -82,7 +83,6 @@ export function v1(requestEvent, sequelizeManager, callback) {
              * action: authenticate, get sessions
              * returns: sessions list as [ {id: dialect:username@host}, ... ]
              */
-            task = TASKS.DELETE_SESSION;
             task = TASKS.SESSIONS;
             break;
 
