@@ -42,7 +42,7 @@ export class Logger {
                         this.logToFile.info(logEntry);
                 }
 
-                if (!this.headless) {
+                if (!this.headless && this.mainWindow) {
 
                     this.mainWindow.webContents.send(this.CHANNEL, {
                         log: {

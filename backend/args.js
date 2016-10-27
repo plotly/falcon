@@ -1,4 +1,5 @@
 import {contains, isEmpty, merge, mergeAll, range, split} from 'ramda';
+import YAML from 'yamljs';
 
 const optionsBook = {
     headless: {
@@ -119,26 +120,12 @@ function mergeArgs (args) {
 }
 
 // if in development mode, just pass in an empty args object => defaults all
-const acceptedArgs = () => {
-
-    let argsToMerge = [];
-
-    // throw new Error(JSON.stringify(process.argv));
-
-    if (process.env.NODE_ENV === 'development') {
-        argsToMerge = ['logdetail=2'];
-    } else if (!contains('./test/e2e.js', process.argv.slice(2))) {
-        /*
-         * first arg is the path don't need it,
-         * second arg is './' but only when packaged
-         */
-        argsToMerge = process.argv.filter(arg => {
-            return arg !== './'
-        }).slice(1);
-    }
-
-    return argsToMerge;
+const localSettings = () => {
+    const options = YAML.load(`${__dirname}/settings.yaml`);
+    return Object.keys(options).map(option => {
+        return `${option}=${options[option]}`
+    })
 
 };
 
-export const ARGS = mergeArgs(acceptedArgs());
+export const ARGS = mergeArgs(localSettings());
