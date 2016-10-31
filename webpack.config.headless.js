@@ -7,7 +7,7 @@ export default {
 
     devtool: 'source-map',
 
-    entry: './backend/server.js',
+    entry: './backend/headlessServer.js',
 
     output: {
         path: __dirname,

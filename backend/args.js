@@ -6,6 +6,10 @@ const optionsBook = {
         defaultValue: false,
         acceptedValues: [false, true]
     },
+    https: {
+        defaultValue: false,
+        acceptedValues: [false, true]
+    },
     large: {
         defaultValue: true,
         acceptedValues: [false, true]
@@ -33,7 +37,7 @@ const optionsBook = {
     }
 };
 
-const optionsToCheck = ['headless', 'large', 'port', 'clearLog'];
+const optionsToCheck = ['headless', 'large', 'port', 'clearLog', 'https'];
 
 // returns all the default values from options as a dict {key: default, ...}
 const defaultOptions = () => {
@@ -50,6 +54,7 @@ function mergeArgs (args) {
     const parseArgValue = (arg) => {
         switch (arg[0]) {
             case 'headless':
+            case 'https':
             case 'large':
                 return [arg[0], ((arg[1] === 'true') ? true : false)];
             case 'port':
@@ -125,7 +130,6 @@ const localSettings = () => {
     return Object.keys(options).map(option => {
         return `${option}=${options[option]}`
     })
-
 };
 
 export const ARGS = mergeArgs(localSettings());
