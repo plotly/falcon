@@ -182,7 +182,6 @@ export class SequelizeManager {
         if (ARGS.headless) {
             // read locally stored configuration for sessionSelectedId
             const configFromFile = YAML.load(ARGS.configpath)[this.getSessionSelectedId()];
-            console.log(configFromFile);
             this.createConnection(configFromFile);
         } else {
             this.createConnection(configFromApp);

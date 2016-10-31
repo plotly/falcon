@@ -1,6 +1,7 @@
 # Logs
 logs
 *.log
+*.log.*
 
 # Runtime data
 pids
@@ -37,8 +38,12 @@ main.js.map
 
 # Local tests
 test/set_creds.sh
-
+backend/config.yaml
 *.pem
+
+# bundles
+backend/headlessBundle.js
+backend/headlessBundle.js.map
 
 *.srl
 
