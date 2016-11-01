@@ -1,6 +1,7 @@
 import webpack from 'webpack';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import baseConfig from './webpack.config.base';
+import {merge} from 'ramda';
 
 const config = {
     ...baseConfig,
@@ -45,9 +46,9 @@ const config = {
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.DefinePlugin({
             __DEV__: false,
-            'process.env': {
+            'process.env': merge(process.env, {
                 NODE_ENV: JSON.stringify('production')
-            }
+            })
         }),
         new webpack.optimize.UglifyJsPlugin({
             compressor: {

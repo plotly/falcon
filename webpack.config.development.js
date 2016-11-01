@@ -1,6 +1,7 @@
 /* eslint max-len: 0 */
 import webpack from 'webpack';
 import baseConfig from './webpack.config.base';
+import {merge} from 'ramda';
 
 // Import the plugin:
 var DashboardPlugin = require('webpack-dashboard/plugin');
@@ -52,9 +53,9 @@ const config = {
         new webpack.NoErrorsPlugin(),
         new webpack.DefinePlugin({
             __DEV__: true,
-            'process.env': {
+            'process.env': merge(process.env, {
                 NODE_ENV: JSON.stringify('development')
-            }
+            })
         })
     ],
 
