@@ -22,6 +22,8 @@ const responseTools = {
 
 const acceptRequestsFrom = YAML.load(`${__dirname}/acceptedDomains.yaml`);
 
+console.warn('process.env: ', process.env);
+
 if (OPTIONS.https) {
 
     const keyFile = `${__dirname}/../ssl/certs/server/privkey.pem`;
