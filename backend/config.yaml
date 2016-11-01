@@ -1,7 +1,7 @@
 mysql:
     username: masteruser
     password: connecttoplotly
-    database: plotly_database
+    database: null
     port: 3306
     dialect: mysql
     storage: null
@@ -9,7 +9,7 @@ mysql:
 mariadb:
     username: masteruser
     password: connecttoplotly
-    database: plotly_database
+    database: null
     port: 3306
     dialect: mariadb
     storage: null
@@ -17,7 +17,7 @@ mariadb:
 mssql:
     username: masteruser
     password: connecttoplotly
-    database: plotly_database
+    database: null
     port: 1433
     dialect: mssql
     storage: null
