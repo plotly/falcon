@@ -132,7 +132,7 @@ const setupSecureRestifyServer = (responseTools) => {
         origins: acceptRequestsFrom.domains,
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
-    })).listen(OPTIONS.port);
+    })).listen(process.env.PORT || OPTIONS.port);
 
     /*
      * https://github.com/restify/node-restify/issues/664
@@ -156,9 +156,9 @@ export function setupHTTP(responseTools) {
         origins: ['*'],
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
-    })).listen(responseTools.OPTIONS.port);
+    })).listen(process.env.PORT || responseTools.OPTIONS.port);
     responseTools.sequelizeManager.log(
-        `Listening on port ${responseTools.OPTIONS.port}`, 1
+        `Listening on port ${process.env.PORT || responseTools.OPTIONS.port}`, 1
     );
     setupRoutes(httpServer, serverMessageReceive(responseTools));
 
