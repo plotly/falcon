@@ -1,8 +1,7 @@
 .sessionsManagerContainer {
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 30px;
-    width: 800px;
+    width: 850px;
     text-align: center;
 }
 
@@ -62,8 +61,9 @@
 }
 
 .sessionAddWrapper {
+    background-color: white;
     display: inline-block;
-    border-width: 1px 0px 0px 1px;
+    border-width: 1px;
     border-color: #E7E8E9;
     border-style: solid;
     vertical-align: middle;

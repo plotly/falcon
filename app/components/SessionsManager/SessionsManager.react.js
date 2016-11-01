@@ -20,11 +20,11 @@ const getNewId = (sessionsIds) => {
 };
 
 const LOGOS = {
-    postgres: './images/postgres-logo.png',
-    mysql: './images/mysql-logo.png',
-    mariadb: './images/mariadb-logo.png',
-    mssql: './images/mssql-logo.png',
-    sqlite: './images/sqlite-logo.png',
+    postgres: './images/postgres-logo-small.png',
+    mysql: './images/mysql-logo-small.png',
+    mariadb: './images/mariadb-logo-small.png',
+    mssql: './images/mssql-logo-small.png',
+    sqlite: './images/sqlite-logo-small.png',
     elasticsearch: './images/elastic-logo.png',
     redshift: './images/redshift-logo.png'
 };

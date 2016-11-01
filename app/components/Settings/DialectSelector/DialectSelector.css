@@ -1,3 +1,7 @@
+.logoContainer {
+    width: 500px;
+}
+
 .logo {
     display: inline-block;
     width: 90px;
@@ -18,6 +22,8 @@
 .logo:hover, .logoSelected {
     border-color: #8BB5FE;
     cursor: pointer;
+    border-width: 4px;
+    margin: 3px;
 }
 
 .dialectInput {
