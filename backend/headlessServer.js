@@ -46,8 +46,8 @@ if (OPTIONS.https) {
         origins: acceptRequestsFrom.domains,
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
-    })).listen(OPTIONS.port);
-    console.log('listening on port ', OPTIONS.port);
+    })).listen(process.env.PORT || OPTIONS.port);
+    console.log('listening on port ', process.env.PORT || OPTIONS.port);
     /*
      * https://github.com/restify/node-restify/issues/664
      * Handle all OPTIONS requests to a deadend (Allows CORS to work them out)
@@ -65,8 +65,8 @@ if (OPTIONS.https) {
         origins: ['*'],
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
-    })).listen(OPTIONS.port);
-    console.log(`listening on port ${OPTIONS.port}`);
+    })).listen(process.env.PORT || OPTIONS.port);
+    console.log(`listening on port ${process.env.PORT || OPTIONS.port}`);
 
     setupRoutes(httpServer, serverMessageReceive(responseTools));
     console.log('http server is setup');
