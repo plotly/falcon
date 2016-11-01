@@ -21,11 +21,11 @@ mssql:
     port: 1433
     dialect: mssql
     storage: null
-    host: test-mysql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com
+    host: test-mssql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com
 postgres:
     username: masteruser
     password: connecttoplotly
-    database: plotly_database
+    database: plotly_datasets
     port: 5432
     dialect: postgres
     storage: null
