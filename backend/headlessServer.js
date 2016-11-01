@@ -23,12 +23,7 @@ const responseTools = {
 
 const acceptRequestsFrom = YAML.load(`${__dirname}/acceptedDomains.yaml`);
 
-let port;
-if (R.has('PORT', process.env) && process.env.PORT) {
-    port = process.env.PORT;
-} else {
-    port = OPTIONS.port;
-}
+const port = process.env.PORT || OPTIONS.port;
 console.log(`listening on port ${port}`);
 
 if (OPTIONS.https) {
