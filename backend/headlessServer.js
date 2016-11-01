@@ -6,6 +6,7 @@ import {serverMessageReceive,
         CHANNEL} from './messageHandler';
 import * as fs from 'fs';
 import YAML from 'yamljs';
+import R from 'ramda';
 
 let mainWindow = null;
 import restify from 'restify';
@@ -22,7 +23,13 @@ const responseTools = {
 
 const acceptRequestsFrom = YAML.load(`${__dirname}/acceptedDomains.yaml`);
 
-console.warn('process.env: ', process.env);
+let port;
+if (R.has('PORT', process.env) && process.env.PORT) {
+    port = process.env.PORT;
+} else {
+    port = OPTIONS.port;
+}
+console.log(`listening on port ${port}`);
 
 if (OPTIONS.https) {
 
@@ -48,8 +55,8 @@ if (OPTIONS.https) {
         origins: acceptRequestsFrom.domains,
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
-    })).listen(process.env.PORT || OPTIONS.port);
-    console.log('listening on port ', process.env.PORT || OPTIONS.port);
+    })).listen(port);
+
     /*
      * https://github.com/restify/node-restify/issues/664
      * Handle all OPTIONS requests to a deadend (Allows CORS to work them out)
@@ -67,8 +74,7 @@ if (OPTIONS.https) {
         origins: ['*'],
         credentials: false,
         headers: ['Access-Control-Allow-Origin']
-    })).listen(process.env.PORT || OPTIONS.port);
-    console.log(`listening on port ${process.env.PORT || OPTIONS.port}`);
+    })).listen(port);
 
     setupRoutes(httpServer, serverMessageReceive(responseTools));
     console.log('http server is setup');
