@@ -6,8 +6,7 @@ import {
     PlotlyAPIRequest,
     updateGrid
 } from '../../../backend/persistent/PlotlyAPI.js';
-
-import {names, createGrid} from '../utils.js';
+import {names, createGrid, username, apiKey} from '../utils.js';
 
 describe('Grid API Functions', function () {
     it ('updateGrid overwrites a grid with new data', function (done) {
@@ -29,12 +28,14 @@ describe('Grid API Functions', function () {
                     ['z', 30, 60, 90, 120, 150]
                 ],
                 fid,
-                uids
+                uids,
+                username,
+                apiKey
             );
         }).then(() => {
             const url = `grids/${fid}/content`;
             // Retrieve the contents from the grid
-            return PlotlyAPIRequest(url, {}, 'GET');
+            return PlotlyAPIRequest(url, {}, username, apiKey, 'GET');
         }).then(json => {
             // Test that the update worked
             assert.deepEqual(

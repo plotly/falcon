@@ -1,12 +1,9 @@
 import fetch from 'node-fetch';
+import {getSetting} from '../settings.js';
+import Logger from '../logger';
 
-export function PlotlyAPIRequest(relativeUrl, body, method = 'POST') {
-    // TODO - template in on-prem
-
-    const username = 'chris';
-    const apiKey = 'lpa5m34jje';
-
-    return fetch(`https://api-local.plot.ly/v2/${relativeUrl}`, {
+export function PlotlyAPIRequest(relativeUrl, body, username, apiKey, method = 'POST') {
+    return fetch(`${getSetting('PLOTLY_API_DOMAIN')}/v2/${relativeUrl}`, {
         method,
         headers: {
             'Accept': 'application/json',
@@ -17,31 +14,46 @@ export function PlotlyAPIRequest(relativeUrl, body, method = 'POST') {
             ).toString('base64')
         },
         body: JSON.stringify(body)
-    }).then(response => {
-        return response.text();
-    }).then(responseText => {
-        try {
-            const responseJson = JSON.parse(responseText);
-            if (responseJson.errors) {
-                throw new Error(JSON.stringify(responseJson));
-            }
-            return responseJson;
-        } catch (e) {
-            throw new Error(
-                `Error parsing response at ${relativeUrl}\n` +
-                responseText
-            );
-        }
     });
 }
 
 
 export function updateGrid(rows, fid, uids) {
-    // TODO - if the grid doesn't exist, we should delete the query.
+    const username = fid.split(':')[0];
+    const user = getSetting('USERS').find(
+        u => u.username === username
+    );
+    if (!user || !user.apikey) {
+        Logger.log(
+            `Attempting to update grid ${fid} but can't find the
+             credentials for the user "${username}".`, 0
+        );
+        return Promise.reject(new Error('Unauthenticated'));
+    }
+    const apikey = user.apikey;
+
+    // TODO - Test case where no rows are returned.
+    if (uids.length !== rows[0].length) {
+        Logger.log(`
+            A different number of columns was returned in the
+            query than what was initially saved in the grid.
+            ${rows[0].length} columns were queried,
+            ${uids.length} columns were originally saved.
+            The connector does not create columns (yet),
+            and so we will only update the first ${uids.length}
+            columns.
+        `);
+    }
+
     const columns = uids.map(() => []);
     for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
-        for (let j = 0; j < row.length; j++) {
+        /*
+         * For now, only update up to the number of columns that are
+         * already saved. In the future, we should just create more
+         * columns. See error message above.
+         */
+        for (let j = 0; j < Math.min(uids.length, row.length); j++) {
             columns[j][i] = row[j];
         }
     }
@@ -51,5 +63,5 @@ export function updateGrid(rows, fid, uids) {
             data: column
         })))
     };
-    return PlotlyAPIRequest(url, body, 'PUT');
+    return PlotlyAPIRequest(url, body, username, apikey, 'PUT');
 }

@@ -28,6 +28,17 @@ export const QUERIES_PATH = path.join(
     'queries.json'
 );
 
+export const LOG_PATH = path.join(
+    CONNECTOR_FOLDER_PATH,
+    'log.log'
+);
+
+export const SETTINGS_PATH = path.join(
+    CONNECTOR_FOLDER_PATH,
+    'settings.json'
+);
+// TODO - move these to yaml
+
 export function createConnectorFolder () {
     let partialPath = CONNECTOR_FOLDER_PATH_PARTS[0];
     CONNECTOR_FOLDER_PATH_PARTS.slice(1).forEach(pathPart => {

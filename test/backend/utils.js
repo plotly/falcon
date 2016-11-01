@@ -16,6 +16,9 @@ export const columns = [
 
 ];
 
+export const username = 'plotly-database-connector';
+export const apiKey = 'p5sbizfor0';
+
 export function createGrid(filename) {
     const cols = {};
     names.forEach((name, i) => {
@@ -27,7 +30,7 @@ export function createGrid(filename) {
         world_readable: true,
         parent: -1,
         filename: `${filename} - ${Math.random().toString(36).substr(2, 5)}`
-    });
+    }, username, apiKey);
 
 }
 
@@ -39,5 +42,6 @@ export const credentials = {
     'host': 'readonly-test-postgres.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
     'dialect': 'postgres'
 };
+
 
 export const configuration = dissoc('password', credentials);

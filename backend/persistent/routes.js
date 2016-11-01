@@ -10,7 +10,9 @@ import {
     getCredentialById
 } from './Credentials.js';
 import QueryScheduler from './QueryScheduler.js';
+import {getSetting} from '../settings.js';
 import {dissoc} from 'ramda';
+import Logger from '../logger';
 
 export default class Server {
     constructor() {
@@ -28,6 +30,50 @@ export default class Server {
         const server = this.server;
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
+        server.pre(function (request, response, next) {
+            Logger.log(`Request: ${request.href()}`, 2);
+            next();
+        });
+
+        /*
+         * CORS doesn't quite work by default in restify,
+         * see https://github.com/restify/node-restify/issues/664
+         */
+        const headers = [
+            'authorization',
+            'withcredentials',
+            'x-requested-with',
+            'x-forwarded-for',
+            'x-real-ip',
+            'x-customheader',
+            'user-agent',
+            'keep-alive',
+            'host',
+            'accept',
+            'connection',
+            'upgrade',
+            'content-type',
+            'dnt',
+            'if-modified-since',
+            'cache-control'
+        ];
+        server.use(restify.CORS({
+            origins: getSetting('CORS_ALLOWED_ORIGINS'),
+            credentials: false,
+            headers: headers
+        }));
+        headers.forEach(header => restify.CORS.ALLOW_HEADERS.push(header));
+        server.opts( /.*/, function (req, res) {
+            res.header(
+                'Access-Control-Allow-Headers',
+                restify.CORS.ALLOW_HEADERS.join( ', ' )
+            );
+            res.header(
+                'Access-Control-Allow-Methods',
+                'POST, GET, DELETE, OPTIONS'
+            );
+            res.send(204);
+        });
         server.listen(
             9000
         );
@@ -40,7 +86,7 @@ export default class Server {
         });
 
         server.get('/ping', (req, res, next) => {
-            res.send(200);
+            res.json(200, {message: 'pong'});
         });
 
         // save credentials to a file
@@ -76,7 +122,7 @@ export default class Server {
             if (credential) {
                 res.json(200, credential);
             } else {
-                res.send(404);
+                res.json(404, {});
             }
         });
 
@@ -84,16 +130,16 @@ export default class Server {
         server.del('/credentials/:id', (req, res, next) => {
             if (getSanitizedCredentialById(req.params.id)) {
                 deleteCredentialById(req.params.id);
-                res.json(204);
+                res.json(204, {});
             } else {
-                res.json(404);
+                res.json(404, {});
             }
         });
 
         /* Connections */
         server.post('/connect/:credentialId', (req, res, next) => {
             Connections.connect(getCredentialById(req.params.credentialId)).then(() => {
-                res.send(200);
+                res.json(200, {});
             });
         });
 
@@ -107,13 +153,17 @@ export default class Server {
             ).then(rows => {
                 res.json(200, rows);
                 next();
+            }).catch(error => {
+                res.json(400, {error: {message: error.message}});
             });
         });
 
         // return a list of tables or documents
-        server.post('/tables/:credentialId', (req, res, next) => {
+        // TODO - this needs to be /tables/:credentialId/:database/
+        server.post('/tables/:credentialId/:database/', (req, res, next) => {
             Connections.tables(
-                getCredentialById(req.params.credentialId)
+                getCredentialById(req.params.credentialId),
+                req.params.database
             ).then(tables => {
                 res.json(200, tables);
             });
@@ -129,6 +179,9 @@ export default class Server {
             });
         });
 
+        // server.post('/s3/keys/:credentialId')
+        // server.post('/apache-drill/keys/:credentialId')
+
         /* Persistent Connections */
 
         // return the list of registered queries
@@ -141,14 +194,17 @@ export default class Server {
             if (query) {
                 res.json(200, query);
             } else {
-                res.send(404);
+                res.json(404, {});
             }
         });
 
         // register a query
         server.post('/queries', (req, res, next) => {
+            // TODO - Verify that the app has access to
+            // the user's API key and attempt to make a
+            // request to see if it is valid.
             this.queryScheduler.scheduleQuery(req.params);
-            res.send(200);
+            res.json(201, {});
         });
 
         // delete a query
@@ -156,10 +212,17 @@ export default class Server {
             const {fid} = req.params;
             if (getQuery(fid)) {
                 deleteQuery(fid);
-                res.json(204);
+                res.json(204, {});
             } else {
-                res.json(404);
+                res.json(404, {});
             }
+        });
+
+        // TODO - test this error handling stuff.
+        // It doesn't seem like it works inside promises.
+        server.on('uncaughtException', function (req, res, route, err) {
+            console.error('uncaughtException: %s', err.stack);
+            res.json(500, {error: {message: err.message}});
         });
 
     }

@@ -23,6 +23,10 @@ export function connect(credentials) {
     });
 }
 
+/*
+ * Download a (csv) file from S3, parse it
+ * and return the results.
+ */
 export function query(key, credentials) {
     const {bucket} = credentials;
     const client = createClient(credentials);
@@ -35,6 +39,24 @@ export function query(key, credentials) {
             const textData = response.Body.toString();
             // TODO ^ handle binary files too
             resolve(parse(textData));
+        });
+    });
+}
+
+/*
+ * List all of the files in an S3 bucket
+ */
+export function files(credentials) {
+    const {bucket} = credentials;
+    const client = createClient(credentials);
+    return new Promise((resolve, reject) => {
+        client.listObjects({Bucket: bucket}, (err, data) => {
+            if (err) {
+                reject(err);
+                return;
+            } else {
+                resolve(data.Content);
+            }
         });
     });
 }

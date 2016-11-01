@@ -2,7 +2,7 @@ import {app, BrowserWindow, ipcMain} from 'electron';
 import {contains} from 'ramda';
 
 import {Sessions} from './sessions';
-import {Logger} from './logger';
+import Logger from './logger';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import {ElasticManager} from './elasticManager';
 import QueryScheduler from './persistent/QueryScheduler.js';
@@ -12,6 +12,8 @@ import {setupHTTP, setupHTTPS, findSelfSignedCert} from './setupServers';
 import {setupMenus} from './menus';
 
 import Server from './persistent/routes.js';
+
+Logger.log('Starting application', 2);
 
 if (process.env.NODE_ENV === 'development') {
     require('electron-debug')();
@@ -31,7 +33,11 @@ const isTestRun = () => {
 const canSetupHTTPS = isUnix() && !isTestRun();
 
 const server = new Server();
+
+Logger.log('Starting server', 2);
 server.start();
+Logger.log('Loading persistent queries', 2);
+server.queryScheduler.loadQueries();
 
 app.on('ready', () => {
 
@@ -41,22 +47,6 @@ app.on('ready', () => {
         width: 1024,
         height: OPTIONS.large ? 1024 : 728
     });
-
-    const logger = new Logger(OPTIONS, mainWindow, CHANNEL);
-    // const sessions = new Sessions();
-    // const sequelizeManager = new SequelizeManager(logger, sessions);
-    // const elasticManager = new ElasticManager(logger, sessions);
-
-    /*
-        'responseTools' is generic for the things required to handle
-        responses from either the app through IPC CHANNEL or from a API
-        request
-    */
-    // const responseTools = {
-    //     sequelizeManager, elasticManager, mainWindow, OPTIONS, queryScheduler
-    // };
-
-    // sequelizeManager.log('Starting Application...', 0);
 
     mainWindow.loadURL(`file://${__dirname}/../app/app.html`);
 

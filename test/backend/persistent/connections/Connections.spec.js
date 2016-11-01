@@ -215,7 +215,7 @@ describe('S3 - Connection', function () {
 
 });
 
-describe.only('Apache Drill - Connection', function () {
+describe('Apache Drill - Connection', function () {
     it('connects', function(done) {
         connect(apacheDrillCredentials)
         .then(res => done())

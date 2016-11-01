@@ -55,6 +55,7 @@ export function connect(credentials) {
     return getConnection(credentials).connect(credentials);
 }
 
+/* SQL-like Connectors */
 
 /*
  * return a promise with the available tables from a database
@@ -75,6 +76,29 @@ export function databases(credentials) {
  * e.g., for elasticsearch, this means return the available
  * "documents" per an "index"
  */
-export function tables(credentials) {
-    return getConnection(credentials).tables(credentials);
+export function tables(credentials, database) {
+    return getConnection(credentials).tables(credentials, database);
+}
+
+/* FileSystem-like Connectors */
+
+/*
+ * Return a promise with the files that are available for querying.
+ *
+ * e.g. for S3 and ApacheDrill, this returns the list of S3 keys.
+ * In the future, if we support local file querying, this could include
+ * a list of local files
+ */
+export function files(credentials) {
+    return getConnection(credentials).files(credentials);
+}
+
+
+/* Apache Drill specific functions */
+
+/*
+ * Return a list of configured Apache Drill storage plugins
+ */
+export function storage(credentials) {
+    return getConnection(credentials).storage(credentials);
 }

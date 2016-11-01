@@ -70,8 +70,9 @@ export function query(queryString, credentials) {
     ).then(results => parseSQL(results));
 }
 
-export function tables(credentials) {
-    return createClient(credentials).query(
+export function tables(credentials, database) {
+    // TODO - Should databases be saved as part of credentials or not?
+    return createClient(merge(credentials, {database})).query(
         SHOW_TABLES_QUERY[credentials.dialect],
         {type: Sequelize.QueryTypes.SELECT}
     ).map(data => data[0]);

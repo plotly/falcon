@@ -40,3 +40,5 @@ export function query(queryStatement, credentials) {
     });
 
 }
+
+// export function storage()

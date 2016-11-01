@@ -1,30 +1,19 @@
 import * as Connections from './connections/Connections';
 import {updateGrid} from './PlotlyAPI';
 import {getCredentialById} from './Credentials';
-import {getQueries, saveQuery} from './Queries';
-
-function queryAndUpdateGrid (fid, uids, queryString, credentialId) {
-    const requestedDBCredentials = getCredentialById(credentialId);
-    Connections.query(queryString, requestedDBCredentials).then(
-        rowsAndColumns => updateGrid(
-            rowsAndColumns.rows,
-            fid,
-            uids
-        )
-        // TODO - ^^ Error handling.
-        // - throttling
-        // - API keys
-        // - 404 -> remove query
-    );
-}
-
+import {getQueries, saveQuery, deleteQuery} from './Queries';
+import Logger from '../Logger';
 
 class QueryScheduler {
-    constructor(job = queryAndUpdateGrid) {
+    constructor() {
         this.scheduleQuery = this.scheduleQuery.bind(this);
         this.loadQueries = this.loadQueries.bind(this);
+        this.clearQuery = this.clearQuery.bind(this);
+        this.clearQueries = this.clearQueries.bind(this);
+        this.queryAndUpdateGrid = this.queryAndUpdateGrid.bind(this);
 
-        this.job = job;
+        // Expose this.job so that tests can overwrite it
+        this.job = this.queryAndUpdateGrid;
         this.queryJobs = {};
     }
 
@@ -35,7 +24,8 @@ class QueryScheduler {
         query: query,
         credentialId: credentialId
     }) {
-
+        Logger.log(`Scheduling "${query}" with credential ${credentialId} updating grid ${fid}`);
+        // TODO - Make Query an object that contains database
         // Save query to a file
         saveQuery({
             fid,
@@ -50,7 +40,14 @@ class QueryScheduler {
         }
 
         this.queryJobs[fid] = setInterval(
-            () => this.job(fid, uids, query, credentialId),
+            () => {
+                try {
+                    this.job(fid, uids, query, credentialId);
+                } catch (e) {
+                    Logger.log(e, 0);
+                }
+
+            },
             refreshRate
         );
 
@@ -59,21 +56,75 @@ class QueryScheduler {
     // Load and schedule queries - To be run on app start.
     loadQueries() {
         // read queries from a file
-        const queries = this.getQueries();
+        const queries = getQueries();
         queries.forEach(this.scheduleQuery);
+    }
+
+    // Remove query from memory
+    clearQuery(fid) {
+        clearInterval(this.queryJobs[fid]);
+        delete this.queryJobs[fid];
     }
 
     // Clear out setInterval queries from memory - used to clean up tests
     clearQueries() {
-        Object.keys(this.queryJobs).forEach(fid => {
-            clearInterval(this.queryJobs[fid]);
-            delete this.queryJobs[fid];
+        Object.keys(this.queryJobs).forEach(this.clearQuery);
+    }
+
+    queryAndUpdateGrid (fid, uids, queryString, credentialId) {
+        // TODO - look up username and API key
+        const requestedDBCredentials = getCredentialById(credentialId);
+        let startTime = process.hrtime();
+
+        Logger.log(`Querying "${queryString}" with credential ${credentialId} to update grid ${fid}`, 2);
+        Connections.query(queryString, requestedDBCredentials)
+        .then(rowsAndColumns => {
+            Logger.log(`Query "${queryString}" took ${process.hrtime(startTime)[0]} seconds`, 2);
+
+            Logger.log(`Updating grid ${fid} with new data`, 2);
+            Logger.log(
+                `First row:
+                ${JSON.stringify(rowsAndColumns.rows.slice(1))}`,
+            2);
+
+            startTime = process.hrtime();
+
+            return updateGrid(
+                rowsAndColumns.rows,
+                fid,
+                uids
+            );
+
+        }).then(res => res.json().then(json => {
+            Logger.log(`Request to Plotly took ${process.hrtime(startTime)[0]} seconds`, 2);
+            /*
+             * If 404, then assume the user has deleted their grid and
+             * remove the query
+             */
+            if (res.status === 404) {
+                // TODO - Log this
+                this.clearQuery(fid);
+                deleteQuery(fid);
+                Logger.log(
+                    `Grid ID ${fid} doesn't exist on Plotly anymore,
+                     removing persistent query.`,
+                     2
+                );
+            } else if (res.status !== 200) {
+                Logger.log(`Error ${res.status} while updating grid ${fid}.`, 0);
+                Logger.log('Error response: ' + JSON.stringify(json), 0);
+            } else {
+                Logger.log(`Grid ${fid} has been updated.`, 2);
+            }
+        }))
+        .catch(error => {
+            console.error(error);
+            Logger.log(error, 0);
         });
     }
+
 }
 
-// TODO - temporary
-export {queryAndUpdateGrid};
 export default QueryScheduler;
 
 
