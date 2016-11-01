@@ -38,7 +38,6 @@ main.js.map
 
 # Local tests
 test/set_creds.sh
-backend/config.yaml
 *.pem
 
 # bundles
