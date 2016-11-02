@@ -9,7 +9,7 @@ import {
 } from '../actions/sessions.js';
 import Immutable from 'immutable';
 import {EMPTY_SESSION} from '../constants/constants';
-import {dissoc} from 'ramda';
+import {assoc, assocPath, merge, dissoc} from 'ramda';
 
 // see end of file for `list` description
 const INITIAL_STATE = Immutable.Map({
@@ -17,6 +17,7 @@ const INITIAL_STATE = Immutable.Map({
     sessionSelectedId: '0',
     startupIPC: Immutable.Map({})
 });
+
 
 export default function sessions(state = INITIAL_STATE, action) {
 

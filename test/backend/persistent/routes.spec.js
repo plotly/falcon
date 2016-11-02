@@ -136,22 +136,6 @@ describe('Server', function () {
         }).catch(done);
     });
 
-    // Meta info about the databases
-    it('/databases returns a list of databases', function(done) {
-        this.timeout(5000);
-        POST(`/databases/${credentialId}`, {configuration})
-        .then(res => res.json())
-        .then(json => {
-            assert.deepEqual(json, [
-                'rdsadmin',
-                'postgres',
-                'consumercomplaints',
-                'plotly_datasets'
-            ]);
-            done();
-        }).catch(done);
-    });
-
     // Credentials
     it('saves credentials to a file if they do not exist', function(done) {
         fs.unlinkSync(CREDENTIALS_PATH);

@@ -11,31 +11,10 @@ export default class Configuration extends Component {
     }
 
     componentDidMount() {
-        this.props.sessionsActions.initializeSessions();
+        // this.props.sessionsActions.initializeSessions();
     }
 
     render() {
-        let settings = null;
-        const {
-            sessionsActions,
-            sessions
-        } = this.props;
-        const sessionSelected = sessions.getIn(
-            ['list', `${this.props.sessions.get('sessionSelectedId')}`]
-        );
-
-        if (this.props.sessions.get('list').size > 0) {
-
-            settings = (
-                <Settings
-                    configuration={sessionSelected.get('configuration')}
-                    connection={sessionSelected.get('connection')}
-                    ipc={sessionSelected.get('ipc')}
-
-                    sessionsActions={sessionsActions}
-                />
-            );
-        }
 
         return (
             <div className={styles.fullApp}>
@@ -79,6 +58,9 @@ export default class Configuration extends Component {
                     </div>
                 </div>
 
+                <Settings/>
+
+                {/*
                 <SessionsManager
                     sessionsActions={this.props.sessionsActions}
                     sessions={this.props.sessions}
@@ -87,6 +69,7 @@ export default class Configuration extends Component {
                 <div className={styles.settings}>
                     {settings}
                 </div>
+                */}
 
             </div>
 

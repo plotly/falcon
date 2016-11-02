@@ -64,20 +64,8 @@ export function connect(credentials) {
  * e.g., for elasticsearch, this means return the available
  * "documents" per an "index"
  */
-export function databases(credentials) {
-    return getConnection(credentials).databases(credentials);
-}
-
-
-/*
- * return a promise with the available tables from a database
- *
- * this can have flexible meaning for other datastores.
- * e.g., for elasticsearch, this means return the available
- * "documents" per an "index"
- */
-export function tables(credentials, database) {
-    return getConnection(credentials).tables(credentials, database);
+export function tables(credentials) {
+    return getConnection(credentials).tables(credentials);
 }
 
 /* FileSystem-like Connectors */

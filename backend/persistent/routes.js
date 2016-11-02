@@ -138,7 +138,8 @@ export default class Server {
 
         /* Connections */
         server.post('/connect/:credentialId', (req, res, next) => {
-            Connections.connect(getCredentialById(req.params.credentialId)).then(() => {
+            Connections.connect(getCredentialById(req.params.credentialId))
+            .then(() => {
                 res.json(200, {});
             });
         });
@@ -158,24 +159,12 @@ export default class Server {
             });
         });
 
-        // return a list of tables or documents
-        // TODO - this needs to be /tables/:credentialId/:database/
-        server.post('/tables/:credentialId/:database/', (req, res, next) => {
+        server.post('/tables/:credentialId', (req, res, next) => {
             Connections.tables(
                 getCredentialById(req.params.credentialId),
                 req.params.database
             ).then(tables => {
                 res.json(200, tables);
-            });
-        });
-
-        // return a list of tables or documents
-        server.post('/databases/:credentialId', (req, res, next) => {
-            Connections.databases(
-                getCredentialById(req.params.credentialId)
-            ).then(databases => {
-                res.json(200, databases);
-                // TODO - fix this up
             });
         });
 
@@ -221,7 +210,7 @@ export default class Server {
         // TODO - test this error handling stuff.
         // It doesn't seem like it works inside promises.
         server.on('uncaughtException', function (req, res, route, err) {
-            console.error('uncaughtException: %s', err.stack);
+            Logger.log('uncaughtException: ' + err.stack, 0);
             res.json(500, {error: {message: err.message}});
         });
 

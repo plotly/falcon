@@ -20,3 +20,9 @@ little things
     - test that server is running (keep majority of api tests in routes.spec.js)
     - test headless mode
 - update `updateGrid` in QueryScheduler to remove query if the response was a 404
+
+***
+
+- Alert users who are deleting a tab that contains a credential ID with a
+  persistent query
+- Tell people about the logs in the UI

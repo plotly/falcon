@@ -1,116 +1,35 @@
-import React, {Component, PropTypes} from 'react';
-import ImmutablePropTypes from 'react-immutable-proptypes';
-import * as styles from './DialectSelector.css';
+import React, { PropTypes } from 'react';
+import * as DialectStyles from './DialectSelector.css';
+import {
+    DIALECTS, LOGOS
+} from '../../../constants/constants';
 import classnames from 'classnames';
-import {DIALECTS} from '../../../constants/constants';
-import {dissoc} from 'ramda';
 
-/*
-    Displays interactive database dialect logos and alters
-    the chosen `configuration` dialect parameter.
-*/
+export default function DialectSelector(props) {
+    const {credentialObject, updateCredential} = props;
 
-let LOGOS = {
-    REDSHIFT: './images/redshift-logo.png',
-    POSTGRES: './images/postgres-logo.png',
-    ELASTICSEARCH: './images/elastic-logo.png',
-    MYSQL: './images/mysql-logo.png',
-    MARIADB: './images/mariadb-logo.png',
-    MSSQL: './images/mssql-logo.png',
-    SQLITE: './images/sqlite-logo.png'
-};
-// TODO: remove when #40 is resolved
-if (process.platform !== 'darwin') {
-    LOGOS = dissoc('SQLITE', LOGOS);
+    const logos = Object.keys(DIALECTS).map(DIALECT => (
+        <div
+            key={DIALECT}
+            className={classnames(
+                DialectStyles.logo, {
+                      [DialectStyles.logoSelected]:
+                      credentialObject.dialect === DIALECTS[DIALECT]
+                 }
+            )}
+            onClick={() => {
+                updateCredential(
+                    {dialect: DIALECTS[DIALECT]}
+                );
+            }}
+            id={`test-logo-${DIALECTS[DIALECT]}`}
+        >
+            <img
+                className={DialectStyles.logoImage}
+                src={LOGOS[DIALECT]}
+            />
+        </div>
+    ));
+
+    return <div className={DialectStyles.logoContainer}>{logos}</div>;
 }
-
-export default class DialectSelector extends Component {
-    constructor(props) {
-        super(props);
-        this.resetAll = this.resetAll.bind(this);
-        this.testClass = this.testClass.bind(this);
-        this.logoIsSelected = this.logoIsSelected.bind(this);
-        this.state = {
-            selectedDialect: props.configuration.get('dialect')
-        };
-    }
-
-    testClass(dialect) {
-        /*
-            Sanity check, to see if the dialect selected by user is consistent
-            with the configuration store.
-        */
-
-        const consistency =
-            (DIALECTS[dialect]
-            === this.state.selectedDialect) &&
-            (DIALECTS[dialect]
-            === this.props.configuration.get('dialect'));
-
-        let className = 'test';
-        if (consistency) {
-            className = 'test-consistent-state';
-        } else {
-            className = 'test-nonconsistent-state';
-        }
-        return className;
-    }
-
-    logoIsSelected(dialect) {
-        return this.state.selectedDialect === DIALECTS[dialect];
-    }
-
-    resetAll() {
-        this.props.sessionsActions.updateConfiguration(
-        {
-            username: '',
-            password: '',
-            database: '',
-            port: '',
-            storage: '',
-            host: ''
-        });
-    }
-
-    componentWillReceiveProps(nextProps) {
-        const nextDialect = nextProps.configuration.get('dialect');
-        if (this.state.selectedDialect !== nextDialect) {
-            this.setState({selectedDialect: nextDialect});
-        }
-    }
-
-	render() {
-        const {sessionsActions} = this.props;
-
-		const logos = Object.keys(DIALECTS).map(dialect => (
-                <div className={classnames(
-                        styles.logo, {
-                              [styles.logoSelected]:
-                              this.state.selectedDialect === DIALECTS[dialect]
-                         },
-                        [this.testClass(dialect)]
-                    )}
-                    onClick={() => {
-                        this.setState({selectedDialect: DIALECTS[dialect]});
-                        sessionsActions.updateConfiguration({dialect: DIALECTS[dialect]});
-                        this.resetAll();
-                    }}
-                    id={`test-logo-${DIALECTS[dialect]}`}
-                >
-                    <img
-                        className={styles.logoImage}
-                        src={LOGOS[dialect]}
-                    />
-                </div>
-        ));
-
-		return (
-			<div className={styles.logoContainer}>{logos}</div>
-		);
-	}
-}
-
-DialectSelector.propTypes = {
-    configuration: ImmutablePropTypes.map.isRequired,
-    sessionsActions: PropTypes.object
-};

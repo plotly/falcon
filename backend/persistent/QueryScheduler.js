@@ -84,7 +84,7 @@ class QueryScheduler {
             Logger.log(`Updating grid ${fid} with new data`, 2);
             Logger.log(
                 `First row:
-                ${JSON.stringify(rowsAndColumns.rows.slice(1))}`,
+                ${JSON.stringify(rowsAndColumns.rows.slice(0, 1))}`,
             2);
 
             startTime = process.hrtime();
@@ -95,8 +95,11 @@ class QueryScheduler {
                 uids
             );
 
-        }).then(res => res.json().then(json => {
-            Logger.log(`Request to Plotly took ${process.hrtime(startTime)[0]} seconds`, 2);
+        }).then(res => {
+            setTimeout(function() {
+                Logger.log(`Request to Plotly for grid ${fid} took ${process.hrtime(startTime)[0]} seconds`, 2);
+            }, 2000);
+
             /*
              * If 404, then assume the user has deleted their grid and
              * remove the query
@@ -112,15 +115,21 @@ class QueryScheduler {
                 );
             } else if (res.status !== 200) {
                 Logger.log(`Error ${res.status} while updating grid ${fid}.`, 0);
-                Logger.log('Error response: ' + JSON.stringify(json), 0);
-            } else {
-                Logger.log(`Grid ${fid} has been updated.`, 2);
             }
-        }))
-        .catch(error => {
+
+            res.json().then(json => {
+                if (res.status !== 200) {
+                    Logger.log(`Response: ${JSON.stringify(json, null, 2)}`, 2);
+                } else {
+                Logger.log(`Grid ${fid} has been updated.`, 2);
+                }
+            });
+
+        }).catch(error => {
             console.error(error);
             Logger.log(error, 0);
         });
+
     }
 
 }

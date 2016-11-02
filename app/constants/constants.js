@@ -22,7 +22,7 @@ export const APP_STATUS = {
     DISCONNECTED: 'DISCONNECTED'
 };
 
-export const CONNETION_CONFIG = {
+export const CONNECTION_CONFIG = {
     [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port'],
     [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port'],
 	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port'],
@@ -32,7 +32,7 @@ export const CONNETION_CONFIG = {
     [DIALECTS.SQLITE]: ['storage']
 };
 
-export const CONNETION_OPTIONS = {
+export const CONNECTION_OPTIONS = {
     [DIALECTS.MYSQL]: ['ssl'],
     [DIALECTS.MARIADB]: ['ssl'],
 	[DIALECTS.MSSQL]: ['ssl'],
@@ -59,9 +59,18 @@ export const EMPTY_SESSION =
         database: '',
         dialect: DIALECTS.MYSQL,
         port: '',
-        storage: '',
         host: '',
         ssl: false
     },
     CONNECTION: {status: APP_STATUS.INITIALIZED}
+};
+
+export const LOGOS = {
+    REDSHIFT: './images/redshift-logo.png',
+    POSTGRES: './images/postgres-logo.png',
+    ELASTICSEARCH: './images/elastic-logo.png',
+    MYSQL: './images/mysql-logo.png',
+    MARIADB: './images/mariadb-logo.png',
+    MSSQL: './images/mssql-logo.png',
+    SQLITE: './images/sqlite-logo.png'
 };

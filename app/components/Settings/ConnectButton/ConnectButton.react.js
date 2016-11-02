@@ -4,166 +4,45 @@ import classnames from 'classnames';
 import * as styles from './ConnectButton.css';
 import {APP_STATUS, BUTTON_MESSAGE} from '../../../constants/constants';
 
-/*
-	Displays a connect button and a disconnect button.
-	Asks sequelize to create a new connection using credentials.
-	Fires preset queries to show available databases/schemes
-	inside the users' account using `sessionsActions`.
-	Displays errors and log messages using `ipc`.
-*/
+export default function ConnectButton(props) {
+    const {
+        credentialsHaveBeenSaved,
+        connect,
+        connectRequest,
+        saveCredentialsRequest
+    } = props;
+    console.warn('Connect Button Props: ', props);
 
-export default class ConnectButton extends Component {
-    constructor(props) {
-        super(props);
-        this.connect = this.connect.bind(this);
-        this.disconnect = this.disconnect.bind(this);
-        this.testClass = this.testClass.bind(this);
-        this.updateStatus = this.updateStatus.bind(this);
-        this.state = {
-            hover: false
-        };
-    }
+    let buttonText;
+    let buttonClick = () => {};
+    let error = null;
 
-    testClass() {
-        /*
-            Return the connection state as class-status.
-            Knowing this status and getting the errorMessage and buttonMessage
-            from their respective className tags will suffice to test this
-            comoponent.
-        */
-        return `test-${this.props.connection.get('status')}`;
-    }
+    if (!connectRequest.status) {
+        buttonText = 'Connect';
+    } else if (connectRequest.status === 'loading') {
+        buttonText = 'Connecting...';
+    } else if (connectRequest.status >= 200 && connectRequest.status < 300) {
+        buttonText = 'Connected';
+   } else if (connectRequest.status >= 400 || saveCredentialsRequest.status >= 400) {
+       buttonText = 'Connect';
+       // TODO - Try out bad credentials to verify this.
+       // TODO - Try out locking the home folder and verifying this.
+       let errorMessage = 'Hm... had trouble connecting.';
+       if (connectRequest.content && connectRequest.content.error && connectRequest.content.error.message) {
+           errorMessage = connectRequest.content.error.message;
+       } else if (saveCredentialsRequest.content && saveCredentialsRequest.content.error && saveCredentialsRequest.content.error.message) {
+           errorMessage = saveCredentialsRequest.content.error.message
+       }
+       error = <div className={styles.errorMessage}>{errorMessage}</div>;
+   } 
 
-    connect() {
-        this.updateStatus(APP_STATUS.CONNECTING);
-        this.props.sessionsActions.connect();
-    }
+   return (
+        <div>
+            <div
+                className={styles.buttonPrimary}
+                onClick={connect}>{buttonText}</div>
+                {error}
+        </div>
+   );
 
-    disconnect() {
-        this.props.sessionsActions.disconnect();
-    }
-
-    onMouseOver() {
-        this.setState({hover: true});
-    }
-
-    onMouseOut() {
-        this.setState({hover: false});
-    }
-
-    updateStatus(status) {
-        if (status !== this.props.connection.get('status')) {
-            this.props.sessionsActions.updateConnection({status});
-            this.setState({
-                buttonMessage: BUTTON_MESSAGE[status]
-            });
-        }
-    }
-
-    componentWillReceiveProps(nextProps) {
-        const status = this.props.connection.get('status');
-            if (!nextProps.ipc.get('error')) {
-                if (
-                    nextProps.ipc.has('databases') &&
-                    !nextProps.ipc.get('databases')
-                ) {
-                    this.updateStatus(APP_STATUS.DISCONNECTED);
-                } else if (nextProps.ipc.get('databases')) {
-                    this.updateStatus(APP_STATUS.CONNECTED);
-                }
-            } else {
-                if (nextProps.ipc.getIn(['error', 'name']) === 'ConnectionError') {
-                    this.updateStatus(APP_STATUS.CON_ERROR);
-                } else if (status !== APP_STATUS.CON_ERROR) {
-                    this.updateStatus(APP_STATUS.ERROR);
-                }
-            }
-    }
-
-	render() {
-		const {connection, ipc} = this.props;
-        const status = connection.get('status');
-
-        let errorMessage;
-        let onButtonClick;
-
-        let buttonMessage = BUTTON_MESSAGE[status];
-        if (this.state.hover &&
-            (status === APP_STATUS.CONNECTED || status === APP_STATUS.ERROR)) {
-            buttonMessage = 'disconnect';
-        }
-
-        // what should the button onClick do depending on the app status
-        switch (status) {
-
-            case APP_STATUS.INITIALIZED:
-                onButtonClick = this.connect;
-                break;
-
-            case APP_STATUS.CON_ERROR:
-                errorMessage = (
-                    <pre className={styles.errorMessage}>
-                        {
-                            'Hm... an error occured: ' +
-                            ipc.getIn(['error', 'message'])
-                        }
-                    </pre>
-                );
-                onButtonClick = this.connect;
-                break;
-
-            case APP_STATUS.ERROR:
-                errorMessage = (
-                    <pre className={styles.errorMessage}>
-                        {
-                            'Hm... there was an error connecting: ' +
-                            ipc.getIn(['error', 'message'])
-                        }
-                    </pre>
-                );
-                onButtonClick = this.disconnect;
-                break;
-
-            case APP_STATUS.CONNECTED:
-                onButtonClick = this.disconnect;
-                break;
-
-            case APP_STATUS.CONNECTING:
-                onButtonClick = () => {};
-                break;
-
-            case APP_STATUS.DISCONNECTED:
-                onButtonClick = this.connect;
-                break;
-
-            default:
-                onButtonClick = this.connect;
-        }
-
-		return (
-			<div className={styles.footer}>
-				<a className={classnames(
-                        styles.buttonPrimary,
-                        [this.testClass()]
-                    )}
-					onClick={onButtonClick}
-                    onMouseOut={() => {this.setState({hover: false});}}
-                    onMouseOver={() => {this.setState({hover: true});}}
-                    id={'test-connect-button'}
-				>
-					{buttonMessage}
-				</a>
-                <pre id={'test-error-message'}>
-                    {errorMessage}
-                </pre>
-			</div>
-		);
-	}
 }
-
-ConnectButton.propTypes = {
-    configuration: ImmutablePropTypes.map.isRequired,
-    connection: ImmutablePropTypes.map.isRequired,
-    sessionsActions: PropTypes.object,
-    ipc: ImmutablePropTypes.map.isRequired
-};

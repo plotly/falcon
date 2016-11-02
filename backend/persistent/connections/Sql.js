@@ -2,6 +2,8 @@ import Sequelize from 'sequelize';
 import {parseSQL} from '../../parse';
 import {merge} from 'ramda';
 import {DIALECTS} from '../../../app/constants/constants';
+import Logger from '../../Logger';
+import {dissoc} from 'ramda';
 
 // http://stackoverflow.com/questions/32037385/using-sequelize-with-redshift
 const REDSHIFT_OPTIONS = {
@@ -12,14 +14,6 @@ const REDSHIFT_OPTIONS = {
     dialectOptions: {
         ssl: true
     }
-};
-
-const SHOW_DATABASES_QUERY = {
-    [DIALECTS.MYSQL]: 'SHOW DATABASES',
-    [DIALECTS.SQLITE]: 'SHOW DATABASES',
-    [DIALECTS.MARIADB]: 'SHOW DATABASES',
-    [DIALECTS.POSTGRES]: 'SELECT datname AS database FROM pg_database WHERE datistemplate = false;',
-    [DIALECTS.MSSQL]: 'SELECT name FROM Sys.Databases'
 };
 
 const SHOW_TABLES_QUERY = {
@@ -45,7 +39,9 @@ function createClient(credentials) {
 
     let options = {
         dialect, host, port, storage,
-        dialectOptions: {ssl}
+        dialectOptions: {ssl},
+        logging: Logger.log,
+        benchmark: true
     };
     if (dialect === 'redshift') {
         Sequelize.HSTORE.types.postgres.oids.push('dummy');
@@ -55,11 +51,16 @@ function createClient(credentials) {
     }
 
     return new Sequelize(
-        database, username, password, options
+        database, username, password, options,
     );
 }
 
 export function connect(credentials) {
+    Logger.log(`
+        Attempting to authenticate with credentials
+        ${JSON.stringify(dissoc('password', credentials), null, 2)}
+        (password omitted)`
+    );
     return createClient(credentials).authenticate();
 }
 
@@ -70,18 +71,10 @@ export function query(queryString, credentials) {
     ).then(results => parseSQL(results));
 }
 
-export function tables(credentials, database) {
+export function tables(credentials) {
     // TODO - Should databases be saved as part of credentials or not?
-    return createClient(merge(credentials, {database})).query(
+    return createClient(credentials).query(
         SHOW_TABLES_QUERY[credentials.dialect],
         {type: Sequelize.QueryTypes.SELECT}
     ).map(data => data[0]);
 }
-
-export function databases(credentials) {
-    return createClient(credentials).query(
-        SHOW_DATABASES_QUERY[credentials.dialect],
-        {type: Sequelize.QueryTypes.SELECT}
-    ).map(data => data.database);
-}
-// TODO ^^ Test against all databases

@@ -1,33 +1,21 @@
 import React from 'react';
 import {render} from 'react-dom';
 import {Provider} from 'react-redux';
-import {Router, hashHistory} from 'react-router';
-import {syncHistoryWithStore} from 'react-router-redux';
 
-import routes from './routes';
 import configureStore from './store/configureStore';
-import {updateIpcState} from './actions/sessions';
 
 import {productName, version} from '../package.json';
-import {CHANNEL} from './../backend/messageHandler';
 import './app.global.css';
 
 const store = configureStore();
-const history = syncHistoryWithStore(hashHistory, store);
 
-const ipcRenderer = require('electron').ipcRenderer;
-ipcRenderer.on(CHANNEL, function(event, message) {
-    store.dispatch(updateIpcState(message));
-});
+import ConfigurationPage from './containers/ConfigurationPage';
 
 window.document.title = `${productName} v${version}`;
 
 render(
     <Provider store={store}>
-        <Router
-            history={history}
-            routes={routes}
-        />
+        <ConfigurationPage/>
     </Provider>,
     document.getElementById('root')
 );

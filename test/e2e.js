@@ -12,7 +12,7 @@ var FormData = require('form-data');
 import {
     APP_STATUS,
     DIALECTS,
-    CONNETION_CONFIG
+    CONNECTION_CONFIG
 } from '../app/constants/constants';
 
 // import styles to use for tests
@@ -172,7 +172,7 @@ describe('plotly database connector', function Spec() {
 
         // user inputs
         this.fillInputs = async (testedDialect) => {
-            CONNETION_CONFIG[testedDialect].forEach(credential => {
+            CONNECTION_CONFIG[testedDialect].forEach(credential => {
                 this.getInputField(credential)
                 .then(input => {
                     input.sendKeys(CREDENTIALS[testedDialect][credential]);
@@ -181,7 +181,7 @@ describe('plotly database connector', function Spec() {
         };
 
         this.wrongInputs = async (testedDialect) => {
-            CONNETION_CONFIG[testedDialect].forEach(credential => {
+            CONNECTION_CONFIG[testedDialect].forEach(credential => {
                 this.getInputField(credential)
                 .then(input => input.sendKeys('blah'));
             });

@@ -3,9 +3,10 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './UserCredentials.css';
 import {shell} from 'electron';
 import {
-    CONNETION_CONFIG, CONNETION_OPTIONS
+    CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS
 } from '../../../constants/constants';
 const {dialog} = require('electron').remote;
+import classnames from 'classnames';
 
 /*
 	Displays and alters user inputs for `configuration`
@@ -52,6 +53,7 @@ export default class UserCredentials extends Component {
 	}
 
 	getOnClick(credential) {
+        // sqlite requires a path
 		return () => {
 			if (credential === 'storage') {
 				dialog.showOpenDialog({
@@ -65,7 +67,7 @@ export default class UserCredentials extends Component {
 					// get the filename to use as username in the logs
 					const splitPath = path.split('/');
 					const fileName = splitPath.length - 1;
-					this.props.sessionsActions.updateConfiguration({
+					this.props.updateCredential({
 						[credential]: paths[0],
 						'username': splitPath[fileName]
 					});
@@ -75,107 +77,91 @@ export default class UserCredentials extends Component {
 	}
 
 	render() {
-		const {configuration, sessionsActions} = this.props;
 
-        let inputNames = CONNETION_CONFIG[configuration.get('dialect')].map(credential => {
+		const {credentialObject, updateCredential} = this.props;
+
+        let inputNames = CONNECTION_CONFIG[credentialObject.dialect].map(credential => {
             return (
-                <div>
+                <div key={credential}>
                     <span className ={styles.inputName}>{credential}</span>
                 </div>
             );
         });
-		let inputs = CONNETION_CONFIG[configuration.get('dialect')]
+		let inputs = CONNECTION_CONFIG[credentialObject.dialect]
 			.map(credential => (
-            <div>
+            <div key={credential}>
                 <input className={this.testClass()}
                     placeholder={this.getPlaceholder(credential)}
                     type={this.getInputType(credential)}
                     onChange={e => (
-                        sessionsActions.updateConfiguration({[credential]: e.target.value})
+                        updateCredential({[credential]: e.target.value})
                     )}
                     onClick={this.getOnClick(credential)}
-                    value={configuration.get(credential)}
+                    value={credentialObject[credential]}
                     id={`test-input-${credential}`}
                 />
             </div>
 		));
 
-        let options = CONNETION_OPTIONS[configuration.get('dialect')]
-            .map((option) => (
-            <div className={styles.options}>
-                <label className={styles.label}><input
-                    className={styles.checkbox}
-                    type="checkbox"
-                    onChange={() => {
-                        sessionsActions.updateConfiguration(
-                            {[option]: !configuration.get(option)}
-                        );
-                    }}
-                    id={`test-option-${option}`}
-                />
-                {option}
-                </label>
-            </div>
-        ));
-
-        const databaseOptions = () => {
-            // return only if there are connection_options for that database
-            if (CONNETION_OPTIONS[configuration.get('dialect')].length !== 0) {
-                if (this.state.showOptions) {
-                    return (
-                        <div className={styles.databaseOptionsContainer}>
-                            <a className={styles.databaseOptions}
-                                onClick={() => {this.setState(
-                                    {showOptions: false});}
-                                }
-                            >
-                                Hide Database Options
-                            </a>
-                            {options}
-                        </div>
-                    );
-                } else {
-                    return (
-                        <div className={styles.databaseOptionsContainer}>
-                            <a className={styles.databaseOptions}
-                                onClick={() => {this.setState(
-                                    {showOptions: true});}
-                                }
-                            >
-                                Show Database Options
-                            </a>
-                        </div>
-                    );
-                }
-            } else {
-                return null;
-            }
-        };
-
+        let options = null;
+        if (CONNECTION_OPTIONS[credentialObject.dialect].length !== 0) {
+            options = CONNECTION_OPTIONS[credentialObject.dialect]
+                .map((option) => (
+                <div
+                    className={styles.options}
+                    key={option}
+                >
+                    {option}
+                    <label className={styles.label}><input
+                        className={styles.checkbox}
+                        type="checkbox"
+                        onChange={() => {
+                            updateCredential(
+                                {[option]: !configuration.get(option)}
+                            );
+                        }}
+                        id={`test-option-${option}`}
+                    />
+                    </label>
+                </div>
+            ));
+        }
 
 		return (
-			<div className={styles.inputContainer}>
-                <div className={styles.inputNamesContainer}>
-                    <span className ={styles.inputName}>{'Documentation'}</span>
-                    {inputNames}
-                </div>
-                <div className={styles.inputFieldsContainer}>
-                    <a className={styles.documentationLink}
-                        onClick={() => {
-                        shell.openExternal(documentationLink(configuration.get('dialect')));
-                    }}
-                    >
-                    plotly &nbsp;{configuration.get('dialect')}&nbsp; documentation
-                    </a>
-				{inputs}
-                {databaseOptions()}
-                </div>
-			</div>
+            <div>
+
+    			<div className={styles.inputContainer}>
+
+                    <div className={styles.inputNamesContainer}>
+                        <span className ={styles.inputName}>{'Documentation'}</span>
+                        {inputNames}
+                    </div>
+                    <div className={styles.inputFieldsContainer}>
+                        <a className={styles.documentationLink}
+                            onClick={() => {
+                            shell.openExternal(documentationLink(credentialObject.dialect));
+                        }}
+                        >
+                        plotly &nbsp;{credentialObject.dialect}&nbsp; documentation
+                        </a>
+    				{inputs}
+                    {options}
+                    </div>
+    			</div>
+            </div>
 		);
 	}
 }
 
 UserCredentials.propTypes = {
-    configuration: ImmutablePropTypes.map.isRequired,
-    sessionsActions: PropTypes.object
+    credentialObject: PropTypes.shape({
+        dialect: PropTypes.string.required,
+        username: PropTypes.string,
+        port: PropTypes.string,
+        host: PropTypes.string,
+        ssl: PropTypes.bool,
+        id: PropTypes.string,
+        database: PropTypes.string
+    }),
+    updateCredential: PropTypes.func
 };
