@@ -1,10 +1,12 @@
 import { combineReducers } from 'redux';
-import sessions from './sessions';
 import {assoc, assocPath, merge, dissoc} from 'ramda';
 
 
 /*
 {
+    // If tabs map to saved credentials, then that mapping is stored here.
+    // If tabs aren't yet saved, then they won't be in this map.
+    // Tab IDs and Credential IDs are used to index parts of the store below.
     tabMap: {
         [tabid1]: [credentialId1]
     },
@@ -14,9 +16,10 @@ import {assoc, assocPath, merge, dissoc} from 'ramda';
         [tabid1]: 'my-table'
     }
 
+    // Local store of the credentials.
+    // Preloaded with the response from credentialsRequest
     credentials: {
         [tabid1]: {
-            dirty: false,
             username: 'chris',
             [...]
         }
@@ -44,18 +47,40 @@ import {assoc, assocPath, merge, dissoc} from 'ramda';
         }
     }
 
+    tablesRequests: {
+        [credentialId1]: {
+            status: 200,
+            content: ['table1', 'table2', ...]
+        }
+    },
+
     previewTableRequests: {
-        [credentialId]: {
+        [credentialId1]: {
             status: 200,
             content: ...
         }
+    },
+
+    s3KeysRequests: {
+        [credentialId]: {
+            status: 200,
+            content: [...]
+        }
     }
+
+    apacheDrillStorageRequests: {
+        [credentialId]: {
+            status: 200,
+            content: [...]
+        }
+    }
+
 }
 */
 
 
 function createApiReducer(store) {
-    return function(state = {}, action) {
+    return function ApiReducer(state = {}, action) {
         let newState = state;
         if (action.type === store) {
             const {payload} = action;
@@ -82,12 +107,15 @@ function createApiReducer(store) {
 export const connectRequests = createApiReducer('connectRequest');
 export const credentialsRequest = createApiReducer('credentialsRequest');
 export const saveCredentialsRequests = createApiReducer('saveCredentialsRequest');
-export const previewTableRequests = createApiReducer('previewTableRequest');
 export const tablesRequests = createApiReducer('tables');
+export const previewTableRequests = createApiReducer('previewTableRequest');
+export const s3KeysRequests = createApiReducer('s3KeysRequests');
+export const apacheDrillStorageRequests = createApiReducer('apacheDrillStorageRequests');
+export const apacheDrillS3KeysRequests = createApiReducer('apacheDrillS3KeysRequests');
 
 function tabMap(state = {}, action) {
     let newState = state;
-    if (action.type === 'tabMap') {
+    if (action.type === 'MERGE_TAB_MAP') {
         newState = merge(state, action.payload);
     }
     return newState;
@@ -95,7 +123,7 @@ function tabMap(state = {}, action) {
 
 
 function selectedTab(state = '', action) {
-    if (action.type === 'selectedTab') { // TODO - clean up all these types
+    if (action.type === 'SET_TAB') {
         return action.payload;
     } else {
         return state;
@@ -108,7 +136,6 @@ function selectedTables(state = {}, action) {
         return state;
     }
 }
-
 
 function credentials(state = {}, action) {
     if (action.type === 'MERGE_CREDENTIALS') {
@@ -129,7 +156,6 @@ function credentials(state = {}, action) {
     }
 }
 
-
 const rootReducer = combineReducers({
     tabMap,
     credentials,
@@ -139,7 +165,10 @@ const rootReducer = combineReducers({
     credentialsRequest,
     saveCredentialsRequests,
     tablesRequests,
-    previewTableRequests
+    previewTableRequests,
+    s3KeysRequests,
+    apacheDrillStorageRequests,
+    apacheDrillS3KeysRequests
 });
 
 export default rootReducer;

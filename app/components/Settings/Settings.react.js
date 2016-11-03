@@ -5,29 +5,23 @@ import * as styles from '../SessionsManager/SessionsManager.css';
 import UserCredentials from './UserCredentials/UserCredentials.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
-import {reduce, flip, dissoc} from 'ramda';
+import {reduce, flip, dissoc, contains} from 'ramda';
 import Select from 'react-select';
 import TableDropdown from './TableDropdown/TableDropdown.react';
 import classnames from 'classnames';
-
-const LOGOS = {
-    postgres: './images/postgres-logo-small.png',
-    mysql: './images/mysql-logo-small.png',
-    mariadb: './images/mariadb-logo-small.png',
-    mssql: './images/mssql-logo-small.png',
-    sqlite: './images/sqlite-logo-small.png',
-    elasticsearch: './images/elastic-logo.png',
-    redshift: './images/redshift-logo.png'
-};
+import {LOGOS, DIALECTS} from '../../constants/constants.js';
 
 function Tab(props) {
     const {tabId, isSelected, credentialObject, setTab, deleteTab} = props;
     const {username, host, dialect, id} = credentialObject;
     return (
-        <div className={classnames(
-            styles.sessionWrapper,
-            {[styles.sessionWrapperSelected]: isSelected}
-        )}>
+        <div
+            className={classnames(
+                styles.sessionWrapper,
+                {[styles.sessionWrapperSelected]: isSelected}
+            )}
+            onClick={() => setTab(tabId)}
+        >
 
             {/* TODO - Move this x to the other side */}
             <img
@@ -46,7 +40,6 @@ function Tab(props) {
 
             <img
                 className={styles.sessionLogo}
-                onClick={() => setTab(tabId)}
                 src={LOGOS[dialect]}
                 id={`test-session-id-${id}`}
             >
@@ -148,6 +141,97 @@ const TablePreview = props => {
     }
 }
 
+const S3Preview = props => {
+    const {s3KeysRequest} = props;
+    if (s3KeysRequest.status >= 400) {
+        return (<div>{'Hm... An error while trying to load S3 keys'}</div>);
+    } else if (s3KeysRequest.status === 'loading') {
+        return (<div>{'Loading...'}</div>);
+    } else if (s3KeysRequest.status === 200) {
+        return (
+            <div>
+                <h5>CSV Files on S3</h5>
+                <div style={{maxHeight: 500, overflowY: 'auto'}}>
+                    {s3KeysRequest.content.filter(object => object.Key.endsWith('.csv'))
+                        .map(object => <div>{object.Key}</div>
+                    )}
+                </div>
+            </div>
+        );
+    } else {
+        return null;
+    }
+}
+
+
+const ApacheDrillPreview = props => {
+    const {
+        apacheDrillStorageRequest,
+        apacheDrillS3KeysRequest
+    } = props;
+    if (apacheDrillStorageRequest.status >= 400) {
+        return (<div>{'Hm... An error while trying to load Apache Drill'}</div>);
+    } else if (apacheDrillStorageRequest.status === 'loading') {
+        return (<div>{'Loading...'}</div>);
+    } else if (apacheDrillStorageRequest.status === 200) {
+        const storage = (
+            <div>
+                <h5>Enabled Apache Drill Storage Plugins</h5>
+                <div style={{maxHeight: 500, overflowY: 'auto'}}>
+                    {apacheDrillStorageRequest.content
+                        .filter(object => object.config.enabled)
+                        .map(object => (
+                            <div>{`${object.name} - ${object.config.connection}`}</div>
+                        ))
+                    }
+                </div>
+            </div>
+        );
+
+        let availableFiles = null;
+        if (apacheDrillS3KeysRequest.status === 200) {
+            const parquetFiles = apacheDrillS3KeysRequest
+                .content
+                .filter(object => object.Key.indexOf('.parquet') > -1)
+                .map(object => object.Key.slice(0, object.Key.indexOf('.parquet')) + '.parquet');
+            const uniqueParquetFiles = [];
+            parquetFiles.forEach(file => {
+                if (uniqueParquetFiles.indexOf(file) === -1) {
+                    uniqueParquetFiles.push(file);
+                }
+            });
+            if (uniqueParquetFiles.length === 0) {
+                availableFiles = (
+                    <div>
+                        Heads up! It looks like no .parquet files were
+                        found in this S3 bucket.
+                    </div>
+                );
+            } else {
+                availableFiles = (
+                    <div>
+                        <h5>Available Parquet Files on S3</h5>
+                        <div style={{maxHeight: 500, overflowY: 'auto'}}>
+                            {uniqueParquetFiles.map(key => (
+                                <div>{`${key}`}</div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            }
+        }
+        return (
+            <div>
+                {storage}
+                {availableFiles}
+            </div>
+        );
+    } else {
+        return null;
+    }
+}
+
+
 class Settings extends Component {
     constructor(props) {
         super(props);
@@ -168,23 +252,55 @@ class Settings extends Component {
             previewTableRequest,
             connectRequest,
             getTables,
+            getS3Keys,
+            getApacheDrillStorage,
+            getApacheDrillS3Keys,
             selectedTable,
             setTable,
-            tablesRequest
+            tablesRequest,
+            s3KeysRequest,
+            apacheDrillStorageRequest,
+            apacheDrillS3KeysRequest,
+            credentials,
+            selectedTab
         } = this.props;
         console.warn('fetchData: ', this.props);
         if (credentialsRequest && !credentialsRequest.status) {
             initialize();
         }
-        if (connectRequest.status === 200 && !tablesRequest.status) {
-            getTables();
+        const credentialObject = credentials[selectedTab] || {};
+        if (contains(credentialObject.dialect, [
+                     DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
+                     DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE])) {
+
+             if (connectRequest.status === 200 && !tablesRequest.status) {
+                 getTables();
+             }
+             if (tablesRequest.status === 200 && !selectedTable) {
+                 setTable(tablesRequest.content[0]);
+             }
+             if (selectedTable && !previewTableRequest.status) {
+                 previewTables();
+             }
+
+        } else if (credentialObject.dialect === DIALECTS.S3) {
+
+            if (connectRequest.status === 200 && !s3KeysRequest.status) {
+                getS3Keys();
+            }
+
+        } else if (credentialObject.dialect === DIALECTS.APACHE_DRILL) {
+
+            if (connectRequest.status === 200 && !apacheDrillStorageRequest.status) {
+                getApacheDrillStorage();
+            }
+
+            if (apacheDrillStorageRequest.status === 200 && !apacheDrillS3KeysRequest.status) {
+                getApacheDrillS3Keys();
+            }
+
         }
-        if (tablesRequest.status === 200 && !selectedTable) {
-            setTable(tablesRequest.content[0]);
-        }
-        if (selectedTable && !previewTableRequest.status) {
-            previewTables();
-        }
+
     }
 
 
@@ -201,6 +317,9 @@ class Settings extends Component {
             selectedTable,
             tablesRequest,
             previewTableRequest,
+            s3KeysRequest,
+            apacheDrillStorageRequest,
+            apacheDrillS3KeysRequest,
             newTab,
             deleteTab,
             setTab
@@ -210,7 +329,7 @@ class Settings extends Component {
             return null; // initializing
         }
 
-        console.log(JSON.stringify(this.props, null, 2));
+        console.log('props: ', this.props);
 
         return (
             <div>
@@ -221,6 +340,7 @@ class Settings extends Component {
                     setTab={setTab}
                     deleteTab={deleteTab}
                 />
+
                 <SettingsForm
                     credentialObject={credentials[selectedTab]}
                     updateCredential={updateCredential}
@@ -239,6 +359,15 @@ class Settings extends Component {
                 />
 
                 <TablePreview previewTableRequest={previewTableRequest}/>
+
+                <S3Preview
+                    s3KeysRequest={s3KeysRequest}
+                />
+
+                <ApacheDrillPreview
+                    apacheDrillStorageRequest={apacheDrillStorageRequest}
+                    apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+                />
 
                 <pre>
                     {JSON.stringify(this.props, null, 2)}
@@ -263,7 +392,10 @@ function mapStateToProps(state) {
         saveCredentialsRequests,
         previewTableRequests,
         tablesRequests,
-        selectedTables
+        selectedTables,
+        s3KeysRequests,
+        apacheDrillStorageRequests,
+        apacheDrillS3KeysRequests
     } = state;
 
     const selectedCredentialId = tabMap[selectedTab];
@@ -282,6 +414,9 @@ function mapStateToProps(state) {
         saveCredentialsRequest: saveCredentialsRequests[selectedCredentialId] || {},
         previewTableRequest: previewTableRequests[selectedCredentialId] || {},
         tablesRequest: tablesRequests[selectedCredentialId] || {},
+        s3KeysRequest: s3KeysRequests[selectedCredentialId] || {},
+        apacheDrillStorageRequest: apacheDrillStorageRequests[selectedCredentialId] || {},
+        apacheDrillS3KeysRequest: apacheDrillS3KeysRequests[selectedCredentialId] || {},
         previewTableRequest,
         credentialObject: credentials[selectedTab],
         selectedTable,
@@ -299,11 +434,6 @@ function mapDispatchToProps(dispatch) {
             dispatch(Actions.getCredentials())
             .then(() => dispatch(Actions.initializeTabs()));
         },
-        updateCredential: () => {
-            dispatch({
-                type: 'MERGE'
-            });
-        },
         dispatch
     };
 }
@@ -320,22 +450,25 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     const {dispatch} = dispatchProps;
 
     function boundUpdateCredential(credentialUpdate) {
-        dispatch({
-            type: 'UPDATE_CREDENTIAL',
-            payload: {
-                tableId: selectedTab,
-                update: credentialUpdate
-            }
-        });
+        dispatch(Actions.updateCredential({
+            tableId: selectedTab,
+            update: credentialUpdate
+        }));
     }
     function boundGetTables() {
         return dispatch(Actions.getTables(selectedCredentialId));
     }
+    function boundGetS3Keys() {
+        return dispatch(Actions.getS3Keys(selectedCredentialId));
+    }
+    function boundGetApacheDrillStorage() {
+        return dispatch(Actions.getApacheDrillStorage(selectedCredentialId));
+    }
+    function boundGetApacheDrillS3Keys() {
+        return dispatch(Actions.getApacheDrillS3Keys(selectedCredentialId));
+    }
     function boundSetTable(table) {
-        return dispatch({
-            type: 'SET_TABLE',
-            payload: {[selectedTab]: table}
-        });
+        return dispatch(Actions.setTable({[selectedTab]: table}));
     }
     function boundPreviewTables() {
         return dispatch(Actions.previewTable(
@@ -355,7 +488,6 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         connect = function saveAndConnect() {
             dispatch(Actions.saveCredentials(credentials[selectedTab], selectedTab))
             .then(json => {
-                console.warn('THEN!!!!!', json);
                 dispatch(Actions.connect(json.credentialId))
             })
             // TODO - If connecting *fails* then we should delete the credential
@@ -366,7 +498,6 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         connect = () => dispatch(Actions.connect(selectedCredentialId));
     }
 
-
     return Object.assign(
         {},
         reduce(flip(dissoc), stateProps, ['dispatch']),
@@ -376,6 +507,9 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             getTables: boundGetTables,
             setTable: boundSetTable,
             previewTables: boundPreviewTables,
+            getS3Keys: boundGetS3Keys,
+            getApacheDrillStorage: boundGetApacheDrillStorage,
+            getApacheDrillS3Keys: boundGetApacheDrillS3Keys,
             newTab: () => dispatch(Actions.newTab()),
             deleteTab: tab => dispatch(Actions.deleteTab(tab)),
             setTab: tab => dispatch(Actions.setTab(tab)),

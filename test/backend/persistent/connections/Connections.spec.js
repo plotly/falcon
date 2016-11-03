@@ -1,37 +1,16 @@
 import {expect, assert} from 'chai';
 
 import {
-    query, connect
+    sqlCredentials,
+    elasticsearchCredentials,
+    publicReadableS3Credentials,
+    apacheDrillCredentials,
+    apacheDrillStorage
+} from '../../utils.js';
+
+import {
+    query, connect, files, storage, listS3Files
 } from '../../../../backend/persistent/connections/Connections.js';
-
-const sqlCredentials = {
-    username: 'masteruser',
-    password: 'connecttoplotly',
-    database: 'plotly_datasets',
-    port: 5432,
-    host: 'readonly-test-postgres.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
-    dialect: 'postgres'
-};
-
-const elasticsearchCredentials = {
-    dialect: 'elasticsearch',
-    host: 'https://67a7441549120daa2dbeef8ac4f5bb2e.us-east-1.aws.found.io',
-    port: '9243'
-};
-
-const publicReadableS3Credentials = {
-    dialect: 's3',
-    bucket: 'plotly-s3-connector-test',
-    accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
-    secretAccessKey: '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'
-    // TODO - region here too?
-};
-
-const apacheDrillCredentials = {
-    dialect: 'apache drill',
-    host: 'http://ec2-35-160-151-112.us-west-2.compute.amazonaws.com',
-    port: 8047
-};
 
 const transpose = m => m[0].map((x, i) => m.map(x => x[i]));
 
@@ -213,6 +192,28 @@ describe('S3 - Connection', function () {
         }).catch(done);
     });
 
+    it('files lists s3 files', function(done) {
+        this.timeout(5 * 1000);
+        files(publicReadableS3Credentials)
+        .then(files => {
+            assert.deepEqual(
+                JSON.stringify(files[0]),
+                JSON.stringify({
+                    "Key":"311.parquet/._SUCCESS.crc",
+                    "LastModified":"2016-10-26T03:27:31.000Z",
+                    "ETag":'"9dfecc15c928c9274ad273719aa7a3c0"',
+                    "Size":8,
+                    "StorageClass":"STANDARD",
+                    "Owner": {
+                        "DisplayName":"chris",
+                        "ID":"655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+                    }
+                })
+            );
+            done();
+        }).catch(done);
+    });
+
 });
 
 describe('Apache Drill - Connection', function () {
@@ -220,6 +221,39 @@ describe('Apache Drill - Connection', function () {
         connect(apacheDrillCredentials)
         .then(res => done())
         .catch(done);
+    });
+
+    it('storage returns valid apache drill storage items', function(done) {
+        this.timeout(10 * 1000);
+        storage(apacheDrillCredentials)
+        .then(config => {
+            assert.deepEqual(
+                config, apacheDrillStorage)
+            done();
+        }).catch(done);
+    });
+
+    it('s3-keys returns a list of files in the s3 bucket', function(done) {
+        this.timeout(10 * 1000);
+        console.warn('apacheDrillCredentials: ', apacheDrillCredentials);
+        listS3Files(apacheDrillCredentials)
+        .then(files => {
+            assert.deepEqual(
+                JSON.stringify(files[0]),
+                JSON.stringify({
+                    "Key":"311.parquet/._SUCCESS.crc",
+                    "LastModified":"2016-10-26T03:27:31.000Z",
+                    "ETag":'"9dfecc15c928c9274ad273719aa7a3c0"',
+                    "Size":8,
+                    "StorageClass":"STANDARD",
+                    "Owner": {
+                        "DisplayName":"chris",
+                        "ID":"655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+                    }
+                })
+            );
+            done();
+        }).catch(done);
     });
 
     it('query parses parquet files on S3', function(done) {

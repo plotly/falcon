@@ -159,17 +159,38 @@ export default class Server {
             });
         });
 
+
         server.post('/tables/:credentialId', (req, res, next) => {
             Connections.tables(
-                getCredentialById(req.params.credentialId),
-                req.params.database
+                getCredentialById(req.params.credentialId)
             ).then(tables => {
                 res.json(200, tables);
             });
         });
 
-        // server.post('/s3/keys/:credentialId')
-        // server.post('/apache-drill/keys/:credentialId')
+        server.post('/s3-keys/:credentialId', (req, res, next) => {
+            Connections.files(
+                getCredentialById(req.params.credentialId)
+            ).then(files => {
+                res.json(200, files);
+            });
+        })
+
+        server.post('/apache-drill-storage/:credentialId', (req, res, next) => {
+            Connections.storage(
+                getCredentialById(req.params.credentialId)
+            ).then(files => {
+                res.json(200, files);
+            });
+        });
+
+        server.post('/apache-drill-s3-keys/:credentialId', (req, res, next) => {
+            Connections.listS3Files(
+                getCredentialById(req.params.credentialId)
+            ).then(files => {
+                res.json(200, files);
+            });
+        });
 
         /* Persistent Connections */
 

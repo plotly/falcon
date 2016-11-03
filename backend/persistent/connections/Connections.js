@@ -77,6 +77,8 @@ export function tables(credentials) {
  * In the future, if we support local file querying, this could include
  * a list of local files
  */
+// TODO - I think specificity is better here, just name this to "keys"
+// and if we ever add local file stuff, add a new function like "files".
 export function files(credentials) {
     return getConnection(credentials).files(credentials);
 }
@@ -89,4 +91,15 @@ export function files(credentials) {
  */
 export function storage(credentials) {
     return getConnection(credentials).storage(credentials);
+}
+
+/*
+ * List the S3 files that apache drill is connecting to to make
+ * running queries easier for the user.
+ * TODO - This should be more generic, should pass in the storage plugin
+ * name or the storage connection and then return the available files for
+ * that plugin.
+ */
+export function listS3Files(credentials) {
+    return getConnection(credentials).listS3Files(credentials);
 }

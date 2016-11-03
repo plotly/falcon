@@ -1,4 +1,6 @@
 import fetch from 'node-fetch';
+import * as S3 from './S3.js';
+
 
 export function connect(credentials) {
     const {host, port} = credentials;
@@ -41,4 +43,17 @@ export function query(queryStatement, credentials) {
 
 }
 
-// export function storage()
+export function storage(credentials) {
+    const {host, port} = credentials;
+    const url = `${host}:${port}/storage.json`;
+    return fetch(url).then(res => res.json());
+}
+
+// TODO - Make this more flexible?
+export function listS3Files(credentials) {
+    return S3.files({
+        bucket: credentials.bucket,
+        accessKeyId: credentials.accessKeyId,
+        secretAccessKey: credentials.secretAccessKey
+    });
+}

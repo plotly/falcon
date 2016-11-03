@@ -55,7 +55,7 @@ export function files(credentials) {
                 reject(err);
                 return;
             } else {
-                resolve(data.Content);
+                resolve(data.Contents);
             }
         });
     });

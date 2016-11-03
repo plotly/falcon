@@ -11,7 +11,15 @@ import {
     QUERIES_PATH
 } from '../../../backend/utils/homeFiles.js';
 import fs from 'fs';
-import {credentials, configuration} from '../utils.js';
+import {
+    configuration,
+    sqlCredentials,
+    elasticsearchCredentials,
+    publicReadableS3Credentials,
+    apacheDrillCredentials,
+    apacheDrillStorage
+} from '../utils.js';
+
 import {dissoc} from 'ramda';
 
 // Shortcuts
@@ -65,7 +73,7 @@ describe('Server', function () {
             fs.unlinkSync(QUERIES_PATH);
         } catch (e) {}
 
-        credentialId = saveCredential(credentials);
+        credentialId = saveCredential(sqlCredentials);
         queryObject = {
             fid: 'chris:10',
             uids: ['asd', 'xyz'],
@@ -136,15 +144,81 @@ describe('Server', function () {
         }).catch(done);
     });
 
+    // S3
+    it('/s3-keys returns a list of keys', function(done) {
+        const s3CredId = saveCredential(publicReadableS3Credentials);
+
+        this.timeout(5000);
+        POST(`s3-keys/${s3CredId}`)
+        .then(res => res.json())
+        .then(files => {
+            assert.deepEqual(
+                JSON.stringify(files[0]),
+                JSON.stringify({
+                    "Key":"311.parquet/._SUCCESS.crc",
+                    "LastModified":"2016-10-26T03:27:31.000Z",
+                    "ETag":'"9dfecc15c928c9274ad273719aa7a3c0"',
+                    "Size":8,
+                    "StorageClass":"STANDARD",
+                    "Owner": {
+                        "DisplayName":"chris",
+                        "ID":"655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+                    }
+                })
+            );
+            done()
+        }).catch(done);
+    });
+
+    // Apache Drill
+    it('/apache-drill-storage returns a list of storage items', function(done) {
+        const s3CredId = saveCredential(apacheDrillCredentials);
+
+        this.timeout(5000);
+        POST(`apache-drill-storage/${s3CredId}`)
+        .then(res => res.json())
+        .then(storage => {
+            assert.deepEqual(
+                storage,
+                apacheDrillStorage
+            );
+            done()
+        }).catch(done);
+    });
+
+    it.only('/apache-drill-s3-keys returns a list of s3 files', function(done) {
+        const s3CredId = saveCredential(apacheDrillCredentials);
+        this.timeout(5000);
+        POST(`apache-drill-s3-keys/${s3CredId}`)
+        .then(res => res.json())
+        .then(files => {
+            assert.deepEqual(
+                JSON.stringify(files[0]),
+                JSON.stringify({
+                    "Key":"311.parquet/._SUCCESS.crc",
+                    "LastModified":"2016-10-26T03:27:31.000Z",
+                    "ETag":'"9dfecc15c928c9274ad273719aa7a3c0"',
+                    "Size":8,
+                    "StorageClass":"STANDARD",
+                    "Owner": {
+                        "DisplayName":"chris",
+                        "ID":"655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+                    }
+                })
+            );
+            done()
+        }).catch(done);
+    });
+
     // Credentials
     it('saves credentials to a file if they do not exist', function(done) {
         fs.unlinkSync(CREDENTIALS_PATH);
         assert.deepEqual(getCredentials(), []);
-        POST('credentials', credentials)
+        POST('credentials', sqlCredentials)
         .then(res => {
             assert.equal(res.status, 200);
             assert.deepEqual(
-                [credentials],
+                [sqlCredentials],
                 getCredentials().map(dissoc('id'))
             );
             done();
@@ -152,7 +226,7 @@ describe('Server', function () {
     });
 
     it("doesn't save credentials if they already exist", function(done) {
-        POST('credentials', credentials)
+        POST('credentials', sqlCredentials)
         .then(res => {
             assert.equal(res.status, 409);
             assert.deepEqual(res.credentialId, credentialId);
@@ -168,14 +242,14 @@ describe('Server', function () {
         .then(json => {
             assert.deepEqual(
                 json.map(dissoc('id')),
-                [dissoc('password', credentials)]
+                [dissoc('password', sqlCredentials)]
             );
             done();
         }).catch(done);
     });
 
     it('deletes credentials', function(done) {
-        assert.deepEqual(getCredentials().map(dissoc('id')), [credentials]);
+        assert.deepEqual(getCredentials().map(dissoc('id')), [sqlCredentials]);
          DELETE(`credentials/${credentialId}`)
         .then(res => {
             assert.equal(res.status, 204);

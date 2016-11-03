@@ -10,16 +10,9 @@ export const DIALECTS = {
     REDSHIFT: 'redshift',
     ELASTICSEARCH: 'elasticsearch',
     MSSQL: 'mssql',
-    SQLITE: 'sqlite'
-};
-
-export const APP_STATUS = {
-    INITIALIZED: 'INITIALIZED',
-    CON_ERROR: 'CON_ERROR',
-    ERROR: 'ERROR',
-    CONNECTED: 'CONNECTED',
-    CONNECTING: 'CONNECTING',
-    DISCONNECTED: 'DISCONNECTED'
+    SQLITE: 'sqlite',
+    S3: 's3',
+    APACHE_DRILL: 'apache drill'
 };
 
 export const CONNECTION_CONFIG = {
@@ -28,10 +21,19 @@ export const CONNECTION_CONFIG = {
 	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port'],
     [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.REDSHIFT]: ['username', 'password', 'host', 'port', 'database'],
+    [DIALECTS.SQLITE]: ['storage'],
     [DIALECTS.ELASTICSEARCH]: ['username', 'password', 'host', 'port'],
-    [DIALECTS.SQLITE]: ['storage']
+    [DIALECTS.S3]: ['bucket', 'accessKeyId', 'secretAccessKey'],
+    [DIALECTS.APACHE_DRILL]: [
+        'host',
+        'port',
+        'bucket',
+        'accessKeyId',
+        'secretAccessKey'
+    ] // TODO - password for apache drill?
 };
 
+// TODO - Combine this with the CONNECTION_CONFIG
 export const CONNECTION_OPTIONS = {
     [DIALECTS.MYSQL]: ['ssl'],
     [DIALECTS.MARIADB]: ['ssl'],
@@ -39,30 +41,10 @@ export const CONNECTION_OPTIONS = {
     [DIALECTS.POSTGRES]: ['ssl'],
     [DIALECTS.REDSHIFT]: ['ssl'],
     [DIALECTS.ELASTICSEARCH]: [],
-    [DIALECTS.SQLITE]: []
-};
+    [DIALECTS.SQLITE]: [],
+    [DIALECTS.S3]: [],
+    [DIALECTS.APACHE_DRILL]: []
 
-export const BUTTON_MESSAGE = {
-    INITIALIZED: 'connect',
-    CON_ERROR: 'try again',
-    ERROR: 'connected',
-    CONNECTED: 'connected',
-    CONNECTING: 'connecting...',
-    DISCONNECTED: 'connect'
-};
-
-export const EMPTY_SESSION =
-{
-    CONFIGURATION: {
-        username: '',
-        password: '',
-        database: '',
-        dialect: DIALECTS.MYSQL,
-        port: '',
-        host: '',
-        ssl: false
-    },
-    CONNECTION: {status: APP_STATUS.INITIALIZED}
 };
 
 export const LOGOS = {
@@ -72,5 +54,7 @@ export const LOGOS = {
     MYSQL: './images/mysql-logo.png',
     MARIADB: './images/mariadb-logo.png',
     MSSQL: './images/mssql-logo.png',
-    SQLITE: './images/sqlite-logo.png'
+    SQLITE: './images/sqlite-logo.png',
+    S3: './images/sqlite-logo.png',
+    APACHE_DRILL: './images/sqlite-logo.png'
 };
