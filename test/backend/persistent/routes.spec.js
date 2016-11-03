@@ -186,7 +186,7 @@ describe('Server', function () {
         }).catch(done);
     });
 
-    it.only('/apache-drill-s3-keys returns a list of s3 files', function(done) {
+    it('/apache-drill-s3-keys returns a list of s3 files', function(done) {
         const s3CredId = saveCredential(apacheDrillCredentials);
         this.timeout(5000);
         POST(`apache-drill-s3-keys/${s3CredId}`)

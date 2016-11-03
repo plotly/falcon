@@ -1,7 +1,7 @@
 import * as Connections from './connections/Connections';
 import {updateGrid} from './PlotlyAPI';
 import {getCredentialById} from './Credentials';
-import {getQueries, saveQuery, deleteQuery} from './Queries';
+import {getQuery, getQueries, saveQuery, deleteQuery} from './Queries';
 import Logger from '../Logger';
 
 class QueryScheduler {
@@ -24,8 +24,20 @@ class QueryScheduler {
         query: query,
         credentialId: credentialId
     }) {
+        if (!refreshRate) {
+            throw new Error('Refresh rate was not supplied');
+        // TODO - bump up to 60 when done testing.
+        } else if (refreshRate < 10 * 1000) {
+            throw new Error('Refresh rate must be at least 60000 (60 seconds)');
+        }
+
         Logger.log(`Scheduling "${query}" with credential ${credentialId} updating grid ${fid}`);
-        // TODO - Make Query an object that contains database
+        // Delete query if it is already saved
+        if (getQuery(fid)) {
+            this.clearQuery(fid);
+            deleteQuery(fid);
+        }
+
         // Save query to a file
         saveQuery({
             fid,
@@ -35,10 +47,7 @@ class QueryScheduler {
             credentialId
         });
 
-        if (this.queryJobs[fid]) {
-            clearInterval(this.queryJobs[fid]);
-        }
-
+        // Schedule
         this.queryJobs[fid] = setInterval(
             () => {
                 try {

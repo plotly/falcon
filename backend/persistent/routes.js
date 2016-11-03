@@ -213,8 +213,16 @@ export default class Server {
             // TODO - Verify that the app has access to
             // the user's API key and attempt to make a
             // request to see if it is valid.
+            let status;
+            if (getQuery(req.params.fid)) {
+                // TODO - Technically, this should be
+                // under the endpoint `/queries/:fid`
+                status = 200;
+            } else {
+                status = 201;
+            }
             this.queryScheduler.scheduleQuery(req.params);
-            res.json(201, {});
+            res.json(status, {});
         });
 
         // delete a query

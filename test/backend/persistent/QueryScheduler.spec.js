@@ -68,9 +68,7 @@ describe('QueryScheduler', () => {
             fid: 'test-fid',
             uids: '',
             query: '',
-            credentialId: 'unique-id',
-            username,
-            apiKey
+            credentialId: 'unique-id'
         };
         queryScheduler.scheduleQuery(queryObject);
         let queriesFromFile = getQueries();
@@ -84,7 +82,30 @@ describe('QueryScheduler', () => {
         );
     });
 
-    it.only('queries a database and updates a plotly grid on an interval', function(done) {
+    it.only('saving a query that already exists updates the query', () => {
+        const queryScheduler = new QueryScheduler();
+        queryScheduler.job = () => {};
+
+        const queryObject = {
+            refreshRate: 1,
+            fid: 'test-fid',
+            uids: '',
+            query: 'my query',
+            credentialId: 'unique-id'
+        };
+
+        assert.deepEqual([], getQueries());
+        queryScheduler.scheduleQuery(queryObject);
+        assert.deepEqual([queryObject], getQueries());
+        const updatedQuery = merge(
+            queryObject,
+            {refreshRate: 10, 'query': 'new query'}
+        );
+        queryScheduler.scheduleQuery(updatedQuery);
+        assert.deepEqual([updatedQuery], getQueries());
+    });
+
+    it('queries a database and updates a plotly grid on an interval', function(done) {
         console.warn('running test');
         function checkGridAgainstQuery(fid) {
             return PlotlyAPIRequest(`grids/${fid}/content`, {}, username, apiKey, 'GET')
