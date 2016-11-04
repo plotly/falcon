@@ -9,6 +9,17 @@
 	margin-right: auto;
 }
 
+.tabsContainer {
+    text-align: center;
+}
+
+.openTab {
+    background: white;
+    border-width: 0px 1px 1px 1px;
+    border-color: #E7E8E9;
+    border-style: solid;
+}
+
 .configurationOptions {
 	width: 100%;
 	text-align: center;

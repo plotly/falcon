@@ -130,7 +130,7 @@ export default class UserCredentials extends Component {
 		return (
             <div>
 
-    			<div className={styles.inputContainer}>
+            <div className={styles.inputContainer}>
 
                     <div className={styles.inputNamesContainer}>
                         <span className ={styles.inputName}>{'Documentation'}</span>
@@ -144,10 +144,12 @@ export default class UserCredentials extends Component {
                         >
                         plotly &nbsp;{credentialObject.dialect}&nbsp; documentation
                         </a>
-    				{inputs}
-                    {options}
+                        {inputs}
+                        <div className={styles.optionsContainer}>
+                            {options}
+                        </div>
                     </div>
-    			</div>
+                </div>
             </div>
 		);
 	}

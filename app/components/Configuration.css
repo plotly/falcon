@@ -20,6 +20,7 @@
     margin-top: 25px;
     display: inline-block;
     vertical-align: top;
+    color: #096CB3;
 }
 
 .supportLinks {
@@ -44,4 +45,17 @@
     background-color: white;
     padding-top: 20px;
     margin: 0px 20px 0px 20px;
+}
+
+.onPremForm {
+    text-align: center;
+}
+
+.onPremDomainInput {
+    text-align: center;
+}
+
+.addOnPremLink {
+    cursor: pointer;
+    text-align: center;
 }

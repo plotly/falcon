@@ -43,3 +43,7 @@ test/set_creds.sh
 *.srl
 
 .srl
+
+backend/headlessBundle.js
+
+backend/headlessBundle.js.map

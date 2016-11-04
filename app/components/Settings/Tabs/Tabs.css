@@ -1,11 +1,5 @@
-.sessionsManagerContainer {
-    margin-left: auto;
-    margin-right: auto;
-    width: 850px;
-    text-align: center;
-}
 
-.sessionsManagerWrapper {
+.tabManagerWrapper {
     /* display: inline-block; */
     /* vertical-align: middle; */
     text-align: left;
@@ -16,7 +10,25 @@
     overflow-y: hidden;
 }
 
-.sessionWrapper {
+.tabManagerContainer {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
+
+
+.tabAddWrapper {
+    background-color: white;
+    display: inline-block;
+    border-width: 1px;
+    border-color: #E7E8E9;
+    border-style: solid;
+    vertical-align: middle;
+    height: 36px;
+    width: 36px;
+}
+
+.tabWrapper {
     display: inline-block;
     cursor: pointer;
     /*margin: 0px;
@@ -36,80 +48,57 @@
     padding-bottom: 50px;*/
 }
 
-.sessionLogo {
+.tabLogo {
     height: 20px;
     display: inline;
     vertical-align: middle;
     padding-right: 5px;
 }
 
-.sessionIdentifier {
+.tabIdentifier {
     margin: 0px;
     display: inline;
     vertical-align: middle;
 }
 
-.sessionDelete {
+.tabDelete {
     width: 12px;
     padding-right: 5px;
     vertical-align: middle;
 }
 
-.sessionAdd {
+.tabAdd {
     width: 20px;
     padding: 8px;
 }
 
-.sessionAddWrapper {
-    background-color: white;
-    display: inline-block;
-    border-width: 1px;
-    border-color: #E7E8E9;
-    border-style: solid;
-    vertical-align: middle;
-    height: 36px;
-    width: 36px;
-}
 
-.sessionWrapper:hover, sessionWrapper:focus{
+.tabWrapper:hover, tabWrapper:focus{
     cursor: pointer;
 }
 
-.sessionAdd:hover, session:focus{
+.tabAdd:hover, tab:focus{
     cursor: pointer;
 }
 
-.sessionDelete:hover, session:focus{
+.tabDelete:hover, tab:focus{
     cursor: pointer;
 }
 
-.sessionWrapperSelected {
+.tabWrapperSelected {
     border-bottom: 1px solid #fff;
 }
 
-.sessionAddText {
+.tabAddText {
     display: inline-block;;
     padding: 10px 20px 10px 20px;
     color: #8BB5FE;
 }
 
-/* this flips the scroll y bar from bottom to up of the session tabs */
-.Flipped, .Flipped .sessionWrapper, .Flipped .sessionAddText
+/* this flips the scroll y bar from bottom to up of the tab tab */
+.Flipped, .Flipped .tabWrapper, .Flipped .tabAddText
 {
     transform:rotateX(180deg);
     -ms-transform:rotateX(180deg); /* IE 9 */
     -webkit-transform:rotateX(180deg); /* Safari and Chrome */
-}
-
-.onPremForm {
-    text-align: center;
-}
-
-.onPremDomainInput {
-    text-align: center;
-}
-
-.addOnPremLink {
-    cursor: pointer;
-    text-align: center;
 }

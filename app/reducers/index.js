@@ -121,7 +121,6 @@ function tabMap(state = {}, action) {
     return newState;
 }
 
-
 function selectedTab(state = '', action) {
     if (action.type === 'SET_TAB') {
         return action.payload;
@@ -129,6 +128,7 @@ function selectedTab(state = '', action) {
         return state;
     }
 }
+
 function selectedTables(state = {}, action) {
     if (action.type === 'SET_TABLE') {
         return merge(state, action.payload);

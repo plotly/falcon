@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Settings from './Settings/Settings.react';
 import {shell} from 'electron';
-import SessionsManager from './SessionsManager/SessionsManager.react';
 import * as styles from './Configuration.css';
 
 export default class Configuration extends Component {
@@ -59,17 +58,6 @@ export default class Configuration extends Component {
                 </div>
 
                 <Settings/>
-
-                {/*
-                <SessionsManager
-                    sessionsActions={this.props.sessionsActions}
-                    sessions={this.props.sessions}
-                />
-
-                <div className={styles.settings}>
-                    {settings}
-                </div>
-                */}
 
             </div>
 

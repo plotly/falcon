@@ -16,9 +16,9 @@ export const DIALECTS = {
 };
 
 export const CONNECTION_CONFIG = {
-    [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port'],
-    [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port'],
-	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port'],
+    [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port', 'database'],
+    [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port', 'database'],
+	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.REDSHIFT]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.SQLITE]: ['storage'],
@@ -55,6 +55,6 @@ export const LOGOS = {
     MARIADB: './images/mariadb-logo.png',
     MSSQL: './images/mssql-logo.png',
     SQLITE: './images/sqlite-logo.png',
-    S3: './images/sqlite-logo.png',
-    APACHE_DRILL: './images/sqlite-logo.png'
+    S3: './images/s3-logo.png',
+    APACHE_DRILL: './images/apache_drill-logo.png'
 };

@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import * as DialectStyles from './DialectSelector.css';
+import * as styles from './DialectSelector.css';
 import {
     DIALECTS, LOGOS
 } from '../../../constants/constants';
@@ -12,8 +12,8 @@ export default function DialectSelector(props) {
         <div
             key={DIALECT}
             className={classnames(
-                DialectStyles.logo, {
-                      [DialectStyles.logoSelected]:
+                styles.logo, {
+                      [styles.logoSelected]:
                       credentialObject.dialect === DIALECTS[DIALECT]
                  }
             )}
@@ -25,11 +25,11 @@ export default function DialectSelector(props) {
             id={`test-logo-${DIALECTS[DIALECT]}`}
         >
             <img
-                className={DialectStyles.logoImage}
+                className={styles.logoImage}
                 src={LOGOS[DIALECT]}
             />
         </div>
     ));
 
-    return <div className={DialectStyles.logoContainer}>{logos}</div>;
+    return <div className={styles.logoContainer}>{logos}</div>;
 }

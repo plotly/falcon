@@ -1,83 +1,14 @@
 import React, {Component, PropTypes} from 'react';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import * as Actions from '../../actions/sessions';
-import * as styles from '../SessionsManager/SessionsManager.css';
+import * as styles from './Settings.css';
+import Tabs from './Tabs/Tabs.react';
 import UserCredentials from './UserCredentials/UserCredentials.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import {reduce, flip, dissoc, contains} from 'ramda';
-import Select from 'react-select';
 import TableDropdown from './TableDropdown/TableDropdown.react';
-import classnames from 'classnames';
-import {LOGOS, DIALECTS} from '../../constants/constants.js';
-
-function Tab(props) {
-    const {tabId, isSelected, credentialObject, setTab, deleteTab} = props;
-    const {username, host, dialect, id} = credentialObject;
-    return (
-        <div
-            className={classnames(
-                styles.sessionWrapper,
-                {[styles.sessionWrapperSelected]: isSelected}
-            )}
-            onClick={() => setTab(tabId)}
-        >
-
-            {/* TODO - Move this x to the other side */}
-            <img
-                className={styles.sessionDelete}
-                onClick={() => deleteTab(tabId)}
-                src="./images/delete.png"
-                id={`test-session-delete-${id}`}
-            >
-            </img>
-
-            <p className={styles.sessionIdentifier}>
-                <span>
-                    {username}@{host}
-                </span>
-            </p>
-
-            <img
-                className={styles.sessionLogo}
-                src={LOGOS[dialect]}
-                id={`test-session-id-${id}`}
-            >
-            </img>
-
-        </div>
-
-    );
-}
-
-function Tabs(props) {
-    const {credentials, selectedTab, newTab, setTab, deleteTab} = props;
-    return (
-        <div>
-            {Object.keys(credentials).map(tabId =>
-                <Tab
-                    key={tabId}
-                    tabId={tabId}
-                    isSelected={tabId===selectedTab}
-                    credentialObject={credentials[tabId]}
-                    setTab={setTab}
-                    deleteTab={deleteTab}
-                />
-            )}
-
-            <div className={styles.sessionAddWrapper}>
-                <img
-                    className={styles.sessionAdd}
-                    onClick={newTab}
-                    src="./images/add.png"
-                    id="test-session-add"
-                >
-                </img>
-            </div>
-
-        </div>
-    );
-}
+import {DIALECTS} from '../../constants/constants.js';
 
 function SettingsForm(props) {
     const {credentialObject, updateCredential} = props;
@@ -94,7 +25,6 @@ function SettingsForm(props) {
                 updateCredential={updateCredential}
             />
         </div>
-
     );
 }
 
@@ -120,7 +50,7 @@ const Table = props => {
             </tbody>
         </table>
     );
-}
+};
 
 const TablePreview = props => {
     const {previewTableRequest} = props;
@@ -138,7 +68,7 @@ const TablePreview = props => {
     } else {
         return null;
     }
-}
+};
 
 const S3Preview = props => {
     const {s3KeysRequest} = props;
@@ -160,7 +90,7 @@ const S3Preview = props => {
     } else {
         return null;
     }
-}
+};
 
 
 const ApacheDrillPreview = props => {
@@ -228,7 +158,7 @@ const ApacheDrillPreview = props => {
     } else {
         return null;
     }
-}
+};
 
 
 class Settings extends Component {
@@ -340,33 +270,35 @@ class Settings extends Component {
                     deleteTab={deleteTab}
                 />
 
-                <SettingsForm
-                    credentialObject={credentials[selectedTab]}
-                    updateCredential={updateCredential}
-                />
-                <ConnectButton
-                    credentialsHaveBeenSaved={credentialsHaveBeenSaved}
-                    connect={connect}
-                    saveCredentialsRequest={saveCredentialsRequest}
-                    connectRequest={connectRequest}
-                />
+                <div className={styles.openTab}>
+                    <SettingsForm
+                        credentialObject={credentials[selectedTab]}
+                        updateCredential={updateCredential}
+                    />
+                    <ConnectButton
+                        credentialsHaveBeenSaved={credentialsHaveBeenSaved}
+                        connect={connect}
+                        saveCredentialsRequest={saveCredentialsRequest}
+                        connectRequest={connectRequest}
+                    />
 
-                <TableDropdown
-                    selectedTable={selectedTable}
-                    tablesRequest={tablesRequest}
-                    setTable={setTable}
-                />
+                    <TableDropdown
+                        selectedTable={selectedTable}
+                        tablesRequest={tablesRequest}
+                        setTable={setTable}
+                    />
 
-                <TablePreview previewTableRequest={previewTableRequest}/>
+                    <TablePreview previewTableRequest={previewTableRequest}/>
 
-                <S3Preview
-                    s3KeysRequest={s3KeysRequest}
-                />
+                    <S3Preview
+                        s3KeysRequest={s3KeysRequest}
+                    />
 
-                <ApacheDrillPreview
-                    apacheDrillStorageRequest={apacheDrillStorageRequest}
-                    apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
-                />
+                    <ApacheDrillPreview
+                        apacheDrillStorageRequest={apacheDrillStorageRequest}
+                        apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+                    />
+                </div>
 
                 <pre>
                     {JSON.stringify(this.props, null, 2)}
@@ -416,7 +348,6 @@ function mapStateToProps(state) {
         s3KeysRequest: s3KeysRequests[selectedCredentialId] || {},
         apacheDrillStorageRequest: apacheDrillStorageRequests[selectedCredentialId] || {},
         apacheDrillS3KeysRequest: apacheDrillS3KeysRequests[selectedCredentialId] || {},
-        previewTableRequest,
         credentialObject: credentials[selectedTab],
         selectedTable,
         credentialsRequest,
@@ -424,7 +355,7 @@ function mapStateToProps(state) {
         credentialsHaveBeenSaved,
         selectedTab,
         selectedCredentialId
-    }
+    };
 }
 
 function mapDispatchToProps(dispatch) {
@@ -479,7 +410,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     }
 
     /*
-     * Connect either saves the credentials and then connects
+     * connect either saves the credentials and then connects
      * or just connects if the credentials have already been saved
      */
     let connect;
@@ -487,8 +418,8 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         connect = function saveAndConnect() {
             dispatch(Actions.saveCredentials(credentials[selectedTab], selectedTab))
             .then(json => {
-                dispatch(Actions.connect(json.credentialId))
-            })
+                dispatch(Actions.connect(json.credentialId));
+            });
             // TODO - If connecting *fails* then we should delete the credential
             // so that the user can re-try.
             // TODO - support updating credentials.

@@ -105,9 +105,8 @@ export function saveCredentials(credentialsObject, tabId) {
         )).then(json => {
             dispatch(mergeTabMap({[tabId]: json.credentialId}));
             return json;
-        })
-
-    }
+        });
+    };
 }
 
 export function getTables(credentialId) {
@@ -160,7 +159,7 @@ function PREVIEW_QUERY (dialect, table, database = '') {
         default:
             throw new Error(`Dialect ${dialect} is not one of the DIALECTS`);
     }
-};
+}
 export function previewTable (credentialId, dialect, table, database) {
     const body = {
         query: PREVIEW_QUERY(dialect, table, database)
@@ -220,7 +219,7 @@ export function newTab() {
             }
         }));
         dispatch(setTab(newId));
-    }
+    };
 }
 
 export function deleteTab(tabId) {
@@ -244,5 +243,5 @@ export function deleteTab(tabId) {
             dispatch(setTab(tabIds[nextIdIndex]));
         }
         dispatch(deleteCredential(tabId));
-    }
+    };
 }
