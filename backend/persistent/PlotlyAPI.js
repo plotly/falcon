@@ -3,6 +3,8 @@ import {getSetting} from '../settings.js';
 import Logger from '../logger';
 
 export function PlotlyAPIRequest(relativeUrl, body, username, apiKey, method = 'POST') {
+    console.warn(`${method}: ${getSetting('PLOTLY_API_DOMAIN')}/v2/${relativeUrl}`);
+    console.warn(`${username} - ${apiKey}`);
     return fetch(`${getSetting('PLOTLY_API_DOMAIN')}/v2/${relativeUrl}`, {
         method,
         headers: {
@@ -13,7 +15,7 @@ export function PlotlyAPIRequest(relativeUrl, body, username, apiKey, method = '
                 username + ':' + apiKey
             ).toString('base64')
         },
-        body: JSON.stringify(body)
+        body: body ? JSON.stringify(body) : null
     });
 }
 

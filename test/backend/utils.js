@@ -17,7 +17,7 @@ export const columns = [
 ];
 
 export const username = 'plotly-database-connector';
-export const apiKey = 'p5sbizfor0';
+export const apiKey = 'reiptow6gu';
 
 export function createGrid(filename) {
     const cols = {};
@@ -64,7 +64,7 @@ export const apacheDrillCredentials = {
 
     bucket: 'plotly-s3-connector-test',
     accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
-    secretAccessKey: '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'    
+    secretAccessKey: 'Urvus4R7MnJOAqT4U3eovlCBimQ4Zg2Y9sV5LWow'
 };
 
 

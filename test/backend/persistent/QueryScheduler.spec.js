@@ -15,9 +15,12 @@ import {getQuery, getQueries} from '../../../backend/persistent/Queries.js';
 import { PlotlyAPIRequest,
     updateGrid
 } from '../../../backend/persistent/PlotlyAPI.js';
-import {createGrid, names, credentials, username, apiKey} from '../utils.js';
+import {getSetting, saveSetting} from '../../../backend/settings.js';
+import {createGrid, names, sqlCredentials, username, apiKey} from '../utils.js';
 
 let queryScheduler;
+let savedUrl;
+let savedUsers;
 describe('QueryScheduler', () => {
     beforeEach(() => {
         try {
@@ -27,17 +30,23 @@ describe('QueryScheduler', () => {
         //     fs.unlinkSync(CREDENTIALS_PATH);
         // } catch (e) {}
         queryScheduler = new QueryScheduler();
+        queryScheduler.minimumRefreshRate = 1;
+        savedUrl = getSetting('PLOTLY_API_DOMAIN');
+        savedUsers = getSetting('USERS');
+        saveSetting('PLOTLY_API_DOMAIN', 'https://api.plot.ly');
+        saveSetting('PLOTLY_API_DOMAIN', 'https://api.plot.ly');
+        saveSetting('USERS', [{username, apikey: apiKey}]);
     });
 
     afterEach(() => {
         queryScheduler.clearQueries();
         queryScheduler = null;
-
+        saveSetting('PLOTLY_API_DOMAIN', savedUrl);
+        saveSetting('USERS', savedUsers);
     });
 
     it('executes a function on an interval', (done) => {
         const spy = chai.spy(() => {});
-        const queryScheduler = new QueryScheduler();
         queryScheduler.job = spy;
 
         const delay = 100;
@@ -60,7 +69,6 @@ describe('QueryScheduler', () => {
     });
 
     it('saves queries to file', () => {
-        const queryScheduler = new QueryScheduler();
         queryScheduler.job = () => {};
 
         const queryObject = {
@@ -82,8 +90,7 @@ describe('QueryScheduler', () => {
         );
     });
 
-    it.only('saving a query that already exists updates the query', () => {
-        const queryScheduler = new QueryScheduler();
+    it('saving a query that already exists updates the query', () => {
         queryScheduler.job = () => {};
 
         const queryObject = {
@@ -105,8 +112,60 @@ describe('QueryScheduler', () => {
         assert.deepEqual([updatedQuery], getQueries());
     });
 
+    it.only('clears and deletes the query if its associated grid was deleted', function(done) {
+        const refreshRate = 1 * 1000;
+        this.timeout(refreshRate * 20);
+
+        /*
+         * Save the sqlCredentials to a file.
+         * This is done by the UI or by the user.
+        */
+        const credentialId = saveCredential(sqlCredentials);
+
+        /*
+         * Create a grid that we want to update with new data
+         * Note that the scheduler doesn't ever actually create grids,
+         * it only updates them
+         */
+         createGrid('test delete').then(res => res.json().then(json => {
+             assert.equal(res.status, 201);
+             const fid = json.file.fid;
+             const uids = json.file.cols.map(col => col.uid);
+             const queryObject = {
+                 fid,
+                 uids,
+                 refreshRate,
+                 credentialId,
+                 query: 'SELECT * from ebola_2014 LIMIT 2'
+             };
+             assert.deepEqual(getQueries(), [], 'No queries existed');
+             assert(!Boolean(queryScheduler.queryJobs[fid]), 'No queries were scheduled');
+             queryScheduler.scheduleQuery(queryObject);
+             assert.deepEqual(getQueries(), [queryObject], 'A query has been saved');
+
+             assert(Boolean(queryScheduler.queryJobs[fid]), 'A query has been scheduled');
+
+             PlotlyAPIRequest(`grids/${fid}`, null, username, apiKey, 'DELETE').then(res => {
+                assert.equal(res.status, 204, 'Grid was successfully deleted');
+
+                setTimeout(function() {
+                    /*
+                     * By now, QueryScheduler should've attempted to update
+                     * the grid and failed and then detected that it was deleted
+                     * and removed the query and the timeout handler
+                     */
+                    assert(!Boolean(queryScheduler.queryJobs[fid]), 'Queries were removed');
+                    assert.deepEqual(getQueries(), [], 'Queries were deleted');
+                    done();
+                }, refreshRate * 3);
+
+            }).catch(done);
+
+        })).catch(done);
+
+    });
+
     it('queries a database and updates a plotly grid on an interval', function(done) {
-        console.warn('running test');
         function checkGridAgainstQuery(fid) {
             return PlotlyAPIRequest(`grids/${fid}/content`, {}, username, apiKey, 'GET')
             .then(res => res.json().then(json => {
@@ -161,10 +220,10 @@ describe('QueryScheduler', () => {
         this.timeout(refreshRate * 10);
 
         /*
-         * Save the credentials to a file.
+         * Save the sqlCredentials to a file.
          * This is done by the UI or by the user.
         */
-        const credentialId = saveCredential(credentials);
+        const credentialId = saveCredential(sqlCredentials);
 
         /*
          * Create a grid that we want to update with new data
@@ -176,7 +235,6 @@ describe('QueryScheduler', () => {
              const fid = json.file.fid;
              const uids = json.file.cols.map(col => col.uid);
 
-             const queryScheduler = new QueryScheduler();
              const queryObject = {
                  fid,
                  uids,

@@ -85,6 +85,11 @@ export default class Server {
             });
         });
 
+        server.get('/status', (req, res, next) => {
+            // TODO - Maybe fix up this copy
+            res.send('Connector status - running and available for requests.');
+        });
+
         server.get('/ping', (req, res, next) => {
             res.json(200, {message: 'pong'});
         });

@@ -2,7 +2,9 @@ import * as Connections from './connections/Connections';
 import {updateGrid} from './PlotlyAPI';
 import {getCredentialById} from './Credentials';
 import {getQuery, getQueries, saveQuery, deleteQuery} from './Queries';
+import {getSetting} from '../Settings';
 import Logger from '../Logger';
+import {PlotlyAPIRequest} from './PlotlyAPI';
 
 class QueryScheduler {
     constructor() {
@@ -14,6 +16,7 @@ class QueryScheduler {
 
         // Expose this.job so that tests can overwrite it
         this.job = this.queryAndUpdateGrid;
+        this.minimumRefreshRate = 60 * 1000;
         this.queryJobs = {};
     }
 
@@ -27,8 +30,11 @@ class QueryScheduler {
         if (!refreshRate) {
             throw new Error('Refresh rate was not supplied');
         // TODO - bump up to 60 when done testing.
-        } else if (refreshRate < 10 * 1000) {
-            throw new Error('Refresh rate must be at least 60000 (60 seconds)');
+    } else if (refreshRate < this.minimumRefreshRate) {
+            throw new Error(`
+                Refresh rate must be at least
+                ${this.minimumRefreshRate}
+                (${this.minimumRefreshRate / 1000} seconds)`);
         }
 
         Logger.log(`Scheduling "${query}" with credential ${credentialId} updating grid ${fid}`);
@@ -105,32 +111,55 @@ class QueryScheduler {
             );
 
         }).then(res => {
-            setTimeout(function() {
-                Logger.log(`Request to Plotly for grid ${fid} took ${process.hrtime(startTime)[0]} seconds`, 2);
-            }, 2000);
+            Logger.log(`Request to Plotly for grid ${fid} took ${process.hrtime(startTime)[0]} seconds`, 2);
 
-            /*
-             * If 404, then assume the user has deleted their grid and
-             * remove the query
-             */
-            if (res.status === 404) {
-                // TODO - Log this
-                this.clearQuery(fid);
-                deleteQuery(fid);
-                Logger.log(
-                    `Grid ID ${fid} doesn't exist on Plotly anymore,
-                     removing persistent query.`,
-                     2
-                );
-            } else if (res.status !== 200) {
+            if (res.status !== 200) {
                 Logger.log(`Error ${res.status} while updating grid ${fid}.`, 0);
+
+                /*
+                 * If it was a 500 error, it might've been because the user
+                 * has deleted their grid.
+                 * Check if the grid exists and the query if it doesn't.
+                 * In Plotly, deletes can either be permenant or non-permentant.
+                 * Delete the grid in either case.
+                 */
+                const username = fid.split(':')[0];
+                const user = getSetting('USERS').find(
+                     u => u.username === username
+                );
+                PlotlyAPIRequest(`grids/${fid}`, null, user.username, user.apikey, 'GET')
+                .then(res => {
+                    // Permenant deletion
+                    if (res.status === 404) {
+                        Logger.log(`
+                            Grid ID ${fid} doesn't exist on Plotly anymore,
+                            removing persistent query.`,
+                             2
+                        );
+                        this.clearQuery(fid);
+                        deleteQuery(fid);
+                    } else {
+                        res.json().then(filemeta => {
+                            if (filemeta.deleted) {
+                                Logger.log(`
+                                    Grid ID ${fid} was deleted,
+                                    removing persistent query.`,
+                                    2
+                                );
+                                this.clearQuery(fid);
+                                deleteQuery(fid);
+                            }
+                        });
+                    }
+                });
+
             }
 
             res.json().then(json => {
                 if (res.status !== 200) {
                     Logger.log(`Response: ${JSON.stringify(json, null, 2)}`, 2);
                 } else {
-                Logger.log(`Grid ${fid} has been updated.`, 2);
+                    Logger.log(`Grid ${fid} has been updated.`, 2);
                 }
             });
 

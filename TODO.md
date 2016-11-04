@@ -26,3 +26,5 @@ little things
 - Alert users who are deleting a tab that contains a credential ID with a
   persistent query
 - Tell people about the logs in the UI
+- Need to update shareplot and workspace dates to be "date modified" instead of
+  date created.
