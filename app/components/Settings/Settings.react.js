@@ -343,7 +343,7 @@ function mapStateToProps(state) {
     return {
         connectRequest: connectRequests[selectedCredentialId] || {},
         saveCredentialsRequest: saveCredentialsRequests[selectedCredentialId] || {},
-        previewTableRequest: previewTableRequests[selectedCredentialId] || {},
+        previewTableRequest,
         tablesRequest: tablesRequests[selectedCredentialId] || {},
         s3KeysRequest: s3KeysRequests[selectedCredentialId] || {},
         apacheDrillStorageRequest: apacheDrillStorageRequests[selectedCredentialId] || {},

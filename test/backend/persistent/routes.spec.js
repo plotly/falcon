@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import assert from 'assert';
-import Server from '../../../backend/persistent/routes.js';
+import Server from '../../../backend/routes.js';
 import {
     getCredentials,
     getSanitizedCredentials,

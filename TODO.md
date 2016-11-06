@@ -1,4 +1,22 @@
-- get http / https to work
+- Chris - Web version (bundle, new endpoint)
+- Sobo - UI:  
+    - 'x' should `alert("")`
+    - after successfully connecting, credentials should collapse
+    - add "edit" button to modify the credentials and a new button to save the modified credentials
+- Sobo - Add the SSL scripts back to the desktop app
+- Sobo - Fix up tables UI in APP and add back the step 3 and step 4 screenshots
+- HTTPS - Add a setting with the path to the CERT files
+- Move all ~/.plotly/connector/.json files to .yaml files
+- Can we deploy this with on-prem? Chris will check in with Jody
+    - Do we get SSL for free with this?
+- UI and endpoints for adding API keys
+- Apache Drill, S3 into workspace 2
+- Deploy on heroku and start running against prod
+
+***
+
+
+ - get http / https to work
      - new endpoints to replace IPC?
 - get logger back in server
 - figure out new endpoints for e.g. folders in S3 (GET /s3-folders)

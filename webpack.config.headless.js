@@ -7,11 +7,11 @@ export default {
 
     devtool: 'source-map',
 
-    entry: './backend/headlessServer.js',
+    entry: './backend/headless.development.js',
 
     output: {
         path: __dirname,
-        filename: './backend/headlessBundle.js'
+        filename: './dist/headless-bundle.js'
     },
 
     plugins: [
@@ -25,9 +25,7 @@ export default {
             { raw: true, entryOnly: false }
         ),
         new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify('production')
-            }
+            'process.env.NODE_ENV': JSON.stringify('production')
         }),
         // https://github.com/felixge/node-formidable/issues/337
         new webpack.DefinePlugin({ 'global.GENTLY': false })

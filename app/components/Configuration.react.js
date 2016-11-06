@@ -1,7 +1,18 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Settings from './Settings/Settings.react';
-import {shell} from 'electron';
+
+let shell;
+try {
+    shell = require('electron').shell;
+} catch(e) {
+    const shell = {
+        openExternal: function openExternal(link) {
+            console.warn('opening link');
+        }
+    }
+}
+
 import * as styles from './Configuration.css';
 
 export default class Configuration extends Component {

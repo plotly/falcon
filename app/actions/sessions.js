@@ -12,6 +12,12 @@ export const deleteCredential = createAction('DELETE_CREDENTIAL');
 
 
 function GET(path) {
+    /*
+     * TODO - Need to template in 9000.
+     * Can't just do a relative domain name because electron
+     * loads up the app's HTML with loadFile which makes the base URL
+     * of the app a filename not a URL.
+     */
     return fetch(`http://localhost:9000/${path}`, {
         method: 'GET',
         headers: {

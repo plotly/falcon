@@ -1,12 +1,27 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './UserCredentials.css';
-import {shell} from 'electron';
 import {
     CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS
 } from '../../../constants/constants';
-const {dialog} = require('electron').remote;
 import classnames from 'classnames';
+
+let dialog;
+let shell;
+try {
+    shell = require('electron').shell;
+} catch(e) {
+    const shell = {
+        openExternal: function openExternal(link) {
+            console.warn('opening link');
+        }
+    }
+}
+try {
+    dialog = require('electron').remote.dialog;
+} catch(e) {
+    dialog = null;
+}
 
 /*
 	Displays and alters user inputs for `configuration`
@@ -142,7 +157,7 @@ export default class UserCredentials extends Component {
                             shell.openExternal(documentationLink(credentialObject.dialect));
                         }}
                         >
-                        plotly &nbsp;{credentialObject.dialect}&nbsp; documentation
+                            plotly &nbsp;{credentialObject.dialect}&nbsp; documentation
                         </a>
                         {inputs}
                         <div className={styles.optionsContainer}>

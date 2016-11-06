@@ -1,17 +1,12 @@
 import {app, BrowserWindow, ipcMain} from 'electron';
 import {contains} from 'ramda';
 
-import {Sessions} from './sessions';
 import Logger from './logger';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
-import {ElasticManager} from './elasticManager';
 import QueryScheduler from './persistent/QueryScheduler.js';
-import {ipcMessageReceive,
-        CHANNEL} from './messageHandler';
-import {setupHTTP, setupHTTPS, findSelfSignedCert} from './setupServers';
 import {setupMenus} from './menus';
 
-import Server from './persistent/routes.js';
+import Server from './routes.js';
 
 Logger.log('Starting application', 2);
 
@@ -19,21 +14,14 @@ if (process.env.NODE_ENV === 'development') {
     require('electron-debug')();
 }
 
-const isUnix = () => {
-    return (process.platform === 'darwin' || process.platform === 'linux');
-};
-// TODO ^ why does this need to be a function? does this change during run-time?
 
 const isTestRun = () => {
     return (contains('--test-type=webdriver', process.argv.slice(2)));
 };
 // TODO ^ why does this need to be a function? does this change during run-time?
 
-// TODO: issue #65 shell scripts for HTTPS setup will not work on windows atm
-const canSetupHTTPS = isUnix() && !isTestRun();
 
 const server = new Server();
-
 Logger.log('Starting server', 2);
 server.start();
 Logger.log('Loading persistent queries', 2);

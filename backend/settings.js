@@ -18,7 +18,8 @@ const DEFAULT_SETTINGS = {
         'https://plot.ly',
         'https://stage.plot.ly',
         'https://local.plot.ly'
-    ]
+    ],
+    PORT: 9000
 };
 
 function loadSettings() {
@@ -39,9 +40,16 @@ export function saveSetting(settingName, settingValue) {
     fs.writeFileSync(SETTINGS_PATH, JSON.stringify(settingsOnFile));
 }
 
+/*
+ * Load settings from process.env,
+ * then from the saved file in SETTINGS_PATH,
+ * then from the defaults above
+ */
 export function getSetting(settingName) {
     const settingsOnFile = loadSettings();
-    if (has(settingName, settingsOnFile)) {
+    if (has(settingName, process.env)) {
+        return process.env[settingName];
+    } else if (has(settingName, settingsOnFile)) {
         return settingsOnFile[settingName];
     } else if (has(settingName, DEFAULT_SETTINGS)) {
         return DEFAULT_SETTINGS[settingName];

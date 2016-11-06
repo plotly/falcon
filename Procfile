@@ -1,1 +1,1 @@
-web: node ./backend/headlessBundle.js
+web: node ./dist/headless-bundle.js
