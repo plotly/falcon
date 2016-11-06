@@ -14,7 +14,7 @@ export const deleteCredential = createAction('DELETE_CREDENTIAL');
 
 
 function baseUrl() {
-     if (contains(['http', 'https'], window.location.protocol)) {
+     if (contains(window.location.protocol, ['http:', 'https:'])) {
          /*
           * Use relative domain if the app is running headlessly
           * with a web front-end served by the app
