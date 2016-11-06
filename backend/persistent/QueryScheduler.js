@@ -2,8 +2,8 @@ import * as Connections from './connections/Connections';
 import {updateGrid} from './PlotlyAPI';
 import {getCredentialById} from './Credentials';
 import {getQuery, getQueries, saveQuery, deleteQuery} from './Queries';
-import {getSetting} from '../Settings';
-import Logger from '../Logger';
+import {getSetting} from '../settings';
+import Logger from '../logger';
 import {PlotlyAPIRequest} from './PlotlyAPI';
 
 class QueryScheduler {

@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 import {parseSQL} from '../../parse';
 import {merge} from 'ramda';
 import {DIALECTS} from '../../../app/constants/constants';
-import Logger from '../../Logger';
+import Logger from '../../logger';
 import {dissoc} from 'ramda';
 
 // http://stackoverflow.com/questions/32037385/using-sequelize-with-redshift
