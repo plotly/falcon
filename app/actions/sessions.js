@@ -2,6 +2,8 @@ import fetch from 'isomorphic-fetch';
 import uuid from 'node-uuid';
 import {createAction} from 'redux-actions';
 import {DIALECTS} from '../constants/constants';
+import {contains} from 'ramda';
+import queryString from 'query-string';
 
 export const mergeTabMap = createAction('MERGE_TAB_MAP');
 export const setTab = createAction('SET_TAB');
@@ -11,14 +13,26 @@ export const updateCredential = createAction('UPDATE_CREDENTIAL');
 export const deleteCredential = createAction('DELETE_CREDENTIAL');
 
 
+function baseUrl() {
+     if (contains(['http', 'https'], window.location.protocol)) {
+         /*
+          * Use relative domain if the app is running headlessly
+          * with a web front-end served by the app
+          */
+         return ''
+     } else {
+         /*
+          * Use the server location if the app is running in electron
+          * with electron serving the app file. The electron backend
+          * provides the port env variable as a query string param.
+          */
+          const PORT = queryString.parse(location.search).port;
+         return `http://localhost:${PORT}`;
+     }
+}
+
 function GET(path) {
-    /*
-     * TODO - Need to template in 9000.
-     * Can't just do a relative domain name because electron
-     * loads up the app's HTML with loadFile which makes the base URL
-     * of the app a filename not a URL.
-     */
-    return fetch(`http://localhost:9000/${path}`, {
+    return fetch(`${baseUrl()}/${path}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -28,7 +42,7 @@ function GET(path) {
 }
 
 function DELETE(path) {
-    return fetch(`http://localhost:9000/${path}`, {
+    return fetch(`${baseUrl()}/${path}`, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',
@@ -38,7 +52,7 @@ function DELETE(path) {
 }
 
 function POST(path, body = {}) {
-    return fetch(`http://localhost:9000/${path}`, {
+    return fetch(`${baseUrl()}/${path}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',

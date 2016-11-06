@@ -5,6 +5,7 @@ import Logger from './logger';
 import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {setupMenus} from './menus';
+import {getSetting} from './settings';
 
 import Server from './routes.js';
 
@@ -36,34 +37,17 @@ app.on('ready', () => {
         height: OPTIONS.large ? 1024 : 728
     });
 
-    mainWindow.loadURL(`file://${__dirname}/../app/app.html`);
+    // Provide the port of the server to the front-end as a query string param.
+    mainWindow.loadURL(`file://${__dirname}/../app/app.html?port=${getSetting('PORT')}`);
 
     // startup main window
     mainWindow.webContents.on('did-finish-load', () => {
 
-        // show window if it's not running in headless mode and not a test
-        if (!OPTIONS.headless && !isTestRun()) {
-            // sequelizeManager.log('Opening main window.', 2);
+        // show main window if not a test
+        if (!isTestRun()) {
             mainWindow.show();
             mainWindow.focus();
         }
-
-        // ipcMain.removeAllListeners(CHANNEL);
-        // // what to do when a message through IPC is received
-        // ipcMain.on(CHANNEL, ipcMessageReceive(responseTools));
-        // // what to do when a message through API is received
-        // // setupHTTP(responseTools);
-
-        // mainWindow.webContents.send(CHANNEL, {canSetupHTTPS});
-        //
-        // if (canSetupHTTPS) {
-        //     const hasSelfSignedCert = findSelfSignedCert();
-        //     mainWindow.webContents.send(CHANNEL, {hasSelfSignedCert});
-        //     // if user has certificates, setup the HTTPS server right away
-        //     if (hasSelfSignedCert) {
-        //         // setupHTTPS(responseTools);
-        //     }
-        // }
 
     });
 
