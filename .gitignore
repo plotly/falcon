@@ -34,6 +34,7 @@ dist
 release
 main.js
 main.js.map
+static/*.js*
 
 # Local tests
 test/set_creds.sh
