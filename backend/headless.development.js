@@ -2,6 +2,7 @@
 import Logger from './logger';
 import Server from './routes.js';
 
+
 const server = new Server();
 Logger.log('Starting server', 2);
 server.start();
