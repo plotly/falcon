@@ -62,7 +62,7 @@ export function files(credentials) {
 }
 
 function parse(textData) {
-    // TODO - use the same parsing routines as the front-end
+    // TODO - use a more robust parsing algorithm
     const allRows = textData.split('\n').map(row => row.split(','));
     const columnnames = allRows[0];
     const rows = allRows.slice(1);

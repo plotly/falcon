@@ -19,7 +19,8 @@ export function getCredentials() {
 export function getSanitizedCredentialById(id) {
     const credential = getCredentials().find(credential => credential.id === id);
     if (credential) {
-        return dissoc('password', credential);
+        // TODO - use reduce or w/e
+        return dissoc('secretAccessKey', dissoc('password', credential));
     } else {
         return null;
     }
