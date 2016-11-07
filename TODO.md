@@ -1,4 +1,8 @@
-- Chris - Web version (bundle, new endpoint)
+- Parquet files hang sometimes
+
+***
+
+- [x] Chris - Web version (bundle, new endpoint)
 - Sobo - UI:  
     - 'x' should `alert("")`
     - after successfully connecting, credentials should collapse
@@ -10,8 +14,9 @@
 - Can we deploy this with on-prem? Chris will check in with Jody
     - Do we get SSL for free with this?
 - UI and endpoints for adding API keys
-- Apache Drill, S3 into workspace 2
-- Deploy on heroku and start running against prod
+- [x] Apache Drill, S3 into workspace 2
+- [x] Deploy on heroku
+- start running against prod
 
 ***
 
