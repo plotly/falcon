@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import {reduce, flip, dissoc, contains} from 'ramda';
 import {connect} from 'react-redux';
 import * as Actions from '../../actions/sessions';
 import * as styles from './Settings.css';
@@ -6,8 +7,8 @@ import Tabs from './Tabs/Tabs.react';
 import UserCredentials from './UserCredentials/UserCredentials.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
-import {reduce, flip, dissoc, contains} from 'ramda';
 import TableDropdown from './TableDropdown/TableDropdown.react';
+import Preview from './Preview/Preview.react';
 import {DIALECTS} from '../../constants/constants.js';
 
 function SettingsForm(props) {
@@ -27,139 +28,6 @@ function SettingsForm(props) {
         </div>
     );
 }
-
-const Table = props => {
-    const {rows, columns} = props;
-
-    return (
-        <table>
-            <thead>
-                <tr>
-                    {columns.map(column => <th>{column}</th>)}
-                </tr>
-            </thead>
-
-            <tbody>
-                {
-                    rows.map(row =>
-                        <tr>
-                            {row.map(cell => <td>{cell}</td>)}
-                        </tr>
-                    )
-                }
-            </tbody>
-        </table>
-    );
-};
-
-const TablePreview = props => {
-    const {previewTableRequest} = props;
-    if (previewTableRequest.status >= 400) {
-        return (<div>{'Hm... An error while trying to load this table'}</div>);
-    } else if (previewTableRequest.status === 'loading') {
-        return (<div>{'Loading...'}</div>);
-    } else if (previewTableRequest.status === 200) {
-        return (
-            <Table
-                rows={previewTableRequest.content.rows}
-                columns={previewTableRequest.content.columnnames}
-            />
-        );
-    } else {
-        return null;
-    }
-};
-
-const S3Preview = props => {
-    const {s3KeysRequest} = props;
-    if (s3KeysRequest.status >= 400) {
-        return (<div>{'Hm... An error while trying to load S3 keys'}</div>);
-    } else if (s3KeysRequest.status === 'loading') {
-        return (<div>{'Loading...'}</div>);
-    } else if (s3KeysRequest.status === 200) {
-        return (
-            <div>
-                <h5>CSV Files on S3</h5>
-                <div style={{maxHeight: 500, overflowY: 'auto'}}>
-                    {s3KeysRequest.content.filter(object => object.Key.endsWith('.csv'))
-                        .map(object => <div>{object.Key}</div>
-                    )}
-                </div>
-            </div>
-        );
-    } else {
-        return null;
-    }
-};
-
-
-const ApacheDrillPreview = props => {
-    const {
-        apacheDrillStorageRequest,
-        apacheDrillS3KeysRequest
-    } = props;
-    if (apacheDrillStorageRequest.status >= 400) {
-        return (<div>{'Hm... An error while trying to load Apache Drill'}</div>);
-    } else if (apacheDrillStorageRequest.status === 'loading') {
-        return (<div>{'Loading...'}</div>);
-    } else if (apacheDrillStorageRequest.status === 200) {
-        const storage = (
-            <div>
-                <h5>Enabled Apache Drill Storage Plugins</h5>
-                <div style={{maxHeight: 500, overflowY: 'auto'}}>
-                    {apacheDrillStorageRequest.content
-                        .filter(object => object.config.enabled)
-                        .map(object => (
-                            <div>{`${object.name} - ${object.config.connection}`}</div>
-                        ))
-                    }
-                </div>
-            </div>
-        );
-
-        let availableFiles = null;
-        if (apacheDrillS3KeysRequest.status === 200) {
-            const parquetFiles = apacheDrillS3KeysRequest
-                .content
-                .filter(object => object.Key.indexOf('.parquet') > -1)
-                .map(object => object.Key.slice(0, object.Key.indexOf('.parquet')) + '.parquet');
-            const uniqueParquetFiles = [];
-            parquetFiles.forEach(file => {
-                if (uniqueParquetFiles.indexOf(file) === -1) {
-                    uniqueParquetFiles.push(file);
-                }
-            });
-            if (uniqueParquetFiles.length === 0) {
-                availableFiles = (
-                    <div>
-                        Heads up! It looks like no .parquet files were
-                        found in this S3 bucket.
-                    </div>
-                );
-            } else {
-                availableFiles = (
-                    <div>
-                        <h5>Available Parquet Files on S3</h5>
-                        <div style={{maxHeight: 500, overflowY: 'auto'}}>
-                            {uniqueParquetFiles.map(key => (
-                                <div>{`${key}`}</div>
-                            ))}
-                        </div>
-                    </div>
-                );
-            }
-        }
-        return (
-            <div>
-                {storage}
-                {availableFiles}
-            </div>
-        );
-    } else {
-        return null;
-    }
-};
-
 
 class Settings extends Component {
     constructor(props) {
@@ -202,15 +70,17 @@ class Settings extends Component {
                      DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
                      DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE])) {
 
-             if (connectRequest.status === 200 && !tablesRequest.status) {
-                 getTables();
-             }
-             if (tablesRequest.status === 200 && !selectedTable) {
-                 setTable(tablesRequest.content[0]);
-             }
-             if (selectedTable && !previewTableRequest.status) {
-                 previewTables();
-             }
+            if (connectRequest.status === 200 && !tablesRequest.status) {
+                getTables();
+            }
+            if (tablesRequest.status === 200 && !selectedTable) {
+                window.props = this.props;
+                return;
+                setTable(tablesRequest.content[0]);
+            }
+            if (selectedTable && !previewTableRequest.status) {
+                previewTables();
+            }
 
         } else if (credentialObject.dialect === DIALECTS.S3) {
 
@@ -288,16 +158,13 @@ class Settings extends Component {
                         setTable={setTable}
                     />
 
-                    <TablePreview previewTableRequest={previewTableRequest}/>
-
-                    <S3Preview
+                    <Preview
+                        previewTableRequest={previewTableRequest}
                         s3KeysRequest={s3KeysRequest}
-                    />
-
-                    <ApacheDrillPreview
                         apacheDrillStorageRequest={apacheDrillStorageRequest}
                         apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
                     />
+
                 </div>
 
                 <pre>
@@ -341,6 +208,7 @@ function mapStateToProps(state) {
     }
 
     return {
+        credentialsRequest,
         connectRequest: connectRequests[selectedCredentialId] || {},
         saveCredentialsRequest: saveCredentialsRequests[selectedCredentialId] || {},
         previewTableRequest,
@@ -348,12 +216,11 @@ function mapStateToProps(state) {
         s3KeysRequest: s3KeysRequests[selectedCredentialId] || {},
         apacheDrillStorageRequest: apacheDrillStorageRequests[selectedCredentialId] || {},
         apacheDrillS3KeysRequest: apacheDrillS3KeysRequests[selectedCredentialId] || {},
-        credentialObject: credentials[selectedTab],
-        selectedTable,
-        credentialsRequest,
+        selectedTab,
         credentials,
         credentialsHaveBeenSaved,
-        selectedTab,
+        credentialObject: credentials[selectedTab],
+        selectedTable,
         selectedCredentialId
     };
 }

@@ -232,7 +232,7 @@ export default class Server {
             ).then(files => {
                 res.json(200, files);
             });
-        })
+        });
 
         server.post('/apache-drill-storage/:credentialId', function apacheDrillStorageHandler(req, res, next) {
             Connections.storage(

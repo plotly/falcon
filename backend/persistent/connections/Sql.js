@@ -1,9 +1,8 @@
 import Sequelize from 'sequelize';
 import {parseSQL} from '../../parse';
-import {merge} from 'ramda';
+import {dissoc, flatten, merge, mergeAll, values} from 'ramda';
 import {DIALECTS} from '../../../app/constants/constants';
 import Logger from '../../logger';
-import {dissoc} from 'ramda';
 
 // http://stackoverflow.com/questions/32037385/using-sequelize-with-redshift
 const REDSHIFT_OPTIONS = {
@@ -73,9 +72,10 @@ export function query(queryString, credentials) {
 }
 
 export function tables(credentials) {
-    // TODO - Should databases be saved as part of credentials or not?
     return createClient(credentials).query(
         SHOW_TABLES_QUERY[credentials.dialect],
         {type: Sequelize.QueryTypes.SELECT}
-    ).map(data => data[0]);
+    ).map(data => {
+        return values(data);
+    });
 }
