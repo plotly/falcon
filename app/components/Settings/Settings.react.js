@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {reduce, flip, dissoc, contains} from 'ramda';
 import {connect} from 'react-redux';
+import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
 import * as styles from './Settings.css';
 import Tabs from './Tabs/Tabs.react';
@@ -11,10 +12,18 @@ import TableDropdown from './TableDropdown/TableDropdown.react';
 import Preview from './Preview/Preview.react';
 import {DIALECTS} from '../../constants/constants.js';
 
+const unfoldIcon = (
+    <img
+        src="./images/unfold.png"
+        className={styles.unfoldIcon}
+    >
+    </img>
+);
+
 function SettingsForm(props) {
-    const {credentialObject, updateCredential} = props;
+    const {credentialObject, updateCredential, connectRequest} = props;
     return (
-        <div className={styles.configurationOptions}>
+        <div className={styles.configurationContainer}>
             <div className={styles.dialectSelector}>
                 <DialectSelector
                     credentialObject={credentialObject}
@@ -33,6 +42,27 @@ class Settings extends Component {
     constructor(props) {
         super(props);
         this.fetchData = this.fetchData.bind(this);
+        this.wrapComponent = this.wrapComponent.bind(this);
+        this.state = {show_credentials: true};
+    }
+
+    wrapComponent(name, reactComponent) {
+        return (
+            <div className={styles.stepTitleContainer}>
+                <h5>
+                    <a
+                        className={styles.stepTitle}
+                        onClick={() => this.setState({
+                            [`show_${name}`]: !this.state[`show_${name}`]
+                        })}
+                    >
+                        {name}
+                    </a>
+                    {this.state[`show_${name}`] ? null : unfoldIcon}
+                </h5>
+                {this.state[`show_${name}`] ? reactComponent : null}
+            </div>
+        );
     }
 
     componentDidMount() {
@@ -69,14 +99,15 @@ class Settings extends Component {
         if (contains(credentialObject.dialect, [
                      DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
                      DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE])) {
-
+            if (connectRequest.status !== 200 && !this.state.show_credentials) {
+                this.setState({show_credentials: true});
+            }
             if (connectRequest.status === 200 && !tablesRequest.status) {
                 getTables();
             }
             if (tablesRequest.status === 200 && !selectedTable) {
-                window.props = this.props;
-                return;
-                setTable(tablesRequest.content[0]);
+                this.setState({show_credentials: false});
+                setTable(tablesRequest.content[0][0]);
             }
             if (selectedTable && !previewTableRequest.status) {
                 previewTables();
@@ -97,9 +128,7 @@ class Settings extends Component {
             if (apacheDrillStorageRequest.status === 200 && !apacheDrillS3KeysRequest.status) {
                 getApacheDrillS3Keys();
             }
-
         }
-
     }
 
 
@@ -128,8 +157,6 @@ class Settings extends Component {
             return null; // initializing
         }
 
-        console.log('props: ', this.props);
-
         return (
             <div>
                 <Tabs
@@ -141,10 +168,13 @@ class Settings extends Component {
                 />
 
                 <div className={styles.openTab}>
+                    {this.wrapComponent('credentials',
                     <SettingsForm
+                        connectRequest={connectRequest}
                         credentialObject={credentials[selectedTab]}
                         updateCredential={updateCredential}
-                    />
+                    />)}
+
                     <ConnectButton
                         credentialsHaveBeenSaved={credentialsHaveBeenSaved}
                         connect={connect}
@@ -277,12 +307,12 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     }
 
     /*
-     * connect either saves the credentials and then connects
+     * dispatchConnect either saves the credentials and then connects
      * or just connects if the credentials have already been saved
      */
-    let connect;
+    let dispatchConnect;
     if (!credentialsHaveBeenSaved) {
-        connect = function saveAndConnect() {
+        dispatchConnect = function saveAndConnect() {
             dispatch(Actions.saveCredentials(credentials[selectedTab], selectedTab))
             .then(json => {
                 dispatch(Actions.connect(json.credentialId));
@@ -292,7 +322,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             // TODO - support updating credentials.
         };
     } else {
-        connect = () => dispatch(Actions.connect(selectedCredentialId));
+        dispatchConnect = () => dispatch(Actions.connect(selectedCredentialId));
     }
 
     return Object.assign(
@@ -310,7 +340,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             newTab: () => dispatch(Actions.newTab()),
             deleteTab: tab => dispatch(Actions.deleteTab(tab)),
             setTab: tab => dispatch(Actions.setTab(tab)),
-            connect
+            connect: dispatchConnect
         }
     );
 }

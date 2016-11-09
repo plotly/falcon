@@ -48,13 +48,13 @@ export const CONNECTION_OPTIONS = {
 };
 
 export const LOGOS = {
-    REDSHIFT: './images/redshift-logo.png',
-    POSTGRES: './images/postgres-logo.png',
-    ELASTICSEARCH: './images/elastic-logo.png',
-    MYSQL: './images/mysql-logo.png',
-    MARIADB: './images/mariadb-logo.png',
-    MSSQL: './images/mssql-logo.png',
-    SQLITE: './images/sqlite-logo.png',
-    S3: './images/s3-logo.png',
-    APACHE_DRILL: './images/apache_drill-logo.png'
+    [DIALECTS.REDSHIFT]: './images/redshift-logo.png',
+    [DIALECTS.POSTGRES]: './images/postgres-logo.png',
+    [DIALECTS.ELASTICSEARCH]: './images/elastic-logo.png',
+    [DIALECTS.MYSQL]: './images/mysql-logo.png',
+    [DIALECTS.MARIADB]: './images/mariadb-logo.png',
+    [DIALECTS.MSSQL]: './images/mssql-logo.png',
+    [DIALECTS.SQLITE]: './images/sqlite-logo.png',
+    [DIALECTS.S3]: './images/s3-logo.png',
+    [DIALECTS.APACHE_DRILL]: './images/apache_drill-logo.png'
 };

@@ -31,16 +31,19 @@ export default function ConnectButton(props) {
        if (connectRequest.content && connectRequest.content.error && connectRequest.content.error.message) {
            errorMessage = connectRequest.content.error.message;
        } else if (saveCredentialsRequest.content && saveCredentialsRequest.content.error && saveCredentialsRequest.content.error.message) {
-           errorMessage = saveCredentialsRequest.content.error.message
+           errorMessage = saveCredentialsRequest.content.error.message;
        }
        error = <div className={styles.errorMessage}>{errorMessage}</div>;
-   } 
+   }
 
    return (
-        <div>
+        <div className={styles.connectButtonContainer}>
             <div
                 className={styles.buttonPrimary}
-                onClick={connect}>{buttonText}</div>
+                onClick={connect}
+            >
+                {buttonText}
+            </div>
                 {error}
         </div>
    );
