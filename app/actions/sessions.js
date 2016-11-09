@@ -13,6 +13,27 @@ export const mergeCredentials = createAction('MERGE_CREDENTIALS');
 export const updateCredential = createAction('UPDATE_CREDENTIAL');
 export const deleteCredential = createAction('DELETE_CREDENTIAL');
 
+const DELETE_TAB_MESSAGE = 'You are about to delete a connection. ' +
+'If you have scheduled persistent queries with that connection, they ' +
+'will stop refreshing. Are you sure you want to continue?';
+
+function baseUrl() {
+     if (contains(window.location.protocol, ['http:', 'https:'])) {
+         /*
+          * Use relative domain if the app is running headlessly
+          * with a web front-end served by the app
+          */
+         return '';
+     } else {
+         /*
+          * Use the server location if the app is running in electron
+          * with electron serving the app file. The electron backend
+          * provides the port env variable as a query string param.
+          */
+          const PORT = queryString.parse(location.search).port;
+         return `http://localhost:${PORT}`;
+     }
+}
 
 function GET(path) {
     return fetch(`${baseUrl()}/${path}`, {
@@ -227,24 +248,27 @@ export function newTab() {
 
 export function deleteTab(tabId) {
     return function (dispatch, getState) {
-        // TODO - Make a delete request to delete the request from the disk.
-        // TODO - Check if any persistent connections depend on this before deleting
-        //        and warn the user if so.
-        if (tabId === getState().selectedTab) {
-            const tabIds = Object.keys(getState().credentials);
-            const currentIdIndex = tabIds.indexOf(tabId);
-            let nextIdIndex;
-            if (currentIdIndex === 0) {
-                if (tabIds.length > 1) {
-                    nextIdIndex = 1;
+        /* eslint no-alert: 0 */
+        if (confirm(DELETE_TAB_MESSAGE)) {
+            if (tabId === getState().selectedTab) {
+                const tabIds = Object.keys(getState().credentials);
+                const currentIdIndex = tabIds.indexOf(tabId);
+                let nextIdIndex;
+                if (currentIdIndex === 0) {
+                    if (tabIds.length > 1) {
+                        nextIdIndex = 1;
+                    } else {
+                        nextIdIndex = -1; // null out
+                    }
                 } else {
-                    nextIdIndex = -1; // null out
+                    nextIdIndex = currentIdIndex - 1;
                 }
-            } else {
-                nextIdIndex = currentIdIndex - 1;
+                dispatch(setTab(tabIds[nextIdIndex]));
             }
-            dispatch(setTab(tabIds[nextIdIndex]));
+            dispatch(deleteCredential(tabId));
+        } else {
+            return;
         }
-        dispatch(deleteCredential(tabId));
+        /* eslint no-alert: 0 */
     };
 }

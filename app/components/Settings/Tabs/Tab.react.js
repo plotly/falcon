@@ -11,6 +11,7 @@ export default class Tab extends Component {
     render() {
         const {tabId, isSelected, credentialObject, setTab, deleteTab} = this.props;
         const {username, host, dialect, id} = credentialObject;
+
         return (
             <div
                 className={classnames(
@@ -20,18 +21,18 @@ export default class Tab extends Component {
                 onClick={() => setTab(tabId)}
             >
 
-                <p className={styles.tabIdentifier}>
-                    <span>
-                        {username}@{host}
-                    </span>
-                </p>
-
                 <img
                     className={styles.tabLogo}
                     src={LOGOS[dialect]}
                     id={`test-tab-id-${id}`}
                 >
                 </img>
+
+                <p className={styles.tabIdentifier}>
+                    <span>
+                        {username}@{host}
+                    </span>
+                </p>
 
                 <img
                     className={styles.tabDelete}

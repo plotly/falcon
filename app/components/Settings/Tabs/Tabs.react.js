@@ -16,12 +16,12 @@ export default class Tabs extends Component {
                     <div className={styles.tabManagerContainer}>
                         {keys(credentials).map(tabId =>
                             <Tab
-                                key={tabId}
-                                tabId={tabId}
-                                isSelected={tabId === selectedTab}
                                 credentialObject={credentials[tabId]}
-                                setTab={setTab}
                                 deleteTab={deleteTab}
+                                isSelected={tabId === selectedTab}
+                                key={tabId}
+                                setTab={setTab}
+                                tabId={tabId}
                             />
                         )}
 
