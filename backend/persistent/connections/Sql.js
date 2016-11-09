@@ -43,6 +43,7 @@ function createClient(credentials) {
         logging: Logger.log,
         benchmark: true
     };
+
     if (dialect === 'redshift') {
         Sequelize.HSTORE.types.postgres.oids.push('dummy');
         options = merge(options, REDSHIFT_OPTIONS);
@@ -56,10 +57,10 @@ function createClient(credentials) {
 }
 
 export function connect(credentials) {
-    Logger.log(`
-        Attempting to authenticate with credentials
-        ${JSON.stringify(dissoc('password', credentials), null, 2)}
-        (password omitted)`
+    Logger.log('' +
+        'Attempting to authenticate with credentials ' +
+        `${JSON.stringify(dissoc('password', credentials), null, 2)} ` +
+        '(password omitted)'
     );
     return createClient(credentials).authenticate();
 }

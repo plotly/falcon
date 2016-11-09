@@ -57,7 +57,10 @@ class QueryScheduler {
         this.queryJobs[fid] = setInterval(
             () => {
                 try {
-                    this.job(fid, uids, query, credentialId);
+                    this.job(fid, uids, query, credentialId)
+                    .catch(error => {
+                        Logger.log(error, 0);
+                    });
                 } catch (e) {
                     Logger.log(e, 0);
                 }
@@ -92,10 +95,9 @@ class QueryScheduler {
         let startTime = process.hrtime();
 
         Logger.log(`Querying "${queryString}" with credential ${credentialId} to update grid ${fid}`, 2);
-        Connections.query(queryString, requestedDBCredentials)
+        return Connections.query(queryString, requestedDBCredentials)
         .then(rowsAndColumns => {
             Logger.log(`Query "${queryString}" took ${process.hrtime(startTime)[0]} seconds`, 2);
-
             Logger.log(`Updating grid ${fid} with new data`, 2);
             Logger.log(
                 `First row:
@@ -112,7 +114,6 @@ class QueryScheduler {
 
         }).then(res => {
             Logger.log(`Request to Plotly for grid ${fid} took ${process.hrtime(startTime)[0]} seconds`, 2);
-
             if (res.status !== 200) {
                 Logger.log(`Error ${res.status} while updating grid ${fid}.`, 0);
 
@@ -127,7 +128,7 @@ class QueryScheduler {
                 const user = getSetting('USERS').find(
                      u => u.username === username
                 );
-                PlotlyAPIRequest(`grids/${fid}`, null, user.username, user.apikey, 'GET')
+                return PlotlyAPIRequest(`grids/${fid}`, null, user.username, user.apikey, 'GET')
                 .then(res => {
                     // Permenant deletion
                     if (res.status === 404) {
@@ -139,7 +140,7 @@ class QueryScheduler {
                         this.clearQuery(fid);
                         deleteQuery(fid);
                     } else {
-                        res.json().then(filemeta => {
+                        return res.json().then(filemeta => {
                             if (filemeta.deleted) {
                                 Logger.log(`
                                     Grid ID ${fid} was deleted,
@@ -153,20 +154,15 @@ class QueryScheduler {
                     }
                 });
 
+            } else {
+
+                return res.json().then(json => {
+                    Logger.log(`Grid ${fid} has been updated.`, 2);
+                });
+
             }
 
-            res.json().then(json => {
-                if (res.status !== 200) {
-                    Logger.log(`Response: ${JSON.stringify(json, null, 2)}`, 2);
-                } else {
-                    Logger.log(`Grid ${fid} has been updated.`, 2);
-                }
-            });
-
-        }).catch(error => {
-            console.error(error);
-            Logger.log(error, 0);
-        });
+        })
 
     }
 

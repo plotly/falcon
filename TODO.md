@@ -1,4 +1,8 @@
-- Parquet files hang sometimes
+- [x] Parquet files hang sometimes
+- [ ] postgis instance
+- [ ] fail when registering queries
+- [ ] whats with that "Can't set headers after request is sent" error message??
+- [ ] clean up all of the Logger.log calls - the whitespace that the back tick quotes introduce is real annoying.
 
 ***
 

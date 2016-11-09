@@ -112,7 +112,7 @@ describe('QueryScheduler', () => {
         assert.deepEqual([updatedQuery], getQueries());
     });
 
-    it.only('clears and deletes the query if its associated grid was deleted', function(done) {
+    it('clears and deletes the query if its associated grid was deleted', function(done) {
         const refreshRate = 1 * 1000;
         this.timeout(refreshRate * 20);
 

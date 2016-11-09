@@ -27,6 +27,7 @@ export default class Server {
     }
 
     start() {
+        const that = this;
         const server = this.server;
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
@@ -78,7 +79,6 @@ export default class Server {
             getSetting('PORT')
         );
 
-
         server.get(/\/static\/?.*/, restify.serveStatic({
             directory: `${__dirname}/../`
         }));
@@ -86,22 +86,38 @@ export default class Server {
             directory: `${__dirname}/../app/`
         }));
 
+        server.get('/oauth', restify.serveStatic({
+            directory: `${__dirname}/../static`,
+            file: 'oauth.html'
+        }));
+        server.post('save-oauth', function saveOauth(req, res, next) {
+            const {token} = req.params;
+            console.log('token: ', token);
+            res.json(200, {});
+        });
+
+
         server.get('/', restify.serveStatic({
             directory: `${__dirname}/../static`,
             file: 'index.html'
         }));
 
-        server.get('/status', (req, res, next) => {
+        server.get('/status', function statusHandler(req, res, next) {
             // TODO - Maybe fix up this copy
             res.send('Connector status - running and available for requests.');
         });
 
-        server.get('/ping', (req, res, next) => {
+        server.get('/ping', function pingHandler(req, res, next) {
             res.json(200, {message: 'pong'});
         });
 
+        // Hidden URL to test uncaught exceptions
+        server.post('/_throw', function throwHandler(req, res, next) {
+            throw new Error('Yikes - uncaught error');
+        })
+
         // save credentials to a file
-        server.post('/credentials', (req, res, next) => {
+        server.post('/credentials', function postCredentialsHandler(req, res, next) {
             /*
              * Check if an existing set of credentials exist
              * If it does, prevent overwriting so that IDs
@@ -120,7 +136,7 @@ export default class Server {
         });
 
         // return sanitized credentials
-        server.get('/credentials', (req, res, next) => {
+        server.get('/credentials', function getCredentialsHandler(req, res, next) {
             res.json(200, getSanitizedCredentials());
         });
 
@@ -128,7 +144,7 @@ export default class Server {
          * return a single credential by id
          * ids are assigned by the server on credential save
          */
-        server.get('/credentials/:id', (req, res, next) => {
+        server.get('/credentials/:id', function getCredentialsIdHandler(req, res, next) {
             const credential = getSanitizedCredentialById(req.id);
             if (credential) {
                 res.json(200, credential);
@@ -138,7 +154,7 @@ export default class Server {
         });
 
         // delete credentials
-        server.del('/credentials/:id', (req, res, next) => {
+        server.del('/credentials/:id', function delCredentialsHandler(req, res, next) {
             if (getSanitizedCredentialById(req.params.id)) {
                 deleteCredentialById(req.params.id);
                 res.json(204, {});
@@ -148,7 +164,7 @@ export default class Server {
         });
 
         /* Connections */
-        server.post('/connect/:credentialId', (req, res, next) => {
+        server.post('/connect/:credentialId', function postConnectHandler(req, res, next) {
             Connections.connect(getCredentialById(req.params.credentialId))
             .then(() => {
                 res.json(200, {});
@@ -158,7 +174,7 @@ export default class Server {
         /* One-Shot Queries */
 
         // Make a query and return the results as a grid
-        server.post('/query/:credentialId', (req, res, next) => {
+        server.post('/query/:credentialId', function postQueryHandler(req, res, next) {
             Connections.query(
                 req.params.query,
                 getCredentialById(req.params.credentialId)
@@ -170,8 +186,7 @@ export default class Server {
             });
         });
 
-
-        server.post('/tables/:credentialId', (req, res, next) => {
+        server.post('/tables/:credentialId', function tablesHandler(req, res, next) {
             Connections.tables(
                 getCredentialById(req.params.credentialId)
             ).then(tables => {
@@ -179,7 +194,7 @@ export default class Server {
             });
         });
 
-        server.post('/s3-keys/:credentialId', (req, res, next) => {
+        server.post('/s3-keys/:credentialId', function s3KeysHandler(req, res, next) {
             Connections.files(
                 getCredentialById(req.params.credentialId)
             ).then(files => {
@@ -187,7 +202,7 @@ export default class Server {
             });
         })
 
-        server.post('/apache-drill-storage/:credentialId', (req, res, next) => {
+        server.post('/apache-drill-storage/:credentialId', function apacheDrillStorageHandler(req, res, next) {
             Connections.storage(
                 getCredentialById(req.params.credentialId)
             ).then(files => {
@@ -195,7 +210,7 @@ export default class Server {
             });
         });
 
-        server.post('/apache-drill-s3-keys/:credentialId', (req, res, next) => {
+        server.post('/apache-drill-s3-keys/:credentialId', function apacheDrills3KeysHandler(req, res, next) {
             Connections.listS3Files(
                 getCredentialById(req.params.credentialId)
             ).then(files => {
@@ -206,11 +221,11 @@ export default class Server {
         /* Persistent Connections */
 
         // return the list of registered queries
-        server.get('/queries', (req, res, next) => {
+        server.get('/queries', function getQueriesHandler(req, res, next) {
             res.json(200, getQueries());
         });
 
-        server.get('/queries/:fid', (req, res, next) => {
+        server.get('/queries/:fid', function getQueriesFidHandler(req, res, next) {
             const query = getQuery(req.params.fid);
             if (query) {
                 res.json(200, query);
@@ -219,25 +234,38 @@ export default class Server {
             }
         });
 
-        // register a query
-        server.post('/queries', (req, res, next) => {
+        // register or update a query
+        server.post('/queries', function postQueriesHandler(req, res, next) {
             // TODO - Verify that the app has access to
             // the user's API key and attempt to make a
             // request to see if it is valid.
-            let status;
-            if (getQuery(req.params.fid)) {
-                // TODO - Technically, this should be
-                // under the endpoint `/queries/:fid`
-                status = 200;
-            } else {
-                status = 201;
-            }
-            this.queryScheduler.scheduleQuery(req.params);
-            res.json(status, {});
+
+            // Make the query and update the user's grid
+            const {fid, uids, query, credentialId} = req.params;
+            that.queryScheduler.queryAndUpdateGrid(
+                fid, uids, query, credentialId
+            )
+            .then(function returnSuccess(){
+                let status;
+                if (getQuery(req.params.fid)) {
+                    // TODO - Technically, this should be
+                    // under the endpoint `/queries/:fid`
+                    status = 200;
+                } else {
+                    status = 201;
+                }
+                that.queryScheduler.scheduleQuery(req.params);
+                res.json(status, {});
+            })
+            .catch(function returnError(error){
+                Logger.log(error, 0);
+                res.json(400, {error: {message: error.message}});
+            });
+
         });
 
         // delete a query
-        server.del('/queries/:fid', (req, res, next) => {
+        server.del('/queries/:fid', function delQueriesHandler(req, res, next) {
             const {fid} = req.params;
             if (getQuery(fid)) {
                 deleteQuery(fid);
@@ -246,13 +274,15 @@ export default class Server {
                 res.json(404, {});
             }
         });
-
-        // TODO - test this error handling stuff.
-        // It doesn't seem like it works inside promises.
-        server.on('uncaughtException', function (req, res, route, err) {
-            Logger.log('uncaughtException: ' + err.stack, 0);
-            res.json(500, {error: {message: err.message}});
-        });
+        //
+        // server.on('uncaughtException', function uncaughtExceptionHandler(req, res, route, err) {
+        //     if (err.message.indexOf("Can't set headers after they are sent") === -1) {
+        //         Logger.log(err);
+        //     }
+        //     res.json(500, {
+        //         error: {message: err.message}
+        //     });
+        // });
 
     }
 

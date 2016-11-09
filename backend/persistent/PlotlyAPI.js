@@ -3,8 +3,6 @@ import {getSetting} from '../settings.js';
 import Logger from '../logger';
 
 export function PlotlyAPIRequest(relativeUrl, body, username, apiKey, method = 'POST') {
-    console.warn(`${method}: ${getSetting('PLOTLY_API_DOMAIN')}/v2/${relativeUrl}`);
-    console.warn(`${username} - ${apiKey}`);
     return fetch(`${getSetting('PLOTLY_API_DOMAIN')}/v2/${relativeUrl}`, {
         method,
         headers: {
@@ -22,15 +20,17 @@ export function PlotlyAPIRequest(relativeUrl, body, username, apiKey, method = '
 
 export function updateGrid(rows, fid, uids) {
     const username = fid.split(':')[0];
-    const user = getSetting('USERS').find(
+    const users = getSetting('USERS');
+    const user = users.find(
         u => u.username === username
     );
     if (!user || !user.apikey) {
-        Logger.log(
-            `Attempting to update grid ${fid} but can't find the
-             credentials for the user "${username}".`, 0
+        const errorMessage = (
+            `Attempting to update grid ${fid} but the ` +
+            `credentials for the user "${username} do not exist".`
         );
-        return Promise.reject(new Error('Unauthenticated'));
+        Logger.log(errorMessage, 0);
+        throw new Error(errorMessage);
     }
     const apikey = user.apikey;
 

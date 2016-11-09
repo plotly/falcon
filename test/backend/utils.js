@@ -43,6 +43,16 @@ export const sqlCredentials = {
     dialect: 'postgres'
 };
 
+// my local ones - TODO - delete
+// export const sqlCredentials = {
+//     username: 'chriddyp',
+//     password: '',
+//     database: 'chriddyp',
+//     port: 5432,
+//     host: 'localhost',
+//     dialect: 'postgres'
+// };
+
 export const elasticsearchCredentials = {
     dialect: 'elasticsearch',
     host: 'https://67a7441549120daa2dbeef8ac4f5bb2e.us-east-1.aws.found.io',

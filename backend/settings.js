@@ -7,13 +7,23 @@ import {
     createConnectorFolder
 } from './utils/homeFiles';
 
+// TODO - Since these settings can set as ENV variables, we should
+// probably prefix them with like `PLOTLY_` to prevent any namespace
+// clashes.
 const DEFAULT_SETTINGS = {
     LOG_PATH: LOG_PATH,
     HEADLESS: false,
+
+    // TODO - Set to https://api.plot.ly
+    // PLOTLY_API_DOMAIN: 'https://api.plot.ly',
     PLOTLY_API_DOMAIN: 'https://api-local.plot.ly',
+
+    // TODO - Remove this
     USERS: [
+        // {username: 'plotly-database-connector', apikey: 'reiptow6gu'}
         {username: 'chris', apikey: '1c7f5rx2ef'}
     ],
+
     CORS_ALLOWED_ORIGINS: [
         'https://plot.ly',
         'https://stage.plot.ly',
