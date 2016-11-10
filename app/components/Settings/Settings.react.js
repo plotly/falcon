@@ -139,7 +139,8 @@ class Settings extends Component {
             updateCredential,
             connect,
             connectRequest,
-            saveCredentialsRequest,
+            saveCredentialsRequests,
+            deleteCredentialsRequests,
             credentialsHaveBeenSaved,
             setTable,
             selectedTable,
@@ -178,7 +179,7 @@ class Settings extends Component {
                     <ConnectButton
                         credentialsHaveBeenSaved={credentialsHaveBeenSaved}
                         connect={connect}
-                        saveCredentialsRequest={saveCredentialsRequest}
+                        saveCredentialsRequest={saveCredentialsRequests}
                         connectRequest={connectRequest}
                     />
 
@@ -218,6 +219,7 @@ function mapStateToProps(state) {
         credentialsRequest,
         connectRequests,
         saveCredentialsRequests,
+        deleteCredentialsRequests,
         previewTableRequests,
         tablesRequests,
         selectedTables,
@@ -241,6 +243,7 @@ function mapStateToProps(state) {
         credentialsRequest,
         connectRequest: connectRequests[selectedCredentialId] || {},
         saveCredentialsRequest: saveCredentialsRequests[selectedCredentialId] || {},
+        deleteCredentialsRequest: deleteCredentialsRequests[selectedCredentialId] || {},
         previewTableRequest,
         tablesRequest: tablesRequests[selectedCredentialId] || {},
         s3KeysRequest: s3KeysRequests[selectedCredentialId] || {},

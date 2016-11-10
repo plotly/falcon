@@ -35,6 +35,8 @@ function baseUrl() {
      }
 }
 
+const request = {GET, POST, DELETE};
+
 function GET(path) {
     return fetch(`${baseUrl()}/${path}`, {
         method: 'GET',
@@ -65,8 +67,6 @@ function POST(path, body = {}) {
         body: body ? JSON.stringify(body) : null
     });
 }
-const request = {GET, POST, DELETE};
-
 
 function apiThunk(endpoint, method, store, id, body) {
     return dispatch => {
@@ -180,6 +180,15 @@ function PREVIEW_QUERY (dialect, table, database = '') {
         case DIALECTS.MSSQL:
             return 'SELECT TOP 5 * FROM ' +
                 `${database}.dbo.${table}`;
+        case DIALECTS.ELASTICSEARCH:
+            return {
+                database,
+                table,
+                size: 5,
+                body: {
+                    query: { 'match_all': {} }
+                }
+            };
         default:
             throw new Error(`Dialect ${dialect} is not one of the DIALECTS`);
     }
@@ -250,9 +259,11 @@ export function deleteTab(tabId) {
     return function (dispatch, getState) {
         /* eslint no-alert: 0 */
         if (confirm(DELETE_TAB_MESSAGE)) {
+        /* eslint no-alert: 0 */
             if (tabId === getState().selectedTab) {
                 const tabIds = Object.keys(getState().credentials);
                 const currentIdIndex = tabIds.indexOf(tabId);
+                const credentialId = getState().credentials[tabId].id;
                 let nextIdIndex;
                 if (currentIdIndex === 0) {
                     if (tabIds.length > 1) {
@@ -264,11 +275,16 @@ export function deleteTab(tabId) {
                     nextIdIndex = currentIdIndex - 1;
                 }
                 dispatch(setTab(tabIds[nextIdIndex]));
+                dispatch(apiThunk(
+                    `credentials/${credentialId}`,
+                    'DELETE',
+                    'deleteCredentialsRequests',
+                    credentialId
+                ));
             }
             dispatch(deleteCredential(tabId));
         } else {
             return;
         }
-        /* eslint no-alert: 0 */
     };
 }

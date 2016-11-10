@@ -106,7 +106,8 @@ function createApiReducer(store) {
 }
 export const connectRequests = createApiReducer('connectRequest');
 export const credentialsRequest = createApiReducer('credentialsRequest');
-export const saveCredentialsRequests = createApiReducer('saveCredentialsRequest');
+export const saveCredentialsRequests = createApiReducer('saveCredentialsRequests');
+export const deleteCredentialsRequests = createApiReducer('deleteCredentialsRequests');
 export const tablesRequests = createApiReducer('tables');
 export const previewTableRequests = createApiReducer('previewTableRequest');
 export const s3KeysRequests = createApiReducer('s3KeysRequests');
@@ -164,6 +165,7 @@ const rootReducer = combineReducers({
     connectRequests,
     credentialsRequest,
     saveCredentialsRequests,
+    deleteCredentialsRequests,
     tablesRequests,
     previewTableRequests,
     s3KeysRequests,
