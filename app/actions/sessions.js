@@ -17,24 +17,6 @@ const DELETE_TAB_MESSAGE = 'You are about to delete a connection. ' +
 'If you have scheduled persistent queries with that connection, they ' +
 'will stop refreshing. Are you sure you want to continue?';
 
-function baseUrl() {
-     if (contains(window.location.protocol, ['http:', 'https:'])) {
-         /*
-          * Use relative domain if the app is running headlessly
-          * with a web front-end served by the app
-          */
-         return '';
-     } else {
-         /*
-          * Use the server location if the app is running in electron
-          * with electron serving the app file. The electron backend
-          * provides the port env variable as a query string param.
-          */
-          const PORT = queryString.parse(location.search).port;
-         return `http://localhost:${PORT}`;
-     }
-}
-
 const request = {GET, POST, DELETE};
 
 function GET(path) {

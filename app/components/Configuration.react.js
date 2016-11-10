@@ -1,11 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Settings from './Settings/Settings.react';
-
+import {baseUrl} from '../utils/utils';
 import {Link} from './Link.react';
 
 import * as styles from './Configuration.css';
-
 
 const LINKS = {
     PLANS: 'http://plot.ly/plans/',
@@ -31,7 +30,7 @@ export default class Configuration extends Component {
         const baseURL = 'https://local.plot.ly';
         const resource = '/o/authorize/';
         const client_id = 'LX4A5wifVDc06WIU1uWmIm0KgqN9Bs0qsEb1GW3n';
-        const redirect_uri = utils.baseUrl() + '/oauth';
+        const redirect_uri = baseUrl + '/oauth';
         const queryString = `?response_type=token&client_id=${client_id}&redirect_uri=${redirect_uri}`;
         const oauthURL = (
             'https://local.plot.ly/o/authorize' + queryString
