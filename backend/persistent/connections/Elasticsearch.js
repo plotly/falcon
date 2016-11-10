@@ -1,5 +1,10 @@
 import {parseElasticsearch} from '../../parse';
+<<<<<<< HEAD
 import fetch from 'node-fetch';
+=======
+import elasticsearch from 'elasticsearch';
+import {keys} from 'ramda';
+>>>>>>> Adds fun tables() to /connections/elasticsearch.js
 
 function request(relativeUrl, credentials, {body, method}) {
     const {host, port, username, password} = credentials;
@@ -40,4 +45,11 @@ export function query(queryObject, credentials) {
 export function elasticsearchMappings(credentials) {
     const {index} = credentials;
     return request(`${index}/_mappings`, credentials, {method: 'GET'});
+}
+
+export function tables(credentials) {
+    const client = createClient(credentials);
+    return client.indices.getMapping('_all').then(
+        response => keys(response[credentials.database]['mappings'])
+    );
 }

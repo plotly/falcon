@@ -22,7 +22,7 @@ export const CONNECTION_CONFIG = {
     [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.REDSHIFT]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.SQLITE]: ['storage'],
-    [DIALECTS.ELASTICSEARCH]: ['username', 'password', 'host', 'port'],
+    [DIALECTS.ELASTICSEARCH]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.S3]: ['bucket', 'accessKeyId', 'secretAccessKey'],
     [DIALECTS.APACHE_DRILL]: [
         'host',

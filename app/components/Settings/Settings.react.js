@@ -96,8 +96,10 @@ class Settings extends Component {
         }
         const credentialObject = credentials[selectedTab] || {};
         if (contains(credentialObject.dialect, [
-                     DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
-                     DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE])) {
+                    DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
+                    DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE,
+                    DIALECTS.ELASTICSEARCH
+        ])) {
             if (connectRequest.status !== 200 && !this.state.show_credentials) {
                 this.setState({show_credentials: true});
             }
