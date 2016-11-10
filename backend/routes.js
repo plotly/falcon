@@ -10,9 +10,10 @@ import {
     getCredentialById
 } from './persistent/Credentials.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
-import {getSetting} from './settings.js';
-import {dissoc} from 'ramda';
+import {getSetting, saveSetting} from './settings.js';
+import {dissoc, pluck, contains} from 'ramda';
 import Logger from './logger';
+import fetch from 'node-fetch';
 
 export default class Server {
     constructor() {
@@ -90,12 +91,43 @@ export default class Server {
             directory: `${__dirname}/../static`,
             file: 'oauth.html'
         }));
-        server.post('save-oauth', function saveOauth(req, res, next) {
-            const {token} = req.params;
-            console.log('token: ', token);
-            res.json(200, {});
-        });
 
+        // Careful - this endpoint is untested
+        server.post('/oauth-token', function saveOauth(req, res, next) {
+            const {access_token} = req.params;
+            fetch(`${getSetting('PLOTLY_API_DOMAIN')}/v2/users/current`, {
+                headers: {'Authorization': `Bearer ${access_token}`}
+            })
+            .then(userRes => userRes.json().then(userMeta => {
+                if (userRes.status === 200) {
+                    const {username} = userMeta;
+                    if (!username) {
+                        res.json(500, {error: {message: `User was not found.`}});
+                    }
+                    const existingUsers = getSetting('USERS');
+                    const existingUsernames = pluck('username', existingUsers);
+                    let status;
+                    if (contains(username, existingUsernames)) {
+                        existingUsers[
+                            existingUsernames.indexOf(username)
+                        ]['access_token'] = access_token;
+                        status = 200
+                    } else {
+                        existingUsers.push({username, accessToken: access_token});
+                        status = 201;
+                    }
+                    saveSetting('USERS', existingUsers);
+                    res.json(status, {});
+                } else {
+                    Logger.log(userMeta, 0);
+                    res.json(500, {error: {message: `Error ${userRes.status} fetching user`}});
+                }
+            }))
+            .catch(err => {
+                Logger.log(err, 0);
+                res.json(500, {error: {message: err.message}});
+            });
+        });
 
         server.get('/', restify.serveStatic({
             directory: `${__dirname}/../static`,

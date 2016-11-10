@@ -35,7 +35,7 @@ describe('Grid API Functions', function () {
         }).then(() => {
             const url = `grids/${fid}/content`;
             // Retrieve the contents from the grid
-            return PlotlyAPIRequest(url, {}, username, apiKey, 'GET');
+            return PlotlyAPIRequest(url, {username, apiKey, method: 'GET'});
         }).then(json => {
             // Test that the update worked
             assert.deepEqual(

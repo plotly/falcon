@@ -16,6 +16,7 @@ export const columns = [
 
 ];
 
+// test account on prod
 export const username = 'plotly-database-connector';
 export const apiKey = 'reiptow6gu';
 
@@ -26,12 +27,16 @@ export function createGrid(filename) {
     });
     const grid = {cols};
     return PlotlyAPIRequest('grids', {
-        data: grid,
-        world_readable: true,
-        parent: -1,
-        filename: `${filename} - ${Math.random().toString(36).substr(2, 5)}`
-    }, username, apiKey);
-
+        method: 'POST',
+        username,
+        apiKey,
+        body: {
+            data: grid,
+            world_readable: true,
+            parent: -1,
+            filename: `${filename} - ${Math.random().toString(36).substr(2, 5)}`
+        }
+    });
 }
 
 export const sqlCredentials = {

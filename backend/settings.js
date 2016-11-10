@@ -21,7 +21,7 @@ const DEFAULT_SETTINGS = {
     // TODO - Remove this
     USERS: [
         // {username: 'plotly-database-connector', apikey: 'reiptow6gu'}
-        {username: 'chris', apikey: '1c7f5rx2ef'}
+        // {username: 'chris', apikey: '1c7f5rx2ef'}
     ],
 
     CORS_ALLOWED_ORIGINS: [

@@ -2,6 +2,7 @@ import fetch from 'isomorphic-fetch';
 import uuid from 'node-uuid';
 import {createAction} from 'redux-actions';
 import {DIALECTS} from '../constants/constants';
+import {baseUrl} from '../utils/utils';
 import {contains} from 'ramda';
 import queryString from 'query-string';
 
@@ -12,24 +13,6 @@ export const mergeCredentials = createAction('MERGE_CREDENTIALS');
 export const updateCredential = createAction('UPDATE_CREDENTIAL');
 export const deleteCredential = createAction('DELETE_CREDENTIAL');
 
-
-function baseUrl() {
-     if (contains(window.location.protocol, ['http:', 'https:'])) {
-         /*
-          * Use relative domain if the app is running headlessly
-          * with a web front-end served by the app
-          */
-         return ''
-     } else {
-         /*
-          * Use the server location if the app is running in electron
-          * with electron serving the app file. The electron backend
-          * provides the port env variable as a query string param.
-          */
-          const PORT = queryString.parse(location.search).port;
-         return `http://localhost:${PORT}`;
-     }
-}
 
 function GET(path) {
     return fetch(`${baseUrl()}/${path}`, {

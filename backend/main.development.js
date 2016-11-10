@@ -37,6 +37,8 @@ app.on('ready', () => {
         height: OPTIONS.large ? 1024 : 728
     });
 
+    // TODO - Does this work too?
+    // mainWindow.loadURL(`http://localhost:${getSetting('PORT')}`);
     // Provide the port of the server to the front-end as a query string param.
     mainWindow.loadURL(`file://${__dirname}/../app/app.html?port=${getSetting('PORT')}`);
 

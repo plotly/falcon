@@ -145,7 +145,7 @@ describe('QueryScheduler', () => {
 
              assert(Boolean(queryScheduler.queryJobs[fid]), 'A query has been scheduled');
 
-             PlotlyAPIRequest(`grids/${fid}`, null, username, apiKey, 'DELETE').then(res => {
+             PlotlyAPIRequest(`grids/${fid}`, {username, apiKey, method: 'DELETE'}).then(res => {
                 assert.equal(res.status, 204, 'Grid was successfully deleted');
 
                 setTimeout(function() {
@@ -167,7 +167,7 @@ describe('QueryScheduler', () => {
 
     it('queries a database and updates a plotly grid on an interval', function(done) {
         function checkGridAgainstQuery(fid) {
-            return PlotlyAPIRequest(`grids/${fid}/content`, {}, username, apiKey, 'GET')
+            return PlotlyAPIRequest(`grids/${fid}/content`, {username, apiKey, method: 'GET'})
             .then(res => res.json().then(json => {
                 assert.equal(res.status, 200);
                 assert.deepEqual(
@@ -203,7 +203,7 @@ describe('QueryScheduler', () => {
             // Verify that the grid was updated
             .then(res => {
                 assert(res.status, 200);
-                return PlotlyAPIRequest(`grids/${fid}/content`, {}, username, apiKey, 'GET');
+                return PlotlyAPIRequest(`grids/${fid}/content`, {username, apiKey, 'GET'});
             })
             .then(res => res.json().then(json => {
                 assert(res.status, 200);
@@ -275,7 +275,7 @@ describe('QueryScheduler', () => {
                              assert(has(fid, queryScheduler.queryJobs));
                              assert.deepEqual(getQuery(fid), queryObject);
                              assert.deepEqual(queryScheduler[fid], queryObject);
-                             return PlotlyAPIRequest(`grids/${fid}`, {}, username, apiKey, 'DELETE');
+                             return PlotlyAPIRequest(`grids/${fid}`, {username, apiKey, 'DELETE'});
                          })
                          .then(res => {
                              assert(res.status, 200);

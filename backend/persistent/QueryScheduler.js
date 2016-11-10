@@ -128,7 +128,11 @@ class QueryScheduler {
                 const user = getSetting('USERS').find(
                      u => u.username === username
                 );
-                return PlotlyAPIRequest(`grids/${fid}`, null, user.username, user.apikey, 'GET')
+                const {apikey: apiKey, accessToken} = user;
+                return PlotlyAPIRequest(
+                    `grids/${fid}`,
+                    {username, apiKey, accessToken, method: 'GET'}
+                )
                 .then(res => {
                     // Permenant deletion
                     if (res.status === 404) {

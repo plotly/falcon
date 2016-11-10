@@ -2,16 +2,24 @@ import fetch from 'node-fetch';
 import {getSetting} from '../settings.js';
 import Logger from '../logger';
 
-export function PlotlyAPIRequest(relativeUrl, body, username, apiKey, method = 'POST') {
+export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessToken, method}) {
+    let authorization;
+    if (apiKey) {
+        authorization = 'Basic ' + new Buffer(
+            username + ':' + apiKey
+        ).toString('base64');
+    } else if (accessToken) {
+        authorization = `Bearer ${accessToken}`;
+    } else {
+        throw new Error('Missing apiKey or accessToken');
+    }
     return fetch(`${getSetting('PLOTLY_API_DOMAIN')}/v2/${relativeUrl}`, {
         method,
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Plotly-Client-Platform': 'db-connect',
-            'Authorization': 'Basic ' + new Buffer(
-                username + ':' + apiKey
-            ).toString('base64')
+            'Authorization': authorization
         },
         body: body ? JSON.stringify(body) : null
     });
@@ -24,7 +32,7 @@ export function updateGrid(rows, fid, uids) {
     const user = users.find(
         u => u.username === username
     );
-    if (!user || !user.apikey) {
+    if (!user || !(user.apiKey || user.accessToken)) {
         const errorMessage = (
             `Attempting to update grid ${fid} but the ` +
             `credentials for the user "${username} do not exist".`
@@ -32,7 +40,8 @@ export function updateGrid(rows, fid, uids) {
         Logger.log(errorMessage, 0);
         throw new Error(errorMessage);
     }
-    const apikey = user.apikey;
+    const apiKey = user.apiKey;
+    const accessToken = user.accessToken;
 
     // TODO - Test case where no rows are returned.
     if (uids.length !== rows[0].length) {
@@ -65,5 +74,5 @@ export function updateGrid(rows, fid, uids) {
             data: column
         })))
     };
-    return PlotlyAPIRequest(url, body, username, apikey, 'PUT');
+    return PlotlyAPIRequest(url, {body, username, apiKey, accessToken, method: 'PUT'});
 }
