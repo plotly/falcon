@@ -1,38 +1,43 @@
 import {parseElasticsearch} from '../../parse';
-import elasticsearch from 'elasticsearch';
+import fetch from 'node-fetch';
 
-function createClient(credentials) {
+function request(relativeUrl, credentials, {body, method}) {
     const {host, port, username, password} = credentials;
-    return new elasticsearch.Client({
-        host: `${host}:${port}`,
-        auth: `${username}:${password}`
+    const url = `${host}:${port}/${relativeUrl}?format=json`;
+    const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    };
+    if (username && password) {
+        headers['Authorization'] = 'Basic ' + new Buffer(
+            username + ':' + password
+        ).toString('base64');
+    }
+    return fetch(url, {
+        headers,
+        method,
+        body: body ? JSON.stringify(body) : null
     });
 }
 
-
 export function connect(credentials) {
-    const client = createClient(credentials);
-
-    return new Promise(function(resolve, reject) {
-        client.ping({
-            requestTimeout: 10 * 1000,
-            hello: 'hello elasticsearch'
-        }, error => {
-            if (error) {
-                reject(`An error occured when connecting
-                        to elasticsearch: ${error}`);
-                // TODO ^ Are we sure that error is a string?
-            } else {
-                resolve();
-            }
-        });
-    });
-
+    const {index} = credentials;
+    return request(`_cat/indices/${index}`, credentials, {method: 'GET'});
 }
 
 export function query(queryObject, credentials) {
-    const client = createClient(credentials);
-    return client.search(queryObject).then(
-        results => parseElasticsearch(results.hits.hits)
-    );
+    const {index} = credentials;
+    return request(`${index}/_search`, credentials, {body: queryObject, method: 'POST'})
+    .then(res => res.json().then(results => {
+        if (res.status === 200) {
+            return parseElasticsearch(results.hits.hits)
+        } else {
+            throw new Error(results);
+        }
+    }));
+}
+
+export function elasticsearchMappings(credentials) {
+    const {index} = credentials;
+    return request(`${index}/_mappings`, credentials, {method: 'GET'});
 }

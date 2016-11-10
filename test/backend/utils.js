@@ -61,7 +61,8 @@ export const sqlCredentials = {
 export const elasticsearchCredentials = {
     dialect: 'elasticsearch',
     host: 'https://67a7441549120daa2dbeef8ac4f5bb2e.us-east-1.aws.found.io',
-    port: '9243'
+    port: '9243',
+    index: 'sample-data'
 };
 
 export const publicReadableS3Credentials = {

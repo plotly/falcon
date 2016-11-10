@@ -364,7 +364,7 @@ describe('Server', function () {
     });
 
     // Persistent Queries
-    it.only('registers a query and returns saved queries', function(done) {
+    it('registers a query and returns saved queries', function(done) {
         this.timeout(10 * 1000);
         // Verify that there are no queries saved
         GET('queries')

@@ -250,6 +250,14 @@ export default class Server {
             });
         });
 
+        server.post('/elasticsearch-mappings', function elasticsearchMappingsHandler(req, res, next) {
+            Connections.getElasticsearchMappings(
+                getCredentialById(req.params.credentialId)
+            ).then(mappings => {
+                res.json(200, mappings);
+            });
+        });
+
         /* Persistent Connections */
 
         // return the list of registered queries

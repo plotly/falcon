@@ -203,7 +203,7 @@ describe('QueryScheduler', () => {
             // Verify that the grid was updated
             .then(res => {
                 assert(res.status, 200);
-                return PlotlyAPIRequest(`grids/${fid}/content`, {username, apiKey, 'GET'});
+                return PlotlyAPIRequest(`grids/${fid}/content`, {username, apiKey, method: 'GET'});
             })
             .then(res => res.json().then(json => {
                 assert(res.status, 200);
@@ -275,7 +275,7 @@ describe('QueryScheduler', () => {
                              assert(has(fid, queryScheduler.queryJobs));
                              assert.deepEqual(getQuery(fid), queryObject);
                              assert.deepEqual(queryScheduler[fid], queryObject);
-                             return PlotlyAPIRequest(`grids/${fid}`, {username, apiKey, 'DELETE'});
+                             return PlotlyAPIRequest(`grids/${fid}`, {username, apiKey, method: 'DELETE'});
                          })
                          .then(res => {
                              assert(res.status, 200);

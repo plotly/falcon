@@ -3,6 +3,9 @@
 - [ ] fail when registering queries
 - [ ] whats with that "Can't set headers after request is sent" error message??
 - [ ] clean up all of the Logger.log calls - the whitespace that the back tick quotes introduce is real annoying.
+- [ ] elasticsearch UI on prod
+- [ ] run in a docker container
+- [ ] publish architecture
 
 ***
 
@@ -16,8 +19,8 @@
 - HTTPS - Add a setting with the path to the CERT files
 - Move all ~/.plotly/connector/.json files to .yaml files
 - Can we deploy this with on-prem? Chris will check in with Jody
-    - Do we get SSL for free with this?
-- UI and endpoints for adding API keys
+    - [x] Do we get SSL for free with this?
+- [x] UI and endpoints for adding API keys
 - [x] Apache Drill, S3 into workspace 2
 - [x] Deploy on heroku
 - start running against prod

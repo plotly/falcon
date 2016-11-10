@@ -9,7 +9,7 @@ import {
 } from '../../utils.js';
 
 import {
-    query, connect, files, storage, listS3Files
+    query, connect, files, storage, listS3Files, elasticsearchMappings
 } from '../../../../backend/persistent/connections/Connections.js';
 
 const transpose = m => m[0].map((x, i) => m.map(x => x[i]));
@@ -44,12 +44,68 @@ describe('SQL - Connections', function () {
 
 
 describe('Elasticsearch - Connections', function () {
-    it ('Connections.connect connects to a database', function(done) {
+    it('Connections.connect connects to a database', function(done) {
         this.timeout(4 * 1000);
-        connect(elasticsearchCredentials).then(done).catch(done);
+        connect(elasticsearchCredentials).then(res => res.json().then(json => {
+            console.warn(json);
+            assert.equal(res.status, 200);
+            assert.equal(json[0].status, 'open');
+            done();
+        })).catch(done);
     });
 
-    it('Connections.query queries a database', function(done) {
+    it.only('Connections.mappings returns mappings', function(done) {
+        elasticsearchMappings(elasticsearchCredentials).then(res => res.json().then(json => {
+            assert.deepEqual(
+                json,
+                {
+                    "sample-data": {
+                      "mappings": {
+                        "test-type": {
+                          "properties": {
+                            "my-boolean-1": {
+                              "type": "boolean"
+                          },
+                            "my-boolean-2": {
+                              "type": "boolean"
+                          },
+                            "my-date-1": {
+                              "format": "strict_date_optional_time||epoch_millis",
+                              "type": "date"
+                          },
+                            "my-date-2": {
+                              "format": "strict_date_optional_time||epoch_millis",
+                              "type": "date"
+                          },
+                            "my-geo-point-1": {
+                              "type": "geo_point"
+                          },
+                            "my-geo-point-2": {
+                              "type": "geo_point"
+                          },
+                            "my-number-1": {
+                              "type": "long"
+                          },
+                            "my-number-2": {
+                              "type": "long"
+                          },
+                            "my-string-1": {
+                              "type": "string"
+                          },
+                            "my-string-2": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                }
+            );
+            done();
+        })).catch(done);
+    });
+
+    it('Connections.query queries an index', function(done) {
         this.timeout(4 * 1000);
         query(
             {

@@ -68,8 +68,6 @@ export function tables(credentials) {
     return getConnection(credentials).tables(credentials);
 }
 
-/* FileSystem-like Connectors */
-
 /*
  * Return a promise with the files that are available for querying.
  *
@@ -102,4 +100,8 @@ export function storage(credentials) {
  */
 export function listS3Files(credentials) {
     return getConnection(credentials).listS3Files(credentials);
+}
+
+export function elasticsearchMappings(credentials) {
+    return getConnection(credentials).elasticsearchMappings(credentials);
 }
