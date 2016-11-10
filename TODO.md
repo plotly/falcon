@@ -11,11 +11,12 @@
 
 - [x] Chris - Web version (bundle, new endpoint)
 - Sobo - UI:  
-    - 'x' should `alert("")`
-    - after successfully connecting, credentials should collapse
-    - add "edit" button to modify the credentials and a new button to save the modified credentials
+    - [x] 'x' should `alert("")`
+    - [x] after successfully connecting, credentials should collapse
+    - [] add "edit" button to modify the credentials and a new button to save the modified credentials
+	- [x] fix tables UI
+	- [] add elasticsearch get mappings endpoint
 - Sobo - Add the SSL scripts back to the desktop app
-- Sobo - Fix up tables UI in APP and add back the step 3 and step 4 screenshots
 - HTTPS - Add a setting with the path to the CERT files
 - Move all ~/.plotly/connector/.json files to .yaml files
 - Can we deploy this with on-prem? Chris will check in with Jody

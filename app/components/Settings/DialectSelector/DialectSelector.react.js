@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import {values} from 'ramda';
 import * as styles from './DialectSelector.css';
 import {
     DIALECTS, LOGOS
@@ -8,21 +9,21 @@ import classnames from 'classnames';
 export default function DialectSelector(props) {
     const {credentialObject, updateCredential} = props;
 
-    const logos = Object.keys(DIALECTS).map(DIALECT => (
+    const logos = values(DIALECTS).map(DIALECT => (
         <div
             key={DIALECT}
             className={classnames(
                 styles.logo, {
                       [styles.logoSelected]:
-                      credentialObject.dialect === DIALECTS[DIALECT]
+                      credentialObject.dialect === DIALECT
                  }
             )}
             onClick={() => {
                 updateCredential(
-                    {dialect: DIALECTS[DIALECT]}
+                    {dialect: DIALECT}
                 );
             }}
-            id={`test-logo-${DIALECTS[DIALECT]}`}
+            id={`test-logo-${DIALECT}`}
         >
             <img
                 className={styles.logoImage}

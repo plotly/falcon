@@ -102,7 +102,7 @@ export default class Server {
                 if (userRes.status === 200) {
                     const {username} = userMeta;
                     if (!username) {
-                        res.json(500, {error: {message: `User was not found.`}});
+                        res.json(500, {error: {message: 'User was not found.'}});
                     }
                     const existingUsers = getSetting('USERS');
                     const existingUsernames = pluck('username', existingUsers);
@@ -111,7 +111,7 @@ export default class Server {
                         existingUsers[
                             existingUsernames.indexOf(username)
                         ]['access_token'] = access_token;
-                        status = 200
+                        status = 200;
                     } else {
                         existingUsers.push({username, accessToken: access_token});
                         status = 201;
@@ -146,7 +146,7 @@ export default class Server {
         // Hidden URL to test uncaught exceptions
         server.post('/_throw', function throwHandler(req, res, next) {
             throw new Error('Yikes - uncaught error');
-        })
+        });
 
         // save credentials to a file
         server.post('/credentials', function postCredentialsHandler(req, res, next) {
@@ -232,7 +232,7 @@ export default class Server {
             ).then(files => {
                 res.json(200, files);
             });
-        })
+        });
 
         server.post('/apache-drill-storage/:credentialId', function apacheDrillStorageHandler(req, res, next) {
             Connections.storage(
@@ -285,7 +285,7 @@ export default class Server {
             that.queryScheduler.queryAndUpdateGrid(
                 fid, uids, query, credentialId
             )
-            .then(function returnSuccess(){
+            .then(function returnSuccess() {
                 let status;
                 if (getQuery(req.params.fid)) {
                     // TODO - Technically, this should be
@@ -297,7 +297,7 @@ export default class Server {
                 that.queryScheduler.scheduleQuery(req.params);
                 res.json(status, {});
             })
-            .catch(function returnError(error){
+            .catch(function returnError(error) {
                 Logger.log(error, 0);
                 res.json(400, {error: {message: error.message}});
             });

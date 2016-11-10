@@ -20,9 +20,18 @@
     border-style: solid;
 }
 
-.configurationOptions {
+.configurationContainer {
 	width: 100%;
 	text-align: center;
+}
+
+.stepTitleContainer {
+    padding: 20px;
+    text-transform: capitalize;
+}
+
+.stepTitle {
+
 }
 
 .info {
@@ -86,5 +95,5 @@
 .unfoldIcon {
     height: 18px;
     width: 18px;
-    padding-left: 20px;
+    padding-left: 10px;
 }

@@ -1,20 +1,16 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Settings from './Settings/Settings.react';
-import * as utils from '../utils/utils';
-
-let shell;
-try {
-    shell = require('electron').shell;
-} catch(e) {
-    const shell = {
-        openExternal: function openExternal(link) {
-            console.warn('opening link');
-        }
-    }
-}
+import {baseUrl} from '../utils/utils';
+import {Link} from './Link.react';
 
 import * as styles from './Configuration.css';
+
+const LINKS = {
+    PLANS: 'http://plot.ly/plans/',
+    DOCS: 'http://help.plot.ly/database-connectors/',
+    TYPEFORM: 'https://plotly.typeform.com/to/KUiCSl'
+};
 
 export default class Configuration extends Component {
     constructor(props) {
@@ -34,7 +30,7 @@ export default class Configuration extends Component {
         const baseURL = 'https://local.plot.ly';
         const resource = '/o/authorize/';
         const client_id = 'LX4A5wifVDc06WIU1uWmIm0KgqN9Bs0qsEb1GW3n';
-        const redirect_uri = utils.baseUrl() + '/oauth';
+        const redirect_uri = baseUrl + '/oauth';
         const queryString = `?response_type=token&client_id=${client_id}&redirect_uri=${redirect_uri}`;
         const oauthURL = (
             'https://local.plot.ly/o/authorize' + queryString
@@ -55,38 +51,9 @@ export default class Configuration extends Component {
 
                     <div className={styles.supportLinks}>
                         <div className={styles.externalLinkContainer}>
-                            <span className={styles.externalLink}
-                                onClick={() => {
-                                shell.openExternal('http://plot.ly/plans/');
-                            }}
-                            >
-                            Upgrade&nbsp;for&nbsp;Support
-                            </span>
-
-                            <span className={styles.externalLink}
-                                onClick={() => {
-                                shell.openExternal('http://help.plot.ly/database-connectors/');
-                            }}
-                            >
-                            Documentation
-                            </span>
-
-                            <span className={styles.externalLink}
-                                onClick={() => {
-                                shell.openExternal('https://plotly.typeform.com/to/KUiCSl');
-                            }}
-                            >
-                            Request&nbsp;a&nbsp;Connector
-                            </span>
-
-                            {/* TODO - This needs to be part of the sign-in flow */}
-                            <span className={styles.externalLink}
-                                onClick={() => {
-                                shell.openExternal(oauthURL);
-                            }}
-                            >
-                            Login
-                            </span>
+                            {Link(LINKS.PLANS, 'Upgrade for Support')}
+                            {Link(LINKS.DOCS, 'Documentation')}
+                            {Link(LINKS.TYPEFORM, 'Request a Connector')}
                         </div>
                     </div>
                 </div>
@@ -100,6 +67,5 @@ export default class Configuration extends Component {
 }
 
 Configuration.propTypes = {
-    sessionsActions: PropTypes.object,
-    sessions: ImmutablePropTypes.map.isRequired
+    sessionsActions: PropTypes.object
 };

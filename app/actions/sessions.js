@@ -13,6 +13,11 @@ export const mergeCredentials = createAction('MERGE_CREDENTIALS');
 export const updateCredential = createAction('UPDATE_CREDENTIAL');
 export const deleteCredential = createAction('DELETE_CREDENTIAL');
 
+const DELETE_TAB_MESSAGE = 'You are about to delete a connection. ' +
+'If you have scheduled persistent queries with that connection, they ' +
+'will stop refreshing. Are you sure you want to continue?';
+
+const request = {GET, POST, DELETE};
 
 function GET(path) {
     return fetch(`${baseUrl()}/${path}`, {
@@ -44,8 +49,6 @@ function POST(path, body = {}) {
         body: body ? JSON.stringify(body) : null
     });
 }
-const request = {GET, POST, DELETE};
-
 
 function apiThunk(endpoint, method, store, id, body) {
     return dispatch => {
@@ -159,6 +162,15 @@ function PREVIEW_QUERY (dialect, table, database = '') {
         case DIALECTS.MSSQL:
             return 'SELECT TOP 5 * FROM ' +
                 `${database}.dbo.${table}`;
+        case DIALECTS.ELASTICSEARCH:
+            return {
+                database,
+                table,
+                size: 5,
+                body: {
+                    query: { 'match_all': {} }
+                }
+            };
         default:
             throw new Error(`Dialect ${dialect} is not one of the DIALECTS`);
     }
@@ -227,24 +239,34 @@ export function newTab() {
 
 export function deleteTab(tabId) {
     return function (dispatch, getState) {
-        // TODO - Make a delete request to delete the request from the disk.
-        // TODO - Check if any persistent connections depend on this before deleting
-        //        and warn the user if so.
-        if (tabId === getState().selectedTab) {
-            const tabIds = Object.keys(getState().credentials);
-            const currentIdIndex = tabIds.indexOf(tabId);
-            let nextIdIndex;
-            if (currentIdIndex === 0) {
-                if (tabIds.length > 1) {
-                    nextIdIndex = 1;
+        /* eslint no-alert: 0 */
+        if (confirm(DELETE_TAB_MESSAGE)) {
+        /* eslint no-alert: 0 */
+            if (tabId === getState().selectedTab) {
+                const tabIds = Object.keys(getState().credentials);
+                const currentIdIndex = tabIds.indexOf(tabId);
+                const credentialId = getState().credentials[tabId].id;
+                let nextIdIndex;
+                if (currentIdIndex === 0) {
+                    if (tabIds.length > 1) {
+                        nextIdIndex = 1;
+                    } else {
+                        nextIdIndex = -1; // null out
+                    }
                 } else {
-                    nextIdIndex = -1; // null out
+                    nextIdIndex = currentIdIndex - 1;
                 }
-            } else {
-                nextIdIndex = currentIdIndex - 1;
+                dispatch(setTab(tabIds[nextIdIndex]));
+                dispatch(apiThunk(
+                    `credentials/${credentialId}`,
+                    'DELETE',
+                    'deleteCredentialsRequests',
+                    credentialId
+                ));
             }
-            dispatch(setTab(tabIds[nextIdIndex]));
+            dispatch(deleteCredential(tabId));
+        } else {
+            return;
         }
-        dispatch(deleteCredential(tabId));
     };
 }

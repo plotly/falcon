@@ -1,3 +1,7 @@
+.connectButtonContainer {
+    margin: 10px 0px 30px 0px;
+}
+
 .buttonPrimary {
     background-color: white;
     border-color: #8d98af;
