@@ -91,7 +91,6 @@ class Settings extends Component {
             credentials,
             selectedTab
         } = this.props;
-        console.warn('fetchData: ', this.props);
         if (credentialsRequest && !credentialsRequest.status) {
             initialize();
         }
@@ -197,10 +196,6 @@ class Settings extends Component {
                     />
 
                 </div>
-
-                <pre>
-                    {JSON.stringify(this.props, null, 2)}
-                </pre>
             </div>
         );
 

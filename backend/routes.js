@@ -275,6 +275,8 @@ export default class Server {
         });
 
         // register or update a query
+        // TODO - Updating a query should probably be under
+        // the endpoint `/queries/:fid`
         server.post('/queries', function postQueriesHandler(req, res, next) {
             // TODO - Verify that the app has access to
             // the user's API key and attempt to make a
