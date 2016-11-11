@@ -192,10 +192,11 @@ export default class Server {
         });
 
         // delete credentials
+        // TODO - delete all associated queries?
         server.del('/credentials/:id', function delCredentialsHandler(req, res, next) {
             if (getSanitizedCredentialById(req.params.id)) {
                 deleteCredentialById(req.params.id);
-                res.json(204, {});
+                res.json(200, {});
             } else {
                 res.json(404, {});
             }
@@ -317,7 +318,7 @@ export default class Server {
             const {fid} = req.params;
             if (getQuery(fid)) {
                 deleteQuery(fid);
-                res.json(204, {});
+                res.json(200, {});
             } else {
                 res.json(404, {});
             }
