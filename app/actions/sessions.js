@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import uuid from 'node-uuid';
 import {createAction} from 'redux-actions';
-import {DIALECTS} from '../constants/constants';
+import {DIALECTS, INITIAL_CREDENTIALS} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
 import {contains} from 'ramda';
 import queryString from 'query-string';
@@ -9,6 +9,7 @@ import queryString from 'query-string';
 export const mergeTabMap = createAction('MERGE_TAB_MAP');
 export const setTab = createAction('SET_TAB');
 export const setTable = createAction('SET_TABLE');
+export const setIndex = createAction('SET_INDEX');
 export const mergeCredentials = createAction('MERGE_CREDENTIALS');
 export const updateCredential = createAction('UPDATE_CREDENTIAL');
 export const deleteCredential = createAction('DELETE_CREDENTIAL');
@@ -124,6 +125,16 @@ export function getTables(credentialId) {
     );
 }
 
+export function getElasticsearchMappings(credentialId) {
+    console.warn('getElasticsearchMappings');
+    return apiThunk(
+        `elasticsearch-mappings/${credentialId}`,
+        'POST',
+        'elasticsearchMappingsRequests',
+        credentialId
+    );
+}
+
 export function getS3Keys(credentialId) {
     return apiThunk(
         `s3-keys/${credentialId}`,
@@ -164,11 +175,11 @@ function PREVIEW_QUERY (dialect, table, database = '') {
                 `${database}.dbo.${table}`;
         case DIALECTS.ELASTICSEARCH:
             return {
-                database,
-                table,
-                size: 5,
+                index: database || '_all',
+                type: table || '_all',
                 body: {
-                    query: { 'match_all': {} }
+                    query: { 'match_all': {} },
+                    size: 5
                 }
             };
         default:
@@ -179,6 +190,7 @@ export function previewTable (credentialId, dialect, table, database) {
     const body = {
         query: PREVIEW_QUERY(dialect, table, database)
     };
+    console.warn('query sent', body);
     return apiThunk(
         `query/${credentialId}`,
         'POST',
@@ -223,15 +235,7 @@ export function newTab() {
     return function(dispatch, getState) {
         const newId = uuid.v4();
         dispatch(mergeCredentials({
-            [newId]: {
-                username: '',
-                password: '',
-                database: '',
-                dialect: DIALECTS.MYSQL,
-                port: '',
-                host: '',
-                ssl: false
-            }
+            [newId]: INITIAL_CREDENTIALS
         }));
         dispatch(setTab(newId));
     };

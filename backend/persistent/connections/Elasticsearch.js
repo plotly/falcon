@@ -1,5 +1,7 @@
 import {parseElasticsearch} from '../../parse';
 import fetch from 'node-fetch';
+import elasticsearch from 'elasticsearch';
+import {keys} from 'ramda';
 
 function request(relativeUrl, credentials, {body, method}) {
     const {host, port, username, password} = credentials;
@@ -26,18 +28,18 @@ export function connect(credentials) {
 }
 
 export function query(queryObject, credentials) {
-    const {index} = credentials;
-    return request(`${index}/_search`, credentials, {body: queryObject, method: 'POST'})
+    return request(`${queryObject.index}/${queryObject.type}/_search`, credentials, {
+        body: queryObject.body, method: 'POST'})
     .then(res => res.json().then(results => {
         if (res.status === 200) {
-            return parseElasticsearch(results.hits.hits)
+            return parseElasticsearch(results.hits.hits);
         } else {
-            throw new Error(results);
+            throw new Error(JSON.stringify(results));
         }
     }));
 }
 
 export function elasticsearchMappings(credentials) {
-    const {index} = credentials;
-    return request(`${index}/_mappings`, credentials, {method: 'GET'});
+    return request('_all/_mappings', credentials, {method: 'GET'})
+    .then(res => res.json());
 }

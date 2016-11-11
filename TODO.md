@@ -15,10 +15,10 @@
     - [x] after successfully connecting, credentials should collapse
     - [] add "edit" button to modify the credentials and a new button to save the modified credentials
 	- [x] fix tables UI
-	- [] add elasticsearch get mappings endpoint
-- Sobo - Add the SSL scripts back to the desktop app
+	- [x] add elasticsearch get mappings endpoint
+- [ ] Sobo - Add the SSL scripts back to the desktop app
 - HTTPS - Add a setting with the path to the CERT files
-- Move all ~/.plotly/connector/.json files to .yaml files
+- [x] Sobo - Move all ~/.plotly/connector/.json files to .yaml files
 - Can we deploy this with on-prem? Chris will check in with Jody
     - [x] Do we get SSL for free with this?
 - [x] UI and endpoints for adding API keys

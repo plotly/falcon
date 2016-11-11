@@ -54,6 +54,13 @@ import {assoc, assocPath, merge, dissoc} from 'ramda';
         }
     },
 
+    getElasticsearchMappingsRequests: {
+        [credentialId1]: {
+            status: 200,
+            content: {index1: {}, index2: {}}
+        }
+    },
+
     previewTableRequests: {
         [credentialId1]: {
             status: 200,
@@ -109,6 +116,7 @@ export const credentialsRequest = createApiReducer('credentialsRequest');
 export const saveCredentialsRequests = createApiReducer('saveCredentialsRequests');
 export const deleteCredentialsRequests = createApiReducer('deleteCredentialsRequests');
 export const tablesRequests = createApiReducer('tables');
+export const elasticsearchMappingsRequests = createApiReducer('elasticsearchMappingsRequests');
 export const previewTableRequests = createApiReducer('previewTableRequest');
 export const s3KeysRequests = createApiReducer('s3KeysRequests');
 export const apacheDrillStorageRequests = createApiReducer('apacheDrillStorageRequests');
@@ -132,6 +140,15 @@ function selectedTab(state = '', action) {
 
 function selectedTables(state = {}, action) {
     if (action.type === 'SET_TABLE') {
+        return merge(state, action.payload);
+    } else {
+        return state;
+    }
+}
+
+function selectedIndecies(state = {}, action) {
+    console.warn(action.payload);
+    if (action.type === 'SET_INDEX') {
         return merge(state, action.payload);
     } else {
         return state;
@@ -162,11 +179,13 @@ const rootReducer = combineReducers({
     credentials,
     selectedTab,
     selectedTables,
+    selectedIndecies,
     connectRequests,
     credentialsRequest,
     saveCredentialsRequests,
     deleteCredentialsRequests,
     tablesRequests,
+    elasticsearchMappingsRequests,
     previewTableRequests,
     s3KeysRequests,
     apacheDrillStorageRequests,

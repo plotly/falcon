@@ -4,8 +4,8 @@ import path from 'path';
 
 /*
  * This works with a few files in the user's ~/.plotly folder:
- * - ~/.plotly/connector/credentials.json - an array of credentials
- * - ~/.plotly/connector/queries.json - an array of query objects
+ * - ~/.plotly/connector/credentials.yaml - an array of credentials
+ * - ~/.plotly/connector/queries.yaml - an array of query objects
  *
  * This module exposes some methods for accessing these files.
  */
@@ -20,12 +20,12 @@ export const CONNECTOR_FOLDER_PATH = path.join(...CONNECTOR_FOLDER_PATH_PARTS);
 
 export const CREDENTIALS_PATH = path.join(
     CONNECTOR_FOLDER_PATH,
-    'credentials.json'
+    'credentials.yaml'
 );
 
 export const QUERIES_PATH = path.join(
     CONNECTOR_FOLDER_PATH,
-    'queries.json'
+    'queries.yaml'
 );
 
 export const LOG_PATH = path.join(
@@ -35,7 +35,7 @@ export const LOG_PATH = path.join(
 
 export const SETTINGS_PATH = path.join(
     CONNECTOR_FOLDER_PATH,
-    'settings.json'
+    'settings.yaml'
 );
 // TODO - move these to yaml
 

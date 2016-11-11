@@ -11,7 +11,6 @@ export default function ConnectButton(props) {
         connectRequest,
         saveCredentialsRequest
     } = props;
-    console.warn('Connect Button Props: ', props);
 
     let buttonText;
     let buttonClick = () => {};
