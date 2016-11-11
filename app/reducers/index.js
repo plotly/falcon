@@ -54,6 +54,13 @@ import {assoc, assocPath, merge, dissoc} from 'ramda';
         }
     },
 
+    getElasticsearchMappingsRequests: {
+        [credentialId1]: {
+            status: 200,
+            content: {index1: {}, index2: {}}
+        }
+    },
+
     previewTableRequests: {
         [credentialId1]: {
             status: 200,
@@ -109,6 +116,7 @@ export const credentialsRequest = createApiReducer('credentialsRequest');
 export const saveCredentialsRequests = createApiReducer('saveCredentialsRequests');
 export const deleteCredentialsRequests = createApiReducer('deleteCredentialsRequests');
 export const tablesRequests = createApiReducer('tables');
+export const elasticsearchMappingsRequests = createApiReducer('elasticsearchMappingsRequests');
 export const previewTableRequests = createApiReducer('previewTableRequest');
 export const s3KeysRequests = createApiReducer('s3KeysRequests');
 export const apacheDrillStorageRequests = createApiReducer('apacheDrillStorageRequests');
@@ -167,6 +175,7 @@ const rootReducer = combineReducers({
     saveCredentialsRequests,
     deleteCredentialsRequests,
     tablesRequests,
+    elasticsearchMappingsRequests,
     previewTableRequests,
     s3KeysRequests,
     apacheDrillStorageRequests,

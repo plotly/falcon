@@ -8,7 +8,7 @@ import Tabs from './Tabs/Tabs.react';
 import UserCredentials from './UserCredentials/UserCredentials.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
-import TableDropdown from './TableDropdown/TableDropdown.react';
+import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import Preview from './Preview/Preview.react';
 import {DIALECTS} from '../../constants/constants.js';
 
@@ -42,11 +42,11 @@ class Settings extends Component {
     constructor(props) {
         super(props);
         this.fetchData = this.fetchData.bind(this);
-        this.wrapComponent = this.wrapComponent.bind(this);
+        this.wrapWithAutoHide = this.wrapWithAutoHide.bind(this);
         this.state = {show_credentials: true};
     }
 
-    wrapComponent(name, reactComponent) {
+    wrapWithAutoHide(name, reactComponent) {
         return (
             <div className={styles.stepTitleContainer}>
                 <h5>
@@ -85,6 +85,8 @@ class Settings extends Component {
             selectedTable,
             setTable,
             tablesRequest,
+            elasticsearchMappingsRequest,
+            getElasticsearchMappings,
             s3KeysRequest,
             apacheDrillStorageRequest,
             apacheDrillS3KeysRequest,
@@ -97,8 +99,7 @@ class Settings extends Component {
         const credentialObject = credentials[selectedTab] || {};
         if (contains(credentialObject.dialect, [
                     DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
-                    DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE,
-                    DIALECTS.ELASTICSEARCH
+                    DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE
         ])) {
             if (connectRequest.status !== 200 && !this.state.show_credentials) {
                 this.setState({show_credentials: true});
@@ -113,19 +114,25 @@ class Settings extends Component {
             if (selectedTable && !previewTableRequest.status) {
                 previewTables();
             }
-
+        } else if (credentialObject.dialect === DIALECTS.ELASTICSEARCH) {
+            if (connectRequest.status !== 200 && !this.state.show_credentials) {
+                this.setState({show_credentials: true});
+            }
+            if (connectRequest.status === 200 && !elasticsearchMappingsRequest.status) {
+                getElasticsearchMappings();
+            }
+            if (selectedTable && !previewTableRequest.status) {
+                previewTables();
+            }
         } else if (credentialObject.dialect === DIALECTS.S3) {
 
             if (connectRequest.status === 200 && !s3KeysRequest.status) {
                 getS3Keys();
             }
-
         } else if (credentialObject.dialect === DIALECTS.APACHE_DRILL) {
-
             if (connectRequest.status === 200 && !apacheDrillStorageRequest.status) {
                 getApacheDrillStorage();
             }
-
             if (apacheDrillStorageRequest.status === 200 && !apacheDrillS3KeysRequest.status) {
                 getApacheDrillS3Keys();
             }
@@ -146,6 +153,7 @@ class Settings extends Component {
             setTable,
             selectedTable,
             tablesRequest,
+            elasticsearchMappingsRequest,
             previewTableRequest,
             s3KeysRequest,
             apacheDrillStorageRequest,
@@ -170,7 +178,7 @@ class Settings extends Component {
                 />
 
                 <div className={styles.openTab}>
-                    {this.wrapComponent('credentials',
+                    {this.wrapWithAutoHide('credentials',
                     <SettingsForm
                         connectRequest={connectRequest}
                         credentialObject={credentials[selectedTab]}
@@ -184,8 +192,10 @@ class Settings extends Component {
                         connectRequest={connectRequest}
                     />
 
-                    <TableDropdown
+                    <OptionsDropdown
+                        credentialObject={credentials[selectedTab]}
                         selectedTable={selectedTable}
+                        elasticsearchMappingsRequest={elasticsearchMappingsRequest}
                         tablesRequest={tablesRequest}
                         setTable={setTable}
                     />
@@ -219,6 +229,7 @@ function mapStateToProps(state) {
         deleteCredentialsRequests,
         previewTableRequests,
         tablesRequests,
+        elasticsearchMappingsRequests,
         selectedTables,
         s3KeysRequests,
         apacheDrillStorageRequests,
@@ -243,6 +254,7 @@ function mapStateToProps(state) {
         deleteCredentialsRequest: deleteCredentialsRequests[selectedCredentialId] || {},
         previewTableRequest,
         tablesRequest: tablesRequests[selectedCredentialId] || {},
+        elasticsearchMappingsRequest: elasticsearchMappingsRequests[selectedCredentialId] || {},
         s3KeysRequest: s3KeysRequests[selectedCredentialId] || {},
         apacheDrillStorageRequest: apacheDrillStorageRequests[selectedCredentialId] || {},
         apacheDrillS3KeysRequest: apacheDrillS3KeysRequests[selectedCredentialId] || {},
@@ -284,6 +296,9 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     }
     function boundGetTables() {
         return dispatch(Actions.getTables(selectedCredentialId));
+    }
+    function boundGetElasticsearchMappings() {
+        return dispatch(Actions.getElasticsearchMappings(selectedCredentialId));
     }
     function boundGetS3Keys() {
         return dispatch(Actions.getS3Keys(selectedCredentialId));
@@ -332,6 +347,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         ownProps, {
             updateCredential: boundUpdateCredential,
             getTables: boundGetTables,
+            getElasticsearchMappings: boundGetElasticsearchMappings,
             setTable: boundSetTable,
             previewTables: boundPreviewTables,
             getS3Keys: boundGetS3Keys,

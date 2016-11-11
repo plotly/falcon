@@ -22,7 +22,7 @@ export const CONNECTION_CONFIG = {
     [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.REDSHIFT]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.SQLITE]: ['storage'],
-    [DIALECTS.ELASTICSEARCH]: ['username', 'password', 'host', 'port', 'database'],
+    [DIALECTS.ELASTICSEARCH]: ['username', 'password', 'host', 'port', 'index'],
     [DIALECTS.S3]: ['bucket', 'accessKeyId', 'secretAccessKey'],
     [DIALECTS.APACHE_DRILL]: [
         'host',
@@ -57,4 +57,17 @@ export const LOGOS = {
     [DIALECTS.SQLITE]: './images/sqlite-logo.png',
     [DIALECTS.S3]: './images/s3-logo.png',
     [DIALECTS.APACHE_DRILL]: './images/apache_drill-logo.png'
+};
+
+
+export const INITIAL_CREDENTIALS = {
+    username: '',
+    password: '',
+    database: '',
+    index: '',
+    doc: '',
+    dialect: DIALECTS.MYSQL,
+    port: '',
+    host: '',
+    ssl: false
 };

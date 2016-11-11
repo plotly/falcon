@@ -20,7 +20,7 @@ export default class Tab extends Component {
                 )}
                 onClick={() => setTab(tabId)}
             >
-            
+
                 <img
                     className={styles.tabDelete}
                     onClick={() => deleteTab(tabId)}
@@ -41,8 +41,6 @@ export default class Tab extends Component {
                         {username}@{host}
                     </span>
                 </p>
-
-
 
             </div>
 

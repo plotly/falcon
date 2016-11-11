@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import uuid from 'node-uuid';
 import {createAction} from 'redux-actions';
-import {DIALECTS} from '../constants/constants';
+import {DIALECTS, INITIAL_CREDENTIALS} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
 import {contains} from 'ramda';
 import queryString from 'query-string';
@@ -124,6 +124,16 @@ export function getTables(credentialId) {
     );
 }
 
+export function getElasticsearchMappings(credentialId) {
+    console.warn('getElasticsearchMappings');
+    return apiThunk(
+        `elasticsearch-mappings/${credentialId}`,
+        'POST',
+        'elasticsearchMappingsRequests',
+        credentialId
+    );
+}
+
 export function getS3Keys(credentialId) {
     return apiThunk(
         `s3-keys/${credentialId}`,
@@ -164,8 +174,8 @@ function PREVIEW_QUERY (dialect, table, database = '') {
                 `${database}.dbo.${table}`;
         case DIALECTS.ELASTICSEARCH:
             return {
-                database,
-                table,
+                index: 'plotly_datasets',
+                type: 'ebola_2014',
                 size: 5,
                 body: {
                     query: { 'match_all': {} }
@@ -223,15 +233,7 @@ export function newTab() {
     return function(dispatch, getState) {
         const newId = uuid.v4();
         dispatch(mergeCredentials({
-            [newId]: {
-                username: '',
-                password: '',
-                database: '',
-                dialect: DIALECTS.MYSQL,
-                port: '',
-                host: '',
-                ssl: false
-            }
+            [newId]: INITIAL_CREDENTIALS
         }));
         dispatch(setTab(newId));
     };
