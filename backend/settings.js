@@ -15,13 +15,14 @@ const DEFAULT_SETTINGS = {
     HEADLESS: false,
 
     // TODO - Set to https://api.plot.ly
-    // PLOTLY_API_DOMAIN: 'https://api.plot.ly',
     PLOTLY_API_DOMAIN: 'https://api-local.plot.ly',
+    // PLOTLY_API_DOMAIN: 'https://api.plot.ly',
 
-    // TODO - Remove this
+    // TODO - Remove these sample accounts
+    // TODO - This should just be an object keyed by username
     USERS: [
-        // {username: 'plotly-database-connector', apikey: 'reiptow6gu'}
-        // {username: 'chris', apikey: '1c7f5rx2ef'}
+        // {username: 'plotly-database-connector', apiKey: 'reiptow6gu'}
+        {username: 'chris', apiKey: '1c7f5rx2ef'}
     ],
 
     CORS_ALLOWED_ORIGINS: [
@@ -29,7 +30,9 @@ const DEFAULT_SETTINGS = {
         'https://stage.plot.ly',
         'https://local.plot.ly'
     ],
-    PORT: 9000
+    PORT: 9000,
+
+    LOG_TO_STDOUT: false
 };
 
 function loadSettings() {
@@ -58,7 +61,12 @@ export function saveSetting(settingName, settingValue) {
 export function getSetting(settingName) {
     const settingsOnFile = loadSettings();
     if (has(settingName, process.env)) {
-        return process.env[settingName];
+        let envObject = process.env[settingName];
+        try {
+            return JSON.parse(envObject);
+        } catch(e) {
+            return envObject;
+        }
     } else if (has(settingName, settingsOnFile)) {
         return settingsOnFile[settingName];
     } else if (has(settingName, DEFAULT_SETTINGS)) {

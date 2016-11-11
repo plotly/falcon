@@ -134,6 +134,12 @@ export default class Server {
             file: 'index.html'
         }));
 
+        server.get('/db-connector', restify.serveStatic({
+            directory: `${__dirname}/../static`,
+            file: 'index.html'
+        }));
+
+
         server.get('/status', function statusHandler(req, res, next) {
             // TODO - Maybe fix up this copy
             res.send('Connector status - running and available for requests.');
@@ -316,15 +322,25 @@ export default class Server {
                 res.json(404, {});
             }
         });
-        //
-        // server.on('uncaughtException', function uncaughtExceptionHandler(req, res, route, err) {
-        //     if (err.message.indexOf("Can't set headers after they are sent") === -1) {
-        //         Logger.log(err);
-        //     }
-        //     res.json(500, {
-        //         error: {message: err.message}
-        //     });
-        // });
+
+        // Transform restify's error messages into our standard error object
+        server.on('uncaughtException', function uncaughtExceptionHandler(req, res, route, err) {
+            /*
+             * TODO - This custom error handler causes an unhandled rejection error
+             * "Can't set headers after they are sent" which gets fired after
+             * uncaughtException responses.
+             * It doesn't seem to affect the actual API responses (they are tested).
+             * I haven't been able to track it down succcessfully.
+             * It might be related to the CORS OPTIONS requests that get preceed
+             * these requests.
+             */
+            if (err.message.indexOf("Can't set headers after they are sent") === -1) {
+                Logger.log(err);
+            }
+            res.json(500, {
+                error: {message: err.message}
+            });
+        });
 
     }
 

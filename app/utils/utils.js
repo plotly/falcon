@@ -4,14 +4,16 @@ import queryString from 'query-string';
 export function baseUrl() {
      if (contains(window.location.protocol, ['http:', 'https:'])) {
          /*
-          * Use relative domain if the app is running headlessly
-          * with a web front-end served by the app
+          * Use the full URL of the page if the app is running headlessly
+          * with a web front-end served by the app.
+          *
+          * Note that href includes the pathname - this is intentional:
+          * in on-prem instances this app will be served behind some relative
+          * url like https://plotly.acme.com/connector and all subsequent
+          * requests need to be made against that full path, e.g.
+          * https://plotly.acme.com/connector/queries
           */
-         /*
-          * NOTE - not using window.location.origin because it's undefined
-          * for some versions of IE - http://tosbourn.com/a-fix-for-window-location-origin-in-internet-explorer/
-          */
-         return window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+         return window.location.href;
       } else {
          /*
           * Use the server location if the app is running in electron

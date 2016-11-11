@@ -35,7 +35,7 @@ export function updateGrid(rows, fid, uids) {
     if (!user || !(user.apiKey || user.accessToken)) {
         const errorMessage = (
             `Attempting to update grid ${fid} but the ` +
-            `credentials for the user "${username} do not exist".`
+            `credentials for the user "${username}" do not exist.`
         );
         Logger.log(errorMessage, 0);
         throw new Error(errorMessage);
