@@ -151,7 +151,9 @@ class Settings extends Component {
             deleteCredentialsRequests,
             credentialsHaveBeenSaved,
             setTable,
+            setIndex,
             selectedTable,
+            selectedIndex,
             tablesRequest,
             elasticsearchMappingsRequest,
             previewTableRequest,
@@ -198,6 +200,8 @@ class Settings extends Component {
                         elasticsearchMappingsRequest={elasticsearchMappingsRequest}
                         tablesRequest={tablesRequest}
                         setTable={setTable}
+                        setIndex={setIndex}
+                        selectedIndex={selectedIndex}
                     />
 
                     <Preview
@@ -231,6 +235,7 @@ function mapStateToProps(state) {
         tablesRequests,
         elasticsearchMappingsRequests,
         selectedTables,
+        selectedIndecies,
         s3KeysRequests,
         apacheDrillStorageRequests,
         apacheDrillS3KeysRequests
@@ -238,7 +243,8 @@ function mapStateToProps(state) {
 
     const selectedCredentialId = tabMap[selectedTab];
     const credentialsHaveBeenSaved = Boolean(selectedCredentialId);
-    const selectedTable = selectedTables[selectedTab];
+    const selectedTable = selectedTables[selectedTab] || null;
+    const selectedIndex = selectedIndecies[selectedTab] || null;
 
     let previewTableRequest = {};
     if (previewTableRequests[selectedCredentialId] &&
@@ -263,6 +269,7 @@ function mapStateToProps(state) {
         credentialsHaveBeenSaved,
         credentialObject: credentials[selectedTab],
         selectedTable,
+        selectedIndex,
         selectedCredentialId
     };
 }
@@ -312,6 +319,9 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     function boundSetTable(table) {
         return dispatch(Actions.setTable({[selectedTab]: table}));
     }
+    function boundSetIndex(index) {
+        return dispatch(Actions.setIndex({[selectedTab]: index}));
+    }
     function boundPreviewTables() {
         return dispatch(Actions.previewTable(
             selectedCredentialId,
@@ -349,6 +359,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             getTables: boundGetTables,
             getElasticsearchMappings: boundGetElasticsearchMappings,
             setTable: boundSetTable,
+            setIndex: boundSetIndex,
             previewTables: boundPreviewTables,
             getS3Keys: boundGetS3Keys,
             getApacheDrillStorage: boundGetApacheDrillStorage,

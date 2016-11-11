@@ -146,6 +146,15 @@ function selectedTables(state = {}, action) {
     }
 }
 
+function selectedIndecies(state = {}, action) {
+    console.warn(action.payload);
+    if (action.type === 'SET_INDEX') {
+        return merge(state, action.payload);
+    } else {
+        return state;
+    }
+}
+
 function credentials(state = {}, action) {
     if (action.type === 'MERGE_CREDENTIALS') {
         return merge(state, action.payload);
@@ -170,6 +179,7 @@ const rootReducer = combineReducers({
     credentials,
     selectedTab,
     selectedTables,
+    selectedIndecies,
     connectRequests,
     credentialsRequest,
     saveCredentialsRequests,

@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import classnames from 'classnames';
-import {flatten, keys} from 'ramda';
+import {flatten, keys, isEmpty} from 'ramda';
 import * as styles from './TableDropdown.css';
 import Select from 'react-select';
 
@@ -51,7 +51,7 @@ export default class OptionsDropdown extends Component {
 
     renderElasticsearchIndecies() {
         const {
-            selectedTable, elasticsearchMappingsRequest: EMR, setTable
+            elasticsearchMappingsRequest: EMR, setIndex, selectedIndex
         } = this.props;
         if (!EMR.status) {
             return null;
@@ -71,9 +71,9 @@ export default class OptionsDropdown extends Component {
                     >
                         <Select
                             options={indeciesList.map(t => ({label: t, value: t}))}
-                            value={this.state.elasticsearchIndex}
+                            value={selectedIndex}
                             onChange={option => {
-                                this.setState({elasticsearchIndex: option.value});
+                                setIndex(option.value);
                             }}
                         />
                     </div>
@@ -84,18 +84,11 @@ export default class OptionsDropdown extends Component {
 
     renderElasticsearchDocs() {
         const {
-            selectedTable, elasticsearchMappingsRequest: EMR, setTable, credentialObject
+            selectedTable, selectedIndex, elasticsearchMappingsRequest: EMR, setTable, credentialObject
         } = this.props;
-        if (!EMR.status) {
+        if (!selectedIndex) {
             return null;
-        } else if (EMR.status === 'loading') {
-            return <div>{'Loading docs'}</div>;
-        } else if (EMR.status > 300) {
-            // TODO - Make this prettier.
-            return <div>{'Hm.. there was an error loading up your docs'}</div>;
-        } else if (EMR.status === 200) {
-            const availableIndecies = keys(EMR.content);
-            const selectedIndex = this.state.elasticsearchIndex || availableIndecies[0] || 'none found';
+        } else {
             const tablesList = keys(EMR.content[selectedIndex].mappings);
             if (tablesList.length === 0) {
                 return <div>{'No docs found'}</div>;

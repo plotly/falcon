@@ -28,8 +28,8 @@ export function connect(credentials) {
 }
 
 export function query(queryObject, credentials) {
-    const {index} = credentials;
-    return request(`${index}/_search`, credentials, {body: queryObject, method: 'POST'})
+    return request(`${queryObject.index}/${queryObject.type}/_search`, credentials, {
+        body: queryObject.body, method: 'POST'})
     .then(res => res.json().then(results => {
         if (res.status === 200) {
             return parseElasticsearch(results.hits.hits);
@@ -40,7 +40,6 @@ export function query(queryObject, credentials) {
 }
 
 export function elasticsearchMappings(credentials) {
-    console.warn('credentials ', credentials);
     return request('_all/_mappings', credentials, {method: 'GET'})
     .then(res => res.json());
 }

@@ -9,6 +9,7 @@ import queryString from 'query-string';
 export const mergeTabMap = createAction('MERGE_TAB_MAP');
 export const setTab = createAction('SET_TAB');
 export const setTable = createAction('SET_TABLE');
+export const setIndex = createAction('SET_INDEX');
 export const mergeCredentials = createAction('MERGE_CREDENTIALS');
 export const updateCredential = createAction('UPDATE_CREDENTIAL');
 export const deleteCredential = createAction('DELETE_CREDENTIAL');
@@ -174,11 +175,11 @@ function PREVIEW_QUERY (dialect, table, database = '') {
                 `${database}.dbo.${table}`;
         case DIALECTS.ELASTICSEARCH:
             return {
-                index: 'plotly_datasets',
-                type: 'ebola_2014',
-                size: 5,
+                index: database || '_all',
+                type: table || '_all',
                 body: {
-                    query: { 'match_all': {} }
+                    query: { 'match_all': {} },
+                    size: 5
                 }
             };
         default:
@@ -189,6 +190,7 @@ export function previewTable (credentialId, dialect, table, database) {
     const body = {
         query: PREVIEW_QUERY(dialect, table, database)
     };
+    console.warn('query sent', body);
     return apiThunk(
         `query/${credentialId}`,
         'POST',
