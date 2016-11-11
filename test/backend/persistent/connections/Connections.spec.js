@@ -55,10 +55,39 @@ describe('Elasticsearch - Connections', function () {
     });
 
     it.only('Connections.mappings returns mappings', function(done) {
-        elasticsearchMappings(elasticsearchCredentials).then(res => res.json().then(json => {
+        elasticsearchMappings(elasticsearchCredentials).then(json => {
             assert.deepEqual(
                 json,
                 {
+                    "plotly_datasets": {
+                      "mappings": {
+                        "ebola_2014": {
+                          "properties": {
+                            "Country": {
+                              "type": "string"
+                            },
+                            "Lat": {
+                              "type": "float"
+                            },
+                            "Lon": {
+                              "type": "float"
+                            },
+                            "Month": {
+                              "type": "integer"
+                            },
+                            "Value": {
+                              "type": "float"
+                            },
+                            "Year": {
+                              "type": "integer"
+                            },
+                            "index": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                  },
                     "sample-data": {
                       "mappings": {
                         "test-type": {
@@ -102,7 +131,7 @@ describe('Elasticsearch - Connections', function () {
                 }
             );
             done();
-        })).catch(done);
+        }).catch(done);
     });
 
     it('Connections.query queries an index', function(done) {

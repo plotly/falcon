@@ -257,12 +257,12 @@ export default class Server {
             });
         });
 
+        // TODO - do we need `.catch` on all of these or will our
+        // uncaughtExceptionHandler deal with it appropriately?
         server.post('/elasticsearch-mappings/:credentialId', function elasticsearchMappingsHandler(req, res, next) {
-            console.warn('elasticsearch-mappings');
             Connections.elasticsearchMappings(
                 getCredentialById(req.params.credentialId)
             ).then(mappings => {
-                console.warn(mappings);
                 res.json(200, mappings);
             });
         });
