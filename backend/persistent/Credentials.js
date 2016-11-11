@@ -1,6 +1,7 @@
 import fs from 'fs';
 import {assoc, dissoc, findIndex} from 'ramda';
 import uuid from 'node-uuid';
+import YAML from 'yamljs';
 
 import {
     CONNECTOR_FOLDER_PATH,
@@ -10,7 +11,7 @@ import {
 
 export function getCredentials() {
     if (fs.existsSync(CREDENTIALS_PATH)) {
-        return JSON.parse(fs.readFileSync(CREDENTIALS_PATH).toString());
+        return YAML.load(CREDENTIALS_PATH.toString());
     } else {
         return [];
     }
@@ -36,7 +37,7 @@ export function deleteCredentialById(id) {
     const index = findIndex(credential => credential.id === id, credentials);
     if (index > -1) {
         credentials.splice(index, 1);
-        fs.writeFileSync(CREDENTIALS_PATH, JSON.stringify(credentials));
+        fs.writeFileSync(CREDENTIALS_PATH, YAML.stringify(credentials, 4));
     }
 }
 
@@ -52,7 +53,7 @@ export function saveCredential(credentialObject) {
     if (!fs.existsSync(CONNECTOR_FOLDER_PATH)) {
         createConnectorFolder();
     }
-    fs.writeFileSync(CREDENTIALS_PATH, JSON.stringify(credentials));
+    fs.writeFileSync(CREDENTIALS_PATH, YAML.stringify(credentials, 4));
     return credentialId;
 }
 

@@ -1,5 +1,6 @@
 import fs from 'fs';
 import {findIndex} from 'ramda';
+import YAML from 'yamljs';
 
 import {
     CONNECTOR_FOLDER_PATH,
@@ -14,7 +15,7 @@ export function getQuery(fid) {
 
 export function getQueries() {
     if (fs.existsSync(QUERIES_PATH)) {
-        return JSON.parse(fs.readFileSync(QUERIES_PATH).toString());
+        return YAML.load(QUERIES_PATH.toString());
     } else {
         return [];
     }
@@ -26,7 +27,7 @@ export function saveQuery(queryObject) {
     if (!fs.existsSync(CONNECTOR_FOLDER_PATH)) {
         createConnectorFolder();
     }
-    fs.writeFileSync(QUERIES_PATH, JSON.stringify(queries));
+    fs.writeFileSync(QUERIES_PATH, YAML.stringify(queries, 4));
 }
 
 export function deleteQuery(fid) {
@@ -35,7 +36,7 @@ export function deleteQuery(fid) {
 
     if (index > -1) {
         queries.splice(index, 1);
-        fs.writeFileSync(QUERIES_PATH, JSON.stringify(queries));
+        fs.writeFileSync(QUERIES_PATH, YAML.stringify(queries, 4));
     }
 
 }

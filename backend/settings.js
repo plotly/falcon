@@ -1,5 +1,6 @@
 import fs from 'fs';
 import {has} from 'ramda';
+import YAML from 'yamljs';
 import {
     LOG_PATH,
     SETTINGS_PATH,
@@ -37,7 +38,7 @@ const DEFAULT_SETTINGS = {
 
 function loadSettings() {
     if (fs.existsSync(SETTINGS_PATH)) {
-        return JSON.parse(fs.readFileSync(SETTINGS_PATH).toString());
+        return YAML.load(SETTINGS_PATH.toString());
     } else {
         return {};
     }
@@ -50,7 +51,7 @@ export function saveSetting(settingName, settingValue) {
     }
     const settingsOnFile = loadSettings();
     settingsOnFile[settingName] = settingValue;
-    fs.writeFileSync(SETTINGS_PATH, JSON.stringify(settingsOnFile));
+    fs.writeFileSync(SETTINGS_PATH, YAML.stringify(settingsOnFile));
 }
 
 /*
@@ -64,7 +65,7 @@ export function getSetting(settingName) {
         let envObject = process.env[settingName];
         try {
             return JSON.parse(envObject);
-        } catch(e) {
+        } catch (e) {
             return envObject;
         }
     } else if (has(settingName, settingsOnFile)) {
