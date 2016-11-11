@@ -1,6 +1,8 @@
 import {contains} from 'ramda';
 import queryString from 'query-string';
 
+export const canConfigureHTTPS = process.platform === 'darwin' || process.platform === 'linux';
+
 export function baseUrl() {
      if (contains(window.location.protocol, ['http:', 'https:'])) {
          /*
@@ -15,7 +17,7 @@ export function baseUrl() {
           */
          let url = window.location.href;
          if (url.endsWith('/')) {
-             url = url.slice(0, url.length-1);
+             url = url.slice(0, url.length - 1);
          }
          return url;
       } else {

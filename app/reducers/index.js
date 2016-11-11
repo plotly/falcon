@@ -147,7 +147,6 @@ function selectedTables(state = {}, action) {
 }
 
 function selectedIndecies(state = {}, action) {
-    console.warn(action.payload);
     if (action.type === 'SET_INDEX') {
         return merge(state, action.payload);
     } else {
