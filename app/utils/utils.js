@@ -13,7 +13,11 @@ export function baseUrl() {
           * requests need to be made against that full path, e.g.
           * https://plotly.acme.com/connector/queries
           */
-         return window.location.href;
+         let url = window.location.href;
+         if (url.endsWith('/')) {
+             url = url.slice(0, url.length-1);
+         }
+         return url;
       } else {
          /*
           * Use the server location if the app is running in electron
