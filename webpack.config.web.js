@@ -8,12 +8,15 @@ const config = {
 
     devtool: 'source-map',
 
-    entry: './app/index',
+    entry: {
+        'web': './app/index',
+        'oauth': './app/oauth/index',
+    },
 
     output: {
         ...baseConfig.output,
         path: path.join(__dirname, 'static'),
-        filename: 'web-bundle.min.js',
+        filename: '[name]-bundle.min.js',
         libraryTarget: 'var'
     },
 

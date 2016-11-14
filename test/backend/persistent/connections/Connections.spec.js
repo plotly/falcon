@@ -54,7 +54,7 @@ describe('Elasticsearch - Connections', function () {
         })).catch(done);
     });
 
-    it.only('Connections.mappings returns mappings', function(done) {
+    it('Connections.mappings returns mappings', function(done) {
         elasticsearchMappings(elasticsearchCredentials).then(json => {
             assert.deepEqual(
                 json,
@@ -134,15 +134,22 @@ describe('Elasticsearch - Connections', function () {
         }).catch(done);
     });
 
-    it('Connections.query queries an index', function(done) {
+    it('Connections.query queries an elasticsearch index', function(done) {
         this.timeout(4 * 1000);
         query(
             {
-                query: {
-                    query_string: {query: '*'}
+                search: {
+                    query: {
+                        query_string: {
+                            query: '*'
+                        }
+                    },
+                    from: 0,
+                    size: 1000
                 },
-                from: 0,
-                size: 1000
+                // TODO - this should just be 'index' and 'type'
+                selectedIndex: 'sample-data',
+                selectedType: 'test-type'
             },
             elasticsearchCredentials
         ).then(results => {
@@ -250,6 +257,121 @@ describe('Elasticsearch - Connections', function () {
             done();
         }).catch(done);
     });
+
+    it('Connections.query queries an elasticsearch index and limits the size', function(done) {
+        this.timeout(4 * 1000);
+        query(JSON.stringify(
+            {
+                body: {
+                    query: {
+                        query_string: {
+                            query: '*'
+                        }
+                    },
+                    size: '1'
+                },
+                // TODO - this should just be 'index' and 'type'
+                selectedIndex: 'sample-data',
+                selectedType: 'test-type'
+            }),
+            elasticsearchCredentials
+        ).then(results => {
+            assert.deepEqual(results, {
+                nrows: 1,
+                ncols: 10,
+                columnnames: [
+                    'my-date-1',
+                    'my-string-1', 'my-string-2',
+                    'my-date-2',
+                    'my-number-1', 'my-number-2',
+                    'my-geo-point-2', 'my-geo-point-1',
+                    'my-boolean-2', 'my-boolean-1'
+                ],
+                rows: transpose([
+                    [
+                        '2015-01-01T12:30:40Z',
+                    ],
+
+                    [
+                        'NYC'
+                    ],
+                    [
+                        'USA'
+                    ],
+
+                    [
+                        '1915-01-01T12:30:40Z'
+                    ],
+
+                    [1],
+                    [10],
+
+                    // TODO - Should we expand out geo-point into 2 columns?
+                    [
+                        [-10, -10]
+                    ],
+
+                    [
+                        [10, 10]
+                    ],
+
+                    [true],
+                    [true]
+
+                ])
+            });
+            done();
+        }).catch(done);
+    });
+
+
+    it.only('Returns valid aggregated data', function(done) {
+        this.timeout(4 * 1000);
+        query(JSON.stringify(
+            {
+                body: {
+                    'query': {
+                        'query_string': {
+                            'query': '*'
+                        }
+                    },
+                    'aggs': {
+                        'agg1': {
+                            'histogram': {
+                                'interval': 10,
+                                'field': 'my-number-1'
+                            },
+                            'aggs': {
+                                'agg2': {
+                                    'sum': {
+                                        'field': 'my-number-2'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    'size': 2
+                },
+                // TODO - this should just be 'index' and 'type'
+                selectedIndex: 'sample-data',
+                selectedType: 'test-type'
+            }),
+            elasticsearchCredentials
+        ).then(results => {
+            assert.deepEqual(results, {
+                columnnames: [
+                    'my-number-1',
+                    'sum of my-number-2'
+                ],
+                rows: [
+                    [0, 450],
+                    [10, 210]
+                ]
+            });
+            done();
+        }).catch(done);
+
+    })
 
 });
 

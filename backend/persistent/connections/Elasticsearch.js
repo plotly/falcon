@@ -27,12 +27,16 @@ export function connect(credentials) {
     return request(`_cat/indices/${index}`, credentials, {method: 'GET'});
 }
 
-export function query(queryObject, credentials) {
-    return request(`${queryObject.index}/${queryObject.type}/_search`, credentials, {
-        body: queryObject.body, method: 'POST'})
+export function query(query, credentials) {
+    const queryObject = JSON.parse(query);
+    const {body, selectedIndex, selectedType} = queryObject;
+    return request(`${selectedIndex}/${selectedType}/_search`, credentials, {
+        body,
+        method: 'POST'
+    })
     .then(res => res.json().then(results => {
         if (res.status === 200) {
-            return parseElasticsearch(results.hits.hits);
+            return parseElasticsearch(queryObject.body, results);
         } else {
             throw new Error(JSON.stringify(results));
         }

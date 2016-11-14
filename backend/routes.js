@@ -193,6 +193,7 @@ export default class Server {
 
         // delete credentials
         // TODO - delete all associated queries?
+        // TODO - deleting, at least from the front end, isn't working.
         server.del('/credentials/:id', function delCredentialsHandler(req, res, next) {
             if (getSanitizedCredentialById(req.params.id)) {
                 deleteCredentialById(req.params.id);

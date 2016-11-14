@@ -38,7 +38,7 @@ const DEFAULT_SETTINGS = {
 
 function loadSettings() {
     if (fs.existsSync(SETTINGS_PATH)) {
-        return YAML.load(SETTINGS_PATH.toString());
+        return YAML.load(SETTINGS_PATH);
     } else {
         return {};
     }

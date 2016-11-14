@@ -22,7 +22,8 @@ export const CONNECTION_CONFIG = {
     [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.REDSHIFT]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.SQLITE]: ['storage'],
-    [DIALECTS.ELASTICSEARCH]: ['username', 'password', 'host', 'port', 'index'],
+    // TODO - What are the actual elasticsearch credentials options?
+    [DIALECTS.ELASTICSEARCH]: ['username', 'password', 'host', 'port'],
     [DIALECTS.S3]: ['bucket', 'accessKeyId', 'secretAccessKey'],
     [DIALECTS.APACHE_DRILL]: [
         'host',
