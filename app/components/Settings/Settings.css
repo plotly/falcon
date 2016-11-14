@@ -1,3 +1,4 @@
+
 .containerWrapper {
 	width: 100%;
 }
@@ -46,30 +47,6 @@
 
 .dialectSelector {
 	display: inline-block;
-}
-
-.connectButton {
-	padding-top: 30px;
-	text-align: center;
-}
-
-.step1Container {
-    width: 800px;
-}
-
-.step2Container {
-	width: 800px;
-	padding-top: 30px;
-}
-
-.step3Container {
-	width: 800px;
-	padding-top: 20px;
-}
-
-.step4Container {
-	width: 800px;
-	padding-top: 20px;
 }
 
 .previewController {

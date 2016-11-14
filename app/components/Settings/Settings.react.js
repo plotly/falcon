@@ -10,6 +10,7 @@ import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import Preview from './Preview/Preview.react';
+import HttpsSetup from './HttpsServer/HttpsSetup.react';
 import {DIALECTS} from '../../constants/constants.js';
 
 const unfoldIcon = (
@@ -119,6 +120,7 @@ class Settings extends Component {
                 this.setState({show_credentials: true});
             }
             if (connectRequest.status === 200 && !elasticsearchMappingsRequest.status) {
+                this.setState({show_credentials: false});
                 getElasticsearchMappings();
             }
             if (selectedTable && !previewTableRequest.status) {
@@ -210,6 +212,8 @@ class Settings extends Component {
                         apacheDrillStorageRequest={apacheDrillStorageRequest}
                         apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
                     />
+
+                    <HttpsSetup />
 
                 </div>
             </div>

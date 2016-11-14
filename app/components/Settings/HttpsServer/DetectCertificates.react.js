@@ -13,30 +13,25 @@ export default class DetectCertificates extends Component {
             expandInstructions: false
         };
     }
-    componentWillMount() {
-
-        INTERVAL_ID = setInterval(() => {
-            fetch(
-                `https://${BACKEND.CONNECTOR_URL}:${BACKEND.OPTIONS.port}/status`
-            )
-            .then(() => {
-                this.setState({successfulFetch: true});
-            })
-            .catch(err => {
-                if (err.message === 'failed to fetch') {
-                    this.setState({successfulFetch: false});
-                }
-            });
-        }, 1000);
+    refreshState() {
+        fetch(
+            `https://${BACKEND.CONNECTOR_URL}:${BACKEND.OPTIONS.port}/status`
+        )
+        .then(() => {
+            this.setState({successfulFetch: true});
+        })
+        .catch(err => {
+            if (err.message === 'failed to fetch') {
+                this.setState({successfulFetch: false});
+            }
+        });
     }
 
     componentWillUnmount() {
         clearInterval(INTERVAL_ID);
     }
 
-
     render() {
-
         let httpsServerStatus;
         if (this.state.successfulFetch) {
             httpsServerStatus = (
@@ -61,6 +56,7 @@ export default class DetectCertificates extends Component {
                             }
                             instructions.
                         </a>
+                        <a onClick={() => this.refreshState()}>Click</a>
                     </div>
                     {
                         this.state.expandInstructions
@@ -82,6 +78,5 @@ export default class DetectCertificates extends Component {
 
 
 DetectCertificates.propTypes = {
-    sessionsActions: PropTypes.object,
-    ipc: ImmutablePropTypes.map.isRequired
+
 };

@@ -126,7 +126,6 @@ export function getTables(credentialId) {
 }
 
 export function getElasticsearchMappings(credentialId) {
-    console.warn('getElasticsearchMappings');
     return apiThunk(
         `elasticsearch-mappings/${credentialId}`,
         'POST',
@@ -190,7 +189,6 @@ export function previewTable (credentialId, dialect, table, database) {
     const body = {
         query: PREVIEW_QUERY(dialect, table, database)
     };
-    console.warn('query sent', body);
     return apiThunk(
         `query/${credentialId}`,
         'POST',

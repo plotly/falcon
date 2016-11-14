@@ -10,10 +10,8 @@ export default class CreateCertificates extends Component {
     }
 
     render() {
-        const {sessionsActions, ipc} = this.props;
 
-        const hasSelfSignedCert = ipc.has('hasSelfSignedCert') &&
-            ipc.get('hasSelfSignedCert');
+        const hasSelfSignedCert = false;
 
         let httpVideo;
         let httpVideoLinkWording;
@@ -63,7 +61,7 @@ export default class CreateCertificates extends Component {
                 <div>
                     This app is not running on HTTPS.&nbsp;
                     <a
-                       onClick={sessionsActions.setupHttpsServer}
+                       onClick={() => console.warn('generate https')}
                     >
                         Click to generate HTTPS certificates.
                     </a>
@@ -83,6 +81,5 @@ export default class CreateCertificates extends Component {
 
 
 CreateCertificates.propTypes = {
-    sessionsActions: PropTypes.object,
-    ipc: ImmutablePropTypes.map.isRequired
+
 };
