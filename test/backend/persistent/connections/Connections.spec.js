@@ -147,9 +147,8 @@ describe('Elasticsearch - Connections', function () {
                     from: 0,
                     size: 1000
                 },
-                // TODO - this should just be 'index' and 'type'
-                selectedIndex: 'sample-data',
-                selectedType: 'test-type'
+                index: 'sample-data',
+                type: 'test-type'
             },
             elasticsearchCredentials
         ).then(results => {
@@ -271,8 +270,8 @@ describe('Elasticsearch - Connections', function () {
                     size: '1'
                 },
                 // TODO - this should just be 'index' and 'type'
-                selectedIndex: 'sample-data',
-                selectedType: 'test-type'
+                index: 'sample-data',
+                type: 'test-type'
             }),
             elasticsearchCredentials
         ).then(results => {
@@ -353,8 +352,8 @@ describe('Elasticsearch - Connections', function () {
                     'size': 2
                 },
                 // TODO - this should just be 'index' and 'type'
-                selectedIndex: 'sample-data',
-                selectedType: 'test-type'
+                index: 'sample-data',
+                type: 'test-type'
             }),
             elasticsearchCredentials
         ).then(results => {

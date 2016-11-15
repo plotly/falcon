@@ -51,7 +51,7 @@ export default class OptionsDropdown extends Component {
 
     renderElasticsearchIndecies() {
         const {
-            elasticsearchMappingsRequest: EMR, setIndex, selectedIndex
+            elasticsearchMappingsRequest: EMR, setIndex, index
         } = this.props;
         if (!EMR.status) {
             return null;
@@ -71,7 +71,7 @@ export default class OptionsDropdown extends Component {
                     >
                         <Select
                             options={indeciesList.map(t => ({label: t, value: t}))}
-                            value={selectedIndex}
+                            value={index}
                             onChange={option => {
                                 setIndex(option.value);
                             }}
@@ -84,12 +84,12 @@ export default class OptionsDropdown extends Component {
 
     renderElasticsearchDocs() {
         const {
-            selectedTable, selectedIndex, elasticsearchMappingsRequest: EMR, setTable, credentialObject
+            selectedTable, index, elasticsearchMappingsRequest: EMR, setTable, credentialObject
         } = this.props;
-        if (!selectedIndex) {
+        if (!index) {
             return null;
         } else {
-            const tablesList = keys(EMR.content[selectedIndex].mappings);
+            const tablesList = keys(EMR.content[index].mappings);
             if (tablesList.length === 0) {
                 return <div>{'No docs found'}</div>;
             } else {

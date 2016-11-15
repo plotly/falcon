@@ -29,8 +29,8 @@ export function connect(credentials) {
 
 export function query(query, credentials) {
     const queryObject = JSON.parse(query);
-    const {body, selectedIndex, selectedType} = queryObject;
-    return request(`${selectedIndex}/${selectedType}/_search`, credentials, {
+    const {body, index, type} = queryObject;
+    return request(`${index}/${type}/_search`, credentials, {
         body,
         method: 'POST'
     })

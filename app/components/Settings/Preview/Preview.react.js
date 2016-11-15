@@ -1,5 +1,4 @@
 import React, {Component, PropTypes} from 'react';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './Preview.css';
 
 export default class Preview extends Component {

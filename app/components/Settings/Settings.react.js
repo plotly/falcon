@@ -155,7 +155,7 @@ class Settings extends Component {
             setTable,
             setIndex,
             selectedTable,
-            selectedIndex,
+            index,
             tablesRequest,
             elasticsearchMappingsRequest,
             previewTableRequest,
@@ -203,7 +203,7 @@ class Settings extends Component {
                         tablesRequest={tablesRequest}
                         setTable={setTable}
                         setIndex={setIndex}
-                        selectedIndex={selectedIndex}
+                        index={index}
                     />
 
                     <Preview
@@ -248,7 +248,7 @@ function mapStateToProps(state) {
     const selectedCredentialId = tabMap[selectedTab];
     const credentialsHaveBeenSaved = Boolean(selectedCredentialId);
     const selectedTable = selectedTables[selectedTab] || null;
-    const selectedIndex = selectedIndecies[selectedTab] || null;
+    const index = selectedIndecies[selectedTab] || null;
 
     let previewTableRequest = {};
     if (previewTableRequests[selectedCredentialId] &&
@@ -273,7 +273,7 @@ function mapStateToProps(state) {
         credentialsHaveBeenSaved,
         credentialObject: credentials[selectedTab],
         selectedTable,
-        selectedIndex,
+        index,
         selectedCredentialId
     };
 }
