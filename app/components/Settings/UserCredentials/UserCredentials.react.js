@@ -79,7 +79,7 @@ export default class UserCredentials extends Component {
 					// result returned in an array
 					// TODO: add length of paths === 0 check
 					// TODO: add path non null check
-					const path = paths[0];
+					const path = head(paths);
 					// get the filename to use as username in the logs
 					const splitPath = path.split('/');
 					const fileName = splitPath.length - 1;
