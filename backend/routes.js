@@ -12,6 +12,7 @@ import {
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
 import {dissoc, pluck, contains} from 'ramda';
+import {hasCerts} from './https.js';
 import Logger from './logger';
 import fetch from 'node-fetch';
 
@@ -325,6 +326,11 @@ export default class Server {
             } else {
                 res.json(404, {});
             }
+        });
+
+        // https
+        server.get('/has-certs', (req, res, next) => {
+            res.json(200, hasCerts());
         });
 
         // Transform restify's error messages into our standard error object

@@ -92,11 +92,19 @@ export function getCredentials() {
     );
 }
 
+export function hasCerts() {
+    return apiThunk(
+        'has-certs',
+        'GET',
+        'hasCertsRequest'
+    );
+}
+
 export function connect(credentialId) {
     return apiThunk(
         `connect/${credentialId}`,
         'POST',
-        'connectRequest',
+        'connectRequests',
         credentialId
     );
 }
@@ -106,7 +114,7 @@ export function saveCredentials(credentialsObject, tabId) {
         return dispatch(apiThunk(
             'credentials',
             'POST',
-            'saveCredentialsRequest',
+            'saveCredentialsRequests',
             tabId,
             credentialsObject
         )).then(json => {

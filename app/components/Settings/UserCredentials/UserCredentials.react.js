@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './UserCredentials.css';
+import {head} from 'ramda'; 
 import {
     CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS
 } from '../../../constants/constants';
@@ -10,16 +11,16 @@ let dialog;
 let shell;
 try {
     shell = require('electron').shell;
-} catch(e) {
+} catch (e) {
     const shell = {
         openExternal: function openExternal(link) {
             console.warn('opening link');
         }
-    }
+    };
 }
 try {
     dialog = require('electron').remote.dialog;
-} catch(e) {
+} catch (e) {
     dialog = null;
 }
 

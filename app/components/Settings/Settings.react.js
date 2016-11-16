@@ -68,6 +68,7 @@ class Settings extends Component {
 
     componentDidMount() {
         this.fetchData();
+        this.props.dispatch(Actions.hasCerts());
     }
     componentDidUpdate() {
         this.fetchData();
@@ -149,6 +150,7 @@ class Settings extends Component {
             updateCredential,
             connect,
             connectRequest,
+            hasCertsRequest,
             saveCredentialsRequests,
             deleteCredentialsRequests,
             credentialsHaveBeenSaved,
@@ -213,7 +215,9 @@ class Settings extends Component {
                         apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
                     />
 
-                    <HttpsSetup />
+                    <HttpsSetup
+                        hasCertsRequest={hasCertsRequest}
+                    />
 
                 </div>
             </div>
@@ -232,6 +236,7 @@ function mapStateToProps(state) {
         tabMap,
         credentials,
         credentialsRequest,
+        hasCertsRequest,
         connectRequests,
         saveCredentialsRequests,
         deleteCredentialsRequests,
@@ -259,6 +264,7 @@ function mapStateToProps(state) {
 
     return {
         credentialsRequest,
+        hasCertsRequest,
         connectRequest: connectRequests[selectedCredentialId] || {},
         saveCredentialsRequest: saveCredentialsRequests[selectedCredentialId] || {},
         deleteCredentialsRequest: deleteCredentialsRequests[selectedCredentialId] || {},

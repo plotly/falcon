@@ -11,7 +11,7 @@ export default class HttpsSetup extends Component {
 
     renderCreateCertificates() {
         return canConfigureHTTPS ? (
-            <CreateCertificates />
+            <CreateCertificates hasCertsRequest={this.props.hasCertsRequest}/>
         ) : null;
     }
 
@@ -23,10 +23,9 @@ export default class HttpsSetup extends Component {
     }
 
     render() {
-        console.warn(canConfigureHTTPS);
+        console.warn('hasCertsRequest.content', this.props.hasCertsRequest);
         return (
             <div className={styles.step3Container}>
-                https setup things
                 {canConfigureHTTPS ? (
                     <h5>
                         <a>

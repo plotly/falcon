@@ -111,8 +111,9 @@ function createApiReducer(store) {
         return newState;
     };
 }
-export const connectRequests = createApiReducer('connectRequest');
+export const connectRequests = createApiReducer('connectRequests');
 export const credentialsRequest = createApiReducer('credentialsRequest');
+export const hasCertsRequest = createApiReducer('hasCertsRequest');
 export const saveCredentialsRequests = createApiReducer('saveCredentialsRequests');
 export const deleteCredentialsRequests = createApiReducer('deleteCredentialsRequests');
 export const tablesRequests = createApiReducer('tables');
@@ -121,6 +122,7 @@ export const previewTableRequests = createApiReducer('previewTableRequest');
 export const s3KeysRequests = createApiReducer('s3KeysRequests');
 export const apacheDrillStorageRequests = createApiReducer('apacheDrillStorageRequests');
 export const apacheDrillS3KeysRequests = createApiReducer('apacheDrillS3KeysRequests');
+
 
 function tabMap(state = {}, action) {
     let newState = state;
@@ -176,6 +178,7 @@ function credentials(state = {}, action) {
 const rootReducer = combineReducers({
     tabMap,
     credentials,
+    hasCertsRequest,
     selectedTab,
     selectedTables,
     selectedIndecies,

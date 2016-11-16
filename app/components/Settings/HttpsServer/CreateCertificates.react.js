@@ -11,8 +11,8 @@ export default class CreateCertificates extends Component {
 
     render() {
 
-        const hasSelfSignedCert = false;
-
+        const hasCertsRequest = this.props.hasCertsRequest;
+        const hasCerts = hasCertsRequest.content;
         let httpVideo;
         let httpVideoLinkWording;
         if (this.state.httpVideoShow) {
@@ -33,24 +33,24 @@ export default class CreateCertificates extends Component {
         let httpNote = null;
         httpNote = (
             <div style={{fontSize: '0.8em'}}>
-                Alternatively, you can run the connector without
-                HTTPS and allow your browser to make insecure
-                requests.&nbsp;
+                {'Alternatively, you can run the connector without' +
+                'HTTPS and allow your browser to make insecure' +
+                'requests.'}
                 <a
                     onClick={() => {this.setState(
                         {httpVideoShow: !this.state.httpVideoShow}
                     );}}
                 >
-                {httpVideoLinkWording}
+                    {httpVideoLinkWording}
                 </a>
                 <div>
-                {httpVideo}
+                    {httpVideo}
                 </div>
             </div>
         );
 
         let httpsServerStatus = null;
-        if (hasSelfSignedCert) {
+        if (hasCerts) {
             httpsServerStatus = (
                 <div>✓ This app is successfully running on HTTPS.</div>
             );
