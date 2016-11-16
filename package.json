@@ -16,7 +16,6 @@
     "heroku-postbuild": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.headless.js --progress --profile --colors",
     "build-renderer": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.production.js --progress --profile --colors",
     "build": "npm run build-main && npm run build-renderer",
-    "build": "npm run build-main && npm run build-renderer && npm run build-headless",
     "start": "cross-env NODE_ENV=production electron ./",
     "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./backend/main.development",
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
@@ -73,7 +72,7 @@
       "webpack-dashboard": "^0.1.1",
       "webpack-dev-middleware": "^1.6.1",
       "webpack-hot-middleware": "^2.10.0",
-      "chromedriver": "^2.21.2"      
+      "chromedriver": "^2.21.2"
   },
   "dependencies": {
       "babel-core": "^6.7.6",

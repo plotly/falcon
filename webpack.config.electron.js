@@ -25,9 +25,9 @@ export default {
             { raw: true, entryOnly: false }
         ),
         new webpack.DefinePlugin({
-            'process.env': merge(process.env, {
+            'process.env': {
                 NODE_ENV: JSON.stringify('production')
-            })
+            }
         }),
         // https://github.com/felixge/node-formidable/issues/337
         new webpack.DefinePlugin({ 'global.GENTLY': false })

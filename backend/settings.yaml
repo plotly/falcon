@@ -1,2 +1,2 @@
-headless: true
+headless: false
 https: false

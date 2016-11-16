@@ -50,12 +50,11 @@ function parseGeoJSON(rows) {
     const newRows = rows.map((row) => {
         return row.map((el) => {
             if (el !== null && typeof el === 'object') {
-                // push the object to GeoJSONs and replace it with an id
+                // push the object to GeoJSONs
                 GeoJSONs.push(
                     {[id]: toGeoJSON(el)}
                 );
                 id += 1;
-                return `GeoJSON ${id - 1}`;
             }
             return el;
         });
