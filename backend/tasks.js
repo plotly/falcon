@@ -1,6 +1,5 @@
 import {merge, contains} from 'ramda';
 import {AUTHENTICATION, TASK} from './errors';
-// import {setupHTTPS, newOnPremSession} from './setupServers';
 import {DIALECTS} from '../app/constants/constants';
 import {trackEvent} from './mixpanel';
 
@@ -141,24 +140,35 @@ export function executeTask(responseTools, responseSender, payload) {
 		/*
 		 * https tasks -->
 		 */
-        //
-		// case TASKS.SETUP_HTTPS_SERVER: {
-        //     trackEvent(task);
-        //     log('Setting up https server...', 1);
-        //     setupHTTPS(responseTools);
-		// 	break;
-		// }
-        //
-		// /*
-		//  * On-Prem tasks -->
-		//  */
-        //
-		// case TASKS.NEW_ON_PREM_SESSION: {
-        //     trackEvent(task);
-        //     log(`Adding domain ${message} to CORS`, 1);
-		// 	newOnPremSession(message, responseTools);
-		// 	break;
-		// }
+
+
+		case TASKS.SETUP_HTTPS_SERVER: {
+            try {
+                const {setupHTTPS} = require('./setupServers');
+                trackEvent(task);
+                log('Setting up https server...', 1);
+                setupHTTPS(responseTools);
+            } catch (e) {
+                log('Could not set up https server...', 1);
+            }
+            break;
+        }
+
+        /*
+		 * On-Prem tasks -->
+		 */
+
+         case TASKS.NEW_ON_PREM_SESSION: {
+            try {
+                const {newOnPremSession} = require('./setupServers');
+                trackEvent(task);
+                log(`Adding domain ${message} to CORS`, 1);
+                newOnPremSession(message, responseTools);
+            } catch (e) {
+                log('Could not set up new on prem server...', 1);
+            }
+            break;
+        }
 
 		/*
 		 * v1 API -->

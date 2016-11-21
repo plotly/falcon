@@ -18,6 +18,10 @@ const appName = argv.name || argv.n || pkg.productName;
 const shouldUseAsar = argv.asar || argv.a || false;
 const shouldBuildAll = argv.all || false;
 
+const userFriendlyAppNames = {
+    arch: {ia32: '32bit', x64: '64bit'}, plat: {linux: 'Linux', darwin: 'Mac', win32: 'Windows'}
+};
+
 const DEFAULT_OPTS = {
     dir: './',
     name: appName,
@@ -120,7 +124,7 @@ function pack(plat, arch, cb) {
         arch,
         prune: true,
         'app-version': pkg.version || DEFAULT_OPTS.version,
-        out: `release/${plat}-${arch}`
+        out: `release/${userFriendlyAppNames.plat[plat]}-${userFriendlyAppNames.arch[arch]}`
     });
 
     packager(opts, cb);
@@ -129,6 +133,6 @@ function pack(plat, arch, cb) {
 function log(plat, arch) {
     return (err, filepath) => {
         if (err) return console.error(err);
-        console.log(`${plat}-${arch} finished!`);
+        console.log(`${plat}-${arch} finished! see release/${userFriendlyAppNames.plat[plat]}-${userFriendlyAppNames.arch[arch]}`);
     };
 }
