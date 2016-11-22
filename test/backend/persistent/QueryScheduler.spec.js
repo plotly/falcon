@@ -30,7 +30,7 @@ describe('QueryScheduler', () => {
         //     fs.unlinkSync(CREDENTIALS_PATH);
         // } catch (e) {}
         queryScheduler = new QueryScheduler();
-        queryScheduler.minimumRefreshRate = 1;
+        queryScheduler.minimumRefreshInterval = 1;
         savedUrl = getSetting('PLOTLY_API_DOMAIN');
         savedUsers = getSetting('USERS');
         saveSetting('PLOTLY_API_DOMAIN', 'https://api.plot.ly');
@@ -51,7 +51,7 @@ describe('QueryScheduler', () => {
 
         const delay = 100;
         queryScheduler.scheduleQuery({
-            refreshRate: delay,
+            refreshInterval: delay,
             fid: '...',
             uids: '...',
             query: '...',
@@ -72,7 +72,7 @@ describe('QueryScheduler', () => {
         queryScheduler.job = () => {};
 
         const queryObject = {
-            refreshRate: 1,
+            refreshInterval: 1,
             fid: 'test-fid',
             uids: '',
             query: '',
@@ -94,7 +94,7 @@ describe('QueryScheduler', () => {
         queryScheduler.job = () => {};
 
         const queryObject = {
-            refreshRate: 1,
+            refreshInterval: 1,
             fid: 'test-fid',
             uids: '',
             query: 'my query',
@@ -106,15 +106,15 @@ describe('QueryScheduler', () => {
         assert.deepEqual([queryObject], getQueries());
         const updatedQuery = merge(
             queryObject,
-            {refreshRate: 10, 'query': 'new query'}
+            {refreshInterval: 10, 'query': 'new query'}
         );
         queryScheduler.scheduleQuery(updatedQuery);
         assert.deepEqual([updatedQuery], getQueries());
     });
 
     it('clears and deletes the query if its associated grid was deleted', function(done) {
-        const refreshRate = 1 * 1000;
-        this.timeout(refreshRate * 20);
+        const refreshInterval = 1 * 1000;
+        this.timeout(refreshInterval * 20);
 
         /*
          * Save the sqlCredentials to a file.
@@ -134,7 +134,7 @@ describe('QueryScheduler', () => {
              const queryObject = {
                  fid,
                  uids,
-                 refreshRate,
+                 refreshInterval,
                  credentialId,
                  query: 'SELECT * from ebola_2014 LIMIT 2'
              };
@@ -157,7 +157,7 @@ describe('QueryScheduler', () => {
                     assert(!Boolean(queryScheduler.queryJobs[fid]), 'Queries were removed');
                     assert.deepEqual(getQueries(), [], 'Queries were deleted');
                     done();
-                }, refreshRate * 3);
+                }, refreshInterval * 3);
 
             }).catch(done);
 
@@ -216,8 +216,8 @@ describe('QueryScheduler', () => {
             }));
         }
 
-        const refreshRate = 30 * 1000;
-        this.timeout(refreshRate * 10);
+        const refreshInterval = 30 * 1000;
+        this.timeout(refreshInterval * 10);
 
         /*
          * Save the sqlCredentials to a file.
@@ -238,7 +238,7 @@ describe('QueryScheduler', () => {
              const queryObject = {
                  fid,
                  uids,
-                 refreshRate,
+                 refreshInterval,
                  credentialId,
                  username,
                  apiKey,
@@ -248,7 +248,7 @@ describe('QueryScheduler', () => {
 
 
              /*
-              * After refreshRate seconds, the scheduler will update the grid's contents.
+              * After refreshInterval seconds, the scheduler will update the grid's contents.
               * Download the grid's contents and check.
               */
              setTimeout(() => {
@@ -283,13 +283,13 @@ describe('QueryScheduler', () => {
                                  assert(!has(fid, queryScheduler.queryJobs));
                                  assert.isNull(getQuery(fid));
                                  done();
-                             }, refreshRate);
+                             }, refreshInterval);
                          })
                          .catch(done);
-                     }, refreshRate);
+                     }, refreshInterval);
                  })
                  .catch(done);
-            }, refreshRate + (5 * 1000)); // Give scheduleQuery an extra 5 seconds.
+            }, refreshInterval + (5 * 1000)); // Give scheduleQuery an extra 5 seconds.
         })).catch(done);
     });
 

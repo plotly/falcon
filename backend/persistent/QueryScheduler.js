@@ -16,25 +16,25 @@ class QueryScheduler {
 
         // Expose this.job so that tests can overwrite it
         this.job = this.queryAndUpdateGrid;
-        this.minimumRefreshRate = 60 * 1000;
+        this.minimumRefreshInterval = 60 * 1000;
         this.queryJobs = {};
     }
 
     scheduleQuery({
         fid: fid,
         uids: uids,
-        refreshRate: refreshRate,
+        refreshInterval: refreshInterval,
         query: query,
         credentialId: credentialId
     }) {
-        if (!refreshRate) {
+        if (!refreshInterval) {
             throw new Error('Refresh rate was not supplied');
         // TODO - bump up to 60 when done testing.
-    } else if (refreshRate < this.minimumRefreshRate) {
+    } else if (refreshInterval < this.minimumRefreshInterval) {
             throw new Error(`
                 Refresh rate must be at least
-                ${this.minimumRefreshRate}
-                (${this.minimumRefreshRate / 1000} seconds)`);
+                ${this.minimumRefreshInterval}
+                (${this.minimumRefreshInterval / 1000} seconds)`);
         }
 
         Logger.log(`Scheduling "${query}" with credential ${credentialId} updating grid ${fid}`);
@@ -48,7 +48,7 @@ class QueryScheduler {
         saveQuery({
             fid,
             uids,
-            refreshRate,
+            refreshInterval,
             query,
             credentialId
         });
@@ -66,7 +66,7 @@ class QueryScheduler {
                 }
 
             },
-            refreshRate
+            refreshInterval
         );
 
     }
