@@ -113,7 +113,7 @@ describe('QueryScheduler', () => {
     });
 
     it('clears and deletes the query if its associated grid was deleted', function(done) {
-        const refreshInterval = 1 * 1000;
+        const refreshInterval = 1;
         this.timeout(refreshInterval * 20);
 
         /*
@@ -216,7 +216,7 @@ describe('QueryScheduler', () => {
             }));
         }
 
-        const refreshInterval = 30 * 1000;
+        const refreshInterval = 30;
         this.timeout(refreshInterval * 10);
 
         /*
@@ -289,7 +289,7 @@ describe('QueryScheduler', () => {
                      }, refreshInterval);
                  })
                  .catch(done);
-            }, refreshInterval + (5 * 1000)); // Give scheduleQuery an extra 5 seconds.
+            }, refreshInterval + 5); // Give scheduleQuery an extra 5 seconds.
         })).catch(done);
     });
 

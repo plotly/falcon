@@ -84,7 +84,7 @@ describe('Server', function () {
         queryObject = {
             fid: 'chris:10',
             uids: ['asd', 'xyz'],
-            refreshInterval: 5 * 1000,
+            refreshInterval: 5,
             query: 'SELECT * FROM ebola_2014 LIMIT 1',
             credentialId: credentialId
         };
@@ -387,7 +387,7 @@ describe('Server', function () {
             queryObject = {
                 fid,
                 uids,
-                refreshInterval: 60 * 1000,
+                refreshInterval: 60,
                 credentialId,
                 query: 'SELECT * from ebola_2014 LIMIT 2'
             };

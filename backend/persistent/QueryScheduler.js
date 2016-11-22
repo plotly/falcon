@@ -16,7 +16,7 @@ class QueryScheduler {
 
         // Expose this.job so that tests can overwrite it
         this.job = this.queryAndUpdateGrid;
-        this.minimumRefreshInterval = 60 * 1000;
+        this.minimumRefreshInterval = 60;
         this.queryJobs = {};
     }
 
@@ -34,7 +34,7 @@ class QueryScheduler {
             throw new Error(`
                 Refresh rate must be at least
                 ${this.minimumRefreshInterval}
-                (${this.minimumRefreshInterval / 1000} seconds)`);
+                (${this.minimumRefreshInterval} seconds)`);
         }
 
         Logger.log(`Scheduling "${query}" with credential ${credentialId} updating grid ${fid}`);
@@ -66,7 +66,7 @@ class QueryScheduler {
                 }
 
             },
-            refreshInterval
+            refreshInterval * 1000 
         );
 
     }
