@@ -19,7 +19,7 @@ const DEFAULT_SETTINGS = {
     PLOTLY_API_DOMAIN: 'https://api-local.plot.ly',
     // PLOTLY_API_DOMAIN: 'https://api.plot.ly',
 
-    CONNECTOR_HTTPS_DOMAIN: 'https://connector.plot.ly',
+    CONNECTOR_HTTPS_DOMAIN: 'localhost',
 
     // TODO - Remove these sample accounts
     // TODO - This should just be an object keyed by username
@@ -36,8 +36,8 @@ const DEFAULT_SETTINGS = {
     PORT: 9494,
 
     // certificates paths
-    KEY_FILE: `${__dirname}/../../ssl/certs/server/privkey.pem`,
-    CSR_FILE: `${__dirname}/../../ssl/certs/server/fullchain.pem`,
+    KEY_FILE: `${__dirname}/../ssl/certs/server/privkey.pem`,
+    CSR_FILE: `${__dirname}/../ssl/certs/server/fullchain.pem`,
 
     LOG_TO_STDOUT: false
 };

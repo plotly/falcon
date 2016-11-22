@@ -26,7 +26,9 @@ export function baseUrl() {
           * with electron serving the app file. The electron backend
           * provides the port env variable as a query string param.
           */
-          const PORT = queryString.parse(location.search).port;
-         return `http://localhost:${PORT}`;
+        const URL = queryString.parse(location.search).url;
+        const PORT = queryString.parse(location.search).port;
+        console.log('baseUrl', `${URL}:${PORT}`);
+        return `${URL}:${PORT}`;
      }
 }

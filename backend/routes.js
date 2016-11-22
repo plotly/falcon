@@ -1,4 +1,5 @@
 var restify = require('restify');
+import fs from 'fs';
 import * as Connections from './persistent/connections/Connections.js';
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
 import {
@@ -12,13 +13,16 @@ import {
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
 import {dissoc, pluck, contains} from 'ramda';
-import {hasCerts} from './https.js';
+import {createCerts, hasCerts, getCerts} from './https.js';
 import Logger from './logger';
 import fetch from 'node-fetch';
 
 export default class Server {
     constructor() {
-        const server = restify.createServer();
+        const certs = getCerts();
+        const server = certs ? restify.createServer(certs) : restify.createServer();
+        this.protocol = certs ? 'https' : 'http';
+
         const queryScheduler = new QueryScheduler();
 
         this.server = server;
@@ -37,6 +41,7 @@ export default class Server {
             Logger.log(`Request: ${request.href()}`, 2);
             next();
         });
+
 
         /*
          * CORS doesn't quite work by default in restify,
@@ -331,6 +336,11 @@ export default class Server {
         // https
         server.get('/has-certs', (req, res, next) => {
             res.json(200, hasCerts());
+        });
+
+        server.get('/create-certs', (req, res, next) => {
+            const response = createCerts();
+            res.json(200, response || {});
         });
 
         // Transform restify's error messages into our standard error object

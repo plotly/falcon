@@ -1,9 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Instructions from './Instructions.react';
-import {BACKEND} from '../../../constants/constants';
-
-let INTERVAL_ID;
+import {baseUrl} from '../../../utils/utils';
+import {RED_DOT, YELLOW_DOT, GREEN_DOT} from './Buttons.js';
 
 export default class DetectCertificates extends Component {
     constructor(props) {
@@ -13,9 +12,10 @@ export default class DetectCertificates extends Component {
             expandInstructions: false
         };
     }
-    refreshState() {
+
+    fetchStatusHTTPS() {
         fetch(
-            `https://${BACKEND.CONNECTOR_URL}:${BACKEND.OPTIONS.port}/status`
+            `${baseUrl}/status`
         )
         .then(() => {
             this.setState({successfulFetch: true});
@@ -27,21 +27,17 @@ export default class DetectCertificates extends Component {
         });
     }
 
-    componentWillUnmount() {
-        clearInterval(INTERVAL_ID);
-    }
-
     render() {
         let httpsServerStatus;
         if (this.state.successfulFetch) {
             httpsServerStatus = (
-                <div>✓ Your certificates are installed on this computer.</div>
+                <div>{GREEN_DOT}{'Your certificates are installed on this computer. '}</div>
             );
         } else {
             httpsServerStatus = (
                 <div>
                     <div>
-                        Install your self-signed certificates.&nbsp;
+                        {YELLOW_DOT}{'Install your self-signed certificates. '}
                         <a onClick={() => {
                                 this.setState({
                                     expandInstructions:
@@ -56,7 +52,7 @@ export default class DetectCertificates extends Component {
                             }
                             instructions.
                         </a>
-                        <a onClick={() => this.refreshState()}>Click</a>
+                        <a onClick={() => this.fetchStatusHTTPS()}>Click</a>
                     </div>
                     {
                         this.state.expandInstructions

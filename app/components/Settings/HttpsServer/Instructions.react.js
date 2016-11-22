@@ -1,8 +1,8 @@
 import React from 'react';
 import {shell} from 'electron';
-import {BACKEND} from '../../../constants/constants';
+import {baseUrl} from '../../../utils/utils';
 
-const HTML_STATUS_PAGE = `https://${BACKEND.CONNECTOR_URL}:${BACKEND.OPTIONS.port}/status`;
+const HTML_STATUS_PAGE = `${baseUrl}/status`;
 
 const Instructions = () => (
     <div>
@@ -22,7 +22,7 @@ const Instructions = () => (
                     <a onClick={() => {
                         shell.openExternal(HTML_STATUS_PAGE);
                     }}
-                    >
+>
                         {HTML_STATUS_PAGE}
                     </a>
                 </li>

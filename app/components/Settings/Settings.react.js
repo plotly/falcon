@@ -151,6 +151,7 @@ class Settings extends Component {
             connect,
             connectRequest,
             hasCertsRequest,
+            createCertsRequest,
             saveCredentialsRequests,
             deleteCredentialsRequests,
             credentialsHaveBeenSaved,
@@ -217,8 +218,9 @@ class Settings extends Component {
 
                     <HttpsSetup
                         hasCertsRequest={hasCertsRequest}
+                        createCertsRequest={createCertsRequest}
+                        createCerts={() => {this.props.dispatch(Actions.createCerts());}}
                     />
-
                 </div>
             </div>
         );
@@ -237,6 +239,7 @@ function mapStateToProps(state) {
         credentials,
         credentialsRequest,
         hasCertsRequest,
+        createCertsRequest,
         connectRequests,
         saveCredentialsRequests,
         deleteCredentialsRequests,
@@ -265,6 +268,7 @@ function mapStateToProps(state) {
     return {
         credentialsRequest,
         hasCertsRequest,
+        createCertsRequest,
         connectRequest: connectRequests[selectedCredentialId] || {},
         saveCredentialsRequest: saveCredentialsRequests[selectedCredentialId] || {},
         deleteCredentialsRequest: deleteCredentialsRequests[selectedCredentialId] || {},

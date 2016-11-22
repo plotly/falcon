@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-
+import {RED_DOT, YELLOW_DOT, GREEN_DOT} from './Buttons.js';
 const httpVideoLink = 'https://www.youtube.com/embed/S4TXMMn9mh0?rel=0&amp;showinfo=0';
 
 export default class CreateCertificates extends Component {
@@ -10,9 +10,10 @@ export default class CreateCertificates extends Component {
     }
 
     render() {
-
-        const hasCertsRequest = this.props.hasCertsRequest;
-        const hasCerts = hasCertsRequest.content;
+        const {hasCertsRequest, createCertsRequest} = this.props;
+        console.warn('hasCertsRequest', hasCertsRequest);
+        console.warn('createCertsRequest', createCertsRequest);
+        const createdCerts = createCertsRequest;
         let httpVideo;
         let httpVideoLinkWording;
         if (this.state.httpVideoShow) {
@@ -33,9 +34,9 @@ export default class CreateCertificates extends Component {
         let httpNote = null;
         httpNote = (
             <div style={{fontSize: '0.8em'}}>
-                {'Alternatively, you can run the connector without' +
-                'HTTPS and allow your browser to make insecure' +
-                'requests.'}
+                {'Alternatively, you can run the connector without ' +
+                'HTTPS and allow your browser to make insecure ' +
+                'requests. '}
                 <a
                     onClick={() => {this.setState(
                         {httpVideoShow: !this.state.httpVideoShow}
@@ -50,20 +51,23 @@ export default class CreateCertificates extends Component {
         );
 
         let httpsServerStatus = null;
-        if (hasCerts) {
+        if (hasCertsRequest.content.status === 200) {
             httpsServerStatus = (
-                <div>✓ This app is successfully running on HTTPS.</div>
+                <div>{GREEN_DOT}{'The app is running using a secure HTTPS server. '}</div>
             );
-            // reset to null if user creates https certs during runtime
-            httpNote = null;
+        } else if (createdCerts) {
+            httpsServerStatus = (
+                <div>{YELLOW_DOT}{'You have successfully created HTTPS certificates. Please restart the app. '}</div>
+            );
         } else {
             httpsServerStatus = (
                 <div>
-                    This app is not running on HTTPS.&nbsp;
+                    {RED_DOT}
+                    {'This app is not running on a HTTPS server.'}
                     <a
-                       onClick={() => console.warn('generate https')}
+                       onClick={() => this.props.createCerts()}
                     >
-                        Click to generate HTTPS certificates.
+                        {'Click to generate HTTPS certificates.'}
                     </a>
                 </div>
             );

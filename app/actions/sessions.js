@@ -100,6 +100,14 @@ export function hasCerts() {
     );
 }
 
+export function createCerts() {
+    return apiThunk(
+        'create-certs',
+        'GET',
+        'createCertsRequest'
+    );
+}
+
 export function connect(credentialId) {
     return apiThunk(
         `connect/${credentialId}`,
