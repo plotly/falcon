@@ -30,7 +30,6 @@ export function baseUrl() {
           */
         const URL = queryString.parse(location.search).url;
         const PORT = queryString.parse(location.search).port;
-        console.log('baseUrl', `${URL}:${PORT}`);
         return `${URL}:${PORT}`;
      }
 }

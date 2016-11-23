@@ -169,7 +169,10 @@ class Settings extends Component {
             apacheDrillS3KeysRequest,
             newTab,
             deleteTab,
-            setTab
+            setTab,
+            createCerts,
+            hasCerts,
+            redirectUrl
         } = this.props;
 
         if (!selectedTab) {
@@ -222,9 +225,9 @@ class Settings extends Component {
                         hasCertsRequest={hasCertsRequest}
                         createCertsRequest={createCertsRequest}
                         redirectUrlRequest={redirectUrlRequest}
-                        createCerts={() => {this.props.dispatch(Actions.createCerts());}}
-                        hasCerts={() => {this.props.dispatch(Actions.hasCerts());}}
-                        redirectUrl={() => {this.props.dispatch(Actions.redirectUrl());}}
+                        createCerts={createCerts}
+                        hasCerts={hasCerts}
+                        redirectUrl={redirectUrl}
                     />
                 </div>
             </div>
@@ -388,7 +391,10 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             newTab: () => dispatch(Actions.newTab()),
             deleteTab: tab => dispatch(Actions.deleteTab(tab)),
             setTab: tab => dispatch(Actions.setTab(tab)),
-            connect: dispatchConnect
+            connect: dispatchConnect,
+            createCerts: () => dispatch(Actions.createCerts()),
+            hasCerts: () => dispatch(Actions.hasCerts()),
+            redirectUrl: () => dispatch(Actions.redirectUrl())
         }
     );
 }

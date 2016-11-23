@@ -5,6 +5,20 @@ import {contains} from 'ramda';
 import {usesHttpsProtocol} from '../../../utils/utils';
 
 const httpVideoLink = 'https://www.youtube.com/embed/S4TXMMn9mh0?rel=0&amp;showinfo=0';
+const httpVideo = (show) => {
+    return show ? (
+        <iframe
+            width="560"
+            height="315"
+            src={httpVideoLink}
+            frameBorder="0"
+            allowFullScreen
+        ></iframe>
+    ) : null;
+};
+const httpVideoLinkWording = (show) => {
+    return show ? 'Hide Video.' : 'Click to see how.';
+};
 let INTERVAL_HAS_CERTS;
 
 export default class CreateCertificates extends Component {
@@ -14,10 +28,8 @@ export default class CreateCertificates extends Component {
     }
 
     componentWillMount() {
-        console.warn(usesHttpsProtocol());
         if (!usesHttpsProtocol()) {
             INTERVAL_HAS_CERTS = setInterval(() => {
-                console.warn('hasCerts call');
                 this.props.hasCerts();
             }, 1000);
         }
@@ -35,30 +47,8 @@ export default class CreateCertificates extends Component {
 
     render() {
         const {hasCertsRequest, createCertsRequest, redirectUrlRequest} = this.props;
-        console.warn('hasCertsRequest', hasCertsRequest);
-        console.warn('createCertsRequest', createCertsRequest);
-        console.warn('redirectUrlRequest', redirectUrlRequest);
-        console.warn('usesHttpsProtocol', usesHttpsProtocol());
-
         const hasCerts = hasCertsRequest.status === 200 && hasCertsRequest.content;
         const createdCerts = createCertsRequest.status === 200 && createCertsRequest.content;
-
-        let httpVideo;
-        let httpVideoLinkWording;
-        if (this.state.httpVideoShow) {
-            httpVideo =
-                <iframe
-                    width="560"
-                    height="315"
-                    src={httpVideoLink}
-                    frameBorder="0"
-                    allowFullScreen
-                ></iframe>;
-            httpVideoLinkWording = 'Hide Video.';
-        } else {
-            httpVideo = null;
-            httpVideoLinkWording = 'Click to see how.';
-        }
 
         let httpNote = null;
         httpNote = (
@@ -71,10 +61,10 @@ export default class CreateCertificates extends Component {
                         {httpVideoShow: !this.state.httpVideoShow}
                     );}}
                 >
-                    {httpVideoLinkWording}
+                    {httpVideoLinkWording(this.state.httpVideoShow)}
                 </a>
                 <div>
-                    {httpVideo}
+                    {httpVideo(this.state.httpVideoShow)}
                 </div>
             </div>
         );
@@ -91,10 +81,9 @@ export default class CreateCertificates extends Component {
         } else {
             httpsServerStatus = (
                 <div>
-                    {RED_DOT}{'This app is not running on a HTTPS server.'}
+                    {RED_DOT}{'This app is not running on a HTTPS server. '}
                     <a
                        onClick={() => {
-                           console.log('createCerts()');
                            this.props.createCerts();
                        }}
                     >

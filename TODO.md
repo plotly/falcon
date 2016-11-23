@@ -16,8 +16,8 @@
     - [] add "edit" button to modify the connections and a new button to save the modified connections
 	- [x] fix tables UI
 	- [x] add elasticsearch get mappings endpoint
-- [ ] Sobo - Add the SSL scripts back to the desktop app
-- HTTPS - Add a setting with the path to the CERT files
+- [x] Sobo - Add the SSL scripts back to the desktop app
+- [x] Sobo - Add a setting with the path to the CERT files
 - [x] Sobo - Move all ~/.plotly/connector/.json files to .yaml files
 - Can we deploy this with on-prem? Chris will check in with Jody
     - [x] Do we get SSL for free with this?

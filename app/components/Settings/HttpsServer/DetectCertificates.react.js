@@ -1,9 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Instructions from './Instructions.react';
-import {baseUrl} from '../../../utils/utils';
+import {baseUrl, usesHttpsProtocol} from '../../../utils/utils';
 import {RED_DOT, YELLOW_DOT, GREEN_DOT} from './Buttons.js';
-import {usesHttpsProtocol} from '../../../utils/utils';
 
 let INTERVAL_SERVER_STATUS;
 
@@ -19,7 +18,6 @@ export default class DetectCertificates extends Component {
     componentWillMount() {
         if (usesHttpsProtocol()) {
             INTERVAL_SERVER_STATUS = setInterval(() => {
-                console.warn('status call');
                 fetch(
                     `${baseUrl()}/status`
                 )
@@ -45,7 +43,6 @@ export default class DetectCertificates extends Component {
 
     render() {
         const {redirectUrlRequest} = this.props;
-        console.warn('successfulFetch', this.state.successfulFetch);
         let httpsServerStatus;
         if (this.state.successfulFetch && usesHttpsProtocol()) {
             httpsServerStatus = (
@@ -81,7 +78,7 @@ export default class DetectCertificates extends Component {
         } else {
             httpsServerStatus = (
                 <div>
-                    {RED_DOT}{'This does not have a secure domain.'}
+                    {RED_DOT}{'This does not have a secure domain. '}
                     <a
                        onClick={() => {
                            this.props.redirectUrl();
