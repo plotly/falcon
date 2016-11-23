@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import * as styles from './UserCredentials.css';
+import * as styles from './UserConnections.css';
 import {head} from 'ramda'; 
 import {
     CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS
@@ -33,7 +33,7 @@ const documentationLink = (dialect) => {
     return `http://help.plot.ly/database-connectors/${dialect}/`;
 };
 
-export default class UserCredentials extends Component {
+export default class UserConnections extends Component {
     constructor(props) {
         super(props);
 		this.getPlaceholder = this.getPlaceholder.bind(this);
@@ -51,12 +51,12 @@ export default class UserCredentials extends Component {
 		return 'test-input-created';
 	}
 
-	getInputType (credential) {
-		return (credential === 'password') ? 'password' : 'text';
+	getInputType (connection) {
+		return (connection === 'password') ? 'password' : 'text';
 	}
 
-	getPlaceholder(credential) {
-		switch (credential) {
+	getPlaceholder(connection) {
+		switch (connection) {
 			case 'port':
 				return 'server port number (e.g. 3306)';
 			case 'storage':
@@ -64,14 +64,14 @@ export default class UserCredentials extends Component {
             case 'host':
                 return 'server name (e.g. localhost)';
 			default:
-				return credential;
+				return connection;
 		}
 	}
 
-	getOnClick(credential) {
+	getOnClick(connection) {
         // sqlite requires a path
 		return () => {
-			if (credential === 'storage') {
+			if (connection === 'storage') {
 				dialog.showOpenDialog({
 					properties: ['openFile', 'openDirectory'],
 					filters: [{name: 'databases', extensions: ['db']}]
@@ -83,8 +83,8 @@ export default class UserCredentials extends Component {
 					// get the filename to use as username in the logs
 					const splitPath = path.split('/');
 					const fileName = splitPath.length - 1;
-					this.props.updateCredential({
-						[credential]: paths[0],
+					this.props.updateConnection({
+						[connection]: paths[0],
 						'username': splitPath[fileName]
 					});
 				});
@@ -94,34 +94,34 @@ export default class UserCredentials extends Component {
 
 	render() {
 
-		const {credentialObject, updateCredential} = this.props;
+		const {connectionObject, updateConnection} = this.props;
 
-        let inputNames = CONNECTION_CONFIG[credentialObject.dialect].map(credential => {
+        let inputNames = CONNECTION_CONFIG[connectionObject.dialect].map(connection => {
             return (
-                <div key={credential}>
-                    <span className ={styles.inputName}>{credential}</span>
+                <div key={connection}>
+                    <span className ={styles.inputName}>{connection}</span>
                 </div>
             );
         });
-		let inputs = CONNECTION_CONFIG[credentialObject.dialect]
-			.map(credential => (
-            <div key={credential}>
+		let inputs = CONNECTION_CONFIG[connectionObject.dialect]
+			.map(connection => (
+            <div key={connection}>
                 <input className={this.testClass()}
-                    placeholder={this.getPlaceholder(credential)}
-                    type={this.getInputType(credential)}
+                    placeholder={this.getPlaceholder(connection)}
+                    type={this.getInputType(connection)}
                     onChange={e => (
-                        updateCredential({[credential]: e.target.value})
+                        updateConnection({[connection]: e.target.value})
                     )}
-                    onClick={this.getOnClick(credential)}
-                    value={credentialObject[credential]}
-                    id={`test-input-${credential}`}
+                    onClick={this.getOnClick(connection)}
+                    value={connectionObject[connection]}
+                    id={`test-input-${connection}`}
                 />
             </div>
 		));
 
         let options = null;
-        if (CONNECTION_OPTIONS[credentialObject.dialect].length !== 0) {
-            options = CONNECTION_OPTIONS[credentialObject.dialect]
+        if (CONNECTION_OPTIONS[connectionObject.dialect].length !== 0) {
+            options = CONNECTION_OPTIONS[connectionObject.dialect]
                 .map((option) => (
                 <div
                     className={styles.options}
@@ -132,7 +132,7 @@ export default class UserCredentials extends Component {
                         className={styles.checkbox}
                         type="checkbox"
                         onChange={() => {
-                            updateCredential(
+                            updateConnection(
                                 {[option]: !configuration.get(option)}
                             );
                         }}
@@ -155,10 +155,10 @@ export default class UserCredentials extends Component {
                     <div className={styles.inputFieldsContainer}>
                         <a className={styles.documentationLink}
                             onClick={() => {
-                            shell.openExternal(documentationLink(credentialObject.dialect));
+                            shell.openExternal(documentationLink(connectionObject.dialect));
                         }}
                         >
-                            plotly &nbsp;{credentialObject.dialect}&nbsp; documentation
+                            plotly &nbsp;{connectionObject.dialect}&nbsp; documentation
                         </a>
                         {inputs}
                         <div className={styles.optionsContainer}>
@@ -171,8 +171,8 @@ export default class UserCredentials extends Component {
 	}
 }
 
-UserCredentials.propTypes = {
-    credentialObject: PropTypes.shape({
+UserConnections.propTypes = {
+    connectionObject: PropTypes.shape({
         dialect: PropTypes.string.required,
         username: PropTypes.string,
         port: PropTypes.string,
@@ -181,5 +181,5 @@ UserCredentials.propTypes = {
         id: PropTypes.string,
         database: PropTypes.string
     }),
-    updateCredential: PropTypes.func
+    updateConnection: PropTypes.func
 };

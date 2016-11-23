@@ -10,13 +10,13 @@ export default class Tabs extends Component {
     }
 
     render() {
-        const {credentials, selectedTab, newTab, setTab, deleteTab} = this.props;
+        const {connections, selectedTab, newTab, setTab, deleteTab} = this.props;
             return (
                 <div className={classnames(styles.tabManagerWrapper, styles.Flipped)}>
                     <div className={styles.tabManagerContainer}>
-                        {keys(credentials).map(tabId =>
+                        {keys(connections).map(tabId =>
                             <Tab
-                                credentialObject={credentials[tabId]}
+                                connectionObject={connections[tabId]}
                                 deleteTab={deleteTab}
                                 isSelected={tabId === selectedTab}
                                 key={tabId}

@@ -39,7 +39,7 @@ export function createGrid(filename) {
     });
 }
 
-export const sqlCredentials = {
+export const sqlConnections = {
     username: 'masteruser',
     password: 'connecttoplotly',
     database: 'plotly_datasets',
@@ -49,7 +49,7 @@ export const sqlCredentials = {
 };
 
 // my local ones - TODO - delete
-// export const sqlCredentials = {
+// export const sqlConnections = {
 //     username: 'chriddyp',
 //     password: '',
 //     database: 'chriddyp',
@@ -58,14 +58,14 @@ export const sqlCredentials = {
 //     dialect: 'postgres'
 // };
 
-export const elasticsearchCredentials = {
+export const elasticsearchConnections = {
     dialect: 'elasticsearch',
     host: 'https://67a7441549120daa2dbeef8ac4f5bb2e.us-east-1.aws.found.io',
     port: '9243',
     index: 'sample-data'
 };
 
-export const publicReadableS3Credentials = {
+export const publicReadableS3Connections = {
     dialect: 's3',
     bucket: 'plotly-s3-connector-test',
     accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
@@ -73,7 +73,7 @@ export const publicReadableS3Credentials = {
     // TODO - region here too?
 };
 
-export const apacheDrillCredentials = {
+export const apacheDrillConnections = {
     dialect: 'apache drill',
     host: 'http://ec2-35-160-151-112.us-west-2.compute.amazonaws.com',
     port: 8047,
@@ -84,7 +84,7 @@ export const apacheDrillCredentials = {
 };
 
 
-export const configuration = dissoc('password', sqlCredentials);
+export const configuration = dissoc('password', sqlConnections);
 
 export const apacheDrillStorage = [
   {
