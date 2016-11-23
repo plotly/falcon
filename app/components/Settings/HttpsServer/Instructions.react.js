@@ -1,5 +1,21 @@
 import React from 'react';
-import {shell} from 'electron';
+
+/*
+ * We're sharing most of the same components for the web-app and the
+ * electron interface. In the electron app, we walk the user through
+ * setting up self-signed HTTPS certs but we don't show those instructions
+ * in the web-app since it requires `electron` specific modules
+ * (like sudo prompt).
+ * This component is imported in both modules but only rendered in the
+ * electron app. So, shim out the `electron` require so that this still
+ * runs in the web.
+ */
+let shell;
+try {
+    shell = require('electron').shell
+} catch(e) {
+
+}
 import {baseUrl} from '../../../utils/utils';
 
 const HTML_STATUS_PAGE = `${baseUrl()}/status`;
