@@ -13,6 +13,6 @@ COPY . /usr/src/app
 RUN npm run heroku-postbuild
 
 
-ENV PORT 9000
-EXPOSE 9000
+ENV PORT 9494
+EXPOSE 9494
 CMD [ "node", "/usr/src/app/dist/headless-bundle.js"]

@@ -31,7 +31,7 @@ const DEFAULT_SETTINGS = {
         'https://stage.plot.ly',
         'https://local.plot.ly'
     ],
-    PORT: 9000,
+    PORT: 9494,
 
     LOG_TO_STDOUT: false
 };

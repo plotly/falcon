@@ -29,7 +29,7 @@ import {dissoc, merge} from 'ramda';
 // Shortcuts
 function GET(path) {
 
-    return fetch(`http://localhost:9000/${path}`, {
+    return fetch(`http://localhost:9494/${path}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -39,7 +39,7 @@ function GET(path) {
 }
 
 function POST(path, body = {}) {
-    return fetch(`http://localhost:9000/${path}`, {
+    return fetch(`http://localhost:9494/${path}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -51,7 +51,7 @@ function POST(path, body = {}) {
 
 function DELETE(path) {
 
-    return fetch(`http://localhost:9000/${path}`, {
+    return fetch(`http://localhost:9494/${path}`, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',
