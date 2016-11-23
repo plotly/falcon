@@ -36,6 +36,7 @@ release
 main.js
 main.js.map
 static/*.js*
+static/style.css
 
 # Local tests
 test/set_creds.sh
