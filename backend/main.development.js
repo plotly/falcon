@@ -32,9 +32,9 @@ app.on('ready', () => {
 
     const URL = `${server.protocol}://${server.domain}`;
     const PORT = getSetting('PORT');
-    console.log('URL', URL);
     // TODO - Does this work too?
     // mainWindow.loadURL(`http://localhost:${getSetting('PORT')}`);
+
     // Provide the port of the server to the front-end as a query string param.
     mainWindow.loadURL(`file://${__dirname}/../app/app.html?url=${URL}&port=${PORT}`);
 

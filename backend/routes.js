@@ -19,7 +19,6 @@ import fetch from 'node-fetch';
 export default class Server {
     constructor() {
         const certs = getCerts();
-        console.log('certs do not exist', isEmpty(certs));
         const server = isEmpty(certs) ? restify.createServer() : restify.createServer(certs);
 
         const queryScheduler = new QueryScheduler();
@@ -338,8 +337,6 @@ export default class Server {
         });
 
         server.get('/redirect-url', (req, res, next) => {
-            console.log('redirectUrl()');
-            console.log(that.domain);
             res.json(200, redirectUrl(getSetting('CONNECTOR_HTTPS_DOMAIN')));
         });
 
