@@ -122,7 +122,6 @@ describe('Server', function () {
         .catch(done);
     })
 
-
     it('oauth - saves oauth access token with a username if valid', function(done) {
         /*
          * This is a real live access token associated with
