@@ -27,6 +27,10 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
 
 
 export function updateGrid(rows, fid, uids) {
+    /*
+     * TODO - This will not work for collaborators. In addition to saving
+     * the fid we should save the username of the scheduler.
+     */
     const username = fid.split(':')[0];
     const users = getSetting('USERS');
     const user = users.find(
