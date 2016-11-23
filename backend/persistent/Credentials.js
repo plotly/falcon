@@ -9,7 +9,7 @@ import {
     createConnectorFolder
 } from '../utils/homeFiles';
 
-export function getConnections() {
+export function getCredentials() {
     if (fs.existsSync(CREDENTIALS_PATH)) {
         return YAML.load(CREDENTIALS_PATH.toString());
     } else {
@@ -17,70 +17,70 @@ export function getConnections() {
     }
 }
 
-export function getSanitizedConnectionById(id) {
-    const connection = getConnections().find(connection => connection.id === id);
-    if (connection) {
+export function getSanitizedCredentialById(id) {
+    const credential = getCredentials().find(credential => credential.id === id);
+    if (credential) {
         // TODO - use reduce or w/e
-        return dissoc('secretAccessKey', dissoc('password', connection));
+        return dissoc('secretAccessKey', dissoc('password', credential));
     } else {
         return null;
     }
 }
 
-export function getConnectionById(id) {
-    return getConnections().find(connection => connection.id === id);
+export function getCredentialById(id) {
+    return getCredentials().find(credential => credential.id === id);
 }
 
 
-export function deleteConnectionById(id) {
-    const connections = getConnections();
-    const index = findIndex(connection => connection.id === id, connections);
+export function deleteCredentialById(id) {
+    const credentials = getCredentials();
+    const index = findIndex(credential => credential.id === id, credentials);
     if (index > -1) {
-        connections.splice(index, 1);
-        fs.writeFileSync(CREDENTIALS_PATH, YAML.stringify(connections, 4));
+        credentials.splice(index, 1);
+        fs.writeFileSync(CREDENTIALS_PATH, YAML.stringify(credentials, 4));
     }
 }
 
-export function getSanitizedConnections() {
-    const connections = getConnections();
-    return connections.map(cred => dissoc('password', cred));
+export function getSanitizedCredentials() {
+    const credentials = getCredentials();
+    return credentials.map(cred => dissoc('password', cred));
 }
 
-export function saveConnection(connectionObject) {
-    const connections = getConnections();
-    const connectionId = uuid.v4();
-    connections.push(assoc('id', connectionId, connectionObject));
+export function saveCredential(credentialObject) {
+    const credentials = getCredentials();
+    const credentialId = uuid.v4();
+    credentials.push(assoc('id', credentialId, credentialObject));
     if (!fs.existsSync(CONNECTOR_FOLDER_PATH)) {
         createConnectorFolder();
     }
-    fs.writeFileSync(CREDENTIALS_PATH, YAML.stringify(connections, 4));
-    return connectionId;
+    fs.writeFileSync(CREDENTIALS_PATH, YAML.stringify(credentials, 4));
+    return credentialId;
 }
 
 
 /*
- * Find a pair of connections from the disk by looking up each
+ * Find a pair of credentials from the disk by looking up each
  * of the keys in the configuration object.
  *
  * Note that the objects don't need to match exactly -
  * they only need to match in the keys that are provided by the
  * configuration object.
  *
- * This is used to find the unsanitized connections (with the password)
+ * This is used to find the unsanitized credentials (with the password)
  * saved on the disk given a set of sanitized
- * connections (without the password)
+ * credentials (without the password)
  */
-export function lookUpConnections(configuration) {
+export function lookUpCredentials(configuration) {
 
-    const savedDBConnections = getConnections();
-    const requestedDBConnections = savedDBConnections.find(savedConnection => {
-        let connectionsMatch = true;
+    const savedDBCredentials = getCredentials();
+    const requestedDBCredentials = savedDBCredentials.find(savedCredential => {
+        let credentialsMatch = true;
         Object.keys(configuration).forEach(credKey => (
-            connectionsMatch = connectionsMatch && (
-                configuration[credKey] === savedConnection[credKey]
+            credentialsMatch = credentialsMatch && (
+                configuration[credKey] === savedCredential[credKey]
             )
         ));
-        return connectionsMatch;
+        return credentialsMatch;
     });
-    return requestedDBConnections;
+    return requestedDBCredentials;
 }

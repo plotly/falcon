@@ -12,8 +12,8 @@
 - [x] Chris - Web version (bundle, new endpoint)
 - Sobo - UI:  
     - [x] 'x' should `alert("")`
-    - [x] after successfully connecting, connections should collapse
-    - [] add "edit" button to modify the connections and a new button to save the modified connections
+    - [x] after successfully connecting, credentials should collapse
+    - [] add "edit" button to modify the credentials and a new button to save the modified credentials
 	- [x] fix tables UI
 	- [x] add elasticsearch get mappings endpoint
 - [ ] Sobo - Add the SSL scripts back to the desktop app
@@ -54,7 +54,7 @@ little things
 
 ***
 
-- Alert users who are deleting a tab that contains a connection ID with a
+- Alert users who are deleting a tab that contains a credential ID with a
   persistent query
 - Tell people about the logs in the UI
 - Need to update shareplot and workspace dates to be "date modified" instead of

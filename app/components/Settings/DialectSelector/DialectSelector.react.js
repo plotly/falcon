@@ -7,7 +7,7 @@ import {
 import classnames from 'classnames';
 
 export default function DialectSelector(props) {
-    const {connectionObject, updateConnection} = props;
+    const {credentialObject, updateCredential} = props;
 
     const logos = values(DIALECTS).map(DIALECT => (
         <div
@@ -15,11 +15,11 @@ export default function DialectSelector(props) {
             className={classnames(
                 styles.logo, {
                       [styles.logoSelected]:
-                      connectionObject.dialect === DIALECT
+                      credentialObject.dialect === DIALECT
                  }
             )}
             onClick={() => {
-                updateConnection(
+                updateCredential(
                     {dialect: DIALECT}
                 );
             }}

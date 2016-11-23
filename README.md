@@ -47,7 +47,7 @@ $ npm run dev
 
 ### Testing
 
-Note: Currently access to remote databases is required to run local tests. These connections are not committed to git at the moment. Contact us if you require running tests locally.
+Note: Currently access to remote databases is required to run local tests. These credentials are not committed to git at the moment. Contact us if you require running tests locally.
 
 ```bash
 $ npm run build

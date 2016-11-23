@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
 import * as styles from './Settings.css';
 import Tabs from './Tabs/Tabs.react';
-import UserConnections from './UserConnections/UserConnections.react';
+import UserCredentials from './UserCredentials/UserCredentials.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
@@ -22,18 +22,18 @@ const unfoldIcon = (
 );
 
 function SettingsForm(props) {
-    const {connectionObject, updateConnection, connectRequest} = props;
+    const {credentialObject, updateCredential, connectRequest} = props;
     return (
         <div className={styles.configurationContainer}>
             <div className={styles.dialectSelector}>
                 <DialectSelector
-                    connectionObject={connectionObject}
-                    updateConnection={updateConnection}
+                    credentialObject={credentialObject}
+                    updateCredential={updateCredential}
                 />
             </div>
-            <UserConnections
-                connectionObject={connectionObject}
-                updateConnection={updateConnection}
+            <UserCredentials
+                credentialObject={credentialObject}
+                updateCredential={updateCredential}
             />
         </div>
     );
@@ -44,7 +44,7 @@ class Settings extends Component {
         super(props);
         this.fetchData = this.fetchData.bind(this);
         this.wrapWithAutoHide = this.wrapWithAutoHide.bind(this);
-        this.state = {show_connections: true};
+        this.state = {show_credentials: true};
     }
 
     wrapWithAutoHide(name, reactComponent) {
@@ -74,7 +74,7 @@ class Settings extends Component {
     }
     fetchData() {
         const {
-            connectionsRequest,
+            credentialsRequest,
             initialize,
             previewTables,
             previewTableRequest,
@@ -91,47 +91,47 @@ class Settings extends Component {
             s3KeysRequest,
             apacheDrillStorageRequest,
             apacheDrillS3KeysRequest,
-            connections,
+            credentials,
             selectedTab
         } = this.props;
-        if (connectionsRequest && !connectionsRequest.status) {
+        if (credentialsRequest && !credentialsRequest.status) {
             initialize();
         }
-        const connectionObject = connections[selectedTab] || {};
-        if (contains(connectionObject.dialect, [
+        const credentialObject = credentials[selectedTab] || {};
+        if (contains(credentialObject.dialect, [
                     DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
                     DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE
         ])) {
-            if (connectRequest.status !== 200 && !this.state.show_connections) {
-                this.setState({show_connections: true});
+            if (connectRequest.status !== 200 && !this.state.show_credentials) {
+                this.setState({show_credentials: true});
             }
             if (connectRequest.status === 200 && !tablesRequest.status) {
                 getTables();
             }
             if (tablesRequest.status === 200 && !selectedTable) {
-                this.setState({show_connections: false});
+                this.setState({show_credentials: false});
                 setTable(tablesRequest.content[0][0]);
             }
             if (selectedTable && !previewTableRequest.status) {
                 previewTables();
             }
-        } else if (connectionObject.dialect === DIALECTS.ELASTICSEARCH) {
-            if (connectRequest.status !== 200 && !this.state.show_connections) {
-                this.setState({show_connections: true});
+        } else if (credentialObject.dialect === DIALECTS.ELASTICSEARCH) {
+            if (connectRequest.status !== 200 && !this.state.show_credentials) {
+                this.setState({show_credentials: true});
             }
             if (connectRequest.status === 200 && !elasticsearchMappingsRequest.status) {
-                this.setState({show_connections: false});
+                this.setState({show_credentials: false});
                 getElasticsearchMappings();
             }
             if (selectedTable && !previewTableRequest.status) {
                 previewTables();
             }
-        } else if (connectionObject.dialect === DIALECTS.S3) {
+        } else if (credentialObject.dialect === DIALECTS.S3) {
 
             if (connectRequest.status === 200 && !s3KeysRequest.status) {
                 getS3Keys();
             }
-        } else if (connectionObject.dialect === DIALECTS.APACHE_DRILL) {
+        } else if (credentialObject.dialect === DIALECTS.APACHE_DRILL) {
             if (connectRequest.status === 200 && !apacheDrillStorageRequest.status) {
                 getApacheDrillStorage();
             }
@@ -144,14 +144,14 @@ class Settings extends Component {
 
     render() {
         const {
-            connections,
+            credentials,
             selectedTab,
-            updateConnection,
+            updateCredential,
             connect,
             connectRequest,
-            saveConnectionsRequests,
-            deleteConnectionsRequests,
-            connectionsHaveBeenSaved,
+            saveCredentialsRequests,
+            deleteCredentialsRequests,
+            credentialsHaveBeenSaved,
             setTable,
             setIndex,
             selectedTable,
@@ -174,7 +174,7 @@ class Settings extends Component {
         return (
             <div>
                 <Tabs
-                    connections={connections}
+                    credentials={credentials}
                     selectedTab={selectedTab}
                     newTab={newTab}
                     setTab={setTab}
@@ -182,22 +182,22 @@ class Settings extends Component {
                 />
 
                 <div className={styles.openTab}>
-                    {this.wrapWithAutoHide('connections',
+                    {this.wrapWithAutoHide('credentials',
                     <SettingsForm
                         connectRequest={connectRequest}
-                        connectionObject={connections[selectedTab]}
-                        updateConnection={updateConnection}
+                        credentialObject={credentials[selectedTab]}
+                        updateCredential={updateCredential}
                     />)}
 
                     <ConnectButton
-                        connectionsHaveBeenSaved={connectionsHaveBeenSaved}
+                        credentialsHaveBeenSaved={credentialsHaveBeenSaved}
                         connect={connect}
-                        saveConnectionsRequest={saveConnectionsRequests}
+                        saveCredentialsRequest={saveCredentialsRequests}
                         connectRequest={connectRequest}
                     />
 
                     <OptionsDropdown
-                        connectionObject={connections[selectedTab]}
+                        credentialObject={credentials[selectedTab]}
                         selectedTable={selectedTable}
                         elasticsearchMappingsRequest={elasticsearchMappingsRequest}
                         tablesRequest={tablesRequest}
@@ -230,11 +230,11 @@ function mapStateToProps(state) {
     const {
         selectedTab,
         tabMap,
-        connections,
-        connectionsRequest,
+        credentials,
+        credentialsRequest,
         connectRequests,
-        saveConnectionsRequests,
-        deleteConnectionsRequests,
+        saveCredentialsRequests,
+        deleteCredentialsRequests,
         previewTableRequests,
         tablesRequests,
         elasticsearchMappingsRequests,
@@ -245,43 +245,43 @@ function mapStateToProps(state) {
         apacheDrillS3KeysRequests
     } = state;
 
-    const selectedConnectionId = tabMap[selectedTab];
-    const connectionsHaveBeenSaved = Boolean(selectedConnectionId);
+    const selectedCredentialId = tabMap[selectedTab];
+    const credentialsHaveBeenSaved = Boolean(selectedCredentialId);
     const selectedTable = selectedTables[selectedTab] || null;
     const index = selectedIndecies[selectedTab] || null;
 
     let previewTableRequest = {};
-    if (previewTableRequests[selectedConnectionId] &&
-        previewTableRequests[selectedConnectionId][selectedTable]
+    if (previewTableRequests[selectedCredentialId] &&
+        previewTableRequests[selectedCredentialId][selectedTable]
     ) {
-        previewTableRequest = previewTableRequests[selectedConnectionId][selectedTable];
+        previewTableRequest = previewTableRequests[selectedCredentialId][selectedTable];
     }
 
     return {
-        connectionsRequest,
-        connectRequest: connectRequests[selectedConnectionId] || {},
-        saveConnectionsRequest: saveConnectionsRequests[selectedConnectionId] || {},
-        deleteConnectionsRequest: deleteConnectionsRequests[selectedConnectionId] || {},
+        credentialsRequest,
+        connectRequest: connectRequests[selectedCredentialId] || {},
+        saveCredentialsRequest: saveCredentialsRequests[selectedCredentialId] || {},
+        deleteCredentialsRequest: deleteCredentialsRequests[selectedCredentialId] || {},
         previewTableRequest,
-        tablesRequest: tablesRequests[selectedConnectionId] || {},
-        elasticsearchMappingsRequest: elasticsearchMappingsRequests[selectedConnectionId] || {},
-        s3KeysRequest: s3KeysRequests[selectedConnectionId] || {},
-        apacheDrillStorageRequest: apacheDrillStorageRequests[selectedConnectionId] || {},
-        apacheDrillS3KeysRequest: apacheDrillS3KeysRequests[selectedConnectionId] || {},
+        tablesRequest: tablesRequests[selectedCredentialId] || {},
+        elasticsearchMappingsRequest: elasticsearchMappingsRequests[selectedCredentialId] || {},
+        s3KeysRequest: s3KeysRequests[selectedCredentialId] || {},
+        apacheDrillStorageRequest: apacheDrillStorageRequests[selectedCredentialId] || {},
+        apacheDrillS3KeysRequest: apacheDrillS3KeysRequests[selectedCredentialId] || {},
         selectedTab,
-        connections,
-        connectionsHaveBeenSaved,
-        connectionObject: connections[selectedTab],
+        credentials,
+        credentialsHaveBeenSaved,
+        credentialObject: credentials[selectedTab],
         selectedTable,
         index,
-        selectedConnectionId
+        selectedCredentialId
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         initialize: () => {
-            dispatch(Actions.getConnections())
+            dispatch(Actions.getCredentials())
             .then(() => dispatch(Actions.initializeTabs()));
         },
         dispatch
@@ -292,33 +292,33 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     const {
         selectedTab,
         selectedTable,
-        connections,
-        selectedConnectionId,
-        connectionsHaveBeenSaved,
-        connectionObject
+        credentials,
+        selectedCredentialId,
+        credentialsHaveBeenSaved,
+        credentialObject
     } = stateProps;
     const {dispatch} = dispatchProps;
 
-    function boundUpdateConnection(connectionUpdate) {
-        dispatch(Actions.updateConnection({
+    function boundUpdateCredential(credentialUpdate) {
+        dispatch(Actions.updateCredential({
             tableId: selectedTab,
-            update: connectionUpdate
+            update: credentialUpdate
         }));
     }
     function boundGetTables() {
-        return dispatch(Actions.getTables(selectedConnectionId));
+        return dispatch(Actions.getTables(selectedCredentialId));
     }
     function boundGetElasticsearchMappings() {
-        return dispatch(Actions.getElasticsearchMappings(selectedConnectionId));
+        return dispatch(Actions.getElasticsearchMappings(selectedCredentialId));
     }
     function boundGetS3Keys() {
-        return dispatch(Actions.getS3Keys(selectedConnectionId));
+        return dispatch(Actions.getS3Keys(selectedCredentialId));
     }
     function boundGetApacheDrillStorage() {
-        return dispatch(Actions.getApacheDrillStorage(selectedConnectionId));
+        return dispatch(Actions.getApacheDrillStorage(selectedCredentialId));
     }
     function boundGetApacheDrillS3Keys() {
-        return dispatch(Actions.getApacheDrillS3Keys(selectedConnectionId));
+        return dispatch(Actions.getApacheDrillS3Keys(selectedCredentialId));
     }
     function boundSetTable(table) {
         return dispatch(Actions.setTable({[selectedTab]: table}));
@@ -328,30 +328,30 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     }
     function boundPreviewTables() {
         return dispatch(Actions.previewTable(
-            selectedConnectionId,
-            connectionObject.dialect,
+            selectedCredentialId,
+            credentialObject.dialect,
             selectedTable,
-            connectionObject.database
+            credentialObject.database
         ));
     }
 
     /*
-     * dispatchConnect either saves the connections and then connects
-     * or just connects if the connections have already been saved
+     * dispatchConnect either saves the credentials and then connects
+     * or just connects if the credentials have already been saved
      */
     let dispatchConnect;
-    if (!connectionsHaveBeenSaved) {
+    if (!credentialsHaveBeenSaved) {
         dispatchConnect = function saveAndConnect() {
-            dispatch(Actions.saveConnections(connections[selectedTab], selectedTab))
+            dispatch(Actions.saveCredentials(credentials[selectedTab], selectedTab))
             .then(json => {
-                dispatch(Actions.connect(json.connectionId));
+                dispatch(Actions.connect(json.credentialId));
             });
-            // TODO - If connecting *fails* then we should delete the connection
+            // TODO - If connecting *fails* then we should delete the credential
             // so that the user can re-try.
-            // TODO - support updating connections.
+            // TODO - support updating credentials.
         };
     } else {
-        dispatchConnect = () => dispatch(Actions.connect(selectedConnectionId));
+        dispatchConnect = () => dispatch(Actions.connect(selectedCredentialId));
     }
 
     return Object.assign(
@@ -359,7 +359,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         reduce(flip(dissoc), stateProps, ['dispatch']),
         dispatchProps,
         ownProps, {
-            updateConnection: boundUpdateConnection,
+            updateCredential: boundUpdateCredential,
             getTables: boundGetTables,
             getElasticsearchMappings: boundGetElasticsearchMappings,
             setTable: boundSetTable,

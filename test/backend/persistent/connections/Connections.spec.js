@@ -1,10 +1,10 @@
 import {expect, assert} from 'chai';
 
 import {
-    sqlConnections,
-    elasticsearchConnections,
-    publicReadableS3Connections,
-    apacheDrillConnections,
+    sqlCredentials,
+    elasticsearchCredentials,
+    publicReadableS3Credentials,
+    apacheDrillCredentials,
     apacheDrillStorage
 } from '../../utils.js';
 
@@ -18,14 +18,14 @@ const transpose = m => m[0].map((x, i) => m.map(x => x[i]));
 describe('SQL - Connections', function () {
     it('Connections.connect connects to a database', function(done) {
         this.timeout(4 * 1000);
-        connect(sqlConnections).then(done).catch(done);
+        connect(sqlCredentials).then(done).catch(done);
     });
 
     it('Connections.query queries a database', function(done) {
         this.timeout(4 * 1000);
         query(
             'SELECT * from ebola_2014 LIMIT 2',
-            sqlConnections
+            sqlCredentials
         ).then(results => {
             assert.deepEqual(results.rows, [
                 ['Guinea', 3, 14, '9.95', '-9.7', '122'],
@@ -46,7 +46,7 @@ describe('SQL - Connections', function () {
 describe('Elasticsearch - Connections', function () {
     it('Connections.connect connects to a database', function(done) {
         this.timeout(4 * 1000);
-        connect(elasticsearchConnections).then(res => res.json().then(json => {
+        connect(elasticsearchCredentials).then(res => res.json().then(json => {
             console.warn(json);
             assert.equal(res.status, 200);
             assert.equal(json[0].status, 'open');
@@ -55,7 +55,7 @@ describe('Elasticsearch - Connections', function () {
     });
 
     it('Connections.mappings returns mappings', function(done) {
-        elasticsearchMappings(elasticsearchConnections).then(json => {
+        elasticsearchMappings(elasticsearchCredentials).then(json => {
             assert.deepEqual(
                 json,
                 {
@@ -150,7 +150,7 @@ describe('Elasticsearch - Connections', function () {
                 index: 'sample-data',
                 type: 'test-type'
             },
-            elasticsearchConnections
+            elasticsearchCredentials
         ).then(results => {
             assert.deepEqual(results, {
                 nrows: 11,
@@ -273,7 +273,7 @@ describe('Elasticsearch - Connections', function () {
                 index: 'sample-data',
                 type: 'test-type'
             }),
-            elasticsearchConnections
+            elasticsearchCredentials
         ).then(results => {
             assert.deepEqual(results, {
                 nrows: 1,
@@ -355,7 +355,7 @@ describe('Elasticsearch - Connections', function () {
                 index: 'sample-data',
                 type: 'test-type'
             }),
-            elasticsearchConnections
+            elasticsearchCredentials
         ).then(results => {
             assert.deepEqual(results, {
                 columnnames: [
@@ -375,12 +375,12 @@ describe('Elasticsearch - Connections', function () {
 });
 
 describe('S3 - Connection', function () {
-    it('connect succeeds with the right connections', function(done) {
+    it('connect succeeds with the right credentials', function(done) {
         this.timeout(4 * 1000);
-        connect(publicReadableS3Connections).then(done).catch(done);
+        connect(publicReadableS3Credentials).then(done).catch(done);
     });
 
-    it('connect fails with the wrong connections', function(done) {
+    it('connect fails with the wrong credentials', function(done) {
         this.timeout(4 * 1000);
         connect({dialect: 's3', accessKeyId: 'asdf', secretAccessKey: 'fdas'})
         .then(() => done('Error - should not have succeeded'))
@@ -389,7 +389,7 @@ describe('S3 - Connection', function () {
 
     it('query parses S3 CSV files', function(done) {
         this.timeout(20 * 1000);
-        query('5k-scatter.csv', publicReadableS3Connections)
+        query('5k-scatter.csv', publicReadableS3Credentials)
         .then(grid => {
             assert.deepEqual(grid.rows[0], ['-0.790276857291', '-1.32900495883']);
             assert.deepEqual(grid.rows.length, 5 * 1000 + 1);
@@ -400,7 +400,7 @@ describe('S3 - Connection', function () {
 
     it('files lists s3 files', function(done) {
         this.timeout(5 * 1000);
-        files(publicReadableS3Connections)
+        files(publicReadableS3Credentials)
         .then(files => {
             assert.deepEqual(
                 JSON.stringify(files[0]),
@@ -424,14 +424,14 @@ describe('S3 - Connection', function () {
 
 describe('Apache Drill - Connection', function () {
     it('connects', function(done) {
-        connect(apacheDrillConnections)
+        connect(apacheDrillCredentials)
         .then(res => done())
         .catch(done);
     });
 
     it('storage returns valid apache drill storage items', function(done) {
         this.timeout(10 * 1000);
-        storage(apacheDrillConnections)
+        storage(apacheDrillCredentials)
         .then(config => {
             assert.deepEqual(
                 config, apacheDrillStorage)
@@ -441,8 +441,8 @@ describe('Apache Drill - Connection', function () {
 
     it('s3-keys returns a list of files in the s3 bucket', function(done) {
         this.timeout(10 * 1000);
-        console.warn('apacheDrillConnections: ', apacheDrillConnections);
-        listS3Files(apacheDrillConnections)
+        console.warn('apacheDrillCredentials: ', apacheDrillCredentials);
+        listS3Files(apacheDrillCredentials)
         .then(files => {
             assert.deepEqual(
                 JSON.stringify(files[0]),
@@ -464,7 +464,7 @@ describe('Apache Drill - Connection', function () {
 
     it('query parses parquet files on S3', function(done) {
         this.timeout(20 * 1000);
-        query('SELECT * FROM s3.root.`sample-data.parquet` LIMIT 10', apacheDrillConnections)
+        query('SELECT * FROM s3.root.`sample-data.parquet` LIMIT 10', apacheDrillCredentials)
         .then(grid => {
 
             /*

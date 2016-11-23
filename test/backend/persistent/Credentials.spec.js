@@ -4,17 +4,17 @@ import {merge, dissoc} from 'ramda';
 
 import {CREDENTIALS_PATH} from '../../../backend/utils/homeFiles.js';
 import {
-    saveConnection
-} from '../../../backend/persistent/Connections.js';
+    saveCredential
+} from '../../../backend/persistent/Credentials.js';
 
-describe('lookUpConnections', function() {
-    let mockConnections;
+describe('lookUpCredentials', function() {
+    let mockCredentials;
     beforeEach(() => {
         try {
             fs.unlinkSync(CREDENTIALS_PATH);
         } catch (e) {}
 
-        mockConnections = [
+        mockCredentials = [
             {
                 host: 'localhost',
                 port: 5000,

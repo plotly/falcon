@@ -9,8 +9,8 @@ export default class Tab extends Component {
     }
 
     render() {
-        const {tabId, isSelected, connectionObject, setTab, deleteTab} = this.props;
-        const {username, host, dialect, id} = connectionObject;
+        const {tabId, isSelected, credentialObject, setTab, deleteTab} = this.props;
+        const {username, host, dialect, id} = credentialObject;
 
         return (
             <div

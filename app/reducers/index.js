@@ -4,11 +4,11 @@ import {assoc, assocPath, merge, dissoc} from 'ramda';
 
 /*
 {
-    // If tabs map to saved connections, then that mapping is stored here.
+    // If tabs map to saved credentials, then that mapping is stored here.
     // If tabs aren't yet saved, then they won't be in this map.
-    // Tab IDs and Connection IDs are used to index parts of the store below.
+    // Tab IDs and Credential IDs are used to index parts of the store below.
     tabMap: {
-        [tabid1]: [connectionId1]
+        [tabid1]: [credentialId1]
     },
 
     selectedTab: tabid1,
@@ -16,9 +16,9 @@ import {assoc, assocPath, merge, dissoc} from 'ramda';
         [tabid1]: 'my-table'
     }
 
-    // Local store of the connections.
-    // Preloaded with the response from connectionsRequest
-    connections: {
+    // Local store of the credentials.
+    // Preloaded with the response from credentialsRequest
+    credentials: {
         [tabid1]: {
             username: 'chris',
             [...]
@@ -26,7 +26,7 @@ import {assoc, assocPath, merge, dissoc} from 'ramda';
     }
 
     // API Requests that just hold the status and the content
-    connectionsRequests: {
+    credentialsRequests: {
         statusCode: 200,
         content: [
             {
@@ -36,47 +36,47 @@ import {assoc, assocPath, merge, dissoc} from 'ramda';
     },
 
     connectRequests: {
-        [connectionId]: {
+        [credentialId]: {
             statusCode: 200
         }
     },
 
-    saveConnectionsRequests: {
+    saveCredentialsRequests: {
         [tabid1]: {
             statusCode: 200
         }
     }
 
     tablesRequests: {
-        [connectionId1]: {
+        [credentialId1]: {
             status: 200,
             content: ['table1', 'table2', ...]
         }
     },
 
     getElasticsearchMappingsRequests: {
-        [connectionId1]: {
+        [credentialId1]: {
             status: 200,
             content: {index1: {}, index2: {}}
         }
     },
 
     previewTableRequests: {
-        [connectionId1]: {
+        [credentialId1]: {
             status: 200,
             content: ...
         }
     },
 
     s3KeysRequests: {
-        [connectionId]: {
+        [credentialId]: {
             status: 200,
             content: [...]
         }
     }
 
     apacheDrillStorageRequests: {
-        [connectionId]: {
+        [credentialId]: {
             status: 200,
             content: [...]
         }
@@ -112,9 +112,9 @@ function createApiReducer(store) {
     };
 }
 export const connectRequests = createApiReducer('connectRequest');
-export const connectionsRequest = createApiReducer('connectionsRequest');
-export const saveConnectionsRequests = createApiReducer('saveConnectionsRequests');
-export const deleteConnectionsRequests = createApiReducer('deleteConnectionsRequests');
+export const credentialsRequest = createApiReducer('credentialsRequest');
+export const saveCredentialsRequests = createApiReducer('saveCredentialsRequests');
+export const deleteCredentialsRequests = createApiReducer('deleteCredentialsRequests');
 export const tablesRequests = createApiReducer('tables');
 export const elasticsearchMappingsRequests = createApiReducer('elasticsearchMappingsRequests');
 export const previewTableRequests = createApiReducer('previewTableRequest');
@@ -154,7 +154,7 @@ function selectedIndecies(state = {}, action) {
     }
 }
 
-function connections(state = {}, action) {
+function credentials(state = {}, action) {
     if (action.type === 'MERGE_CREDENTIALS') {
         return merge(state, action.payload);
     } else if (action.type === 'UPDATE_CREDENTIAL') {
@@ -175,14 +175,14 @@ function connections(state = {}, action) {
 
 const rootReducer = combineReducers({
     tabMap,
-    connections,
+    credentials,
     selectedTab,
     selectedTables,
     selectedIndecies,
     connectRequests,
-    connectionsRequest,
-    saveConnectionsRequests,
-    deleteConnectionsRequests,
+    credentialsRequest,
+    saveCredentialsRequests,
+    deleteCredentialsRequests,
     tablesRequests,
     elasticsearchMappingsRequests,
     previewTableRequests,

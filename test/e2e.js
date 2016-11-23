@@ -118,8 +118,8 @@ describe('plotly database connector', function Spec() {
             byId(`test-logo-${dialect}`)
         );
 
-        this.getInputField = (connection) => findEl(
-            byId(`test-input-${connection}`)
+        this.getInputField = (credential) => findEl(
+            byId(`test-input-${credential}`)
         );
 
         this.getConnectBtn = () => findEl(
@@ -172,17 +172,17 @@ describe('plotly database connector', function Spec() {
 
         // user inputs
         this.fillInputs = async (testedDialect) => {
-            CONNECTION_CONFIG[testedDialect].forEach(connection => {
-                this.getInputField(connection)
+            CONNECTION_CONFIG[testedDialect].forEach(credential => {
+                this.getInputField(credential)
                 .then(input => {
-                    input.sendKeys(CREDENTIALS[testedDialect][connection]);
+                    input.sendKeys(CREDENTIALS[testedDialect][credential]);
                 });
             });
         };
 
         this.wrongInputs = async (testedDialect) => {
-            CONNECTION_CONFIG[testedDialect].forEach(connection => {
-                this.getInputField(connection)
+            CONNECTION_CONFIG[testedDialect].forEach(credential => {
+                this.getInputField(credential)
                 .then(input => input.sendKeys('blah'));
             });
         };
@@ -493,12 +493,12 @@ describe('plotly database connector', function Spec() {
 
         const testedDialect = dialectUnderTest;
 
-        it('set state to "con_error" when connecting using wrong connections',
+        it('set state to "con_error" when connecting using wrong credentials',
         async () => {
             const logo = await this.getLogo(testedDialect);
             const btn = await this.getConnectBtn();
             await logo.click();
-            // connect with wrong connections
+            // connect with wrong credentials
             this.wrongInputs(testedDialect)
             .then(await delay(1000))
             // click to connect

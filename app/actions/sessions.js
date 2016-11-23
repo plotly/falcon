@@ -10,9 +10,9 @@ export const mergeTabMap = createAction('MERGE_TAB_MAP');
 export const setTab = createAction('SET_TAB');
 export const setTable = createAction('SET_TABLE');
 export const setIndex = createAction('SET_INDEX');
-export const mergeConnections = createAction('MERGE_CREDENTIALS');
-export const updateConnection = createAction('UPDATE_CREDENTIAL');
-export const deleteConnection = createAction('DELETE_CREDENTIAL');
+export const mergeCredentials = createAction('MERGE_CREDENTIALS');
+export const updateCredential = createAction('UPDATE_CREDENTIAL');
+export const deleteCredential = createAction('DELETE_CREDENTIAL');
 
 const DELETE_TAB_MESSAGE = 'You are about to delete a connection. ' +
 'If you have scheduled persistent queries with that connection, they ' +
@@ -84,80 +84,80 @@ function apiThunk(endpoint, method, store, id, body) {
     };
 }
 
-export function getConnections() {
+export function getCredentials() {
     return apiThunk(
-        'connections',
+        'credentials',
         'GET',
-        'connectionsRequest'
+        'credentialsRequest'
     );
 }
 
-export function connect(connectionId) {
+export function connect(credentialId) {
     return apiThunk(
-        `connect/${connectionId}`,
+        `connect/${credentialId}`,
         'POST',
         'connectRequest',
-        connectionId
+        credentialId
     );
 }
 
-export function saveConnections(connectionsObject, tabId) {
+export function saveCredentials(credentialsObject, tabId) {
     return dispatch => {
         return dispatch(apiThunk(
-            'connections',
+            'credentials',
             'POST',
-            'saveConnectionsRequest',
+            'saveCredentialsRequest',
             tabId,
-            connectionsObject
+            credentialsObject
         )).then(json => {
-            dispatch(mergeTabMap({[tabId]: json.connectionId}));
+            dispatch(mergeTabMap({[tabId]: json.credentialId}));
             return json;
         });
     };
 }
 
-export function getTables(connectionId) {
+export function getTables(credentialId) {
     return apiThunk(
-        `tables/${connectionId}`,
+        `tables/${credentialId}`,
         'POST',
         'tables',
-        connectionId
+        credentialId
     );
 }
 
-export function getElasticsearchMappings(connectionId) {
+export function getElasticsearchMappings(credentialId) {
     return apiThunk(
-        `elasticsearch-mappings/${connectionId}`,
+        `elasticsearch-mappings/${credentialId}`,
         'POST',
         'elasticsearchMappingsRequests',
-        connectionId
+        credentialId
     );
 }
 
-export function getS3Keys(connectionId) {
+export function getS3Keys(credentialId) {
     return apiThunk(
-        `s3-keys/${connectionId}`,
+        `s3-keys/${credentialId}`,
         'POST',
         's3KeysRequests',
-        connectionId
+        credentialId
     );
 }
 
-export function getApacheDrillStorage(connectionId) {
+export function getApacheDrillStorage(credentialId) {
     return apiThunk(
-        `apache-drill-storage/${connectionId}`,
+        `apache-drill-storage/${credentialId}`,
         'POST',
         'apacheDrillStorageRequests',
-        connectionId
+        credentialId
     );
 }
 
-export function getApacheDrillS3Keys(connectionId) {
+export function getApacheDrillS3Keys(credentialId) {
     return apiThunk(
-        `apache-drill-s3-keys/${connectionId}`,
+        `apache-drill-s3-keys/${credentialId}`,
         'POST',
         'apacheDrillS3KeysRequests',
-        connectionId
+        credentialId
     );
 }
 
@@ -185,15 +185,15 @@ function PREVIEW_QUERY (dialect, table, database = '') {
             throw new Error(`Dialect ${dialect} is not one of the DIALECTS`);
     }
 }
-export function previewTable (connectionId, dialect, table, database) {
+export function previewTable (credentialId, dialect, table, database) {
     const body = {
         query: PREVIEW_QUERY(dialect, table, database)
     };
     return apiThunk(
-        `query/${connectionId}`,
+        `query/${credentialId}`,
         'POST',
         'previewTableRequest',
-        [connectionId, table],
+        [credentialId, table],
         body
     );
 }
@@ -201,26 +201,26 @@ export function previewTable (connectionId, dialect, table, database) {
 export function initializeTabs() {
     return function(dispatch, getState) {
         const state = getState();
-        const {connectionsRequest} = state;
-        if (connectionsRequest.status !== 200) {
+        const {credentialsRequest} = state;
+        if (credentialsRequest.status !== 200) {
             console.error(
                 "Can't initialize tabs - crednetials haven't been retreived yet."
             );
             return;
         }
-        const savedConnections = connectionsRequest.content;
-        if (savedConnections.length > 0) {
-            const tabs = savedConnections.map(() => uuid.v4());
+        const savedCredentials = credentialsRequest.content;
+        if (savedCredentials.length > 0) {
+            const tabs = savedCredentials.map(() => uuid.v4());
             const tabMap = {};
-            const connections = {};
-            savedConnections.forEach((cred, i) => {
+            const credentials = {};
+            savedCredentials.forEach((cred, i) => {
                 tabMap[tabs[i]] = cred.id;
-                connections[tabs[i]] = cred;
+                credentials[tabs[i]] = cred;
             });
             dispatch(mergeTabMap(tabMap));
-            dispatch(mergeConnections(connections));
+            dispatch(mergeCredentials(credentials));
             dispatch(setTab(tabs[0]));
-            savedConnections.forEach(cred => {
+            savedCredentials.forEach(cred => {
                 dispatch(connect(cred.id));
             });
         } else {
@@ -232,7 +232,7 @@ export function initializeTabs() {
 export function newTab() {
     return function(dispatch, getState) {
         const newId = uuid.v4();
-        dispatch(mergeConnections({
+        dispatch(mergeCredentials({
             [newId]: INITIAL_CREDENTIALS
         }));
         dispatch(setTab(newId));
@@ -245,9 +245,9 @@ export function deleteTab(tabId) {
         if (confirm(DELETE_TAB_MESSAGE)) {
         /* eslint no-alert: 0 */
             if (tabId === getState().selectedTab) {
-                const tabIds = Object.keys(getState().connections);
+                const tabIds = Object.keys(getState().credentials);
                 const currentIdIndex = tabIds.indexOf(tabId);
-                const connectionId = getState().connections[tabId].id;
+                const credentialId = getState().credentials[tabId].id;
                 let nextIdIndex;
                 if (currentIdIndex === 0) {
                     if (tabIds.length > 1) {
@@ -260,13 +260,13 @@ export function deleteTab(tabId) {
                 }
                 dispatch(setTab(tabIds[nextIdIndex]));
                 dispatch(apiThunk(
-                    `connections/${connectionId}`,
+                    `credentials/${credentialId}`,
                     'DELETE',
-                    'deleteConnectionsRequests',
-                    connectionId
+                    'deleteCredentialsRequests',
+                    credentialId
                 ));
             }
-            dispatch(deleteConnection(tabId));
+            dispatch(deleteCredential(tabId));
         } else {
             return;
         }

@@ -10,13 +10,13 @@ import {
     QUERIES_PATH,
     CREDENTIALS_PATH
 } from '../../../backend/utils/homeFiles.js';
-import {saveConnection} from '../../../backend/persistent/Connections.js';
+import {saveCredential} from '../../../backend/persistent/Credentials.js';
 import {getQuery, getQueries} from '../../../backend/persistent/Queries.js';
 import { PlotlyAPIRequest,
     updateGrid
 } from '../../../backend/persistent/PlotlyAPI.js';
 import {getSetting, saveSetting} from '../../../backend/settings.js';
-import {createGrid, names, sqlConnections, username, apiKey} from '../utils.js';
+import {createGrid, names, sqlCredentials, username, apiKey} from '../utils.js';
 
 let queryScheduler;
 let savedUrl;
@@ -55,7 +55,7 @@ describe('QueryScheduler', () => {
             fid: '...',
             uids: '...',
             query: '...',
-            connectionId: '...',
+            credentialId: '...',
             username,
             apiKey
         });
@@ -76,7 +76,7 @@ describe('QueryScheduler', () => {
             fid: 'test-fid',
             uids: '',
             query: '',
-            connectionId: 'unique-id'
+            credentialId: 'unique-id'
         };
         queryScheduler.scheduleQuery(queryObject);
         let queriesFromFile = getQueries();
@@ -98,7 +98,7 @@ describe('QueryScheduler', () => {
             fid: 'test-fid',
             uids: '',
             query: 'my query',
-            connectionId: 'unique-id'
+            credentialId: 'unique-id'
         };
 
         assert.deepEqual([], getQueries());
@@ -117,10 +117,10 @@ describe('QueryScheduler', () => {
         this.timeout(refreshInterval * 20);
 
         /*
-         * Save the sqlConnections to a file.
+         * Save the sqlCredentials to a file.
          * This is done by the UI or by the user.
         */
-        const connectionId = saveConnection(sqlConnections);
+        const credentialId = saveCredential(sqlCredentials);
 
         /*
          * Create a grid that we want to update with new data
@@ -135,7 +135,7 @@ describe('QueryScheduler', () => {
                  fid,
                  uids,
                  refreshInterval,
-                 connectionId,
+                 credentialId,
                  query: 'SELECT * from ebola_2014 LIMIT 2'
              };
              assert.deepEqual(getQueries(), [], 'No queries existed');
@@ -220,10 +220,10 @@ describe('QueryScheduler', () => {
         this.timeout(refreshInterval * 10);
 
         /*
-         * Save the sqlConnections to a file.
+         * Save the sqlCredentials to a file.
          * This is done by the UI or by the user.
         */
-        const connectionId = saveConnection(sqlConnections);
+        const credentialId = saveCredential(sqlCredentials);
 
         /*
          * Create a grid that we want to update with new data
@@ -239,7 +239,7 @@ describe('QueryScheduler', () => {
                  fid,
                  uids,
                  refreshInterval,
-                 connectionId,
+                 credentialId,
                  username,
                  apiKey,
                  query: 'SELECT * from ebola_2014 LIMIT 2'

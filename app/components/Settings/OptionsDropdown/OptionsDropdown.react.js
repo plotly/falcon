@@ -84,7 +84,7 @@ export default class OptionsDropdown extends Component {
 
     renderElasticsearchDocs() {
         const {
-            selectedTable, index, elasticsearchMappingsRequest: EMR, setTable, connectionObject
+            selectedTable, index, elasticsearchMappingsRequest: EMR, setTable, credentialObject
         } = this.props;
         if (!index) {
             return null;
