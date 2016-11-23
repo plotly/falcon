@@ -97,11 +97,20 @@ describe('Server', function () {
     });
 
 
-    it ('responds on a ping', function(done) {
+    it('responds on a ping', function(done) {
         GET('ping')
         .then(() => done())
         .catch(done);
     });
+
+    it('returns 200 on loading the index page', function(done) {
+        GET('')
+        .then(res => {
+            assert.equal(res.status, 200);
+            done();
+        })
+        .catch(done);
+    })
 
     // OAuth
     it('returns 200 on loading the oauth page', function(done) {
