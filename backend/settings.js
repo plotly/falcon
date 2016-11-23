@@ -66,14 +66,14 @@ export function saveSetting(settingName, settingValue) {
 }
 
 /*
- * Load settings from process.env,
+ * Load settings from process.env prefixed with `PLOTLY_CONNECTOR_`
  * then from the saved file in SETTINGS_PATH,
  * then from the defaults above
  */
 export function getSetting(settingName) {
     const settingsOnFile = loadSettings();
-    if (has(settingName, process.env)) {
-        let envObject = process.env[settingName];
+    if (has(`PLOTLY_CONNECTOR_${settingName}`, process.env)) {
+        let envObject = process.env[`PLOTLY_CONNECTOR_${settingName}`];
         try {
             return JSON.parse(envObject);
         } catch (e) {
