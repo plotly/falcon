@@ -32,6 +32,7 @@ const DEFAULT_SETTINGS = {
     PORT: 9494,
 
     // certificates paths
+    // TODO - This isn't portable - should move this to the home folder
     KEY_FILE: `${__dirname}/../ssl/certs/server/privkey.pem`,
     CSR_FILE: `${__dirname}/../ssl/certs/server/fullchain.pem`,
 
