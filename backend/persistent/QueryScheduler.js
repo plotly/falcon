@@ -1,4 +1,4 @@
-import * as Connections from './connections/Connections';
+import * as Connections from './datastores/Datastores';
 import {updateGrid} from './PlotlyAPI';
 import {getConnectionById} from './Connections';
 import {getQuery, getQueries, saveQuery, deleteQuery} from './Queries';
@@ -175,7 +175,7 @@ class QueryScheduler {
 export default QueryScheduler;
 
 
-// TODO - do we allow the user to change their connections
+// TODO - do we allow the user to change their connection
 // and all of their saved queries? if we save
 // serializedConfiguration in plotly, then that'll be hard to
 // update.

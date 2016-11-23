@@ -10,7 +10,7 @@ import {
 
 import {
     query, connect, files, storage, listS3Files, elasticsearchMappings
-} from '../../../../backend/persistent/connections/Connections.js';
+} from '../../../../backend/persistent/datastores/Datastores.js';
 
 const transpose = m => m[0].map((x, i) => m.map(x => x[i]));
 
@@ -375,12 +375,12 @@ describe('Elasticsearch - Connections', function () {
 });
 
 describe('S3 - Connection', function () {
-    it('connect succeeds with the right connections', function(done) {
+    it('connect succeeds with the right connection', function(done) {
         this.timeout(4 * 1000);
         connect(publicReadableS3Connections).then(done).catch(done);
     });
 
-    it('connect fails with the wrong connections', function(done) {
+    it('connect fails with the wrong connection', function(done) {
         this.timeout(4 * 1000);
         connect({dialect: 's3', accessKeyId: 'asdf', secretAccessKey: 'fdas'})
         .then(() => done('Error - should not have succeeded'))

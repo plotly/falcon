@@ -1,15 +1,14 @@
 var restify = require('restify');
-import fs from 'fs';
-import * as Connections from './persistent/connections/Connections.js';
+import * as Connections from './persistent/datastores/Datastores.js';
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
 import {
-    saveCredential,
-    lookUpCredentials,
-    getSanitizedCredentials,
-    getSanitizedCredentialById,
-    deleteCredentialById,
-    getCredentialById
-} from './persistent/Credentials.js';
+    saveConnection,
+    lookUpConnections,
+    getSanitizedConnections,
+    getSanitizedConnectionById,
+    deleteConnectionById,
+    getConnectionById
+} from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
 import {dissoc, contains, isEmpty, pluck} from 'ramda';
@@ -43,7 +42,6 @@ export default class Server {
             Logger.log(`Request: ${request.href()}`, 2);
             next();
         });
-
 
         /*
          * CORS doesn't quite work by default in restify,
@@ -143,12 +141,6 @@ export default class Server {
             file: 'index.html'
         }));
 
-        server.get('/db-connector', restify.serveStatic({
-            directory: `${__dirname}/../static`,
-            file: 'index.html'
-        }));
-
-
         server.get('/status', function statusHandler(req, res, next) {
             // TODO - Maybe fix up this copy
             res.send('Connector status - running and available for requests.');
@@ -163,49 +155,49 @@ export default class Server {
             throw new Error('Yikes - uncaught error');
         });
 
-        // save credentials to a file
-        server.post('/credentials', function postCredentialsHandler(req, res, next) {
+        // save connections to a file
+        server.post('/connections', function postConnectionsHandler(req, res, next) {
             /*
-             * Check if an existing set of credentials exist
+             * Check if the connection already exists
              * If it does, prevent overwriting so that IDs
              * that might be saved on other servers that refer
-             * to this exact same set of credentials don't get
+             * to this exact same connection doesn't get
              * overwritten.
              */
-            const credentialsOnFile = lookUpCredentials(
+            const connectionsOnFile = lookUpConnections(
                 dissoc('password', req.params)
             );
-            if (credentialsOnFile) {
-                res.send(409, {credentialId: credentialsOnFile.id});
+            if (connectionsOnFile) {
+                res.send(409, {connectionId: connectionsOnFile.id});
             } else {
-                res.send(200, {credentialId: saveCredential(req.params)});
+                res.send(200, {connectionId: saveConnection(req.params)});
             }
         });
 
-        // return sanitized credentials
-        server.get('/credentials', function getCredentialsHandler(req, res, next) {
-            res.json(200, getSanitizedCredentials());
+        // return sanitized connections
+        server.get('/connections', function getConnectionsHandler(req, res, next) {
+            res.json(200, getSanitizedConnections());
         });
 
         /*
-         * return a single credential by id
-         * ids are assigned by the server on credential save
+         * return a single connection by id
+         * ids are assigned by the server on connection save
          */
-        server.get('/credentials/:id', function getCredentialsIdHandler(req, res, next) {
-            const credential = getSanitizedCredentialById(req.id);
-            if (credential) {
-                res.json(200, credential);
+        server.get('/connections/:id', function getConnectionsIdHandler(req, res, next) {
+            const connection = getSanitizedConnectionById(req.id);
+            if (connection) {
+                res.json(200, connection);
             } else {
                 res.json(404, {});
             }
         });
 
-        // delete credentials
+        // delete connections
         // TODO - delete all associated queries?
         // TODO - deleting, at least from the front end, isn't working.
-        server.del('/credentials/:id', function delCredentialsHandler(req, res, next) {
-            if (getSanitizedCredentialById(req.params.id)) {
-                deleteCredentialById(req.params.id);
+        server.del('/connections/:id', function delConnectionsHandler(req, res, next) {
+            if (getSanitizedConnectionById(req.params.id)) {
+                deleteConnectionById(req.params.id);
                 res.json(200, {});
             } else {
                 res.json(404, {});
@@ -213,8 +205,8 @@ export default class Server {
         });
 
         /* Connections */
-        server.post('/connect/:credentialId', function postConnectHandler(req, res, next) {
-            Connections.connect(getCredentialById(req.params.credentialId))
+        server.post('/connect/:connectionId', function postConnectHandler(req, res, next) {
+            Connections.connect(getConnectionById(req.params.connectionId))
             .then(() => {
                 res.json(200, {});
             });
@@ -223,10 +215,10 @@ export default class Server {
         /* One-Shot Queries */
 
         // Make a query and return the results as a grid
-        server.post('/query/:credentialId', function postQueryHandler(req, res, next) {
+        server.post('/query/:connectionId', function postQueryHandler(req, res, next) {
             Connections.query(
                 req.params.query,
-                getCredentialById(req.params.credentialId)
+                getConnectionById(req.params.connectionId)
             ).then(rows => {
                 res.json(200, rows);
                 next();
@@ -235,33 +227,33 @@ export default class Server {
             });
         });
 
-        server.post('/tables/:credentialId', function tablesHandler(req, res, next) {
+        server.post('/tables/:connectionId', function tablesHandler(req, res, next) {
             Connections.tables(
-                getCredentialById(req.params.credentialId)
+                getConnectionById(req.params.connectionId)
             ).then(tables => {
                 res.json(200, tables);
             });
         });
 
-        server.post('/s3-keys/:credentialId', function s3KeysHandler(req, res, next) {
+        server.post('/s3-keys/:connectionId', function s3KeysHandler(req, res, next) {
             Connections.files(
-                getCredentialById(req.params.credentialId)
+                getConnectionById(req.params.connectionId)
             ).then(files => {
                 res.json(200, files);
             });
         });
 
-        server.post('/apache-drill-storage/:credentialId', function apacheDrillStorageHandler(req, res, next) {
+        server.post('/apache-drill-storage/:connectionId', function apacheDrillStorageHandler(req, res, next) {
             Connections.storage(
-                getCredentialById(req.params.credentialId)
+                getConnectionById(req.params.connectionId)
             ).then(files => {
                 res.json(200, files);
             });
         });
 
-        server.post('/apache-drill-s3-keys/:credentialId', function apacheDrills3KeysHandler(req, res, next) {
+        server.post('/apache-drill-s3-keys/:connectionId', function apacheDrills3KeysHandler(req, res, next) {
             Connections.listS3Files(
-                getCredentialById(req.params.credentialId)
+                getConnectionById(req.params.connectionId)
             ).then(files => {
                 res.json(200, files);
             });
@@ -269,9 +261,9 @@ export default class Server {
 
         // TODO - do we need `.catch` on all of these or will our
         // uncaughtExceptionHandler deal with it appropriately?
-        server.post('/elasticsearch-mappings/:credentialId', function elasticsearchMappingsHandler(req, res, next) {
+        server.post('/elasticsearch-mappings/:connectionId', function elasticsearchMappingsHandler(req, res, next) {
             Connections.elasticsearchMappings(
-                getCredentialById(req.params.credentialId)
+                getConnectionById(req.params.connectionId)
             ).then(mappings => {
                 res.json(200, mappings);
             });
@@ -302,9 +294,9 @@ export default class Server {
             // request to see if it is valid.
 
             // Make the query and update the user's grid
-            const {fid, uids, query, credentialId} = req.params;
+            const {fid, uids, query, connectionId} = req.params;
             that.queryScheduler.queryAndUpdateGrid(
-                fid, uids, query, credentialId
+                fid, uids, query, connectionId
             )
             .then(function returnSuccess() {
                 let status;

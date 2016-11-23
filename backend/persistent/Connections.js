@@ -1,3 +1,5 @@
+// Save and load connection objects that contain the DB credentials, host, and more
+
 import fs from 'fs';
 import {assoc, dissoc, findIndex} from 'ramda';
 import uuid from 'node-uuid';
@@ -66,7 +68,7 @@ export function saveConnection(connectionObject) {
  * they only need to match in the keys that are provided by the
  * configuration object.
  *
- * This is used to find the unsanitized connections (with the password)
+ * This is used to find the unsanitized connection (with the password)
  * saved on the disk given a set of sanitized
  * connections (without the password)
  */

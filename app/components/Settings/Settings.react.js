@@ -353,7 +353,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     }
 
     /*
-     * dispatchConnect either saves the connections and then connects
+     * dispatchConnect either saves the connection and then connects
      * or just connects if the connections have already been saved
      */
     let dispatchConnect;

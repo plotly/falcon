@@ -287,7 +287,7 @@ describe('Server', function () {
         }).catch(done);
     });
 
-    it('/s3-keys fails with the wrong connections', function(done) {
+    it('/s3-keys fails with the wrong connection credentials', function(done) {
         const s3CredId = saveConnection({
             dialect: 's3',
             accessKeyId: 'asdf',

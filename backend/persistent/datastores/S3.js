@@ -1,17 +1,17 @@
 import AWS from 'aws-sdk';
 
-function createClient(connections) {
+function createClient(connection) {
     AWS.config.update({
-        accessKeyId: connections.accessKeyId,
-        secretAccessKey: connections.secretAccessKey
+        accessKeyId: connection.accessKeyId,
+        secretAccessKey: connection.secretAccessKey
     });
     return new AWS.S3();
 }
 
 
-export function connect(connections) {
-    const {bucket} = connections;
-    const client = createClient(connections);
+export function connect(connection) {
+    const {bucket} = connection;
+    const client = createClient(connection);
     return new Promise((resolve, reject) => {
         client.listObjects({Bucket: bucket}, err => {
             if (err) {
@@ -27,9 +27,9 @@ export function connect(connections) {
  * Download a (csv) file from S3, parse it
  * and return the results.
  */
-export function query(key, connections) {
-    const {bucket} = connections;
-    const client = createClient(connections);
+export function query(key, connection) {
+    const {bucket} = connection;
+    const client = createClient(connection);
     return new Promise((resolve, reject) => {
         client.getObject({Bucket: bucket, Key: key}, (err, response) => {
             if (err) {
@@ -46,9 +46,9 @@ export function query(key, connections) {
 /*
  * List all of the files in an S3 bucket
  */
-export function files(connections) {
-    const {bucket} = connections;
-    const client = createClient(connections);
+export function files(connection) {
+    const {bucket} = connection;
+    const client = createClient(connection);
     return new Promise((resolve, reject) => {
         client.listObjects({Bucket: bucket}, (err, data) => {
             if (err) {

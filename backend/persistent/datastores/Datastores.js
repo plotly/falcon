@@ -13,15 +13,17 @@ import * as ApacheDrill from './ApacheDrill';
  *
  * The queryObject is a string or object that describes the query.
  * For SQL-like interfaces, this is like `SELECT * FROM ebola_2014 LIMIT 10`.
- * But for other connections like elasticsearch will be an object.
+ * But for other connection like elasticsearch will be an object.
  *
- * The type of connection is specified in "dialect" of the configuration.
+ * The type of connection is specified in "dialect" of the connection object.
  * Add new connection types by creating new files in this folder that export a
- * `query`, `connect`, `tables` function. Their interfaces are described below.
+ * `query` or `connect` function. Some connections have
+ * other functions that are exported too, like getting the s3 keys from a bucket.
+ *  Their interfaces are described below.
  */
 
-function getConnection(connections) {
-    const {dialect} = connections;
+function getDatastoreClient(connection) {
+    const {dialect} = connection;
     if (dialect === 'elasticsearch') {
         return Elasticsearch;
     } else if (dialect === 's3') {
@@ -43,16 +45,16 @@ function getConnection(connections) {
  *  }
  *
  */
-export function query(queryObject, connections) {
-    return getConnection(connections).query(queryObject, connections);
+export function query(queryObject, connection) {
+    return getDatastoreClient(connection).query(queryObject, connection);
 }
 
 /*
  * connect functions attempt to ping the connection and
  * return a promise that is empty
  */
-export function connect(connections) {
-    return getConnection(connections).connect(connections);
+export function connect(connection) {
+    return getDatastoreClient(connection).connect(connection);
 }
 
 /* SQL-like Connectors */
@@ -64,8 +66,8 @@ export function connect(connections) {
  * e.g., for elasticsearch, this means return the available
  * "documents" per an "index"
  */
-export function tables(connections) {
-    return getConnection(connections).tables(connections);
+export function tables(connection) {
+    return getDatastoreClient(connection).tables(connection);
 }
 
 /*
@@ -77,8 +79,8 @@ export function tables(connections) {
  */
 // TODO - I think specificity is better here, just name this to "keys"
 // and if we ever add local file stuff, add a new function like "files".
-export function files(connections) {
-    return getConnection(connections).files(connections);
+export function files(connection) {
+    return getDatastoreClient(connection).files(connection);
 }
 
 
@@ -87,8 +89,8 @@ export function files(connections) {
 /*
  * Return a list of configured Apache Drill storage plugins
  */
-export function storage(connections) {
-    return getConnection(connections).storage(connections);
+export function storage(connection) {
+    return getDatastoreClient(connection).storage(connection);
 }
 
 /*
@@ -98,10 +100,10 @@ export function storage(connections) {
  * name or the storage connection and then return the available files for
  * that plugin.
  */
-export function listS3Files(connections) {
-    return getConnection(connections).listS3Files(connections);
+export function listS3Files(connection) {
+    return getDatastoreClient(connection).listS3Files(connection);
 }
 
-export function elasticsearchMappings(connections) {
-    return getConnection(connections).elasticsearchMappings(connections);
+export function elasticsearchMappings(connection) {
+    return getDatastoreClient(connection).elasticsearchMappings(connection);
 }
