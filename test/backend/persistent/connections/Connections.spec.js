@@ -324,7 +324,7 @@ describe('Elasticsearch - Connections', function () {
     });
 
 
-    it.only('Returns valid aggregated data', function(done) {
+    it('Returns valid aggregated data', function(done) {
         this.timeout(4 * 1000);
         query(JSON.stringify(
             {
