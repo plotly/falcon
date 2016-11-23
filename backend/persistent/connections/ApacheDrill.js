@@ -2,14 +2,14 @@ import fetch from 'node-fetch';
 import * as S3 from './S3.js';
 
 
-export function connect(credentials) {
-    const {host, port} = credentials;
+export function connect(connections) {
+    const {host, port} = connections;
     const url = `${host}:${port}/query.json`;
     return fetch(url);
 }
 
-export function query(queryStatement, credentials) {
-    const {host, port} = credentials;
+export function query(queryStatement, connections) {
+    const {host, port} = connections;
     const url = `${host}:${port}/query.json`;
 
     return new Promise((resolve, reject) => {
@@ -43,17 +43,17 @@ export function query(queryStatement, credentials) {
 
 }
 
-export function storage(credentials) {
-    const {host, port} = credentials;
+export function storage(connections) {
+    const {host, port} = connections;
     const url = `${host}:${port}/storage.json`;
     return fetch(url).then(res => res.json());
 }
 
 // TODO - Make this more flexible?
-export function listS3Files(credentials) {
+export function listS3Files(connections) {
     return S3.files({
-        bucket: credentials.bucket,
-        accessKeyId: credentials.accessKeyId,
-        secretAccessKey: credentials.secretAccessKey
+        bucket: connections.bucket,
+        accessKeyId: connections.accessKeyId,
+        secretAccessKey: connections.secretAccessKey
     });
 }

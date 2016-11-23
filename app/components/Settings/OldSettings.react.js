@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './Settings.css';
 import DialectSelector from './DialectSelector/DialectSelector.react';
-import UserCredentials from './UserCredentials/UserCredentials.react';
+import UserConnections from './UserConnections/UserConnections.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import TableDropdown from './TableDropdown/TableDropdown.react';
 import Preview from './Preview/Preview.react';
@@ -43,8 +43,8 @@ export default class Settings extends Component {
             </div>
         );
 
-        const userCredentials = (
-            <UserCredentials
+        const userConnections = (
+            <UserConnections
                 configuration={configuration}
                 sessionsActions={sessionsActions}
             />
@@ -89,8 +89,8 @@ export default class Settings extends Component {
                     <div className={styles.dialectSelector}>
                         {dialectSelector}
                     </div>
-                    <div className={styles.userCredentials}>
-                        {userCredentials}
+                    <div className={styles.userConnections}>
+                        {userConnections}
                     </div>
                 </div>
             );

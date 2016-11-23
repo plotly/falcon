@@ -1,6 +1,6 @@
 import * as Connections from './connections/Connections';
 import {updateGrid} from './PlotlyAPI';
-import {getCredentialById} from './Credentials';
+import {getConnectionById} from './Connections';
 import {getQuery, getQueries, saveQuery, deleteQuery} from './Queries';
 import {getSetting} from '../settings';
 import Logger from '../logger';
@@ -25,7 +25,7 @@ class QueryScheduler {
         uids: uids,
         refreshInterval: refreshInterval,
         query: query,
-        credentialId: credentialId
+        connectionId: connectionId
     }) {
         if (!refreshInterval) {
             throw new Error('Refresh interval was not supplied');
@@ -37,7 +37,7 @@ class QueryScheduler {
                 (${this.minimumRefreshInterval} seconds)`);
         }
 
-        Logger.log(`Scheduling "${query}" with credential ${credentialId} updating grid ${fid}`);
+        Logger.log(`Scheduling "${query}" with connection ${connectionId} updating grid ${fid}`);
         // Delete query if it is already saved
         if (getQuery(fid)) {
             this.clearQuery(fid);
@@ -50,14 +50,14 @@ class QueryScheduler {
             uids,
             refreshInterval,
             query,
-            credentialId
+            connectionId
         });
 
         // Schedule
         this.queryJobs[fid] = setInterval(
             () => {
                 try {
-                    this.job(fid, uids, query, credentialId)
+                    this.job(fid, uids, query, connectionId)
                     .catch(error => {
                         Logger.log(error, 0);
                     });
@@ -89,13 +89,13 @@ class QueryScheduler {
         Object.keys(this.queryJobs).forEach(this.clearQuery);
     }
 
-    queryAndUpdateGrid (fid, uids, queryString, credentialId) {
+    queryAndUpdateGrid (fid, uids, queryString, connectionId) {
         // TODO - look up username and API key
-        const requestedDBCredentials = getCredentialById(credentialId);
+        const requestedDBConnections = getConnectionById(connectionId);
         let startTime = process.hrtime();
 
-        Logger.log(`Querying "${queryString}" with credential ${credentialId} to update grid ${fid}`, 2);
-        return Connections.query(queryString, requestedDBCredentials)
+        Logger.log(`Querying "${queryString}" with connection ${connectionId} to update grid ${fid}`, 2);
+        return Connections.query(queryString, requestedDBConnections)
         .then(rowsAndColumns => {
             Logger.log(`Query "${queryString}" took ${process.hrtime(startTime)[0]} seconds`, 2);
             Logger.log(`Updating grid ${fid} with new data`, 2);
@@ -175,7 +175,7 @@ class QueryScheduler {
 export default QueryScheduler;
 
 
-// TODO - do we allow the user to change their credentials
+// TODO - do we allow the user to change their connections
 // and all of their saved queries? if we save
 // serializedConfiguration in plotly, then that'll be hard to
 // update.

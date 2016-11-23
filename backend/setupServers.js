@@ -130,7 +130,7 @@ const setupSecureRestifyServer = (responseTools) => {
     httpsServer.use(restify.bodyParser({ mapParams: true }));
     httpsServer.use(restify.CORS({
         origins: acceptRequestsFrom.domains,
-        credentials: false,
+        connections: false,
         headers: ['Access-Control-Allow-Origin']
     })).listen(OPTIONS.port);
 
@@ -154,7 +154,7 @@ export function setupHTTP(responseTools) {
     httpServer.use(restify.bodyParser({ mapParams: true }));
     httpServer.use(restify.CORS({
         origins: acceptRequestsFrom.domains,
-        credentials: false,
+        connections: false,
         headers: ['Access-Control-Allow-Origin']
     })).listen(responseTools.OPTIONS.port);
     responseTools.sequelizeManager.log(

@@ -2,10 +2,10 @@ import fetch from 'node-fetch';
 import assert from 'assert';
 import Server from '../../../backend/routes.js';
 import {
-    getCredentials,
-    getSanitizedCredentials,
-    saveCredential
-} from '../../../backend/persistent/Credentials.js';
+    getConnections,
+    getSanitizedConnections,
+    saveConnection
+} from '../../../backend/persistent/Connections.js';
 import {
     CREDENTIALS_PATH,
     QUERIES_PATH,
@@ -16,10 +16,10 @@ import fs from 'fs';
 import {
     createGrid,
     configuration,
-    sqlCredentials,
-    elasticsearchCredentials,
-    publicReadableS3Credentials,
-    apacheDrillCredentials,
+    sqlConnections,
+    elasticsearchConnections,
+    publicReadableS3Connections,
+    apacheDrillConnections,
     apacheDrillStorage
 } from '../utils.js';
 
@@ -63,13 +63,13 @@ function DELETE(path) {
 
 let queryObject;
 let server;
-let credentialId;
+let connectionId;
 describe('Server', function () {
     beforeEach(() => {
         server = new Server();
         server.start();
 
-        // Save some credentials to the user's disk
+        // Save some connections to the user's disk
         try {
             fs.unlinkSync(CREDENTIALS_PATH);
         } catch (e) {}
@@ -80,13 +80,13 @@ describe('Server', function () {
             fs.unlinkSync(SETTINGS_PATH);
         } catch (e) {}
 
-        credentialId = saveCredential(sqlCredentials);
+        connectionId = saveConnection(sqlConnections);
         queryObject = {
             fid: 'chris:10',
             uids: ['asd', 'xyz'],
             refreshInterval: 5,
             query: 'SELECT * FROM ebola_2014 LIMIT 1',
-            credentialId: credentialId
+            connectionId: connectionId
         };
 
     });
@@ -180,7 +180,7 @@ describe('Server', function () {
     // One Time SQL Queries
     it('runs a SQL query', function(done) {
         this.timeout(5000);
-        POST(`query/${credentialId}`, {
+        POST(`query/${connectionId}`, {
             query: 'SELECT * FROM ebola_2014 LIMIT 1'
         })
         .then(res => res.json())
@@ -199,7 +199,7 @@ describe('Server', function () {
 
     it('fails when the SQL query contains a syntax error', function(done) {
         this.timeout(60 * 1000);
-        POST(`query/${credentialId}`, {
+        POST(`query/${connectionId}`, {
             query: 'SELECZ'
         })
         .then(res => res.json().then(json => {
@@ -215,7 +215,7 @@ describe('Server', function () {
 
     it('succeeds when SQL query returns no data', function(done) {
         this.timeout(60 * 1000);
-        POST(`query/${credentialId}`, {
+        POST(`query/${connectionId}`, {
             query: 'SELECT * FROM ebola_2014 LIMIT 0'
         })
         .then(res => res.json().then(json => {
@@ -237,7 +237,7 @@ describe('Server', function () {
     // Meta info about the tables
     it('/tables returns a list of tables', function(done) {
         this.timeout(5000);
-        POST(`tables/${credentialId}`)
+        POST(`tables/${connectionId}`)
         .then(res => res.json())
         .then(json => {
             assert.deepEqual(
@@ -263,7 +263,7 @@ describe('Server', function () {
 
     // S3
     it('/s3-keys returns a list of keys', function(done) {
-        const s3CredId = saveCredential(publicReadableS3Credentials);
+        const s3CredId = saveConnection(publicReadableS3Connections);
 
         this.timeout(5000);
         POST(`s3-keys/${s3CredId}`)
@@ -287,8 +287,8 @@ describe('Server', function () {
         }).catch(done);
     });
 
-    it('/s3-keys fails with the wrong credentials', function(done) {
-        const s3CredId = saveCredential({
+    it('/s3-keys fails with the wrong connections', function(done) {
+        const s3CredId = saveConnection({
             dialect: 's3',
             accessKeyId: 'asdf',
             secretAccessKey: 'fdsa'
@@ -303,7 +303,7 @@ describe('Server', function () {
     });
 
     it('/query returns data for s3', function(done) {
-        const s3CredId = saveCredential(publicReadableS3Credentials);
+        const s3CredId = saveConnection(publicReadableS3Connections);
         this.timeout(5000);
         POST(`query/${s3CredId}`, {query: '5k-scatter.csv'})
         .then(res => res.json().then(json => {
@@ -324,7 +324,7 @@ describe('Server', function () {
 
     // Apache Drill
     it('/apache-drill-storage returns a list of storage items', function(done) {
-        const s3CredId = saveCredential(apacheDrillCredentials);
+        const s3CredId = saveConnection(apacheDrillConnections);
 
         this.timeout(5000);
         POST(`apache-drill-storage/${s3CredId}`)
@@ -339,7 +339,7 @@ describe('Server', function () {
     });
 
     it('/apache-drill-s3-keys returns a list of s3 files', function(done) {
-        const s3CredId = saveCredential(apacheDrillCredentials);
+        const s3CredId = saveConnection(apacheDrillConnections);
         this.timeout(5000);
         POST(`apache-drill-s3-keys/${s3CredId}`)
         .then(res => res.json())
@@ -364,9 +364,9 @@ describe('Server', function () {
 
     // TODO - Fix this test
     it('/query returns a syntax error', function(done) {
-        const s3CredId = saveCredential(apacheDrillCredentials);
+        const s3CredId = saveConnection(apacheDrillConnections);
         this.timeout(5000);
-        POST(`query/${credentialId}`, {
+        POST(`query/${connectionId}`, {
             query: 'SELECTZ;'
         })
         .then(res => res.json().then(json => {
@@ -375,31 +375,31 @@ describe('Server', function () {
         }));
     });
 
-    // Credentials
-    it('saves credentials to a file if they do not exist', function(done) {
+    // Connections
+    it('saves connections to a file if they do not exist', function(done) {
         fs.unlinkSync(CREDENTIALS_PATH);
-        assert.deepEqual(getCredentials(), []);
-        POST('credentials', sqlCredentials)
+        assert.deepEqual(getConnections(), []);
+        POST('connections', sqlConnections)
         .then(res => {
             assert.equal(res.status, 200);
             assert.deepEqual(
-                [sqlCredentials],
-                getCredentials().map(dissoc('id'))
+                [sqlConnections],
+                getConnections().map(dissoc('id'))
             );
             done();
         }).catch(done);
     });
 
-    it("doesn't save credentials if they already exist", function(done) {
-        POST('credentials', sqlCredentials)
+    it("doesn't save connections if they already exist", function(done) {
+        POST('connections', sqlConnections)
         .then(res => {
             assert.equal(res.status, 409);
-            assert.deepEqual(res.credentialId, credentialId);
+            assert.deepEqual(res.connectionId, connectionId);
         });
     });
 
-    it('returns sanitized credentials', function(done) {
-        GET('credentials')
+    it('returns sanitized connections', function(done) {
+        GET('connections')
         .then(res => {
             assert.equal(res.status, 200);
             return res.json();
@@ -407,25 +407,25 @@ describe('Server', function () {
         .then(json => {
             assert.deepEqual(
                 json.map(dissoc('id')),
-                [dissoc('password', sqlCredentials)]
+                [dissoc('password', sqlConnections)]
             );
             done();
         }).catch(done);
     });
 
-    it('deletes credentials', function(done) {
-        assert.deepEqual(getCredentials().map(dissoc('id')), [sqlCredentials]);
-         DELETE(`credentials/${credentialId}`)
+    it('deletes connections', function(done) {
+        assert.deepEqual(getConnections().map(dissoc('id')), [sqlConnections]);
+         DELETE(`connections/${connectionId}`)
         .then(res => {
             assert.equal(res.status, 204);
-            assert.deepEqual(getCredentials(), []);
+            assert.deepEqual(getConnections(), []);
             done();
         }).catch(done);
     });
 
-    it('returns an empty array of credentials', function(done) {
+    it('returns an empty array of connections', function(done) {
         fs.unlinkSync(CREDENTIALS_PATH);
-        GET('credentials')
+        GET('connections')
         .then(res => {
             assert.equal(res.status, 200);
             return res.json();
@@ -461,7 +461,7 @@ describe('Server', function () {
                 fid,
                 uids,
                 refreshInterval: 60,
-                credentialId,
+                connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2'
             };
             return POST('queries', queryObject);

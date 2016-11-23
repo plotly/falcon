@@ -9,7 +9,7 @@ import * as ApacheDrill from './ApacheDrill';
  *
  * The configuration object provides the necessary settings to initialize
  * a connection and is serializable as JSON and saved in
- * ~/.plotly/connector/credentials.
+ * ~/.plotly/connector/connections.
  *
  * The queryObject is a string or object that describes the query.
  * For SQL-like interfaces, this is like `SELECT * FROM ebola_2014 LIMIT 10`.
@@ -20,8 +20,8 @@ import * as ApacheDrill from './ApacheDrill';
  * `query`, `connect`, `tables` function. Their interfaces are described below.
  */
 
-function getConnection(credentials) {
-    const {dialect} = credentials;
+function getConnection(connections) {
+    const {dialect} = connections;
     if (dialect === 'elasticsearch') {
         return Elasticsearch;
     } else if (dialect === 's3') {
@@ -43,16 +43,16 @@ function getConnection(credentials) {
  *  }
  *
  */
-export function query(queryObject, credentials) {
-    return getConnection(credentials).query(queryObject, credentials);
+export function query(queryObject, connections) {
+    return getConnection(connections).query(queryObject, connections);
 }
 
 /*
  * connect functions attempt to ping the connection and
  * return a promise that is empty
  */
-export function connect(credentials) {
-    return getConnection(credentials).connect(credentials);
+export function connect(connections) {
+    return getConnection(connections).connect(connections);
 }
 
 /* SQL-like Connectors */
@@ -64,8 +64,8 @@ export function connect(credentials) {
  * e.g., for elasticsearch, this means return the available
  * "documents" per an "index"
  */
-export function tables(credentials) {
-    return getConnection(credentials).tables(credentials);
+export function tables(connections) {
+    return getConnection(connections).tables(connections);
 }
 
 /*
@@ -77,8 +77,8 @@ export function tables(credentials) {
  */
 // TODO - I think specificity is better here, just name this to "keys"
 // and if we ever add local file stuff, add a new function like "files".
-export function files(credentials) {
-    return getConnection(credentials).files(credentials);
+export function files(connections) {
+    return getConnection(connections).files(connections);
 }
 
 
@@ -87,8 +87,8 @@ export function files(credentials) {
 /*
  * Return a list of configured Apache Drill storage plugins
  */
-export function storage(credentials) {
-    return getConnection(credentials).storage(credentials);
+export function storage(connections) {
+    return getConnection(connections).storage(connections);
 }
 
 /*
@@ -98,10 +98,10 @@ export function storage(credentials) {
  * name or the storage connection and then return the available files for
  * that plugin.
  */
-export function listS3Files(credentials) {
-    return getConnection(credentials).listS3Files(credentials);
+export function listS3Files(connections) {
+    return getConnection(connections).listS3Files(connections);
 }
 
-export function elasticsearchMappings(credentials) {
-    return getConnection(credentials).elasticsearchMappings(credentials);
+export function elasticsearchMappings(connections) {
+    return getConnection(connections).elasticsearchMappings(connections);
 }

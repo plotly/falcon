@@ -1,17 +1,17 @@
 import AWS from 'aws-sdk';
 
-function createClient(credentials) {
+function createClient(connections) {
     AWS.config.update({
-        accessKeyId: credentials.accessKeyId,
-        secretAccessKey: credentials.secretAccessKey
+        accessKeyId: connections.accessKeyId,
+        secretAccessKey: connections.secretAccessKey
     });
     return new AWS.S3();
 }
 
 
-export function connect(credentials) {
-    const {bucket} = credentials;
-    const client = createClient(credentials);
+export function connect(connections) {
+    const {bucket} = connections;
+    const client = createClient(connections);
     return new Promise((resolve, reject) => {
         client.listObjects({Bucket: bucket}, err => {
             if (err) {
@@ -27,9 +27,9 @@ export function connect(credentials) {
  * Download a (csv) file from S3, parse it
  * and return the results.
  */
-export function query(key, credentials) {
-    const {bucket} = credentials;
-    const client = createClient(credentials);
+export function query(key, connections) {
+    const {bucket} = connections;
+    const client = createClient(connections);
     return new Promise((resolve, reject) => {
         client.getObject({Bucket: bucket, Key: key}, (err, response) => {
             if (err) {
@@ -46,9 +46,9 @@ export function query(key, credentials) {
 /*
  * List all of the files in an S3 bucket
  */
-export function files(credentials) {
-    const {bucket} = credentials;
-    const client = createClient(credentials);
+export function files(connections) {
+    const {bucket} = connections;
+    const client = createClient(connections);
     return new Promise((resolve, reject) => {
         client.listObjects({Bucket: bucket}, (err, data) => {
             if (err) {

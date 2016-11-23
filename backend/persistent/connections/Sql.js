@@ -31,10 +31,10 @@ const SHOW_TABLES_QUERY = {
 };
 
 
-function createClient(credentials) {
+function createClient(connections) {
     const {
         username, password, database, port, dialect, storage, host, ssl
-    } = credentials;
+    } = connections;
 
     let options = {
         dialect, host, port, storage,
@@ -55,25 +55,25 @@ function createClient(credentials) {
     );
 }
 
-export function connect(credentials) {
+export function connect(connections) {
     Logger.log('' +
-        'Attempting to authenticate with credentials ' +
-        `${JSON.stringify(dissoc('password', credentials), null, 2)} ` +
+        'Attempting to authenticate with connections ' +
+        `${JSON.stringify(dissoc('password', connections), null, 2)} ` +
         '(password omitted)'
     );
-    return createClient(credentials).authenticate();
+    return createClient(connections).authenticate();
 }
 
-export function query(queryString, credentials) {
-    return createClient(credentials).query(
+export function query(queryString, connections) {
+    return createClient(connections).query(
         queryString,
         {type: Sequelize.QueryTypes.SELECT}
     ).then(results => parseSQL(results));
 }
 
-export function tables(credentials) {
-    return createClient(credentials).query(
-        SHOW_TABLES_QUERY[credentials.dialect],
+export function tables(connections) {
+    return createClient(connections).query(
+        SHOW_TABLES_QUERY[connections.dialect],
         {type: Sequelize.QueryTypes.SELECT}
     ).map(data => {
         return values(data);

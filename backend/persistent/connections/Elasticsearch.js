@@ -3,8 +3,8 @@ import fetch from 'node-fetch';
 import elasticsearch from 'elasticsearch';
 import {keys} from 'ramda';
 
-function request(relativeUrl, credentials, {body, method}) {
-    const {host, port, username, password} = credentials;
+function request(relativeUrl, connections, {body, method}) {
+    const {host, port, username, password} = connections;
     const url = `${host}:${port}/${relativeUrl}?format=json`;
     const headers = {
         'Accept': 'application/json',
@@ -22,15 +22,15 @@ function request(relativeUrl, credentials, {body, method}) {
     });
 }
 
-export function connect(credentials) {
-    const {index} = credentials;
-    return request(`_cat/indices/${index}`, credentials, {method: 'GET'});
+export function connect(connections) {
+    const {index} = connections;
+    return request(`_cat/indices/${index}`, connections, {method: 'GET'});
 }
 
-export function query(query, credentials) {
+export function query(query, connections) {
     const queryObject = JSON.parse(query);
     const {body, index, type} = queryObject;
-    return request(`${index}/${type}/_search`, credentials, {
+    return request(`${index}/${type}/_search`, connections, {
         body,
         method: 'POST'
     })
@@ -43,7 +43,7 @@ export function query(query, credentials) {
     }));
 }
 
-export function elasticsearchMappings(credentials) {
-    return request('_all/_mappings', credentials, {method: 'GET'})
+export function elasticsearchMappings(connections) {
+    return request('_all/_mappings', connections, {method: 'GET'})
     .then(res => res.json());
 }

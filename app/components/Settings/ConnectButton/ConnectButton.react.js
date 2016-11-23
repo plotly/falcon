@@ -6,10 +6,10 @@ import {APP_STATUS, BUTTON_MESSAGE} from '../../../constants/constants';
 
 export default function ConnectButton(props) {
     const {
-        credentialsHaveBeenSaved,
+        connectionsHaveBeenSaved,
         connect,
         connectRequest,
-        saveCredentialsRequest
+        saveConnectionsRequest
     } = props;
 
     let buttonText;
@@ -22,15 +22,15 @@ export default function ConnectButton(props) {
         buttonText = 'Connecting...';
     } else if (connectRequest.status >= 200 && connectRequest.status < 300) {
         buttonText = 'Connected';
-   } else if (connectRequest.status >= 400 || saveCredentialsRequest.status >= 400) {
+   } else if (connectRequest.status >= 400 || saveConnectionsRequest.status >= 400) {
        buttonText = 'Connect';
-       // TODO - Try out bad credentials to verify this.
+       // TODO - Try out bad connections to verify this.
        // TODO - Try out locking the home folder and verifying this.
        let errorMessage = 'Hm... had trouble connecting.';
        if (connectRequest.content && connectRequest.content.error && connectRequest.content.error.message) {
            errorMessage = connectRequest.content.error.message;
-       } else if (saveCredentialsRequest.content && saveCredentialsRequest.content.error && saveCredentialsRequest.content.error.message) {
-           errorMessage = saveCredentialsRequest.content.error.message;
+       } else if (saveConnectionsRequest.content && saveConnectionsRequest.content.error && saveConnectionsRequest.content.error.message) {
+           errorMessage = saveConnectionsRequest.content.error.message;
        }
        error = <div className={styles.errorMessage}>{errorMessage}</div>;
    }
