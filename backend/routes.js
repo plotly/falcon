@@ -18,7 +18,13 @@ import fetch from 'node-fetch';
 
 export default class Server {
     constructor() {
-        const certs = getCerts();
+        // TODO - getCerts hangs on my machine, preventing me from running this headlessly.
+
+        /*
+         * TODO - Get console warning "Could not load electron dependencies. Make sure the app is not targeted at electron process."
+         * when running this now. Should figure out a way to remove that warning.
+         */
+        const certs = []; // getCerts();
         const server = isEmpty(certs) ? restify.createServer() : restify.createServer(certs);
 
         const queryScheduler = new QueryScheduler();
