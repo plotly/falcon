@@ -53,23 +53,44 @@ class Status extends Component {
         if (status === 'loading') {
             content = (
                 <h4>
-                    {'loading...'}
+                    {'Authorizing...'}
                 </h4>
             );
         } else if (status === 'success') {
+            // TODO - Need to write this tutorial:
+            // https://help.plot.ly/updating-data-on-a-schedule
             content = (
-                <h4>
-                    {'you are now logged in!'}
-                </h4>
+                <div>
+                    <h4>{'Authorized!'}</h4>
+
+                    <h5>{'You are good to go.'}</h5>
+
+                    <div>
+                        {'The Connector is now authorized to schedule queries and update your datasets. '}
+                        {'Return to Plotly to start scheduling queries.'}
+                    </div>
+
+                    <div>
+                    	 <a href="https://help.plot.ly/updating-data-on-a-schedule">
+                            {'Learn more'}
+                        </a>
+                        {' about how scheduling queries works in Plotly.'}
+                    </div>
+
+                </div>
             );
         } else if (status === 'failure') {
             content = (
                 <h4>
-                    {'an error occurred while trying to save your credentials. Try refreshing.'}
+                    {'Yikes! An error occurred while trying to authorize.'}
                 </h4>
             );
         }
-        return (<div>{content}</div>);
+        return (
+            <div style={{marginTop: '30%', textAlign: 'center'}}>
+                {content}
+            </div>
+        );
     }
 
 }
