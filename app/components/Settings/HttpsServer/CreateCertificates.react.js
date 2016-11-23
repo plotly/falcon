@@ -1,7 +1,11 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import {RED_DOT, YELLOW_DOT, GREEN_DOT} from './Buttons.js';
+import {contains} from 'ramda';
+import {usesHttpsProtocol} from '../../../utils/utils';
 
 const httpVideoLink = 'https://www.youtube.com/embed/S4TXMMn9mh0?rel=0&amp;showinfo=0';
+let INTERVAL_HAS_CERTS;
 
 export default class CreateCertificates extends Component {
     constructor(props) {
@@ -9,9 +13,35 @@ export default class CreateCertificates extends Component {
         this.state = {httpVideoShow: false};
     }
 
-    render() {
+    componentWillMount() {
+        console.warn(usesHttpsProtocol());
+        if (!usesHttpsProtocol()) {
+            INTERVAL_HAS_CERTS = setInterval(() => {
+                console.warn('hasCerts call');
+                this.props.hasCerts();
+            }, 1000);
+        }
+    }
 
-        const hasSelfSignedCert = false;
+    componentWillUnmount() {
+        clearInterval(INTERVAL_HAS_CERTS);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.hasCertsRequest.content) {
+            clearInterval(INTERVAL_HAS_CERTS);
+        }
+    }
+
+    render() {
+        const {hasCertsRequest, createCertsRequest, redirectUrlRequest} = this.props;
+        console.warn('hasCertsRequest', hasCertsRequest);
+        console.warn('createCertsRequest', createCertsRequest);
+        console.warn('redirectUrlRequest', redirectUrlRequest);
+        console.warn('usesHttpsProtocol', usesHttpsProtocol());
+
+        const hasCerts = hasCertsRequest.status === 200 && hasCertsRequest.content;
+        const createdCerts = createCertsRequest.status === 200 && createCertsRequest.content;
 
         let httpVideo;
         let httpVideoLinkWording;
@@ -33,37 +63,42 @@ export default class CreateCertificates extends Component {
         let httpNote = null;
         httpNote = (
             <div style={{fontSize: '0.8em'}}>
-                Alternatively, you can run the connector without
-                HTTPS and allow your browser to make insecure
-                requests.&nbsp;
+                {'Alternatively, you can run the connector without ' +
+                'HTTPS and allow your browser to make insecure ' +
+                'requests. '}
                 <a
                     onClick={() => {this.setState(
                         {httpVideoShow: !this.state.httpVideoShow}
                     );}}
                 >
-                {httpVideoLinkWording}
+                    {httpVideoLinkWording}
                 </a>
                 <div>
-                {httpVideo}
+                    {httpVideo}
                 </div>
             </div>
         );
 
         let httpsServerStatus = null;
-        if (hasSelfSignedCert) {
+        if (usesHttpsProtocol()) {
             httpsServerStatus = (
-                <div>✓ This app is successfully running on HTTPS.</div>
+                <div>{GREEN_DOT}{'The app is running using a secure HTTPS server. '}</div>
             );
-            // reset to null if user creates https certs during runtime
-            httpNote = null;
+        } else if (!usesHttpsProtocol() && hasCerts) {
+            httpsServerStatus = (
+                <div>{YELLOW_DOT}{'You have successfully created HTTPS certificates. '}</div>
+            );
         } else {
             httpsServerStatus = (
                 <div>
-                    This app is not running on HTTPS.&nbsp;
+                    {RED_DOT}{'This app is not running on a HTTPS server.'}
                     <a
-                       onClick={() => console.warn('generate https')}
+                       onClick={() => {
+                           console.log('createCerts()');
+                           this.props.createCerts();
+                       }}
                     >
-                        Click to generate HTTPS certificates.
+                        {'Click to generate HTTPS certificates.'}
                     </a>
                 </div>
             );

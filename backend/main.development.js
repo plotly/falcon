@@ -2,7 +2,6 @@ import {app, BrowserWindow, ipcMain} from 'electron';
 import {contains} from 'ramda';
 
 import Logger from './logger';
-import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {setupMenus} from './menus';
 import {getSetting} from './settings';
@@ -15,12 +14,7 @@ if (process.env.NODE_ENV === 'development') {
     require('electron-debug')();
 }
 
-
-const isTestRun = () => {
-    return (contains('--test-type=webdriver', process.argv.slice(2)));
-};
-// TODO ^ why does this need to be a function? does this change during run-time?
-
+const isTestRun = contains('--test-type=webdriver', process.argv.slice(2));
 
 const server = new Server();
 Logger.log('Starting server', 2);
@@ -30,23 +24,25 @@ server.queryScheduler.loadQueries();
 
 app.on('ready', () => {
 
-
     let mainWindow = new BrowserWindow({
         show: true,
         width: 1024,
-        height: OPTIONS.large ? 1024 : 728
+        height: 1024
     });
 
+    const URL = `${server.protocol}://${server.domain}`;
+    const PORT = getSetting('PORT');
+    console.log('URL', URL);
     // TODO - Does this work too?
     // mainWindow.loadURL(`http://localhost:${getSetting('PORT')}`);
     // Provide the port of the server to the front-end as a query string param.
-    mainWindow.loadURL(`file://${__dirname}/../app/app.html?port=${getSetting('PORT')}`);
+    mainWindow.loadURL(`file://${__dirname}/../app/app.html?url=${URL}&port=${PORT}`);
 
     // startup main window
     mainWindow.webContents.on('did-finish-load', () => {
 
         // show main window if not a test
-        if (!isTestRun()) {
+        if (!isTestRun) {
             mainWindow.show();
             mainWindow.focus();
         }

@@ -1,9 +1,11 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Instructions from './Instructions.react';
-import {BACKEND} from '../../../constants/constants';
+import {baseUrl} from '../../../utils/utils';
+import {RED_DOT, YELLOW_DOT, GREEN_DOT} from './Buttons.js';
+import {usesHttpsProtocol} from '../../../utils/utils';
 
-let INTERVAL_ID;
+let INTERVAL_SERVER_STATUS;
 
 export default class DetectCertificates extends Component {
     constructor(props) {
@@ -13,35 +15,47 @@ export default class DetectCertificates extends Component {
             expandInstructions: false
         };
     }
-    refreshState() {
-        fetch(
-            `https://${BACKEND.CONNECTOR_URL}:${BACKEND.OPTIONS.port}/status`
-        )
-        .then(() => {
-            this.setState({successfulFetch: true});
-        })
-        .catch(err => {
-            if (err.message === 'failed to fetch') {
-                this.setState({successfulFetch: false});
-            }
-        });
+
+    componentWillMount() {
+        if (usesHttpsProtocol()) {
+            INTERVAL_SERVER_STATUS = setInterval(() => {
+                console.warn('status call');
+                fetch(
+                    `${baseUrl()}/status`
+                )
+                .then(() => {
+                    this.setState({successfulFetch: true});
+                })
+                .catch(err => {
+                    this.setState({successfulFetch: false});
+                });
+            }, 1000);
+        }
     }
 
     componentWillUnmount() {
-        clearInterval(INTERVAL_ID);
+        clearInterval(INTERVAL_SERVER_STATUS);
+    }
+
+    componentWillUpdate() {
+        if (usesHttpsProtocol() && this.state.successfulFetch) {
+            clearInterval(INTERVAL_SERVER_STATUS);
+        }
     }
 
     render() {
+        const {redirectUrlRequest} = this.props;
+        console.warn('successfulFetch', this.state.successfulFetch);
         let httpsServerStatus;
-        if (this.state.successfulFetch) {
+        if (this.state.successfulFetch && usesHttpsProtocol()) {
             httpsServerStatus = (
-                <div>✓ Your certificates are installed on this computer.</div>
+                <div>{GREEN_DOT}{'Your certificates are installed on this computer. '}</div>
             );
-        } else {
+        } else if (redirectUrlRequest.status === 200 || usesHttpsProtocol()) {
             httpsServerStatus = (
                 <div>
                     <div>
-                        Install your self-signed certificates.&nbsp;
+                        {YELLOW_DOT}{'Install your self-signed certificates. '}
                         <a onClick={() => {
                                 this.setState({
                                     expandInstructions:
@@ -56,13 +70,25 @@ export default class DetectCertificates extends Component {
                             }
                             instructions.
                         </a>
-                        <a onClick={() => this.refreshState()}>Click</a>
                     </div>
                     {
                         this.state.expandInstructions
                         ? Instructions()
                         : null
                     }
+                </div>
+            );
+        } else {
+            httpsServerStatus = (
+                <div>
+                    {RED_DOT}{'This does not have a secure domain.'}
+                    <a
+                       onClick={() => {
+                           this.props.redirectUrl();
+                       }}
+                    >
+                        {'Click to redirect to your secure domain.'}
+                    </a>
                 </div>
             );
         }

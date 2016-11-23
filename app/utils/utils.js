@@ -1,7 +1,9 @@
 import {contains} from 'ramda';
 import queryString from 'query-string';
 
-export const canConfigureHTTPS = process.platform === 'darwin' || process.platform === 'linux';
+const platform = process.platform;
+
+export const canConfigureHTTPS = platform === 'darwin' || platform === 'linux';
 
 export function baseUrl() {
      if (contains(window.location.protocol, ['http:', 'https:'])) {
@@ -26,7 +28,13 @@ export function baseUrl() {
           * with electron serving the app file. The electron backend
           * provides the port env variable as a query string param.
           */
-          const PORT = queryString.parse(location.search).port;
-         return `http://localhost:${PORT}`;
+        const URL = queryString.parse(location.search).url;
+        const PORT = queryString.parse(location.search).port;
+        console.log('baseUrl', `${URL}:${PORT}`);
+        return `${URL}:${PORT}`;
      }
+}
+
+export function usesHttpsProtocol() {
+    return contains('https://', baseUrl());
 }

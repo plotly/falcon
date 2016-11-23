@@ -18,6 +18,9 @@ const DEFAULT_SETTINGS = {
     // TODO - Needs to be set for on-prem
     PLOTLY_API_DOMAIN: 'https://api.plot.ly',
 
+    // TODO - Should this be configurable or should it just be a constant?
+    CONNECTOR_HTTPS_DOMAIN: 'connector.plot.ly',
+
     // TODO - This should just be an object keyed by username
     USERS: [],
 
@@ -27,6 +30,10 @@ const DEFAULT_SETTINGS = {
         'https://local.plot.ly'
     ],
     PORT: 9494,
+
+    // certificates paths
+    KEY_FILE: `${__dirname}/../ssl/certs/server/privkey.pem`,
+    CSR_FILE: `${__dirname}/../ssl/certs/server/fullchain.pem`,
 
     LOG_TO_STDOUT: false
 };

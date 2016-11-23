@@ -11,22 +11,29 @@ export default class HttpsSetup extends Component {
 
     renderCreateCertificates() {
         return canConfigureHTTPS ? (
-            <CreateCertificates />
+            <CreateCertificates
+                createCertsRequest={this.props.createCertsRequest}
+                hasCertsRequest={this.props.hasCertsRequest}
+                createCerts={this.props.createCerts}
+                hasCerts={this.props.hasCerts}
+            />
         ) : null;
     }
 
     renderDetectCertificates() {
         // return null;
         return canConfigureHTTPS ? (
-            <DetectCertificates />
+            <DetectCertificates
+                hasCertsRequest={this.props.hasCertsRequest}
+                redirectUrlRequest={this.props.redirectUrlRequest}
+                redirectUrl={this.props.redirectUrl}
+            />
         ) : null;
     }
 
     render() {
-        console.warn(canConfigureHTTPS);
         return (
-            <div className={styles.step3Container}>
-                https setup things
+            <div className={styles.httpsSetupWrapper}>
                 {canConfigureHTTPS ? (
                     <h5>
                         <a>
@@ -35,15 +42,15 @@ export default class HttpsSetup extends Component {
                     </h5>
                 ) : null}
 
-                <ul>
+                <div>
                     {
                         [
                             this.renderCreateCertificates(),
                             this.renderDetectCertificates()].map(
-                            step => step ? <li>{step}</li> : null
+                            step => step ? <div>{step}</div> : null
                         )
                     }
-                </ul>
+                </div>
             </div>
         );
     }

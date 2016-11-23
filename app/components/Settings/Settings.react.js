@@ -68,10 +68,13 @@ class Settings extends Component {
 
     componentDidMount() {
         this.fetchData();
+        this.props.dispatch(Actions.hasCerts());
     }
+
     componentDidUpdate() {
         this.fetchData();
     }
+
     fetchData() {
         const {
             credentialsRequest,
@@ -141,7 +144,6 @@ class Settings extends Component {
         }
     }
 
-
     render() {
         const {
             credentials,
@@ -149,6 +151,9 @@ class Settings extends Component {
             updateCredential,
             connect,
             connectRequest,
+            hasCertsRequest,
+            redirectUrlRequest,
+            createCertsRequest,
             saveCredentialsRequests,
             deleteCredentialsRequests,
             credentialsHaveBeenSaved,
@@ -213,8 +218,14 @@ class Settings extends Component {
                         apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
                     />
 
-                    <HttpsSetup />
-
+                    <HttpsSetup
+                        hasCertsRequest={hasCertsRequest}
+                        createCertsRequest={createCertsRequest}
+                        redirectUrlRequest={redirectUrlRequest}
+                        createCerts={() => {this.props.dispatch(Actions.createCerts());}}
+                        hasCerts={() => {this.props.dispatch(Actions.hasCerts());}}
+                        redirectUrl={() => {this.props.dispatch(Actions.redirectUrl());}}
+                    />
                 </div>
             </div>
         );
@@ -232,6 +243,9 @@ function mapStateToProps(state) {
         tabMap,
         credentials,
         credentialsRequest,
+        hasCertsRequest,
+        redirectUrlRequest,
+        createCertsRequest,
         connectRequests,
         saveCredentialsRequests,
         deleteCredentialsRequests,
@@ -259,6 +273,9 @@ function mapStateToProps(state) {
 
     return {
         credentialsRequest,
+        hasCertsRequest,
+        createCertsRequest,
+        redirectUrlRequest,
         connectRequest: connectRequests[selectedCredentialId] || {},
         saveCredentialsRequest: saveCredentialsRequests[selectedCredentialId] || {},
         deleteCredentialsRequest: deleteCredentialsRequests[selectedCredentialId] || {},

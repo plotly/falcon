@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './UserCredentials.css';
+import {head} from 'ramda'; 
 import {
     CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS
 } from '../../../constants/constants';
@@ -10,16 +11,16 @@ let dialog;
 let shell;
 try {
     shell = require('electron').shell;
-} catch(e) {
+} catch (e) {
     const shell = {
         openExternal: function openExternal(link) {
             console.warn('opening link');
         }
-    }
+    };
 }
 try {
     dialog = require('electron').remote.dialog;
-} catch(e) {
+} catch (e) {
     dialog = null;
 }
 
@@ -78,7 +79,7 @@ export default class UserCredentials extends Component {
 					// result returned in an array
 					// TODO: add length of paths === 0 check
 					// TODO: add path non null check
-					const path = paths[0];
+					const path = head(paths);
 					// get the filename to use as username in the logs
 					const splitPath = path.split('/');
 					const fileName = splitPath.length - 1;
