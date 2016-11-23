@@ -4,9 +4,6 @@ import {replace, splitAt} from 'ramda';
 import YAML from 'yamljs';
 import {getSetting, saveSetting} from './settings.js';
 
-import {setupRoutes} from './routes';
-import {serverMessageReceive, CHANNEL} from './messageHandler';
-
 let sudo, dialog;
 try {
     sudo = require('electron-sudo');

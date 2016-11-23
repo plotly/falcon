@@ -2,7 +2,6 @@ import {app, BrowserWindow, ipcMain} from 'electron';
 import {contains} from 'ramda';
 
 import Logger from './logger';
-import {SequelizeManager, OPTIONS} from './sequelizeManager';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {setupMenus} from './menus';
 import {getSetting} from './settings';
@@ -28,7 +27,7 @@ app.on('ready', () => {
     let mainWindow = new BrowserWindow({
         show: true,
         width: 1024,
-        height: OPTIONS.large ? 1024 : 728
+        height: 1024
     });
 
     const URL = `${server.protocol}://${server.domain}`;
