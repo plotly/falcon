@@ -61,8 +61,7 @@ export const sqlConnections = {
 export const elasticsearchConnections = {
     dialect: 'elasticsearch',
     host: 'https://67a7441549120daa2dbeef8ac4f5bb2e.us-east-1.aws.found.io',
-    port: '9243',
-    index: 'sample-data'
+    port: '9243'
 };
 
 export const publicReadableS3Connections = {
