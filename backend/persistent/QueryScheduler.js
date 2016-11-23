@@ -28,7 +28,7 @@ class QueryScheduler {
         credentialId: credentialId
     }) {
         if (!refreshInterval) {
-            throw new Error('Refresh rate was not supplied');
+            throw new Error('Refresh interval was not supplied');
         // TODO - bump up to 60 when done testing.
     } else if (refreshInterval < this.minimumRefreshInterval) {
             throw new Error(`
@@ -66,7 +66,7 @@ class QueryScheduler {
                 }
 
             },
-            refreshInterval * 1000 
+            refreshInterval * 1000
         );
 
     }
