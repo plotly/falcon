@@ -46,6 +46,22 @@ export function saveSetting(settingName, settingValue) {
     }
     const settingsOnFile = loadSettings();
     settingsOnFile[settingName] = settingValue;
+    /*
+     * TODO - Should add `Infinity` to this call so that YAML
+     * stringify's this recursively. Currently it just stringifys
+     * on the first level, meaning that
+     * {a: {b: 5}}
+     * converts to:
+     * - a: {b: 5}
+     * instead of
+     * - a:
+     * -    b: 5
+     *
+     * I'm hesistant to make this change right now because of this
+     * bug in the YAML library: https://github.com/jeremyfa/yaml.js/issues/59.
+     * Converting empty objects or arrays to nulls could break some code
+     * without a more thorough investigation.
+     */
     fs.writeFileSync(SETTINGS_PATH, YAML.stringify(settingsOnFile));
 }
 
