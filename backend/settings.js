@@ -15,16 +15,11 @@ const DEFAULT_SETTINGS = {
     LOG_PATH: LOG_PATH,
     HEADLESS: false,
 
-    // TODO - Set to https://api.plot.ly
-    PLOTLY_API_DOMAIN: 'https://api-local.plot.ly',
-    // PLOTLY_API_DOMAIN: 'https://api.plot.ly',
+    // TODO - Needs to be set for on-prem
+    PLOTLY_API_DOMAIN: 'https://api.plot.ly',
 
-    // TODO - Remove these sample accounts
     // TODO - This should just be an object keyed by username
-    USERS: [
-        // {username: 'plotly-database-connector', apiKey: 'reiptow6gu'}
-        {username: 'chris', apiKey: '1c7f5rx2ef'}
-    ],
+    USERS: [],
 
     CORS_ALLOWED_ORIGINS: [
         'https://plot.ly',

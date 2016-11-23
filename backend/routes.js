@@ -87,7 +87,7 @@ export default class Server {
             directory: `${__dirname}/../app/`
         }));
 
-        server.get('/oauth', restify.serveStatic({
+        server.get('/oauth2/callback', restify.serveStatic({
             directory: `${__dirname}/../static`,
             file: 'oauth.html'
         }));
@@ -103,6 +103,7 @@ export default class Server {
                     const {username} = userMeta;
                     if (!username) {
                         res.json(500, {error: {message: 'User was not found.'}});
+                        return;
                     }
                     const existingUsers = getSetting('USERS');
                     const existingUsernames = pluck('username', existingUsers);
