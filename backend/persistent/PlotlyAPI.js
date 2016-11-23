@@ -33,6 +33,10 @@ export function updateGrid(rows, fid, uids) {
         u => u.username === username
     );
     if (!user || !(user.apiKey || user.accessToken)) {
+        /*
+         * Heads up - the front end looks for "Unauthenticated" in this
+         * error message. So don't change it!
+         */
         const errorMessage = (
             `Unauthenticated: Attempting to update grid ${fid} but the ` +
             `credentials for the user "${username}" do not exist.`
