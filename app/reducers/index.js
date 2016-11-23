@@ -114,6 +114,7 @@ function createApiReducer(store) {
 export const connectRequests = createApiReducer('connectRequests');
 export const credentialsRequest = createApiReducer('credentialsRequest');
 export const hasCertsRequest = createApiReducer('hasCertsRequest');
+export const redirectUrlRequest = createApiReducer('redirectUrlRequest');
 export const createCertsRequest = createApiReducer('createCertsRequest');
 export const saveCredentialsRequests = createApiReducer('saveCredentialsRequests');
 export const deleteCredentialsRequests = createApiReducer('deleteCredentialsRequests');
@@ -180,6 +181,7 @@ const rootReducer = combineReducers({
     tabMap,
     credentials,
     hasCertsRequest,
+    redirectUrlRequest,
     createCertsRequest,
     selectedTab,
     selectedTables,

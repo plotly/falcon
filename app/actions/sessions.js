@@ -108,6 +108,14 @@ export function createCerts() {
     );
 }
 
+export function redirectUrl() {
+    return apiThunk(
+        'redirect-url',
+        'GET',
+        'redirectUrlRequest'
+    );
+}
+
 export function connect(credentialId) {
     return apiThunk(
         `connect/${credentialId}`,

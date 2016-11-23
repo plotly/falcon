@@ -2,7 +2,7 @@ import React from 'react';
 import {shell} from 'electron';
 import {baseUrl} from '../../../utils/utils';
 
-const HTML_STATUS_PAGE = `${baseUrl}/status`;
+const HTML_STATUS_PAGE = `${baseUrl()}/status`;
 
 const Instructions = () => (
     <div>

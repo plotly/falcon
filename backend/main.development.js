@@ -31,12 +31,13 @@ app.on('ready', () => {
         height: OPTIONS.large ? 1024 : 728
     });
 
-    const URL = `${server.protocol}://${getSetting('CONNECTOR_HTTPS_DOMAIN')}`;
+    const URL = `${server.protocol}://${server.domain}`;
+    const PORT = getSetting('PORT');
     console.log('URL', URL);
     // TODO - Does this work too?
     // mainWindow.loadURL(`http://localhost:${getSetting('PORT')}`);
     // Provide the port of the server to the front-end as a query string param.
-    mainWindow.loadURL(`file://${__dirname}/../app/app.html?url=${URL}&port=${getSetting('PORT')}`);
+    mainWindow.loadURL(`file://${__dirname}/../app/app.html?url=${URL}&port=${PORT}`);
 
     // startup main window
     mainWindow.webContents.on('did-finish-load', () => {

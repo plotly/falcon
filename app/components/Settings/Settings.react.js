@@ -70,9 +70,11 @@ class Settings extends Component {
         this.fetchData();
         this.props.dispatch(Actions.hasCerts());
     }
+
     componentDidUpdate() {
         this.fetchData();
     }
+
     fetchData() {
         const {
             credentialsRequest,
@@ -142,7 +144,6 @@ class Settings extends Component {
         }
     }
 
-
     render() {
         const {
             credentials,
@@ -151,6 +152,7 @@ class Settings extends Component {
             connect,
             connectRequest,
             hasCertsRequest,
+            redirectUrlRequest,
             createCertsRequest,
             saveCredentialsRequests,
             deleteCredentialsRequests,
@@ -219,7 +221,10 @@ class Settings extends Component {
                     <HttpsSetup
                         hasCertsRequest={hasCertsRequest}
                         createCertsRequest={createCertsRequest}
+                        redirectUrlRequest={redirectUrlRequest}
                         createCerts={() => {this.props.dispatch(Actions.createCerts());}}
+                        hasCerts={() => {this.props.dispatch(Actions.hasCerts());}}
+                        redirectUrl={() => {this.props.dispatch(Actions.redirectUrl());}}
                     />
                 </div>
             </div>
@@ -239,6 +244,7 @@ function mapStateToProps(state) {
         credentials,
         credentialsRequest,
         hasCertsRequest,
+        redirectUrlRequest,
         createCertsRequest,
         connectRequests,
         saveCredentialsRequests,
@@ -269,6 +275,7 @@ function mapStateToProps(state) {
         credentialsRequest,
         hasCertsRequest,
         createCertsRequest,
+        redirectUrlRequest,
         connectRequest: connectRequests[selectedCredentialId] || {},
         saveCredentialsRequest: saveCredentialsRequests[selectedCredentialId] || {},
         deleteCredentialsRequest: deleteCredentialsRequests[selectedCredentialId] || {},

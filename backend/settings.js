@@ -19,7 +19,7 @@ const DEFAULT_SETTINGS = {
     PLOTLY_API_DOMAIN: 'https://api-local.plot.ly',
     // PLOTLY_API_DOMAIN: 'https://api.plot.ly',
 
-    CONNECTOR_HTTPS_DOMAIN: 'localhost',
+    CONNECTOR_HTTPS_DOMAIN: 'connector.plot.ly',
 
     // TODO - Remove these sample accounts
     // TODO - This should just be an object keyed by username

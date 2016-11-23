@@ -15,6 +15,7 @@ export default class HttpsSetup extends Component {
                 createCertsRequest={this.props.createCertsRequest}
                 hasCertsRequest={this.props.hasCertsRequest}
                 createCerts={this.props.createCerts}
+                hasCerts={this.props.hasCerts}
             />
         ) : null;
     }
@@ -24,13 +25,15 @@ export default class HttpsSetup extends Component {
         return canConfigureHTTPS ? (
             <DetectCertificates
                 hasCertsRequest={this.props.hasCertsRequest}
+                redirectUrlRequest={this.props.redirectUrlRequest}
+                redirectUrl={this.props.redirectUrl}
             />
         ) : null;
     }
 
     render() {
         return (
-            <div className={styles.step3Container}>
+            <div className={styles.httpsSetupWrapper}>
                 {canConfigureHTTPS ? (
                     <h5>
                         <a>

@@ -1,7 +1,9 @@
 import {contains} from 'ramda';
 import queryString from 'query-string';
 
-export const canConfigureHTTPS = process.platform === 'darwin' || process.platform === 'linux';
+const platform = process.platform;
+
+export const canConfigureHTTPS = platform === 'darwin' || platform === 'linux';
 
 export function baseUrl() {
      if (contains(window.location.protocol, ['http:', 'https:'])) {
@@ -31,4 +33,8 @@ export function baseUrl() {
         console.log('baseUrl', `${URL}:${PORT}`);
         return `${URL}:${PORT}`;
      }
+}
+
+export function usesHttpsProtocol() {
+    return contains('https://', baseUrl());
 }

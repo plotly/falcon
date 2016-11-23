@@ -79,6 +79,57 @@ const showSudoMessage = () => {
     }
 };
 
+function isUrlRedirected(url) {
+    console.log('looking in hosts for ', url);
+    console.log(HOSTS);
+    const contents = fs.readFileSync(HOSTS);
+    console.log('contents ' + contents);
+    return contents.indexOf(url) > -1;
+}
+
+function waitForRedirect(url) {
+    return new Promise((resolve, reject) => {
+        const waitPeriod = 1000;
+        const maxWaitPeriod = 10000;
+        let waited = 0;
+        console.log('waiting redirect for ', url);
+        while (!isUrlRedirected(url) && (waited < maxWaitPeriod)) {
+            console.log('Waiting for redirect.');
+            setTimeout(isUrlRedirected(url), waitPeriod);
+            console.log('isUrlRedirected(url)', isUrlRedirected(url));
+            waited += waitPeriod;
+        }
+        console.log('Exit waiting for redirect loop.');
+        if (!isUrlRedirected(url)) {
+            reject('Failed to redirect to seecure domain.');
+        } else {
+            resolve();
+        }
+    }).then(() => {return {};}).catch(err => {return err;});
+}
+
+export function redirectUrl(url) {
+    const redirected = isUrlRedirected(url);
+    console.log('redirected', redirected);
+    if (!redirected) {
+        try {
+            sudo.exec(
+                REDIRECT_CONNECTOR_SCRIPT,
+                SUDO_OPTIONS,
+                function(error) {
+                    if (error) {
+                        console.log('error', error);
+                    }
+                }
+            );
+        } catch (error) {
+            console.log(error);
+            return {error};
+        }
+    }
+    return waitForRedirect(url);
+}
+
 // return HTTPS certs if they exist for a server to use when created or null
 export function getCerts() {
     if (hasCerts()) {
@@ -87,13 +138,11 @@ export function getCerts() {
             certificate: fs.readFileSync(getSetting('CSR_FILE'))
         };
     }
-    return null;
+    return {};
 }
 
-// check if there are certificates required to start an HTTPS server
-// returns boolean if
+// check if there are certificates in the directory specified in settings.js
 export function hasCerts() {
-    console.log('keyFilePath', keyFilePath);
     try {
         // try reading certs
         fs.accessSync(keyFilePath, fs.F_OK);
@@ -105,7 +154,6 @@ export function hasCerts() {
 }
 
 // creates self-signed certificates
-// returns an object with error parameter or 'null' if executed properly
 export function createCerts() {
     try {
         showSudoMessage();
@@ -114,13 +162,23 @@ export function createCerts() {
             SUDO_OPTIONS,
             function(error) {
                 if (error) {
-                    return {error};
-                } else {
-                    return {error: null};
+                    console.log('error', error);
                 }
             }
         );
     } catch (error) {
+        console.log('error', error);
         return {error};
+    }
+    return {};
+}
+
+// TODO: complete this function using sudo
+export function deleteCerts() {
+    try {
+        console.log('delete certs');
+        // deleting certs
+    } catch (error) {
+        return error;
     }
 }

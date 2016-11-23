@@ -12,19 +12,21 @@ import {
 } from './persistent/Credentials.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
-import {dissoc, pluck, contains} from 'ramda';
-import {createCerts, hasCerts, getCerts} from './https.js';
+import {dissoc, contains, isEmpty, pluck} from 'ramda';
+import {createCerts, deleteCerts, hasCerts, getCerts, redirectUrl} from './https.js';
 import Logger from './logger';
 import fetch from 'node-fetch';
 
 export default class Server {
     constructor() {
         const certs = getCerts();
-        const server = certs ? restify.createServer(certs) : restify.createServer();
-        this.protocol = certs ? 'https' : 'http';
+        console.log('certs do not exist', isEmpty(certs));
+        const server = isEmpty(certs) ? restify.createServer() : restify.createServer(certs);
 
         const queryScheduler = new QueryScheduler();
 
+        this.domain = isEmpty(certs) ? 'localhost' : getSetting('CONNECTOR_HTTPS_DOMAIN');
+        this.protocol = isEmpty(certs) ? 'http' : 'https';
         this.server = server;
         this.queryScheduler = queryScheduler;
 
@@ -339,8 +341,17 @@ export default class Server {
         });
 
         server.get('/create-certs', (req, res, next) => {
-            const response = createCerts();
-            res.json(200, response || {});
+            res.json(200, createCerts());
+        });
+
+        server.get('/redirect-url', (req, res, next) => {
+            console.log('redirectUrl()');
+            console.log(that.domain);
+            res.json(200, redirectUrl(getSetting('CONNECTOR_HTTPS_DOMAIN')));
+        });
+
+        server.get('/delete-certs', (req, res, next) => {
+            res.json(200, deleteCerts());
         });
 
         // Transform restify's error messages into our standard error object
