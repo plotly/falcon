@@ -13,15 +13,11 @@
     font-size: 16px;
     font-weight: 100;
     letter-spacing: 1px;
-    margin-left: auto;
-    margin-right:auto;
+    margin: 10px auto 10px auto;
     padding: 10px;
-    padding-left: 20px;
-    padding-right: 20px;
     text-align: center;
     text-transform: capitalize;
-    width: 100px;
-
+    width: 25%;
 }
 
 .buttonPrimary:hover {

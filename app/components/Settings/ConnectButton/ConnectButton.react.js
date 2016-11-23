@@ -4,6 +4,18 @@ import classnames from 'classnames';
 import * as styles from './ConnectButton.css';
 import {APP_STATUS, BUTTON_MESSAGE} from '../../../constants/constants';
 
+const renderEditButton = (status) => {
+    const show = status >= 200 && status < 300;
+    const button = show ? (
+            <div
+                className={styles.buttonPrimary}
+                onClick={() => {console.warn('Edit Credentials');}}
+            >
+                {'Edit Credentials'}
+            </div>
+        ) : null;
+    return button;
+};
 export default function ConnectButton(props) {
     const {
         connectionsHaveBeenSaved,
@@ -37,6 +49,7 @@ export default function ConnectButton(props) {
 
    return (
         <div className={styles.connectButtonContainer}>
+            {renderEditButton(connectRequest.status)}
             <div
                 className={styles.buttonPrimary}
                 onClick={connect}
