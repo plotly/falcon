@@ -27,8 +27,6 @@ export function parseSQL(data) {
 
     // get column names of the first object (repeated for all objects)
     const columnnames = Object.keys(data[0]);
-    const ncols = columnnames.length;
-    const nrows = data.length;
 
     // iterate over each object (each object becomes a row)
     // returns: a row of rows (table)
