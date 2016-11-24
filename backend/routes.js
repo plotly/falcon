@@ -88,7 +88,7 @@ export default class Server {
             res.send(204);
         });
         server.listen(
-            getSetting('PORT')
+            parseInt(getSetting('PORT'), 10)
         );
 
         server.get(/\/static\/?.*/, restify.serveStatic({
