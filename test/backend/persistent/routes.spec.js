@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
-import assert from 'assert';
+import {assert} from 'chai';
+import {contains, dissoc, gt, keys, merge, sort, without} from 'ramda';
 import Server from '../../../backend/routes.js';
 import {
     getConnections,
@@ -24,11 +25,11 @@ import {
     elasticsearchConnections,
     publicReadableS3Connections,
     apacheDrillConnections,
-    apacheDrillStorage
+    apacheDrillStorage,
+    testConnections,
+    testSqlConnections
 } from '../utils.js';
 
-
-import {dissoc, merge} from 'ramda';
 
 // Shortcuts
 function GET(path) {
@@ -191,85 +192,130 @@ describe('Routes - ', function () {
     });
 
     // One Time SQL Queries
-    it('sql - query - runs a SQL query', function(done) {
-        this.timeout(5000);
-        POST(`connections/${connectionId}/query`, {
-            query: 'SELECT * FROM ebola_2014 LIMIT 1'
-        })
-        .then(res => res.json())
-        .then(response => {
-            assert.deepEqual(
-                response.rows,
-                [['Guinea', 3, 14, '9.95', '-9.7', '122']]
-            );
-            assert.deepEqual(
-                response.columnnames,
-                ['country', 'month', 'year', 'lat', 'lon', 'value']
-            );
-            done();
-        }).catch(done);
-    });
-
-    it('sql - query - fails when the SQL query contains a syntax error', function(done) {
-        this.timeout(60 * 1000);
-        POST(`connections/${connectionId}/query`, {
-            query: 'SELECZ'
-        })
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 400);
-            assert.deepEqual(
-                json,
-                {error: {message: 'syntax error at or near "SELECZ"'}}
-            );
-            done();
-        }))
-        .catch(done);
-    });
-
-    it('sql - query - succeeds when SQL query returns no data', function(done) {
-        this.timeout(60 * 1000);
-        POST(`connections/${connectionId}/query`, {
-            query: 'SELECT * FROM ebola_2014 LIMIT 0'
-        })
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 200);
-            assert.deepEqual(
-                json,
-                {
-                    columnnames: [],
-                    rows: [[]]
+    testSqlConnections.forEach(function createTest(connection) {
+        it(`${connection.dialect} - query - runs a SQL query`, function(done) {
+            this.timeout(5000);
+            connectionId = saveConnection(connection);
+            let sampleQuery = 'SELECT * FROM ebola_2014 LIMIT 1';
+            if (connection.dialect === 'mssql') {
+                sampleQuery = (
+                    'SELECT TOP 1 * FROM ' +
+                    `${connection.database}.dbo.ebola_2014`
+                );
+            }
+            POST(`connections/${connectionId}/query`, {
+                query: sampleQuery
+            })
+            .then(res => res.json())
+            .then(response => {
+                let expectedColumnNames;
+                if (contains(connection.dialect, ['mariadb', 'mysql', 'mssql'])) {
+                    expectedColumnNames = ['Country', 'Month', 'Year', 'Lat', 'Lon', 'Value'];
+                } else if (connection.dialect === 'sqlite') {
+                    expectedColumnNames = ['index', 'Country', 'Month', 'Year', 'Lat', 'Lon', 'Value'];
+                } else {
+                    expectedColumnNames = ['country', 'month', 'year', 'lat', 'lon', 'value'];
                 }
-            );
-            done();
-        }))
-        .catch(done);
-    });
 
-    // Meta info about the tables
-    it('sql - tables - returns a list of tables', function(done) {
-        this.timeout(5000);
-        POST(`connections/${connectionId}/sql-tables`)
-        .then(res => res.json())
-        .then(json => {
-            assert.deepEqual(
-                json,
-                [
-                    'alcohol_consumption_by_country_2010',
-                    'february_aa_flight_paths_2011',
-                    'walmart_store_openings_1962_2006',
-                    'february_us_airport_traffic_2011',
-                    'us_ag_exports_2011',
-                    'apple_stock_2014',
-                    'usa_states_2014',
-                    'ebola_2014',
-                    'us_cities_2014',
-                    'world_gdp_with_codes_2014',
-                    'precipitation_2015_06_30',
-                    'weather_data_seattle_2016'
-                ]
-            );
-            done();
-        }).catch(done);
+                assert.deepEqual(
+                    response,
+                    {
+                        rows: [
+                            ({
+                                'postgres': ['Guinea', 3, 14, '9.95', '-9.7', '122'],
+                                'redshift': ['Guinea', 3, 14, '10', '-10', 122],
+                                'mysql': ['Guinea', 3, 14, 10, -10, '122'],
+                                'mariadb': ['Guinea', 3, 14, 10, -10, '122'],
+                                'mssql': ['Guinea', 3, 14, 10, -10, '122'],
+                                'sqlite': [0, 'Guinea', 3, 14, 9.95, -9.7, 122]
+                            })[connection.dialect]
+                        ],
+                        columnnames: expectedColumnNames
+                    }
+                );
+
+                done();
+            }).catch(done);
+        });
+
+        it(`${connection.dialect} - query - fails when the SQL query contains a syntax error`, function(done) {
+            this.timeout(60 * 1000);
+            connectionId = saveConnection(connection);
+            POST(`connections/${connectionId}/query`, {
+                query: 'SELECZ'
+            })
+            .then(res => res.json().then(json => {
+                assert.equal(res.status, 400);
+                assert.deepEqual(
+                    json,
+                    {error: {message:
+                        ({
+                            postgres: 'syntax error at or near "SELECZ"',
+                            redshift: 'syntax error at or near "SELECZ"',
+                            mysql: 'ER_PARSE_ERROR: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'SELECZ\' at line 1',
+                            mariadb: "ER_PARSE_ERROR: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SELECZ' at line 1",
+                            mssql: "Could not find stored procedure 'SELECZ'.",
+                            sqlite: 'SQLITE_ERROR: near "SELECZ": syntax error'
+                        })[connection.dialect]
+                    }}
+                );
+                done();
+            }))
+            .catch(done);
+        });
+
+        it(`${connection.dialect} - query - succeeds when SQL query returns no data`, function(done) {
+            this.timeout(60 * 1000);
+            connectionId = saveConnection(connection);
+            let query = 'SELECT * FROM ebola_2014 LIMIT 0';
+            if (connection.dialect === 'mssql') {
+                query = (
+                    'SELECT TOP 0 * FROM ' +
+                    `${connection.database}.dbo.ebola_2014`
+                );
+            }
+            POST(`connections/${connectionId}/query`, {query})
+            .then(res => res.json().then(json => {
+                assert.equal(res.status, 200);
+                assert.deepEqual(
+                    json,
+                    {
+                        columnnames: [],
+                        rows: [[]]
+                    }
+                );
+                done();
+            }))
+            .catch(done);
+        });
+
+        // Meta info about the tables
+        it(`${connection.dialect} - tables - returns a list of tables`, function(done) {
+            this.timeout(5000);
+            connectionId = saveConnection(connection);
+            POST(`connections/${connectionId}/sql-tables`)
+            .then(res => res.json())
+            .then(json => {
+                assert.deepEqual(
+                    json,
+                    [
+                        'alcohol_consumption_by_country_2010',
+                        'apple_stock_2014',
+                        'ebola_2014',
+                        'february_aa_flight_paths_2011',
+                        'february_us_airport_traffic_2011',
+                        'precipitation_2015_06_30',
+                        'us_ag_exports_2011',
+                        'us_cities_2014',
+                        'usa_states_2014',
+                        'walmart_store_openings_1962_2006',
+                        'weather_data_seattle_2016',
+                        'world_gdp_with_codes_2014'
+                    ]
+                );
+                done();
+            }).catch(done);
+        });
     });
 
     // S3
@@ -323,7 +369,7 @@ describe('Routes - ', function () {
         .then(res => res.json().then(json => {
             assert.equal(res.status, 200),
             assert.deepEqual(
-                Object.keys(json),
+                keys(json),
                 ['columnnames', 'rows']
             );
             assert.deepEqual(
@@ -380,18 +426,78 @@ describe('Routes - ', function () {
     // TODO - Missing elasticsearch and postgis tests
 
     // Connections
-    it('connections - saves connections to a file if they do not exist', function(done) {
-        fs.unlinkSync(CREDENTIALS_PATH);
-        assert.deepEqual(getConnections(), []);
-        POST('connections', sqlConnections)
-        .then(res => {
-            assert.equal(res.status, 200);
-            assert.deepEqual(
-                [sqlConnections],
-                getConnections().map(dissoc('id'))
-            );
-            done();
-        }).catch(done);
+    testConnections.forEach(function(connection) {
+        it(`connections - ${connection.dialect} - saves connections to a file if they are valid and if they do not exist`, function(done) {
+            this.timeout(5 * 1000);
+            fs.unlinkSync(CREDENTIALS_PATH);
+            assert.deepEqual(getConnections(), []);
+            POST('connections', connection)
+            .then(res => res.json().then(json => {
+                assert.deepEqual(
+                    json,
+                    {connectionId: getConnections()[0].id}
+                );
+                assert.equal(res.status, 200);
+                assert.deepEqual(
+                    [connection],
+                    getConnections().map(dissoc('id'))
+                );
+                done();
+            })).catch(done);
+        });
+
+        it(`connections - ${connection.dialect} - fails if the connections are not valid`, function(done) {
+            this.timeout(5 * 1000);
+            fs.unlinkSync(CREDENTIALS_PATH);
+            assert.deepEqual(getConnections(), [], 'connections are empty at start');
+
+            let connectionTypo;
+            if (contains(connection.dialect, ['postgres', 'mysql', 'mariadb', 'redshift', 'mssql'])) {
+                connectionTypo = merge(connection, {username: 'typo'});
+            } else if (connection.dialect === 's3') {
+                connectionTypo = merge(connection, {secretAccessKey: 'typo'});
+            } else if (connection.dialect === 'elasticsearch') {
+                connectionTypo = merge(connection, {host: 'https://lahlahlemons.com'});
+            } else if (connection.dialect === 'apache drill') {
+                connectionTypo = merge(connection, {host: 'https://lahlahlemons.com'});
+            } else if (connection.dialect === 'sqlite') {
+                connectionTypo = merge(connection, {storage: 'typo'});
+            } else {
+                throw new Error('Woops - missing an option in this test');
+            }
+
+            POST('connections', connectionTypo)
+            .then(res => res.json().then(json => {
+                if (contains(connection.dialect, ['mysql', 'mariadb'])) {
+                    assert.include(
+                        json.error.message,
+                        "ER_ACCESS_DENIED_ERROR: Access denied for user 'typo'@"
+                    );
+                } else {
+                    assert.deepEqual(json, {
+                        error: {
+                            message: ({
+                                postgres: 'password authentication failed for user "typo"',
+                                redshift: 'password authentication failed for user "typo"',
+                                mssql: "Login failed for user 'typo'.",
+                                s3: 'The request signature we calculated does not match the signature you provided. Check your key and signing method.',
+                                elasticsearch: 'request to https://lahlahlemons.com:9243/_cat/indices/?format=json failed, reason: getaddrinfo ENOTFOUND lahlahlemons.com lahlahlemons.com:9243',
+                                ['apache drill']: 'request to https://lahlahlemons.com:8047/query.json failed, reason: getaddrinfo ENOTFOUND lahlahlemons.com lahlahlemons.com:8047',
+                                sqlite: 'SQLite file at path "typo" does not exist.'
+                            })[connection.dialect]
+                        }
+                    });
+                }
+                assert.equal(res.status, 400);
+                assert.deepEqual(
+                    [],
+                    getConnections(),
+                    'connections weren\'t saved'
+                );
+                done();
+            })).catch(done);
+
+        });
     });
 
     it("connections - doesn't save connections if they already exist", function(done) {

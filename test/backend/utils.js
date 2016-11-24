@@ -52,29 +52,50 @@ export const sqlConnections = {
     dialect: 'postgres'
 };
 
-// my local ones - TODO - delete
-// export const sqlConnections = {
-//     username: 'chriddyp',
-//     password: '',
-//     database: 'chriddyp',
-//     port: 5432,
-//     host: 'localhost',
-//     dialect: 'postgres'
-// };
-
+export const postgresConnection = sqlConnections;
+export const mysqlConnection = {
+    dialect: 'mysql',
+    username: 'masteruser',
+    password: 'connecttoplotly',
+    host: 'readonly-test-mysql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
+    port: 3306,
+    database: 'plotly_datasets'
+};
+export const mariadbConnection = {
+    dialect: 'mariadb',
+    username: 'masteruser',
+    password: 'connecttoplotly',
+    host: 'readonly-test-mariadb.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
+    port: 3306,
+    database: 'plotly_datasets'
+};
+export const redshiftConnection = {
+    dialect: 'redshift',
+    username: 'plotly',
+    password: 'Qmbdf#3DU]pP8a=CKTK}',
+    host: 'sql-connector-test.cfiaqtidutxu.us-east-1.redshift.amazonaws.com',
+    port: 5439,
+    database: 'plotly_datasets'
+};
+export const mssqlConnection = {
+    dialect: 'mssql',
+    username: 'masteruser',
+    password: 'connecttoplotly',
+    host: 'test-mssql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
+    port: 1433,
+    database: 'plotly_datasets'
+};
 export const elasticsearchConnections = {
     dialect: 'elasticsearch',
     host: 'https://67a7441549120daa2dbeef8ac4f5bb2e.us-east-1.aws.found.io',
     port: '9243'
 };
-
 export const publicReadableS3Connections = {
     dialect: 's3',
     bucket: 'plotly-s3-connector-test',
     accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
     secretAccessKey: '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'
 };
-
 export const apacheDrillConnections = {
     dialect: 'apache drill',
     host: 'http://ec2-35-160-151-112.us-west-2.compute.amazonaws.com',
@@ -84,7 +105,33 @@ export const apacheDrillConnections = {
     accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
     secretAccessKey: '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'
 };
+export const sqliteConnection = {
+    dialect: 'sqlite',
+    storage: `${__dirname}/plotly_datasets.db`
+};
 
+// TODO - Add postgis in here
+
+export const testConnections = [
+    postgresConnection,
+    mysqlConnection,
+    mariadbConnection,
+    redshiftConnection,
+    mssqlConnection,
+    sqliteConnection,
+    elasticsearchConnections,
+    publicReadableS3Connections,
+    apacheDrillConnections
+];
+
+export const testSqlConnections = [
+    postgresConnection,
+    mysqlConnection,
+    mariadbConnection,
+    redshiftConnection,
+    mssqlConnection,
+    sqliteConnection
+];
 
 export const configuration = dissoc('password', sqlConnections);
 
