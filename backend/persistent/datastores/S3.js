@@ -62,14 +62,12 @@ export function files(connection) {
 }
 
 function parse(textData) {
-    // TODO - use a more robust parsing algorithm
+    // TODO - use a more robust and faster parsing algorithm
     const allRows = textData.split('\n').map(row => row.split(','));
     const columnnames = allRows[0];
     const rows = allRows.slice(1);
     return {
         columnnames,
-        rows,
-        nrows: rows.length,
-        ncols: columnnames.length
+        rows
     };
 }
