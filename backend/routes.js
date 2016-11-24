@@ -181,6 +181,11 @@ export default class Server {
              * Can update a connection with a `patch` to `/connections/:connectionId`
              */
             const connectionsOnFile = lookUpConnections(
+                /*
+                 * Remove the password field since the front-end might not
+                 * supply a password if it originally loaded up these creds
+                 * via `GET /connections`.
+                 */
                 dissoc('password', req.params)
             );
             if (connectionsOnFile) {
