@@ -1,8 +1,9 @@
 import Sequelize from 'sequelize';
 import {parseSQL} from '../../parse';
-import {dissoc, flatten, merge, mergeAll, values} from 'ramda';
+import {contains, dissoc, flatten, gt, merge, mergeAll, sort, uniq, values} from 'ramda';
 import {DIALECTS} from '../../../app/constants/constants';
 import Logger from '../../logger';
+import fs from 'fs';
 
 // http://stackoverflow.com/questions/32037385/using-sequelize-with-redshift
 const REDSHIFT_OPTIONS = {
@@ -27,6 +28,11 @@ const SHOW_TABLES_QUERY = {
     [DIALECTS.MSSQL]: (
         'SELECT TABLE_NAME FROM ' +
         'information_schema.tables'
+    ),
+    [DIALECTS.REDSHIFT]: (
+        'SELECT table_name FROM ' +
+        'information_schema.tables WHERE ' +
+        'table_schema = \'public\''
     )
 };
 
@@ -61,7 +67,24 @@ export function connect(connection) {
         `${JSON.stringify(dissoc('password', connection), null, 2)} ` +
         '(password omitted)'
     );
-    return createClient(connection).authenticate();
+    if (connection.dialect !== 'sqlite') {
+        return createClient(connection).authenticate();
+    } else {
+        /*
+         * sqlite's createClient will create a sqlite file even if it
+         * doesn't exist. that means that bad storage parameters won't
+         * reject. Instead of trying `authenticate`, just check if
+         * the file exists.
+         */
+        return new Promise(function(resolve, reject) {
+            if (fs.existsSync(connection.storage)) {
+                resolve();
+            } else {
+                reject(new Error(`SQLite file at path "${connection.storage}" does not exist.`));
+            }
+        })
+    }
+
 }
 
 export function query(queryString, connection) {
@@ -75,5 +98,22 @@ export function tables(connection) {
     return createClient(connection).query(
         SHOW_TABLES_QUERY[connection.dialect],
         {type: Sequelize.QueryTypes.SELECT}
-    ).map(data => data[0]);
+    ).then(tableList => {
+
+        let tableNames;
+
+        if (contains(connection.dialect, ['postgres', 'redshift'])) {
+            tableNames = tableList.map(data => {
+                return data[0]
+            });
+        } else if(connection.dialect === 'sqlite'){
+            tableNames = tableList;
+        } else {
+            tableNames = tableList.map(object => values(object)[0]);
+        }
+
+        return uniq(sort((a, b) => gt(a, b) ? 1 : -1, tableNames));
+
+    });
+
 }
