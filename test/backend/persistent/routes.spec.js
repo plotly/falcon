@@ -148,7 +148,7 @@ describe('Routes - ', function () {
          * in your web browser.
          */
 
-        const access_token = 'RiH6SAOzxgMidg8JPo2ndhmG2u3P1D';
+        const access_token = 'V0s0DotlapdYaFVPHk9LioYVluJ1hH';
 
         POST('oauth2/token', {
             access_token
