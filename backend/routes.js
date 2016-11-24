@@ -401,7 +401,6 @@ export default class Server {
              * these requests.
              */
             if (err.message.indexOf("Can't set headers after they are sent") === -1) {
-                console.error(err);
                 Logger.log(err);
             }
             res.json(500, {
