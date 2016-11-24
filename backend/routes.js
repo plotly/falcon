@@ -170,7 +170,7 @@ export default class Server {
             throw new Error('Yikes - uncaught error');
         });
 
-        // save connections to a file
+        // Validate then save connections to a file
         server.post('/connections', function postDatastoresHandler(req, res, next) {
             /*
              * Check if the connection already exists
@@ -185,8 +185,25 @@ export default class Server {
             );
             if (connectionsOnFile) {
                 res.send(409, {connectionId: connectionsOnFile.id});
+                return;
             } else {
-                res.send(200, {connectionId: saveConnection(req.params)});
+
+                // Check that the connections are valid
+                const connectionObject = req.params;
+                try {
+                    Datastores.connect(connectionObject).then(() => {
+                        res.json(200, {connectionId: saveConnection(req.params)});
+                        return;
+                    }).catch(err => {
+                        Logger.log(err, 2);
+                        res.json(400, {error: {message: err.message}});
+                        return;
+                    });
+                } catch (err) {
+                    Logger.log(err, 2);
+                    res.json(400, {error: {message: err.message}});
+                }
+
             }
         });
 
