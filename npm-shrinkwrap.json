@@ -1705,8 +1705,7 @@
     "dtrace-provider": {
       "version": "0.8.0",
       "from": "dtrace-provider@>=0.8.0 <0.9.0",
-      "resolved": "https://registry.npmjs.org/dtrace-provider/-/dtrace-provider-0.8.0.tgz",
-      "optional": true
+      "resolved": "https://registry.npmjs.org/dtrace-provider/-/dtrace-provider-0.8.0.tgz"
     },
     "duplexer2": {
       "version": "0.0.2",
@@ -1892,8 +1891,7 @@
         "source-map": {
           "version": "0.2.0",
           "from": "source-map@>=0.2.0 <0.3.0",
-          "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.2.0.tgz",
-          "optional": true
+          "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.2.0.tgz"
         }
       }
     },
@@ -2312,8 +2310,7 @@
         "ecc-jsbn": {
           "version": "0.1.1",
           "from": "ecc-jsbn@>=0.1.1 <0.2.0",
-          "resolved": "https://registry.npmjs.org/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz",
-          "optional": true
+          "resolved": "https://registry.npmjs.org/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
         },
         "escape-string-regexp": {
           "version": "1.0.5",
@@ -2480,14 +2477,12 @@
         "jodid25519": {
           "version": "1.0.2",
           "from": "jodid25519@>=1.0.0 <2.0.0",
-          "resolved": "https://registry.npmjs.org/jodid25519/-/jodid25519-1.0.2.tgz",
-          "optional": true
+          "resolved": "https://registry.npmjs.org/jodid25519/-/jodid25519-1.0.2.tgz"
         },
         "jsbn": {
           "version": "0.1.0",
           "from": "jsbn@>=0.1.0 <0.2.0",
-          "resolved": "https://registry.npmjs.org/jsbn/-/jsbn-0.1.0.tgz",
-          "optional": true
+          "resolved": "https://registry.npmjs.org/jsbn/-/jsbn-0.1.0.tgz"
         },
         "json-schema": {
           "version": "0.2.2",
@@ -2716,8 +2711,7 @@
         "tweetnacl": {
           "version": "0.13.3",
           "from": "tweetnacl@>=0.13.0 <0.14.0",
-          "resolved": "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.13.3.tgz",
-          "optional": true
+          "resolved": "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.13.3.tgz"
         },
         "uid-number": {
           "version": "0.0.6",
@@ -4498,19 +4492,16 @@
               "version": "3.1.2",
               "from": "npmlog@>=2.0.0 <2.1.0||>=3.1.0 <3.2.0",
               "resolved": "https://registry.npmjs.org/npmlog/-/npmlog-3.1.2.tgz",
-              "optional": true,
               "dependencies": {
                 "are-we-there-yet": {
                   "version": "1.1.2",
                   "from": "are-we-there-yet@~1.1.2",
                   "resolved": "https://registry.npmjs.org/are-we-there-yet/-/are-we-there-yet-1.1.2.tgz",
-                  "optional": true,
                   "dependencies": {
                     "delegates": {
                       "version": "1.0.0",
                       "from": "delegates@^1.0.0",
-                      "resolved": "https://registry.npmjs.org/delegates/-/delegates-1.0.0.tgz",
-                      "optional": true
+                      "resolved": "https://registry.npmjs.org/delegates/-/delegates-1.0.0.tgz"
                     }
                   }
                 },
@@ -4523,25 +4514,21 @@
                   "version": "2.6.0",
                   "from": "gauge@~2.6.0",
                   "resolved": "https://registry.npmjs.org/gauge/-/gauge-2.6.0.tgz",
-                  "optional": true,
                   "dependencies": {
                     "has-color": {
                       "version": "0.1.7",
                       "from": "has-color@^0.1.7",
-                      "resolved": "https://registry.npmjs.org/has-color/-/has-color-0.1.7.tgz",
-                      "optional": true
+                      "resolved": "https://registry.npmjs.org/has-color/-/has-color-0.1.7.tgz"
                     },
                     "object-assign": {
                       "version": "4.1.0",
                       "from": "object-assign@^4.1.0",
-                      "resolved": "https://registry.npmjs.org/object-assign/-/object-assign-4.1.0.tgz",
-                      "optional": true
+                      "resolved": "https://registry.npmjs.org/object-assign/-/object-assign-4.1.0.tgz"
                     },
                     "signal-exit": {
                       "version": "3.0.0",
                       "from": "signal-exit@^3.0.0",
-                      "resolved": "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.0.tgz",
-                      "optional": true
+                      "resolved": "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.0.tgz"
                     },
                     "string-width": {
                       "version": "1.0.2",
@@ -4577,16 +4564,14 @@
                     "wide-align": {
                       "version": "1.1.0",
                       "from": "wide-align@^1.1.0",
-                      "resolved": "https://registry.npmjs.org/wide-align/-/wide-align-1.1.0.tgz",
-                      "optional": true
+                      "resolved": "https://registry.npmjs.org/wide-align/-/wide-align-1.1.0.tgz"
                     }
                   }
                 },
                 "set-blocking": {
                   "version": "2.0.0",
                   "from": "set-blocking@~2.0.0",
-                  "resolved": "https://registry.npmjs.org/set-blocking/-/set-blocking-2.0.0.tgz",
-                  "optional": true
+                  "resolved": "https://registry.npmjs.org/set-blocking/-/set-blocking-2.0.0.tgz"
                 }
               }
             },
@@ -5114,8 +5099,7 @@
                     "bcrypt-pbkdf": {
                       "version": "1.0.0",
                       "from": "bcrypt-pbkdf@>=1.0.0 <2.0.0",
-                      "resolved": "https://registry.npmjs.org/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz",
-                      "optional": true
+                      "resolved": "https://registry.npmjs.org/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz"
                     },
                     "dashdash": {
                       "version": "1.14.0",
@@ -5125,8 +5109,7 @@
                     "ecc-jsbn": {
                       "version": "0.1.1",
                       "from": "ecc-jsbn@>=0.1.1 <0.2.0",
-                      "resolved": "https://registry.npmjs.org/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz",
-                      "optional": true
+                      "resolved": "https://registry.npmjs.org/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
                     },
                     "getpass": {
                       "version": "0.1.6",
@@ -5136,20 +5119,17 @@
                     "jodid25519": {
                       "version": "1.0.2",
                       "from": "jodid25519@>=1.0.0 <2.0.0",
-                      "resolved": "https://registry.npmjs.org/jodid25519/-/jodid25519-1.0.2.tgz",
-                      "optional": true
+                      "resolved": "https://registry.npmjs.org/jodid25519/-/jodid25519-1.0.2.tgz"
                     },
                     "jsbn": {
                       "version": "0.1.0",
                       "from": "jsbn@>=0.1.0 <0.2.0",
-                      "resolved": "https://registry.npmjs.org/jsbn/-/jsbn-0.1.0.tgz",
-                      "optional": true
+                      "resolved": "https://registry.npmjs.org/jsbn/-/jsbn-0.1.0.tgz"
                     },
                     "tweetnacl": {
                       "version": "0.14.3",
                       "from": "tweetnacl@>=0.14.0 <0.15.0",
-                      "resolved": "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.14.3.tgz",
-                      "optional": true
+                      "resolved": "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.14.3.tgz"
                     }
                   }
                 }
@@ -6285,8 +6265,7 @@
         "dtrace-provider": {
           "version": "0.6.0",
           "from": "dtrace-provider@>=0.6.0 <0.7.0",
-          "resolved": "https://registry.npmjs.org/dtrace-provider/-/dtrace-provider-0.6.0.tgz",
-          "optional": true
+          "resolved": "https://registry.npmjs.org/dtrace-provider/-/dtrace-provider-0.6.0.tgz"
         },
         "http-signature": {
           "version": "0.11.0",
@@ -6372,8 +6351,7 @@
     "safe-json-stringify": {
       "version": "1.0.3",
       "from": "safe-json-stringify@>=1.0.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/safe-json-stringify/-/safe-json-stringify-1.0.3.tgz",
-      "optional": true
+      "resolved": "https://registry.npmjs.org/safe-json-stringify/-/safe-json-stringify-1.0.3.tgz"
     },
     "samsam": {
       "version": "1.1.2",
@@ -7022,8 +7000,7 @@
                         "bcrypt-pbkdf": {
                           "version": "1.0.0",
                           "from": "bcrypt-pbkdf@^1.0.0",
-                          "resolved": "https://registry.npmjs.org/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz",
-                          "optional": true
+                          "resolved": "https://registry.npmjs.org/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.0.tgz"
                         },
                         "dashdash": {
                           "version": "1.14.0",
@@ -7033,8 +7010,7 @@
                         "ecc-jsbn": {
                           "version": "0.1.1",
                           "from": "ecc-jsbn@~0.1.1",
-                          "resolved": "https://registry.npmjs.org/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz",
-                          "optional": true
+                          "resolved": "https://registry.npmjs.org/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
                         },
                         "getpass": {
                           "version": "0.1.6",
@@ -7044,20 +7020,17 @@
                         "jodid25519": {
                           "version": "1.0.2",
                           "from": "jodid25519@^1.0.0",
-                          "resolved": "https://registry.npmjs.org/jodid25519/-/jodid25519-1.0.2.tgz",
-                          "optional": true
+                          "resolved": "https://registry.npmjs.org/jodid25519/-/jodid25519-1.0.2.tgz"
                         },
                         "jsbn": {
                           "version": "0.1.0",
                           "from": "jsbn@~0.1.0",
-                          "resolved": "https://registry.npmjs.org/jsbn/-/jsbn-0.1.0.tgz",
-                          "optional": true
+                          "resolved": "https://registry.npmjs.org/jsbn/-/jsbn-0.1.0.tgz"
                         },
                         "tweetnacl": {
                           "version": "0.14.3",
                           "from": "tweetnacl@~0.14.0",
-                          "resolved": "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.14.3.tgz",
-                          "optional": true
+                          "resolved": "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.14.3.tgz"
                         }
                       }
                     }
