@@ -118,7 +118,7 @@ export function redirectUrl() {
 
 export function connect(connectionId) {
     return apiThunk(
-        `connect/${connectionId}`,
+        `connections/${connectionId}/connect`,
         'POST',
         'connectRequests',
         connectionId
@@ -142,7 +142,7 @@ export function saveConnections(connectionsObject, tabId) {
 
 export function getTables(connectionId) {
     return apiThunk(
-        `tables/${connectionId}`,
+        `connections/${connectionId}/sql-tables`,
         'POST',
         'tables',
         connectionId
@@ -151,7 +151,7 @@ export function getTables(connectionId) {
 
 export function getElasticsearchMappings(connectionId) {
     return apiThunk(
-        `elasticsearch-mappings/${connectionId}`,
+        `connections/${connectionId}/elasticsearch-mappings`,
         'POST',
         'elasticsearchMappingsRequests',
         connectionId
@@ -160,7 +160,7 @@ export function getElasticsearchMappings(connectionId) {
 
 export function getS3Keys(connectionId) {
     return apiThunk(
-        `s3-keys/${connectionId}`,
+        `connections/${connectionId}/s3-keys`,
         'POST',
         's3KeysRequests',
         connectionId
@@ -169,7 +169,7 @@ export function getS3Keys(connectionId) {
 
 export function getApacheDrillStorage(connectionId) {
     return apiThunk(
-        `apache-drill-storage/${connectionId}`,
+        `connections/${connectionId}/apache-drill-storage`,
         'POST',
         'apacheDrillStorageRequests',
         connectionId
@@ -178,7 +178,7 @@ export function getApacheDrillStorage(connectionId) {
 
 export function getApacheDrillS3Keys(connectionId) {
     return apiThunk(
-        `apache-drill-s3-keys/${connectionId}`,
+        `connections/${connectionId}/apache-drill-s3-keys`,
         'POST',
         'apacheDrillS3KeysRequests',
         connectionId
@@ -214,7 +214,7 @@ export function previewTable (connectionId, dialect, table, database) {
         query: PREVIEW_QUERY(dialect, table, database)
     };
     return apiThunk(
-        `query/${connectionId}`,
+        `connections/${connectionId}/query`,
         'POST',
         'previewTableRequest',
         [connectionId, table],
@@ -228,7 +228,7 @@ export function initializeTabs() {
         const {connectionsRequest} = state;
         if (connectionsRequest.status !== 200) {
             console.error(
-                "Can't initialize tabs - crednetials haven't been retreived yet."
+                "Can't initialize tabs - credentials haven't been retreived yet."
             );
             return;
         }

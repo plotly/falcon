@@ -113,7 +113,7 @@ class Settings extends Component {
             }
             if (tablesRequest.status === 200 && !selectedTable) {
                 this.setState({show_connections: false});
-                setTable(tablesRequest.content[0][0]);
+                setTable(tablesRequest.content[0]);
             }
             if (selectedTable && !previewTableRequest.status) {
                 previewTables();

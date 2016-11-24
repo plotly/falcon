@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import classnames from 'classnames';
-import {flatten} from 'ramda';
 import * as styles from './TableDropdown.css';
 import Select from 'react-select';
 
@@ -14,7 +13,7 @@ export default function TableDropdown(props) {
         // TODO - Make this prettier.
         return <div>{'Hm.. there was an error loading up your tables.'}</div>;
     } else if (tablesRequest.status === 200) {
-        const tablesList = flatten(tablesRequest.content);
+        const tablesList = tablesRequest.content;
         if (tablesList.length === 0) {
             return <div>{'No tables found'}</div>;
         } else {
