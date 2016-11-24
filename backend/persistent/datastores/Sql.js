@@ -75,7 +75,5 @@ export function tables(connection) {
     return createClient(connection).query(
         SHOW_TABLES_QUERY[connection.dialect],
         {type: Sequelize.QueryTypes.SELECT}
-    ).map(data => {
-        return values(data);
-    });
+    ).map(data => data[0]);
 }
