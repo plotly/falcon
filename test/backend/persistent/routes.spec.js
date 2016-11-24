@@ -14,6 +14,10 @@ import {
 import {getSetting, saveSetting}  from '../../../backend/Settings.js';
 import fs from 'fs';
 import {
+    username,
+    apiKey,
+    validFid,
+    validUids,
     createGrid,
     configuration,
     sqlConnections,
@@ -60,11 +64,10 @@ function DELETE(path) {
     });
 }
 
-
 let queryObject;
 let server;
 let connectionId;
-describe('Server', function () {
+describe('Routes - ', function () {
     beforeEach(() => {
         server = new Server();
         server.start();
@@ -80,11 +83,15 @@ describe('Server', function () {
             fs.unlinkSync(SETTINGS_PATH);
         } catch (e) {}
 
+        saveSetting('USERS', [{
+            username, apiKey
+        }]);
+
         connectionId = saveConnection(sqlConnections);
         queryObject = {
-            fid: 'chris:10',
-            uids: ['asd', 'xyz'],
-            refreshInterval: 5,
+            fid: validFid,
+            uids: validUids.slice(0, 2), // since this particular query only has 2 columns
+            refreshInterval: 60, // every minute
             query: 'SELECT * FROM ebola_2014 LIMIT 1',
             connectionId: connectionId
         };
@@ -97,13 +104,13 @@ describe('Server', function () {
     });
 
 
-    it('responds on a ping', function(done) {
+    it('ping - responds', function(done) {
         GET('ping')
         .then(() => done())
         .catch(done);
     });
 
-    it('returns 200 on loading the index page', function(done) {
+    it('index page - returns 200', function(done) {
         GET('')
         .then(res => {
             assert.equal(res.status, 200);
@@ -113,7 +120,7 @@ describe('Server', function () {
     })
 
     // OAuth
-    it('returns 200 on loading the oauth page', function(done) {
+    it('oauth - returns 200 on loading the oauth page', function(done) {
         GET('oauth2/callback')
         .then(res => {
             assert.equal(res.status, 200);
@@ -132,12 +139,14 @@ describe('Server', function () {
          * https://plot.ly/o/authorize/?response_type=token&client_id=5sS4Kxx8lqcprixXHKAaCGUCXqPCEVLnRNTGeNQU&redirect_uri=http://localhost:9494/oauth2/callback
          * in your web browser.
          */
+         saveSetting('USERS', []);
+
         assert.deepEqual(
             getSetting('USERS'),
             []
         );
         const access_token = '9DGsJcSoB6s08vVNQJ5u7C1d8TfIo6';
-        POST('oauth-token', {
+        POST('oauth2/token', {
             access_token
         })
         .then(res => res.json().then(json => {
@@ -149,7 +158,7 @@ describe('Server', function () {
             );
 
             // We can save it again and we'll get a 200 instead of a 201
-            POST('oauth-token', {access_token})
+            POST('oauth2/token', {access_token})
             .then(res => res.json().then(json => {
                 assert.deepEqual(json, {});
                 assert.equal(res.status, 200);
@@ -160,8 +169,9 @@ describe('Server', function () {
     });
 
     it('oauth - saving an access token that is not associated with a user account will fail with a 500 level error', function(done) {
+        saveSetting('USERS', []);
         const access_token = 'lah lah lemons';
-        POST('oauth-token', {access_token})
+        POST('oauth2/token', {access_token})
         .then(res => res.json().then(json => {
             assert.deepEqual(json, {
                 error: {
@@ -178,9 +188,9 @@ describe('Server', function () {
     });
 
     // One Time SQL Queries
-    it('runs a SQL query', function(done) {
+    it('sql - query - runs a SQL query', function(done) {
         this.timeout(5000);
-        POST(`query/${connectionId}`, {
+        POST(`connections/${connectionId}/query`, {
             query: 'SELECT * FROM ebola_2014 LIMIT 1'
         })
         .then(res => res.json())
@@ -197,9 +207,9 @@ describe('Server', function () {
         }).catch(done);
     });
 
-    it('fails when the SQL query contains a syntax error', function(done) {
+    it('sql - query - fails when the SQL query contains a syntax error', function(done) {
         this.timeout(60 * 1000);
-        POST(`query/${connectionId}`, {
+        POST(`connections/${connectionId}/query`, {
             query: 'SELECZ'
         })
         .then(res => res.json().then(json => {
@@ -213,9 +223,9 @@ describe('Server', function () {
         .catch(done);
     });
 
-    it('succeeds when SQL query returns no data', function(done) {
+    it('sql - query - succeeds when SQL query returns no data', function(done) {
         this.timeout(60 * 1000);
-        POST(`query/${connectionId}`, {
+        POST(`connections/${connectionId}/query`, {
             query: 'SELECT * FROM ebola_2014 LIMIT 0'
         })
         .then(res => res.json().then(json => {
@@ -224,9 +234,7 @@ describe('Server', function () {
                 json,
                 {
                     columnnames: [],
-                    rows: [[]],
-                    nrows: 0,
-                    ncols: 0
+                    rows: [[]]
                 }
             );
             done();
@@ -235,9 +243,9 @@ describe('Server', function () {
     });
 
     // Meta info about the tables
-    it('/tables returns a list of tables', function(done) {
+    it('sql - tables - returns a list of tables', function(done) {
         this.timeout(5000);
-        POST(`tables/${connectionId}`)
+        POST(`connections/${connectionId}/sql-tables`)
         .then(res => res.json())
         .then(json => {
             assert.deepEqual(
@@ -262,11 +270,10 @@ describe('Server', function () {
     });
 
     // S3
-    it('/s3-keys returns a list of keys', function(done) {
+    it('s3 - s3-keys returns a list of keys', function(done) {
+        this.timeout(10000);
         const s3CredId = saveConnection(publicReadableS3Connections);
-
-        this.timeout(5000);
-        POST(`s3-keys/${s3CredId}`)
+        POST(`connections/${s3CredId}/s3-keys`)
         .then(res => res.json())
         .then(files => {
             assert.deepEqual(
@@ -283,51 +290,56 @@ describe('Server', function () {
                     }
                 })
             );
-            done()
+            done();
         }).catch(done);
     });
 
-    it('/s3-keys fails with the wrong connection credentials', function(done) {
+    it('s3 - s3-keys fails with the wrong connection credentials', function(done) {
+        this.timeout(10000);
         const s3CredId = saveConnection({
             dialect: 's3',
             accessKeyId: 'asdf',
-            secretAccessKey: 'fdsa'
+            secretAccessKey: 'fdsa',
+            bucket: 'plotly-s3-connector-test'
         });
-        POST(`s3-keys/${s3CredId}`)
+        POST(`connections/${s3CredId}/s3-keys`)
         .then(res => res.json().then(json => {
-            expect.equal(res.status, 400);
-            expect.deepEqual(json, {error: {message: 'lah lah lemons'}});
+            assert.equal(res.status, 500);
+            assert.deepEqual(json, {
+                error: {message: 'The AWS Access Key Id you provided does not exist in our records.'}
+            });
             done();
         }))
         .catch(done);
     });
 
-    it('/query returns data for s3', function(done) {
+    it('s3 - query returns data', function(done) {
         const s3CredId = saveConnection(publicReadableS3Connections);
         this.timeout(5000);
-        POST(`query/${s3CredId}`, {query: '5k-scatter.csv'})
+        POST(`connections/${s3CredId}/query`, {query: '5k-scatter.csv'})
         .then(res => res.json().then(json => {
             assert.equal(res.status, 200),
             assert.deepEqual(
                 Object.keys(json),
-                ['columnnames', 'ncols', 'nrows', 'rows']
+                ['columnnames', 'rows']
             );
             assert.deepEqual(
-                rows.slice(0, 3),
+                json.rows.slice(0, 2),
                 [
-                    [1, 2, 3, 4],
-                    [10, 20, 30, 40]
+                    ['-0.790276857291', '-1.32900495883'],
+                    ['0.931947948358', '0.266354435153']
                 ]
             );
-        }));
+            done();
+        })).catch(done);
     });
 
     // Apache Drill
-    it('/apache-drill-storage returns a list of storage items', function(done) {
+    it('apache-drill - apache-drill-storage returns a list of storage items', function(done) {
         const s3CredId = saveConnection(apacheDrillConnections);
 
         this.timeout(5000);
-        POST(`apache-drill-storage/${s3CredId}`)
+        POST(`connections/${s3CredId}/apache-drill-storage`)
         .then(res => res.json())
         .then(storage => {
             assert.deepEqual(
@@ -338,10 +350,10 @@ describe('Server', function () {
         }).catch(done);
     });
 
-    it('/apache-drill-s3-keys returns a list of s3 files', function(done) {
+    it('apache-drill - apache-drill-s3-keys returns a list of s3 files', function(done) {
         const s3CredId = saveConnection(apacheDrillConnections);
         this.timeout(5000);
-        POST(`apache-drill-s3-keys/${s3CredId}`)
+        POST(`connections/${s3CredId}/apache-drill-s3-keys`)
         .then(res => res.json())
         .then(files => {
             assert.deepEqual(
@@ -362,21 +374,10 @@ describe('Server', function () {
         }).catch(done);
     });
 
-    // TODO - Fix this test
-    it('/query returns a syntax error', function(done) {
-        const s3CredId = saveConnection(apacheDrillConnections);
-        this.timeout(5000);
-        POST(`query/${connectionId}`, {
-            query: 'SELECTZ;'
-        })
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 400);
-            assert.deepEqual(json, {error: {message: 'lah lah lemons'}});
-        }));
-    });
+    // TODO - Missing elasticsearch and postgis tests
 
     // Connections
-    it('saves connections to a file if they do not exist', function(done) {
+    it('connections - saves connections to a file if they do not exist', function(done) {
         fs.unlinkSync(CREDENTIALS_PATH);
         assert.deepEqual(getConnections(), []);
         POST('connections', sqlConnections)
@@ -390,15 +391,16 @@ describe('Server', function () {
         }).catch(done);
     });
 
-    it("doesn't save connections if they already exist", function(done) {
+    it("connections - doesn't save connections if they already exist", function(done) {
         POST('connections', sqlConnections)
-        .then(res => {
+        .then(res => res.json().then(json => {
             assert.equal(res.status, 409);
-            assert.deepEqual(res.connectionId, connectionId);
-        });
+            assert.deepEqual(json.connectionId, connectionId);
+            done();
+        })).catch(done);
     });
 
-    it('returns sanitized connections', function(done) {
+    it('connections - returns sanitized connections', function(done) {
         GET('connections')
         .then(res => {
             assert.equal(res.status, 200);
@@ -413,17 +415,17 @@ describe('Server', function () {
         }).catch(done);
     });
 
-    it('deletes connections', function(done) {
+    it('connections - deletes connections', function(done) {
         assert.deepEqual(getConnections().map(dissoc('id')), [sqlConnections]);
          DELETE(`connections/${connectionId}`)
         .then(res => {
-            assert.equal(res.status, 204);
+            assert.equal(res.status, 200);
             assert.deepEqual(getConnections(), []);
             done();
         }).catch(done);
     });
 
-    it('returns an empty array of connections', function(done) {
+    it('connections - returns an empty array of connections', function(done) {
         fs.unlinkSync(CREDENTIALS_PATH);
         GET('connections')
         .then(res => {
@@ -437,7 +439,7 @@ describe('Server', function () {
     });
 
     // Persistent Queries
-    it('registers a query and returns saved queries', function(done) {
+    it('queries - registers a query and returns saved queries', function(done) {
         this.timeout(10 * 1000);
         // Verify that there are no queries saved
         GET('queries')
@@ -466,10 +468,11 @@ describe('Server', function () {
             };
             return POST('queries', queryObject);
         })
-        .then(res => {
+        .then(res => res.json().then(json => {
+            assert.deepEqual(json, {});
             assert.equal(res.status, 201, 'Query was saved');
             return GET('queries')
-        })
+        }))
         .then(res => res.json())
         .then(json => {
             assert.deepEqual(json, [queryObject]);
@@ -478,30 +481,42 @@ describe('Server', function () {
         .catch(done);
     });
 
-    it('gets individual queries', function(done) {
-        POST('queries', queryObject)
-        .then(() => GET(`queries/${queryObject.fid}`))
-        .then(res => res.json())
-        .then(json => {
+    it('queries - gets individual queries', function(done) {
+        this.timeout(10 * 1000);
+        GET(`queries/${queryObject.fid}`)
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 404);
+            return POST('queries', queryObject)
+        }))
+        .then(res => res.json().then(json => {
+            assert.deepEqual(json, {});
+            assert.equal(res.status, 201);
+            return GET(`queries/${queryObject.fid}`);
+        }))
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 200);
             assert.deepEqual(json, queryObject);
             done();
-        }).catch(done);
+        })).catch(done);
     });
 
-    it('deletes queries', function(done) {
+    it('queries - deletes queries', function(done) {
+        this.timeout(10 * 1000);
         POST('queries', queryObject)
         .then(() => DELETE(`queries/${queryObject.fid}`))
-        .then(res => {
-            assert.equal(res.status, 204);
+        .then(res => res.json().then(json => {
+            assert.deepEqual(json, {});
+            assert.equal(res.status, 200);
             return GET(`queries/${queryObject.fid}`);
-        })
+        }))
         .then(res => {
             assert.equal(res.status, 404);
             done();
         }).catch(done);
     });
 
-    it('returns 404s when getting queries that don\'t exist', function(done) {
+    it('queries - returns 404s when getting queries that don\'t exist', function(done) {
+        this.timeout(10 * 1000);
         GET('queries/asdfasdf')
         .then(res => {
             assert.equal(res.status, 404);
@@ -510,7 +525,7 @@ describe('Server', function () {
         .catch(done);
     });
 
-    it('returns 404s when deleting queries that don\'t exist', function(done) {
+    it('queries - returns 404s when deleting queries that don\'t exist', function(done) {
         DELETE('queries/asdfasdf')
         .then(res => {
             assert.equal(res.status, 404);
@@ -519,71 +534,98 @@ describe('Server', function () {
         .catch(done);
     });
 
-    it("POST /queries fails when the user's API keys aren't supplied", function(done) {
-        this.timeout(2 * 1000);
+    it("queries - POST /queries fails when the user's API keys or oauth creds aren't saved", function(done) {
+        this.timeout(10 * 1000);
         saveSetting('USERS', []);
         assert.deepEqual(getSetting('USERS'), []);
         POST('queries', queryObject)
         .then(res => res.json().then(json => {
-            assert.equal(res.status, 400);
-            assert.deepEqual(json, {error: {message: 'API key was not supplied.'}});
+            assert.deepEqual(
+                json,
+                {error: {
+                    message: (
+                        'Unauthenticated: Attempting to update grid ' +
+                        'plotly-database-connector:197 ' +
+                        'but the authentication credentials ' +
+                        'for the user "plotly-database-connector" ' +
+                        'do not exist.'
+                    )
+                }}
+            );
+            assert.equal(res.status, 500);
             done();
         })).catch(done);
     });
 
-    it("POST /queries fails when the user's API keys aren't correct", function(done) {
-        const creds = [{username: 'chris', apikey: 'lah lah lemons'}];
+    it("queries - POST /queries fails when the user's API keys aren't correct", function(done) {
+        this.timeout(10 * 1000);
+        const creds = [{username: 'plotly-database-connector', apiKey: 'lah lah lemons'}];
         saveSetting('USERS', creds);
         assert.deepEqual(getSetting('USERS'), creds);
         POST('queries', queryObject)
         .then(res => res.json().then(json => {
-            assert.equal(res.status, 400);
             assert.deepEqual(
                 json,
-                {error: {message: 'Unauthenticated'}}
-            );
+                {error: {
+                    message: (
+                        `Yikes! ${getSetting('PLOTLY_API_DOMAIN')} failed to identify ${username}. ` +
+                        'These were the credentials supplied: ' +
+                        `Username: ${creds[0].username}, API Key: ${creds[0].apiKey}, OAuth Access Token: ${creds[0].accessToken}.`
+                    )
+                }}
+            )
+            assert.equal(res.status, 400);
             done();
         })).catch(done);
     });
 
-    it("POST /queries fails when it can't connect to the plotly server", function(done) {
+    it("queries - POST /queries fails when it can't connect to the plotly server", function(done) {
         this.timeout(70*1000);
         const nonExistantServer = 'https://plotly.lah-lah-lemons.com';
         saveSetting('PLOTLY_API_DOMAIN', nonExistantServer);
         assert.deepEqual(getSetting('PLOTLY_API_DOMAIN'), nonExistantServer);
         POST('queries', queryObject)
         .then(res => res.json().then(json => {
-            assert.equal(res.status, 500);
             assert.deepEqual(
                 json,
-                {error: {message: 'lah lah lemons'}}
+                {
+                    error: {
+                        message: (
+                            'request to ' +
+                            'https://plotly.lah-lah-lemons.com/v2/users/current ' +
+                            'failed, reason: getaddrinfo ENOTFOUND plotly.lah-lah-lemons.com plotly.lah-lah-lemons.com:443'
+                        )
+                    }
+                }
             );
-            done()
+            assert.equal(res.status, 400);
+            done();
         })).catch(done);
     });
 
-    it('uncaught exceptions get thrown OK ', function(done){
+    it("queries - POST /queries fails when there is a syntax error in the query", function(done) {
+        this.timeout(10 * 1000);
+        const invalidQueryObject = merge(
+            queryObject,
+            {query: 'SELECZ'}
+        );
+        POST('queries', invalidQueryObject)
+        .then(res => res.json().then(json => {
+            assert.deepEqual(
+                json,
+                {error: {message: 'syntax error at or near "SELECZ"'}}
+            );
+            assert.equal(res.status, 400);
+            done();
+        })).catch(done);
+    });
+
+    it('uncaught-exceptions - uncaught exceptions get thrown OK ', function(done){
         this.timeout(3 * 1000);
         POST('_throw')
         .then(res => res.json().then(json => {
             assert.equal(res.status, 500);
             assert.deepEqual(json, {error: {message: 'Yikes - uncaught error'}});
-            done();
-        })).catch(done);
-    });
-
-    it("POST /queries fails when there is a syntax error in the query", function(done) {
-        const invalidQueryObject = merge(
-            queryObject,
-            {query: 'SELECT'}
-        );
-        POST('queries', invalidQueryObject)
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 400);
-            assert.deepEqual(
-                json,
-                {error: {message: 'lah lah lemons'}}
-            );
             done();
         })).catch(done);
     });

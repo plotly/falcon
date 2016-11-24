@@ -20,6 +20,10 @@ export const columns = [
 export const username = 'plotly-database-connector';
 export const apiKey = 'reiptow6gu';
 
+// This fid with these UIDs actually exist on prod
+export const validFid = 'plotly-database-connector:197';
+export const validUids = ['d5d91e', '89d77e', '45b645', 'a7011b', '7cf34b', '881702', '442fd5', 'f5993c', '6d6a67', 'c3246c', 'eac785', '3c3ca8', '7ce7d7', 'f8cd7a', 'e52820', '0a91cc', 'c7dd62', 'b84d17', 'a6c128', 'ae9094'];
+
 export function createGrid(filename) {
     const cols = {};
     names.forEach((name, i) => {
@@ -69,7 +73,6 @@ export const publicReadableS3Connections = {
     bucket: 'plotly-s3-connector-test',
     accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
     secretAccessKey: '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'
-    // TODO - region here too?
 };
 
 export const apacheDrillConnections = {
