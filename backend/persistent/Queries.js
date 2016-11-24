@@ -1,5 +1,5 @@
 import fs from 'fs';
-import {findIndex} from 'ramda';
+import {findIndex, propEq} from 'ramda';
 import YAML from 'yamljs';
 
 import {
@@ -32,7 +32,7 @@ export function saveQuery(queryObject) {
 
 export function deleteQuery(fid) {
     const queries = getQueries();
-    const index = findIndex(query => query.fid === fid, queries);
+    const index = findIndex(propEq('fid', fid), queries);
 
     if (index > -1) {
         queries.splice(index, 1);
