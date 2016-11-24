@@ -229,6 +229,7 @@ class Settings extends Component {
                         hasCerts={hasCerts}
                         redirectUrl={redirectUrl}
                     />
+
                 </div>
             </div>
         );
@@ -394,7 +395,8 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             connect: dispatchConnect,
             createCerts: () => dispatch(Actions.createCerts()),
             hasCerts: () => dispatch(Actions.hasCerts()),
-            redirectUrl: () => dispatch(Actions.redirectUrl())
+            redirectUrl: () => dispatch(Actions.redirectUrl()),
+            editCredential: c => dispatch(Actions.editCredential(c))
         }
     );
 }

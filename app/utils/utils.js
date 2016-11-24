@@ -28,12 +28,16 @@ export function baseUrl() {
           * with electron serving the app file. The electron backend
           * provides the port env variable as a query string param.
           */
-        const URL = queryString.parse(location.search).url;
-        const PORT = queryString.parse(location.search).port;
+        const URL = queryString.parse(location.search).URL;
+        const PORT = queryString.parse(location.search).PORT;
         return `${URL}:${PORT}`;
      }
 }
 
 export function usesHttpsProtocol() {
     return contains('https://', baseUrl());
+}
+
+export function getQuerystringParam(PARAM) {
+    return queryString.parse(location.search)[PARAM];
 }

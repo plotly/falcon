@@ -3,6 +3,7 @@ import uuid from 'node-uuid';
 import {createAction} from 'redux-actions';
 import {DIALECTS, INITIAL_CREDENTIALS} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
+import * as httpsUtils from '../utils/https';
 import {contains} from 'ramda';
 import queryString from 'query-string';
 
@@ -92,28 +93,18 @@ export function getConnections() {
     );
 }
 
-export function hasCerts() {
-    return apiThunk(
-        'has-certs',
-        'GET',
-        'hasCertsRequest'
-    );
-}
-
-export function createCerts() {
-    return apiThunk(
-        'create-certs',
-        'GET',
-        'createCertsRequest'
-    );
-}
-
-export function redirectUrl() {
-    return apiThunk(
-        'redirect-url',
-        'GET',
-        'redirectUrlRequest'
-    );
+export function editCredential(credentialId) {
+    return dispatch => {
+        return dispatch(apiThunk(
+            `credentials/${credentialId}`,
+            'DELETE',
+            'connectRequests',
+            credentialId
+        )).then(json => {
+            dispatch(deleteCredential(credentialId));
+            return json;
+        });
+    };
 }
 
 export function connect(connectionId) {
@@ -294,5 +285,54 @@ export function deleteTab(tabId) {
         } else {
             return;
         }
+    };
+}
+
+// https ->
+export function hasCerts() {
+    return dispatch => {
+        httpsUtils.hasCerts()
+            .then(res => {
+                dispatch({
+                    type: 'hasCertsRequest',
+                    payload: {
+                        status: res.status,
+                        content: res.content,
+                        id: 'hasCertsRequest'
+                    }
+                });
+            });
+    };
+}
+
+export function createCerts() {
+    return dispatch => {
+        httpsUtils.createCerts()
+            .then(res => {
+                dispatch({
+                    type: 'createCertsRequest',
+                    payload: {
+                        status: res.status,
+                        content: res.content,
+                        id: 'createCertsRequest'
+                    }
+                });
+            });
+    };
+}
+
+export function redirectUrl() {
+    return dispatch => {
+        httpsUtils.redirectUrl()
+            .then(res => {
+                dispatch({
+                    type: 'redirectUrlRequest',
+                    payload: {
+                        status: res.status,
+                        content: res.content,
+                        id: 'redirectUrlRequest'
+                    }
+                });
+            });
     };
 }

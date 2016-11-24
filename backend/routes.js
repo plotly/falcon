@@ -12,9 +12,20 @@ import {
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
 import {dissoc, contains, isEmpty, pluck} from 'ramda';
-import {createCerts, deleteCerts, hasCerts, getCerts, redirectUrl} from './https.js';
 import Logger from './logger';
 import fetch from 'node-fetch';
+
+// return HTTPS certs if they exist for a server to use when created or null
+export function getCerts() {
+    try {
+        return {
+            key: fs.readFileSync(getSetting('KEY_FILE')),
+            certificate: fs.readFileSync(getSetting('CSR_FILE'))
+        };
+    } catch (e) {
+        return {};
+    }
+}
 
 export default class Server {
     constructor() {
@@ -354,33 +365,6 @@ export default class Server {
             } else {
                 res.json(404, {});
             }
-        });
-
-        // https certificates
-
-        /*
-         * TODO - These should just be get, post, delete commands
-         * under the endpoint 'ssl-certificates'
-         */
-
-        /*
-         * TODO - These endpoints are untested. Need tests in
-         * routes.spec.js for each of these endpoints.
-         */
-        server.get('/has-certs', (req, res, next) => {
-            res.json(200, hasCerts());
-        });
-
-        server.get('/create-certs', (req, res, next) => {
-            res.json(200, createCerts());
-        });
-
-        server.get('/redirect-url', (req, res, next) => {
-            res.json(200, redirectUrl(getSetting('CONNECTOR_HTTPS_DOMAIN')));
-        });
-
-        server.get('/delete-certs', (req, res, next) => {
-            res.json(200, deleteCerts());
         });
 
         // Transform restify's error messages into our standard error object

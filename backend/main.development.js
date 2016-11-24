@@ -1,5 +1,5 @@
 import {app, BrowserWindow, ipcMain} from 'electron';
-import {contains} from 'ramda';
+import {contains, join} from 'ramda';
 
 import Logger from './logger';
 import QueryScheduler from './persistent/QueryScheduler.js';
@@ -31,12 +31,20 @@ app.on('ready', () => {
     });
 
     const URL = `${server.protocol}://${server.domain}`;
-    const PORT = getSetting('PORT');
+
+    const SETTINGS = join('&',
+        ['CONNECTOR_HTTPS_DOMAIN', 'KEY_FILE', 'CSR_FILE', 'PORT'].map(s => {
+            return `${s}=${getSetting(s)}`;
+    }));
+
+    console.log('SETTINGS', SETTINGS);
+    console.log('URL ', URL);
+
     // TODO - Does this work too?
     // mainWindow.loadURL(`http://localhost:${getSetting('PORT')}`);
 
     // Provide the port of the server to the front-end as a query string param.
-    mainWindow.loadURL(`file://${__dirname}/../app/app.html?url=${URL}&port=${PORT}`);
+    mainWindow.loadURL(`file://${__dirname}/../app/app.html?URL=${URL}&${SETTINGS}`);
 
     // startup main window
     mainWindow.webContents.on('did-finish-load', () => {

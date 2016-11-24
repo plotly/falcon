@@ -1,8 +1,6 @@
 import * as fs from 'fs';
-import restify from 'restify';
 import {replace, splitAt} from 'ramda';
-import YAML from 'yamljs';
-import {getSetting, saveSetting} from './settings.js';
+import {getQuerystringParam} from './utils';
 
 /*
  * Our app has two build targets - electron and node.
@@ -28,17 +26,23 @@ function dynamicRequire(module) {
 
 let sudo, dialog;
 try {
-    sudo = wrappedRequire('electron-sudo');
-    dialog = wrappedRequire('electron').dialog;
-} catch (e) {}
+    sudo = require('electron-sudo');
+    dialog = require('electron').remote.dialog;
+    console.log('required electron');
+} catch (e) {
+    console.log(
+        'Could not load electron dependencies. ' +
+        'Make sure the app is not targeted at electron process.'
+    );
+}
 
 // get settings
-const keyFilePath = getSetting('KEY_FILE');
-const csrFilePath = getSetting('CSR_FILE');
+const keyFilePath = getQuerystringParam('KEY_FILE');
+const csrFilePath = getQuerystringParam('CSR_FILE');
 
 // generic directories
 const HOSTS = '/etc/hosts';
-const SCRIPTS_DIRECTORY = replace(/\ /g, '\\ ', `${__dirname}`);
+const DIRECTORY_ENCODED = replace(/\ /g, '\\ ', `${__dirname}`);
 
 // dialog messages
 const SUDO_MESSAGE = 'Welcome to the Plotly Database Connector! ' +
@@ -52,8 +56,8 @@ const ERROR_MESSAGE = (error) => 'Yikes, an error occurred while setting up' +
     `${error}`;
 
 // scripts
-const REDIRECT_CONNECTOR_SCRIPT = `sh  "${SCRIPTS_DIRECTORY}"/../ssl/redirectConnector.sh`;
-const CREATE_CERTS_SCRIPT = `sh  "${SCRIPTS_DIRECTORY}"/../ssl/createKeys.sh`;
+const REDIRECT_CONNECTOR_SCRIPT = `sh  "${DIRECTORY_ENCODED}"/../ssl/redirectConnector.sh`;
+const CREATE_CERTS_SCRIPT = `sh  "${DIRECTORY_ENCODED}"/../ssl/createKeys.sh`;
 
 // running sudo commands options
 const SUDO_OPTIONS = {
@@ -69,17 +73,6 @@ const SUDO_OPTIONS = {
             }, 50000);
         }
     }
-};
-
-const ERROR_MESSAGE_BOX = (error) => {
-    console.log(error);
-    const charLengthOfMessage = 500;
-    const shortenedMessage = splitAt(charLengthOfMessage, error.toString())[0];
-    return dialog.showMessageBox({
-        type: 'info',
-        buttons: ['OK'],
-        message: ERROR_MESSAGE(shortenedMessage)
-    });
 };
 
 let messageShown;
@@ -118,7 +111,8 @@ function waitForRedirect(url) {
         } else {
             resolve();
         }
-    }).then(() => {return {};}).catch(err => {return err;});
+    }).then(() => {return {};})
+    .catch(err => {return err;});
 }
 
 export function redirectUrl(url) {
@@ -132,58 +126,54 @@ export function redirectUrl(url) {
                 function(error) {
                     if (error) {
                         console.log('error', error);
+                        resolve({status: 500, content: error});
                     }
                 }
             );
         } catch (error) {
             console.log(error);
-            return {error};
+            resolve({status: 500, content: error});
         }
     }
-    return waitForRedirect(url);
-}
-
-// return HTTPS certs if they exist for a server to use when created or null
-export function getCerts() {
-    if (hasCerts()) {
-        return {
-            key: fs.readFileSync(getSetting('KEY_FILE')),
-            certificate: fs.readFileSync(getSetting('CSR_FILE'))
-        };
-    }
-    return {};
+    waitForRedirect(url)
+    .then(res => resolve({status: 200, content: res}));
 }
 
 // check if there are certificates in the directory specified in settings.js
 export function hasCerts() {
-    try {
-        // try reading certs
-        fs.accessSync(keyFilePath, fs.F_OK);
-        fs.accessSync(csrFilePath, fs.F_OK);
-    } catch (e) {
-        return false;
-    }
-    return true;
+    return new Promise((resolve, reject) => {
+        try {
+            // try reading certs
+            fs.accessSync(keyFilePath, fs.F_OK);
+            fs.accessSync(csrFilePath, fs.F_OK);
+        } catch (e) {
+            resolve({status: 404, content: false});
+        }
+        resolve({status: 200, content: true});
+    });
 }
 
 // creates self-signed certificates
 export function createCerts() {
-    try {
-        showSudoMessage();
-        sudo.exec(
-            CREATE_CERTS_SCRIPT,
-            SUDO_OPTIONS,
-            function(error) {
-                if (error) {
-                    console.log('error', error);
+    return new Promise((resolve, reject) => {
+        try {
+            showSudoMessage();
+            sudo.exec(
+                CREATE_CERTS_SCRIPT,
+                SUDO_OPTIONS,
+                function(error) {
+                    if (error) {
+                        console.log('error', error);
+                        resolve({status: 500, content: error});
+                    }
                 }
-            }
-        );
-    } catch (error) {
-        console.log('error', error);
-        return {error};
-    }
-    return {};
+            );
+        } catch (error) {
+            console.log('error', error);
+            resolve({status: 500, content: error});
+        }
+        resolve({status: 200, content: {}});
+    });
 }
 
 // TODO: complete this function using sudo
