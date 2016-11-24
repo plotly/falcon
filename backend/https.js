@@ -4,17 +4,33 @@ import {replace, splitAt} from 'ramda';
 import YAML from 'yamljs';
 import {getSetting, saveSetting} from './settings.js';
 
+/*
+ * Our app has two build targets - electron and node.
+ * The electon target has the `electron` module e.g.
+ * `require('electron')` works.
+ * But the node target doesn't.
+ * We are sharing a bunch of code across both of these targets
+ * include these imports.
+ * We're not really properly splitting apart the electron modules
+ * from the non-electron modules, we're just blindly importing everything.
+ *
+ * To protect the node context from throwing an exception at `require('electron')`
+ * we're wrapping the require statement in a try-catch statement and doing
+ * a dynamic import.
+ * Note that the dynamic import is required for babel not to throw an error
+ * during compilation when it tries to resolve all of the require('any-string')
+ * statements.
+ */
+
+function dynamicRequire(module) {
+    return require(module);
+}
+
 let sudo, dialog;
 try {
-    sudo = require('electron-sudo');
-    dialog = require('electron').dialog;
-    console.log('required electron');
-} catch (e) {
-    console.log(
-        'Could not load electron dependencies. ' +
-        'Make sure the app is not targeted at electron process.'
-    );
-}
+    sudo = wrappedRequire('electron-sudo');
+    dialog = wrappedRequire('electron').dialog;
+} catch (e) {}
 
 // get settings
 const keyFilePath = getSetting('KEY_FILE');
