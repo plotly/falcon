@@ -50,7 +50,7 @@ export function getSanitizedConnections() {
 
 export function saveConnection(connectionObject) {
     const connections = getConnections();
-    const connectionId = uuid.v4();
+    const connectionId = `${connectionObject.dialect}-${uuid.v4()}`;
     connections.push(assoc('id', connectionId, connectionObject));
     if (!fs.existsSync(CONNECTOR_FOLDER_PATH)) {
         createConnectorFolder();
