@@ -16,6 +16,8 @@ class QueryScheduler {
 
         // Expose this.job so that tests can overwrite it
         this.job = this.queryAndUpdateGrid;
+
+        // Expose this.minimumRefreshInterval so that tests can overwrite it
         this.minimumRefreshInterval = 60;
         this.queryJobs = {};
     }
@@ -94,9 +96,49 @@ class QueryScheduler {
         const requestedDBConnections = getConnectionById(connectionId);
         let startTime = process.hrtime();
 
-        Logger.log(`Querying "${queryString}" with connection ${connectionId} to update grid ${fid}`, 2);
-        return Connections.query(queryString, requestedDBConnections)
-        .then(rowsAndColumns => {
+        /*
+         * Do a pre-query check that the user has the correct credentials
+         * and that the connector can connect to plotly
+         */
+        const username = fid.split(':')[0];
+        const user = getSetting('USERS').find(
+             u => u.username === username
+        );
+
+        // Check if the user even exists
+        if (!user || !(user.apiKey || user.accessToken)) {
+            /*
+             * Heads up - the front end looks for "Unauthenticated" in this
+             * error message. So don't change it!
+             */
+            const errorMessage = (
+                `Unauthenticated: Attempting to update grid ${fid} but the ` +
+                `authentication credentials for the user "${username}" do not exist.`
+            );
+            Logger.log(errorMessage, 0);
+            throw new Error(errorMessage);
+        }
+        const {apiKey, accessToken} = user;
+
+        // Check if the credentials are valid
+        return PlotlyAPIRequest('users/current', {
+            method: 'GET', username, apiKey, accessToken
+        }).then(res => {
+            if (res.status !== 200) {
+                const errorMessage = (
+                    `Yikes! ${getSetting('PLOTLY_API_DOMAIN')} failed to identify ${username}. ` +
+                    'These were the credentials supplied: ' +
+                    `Username: ${username}, API Key: ${apiKey}, OAuth Access Token: ${accessToken}.`
+                )
+                Logger.log(errorMessage, 0);
+                throw new Error(errorMessage);
+            }
+
+            Logger.log(`Querying "${queryString}" with connection ${connectionId} to update grid ${fid}`, 2);
+            return Connections.query(queryString, requestedDBConnections)
+
+        }).then(rowsAndColumns => {
+
             Logger.log(`Query "${queryString}" took ${process.hrtime(startTime)[0]} seconds`, 2);
             Logger.log(`Updating grid ${fid} with new data`, 2);
             Logger.log(
@@ -124,11 +166,6 @@ class QueryScheduler {
                  * In Plotly, deletes can either be permenant or non-permentant.
                  * Delete the grid in either case.
                  */
-                const username = fid.split(':')[0];
-                const user = getSetting('USERS').find(
-                     u => u.username === username
-                );
-                const {apikey: apiKey, accessToken} = user;
                 return PlotlyAPIRequest(
                     `grids/${fid}`,
                     {username, apiKey, accessToken, method: 'GET'}
