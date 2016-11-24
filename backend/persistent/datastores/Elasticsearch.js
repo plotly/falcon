@@ -23,8 +23,7 @@ function request(relativeUrl, connection, {body, method}) {
 }
 
 export function connect(connection) {
-    const {index} = connection;
-    return request(`_cat/indices/${index}`, connection, {method: 'GET'});
+    return request(`_cat/indices/`, connection, {method: 'GET'});
 }
 
 export function query(query, connection) {

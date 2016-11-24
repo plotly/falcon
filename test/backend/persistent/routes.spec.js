@@ -130,6 +130,13 @@ describe('Routes - ', function () {
     })
 
     it('oauth - saves oauth access token with a username if valid', function(done) {
+        saveSetting('USERS', []);
+
+        assert.deepEqual(
+            getSetting('USERS'),
+            []
+        );
+
         /*
          * This is a real live access token associated with
          * the user account plotly-database-connector on
@@ -139,13 +146,9 @@ describe('Routes - ', function () {
          * https://plot.ly/o/authorize/?response_type=token&client_id=5sS4Kxx8lqcprixXHKAaCGUCXqPCEVLnRNTGeNQU&redirect_uri=http://localhost:9494/oauth2/callback
          * in your web browser.
          */
-         saveSetting('USERS', []);
 
-        assert.deepEqual(
-            getSetting('USERS'),
-            []
-        );
-        const access_token = '9DGsJcSoB6s08vVNQJ5u7C1d8TfIo6';
+        const access_token = 'RiH6SAOzxgMidg8JPo2ndhmG2u3P1D';
+
         POST('oauth2/token', {
             access_token
         })

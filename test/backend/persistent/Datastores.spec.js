@@ -6,22 +6,22 @@ import {
     publicReadableS3Connections,
     apacheDrillConnections,
     apacheDrillStorage
-} from '../../utils.js';
+} from '../utils.js';
 
 import {
     query, connect, files, storage, listS3Files, elasticsearchMappings
-} from '../../../../backend/persistent/datastores/Datastores.js';
+} from '../../../backend/persistent/datastores/Datastores.js';
 
 const transpose = m => m[0].map((x, i) => m.map(x => x[i]));
 
 
-describe('SQL - Connections', function () {
-    it('Connections.connect connects to a database', function(done) {
+describe('SQL - ', function () {
+    it('connect connects to a database', function(done) {
         this.timeout(4 * 1000);
         connect(sqlConnections).then(done).catch(done);
     });
 
-    it('Connections.query queries a database', function(done) {
+    it('query queries a database', function(done) {
         this.timeout(4 * 1000);
         query(
             'SELECT * from ebola_2014 LIMIT 2',
@@ -34,8 +34,6 @@ describe('SQL - Connections', function () {
             assert.deepEqual(results.columnnames, [
                 'country', 'month', 'year', 'lat', 'lon', 'value'
             ]);
-            assert.deepEqual(results.ncols, 6);
-            assert.deepEqual(results.nrows, 2);
             done();
         }).catch(done);
     });
@@ -43,18 +41,20 @@ describe('SQL - Connections', function () {
 
 
 
-describe('Elasticsearch - Connections', function () {
-    it('Connections.connect connects to a database', function(done) {
+describe('Elasticsearch - ', function () {
+    it('connect connects to an index', function(done) {
         this.timeout(4 * 1000);
         connect(elasticsearchConnections).then(res => res.json().then(json => {
-            console.warn(json);
+            assert.deepEqual(
+                json,
+                [{"health":"yellow","status":"open","index":"plotly_datasets","pri":"1","rep":"1","docs.count":"31","docs.deleted":"0","store.size":"8.5kb","pri.store.size":"8.5kb"},{"health":"yellow","status":"open","index":"sample-data","pri":"1","rep":"1","docs.count":"11","docs.deleted":"0","store.size":"9.9kb","pri.store.size":"9.9kb"}]
+            );
             assert.equal(res.status, 200);
-            assert.equal(json[0].status, 'open');
             done();
         })).catch(done);
     });
 
-    it('Connections.mappings returns mappings', function(done) {
+    it('mappings returns mappings', function(done) {
         elasticsearchMappings(elasticsearchConnections).then(json => {
             assert.deepEqual(
                 json,
@@ -134,11 +134,10 @@ describe('Elasticsearch - Connections', function () {
         }).catch(done);
     });
 
-    it('Connections.query queries an elasticsearch index', function(done) {
+    it('query queries an elasticsearch index', function(done) {
         this.timeout(4 * 1000);
-        query(
-            {
-                search: {
+        query(JSON.stringify({
+                body: {
                     query: {
                         query_string: {
                             query: '*'
@@ -149,12 +148,10 @@ describe('Elasticsearch - Connections', function () {
                 },
                 index: 'sample-data',
                 type: 'test-type'
-            },
+            }),
             elasticsearchConnections
         ).then(results => {
             assert.deepEqual(results, {
-                nrows: 11,
-                ncols: 10,
                 columnnames: [
                     'my-date-1',
                     'my-string-1', 'my-string-2',
@@ -212,6 +209,7 @@ describe('Elasticsearch - Connections', function () {
                     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
                     [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110],
 
+                    // TODO - Should expand these geoPoints out into 2 columns
                     [
                         [-10, -10],
                         [-11, -11],
@@ -257,7 +255,7 @@ describe('Elasticsearch - Connections', function () {
         }).catch(done);
     });
 
-    it('Connections.query queries an elasticsearch index and limits the size', function(done) {
+    it('query queries an elasticsearch index and limits the size', function(done) {
         this.timeout(4 * 1000);
         query(JSON.stringify(
             {
@@ -276,8 +274,6 @@ describe('Elasticsearch - Connections', function () {
             elasticsearchConnections
         ).then(results => {
             assert.deepEqual(results, {
-                nrows: 1,
-                ncols: 10,
                 columnnames: [
                     'my-date-1',
                     'my-string-1', 'my-string-2',

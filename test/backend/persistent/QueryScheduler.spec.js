@@ -45,27 +45,27 @@ describe('QueryScheduler', () => {
         saveSetting('USERS', savedUsers);
     });
 
-    it('executes a function on an interval', (done) => {
+    it('executes a function on an interval', function (done) {
         const spy = chai.spy(() => {});
         queryScheduler.job = spy;
 
-        const delay = 100;
+        const delay = 1;
+        this.timeout(delay * 10 * 1000);
+
         queryScheduler.scheduleQuery({
             refreshInterval: delay,
             fid: '...',
             uids: '...',
             query: '...',
-            connectionId: '...',
-            username,
-            apiKey
+            connectionId: '...'
         });
         setTimeout(function() {
             expect(spy).to.have.been.called();
-        }, delay + 1);
+        }, (delay + 1) * 1000);
         setTimeout(function() {
             expect(spy).to.have.been.called.twice();
             done();
-        }, delay * 3);
+        }, (delay * 3) * 1000);
     });
 
     it('saves queries to file', () => {
@@ -114,7 +114,7 @@ describe('QueryScheduler', () => {
 
     it('clears and deletes the query if its associated grid was deleted', function(done) {
         const refreshInterval = 1;
-        this.timeout(refreshInterval * 20);
+        this.timeout(refreshInterval * 20 * 1000);
 
         /*
          * Save the sqlConnections to a file.
@@ -157,7 +157,7 @@ describe('QueryScheduler', () => {
                     assert(!Boolean(queryScheduler.queryJobs[fid]), 'Queries were removed');
                     assert.deepEqual(getQueries(), [], 'Queries were deleted');
                     done();
-                }, refreshInterval * 3);
+                }, refreshInterval * 3 * 1000);
 
             }).catch(done);
 
@@ -217,7 +217,7 @@ describe('QueryScheduler', () => {
         }
 
         const refreshInterval = 30;
-        this.timeout(refreshInterval * 10);
+        this.timeout(refreshInterval * 10 * 1000);
 
         /*
          * Save the sqlConnections to a file.
@@ -240,8 +240,6 @@ describe('QueryScheduler', () => {
                  uids,
                  refreshInterval,
                  connectionId,
-                 username,
-                 apiKey,
                  query: 'SELECT * from ebola_2014 LIMIT 2'
              };
              queryScheduler.scheduleQuery(queryObject);
@@ -286,10 +284,10 @@ describe('QueryScheduler', () => {
                              }, refreshInterval);
                          })
                          .catch(done);
-                     }, refreshInterval);
+                     }, refreshInterval * 1000);
                  })
                  .catch(done);
-            }, refreshInterval + 5); // Give scheduleQuery an extra 5 seconds.
+            }, (refreshInterval + 5) * 1000); // Give scheduleQuery an extra 5 seconds.
         })).catch(done);
     });
 

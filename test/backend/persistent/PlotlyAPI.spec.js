@@ -16,7 +16,7 @@ describe('Grid API Functions', function () {
         // it works off of the assumption that a grid exists
 
         let fid;
-        createGrid('Test updateGrid').then(json => {
+        createGrid('Test updateGrid').then(res => res.json().then(json => {
             // Update the grid's data
             fid = json.file.fid;
             const uids = json.file.cols.map(col => col.uid);
@@ -28,15 +28,13 @@ describe('Grid API Functions', function () {
                     ['z', 30, 60, 90, 120, 150]
                 ],
                 fid,
-                uids,
-                username,
-                apiKey
+                uids
             );
-        }).then(() => {
+        })).then(() => {
             const url = `grids/${fid}/content`;
             // Retrieve the contents from the grid
             return PlotlyAPIRequest(url, {username, apiKey, method: 'GET'});
-        }).then(json => {
+        }).then(res => res.json().then(json => {
             // Test that the update worked
             assert.deepEqual(
                 json.cols[names[0]].data,
@@ -63,7 +61,7 @@ describe('Grid API Functions', function () {
                 [130, 140, 150]
             );
             done();
-        }).catch(done);
+        })).catch(done);
 
     });
 });
