@@ -26,14 +26,11 @@ function dynamicRequire(module) {
 
 let sudo, dialog;
 try {
-    sudo = require('electron-sudo');
-    dialog = require('electron').remote.dialog;
-    console.log('required electron');
+    sudo = dynamicRequire('electron-sudo');
+    dialog = dynamicRequire('electron').remote.dialog;
+    console.log('Required successfully electron.');
 } catch (e) {
-    console.log(
-        'Could not load electron dependencies. ' +
-        'Make sure the app is not targeted at electron process.'
-    );
+    console.log('Could not load electron dependencies. ');
 }
 
 // get settings
