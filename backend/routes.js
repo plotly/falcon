@@ -103,8 +103,7 @@ export default class Server {
             file: 'oauth.html'
         }));
 
-        // Careful - this endpoint is untested
-        server.post('/oauth-token', function saveOauth(req, res, next) {
+        server.post('/oauth2/token', function saveOauth(req, res, next) {
             const {access_token} = req.params;
             fetch(`${getSetting('PLOTLY_API_DOMAIN')}/v2/users/current`, {
                 headers: {'Authorization': `Bearer ${access_token}`}
@@ -209,8 +208,8 @@ export default class Server {
             }
         });
 
-        /* Connections */
-        server.post('/connect/:connectionId', function postConnectHandler(req, res, next) {
+        /* Connect */
+        server.post('/connections/:connectionId/connect', function postConnectHandler(req, res, next) {
             Connections.connect(getConnectionById(req.params.connectionId))
             .then(() => {
                 res.json(200, {});
@@ -220,7 +219,7 @@ export default class Server {
         /* One-Shot Queries */
 
         // Make a query and return the results as a grid
-        server.post('/query/:connectionId', function postQueryHandler(req, res, next) {
+        server.post('/connections/:connectionId/query', function postQueryHandler(req, res, next) {
             Connections.query(
                 req.params.query,
                 getConnectionById(req.params.connectionId)
@@ -232,45 +231,61 @@ export default class Server {
             });
         });
 
-        server.post('/tables/:connectionId', function tablesHandler(req, res, next) {
+        /*
+         * Dialect-specific endpoints.
+         *
+         * The convention here is for the dialect to take the first part of the URL
+         * with SQL-like dialects are grouped together as `sql`.
+         * Multiple words are separated by hyphens instead of camelCased or
+         * underscored.
+         */
+        server.post('/connections/:connectionId/sql-tables', function tablesHandler(req, res, next) {
             Connections.tables(
                 getConnectionById(req.params.connectionId)
             ).then(tables => {
                 res.json(200, tables);
+            }).catch(error => {
+                res.json(500, {error: {message: error.message}});
             });
         });
 
-        server.post('/s3-keys/:connectionId', function s3KeysHandler(req, res, next) {
+        server.post('/connections/:connectionId/s3-keys', function s3KeysHandler(req, res, next) {
             Connections.files(
                 getConnectionById(req.params.connectionId)
             ).then(files => {
                 res.json(200, files);
+            }).catch(error => {
+                res.json(500, {error: {message: error.message}});
             });
         });
 
-        server.post('/apache-drill-storage/:connectionId', function apacheDrillStorageHandler(req, res, next) {
+        server.post('/connections/:connectionId/apache-drill-storage', function apacheDrillStorageHandler(req, res, next) {
             Connections.storage(
                 getConnectionById(req.params.connectionId)
             ).then(files => {
                 res.json(200, files);
+            }).catch(error => {
+                res.json(500, {error: {message: error.message}});
             });
         });
 
-        server.post('/apache-drill-s3-keys/:connectionId', function apacheDrills3KeysHandler(req, res, next) {
+        server.post('/connections/:connectionId/apache-drill-s3-keys', function apacheDrills3KeysHandler(req, res, next) {
             Connections.listS3Files(
                 getConnectionById(req.params.connectionId)
             ).then(files => {
                 res.json(200, files);
+            }).catch(error => {
+                res.json(500, {error: {message: error.message}});
             });
         });
 
-        // TODO - do we need `.catch` on all of these or will our
-        // uncaughtExceptionHandler deal with it appropriately?
-        server.post('/elasticsearch-mappings/:connectionId', function elasticsearchMappingsHandler(req, res, next) {
+        server.post('/connections/:connectionId/elasticsearch-mappings', function elasticsearchMappingsHandler(req, res, next) {
             Connections.elasticsearchMappings(
                 getConnectionById(req.params.connectionId)
             ).then(mappings => {
                 res.json(200, mappings);
+            }).catch(error => {
+                res.json(500, {error: {message: error.message}});
             });
         });
 
@@ -291,8 +306,10 @@ export default class Server {
         });
 
         // register or update a query
-        // TODO - Updating a query should probably be under
-        // the endpoint `/queries/:fid`
+        /*
+         * TODO - Updating a query should be a PATCH or PUT under
+         * the endpoint `/queries/:fid`
+         */
         server.post('/queries', function postQueriesHandler(req, res, next) {
             // TODO - Verify that the app has access to
             // the user's API key and attempt to make a
@@ -327,13 +344,29 @@ export default class Server {
             const {fid} = req.params;
             if (getQuery(fid)) {
                 deleteQuery(fid);
+                /*
+                 * NOTE - return 200 instead of 204 here
+                 * so that we can respond with an empty body
+                 * which makes front-end generic API handlers
+                 * a little easier to write
+                 */
                 res.json(200, {});
             } else {
                 res.json(404, {});
             }
         });
 
-        // https
+        // https certificates
+
+        /*
+         * TODO - These should just be get, post, delete commands
+         * under the endpoint 'ssl-certificates'
+         */
+
+        /*
+         * TODO - These endpoints are untested. Need tests in
+         * routes.spec.js for each of these endpoints.
+         */
         server.get('/has-certs', (req, res, next) => {
             res.json(200, hasCerts());
         });
