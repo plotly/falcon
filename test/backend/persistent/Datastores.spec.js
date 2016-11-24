@@ -437,7 +437,6 @@ describe('Apache Drill - Connection', function () {
 
     it('s3-keys returns a list of files in the s3 bucket', function(done) {
         this.timeout(10 * 1000);
-        console.warn('apacheDrillConnections: ', apacheDrillConnections);
         listS3Files(apacheDrillConnections)
         .then(files => {
             assert.deepEqual(
