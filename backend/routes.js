@@ -1,5 +1,5 @@
 var restify = require('restify');
-import * as Connections from './persistent/datastores/Datastores.js';
+import * as Datastores from './persistent/datastores/Datastores.js';
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
 import {
     saveConnection,
@@ -171,13 +171,14 @@ export default class Server {
         });
 
         // save connections to a file
-        server.post('/connections', function postConnectionsHandler(req, res, next) {
+        server.post('/connections', function postDatastoresHandler(req, res, next) {
             /*
              * Check if the connection already exists
              * If it does, prevent overwriting so that IDs
              * that might be saved on other servers that refer
              * to this exact same connection doesn't get
              * overwritten.
+             * Can update a connection with a `patch` to `/connections/:connectionId`
              */
             const connectionsOnFile = lookUpConnections(
                 dissoc('password', req.params)
@@ -190,7 +191,7 @@ export default class Server {
         });
 
         // return sanitized connections
-        server.get('/connections', function getConnectionsHandler(req, res, next) {
+        server.get('/connections', function getDatastoresHandler(req, res, next) {
             res.json(200, getSanitizedConnections());
         });
 
@@ -198,7 +199,7 @@ export default class Server {
          * return a single connection by id
          * ids are assigned by the server on connection save
          */
-        server.get('/connections/:id', function getConnectionsIdHandler(req, res, next) {
+        server.get('/connections/:id', function getDatastoresIdHandler(req, res, next) {
             const connection = getSanitizedConnectionById(req.id);
             if (connection) {
                 res.json(200, connection);
@@ -209,8 +210,7 @@ export default class Server {
 
         // delete connections
         // TODO - delete all associated queries?
-        // TODO - deleting, at least from the front end, isn't working.
-        server.del('/connections/:id', function delConnectionsHandler(req, res, next) {
+        server.del('/connections/:id', function delDatastoresHandler(req, res, next) {
             if (getSanitizedConnectionById(req.params.id)) {
                 deleteConnectionById(req.params.id);
                 res.json(200, {});
@@ -221,7 +221,7 @@ export default class Server {
 
         /* Connect */
         server.post('/connections/:connectionId/connect', function postConnectHandler(req, res, next) {
-            Connections.connect(getConnectionById(req.params.connectionId))
+            Datastores.connect(getConnectionById(req.params.connectionId))
             .then(() => {
                 res.json(200, {});
             });
@@ -231,7 +231,7 @@ export default class Server {
 
         // Make a query and return the results as a grid
         server.post('/connections/:connectionId/query', function postQueryHandler(req, res, next) {
-            Connections.query(
+            Datastores.query(
                 req.params.query,
                 getConnectionById(req.params.connectionId)
             ).then(rows => {
@@ -251,7 +251,7 @@ export default class Server {
          * underscored.
          */
         server.post('/connections/:connectionId/sql-tables', function tablesHandler(req, res, next) {
-            Connections.tables(
+            Datastores.tables(
                 getConnectionById(req.params.connectionId)
             ).then(tables => {
                 res.json(200, tables);
@@ -261,7 +261,7 @@ export default class Server {
         });
 
         server.post('/connections/:connectionId/s3-keys', function s3KeysHandler(req, res, next) {
-            Connections.files(
+            Datastores.files(
                 getConnectionById(req.params.connectionId)
             ).then(files => {
                 res.json(200, files);
@@ -271,7 +271,7 @@ export default class Server {
         });
 
         server.post('/connections/:connectionId/apache-drill-storage', function apacheDrillStorageHandler(req, res, next) {
-            Connections.storage(
+            Datastores.storage(
                 getConnectionById(req.params.connectionId)
             ).then(files => {
                 res.json(200, files);
@@ -281,7 +281,7 @@ export default class Server {
         });
 
         server.post('/connections/:connectionId/apache-drill-s3-keys', function apacheDrills3KeysHandler(req, res, next) {
-            Connections.listS3Files(
+            Datastores.listS3Files(
                 getConnectionById(req.params.connectionId)
             ).then(files => {
                 res.json(200, files);
@@ -291,7 +291,7 @@ export default class Server {
         });
 
         server.post('/connections/:connectionId/elasticsearch-mappings', function elasticsearchMappingsHandler(req, res, next) {
-            Connections.elasticsearchMappings(
+            Datastores.elasticsearchMappings(
                 getConnectionById(req.params.connectionId)
             ).then(mappings => {
                 res.json(200, mappings);
@@ -300,7 +300,7 @@ export default class Server {
             });
         });
 
-        /* Persistent Connections */
+        /* Persistent Datastores */
 
         // return the list of registered queries
         server.get('/queries', function getQueriesHandler(req, res, next) {
@@ -379,6 +379,7 @@ export default class Server {
              * these requests.
              */
             if (err.message.indexOf("Can't set headers after they are sent") === -1) {
+                console.error(err);
                 Logger.log(err);
             }
             res.json(500, {
