@@ -128,7 +128,7 @@ class QueryScheduler {
         }).then(res => {
             if (res.status !== 200) {
                 const errorMessage = (
-                    `Yikes! ${getSetting('PLOTLY_API_DOMAIN')} failed to identify ${username}. ` +
+                    `Yikes! ${getSetting('PLOTLY_API_URL')} failed to identify ${username}. ` +
                     'These were the credentials supplied: ' +
                     `Username: ${username}, API Key: ${apiKey}, OAuth Access Token: ${accessToken}.`
                 )

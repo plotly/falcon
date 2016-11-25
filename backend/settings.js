@@ -8,15 +8,13 @@ import {
     createConnectorFolder
 } from './utils/homeFiles';
 
-// TODO - Since these settings can set as ENV variables, we should
-// probably prefix them with like `PLOTLY_` to prevent any namespace
-// clashes.
 const DEFAULT_SETTINGS = {
     LOG_PATH: LOG_PATH,
     HEADLESS: false,
 
     // TODO - Needs to be set for on-prem
-    PLOTLY_API_DOMAIN: 'https://api.plot.ly',
+    PLOTLY_API_SSL_ENABLED: true,
+    PLOTLY_API_DOMAIN: 'api.plot.ly',
 
     // TODO - Should this be configurable or should it just be a constant?
     CONNECTOR_HTTPS_DOMAIN: 'connector.plot.ly',
@@ -38,6 +36,44 @@ const DEFAULT_SETTINGS = {
 
     LOG_TO_STDOUT: false
 };
+
+// Settings that depend on other settings are described here
+function getDerivedSetting(settingName) {
+    if (settingName === 'PLOTLY_API_URL') {
+        return (
+            (getSetting('PLOTLY_API_SSL_ENABLED') ? 'https://' : 'http://') +
+             getSetting('PLOTLY_API_DOMAIN')
+        );
+    } else {
+        throw new Error(`Derived setting ${settingName} does not exist.`);
+    }
+}
+
+
+/*
+ * Load settings from process.env prefixed with `PLOTLY_CONNECTOR_`
+ * then from the saved file in SETTINGS_PATH,
+ * then from the defaults above
+ */
+export function getSetting(settingName) {
+    const settingsOnFile = loadSettings();
+    if (has(`PLOTLY_CONNECTOR_${settingName}`, process.env)) {
+        let envObject = process.env[`PLOTLY_CONNECTOR_${settingName}`];
+        try {
+            return JSON.parse(envObject);
+        } catch (e) {
+            return envObject;
+        }
+    } else if (has(settingName, settingsOnFile)) {
+        return settingsOnFile[settingName];
+    } else if (has(settingName, DEFAULT_SETTINGS)) {
+        return DEFAULT_SETTINGS[settingName];
+    } else {
+        getDerivedSetting(settingName);
+    } else {
+        throw new Error(`${settingName} is not a valid setting`);
+    }
+}
 
 function loadSettings() {
     if (fs.existsSync(SETTINGS_PATH)) {
@@ -71,27 +107,4 @@ export function saveSetting(settingName, settingValue) {
      * without a more thorough investigation.
      */
     fs.writeFileSync(SETTINGS_PATH, YAML.stringify(settingsOnFile));
-}
-
-/*
- * Load settings from process.env prefixed with `PLOTLY_CONNECTOR_`
- * then from the saved file in SETTINGS_PATH,
- * then from the defaults above
- */
-export function getSetting(settingName) {
-    const settingsOnFile = loadSettings();
-    if (has(`PLOTLY_CONNECTOR_${settingName}`, process.env)) {
-        let envObject = process.env[`PLOTLY_CONNECTOR_${settingName}`];
-        try {
-            return JSON.parse(envObject);
-        } catch (e) {
-            return envObject;
-        }
-    } else if (has(settingName, settingsOnFile)) {
-        return settingsOnFile[settingName];
-    } else if (has(settingName, DEFAULT_SETTINGS)) {
-        return DEFAULT_SETTINGS[settingName];
-    } else {
-        throw new Error(`${settingName} is not a valid setting`);
-    }
 }

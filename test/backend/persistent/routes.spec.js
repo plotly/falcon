@@ -239,7 +239,7 @@ describe('Routes - ', function () {
         });
 
         it(`${connection.dialect} - query - fails when the SQL query contains a syntax error`, function(done) {
-            this.timeout(60 * 1000);
+            this.timeout(5 * 1000);
             connectionId = saveConnection(connection);
             POST(`connections/${connectionId}/query`, {
                 query: 'SELECZ'
@@ -677,7 +677,7 @@ describe('Routes - ', function () {
                 json,
                 {error: {
                     message: (
-                        `Yikes! ${getSetting('PLOTLY_API_DOMAIN')} failed to identify ${username}. ` +
+                        `Yikes! ${getSetting('PLOTLY_API_URL')} failed to identify ${username}. ` +
                         'These were the credentials supplied: ' +
                         `Username: ${creds[0].username}, API Key: ${creds[0].apiKey}, OAuth Access Token: ${creds[0].accessToken}.`
                     )
@@ -691,8 +691,8 @@ describe('Routes - ', function () {
     it("queries - POST /queries fails when it can't connect to the plotly server", function(done) {
         this.timeout(70*1000);
         const nonExistantServer = 'https://plotly.lah-lah-lemons.com';
-        saveSetting('PLOTLY_API_DOMAIN', nonExistantServer);
-        assert.deepEqual(getSetting('PLOTLY_API_DOMAIN'), nonExistantServer);
+        saveSetting('PLOTLY_API_URL', nonExistantServer);
+        assert.deepEqual(getSetting('PLOTLY_API_URL'), nonExistantServer);
         POST('queries', queryObject)
         .then(res => res.json().then(json => {
             assert.deepEqual(

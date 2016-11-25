@@ -31,17 +31,17 @@ describe('QueryScheduler', () => {
         // } catch (e) {}
         queryScheduler = new QueryScheduler();
         queryScheduler.minimumRefreshInterval = 1;
-        savedUrl = getSetting('PLOTLY_API_DOMAIN');
+        savedUrl = getSetting('PLOTLY_API_URL');
         savedUsers = getSetting('USERS');
-        saveSetting('PLOTLY_API_DOMAIN', 'https://api.plot.ly');
-        saveSetting('PLOTLY_API_DOMAIN', 'https://api.plot.ly');
+        saveSetting('PLOTLY_API_URL', 'https://api.plot.ly');
+        saveSetting('PLOTLY_API_URL', 'https://api.plot.ly');
         saveSetting('USERS', [{username, apikey: apiKey}]);
     });
 
     afterEach(() => {
         queryScheduler.clearQueries();
         queryScheduler = null;
-        saveSetting('PLOTLY_API_DOMAIN', savedUrl);
+        saveSetting('PLOTLY_API_URL', savedUrl);
         saveSetting('USERS', savedUsers);
     });
 

@@ -116,7 +116,7 @@ export default class Server {
 
         server.post('/oauth2/token', function saveOauth(req, res, next) {
             const {access_token} = req.params;
-            fetch(`${getSetting('PLOTLY_API_DOMAIN')}/v2/users/current`, {
+            fetch(`${getSetting('PLOTLY_API_URL')}/v2/users/current`, {
                 headers: {'Authorization': `Bearer ${access_token}`}
             })
             .then(userRes => userRes.json().then(userMeta => {

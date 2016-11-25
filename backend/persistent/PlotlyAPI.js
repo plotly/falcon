@@ -13,7 +13,7 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
     } else {
         throw new Error('Missing apiKey or accessToken');
     }
-    return fetch(`${getSetting('PLOTLY_API_DOMAIN')}/v2/${relativeUrl}`, {
+    return fetch(`${getSetting('PLOTLY_API_URL')}/v2/${relativeUrl}`, {
         method,
         headers: {
             'Accept': 'application/json',
