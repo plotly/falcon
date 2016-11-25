@@ -71,8 +71,6 @@ export function getSetting(settingName) {
         return DEFAULT_SETTINGS[settingName];
     } else {
         getDerivedSetting(settingName);
-    } else {
-        throw new Error(`${settingName} is not a valid setting`);
     }
 }
 
