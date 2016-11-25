@@ -3,7 +3,8 @@ import uuid from 'node-uuid';
 import {createAction} from 'redux-actions';
 import {DIALECTS, INITIAL_CREDENTIALS} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
-import * as httpsUtils from '../utils/https';
+// TODO - We can't import this into the front-end as it uses fs.
+// import * as httpsUtils from '../utils/https';
 import {contains} from 'ramda';
 import queryString from 'query-string';
 
