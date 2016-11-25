@@ -37,7 +37,6 @@ export const SETTINGS_PATH = path.join(
     CONNECTOR_FOLDER_PATH,
     'settings.yaml'
 );
-// TODO - move these to yaml
 
 export function createConnectorFolder () {
     let partialPath = CONNECTOR_FOLDER_PATH_PARTS[0];
