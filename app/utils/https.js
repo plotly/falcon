@@ -33,7 +33,7 @@ try {
 }
 
 // generic directories
-const APP_DIRECTORY = join('/', slice(0, -2, (window.__filename).split('/')));
+const APP_DIRECTORY = getQuerystringParam('APP_DIRECTORY');
 const DIRECTORY_ENCODED = replace(/\ /g, '\\ ', `${APP_DIRECTORY}`);
 
 // dialog messages
@@ -51,6 +51,7 @@ const ERROR_MESSAGE = (error) => 'Yikes, an error occurred while setting up' +
 const REDIRECT_CONNECTOR_SCRIPT = `sh  "${DIRECTORY_ENCODED}"/ssl/redirectConnector.sh`;
 const CREATE_CERTS_SCRIPT = `sh  "${DIRECTORY_ENCODED}"/ssl/createKeys.sh`;
 
+console.warn('APP_DIRECTORY', APP_DIRECTORY);
 console.warn('DIRECTORY_ENCODED', DIRECTORY_ENCODED);
 
 // running sudo commands options
