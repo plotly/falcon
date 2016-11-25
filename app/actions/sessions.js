@@ -292,48 +292,48 @@ export function deleteTab(tabId) {
 // https ->
 export function hasCerts() {
     return dispatch => {
-        httpsUtils.hasCerts()
-            .then(res => {
-                dispatch({
-                    type: 'hasCertsRequest',
-                    payload: {
-                        status: res.status,
-                        content: res.content,
-                        id: 'hasCertsRequest'
-                    }
-                });
-            });
+        // httpsUtils.hasCerts()
+        //     .then(res => {
+        //         dispatch({
+        //             type: 'hasCertsRequest',
+        //             payload: {
+        //                 status: res.status,
+        //                 content: res.content,
+        //                 id: 'hasCertsRequest'
+        //             }
+        //         });
+        //     });
     };
 }
 
 export function createCerts() {
     return dispatch => {
-        httpsUtils.createCerts()
-            .then(res => {
-                dispatch({
-                    type: 'createCertsRequest',
-                    payload: {
-                        status: res.status,
-                        content: res.content,
-                        id: 'createCertsRequest'
-                    }
-                });
-            });
+        // httpsUtils.createCerts()
+        //     .then(res => {
+        //         dispatch({
+        //             type: 'createCertsRequest',
+        //             payload: {
+        //                 status: res.status,
+        //                 content: res.content,
+        //                 id: 'createCertsRequest'
+        //             }
+        //         });
+        //     });
     };
 }
 
 export function redirectUrl() {
     return dispatch => {
-        httpsUtils.redirectUrl()
-            .then(res => {
-                dispatch({
-                    type: 'redirectUrlRequest',
-                    payload: {
-                        status: res.status,
-                        content: res.content,
-                        id: 'redirectUrlRequest'
-                    }
-                });
-            });
+        // httpsUtils.redirectUrl()
+        //     .then(res => {
+        //         dispatch({
+        //             type: 'redirectUrlRequest',
+        //             payload: {
+        //                 status: res.status,
+        //                 content: res.content,
+        //                 id: 'redirectUrlRequest'
+        //             }
+        //         });
+        //     });
     };
 }
