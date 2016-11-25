@@ -56,6 +56,9 @@
     "connector"
   ],
   "homepage": "",
+  "optionalDependencies": {
+    "fsevents": "*"
+  },
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-spies": "^0.7.1",
@@ -67,7 +70,6 @@
     "eslint-plugin-import": "^1.8.0",
     "eslint-plugin-jsx-a11y": "^0.6.2",
     "eslint-plugin-react": "^4.3.0",
-    "fsevents": "*",
     "mocha": "^2.4.5",
     "react-addons-test-utils": "^15.0.1",
     "redux-devtools": "^3.2.0",
