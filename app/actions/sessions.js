@@ -3,8 +3,7 @@ import uuid from 'node-uuid';
 import {createAction} from 'redux-actions';
 import {DIALECTS, INITIAL_CREDENTIALS} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
-// TODO - We can't import this into the front-end as it uses fs.
-// import * as httpsUtils from '../utils/https';
+import * as httpsUtils from '../utils/https';
 import {contains} from 'ramda';
 import queryString from 'query-string';
 
@@ -291,49 +290,47 @@ export function deleteTab(tabId) {
 
 // https ->
 export function hasCerts() {
-    return dispatch => {
-        // httpsUtils.hasCerts()
-        //     .then(res => {
-        //         dispatch({
-        //             type: 'hasCertsRequest',
-        //             payload: {
-        //                 status: res.status,
-        //                 content: res.content,
-        //                 id: 'hasCertsRequest'
-        //             }
-        //         });
-        //     });
-    };
+    return apiThunk(
+        'has-certs',
+        'GET',
+        'hasCertsRequest'
+    );
 }
 
 export function createCerts() {
     return dispatch => {
-        // httpsUtils.createCerts()
-        //     .then(res => {
-        //         dispatch({
-        //             type: 'createCertsRequest',
-        //             payload: {
-        //                 status: res.status,
-        //                 content: res.content,
-        //                 id: 'createCertsRequest'
-        //             }
-        //         });
-        //     });
+        httpsUtils.createCerts()
+            .then(res => {
+                dispatch({
+                    type: 'createCertsRequest',
+                    payload: {
+                        status: res.status,
+                        content: res.content
+                    }
+                });
+            });
     };
 }
 
 export function redirectUrl() {
     return dispatch => {
-        // httpsUtils.redirectUrl()
-        //     .then(res => {
-        //         dispatch({
-        //             type: 'redirectUrlRequest',
-        //             payload: {
-        //                 status: res.status,
-        //                 content: res.content,
-        //                 id: 'redirectUrlRequest'
-        //             }
-        //         });
-        //     });
+        httpsUtils.redirectUrl()
+            .then(res => {
+                dispatch({
+                    type: 'redirectUrlRequest',
+                    payload: {
+                        status: res.status,
+                        content: res.content
+                    }
+                });
+            });
     };
+}
+
+export function startTempHttpsServer () {
+    return apiThunk(
+        'start-temp-https-server',
+        'GET',
+        'startTempHttpsServerRequest'
+    );
 }

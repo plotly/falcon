@@ -1,5 +1,7 @@
 var restify = require('restify');
 import * as Datastores from './persistent/datastores/Datastores.js';
+import * as fs from 'fs';
+
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
 import {
     saveConnection,
@@ -15,12 +17,15 @@ import {dissoc, contains, isEmpty, pluck} from 'ramda';
 import Logger from './logger';
 import fetch from 'node-fetch';
 
+const HOSTS = '/etc/hosts';
+
+
 // return HTTPS certs if they exist for a server to use when created or null
 export function getCerts() {
     try {
         return {
-            key: fs.readFileSync(getSetting('KEY_FILE')),
-            certificate: fs.readFileSync(getSetting('CSR_FILE'))
+            key: fs.readFileSync(`${__dirname}/..${getSetting('KEY_FILE')}`),
+            certificate: fs.readFileSync(`${__dirname}/..${getSetting('CSR_FILE')}`)
         };
     } catch (e) {
         return {};
@@ -29,21 +34,12 @@ export function getCerts() {
 
 export default class Server {
     constructor() {
-        // TODO - getCerts hangs on my machine, preventing me from running this headlessly.
+        this.certs = getCerts();
+        this.server = isEmpty(this.certs) ? restify.createServer() : restify.createServer(this.certs);
+        this.domain = isEmpty(this.certs) ? 'localhost' : getSetting('CONNECTOR_HTTPS_DOMAIN');
+        this.protocol = isEmpty(this.certs) ? 'http' : 'https';
 
-        /*
-         * TODO - Get console warning "Could not load electron dependencies. Make sure the app is not targeted at electron process."
-         * when running this now. Should figure out a way to remove that warning.
-         */
-        const certs = []; // getCerts();
-        const server = isEmpty(certs) ? restify.createServer() : restify.createServer(certs);
-
-        const queryScheduler = new QueryScheduler();
-
-        this.domain = isEmpty(certs) ? 'localhost' : getSetting('CONNECTOR_HTTPS_DOMAIN');
-        this.protocol = isEmpty(certs) ? 'http' : 'https';
-        this.server = server;
-        this.queryScheduler = queryScheduler;
+        this.queryScheduler = new QueryScheduler();
 
         this.start = this.start.bind(this);
         this.close = this.close.bind(this);
@@ -370,6 +366,66 @@ export default class Server {
                 res.json(400, {error: {message: error.message}});
             });
 
+        });
+
+        server.get('has-certs', (req, res, next) => {
+            if (isEmpty(getCerts())) {
+                res.json(404, false);
+            } else {
+                res.json(200, true);
+            }
+        });
+
+        server.get('is-url-redirected', (req, res, next) => {
+            const contents = fs.readFileSync(HOSTS);
+            if (contents.indexOf(getSetting('CONNECTOR_HTTPS_DOMAIN')) > -1) {
+                res.json(200, true);
+            } else {
+                res.json(404, false);
+            }
+        });
+
+        server.get('start-temp-https-server', (req, res, next) => {
+            // can't install certificates without having visited the https server
+            // and can't start a https app without having installed certificates ...
+            // so while an http one is up this endpoint starts a https one for the sole
+            // purpose of installing certificates into the user's keychain
+            // before restarting the app and simply running a single https instance
+            try {
+                const certs = getCerts();
+                if (isEmpty(certs)) {
+                    throw new Error('No certs found.');
+                }
+                const tempServer = restify.createServer(certs);
+                tempServer.use(restify.CORS({
+                    origins: getSetting('CORS_ALLOWED_ORIGINS'),
+                    credentials: false,
+                    headers: headers
+                }));
+                tempServer.listen(getSetting('PORT') + 1); // not to clash with the open http port
+                tempServer.opts( /.*/, (req, res) => res.send(204));
+                tempServer.get(/\/ssl\/?.*/, restify.serveStatic({
+                    directory: `${__dirname}/../`
+                }));
+                tempServer.get('/status', (req, res) => {
+                    if (req.isSecure()) {
+                        fs.readFile(
+                            `${__dirname}/../ssl/status.html`, 'utf8', function(err, file) {
+                            if (err) {
+                                res.send(500);
+                            }
+                            res.write(file);
+                            res.end();
+                        });
+                    } else {
+                        res.send(404, false);
+                    }
+                });
+            } catch (err) {
+                console.log(err);
+                res.json(404, false);
+            }
+            res.json(200, true);
         });
 
         // delete a query

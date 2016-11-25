@@ -12,13 +12,13 @@ import React from 'react';
  */
 let shell;
 try {
-    shell = require('electron').shell
-} catch(e) {
+    shell = require('electron').shell;
+} catch (e) {
 
 }
-import {baseUrl} from '../../../utils/utils';
-
-const HTML_STATUS_PAGE = `${baseUrl()}/status`;
+import {getQuerystringParam} from '../../../utils/utils';
+const tempHttpsPort = parseInt(getQuerystringParam('PORT'), 10) + 1;
+const HTML_STATUS_PAGE = `https://${getQuerystringParam('CONNECTOR_HTTPS_DOMAIN')}:${tempHttpsPort}/status`;
 
 const Instructions = () => (
     <div>
@@ -35,10 +35,7 @@ const Instructions = () => (
             <ol>
                 <li>
                     Visit&nbsp;
-                    <a onClick={() => {
-                        shell.openExternal(HTML_STATUS_PAGE);
-                    }}
->
+                    <a onClick={() => {shell.openExternal(HTML_STATUS_PAGE);}}>
                         {HTML_STATUS_PAGE}
                     </a>
                 </li>

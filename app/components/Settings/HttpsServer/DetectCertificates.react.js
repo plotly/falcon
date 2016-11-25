@@ -42,18 +42,15 @@ export default class DetectCertificates extends Component {
     }
 
     render() {
-        const {redirectUrlRequest} = this.props;
-        let httpsServerStatus;
-        if (this.state.successfulFetch && usesHttpsProtocol()) {
-            httpsServerStatus = (
-                <div>{GREEN_DOT}{'Your certificates are installed on this computer. '}</div>
-            );
-        } else if (redirectUrlRequest.status === 200 || usesHttpsProtocol()) {
-            httpsServerStatus = (
+        const {startTempHttpsServerRequest} = this.props;
+        let installCertsMessage;
+        if (startTempHttpsServerRequest.status === 200 && startTempHttpsServerRequest.content) {
+            installCertsMessage = (
                 <div>
                     <div>
-                        {YELLOW_DOT}{'Install your self-signed certificates. '}
-                        <a onClick={() => {
+                        {YELLOW_DOT}{'Install your certificate from the browser. '}
+                        <a
+                            onClick={() => {
                                 this.setState({
                                     expandInstructions:
                                         !this.state.expandInstructions
@@ -65,8 +62,9 @@ export default class DetectCertificates extends Component {
                                 ? 'Hide '
                                 : 'View '
                             }
-                            instructions.
+                            {'instructions. '}
                         </a>
+                        {'When done, Restart the app.'}
                     </div>
                     {
                         this.state.expandInstructions
@@ -76,15 +74,16 @@ export default class DetectCertificates extends Component {
                 </div>
             );
         } else {
-            httpsServerStatus = (
+            installCertsMessage = (
                 <div>
-                    {RED_DOT}{'This does not have a secure domain. '}
+                    {RED_DOT}{'Create a browser certificate from your self-signed keys. '}
                     <a
                        onClick={() => {
-                           this.props.redirectUrl();
+                           console.warn('spin temp server');
+                           this.props.startTempHttpsServer();
                        }}
                     >
-                        {'Click to redirect to your secure domain.'}
+                        {'Click to create your certificate. '}
                     </a>
                 </div>
             );
@@ -92,7 +91,7 @@ export default class DetectCertificates extends Component {
 
         return (
             <div>
-                {httpsServerStatus}
+                {installCertsMessage}
             </div>
         );
     }

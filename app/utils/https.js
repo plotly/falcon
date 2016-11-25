@@ -1,6 +1,5 @@
-import * as fs from 'fs';
-import {replace, splitAt} from 'ramda';
-import {getQuerystringParam} from './utils';
+import {join, slice, split, replace, splitAt } from 'ramda';
+import {baseUrl, getQuerystringParam} from './utils';
 
 /*
  * Our app has two build targets - electron and node.
@@ -26,20 +25,16 @@ function dynamicRequire(module) {
 
 let sudo, dialog;
 try {
-    sudo = dynamicRequire('electron-sudo');
-    dialog = dynamicRequire('electron').remote.dialog;
+    sudo = require('electron-sudo');
+    dialog = require('electron').remote.dialog;
     console.log('Required successfully electron.');
 } catch (e) {
     console.log('Could not load electron dependencies. ');
 }
 
-// get settings
-const keyFilePath = getQuerystringParam('KEY_FILE');
-const csrFilePath = getQuerystringParam('CSR_FILE');
-
 // generic directories
-const HOSTS = '/etc/hosts';
-const DIRECTORY_ENCODED = replace(/\ /g, '\\ ', `${__dirname}`);
+const APP_DIRECTORY = join('/', slice(0, -2, split('/', window.__filename)));
+const DIRECTORY_ENCODED = replace(/\ /g, '\\ ', `${APP_DIRECTORY}`);
 
 // dialog messages
 const SUDO_MESSAGE = 'Welcome to the Plotly Database Connector! ' +
@@ -53,8 +48,10 @@ const ERROR_MESSAGE = (error) => 'Yikes, an error occurred while setting up' +
     `${error}`;
 
 // scripts
-const REDIRECT_CONNECTOR_SCRIPT = `sh  "${DIRECTORY_ENCODED}"/../ssl/redirectConnector.sh`;
-const CREATE_CERTS_SCRIPT = `sh  "${DIRECTORY_ENCODED}"/../ssl/createKeys.sh`;
+const REDIRECT_CONNECTOR_SCRIPT = `sh  "${DIRECTORY_ENCODED}"/ssl/redirectConnector.sh`;
+const CREATE_CERTS_SCRIPT = `sh  "${DIRECTORY_ENCODED}"/ssl/createKeys.sh`;
+
+console.warn('DIRECTORY_ENCODED', DIRECTORY_ENCODED);
 
 // running sudo commands options
 const SUDO_OPTIONS = {
@@ -82,12 +79,14 @@ const showSudoMessage = () => {
     }
 };
 
-function isUrlRedirected(url) {
-    console.log('looking in hosts for ', url);
-    console.log(HOSTS);
-    const contents = fs.readFileSync(HOSTS);
-    console.log('contents ' + contents);
-    return contents.indexOf(url) > -1;
+function isUrlRedirected() {
+    return fetch(`${baseUrl()}/is-url-redirected`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    }).then(res => res.json().then(json => {return json.content;}));
 }
 
 function waitForRedirect(url) {
@@ -96,23 +95,24 @@ function waitForRedirect(url) {
         const maxWaitPeriod = 10000;
         let waited = 0;
         console.log('waiting redirect for ', url);
-        while (!isUrlRedirected(url) && (waited < maxWaitPeriod)) {
+        while (!isUrlRedirected() && (waited < maxWaitPeriod)) {
             console.log('Waiting for redirect.');
-            setTimeout(isUrlRedirected(url), waitPeriod);
-            console.log('isUrlRedirected(url)', isUrlRedirected(url));
+            setTimeout(isUrlRedirected(), waitPeriod);
+            console.log('isUrlRedirected(url)', isUrlRedirected());
             waited += waitPeriod;
         }
         console.log('Exit waiting for redirect loop.');
-        if (!isUrlRedirected(url)) {
-            reject('Failed to redirect to seecure domain.');
+        if (!isUrlRedirected()) {
+            reject({status: 404, content: 'Failed to redirect to seecure domain.'});
         } else {
-            resolve();
+            resolve({status: 200, content: {}});
         }
-    }).then(() => {return {};})
-    .catch(err => {return err;});
+    });
 }
 
-export function redirectUrl(url) {
+export function redirectUrl() {
+    // CONNECTOR_HTTPS_DOMAIN is shared between backend and the app
+    const url = getQuerystringParam('CONNECTOR_HTTPS_DOMAIN');
     const redirected = isUrlRedirected(url);
     console.log('redirected', redirected);
     if (!redirected) {
@@ -123,31 +123,16 @@ export function redirectUrl(url) {
                 function(error) {
                     if (error) {
                         console.log('error', error);
-                        resolve({status: 500, content: error});
+                        return {status: 500, content: error};
                     }
                 }
             );
         } catch (error) {
             console.log(error);
-            resolve({status: 500, content: error});
+            return {status: 500, content: error};
         }
     }
-    waitForRedirect(url)
-    .then(res => resolve({status: 200, content: res}));
-}
-
-// check if there are certificates in the directory specified in settings.js
-export function hasCerts() {
-    return new Promise((resolve, reject) => {
-        try {
-            // try reading certs
-            fs.accessSync(keyFilePath, fs.F_OK);
-            fs.accessSync(csrFilePath, fs.F_OK);
-        } catch (e) {
-            resolve({status: 404, content: false});
-        }
-        resolve({status: 200, content: true});
-    });
+    return waitForRedirect(url);
 }
 
 // creates self-signed certificates

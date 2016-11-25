@@ -172,7 +172,9 @@ class Settings extends Component {
             setTab,
             createCerts,
             hasCerts,
-            redirectUrl
+            redirectUrl,
+            startTempHttpsServer,
+            startTempHttpsServerRequest
         } = this.props;
 
         if (!selectedTab) {
@@ -228,6 +230,8 @@ class Settings extends Component {
                         createCerts={createCerts}
                         hasCerts={hasCerts}
                         redirectUrl={redirectUrl}
+                        startTempHttpsServer={startTempHttpsServer}
+                        startTempHttpsServerRequest={startTempHttpsServerRequest}
                     />
 
                 </div>
@@ -248,6 +252,7 @@ function mapStateToProps(state) {
         connections,
         connectionsRequest,
         hasCertsRequest,
+        startTempHttpsServerRequest,
         redirectUrlRequest,
         createCertsRequest,
         connectRequests,
@@ -279,6 +284,7 @@ function mapStateToProps(state) {
         connectionsRequest,
         hasCertsRequest,
         createCertsRequest,
+        startTempHttpsServerRequest,
         redirectUrlRequest,
         connectRequest: connectRequests[selectedConnectionId] || {},
         saveConnectionsRequest: saveConnectionsRequests[selectedConnectionId] || {},
@@ -396,6 +402,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             createCerts: () => dispatch(Actions.createCerts()),
             hasCerts: () => dispatch(Actions.hasCerts()),
             redirectUrl: () => dispatch(Actions.redirectUrl()),
+            startTempHttpsServer: () => dispatch(Actions.startTempHttpsServer()),
             editCredential: c => dispatch(Actions.editCredential(c))
         }
     );
