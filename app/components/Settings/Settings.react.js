@@ -1,9 +1,10 @@
 import React, {Component, PropTypes} from 'react';
-import {reduce, flip, dissoc, contains} from 'ramda';
+import {contains, dissoc, flip, head, reduce } from 'ramda';
 import {connect} from 'react-redux';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
 import * as styles from './Settings.css';
+import * as buttonStyles from './ConnectButton/ConnectButton.css';
 import Tabs from './Tabs/Tabs.react';
 import UserConnections from './UserConnections/UserConnections.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
@@ -22,9 +23,21 @@ const unfoldIcon = (
 );
 
 function SettingsForm(props) {
-    const {connectionObject, updateConnection, connectRequest} = props;
+    const {
+        connectionObject,
+        connectRequest,
+        connectionsHaveBeenSaved,
+        saveConnectionsRequest,
+        updateConnection,
+        disabled
+    } = props;
     return (
-        <div className={styles.configurationContainer}>
+        <div
+            className={classnames(
+                styles.configurationContainer,
+                disabled ? styles.disabledSection : null
+            )}
+        >
             <div className={styles.dialectSelector}>
                 <DialectSelector
                     connectionObject={connectionObject}
@@ -35,6 +48,12 @@ function SettingsForm(props) {
                 connectionObject={connectionObject}
                 updateConnection={updateConnection}
             />
+            <ConnectButton
+                connectionsHaveBeenSaved={connectionsHaveBeenSaved}
+                connect={connect}
+                saveConnectionsRequest={saveConnectionsRequest}
+                connectRequest={connectRequest}
+            />
         </div>
     );
 }
@@ -44,24 +63,26 @@ class Settings extends Component {
         super(props);
         this.fetchData = this.fetchData.bind(this);
         this.wrapWithAutoHide = this.wrapWithAutoHide.bind(this);
-        this.state = {show_connections: true};
+        this.state = {showConnections: true, showPreview: true, editMode: false};
     }
 
     wrapWithAutoHide(name, reactComponent) {
         return (
             <div className={styles.stepTitleContainer}>
-                <h5>
+                <h5 className={
+                    {'border-bottom': '1px solid lightgrey;'}}
+                >
                     <a
                         className={styles.stepTitle}
                         onClick={() => this.setState({
-                            [`show_${name}`]: !this.state[`show_${name}`]
+                            [`show${name}`]: !this.state[`show${name}`]
                         })}
                     >
                         {name}
                     </a>
-                    {this.state[`show_${name}`] ? null : unfoldIcon}
+                    {this.state[`show${name}`] ? null : unfoldIcon}
                 </h5>
-                {this.state[`show_${name}`] ? reactComponent : null}
+                {this.state[`show${name}`] ? reactComponent : null}
             </div>
         );
     }
@@ -75,27 +96,42 @@ class Settings extends Component {
         this.fetchData();
     }
 
+    renderEditButton(show) {
+        return (
+            <div>
+                {show ? (
+                    <div
+                        className={buttonStyles.buttonPrimary}
+                        onClick={() => {this.setState({showConnections: true, editMode: true});}}
+                    >
+                        {'Edit Credentials'}
+                    </div>
+                ) : null}
+            </div>
+        );
+    }
+
     fetchData() {
         const {
-            connectionsRequest,
-            initialize,
-            previewTables,
-            previewTableRequest,
-            connectRequest,
-            getTables,
-            getS3Keys,
-            getApacheDrillStorage,
-            getApacheDrillS3Keys,
-            selectedTable,
-            setTable,
-            tablesRequest,
-            elasticsearchMappingsRequest,
-            getElasticsearchMappings,
-            s3KeysRequest,
             apacheDrillStorageRequest,
             apacheDrillS3KeysRequest,
             connections,
-            selectedTab
+            connectRequest,
+            connectionsRequest,
+            elasticsearchMappingsRequest,
+            getApacheDrillStorage,
+            getApacheDrillS3Keys,
+            getElasticsearchMappings,
+            getTables,
+            getS3Keys,
+            initialize,
+            previewTables,
+            previewTableRequest,
+            selectedTable,
+            setTable,
+            s3KeysRequest,
+            selectedTab,
+            tablesRequest
         } = this.props;
         if (connectionsRequest && !connectionsRequest.status) {
             initialize();
@@ -105,32 +141,31 @@ class Settings extends Component {
                     DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
                     DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE
         ])) {
-            if (connectRequest.status !== 200 && !this.state.show_connections) {
-                this.setState({show_connections: true});
+            if (connectRequest.status !== 200 && !this.state.showConnections) {
+                this.setState({showConnections: true});
             }
             if (connectRequest.status === 200 && !tablesRequest.status) {
                 getTables();
             }
             if (tablesRequest.status === 200 && !selectedTable) {
-                this.setState({show_connections: false});
-                setTable(tablesRequest.content[0]);
+                this.setState({showConnections: false});
+                setTable(head(tablesRequest.content));
             }
             if (selectedTable && !previewTableRequest.status) {
                 previewTables();
             }
         } else if (connectionObject.dialect === DIALECTS.ELASTICSEARCH) {
-            if (connectRequest.status !== 200 && !this.state.show_connections) {
-                this.setState({show_connections: true});
+            if (connectRequest.status !== 200 && !this.state.showConnections) {
+                this.setState({showConnections: true});
             }
             if (connectRequest.status === 200 && !elasticsearchMappingsRequest.status) {
-                this.setState({show_connections: false});
+                this.setState({showConnections: false});
                 getElasticsearchMappings();
             }
             if (selectedTable && !previewTableRequest.status) {
                 previewTables();
             }
         } else if (connectionObject.dialect === DIALECTS.S3) {
-
             if (connectRequest.status === 200 && !s3KeysRequest.status) {
                 getS3Keys();
             }
@@ -154,8 +189,8 @@ class Settings extends Component {
             hasCertsRequest,
             redirectUrlRequest,
             createCertsRequest,
-            saveConnectionsRequests,
-            deleteConnectionsRequests,
+            saveConnectionsRequest,
+            deleteConnectionsRequest,
             connectionsHaveBeenSaved,
             setTable,
             setIndex,
@@ -192,36 +227,39 @@ class Settings extends Component {
                 />
 
                 <div className={styles.openTab}>
-                    {this.wrapWithAutoHide('connections',
-                    <SettingsForm
-                        connectRequest={connectRequest}
-                        connectionObject={connections[selectedTab]}
-                        updateConnection={updateConnection}
-                    />)}
+                    {this.wrapWithAutoHide('Connections',
+                        <SettingsForm
+                            connectRequest={connectRequest}
+                            connectionObject={connections[selectedTab]}
+                            updateConnection={updateConnection}
+                            connectionsHaveBeenSaved={connectionsHaveBeenSaved}
+                            saveConnectionsRequest={saveConnectionsRequest}
+                            disabled={!this.state.editMode}
+                        />
+                    )}
 
-                    <ConnectButton
-                        connectionsHaveBeenSaved={connectionsHaveBeenSaved}
-                        connect={connect}
-                        saveConnectionsRequest={saveConnectionsRequests}
-                        connectRequest={connectRequest}
-                    />
+                    {this.renderEditButton(!this.state.editMode)}
 
-                    <OptionsDropdown
-                        connectionObject={connections[selectedTab]}
-                        selectedTable={selectedTable}
-                        elasticsearchMappingsRequest={elasticsearchMappingsRequest}
-                        tablesRequest={tablesRequest}
-                        setTable={setTable}
-                        setIndex={setIndex}
-                        index={index}
-                    />
+                    {this.wrapWithAutoHide('Preview',
+                        <div>
+                            <OptionsDropdown
+                                connectionObject={connections[selectedTab]}
+                                selectedTable={selectedTable}
+                                elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                                tablesRequest={tablesRequest}
+                                setTable={setTable}
+                                setIndex={setIndex}
+                                index={index}
+                            />
 
-                    <Preview
-                        previewTableRequest={previewTableRequest}
-                        s3KeysRequest={s3KeysRequest}
-                        apacheDrillStorageRequest={apacheDrillStorageRequest}
-                        apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
-                    />
+                            <Preview
+                                previewTableRequest={previewTableRequest}
+                                s3KeysRequest={s3KeysRequest}
+                                apacheDrillStorageRequest={apacheDrillStorageRequest}
+                                apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+                            />
+                        </div>
+                    )}
 
                     <HttpsSetup
                         hasCertsRequest={hasCertsRequest}
