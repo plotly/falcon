@@ -22,15 +22,16 @@ const HOSTS = '/etc/hosts';
 
 // return HTTPS certs if they exist for a server to use when created or null
 export function getCerts() {
-    return {};
-    // try {
-    //     return {
-    //         key: fs.readFileSync(`${__dirname}/..${getSetting('KEY_FILE')}`),
-    //         certificate: fs.readFileSync(`${__dirname}/..${getSetting('CSR_FILE')}`)
-    //     };
-    // } catch (e) {
-    //     return {};
-    // }
+    try {
+        const keyFile = `${__dirname}/..${getSetting('KEY_FILE')}`;
+        const certFile = `${__dirname}/..${getSetting('CSR_FILE')}`;
+        return {
+            key: fs.readFileSync(keyFile),
+            certificate: fs.readFileSync(certFile)
+        };
+    } catch (e) {
+        return {};
+    }
 }
 
 export default class Server {
