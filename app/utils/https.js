@@ -1,6 +1,10 @@
 import {join, slice, replace, splitAt } from 'ramda';
 import {baseUrl, getQuerystringParam} from './utils';
 
+// TODO - Should this file be in the backend folder?
+// TODO - Remove all of these console.logs
+
+
 /*
  * Our app has two build targets - electron and node.
  * The electon target has the `electron` module e.g.
