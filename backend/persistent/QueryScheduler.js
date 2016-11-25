@@ -33,10 +33,12 @@ class QueryScheduler {
             throw new Error('Refresh interval was not supplied');
         // TODO - bump up to 60 when done testing.
     } else if (refreshInterval < this.minimumRefreshInterval) {
-            throw new Error(`
-                Refresh rate must be at least
-                ${this.minimumRefreshInterval}
-                (${this.minimumRefreshInterval} seconds)`);
+            throw new Error(
+                'Refresh interval must be at least ' +
+                `${this.minimumRefreshInterval} ` +
+                `(${this.minimumRefreshInterval} seconds). ` +
+                `${refreshInterval} was supplied.`
+            );
         }
 
         Logger.log(`Scheduling "${query}" with connection ${connectionId} updating grid ${fid}`);
