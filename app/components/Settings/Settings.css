@@ -35,6 +35,11 @@
 
 }
 
+.disabledSection {
+    pointer-events: none;
+    opacity: 0.4;
+}
+
 .info {
 	padding: 25px;
     font-size: 14px;

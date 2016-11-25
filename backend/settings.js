@@ -31,8 +31,9 @@ const DEFAULT_SETTINGS = {
 
     // certificates paths
     // TODO - This isn't portable - should move this to the home folder
-    KEY_FILE: `${__dirname}/../ssl/certs/server/privkey.pem`,
-    CSR_FILE: `${__dirname}/../ssl/certs/server/fullchain.pem`,
+    KEY_FILE: '/ssl/certs/server/privkey.pem',
+    CSR_FILE: '/ssl/certs/server/fullchain.pem',
+    APP_DIRECTORY: `${__dirname}/../`,
 
     LOG_TO_STDOUT: false
 };

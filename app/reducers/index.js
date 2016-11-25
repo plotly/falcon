@@ -116,6 +116,7 @@ export const connectionsRequest = createApiReducer('connectionsRequest');
 export const hasCertsRequest = createApiReducer('hasCertsRequest');
 export const redirectUrlRequest = createApiReducer('redirectUrlRequest');
 export const createCertsRequest = createApiReducer('createCertsRequest');
+export const startTempHttpsServerRequest = createApiReducer('startTempHttpsServerRequest');
 export const saveConnectionsRequests = createApiReducer('saveConnectionsRequests');
 export const deleteConnectionsRequests = createApiReducer('deleteConnectionsRequests');
 export const tablesRequests = createApiReducer('tables');
@@ -183,6 +184,7 @@ const rootReducer = combineReducers({
     hasCertsRequest,
     redirectUrlRequest,
     createCertsRequest,
+    startTempHttpsServerRequest,
     selectedTab,
     selectedTables,
     selectedIndecies,

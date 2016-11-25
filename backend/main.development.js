@@ -31,9 +31,8 @@ app.on('ready', () => {
     });
 
     const URL = `${server.protocol}://${server.domain}`;
-
     const SETTINGS = join('&',
-        ['CONNECTOR_HTTPS_DOMAIN', 'KEY_FILE', 'CSR_FILE', 'PORT'].map(s => {
+        ['CONNECTOR_HTTPS_DOMAIN', 'APP_DIRECTORY', 'KEY_FILE', 'CSR_FILE', 'PORT'].map(s => {
             return `${s}=${getSetting(s)}`;
     }));
 
