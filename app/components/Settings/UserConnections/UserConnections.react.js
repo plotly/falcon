@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './UserConnections.css';
-import {head} from 'ramda'; 
+import {head} from 'ramda';
 import {
     CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS
 } from '../../../constants/constants';
@@ -14,7 +14,7 @@ try {
 } catch (e) {
     const shell = {
         openExternal: function openExternal(link) {
-            console.warn('opening link');
+            console.warn(link);
         }
     };
 }

@@ -1,4 +1,4 @@
-import {join, slice, split, replace, splitAt } from 'ramda';
+import {join, slice, replace, splitAt } from 'ramda';
 import {baseUrl, getQuerystringParam} from './utils';
 
 /*
@@ -27,13 +27,13 @@ let sudo, dialog;
 try {
     sudo = require('electron-sudo');
     dialog = require('electron').remote.dialog;
-    console.log('Required successfully electron.');
+    console.log('Required successfully electron and sudo.');
 } catch (e) {
     console.log('Could not load electron dependencies. ');
 }
 
 // generic directories
-const APP_DIRECTORY = join('/', slice(0, -2, split('/', window.__filename)));
+const APP_DIRECTORY = join('/', slice(0, -2, (window.__filename).split('/')));
 const DIRECTORY_ENCODED = replace(/\ /g, '\\ ', `${APP_DIRECTORY}`);
 
 // dialog messages
