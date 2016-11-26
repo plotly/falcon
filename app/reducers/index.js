@@ -93,12 +93,11 @@ import {assoc, assocPath, contains, merge, dissoc} from 'ramda';
 const canBeReset = [
     'apacheDrillStorageRequests',
     'apacheDrillS3KeysRequests',
-    'createCertsRequest',
     'connectRequests',
     'elasticsearchMappingsRequests',
     'previewTableRequest',
     's3KeysRequests',
-    'tables'
+    'tablesRequests'
 ];
 
 const isResetCall = (store, type) => contains(store, canBeReset) && type === 'RESET';
@@ -152,7 +151,7 @@ export const connectRequests = createApiReducer('connectRequests');
 export const elasticsearchMappingsRequests = createApiReducer('elasticsearchMappingsRequests');
 export const previewTableRequests = createApiReducer('previewTableRequest');
 export const s3KeysRequests = createApiReducer('s3KeysRequests');
-export const tablesRequests = createApiReducer('tables');
+export const tablesRequests = createApiReducer('tablesRequests');
 
 
 

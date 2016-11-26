@@ -535,7 +535,7 @@ describe('Routes - ', function () {
         }).catch(done);
     });
 
-    it.only('connections - updates connection by id', function(done) {
+    it('connections - updates connection by id', function(done) {
         PUT(`connections/${connectionId}`, assoc('username', 'banana', sqlConnections))
         .then(res => {
             assert.equal(res.status, 200);

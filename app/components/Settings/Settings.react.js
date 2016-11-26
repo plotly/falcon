@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {contains, dissoc, flip, head, reduce } from 'ramda';
+import {contains, dissoc, flip, head, isEmpty, reduce } from 'ramda';
 import {connect} from 'react-redux';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
@@ -118,8 +118,11 @@ class Settings extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        // if status goes to 200 from something else, it has been successfully saved to disk
-        if (nextProps.connectRequest.status === 200 && this.props.connectRequest.status !== 200) {
+        // if status goes to 200, credentials have been successfully saved to disk
+        if (this.props.connectionNeedToBeSaved &&
+            nextProps.connectRequest.status === 200 &&
+            this.props.connectRequest.status !== 200)
+        {
             this.props.setConnectionNeedToBeSaved(false);
         }
     }
@@ -149,12 +152,10 @@ class Settings extends Component {
             selectedTab,
             tablesRequest
         } = this.props;
-        if (connectionsRequest && !connectionsRequest.status) {
+        if (connectionsRequest && !connectionsRequest.status ) {
             initialize();
         }
-        if (!connectRequest.status) {
-            connect();
-        }
+        // keeps the credentials form open until connected
         if (connectRequest.status !== 200 && !this.state.showConnections) {
             this.setState({showConnections: true, editMode: true});
         }
@@ -442,7 +443,8 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     } else if (connectionNeedToBeSaved) {
         dispatchConnect = function saveAndConnect() {
             dispatch(Actions.editConnections(connections[selectedTab], selectedConnectionId))
-            .then(() => {dispatch(Actions.reset({id: selectedConnectionId}));});
+            .then(() => {dispatch(Actions.reset({id: selectedConnectionId}));})
+            .then(() => {dispatch(Actions.connect(selectedConnectionId));});
         };
     } else {
         dispatchConnect = () => dispatch(Actions.connect(selectedConnectionId));

@@ -143,7 +143,7 @@ export function getTables(connectionId) {
     return apiThunk(
         `connections/${connectionId}/sql-tables`,
         'POST',
-        'tables',
+        'tablesRequests',
         connectionId
     );
 }
