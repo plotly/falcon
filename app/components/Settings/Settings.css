@@ -27,12 +27,13 @@
 }
 
 .stepTitleContainer {
-    padding: 20px;
+    padding: 20px 30px 0px 30px;
     text-transform: capitalize;
 }
 
 .stepTitle {
-
+    border-bottom: 1px solid #E7E8E9;
+    cursor: pointer;
 }
 
 .disabledSection {
