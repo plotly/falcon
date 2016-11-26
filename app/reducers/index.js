@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import {assoc, assocPath, merge, dissoc} from 'ramda';
+import {assoc, assocPath, contains, merge, dissoc} from 'ramda';
 
 
 /*
@@ -85,6 +85,23 @@ import {assoc, assocPath, merge, dissoc} from 'ramda';
 }
 */
 
+// Some of the API reducers we want to reset in order to restart the fetchData flow inside Settings.react.js
+// An example of such case is when the credentials are updated and we want to go through
+// again the process of fetching tables/files etc. For that to be done easily these API reducers
+// should be rester to initial values.
+
+const canBeReset = [
+    'apacheDrillStorageRequests',
+    'apacheDrillS3KeysRequests',
+    'createCertsRequest',
+    'connectRequests',
+    'elasticsearchMappingsRequests',
+    'previewTableRequest',
+    's3KeysRequests',
+    'tables'
+];
+
+const isResetCall = (store, type) => contains(store, canBeReset) && type === 'RESET';
 
 function createApiReducer(store) {
     return function ApiReducer(state = {}, action) {
@@ -107,24 +124,36 @@ function createApiReducer(store) {
                     {status: payload.status, content: payload.content}
                 );
             }
+        } else if (isResetCall(store, action.type)) {
+            const {payload} = action;
+            if (Array.isArray(payload.id)) {
+                newState = assocPath(payload.id, {}, state);
+            } else if (payload.id) {
+                newState = assoc(payload.id, {}, state);
+            } else {
+                newState = {};
+            }
         }
         return newState;
     };
 }
-export const connectRequests = createApiReducer('connectRequests');
+
 export const connectionsRequest = createApiReducer('connectionsRequest');
+export const deleteConnectionsRequests = createApiReducer('deleteConnectionsRequests');
 export const hasCertsRequest = createApiReducer('hasCertsRequest');
 export const redirectUrlRequest = createApiReducer('redirectUrlRequest');
-export const createCertsRequest = createApiReducer('createCertsRequest');
-export const startTempHttpsServerRequest = createApiReducer('startTempHttpsServerRequest');
 export const saveConnectionsRequests = createApiReducer('saveConnectionsRequests');
-export const deleteConnectionsRequests = createApiReducer('deleteConnectionsRequests');
-export const tablesRequests = createApiReducer('tables');
+export const startTempHttpsServerRequest = createApiReducer('startTempHttpsServerRequest');
+
+export const apacheDrillStorageRequests = createApiReducer('apacheDrillStorageRequests');
+export const apacheDrillS3KeysRequests = createApiReducer('apacheDrillS3KeysRequests');
+export const createCertsRequest = createApiReducer('createCertsRequest');
+export const connectRequests = createApiReducer('connectRequests');
 export const elasticsearchMappingsRequests = createApiReducer('elasticsearchMappingsRequests');
 export const previewTableRequests = createApiReducer('previewTableRequest');
 export const s3KeysRequests = createApiReducer('s3KeysRequests');
-export const apacheDrillStorageRequests = createApiReducer('apacheDrillStorageRequests');
-export const apacheDrillS3KeysRequests = createApiReducer('apacheDrillS3KeysRequests');
+export const tablesRequests = createApiReducer('tables');
+
 
 
 function tabMap(state = {}, action) {
@@ -146,6 +175,21 @@ function selectedTab(state = '', action) {
 function selectedTables(state = {}, action) {
     if (action.type === 'SET_TABLE') {
         return merge(state, action.payload);
+    } else if (action.type === 'RESET') {
+        return merge(state, assoc(action.payload.id, '', state));
+    } else {
+        return state;
+    }
+}
+
+// object for each tab that tells us if the credentials have been modified since last save to disk
+function connectionsNeedToBeSaved(state = {}, action) {
+    if (action.type === 'SET_CONNECTIONS_NEED_TO_BE_SAVED') {
+        return assoc(
+            action.payload.tabId,
+            action.payload.content,
+            state
+        );
     } else {
         return state;
     }
@@ -154,6 +198,8 @@ function selectedTables(state = {}, action) {
 function selectedIndecies(state = {}, action) {
     if (action.type === 'SET_INDEX') {
         return merge(state, action.payload);
+    } else if (action.type === 'RESET') {
+        return merge(state, assoc(action.payload.id, '', state));
     } else {
         return state;
     }
@@ -190,6 +236,7 @@ const rootReducer = combineReducers({
     selectedIndecies,
     connectRequests,
     connectionsRequest,
+    connectionsNeedToBeSaved,
     saveConnectionsRequests,
     deleteConnectionsRequests,
     tablesRequests,

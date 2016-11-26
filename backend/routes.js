@@ -4,12 +4,13 @@ import * as fs from 'fs';
 
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
 import {
-    saveConnection,
-    lookUpConnections,
+    deleteConnectionById,
+    editConnectionById,
+    getConnectionById,
     getSanitizedConnections,
     getSanitizedConnectionById,
-    deleteConnectionById,
-    getConnectionById
+    lookUpConnections,
+    saveConnection
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
@@ -223,6 +224,15 @@ export default class Server {
             const connection = getSanitizedConnectionById(req.id);
             if (connection) {
                 res.json(200, connection);
+            } else {
+                res.json(404, {});
+            }
+        });
+
+        server.put('/connections/:id', (req, res, next) => {
+            const connection = getSanitizedConnectionById(req.params.id);
+            if (connection) {
+                res.json(200, editConnectionById(req.params));
             } else {
                 res.json(404, {});
             }

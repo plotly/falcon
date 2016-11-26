@@ -22,62 +22,26 @@ const unfoldIcon = (
     </img>
 );
 
-function SettingsForm(props) {
-    const {
-        connectionObject,
-        connectRequest,
-        connectionsHaveBeenSaved,
-        saveConnectionsRequest,
-        updateConnection,
-        disabled
-    } = props;
-    return (
-        <div
-            className={classnames(
-                styles.configurationContainer,
-                disabled ? styles.disabledSection : null
-            )}
-        >
-            <div className={styles.dialectSelector}>
-                <DialectSelector
-                    connectionObject={connectionObject}
-                    updateConnection={updateConnection}
-                />
-            </div>
-            <UserConnections
-                connectionObject={connectionObject}
-                updateConnection={updateConnection}
-            />
-            <ConnectButton
-                connectionsHaveBeenSaved={connectionsHaveBeenSaved}
-                connect={connect}
-                saveConnectionsRequest={saveConnectionsRequest}
-                connectRequest={connectRequest}
-            />
-        </div>
-    );
-}
-
 class Settings extends Component {
     constructor(props) {
         super(props);
         this.fetchData = this.fetchData.bind(this);
+        this.renderEditButton = this.renderEditButton.bind(this);
+        this.renderSettingsForm = this.renderSettingsForm.bind(this);
         this.wrapWithAutoHide = this.wrapWithAutoHide.bind(this);
-        this.state = {showConnections: true, showPreview: true, editMode: false};
+        this.state = {showConnections: true, showPreview: true, editMode: true};
     }
 
     wrapWithAutoHide(name, reactComponent) {
         return (
             <div className={styles.stepTitleContainer}>
-                <h5 className={
-                    {'border-bottom': '1px solid lightgrey;'}}
+                <h5
+                    className={styles.stepTitle}
+                    onClick={() => this.setState({
+                        [`show${name}`]: !this.state[`show${name}`]
+                    })}
                 >
-                    <a
-                        className={styles.stepTitle}
-                        onClick={() => this.setState({
-                            [`show${name}`]: !this.state[`show${name}`]
-                        })}
-                    >
+                    <a>
                         {name}
                     </a>
                     {this.state[`show${name}`] ? null : unfoldIcon}
@@ -102,7 +66,10 @@ class Settings extends Component {
                 {show ? (
                     <div
                         className={buttonStyles.buttonPrimary}
-                        onClick={() => {this.setState({showConnections: true, editMode: true});}}
+                        onClick={() => {
+                            this.setState({showConnections: true, editMode: true});
+                            this.props.setConnectionNeedToBeSaved(true);
+                        }}
                     >
                         {'Edit Credentials'}
                     </div>
@@ -111,13 +78,61 @@ class Settings extends Component {
         );
     }
 
+
+    renderSettingsForm() {
+        const {
+            connect,
+            connectionObject,
+            connectRequest,
+            connectionsHaveBeenSaved,
+            saveConnectionsRequest,
+            updateConnection
+        } = this.props;
+
+        return (
+            <div
+                className={classnames(
+                    styles.configurationContainer,
+                    this.state.editMode ? null : styles.disabledSection
+                )}
+            >
+                <div className={styles.dialectSelector}>
+                    <DialectSelector
+                        connectionObject={connectionObject}
+                        updateConnection={updateConnection}
+                    />
+                </div>
+                <UserConnections
+                    connectionObject={connectionObject}
+                    updateConnection={updateConnection}
+                />
+                <ConnectButton
+                    connectionsHaveBeenSaved={connectionsHaveBeenSaved}
+                    connect={connect}
+                    connectRequest={connectRequest}
+                    editMode={this.state.editMode}
+                    saveConnectionsRequest={saveConnectionsRequest}
+                />
+            </div>
+        );
+    }
+
+    componentWillReceiveProps(nextProps) {
+        // if status goes to 200 from something else, it has been successfully saved to disk
+        if (nextProps.connectRequest.status === 200 && this.props.connectRequest.status !== 200) {
+            this.props.setConnectionNeedToBeSaved(false);
+        }
+    }
+
     fetchData() {
         const {
             apacheDrillStorageRequest,
             apacheDrillS3KeysRequest,
+            connect,
             connections,
             connectRequest,
             connectionsRequest,
+            connectionNeedToBeSaved,
             elasticsearchMappingsRequest,
             getApacheDrillStorage,
             getApacheDrillS3Keys,
@@ -128,6 +143,7 @@ class Settings extends Component {
             previewTables,
             previewTableRequest,
             selectedTable,
+            setConnectionNeedToBeSaved,
             setTable,
             s3KeysRequest,
             selectedTab,
@@ -136,15 +152,20 @@ class Settings extends Component {
         if (connectionsRequest && !connectionsRequest.status) {
             initialize();
         }
+        if (!connectRequest.status) {
+            connect();
+        }
+        if (connectRequest.status !== 200 && !this.state.showConnections) {
+            this.setState({showConnections: true, editMode: true});
+        }
+
         const connectionObject = connections[selectedTab] || {};
         if (contains(connectionObject.dialect, [
                     DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
                     DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE
         ])) {
-            if (connectRequest.status !== 200 && !this.state.showConnections) {
-                this.setState({showConnections: true});
-            }
             if (connectRequest.status === 200 && !tablesRequest.status) {
+                this.setState({editMode: false});
                 getTables();
             }
             if (tablesRequest.status === 200 && !selectedTable) {
@@ -155,25 +176,26 @@ class Settings extends Component {
                 previewTables();
             }
         } else if (connectionObject.dialect === DIALECTS.ELASTICSEARCH) {
-            if (connectRequest.status !== 200 && !this.state.showConnections) {
-                this.setState({showConnections: true});
-            }
             if (connectRequest.status === 200 && !elasticsearchMappingsRequest.status) {
-                this.setState({showConnections: false});
+                this.setState({editMode: false});
                 getElasticsearchMappings();
             }
             if (selectedTable && !previewTableRequest.status) {
+                this.setState({showConnections: false});
                 previewTables();
             }
         } else if (connectionObject.dialect === DIALECTS.S3) {
             if (connectRequest.status === 200 && !s3KeysRequest.status) {
+                this.setState({editMode: false});
                 getS3Keys();
             }
         } else if (connectionObject.dialect === DIALECTS.APACHE_DRILL) {
             if (connectRequest.status === 200 && !apacheDrillStorageRequest.status) {
+                this.setState({showConnections: false, editMode: false});
                 getApacheDrillStorage();
             }
             if (apacheDrillStorageRequest.status === 200 && !apacheDrillS3KeysRequest.status) {
+                this.setState({showConnections: false});
                 getApacheDrillS3Keys();
             }
         }
@@ -181,35 +203,35 @@ class Settings extends Component {
 
     render() {
         const {
-            connections,
-            selectedTab,
-            updateConnection,
-            connect,
-            connectRequest,
-            hasCertsRequest,
-            redirectUrlRequest,
-            createCertsRequest,
-            saveConnectionsRequest,
-            deleteConnectionsRequest,
-            connectionsHaveBeenSaved,
-            setTable,
-            setIndex,
-            selectedTable,
-            index,
-            tablesRequest,
-            elasticsearchMappingsRequest,
-            previewTableRequest,
-            s3KeysRequest,
             apacheDrillStorageRequest,
             apacheDrillS3KeysRequest,
-            newTab,
-            deleteTab,
-            setTab,
+            createCertsRequest,
+            connect,
+            connectRequest,
+            connections,
+            connectionsHaveBeenSaved,
             createCerts,
+            deleteConnectionsRequest,
+            deleteTab,
+            elasticsearchMappingsRequest,
+            index,
             hasCerts,
+            hasCertsRequest,
+            newTab,
+            previewTableRequest,
             redirectUrl,
+            redirectUrlRequest,
+            s3KeysRequest,
+            selectedTab,
+            saveConnectionsRequest,
+            setIndex,
+            setTable,
+            selectedTable,
+            setTab,
             startTempHttpsServer,
-            startTempHttpsServerRequest
+            startTempHttpsServerRequest,
+            tablesRequest,
+            updateConnection
         } = this.props;
 
         if (!selectedTab) {
@@ -228,14 +250,7 @@ class Settings extends Component {
 
                 <div className={styles.openTab}>
                     {this.wrapWithAutoHide('Connections',
-                        <SettingsForm
-                            connectRequest={connectRequest}
-                            connectionObject={connections[selectedTab]}
-                            updateConnection={updateConnection}
-                            connectionsHaveBeenSaved={connectionsHaveBeenSaved}
-                            saveConnectionsRequest={saveConnectionsRequest}
-                            disabled={!this.state.editMode}
-                        />
+                        this.renderSettingsForm()
                     )}
 
                     {this.renderEditButton(!this.state.editMode)}
@@ -294,6 +309,7 @@ function mapStateToProps(state) {
         redirectUrlRequest,
         createCertsRequest,
         connectRequests,
+        connectionsNeedToBeSaved,
         saveConnectionsRequests,
         deleteConnectionsRequests,
         previewTableRequests,
@@ -308,8 +324,8 @@ function mapStateToProps(state) {
 
     const selectedConnectionId = tabMap[selectedTab];
     const connectionsHaveBeenSaved = Boolean(selectedConnectionId);
-    const selectedTable = selectedTables[selectedTab] || null;
-    const index = selectedIndecies[selectedTab] || null;
+    const selectedTable = selectedTables[selectedConnectionId] || null;
+    const index = selectedIndecies[selectedConnectionId] || null;
 
     let previewTableRequest = {};
     if (previewTableRequests[selectedConnectionId] &&
@@ -335,6 +351,7 @@ function mapStateToProps(state) {
         apacheDrillS3KeysRequest: apacheDrillS3KeysRequests[selectedConnectionId] || {},
         selectedTab,
         connections,
+        connectionNeedToBeSaved: connectionsNeedToBeSaved[selectedTab],
         connectionsHaveBeenSaved,
         connectionObject: connections[selectedTab],
         selectedTable,
@@ -359,6 +376,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         selectedTable,
         connections,
         selectedConnectionId,
+        connectionNeedToBeSaved,
         connectionsHaveBeenSaved,
         connectionObject
     } = stateProps;
@@ -386,10 +404,10 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         return dispatch(Actions.getApacheDrillS3Keys(selectedConnectionId));
     }
     function boundSetTable(table) {
-        return dispatch(Actions.setTable({[selectedTab]: table}));
+        return dispatch(Actions.setTable({[selectedConnectionId]: table}));
     }
     function boundSetIndex(index) {
-        return dispatch(Actions.setIndex({[selectedTab]: index}));
+        return dispatch(Actions.setIndex({[selectedConnectionId]: index}));
     }
     function boundPreviewTables() {
         return dispatch(Actions.previewTable(
@@ -397,6 +415,12 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             connectionObject.dialect,
             selectedTable,
             connectionObject.database
+        ));
+    }
+    function boundSetConnectionNeedToBeSaved(bool) {
+        return dispatch(Actions.setConnectionNeedToBeSaved(
+            selectedTab,
+            bool
         ));
     }
 
@@ -415,6 +439,11 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             // so that the user can re-try.
             // TODO - support updating connections.
         };
+    } else if (connectionNeedToBeSaved) {
+        dispatchConnect = function saveAndConnect() {
+            dispatch(Actions.editConnections(connections[selectedTab], selectedConnectionId))
+            .then(() => {dispatch(Actions.reset({id: selectedConnectionId}));});
+        };
     } else {
         dispatchConnect = () => dispatch(Actions.connect(selectedConnectionId));
     }
@@ -424,6 +453,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         reduce(flip(dissoc), stateProps, ['dispatch']),
         dispatchProps,
         ownProps, {
+            setConnectionNeedToBeSaved: boundSetConnectionNeedToBeSaved,
             updateConnection: boundUpdateConnection,
             getTables: boundGetTables,
             getElasticsearchMappings: boundGetElasticsearchMappings,

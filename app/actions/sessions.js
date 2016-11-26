@@ -7,6 +7,7 @@ import * as httpsUtils from '../utils/https';
 import {contains} from 'ramda';
 import queryString from 'query-string';
 
+export const reset = createAction('RESET');
 export const mergeTabMap = createAction('MERGE_TAB_MAP');
 export const setTab = createAction('SET_TAB');
 export const setTable = createAction('SET_TABLE');
@@ -19,7 +20,7 @@ const DELETE_TAB_MESSAGE = 'You are about to delete a connection. ' +
 'If you have scheduled persistent queries with that connection, they ' +
 'will stop refreshing. Are you sure you want to continue?';
 
-const request = {GET, POST, DELETE};
+const request = {GET, DELETE, POST, PUT};
 
 function GET(path) {
     return fetch(`${baseUrl()}/${path}`, {
@@ -44,6 +45,17 @@ function DELETE(path) {
 function POST(path, body = {}) {
     return fetch(`${baseUrl()}/${path}`, {
         method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: body ? JSON.stringify(body) : null
+    });
+}
+
+function PUT(path, body = {}) {
+    return fetch(`${baseUrl()}/${path}`, {
+        method: 'PUT',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -93,18 +105,14 @@ export function getConnections() {
     );
 }
 
-export function editCredential(credentialId) {
-    return dispatch => {
-        return dispatch(apiThunk(
-            `credentials/${credentialId}`,
-            'DELETE',
-            'connectRequests',
-            credentialId
-        )).then(json => {
-            dispatch(deleteCredential(credentialId));
-            return json;
-        });
-    };
+export function editConnections(connectionObject, connectionId) {
+    return apiThunk(
+        `connections/${connectionId}`,
+        'PUT',
+        'connectRequests',
+        connectionId,
+        connectionObject
+    );
 }
 
 export function connect(connectionId) {
@@ -176,30 +184,6 @@ export function getApacheDrillS3Keys(connectionId) {
     );
 }
 
-
-function PREVIEW_QUERY (dialect, table, database = '') {
-    switch (dialect) {
-        case DIALECTS.MYSQL:
-        case DIALECTS.SQLITE:
-        case DIALECTS.MARIADB:
-        case DIALECTS.POSTGRES:
-            return `SELECT * FROM ${table} LIMIT 5`;
-        case DIALECTS.MSSQL:
-            return 'SELECT TOP 5 * FROM ' +
-                `${database}.dbo.${table}`;
-        case DIALECTS.ELASTICSEARCH:
-            return {
-                index: database || '_all',
-                type: table || '_all',
-                body: {
-                    query: { 'match_all': {} },
-                    size: 5
-                }
-            };
-        default:
-            throw new Error(`Dialect ${dialect} is not one of the DIALECTS`);
-    }
-}
 export function previewTable (connectionId, dialect, table, database) {
     const body = {
         query: PREVIEW_QUERY(dialect, table, database)
@@ -333,4 +317,40 @@ export function startTempHttpsServer () {
         'GET',
         'startTempHttpsServerRequest'
     );
+}
+
+export function setConnectionNeedToBeSaved(tabId, bool) {
+    return dispatch => {
+        dispatch({
+            type: 'SET_CONNECTIONS_NEED_TO_BE_SAVED',
+            payload: {
+                tabId,
+                content: bool
+            }
+        });
+    };
+}
+
+function PREVIEW_QUERY (dialect, table, database = '') {
+    switch (dialect) {
+        case DIALECTS.MYSQL:
+        case DIALECTS.SQLITE:
+        case DIALECTS.MARIADB:
+        case DIALECTS.POSTGRES:
+            return `SELECT * FROM ${table} LIMIT 5`;
+        case DIALECTS.MSSQL:
+            return 'SELECT TOP 5 * FROM ' +
+                `${database}.dbo.${table}`;
+        case DIALECTS.ELASTICSEARCH:
+            return {
+                index: database || '_all',
+                type: table || '_all',
+                body: {
+                    query: { 'match_all': {} },
+                    size: 5
+                }
+            };
+        default:
+            throw new Error(`Dialect ${dialect} is not one of the DIALECTS`);
+    }
 }
