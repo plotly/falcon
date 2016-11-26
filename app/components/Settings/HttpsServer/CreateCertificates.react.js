@@ -35,10 +35,6 @@ export default class CreateCertificates extends Component {
         const createdCerts = createCertsRequest.status === 200 && createCertsRequest.content;
         const redirectedUrl = redirectUrlRequest.status === 200 && redirectUrlRequest.content;
 
-        console.warn('hasCerts', hasCertsRequest);
-        console.warn('createCertsRequest', createCertsRequest);
-        console.warn('redirectUrlRequest', redirectUrlRequest);
-
         let hasCertsMessage = null;
         if (hasCerts) {
             hasCertsMessage = (
