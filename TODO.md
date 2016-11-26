@@ -6,6 +6,7 @@
 - [ ] elasticsearch UI on prod
 - [ ] run in a docker container
 - [ ] publish architecture
+- [ ] fix documentation links
 
 ***
 
@@ -13,7 +14,7 @@
 - Sobo - UI:  
     - [x] 'x' should `alert("")`
     - [x] after successfully connecting, connections should collapse
-    - [] add "edit" button to modify the connections and a new button to save the modified connections
+    - [x] add "edit" button to modify the connections and a new button to save the modified connections
 	- [x] fix tables UI
 	- [x] add elasticsearch get mappings endpoint
 - [x] Sobo - Add the SSL scripts back to the desktop app
