@@ -23,10 +23,6 @@ import {baseUrl, getQuerystringParam} from './utils';
  * statements.
  */
 
-function dynamicRequire(module) {
-    return require(module);
-}
-
 let sudo, dialog;
 try {
     sudo = require('electron-sudo');
@@ -54,9 +50,6 @@ const ERROR_MESSAGE = (error) => 'Yikes, an error occurred while setting up' +
 // scripts
 const REDIRECT_CONNECTOR_SCRIPT = `sh  "${DIRECTORY_ENCODED}"/ssl/redirectConnector.sh`;
 const CREATE_CERTS_SCRIPT = `sh  "${DIRECTORY_ENCODED}"/ssl/createKeys.sh`;
-
-console.warn('APP_DIRECTORY', APP_DIRECTORY);
-console.warn('DIRECTORY_ENCODED', DIRECTORY_ENCODED);
 
 // running sudo commands options
 const SUDO_OPTIONS = {

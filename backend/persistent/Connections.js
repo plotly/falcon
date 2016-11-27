@@ -1,7 +1,7 @@
 // Save and load connection objects that contain the DB credentials, host, and more
 
 import fs from 'fs';
-import {assoc, dissoc, findIndex} from 'ramda';
+import {assoc, assocPath, dissoc, findIndex, merge} from 'ramda';
 import uuid from 'node-uuid';
 import YAML from 'yamljs';
 
@@ -33,7 +33,6 @@ export function getConnectionById(id) {
     return getConnections().find(connection => connection.id === id);
 }
 
-
 export function deleteConnectionById(id) {
     const connections = getConnections();
     const index = findIndex(connection => connection.id === id, connections);
@@ -57,6 +56,22 @@ export function saveConnection(connectionObject) {
     }
     fs.writeFileSync(getSetting('CONNECTIONS_PATH'), YAML.stringify(connections, 4));
     return connectionId;
+}
+
+export function editConnectionById(newConnectionObject) {
+    const {id} = newConnectionObject;
+    const connections = getConnections();
+    const newConnections = connections.map(connection => {
+        if (connection.id === id) {
+            return newConnectionObject;
+        }
+        return connection;
+    });
+    if (!fs.existsSync(CONNECTOR_FOLDER_PATH)) {
+        createConnectorFolder();
+    }
+    fs.writeFileSync(CREDENTIALS_PATH, YAML.stringify(newConnections, 4));
+    return getSanitizedConnectionById(newConnectionObject.id);
 }
 
 

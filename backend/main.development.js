@@ -36,9 +36,7 @@ app.on('ready', () => {
             return `${s}=${getSetting(s)}`;
     }));
 
-    console.log('SETTINGS', SETTINGS);
-    console.log('URL ', URL);
-
+    console.log(`Visit ${URL}`);
     // TODO - Does this work too?
     // mainWindow.loadURL(`http://localhost:${getSetting('PORT')}`);
 

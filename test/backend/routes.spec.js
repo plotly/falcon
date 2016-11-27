@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import {assert} from 'chai';
-import {contains, dissoc, gt, keys, merge, sort, without} from 'ramda';
+import {assoc, contains, dissoc, gt, keys, merge, sort, without} from 'ramda';
 import Server from '../../backend/routes.js';
 import {
     getConnections,
@@ -41,6 +41,17 @@ function GET(path) {
 function POST(path, body = {}) {
     return fetch(`http://localhost:9494/${path}`, {
         method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: body ? JSON.stringify(body) : null
+    });
+}
+
+function PUT(path, body = {}) {
+    return fetch(`http://localhost:9494/${path}`, {
+        method: 'PUT',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -120,7 +131,7 @@ describe('Routes - ', function () {
             done();
         })
         .catch(done);
-    })
+    });
 
     // OAuth
     it('oauth - returns 200 on loading the oauth page', function(done) {
@@ -130,7 +141,7 @@ describe('Routes - ', function () {
             done();
         })
         .catch(done);
-    })
+    });
 
     it('oauth - saves oauth access token with a username if valid', function(done) {
         saveSetting('USERS', []);
@@ -330,14 +341,14 @@ describe('Routes - ', function () {
             assert.deepEqual(
                 JSON.stringify(files[0]),
                 JSON.stringify({
-                    "Key":"311.parquet/._SUCCESS.crc",
-                    "LastModified":"2016-10-26T03:27:31.000Z",
-                    "ETag":'"9dfecc15c928c9274ad273719aa7a3c0"',
-                    "Size":8,
-                    "StorageClass":"STANDARD",
-                    "Owner": {
-                        "DisplayName":"chris",
-                        "ID":"655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+                    'Key': '311.parquet/._SUCCESS.crc',
+                    'LastModified': '2016-10-26T03:27:31.000Z',
+                    'ETag': '"9dfecc15c928c9274ad273719aa7a3c0"',
+                    'Size': 8,
+                    'StorageClass': 'STANDARD',
+                    'Owner': {
+                        'DisplayName': 'chris',
+                        'ID': '655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a'
                     }
                 })
             );
@@ -397,7 +408,7 @@ describe('Routes - ', function () {
                 storage,
                 apacheDrillStorage
             );
-            done()
+            done();
         }).catch(done);
     });
 
@@ -410,18 +421,18 @@ describe('Routes - ', function () {
             assert.deepEqual(
                 JSON.stringify(files[0]),
                 JSON.stringify({
-                    "Key":"311.parquet/._SUCCESS.crc",
-                    "LastModified":"2016-10-26T03:27:31.000Z",
-                    "ETag":'"9dfecc15c928c9274ad273719aa7a3c0"',
-                    "Size":8,
-                    "StorageClass":"STANDARD",
-                    "Owner": {
-                        "DisplayName":"chris",
-                        "ID":"655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+                    'Key': '311.parquet/._SUCCESS.crc',
+                    'LastModified': '2016-10-26T03:27:31.000Z',
+                    'ETag': '"9dfecc15c928c9274ad273719aa7a3c0"',
+                    'Size': 8,
+                    'StorageClass': 'STANDARD',
+                    'Owner': {
+                        'DisplayName': 'chris',
+                        'ID': '655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a'
                     }
                 })
             );
-            done()
+            done();
         }).catch(done);
     });
 
@@ -526,9 +537,24 @@ describe('Routes - ', function () {
         }).catch(done);
     });
 
+    it('connections - updates connection by id', function(done) {
+        PUT(`connections/${connectionId}`, assoc('username', 'banana', sqlConnections))
+        .then(res => {
+            assert.equal(res.status, 200);
+            return res.json();
+        })
+        .then(json => {
+            assert.deepEqual(
+                dissoc('id', json),
+                dissoc('password', assoc('username', 'banana', sqlConnections))
+            );
+            done();
+        }).catch(done);
+    });
+
     it('connections - deletes connections', function(done) {
         assert.deepEqual(getConnections().map(dissoc('id')), [sqlConnections]);
-         DELETE(`connections/${connectionId}`)
+        DELETE(`connections/${connectionId}`)
         .then(res => {
             assert.equal(res.status, 200);
             assert.deepEqual(getConnections(), []);
@@ -582,7 +608,7 @@ describe('Routes - ', function () {
         .then(res => res.json().then(json => {
             assert.deepEqual(json, {});
             assert.equal(res.status, 201, 'Query was saved');
-            return GET('queries')
+            return GET('queries');
         }))
         .then(res => res.json())
         .then(json => {
@@ -597,7 +623,7 @@ describe('Routes - ', function () {
         GET(`queries/${queryObject.fid}`)
         .then(res => res.json().then(json => {
             assert.equal(res.status, 404);
-            return POST('queries', queryObject)
+            return POST('queries', queryObject);
         }))
         .then(res => res.json().then(json => {
             assert.deepEqual(json, {});
@@ -684,7 +710,7 @@ describe('Routes - ', function () {
                         `Username: ${creds[0].username}, API Key: ${creds[0].apiKey}, OAuth Access Token: ${creds[0].accessToken}.`
                     )
                 }}
-            )
+            );
             assert.equal(res.status, 400);
             done();
         })).catch(done);
@@ -715,7 +741,7 @@ describe('Routes - ', function () {
         })).catch(done);
     });
 
-    it("queries - POST /queries fails when there is a syntax error in the query", function(done) {
+    it('queries - POST /queries fails when there is a syntax error in the query', function(done) {
         this.timeout(10 * 1000);
         const invalidQueryObject = merge(
             queryObject,
@@ -732,7 +758,7 @@ describe('Routes - ', function () {
         })).catch(done);
     });
 
-    it('uncaught-exceptions - uncaught exceptions get thrown OK ', function(done){
+    it('uncaught-exceptions - uncaught exceptions get thrown OK ', function(done) {
         this.timeout(3 * 1000);
         POST('_throw')
         .then(res => res.json().then(json => {

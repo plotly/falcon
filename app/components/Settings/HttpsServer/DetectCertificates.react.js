@@ -79,7 +79,6 @@ export default class DetectCertificates extends Component {
                     {RED_DOT}{'Create a browser certificate from your self-signed keys. '}
                     <a
                        onClick={() => {
-                           console.warn('spin temp server');
                            this.props.startTempHttpsServer();
                        }}
                     >
