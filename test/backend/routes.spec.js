@@ -1,18 +1,13 @@
 import fetch from 'node-fetch';
 import {assert} from 'chai';
 import {contains, dissoc, gt, keys, merge, sort, without} from 'ramda';
-import Server from '../../../backend/routes.js';
+import Server from '../../backend/routes.js';
 import {
     getConnections,
     getSanitizedConnections,
     saveConnection
-} from '../../../backend/persistent/Connections.js';
-import {
-    CREDENTIALS_PATH,
-    QUERIES_PATH,
-    SETTINGS_PATH
-} from '../../../backend/utils/homeFiles.js';
-import {getSetting, saveSetting}  from '../../../backend/Settings.js';
+} from '../../backend/persistent/Connections.js';
+import {getSetting, saveSetting}  from '../../backend/Settings.js';
 import fs from 'fs';
 import {
     username,
@@ -28,7 +23,7 @@ import {
     apacheDrillStorage,
     testConnections,
     testSqlConnections
-} from '../utils.js';
+} from './utils.js';
 
 
 // Shortcuts
@@ -55,7 +50,6 @@ function POST(path, body = {}) {
 }
 
 function DELETE(path) {
-
     return fetch(`http://localhost:9494/${path}`, {
         method: 'DELETE',
         headers: {
@@ -75,18 +69,26 @@ describe('Routes - ', function () {
 
         // Save some connections to the user's disk
         try {
-            fs.unlinkSync(CREDENTIALS_PATH);
+            fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
         } catch (e) {}
         try {
-            fs.unlinkSync(QUERIES_PATH);
+            fs.unlinkSync(getSetting('QUERIES_PATH'));
         } catch (e) {}
         try {
-            fs.unlinkSync(SETTINGS_PATH);
+            fs.unlinkSync(getSetting('SETTINGS_PATH'));
         } catch (e) {}
 
         saveSetting('USERS', [{
             username, apiKey
         }]);
+
+        /*
+         * This is a little hacky: replace the default location
+         * of the cert key file to somewhere that doesn't exist
+         * so that when we start the server, the server runs as
+         * HTTP and not HTTPS
+         */
+        saveSetting('KEY_FILE', 'non-existent-file');
 
         connectionId = saveConnection(sqlConnections);
         queryObject = {
@@ -429,7 +431,7 @@ describe('Routes - ', function () {
     testConnections.forEach(function(connection) {
         it(`connections - ${connection.dialect} - saves connections to a file if they are valid and if they do not exist`, function(done) {
             this.timeout(5 * 1000);
-            fs.unlinkSync(CREDENTIALS_PATH);
+            fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
             assert.deepEqual(getConnections(), []);
             POST('connections', connection)
             .then(res => res.json().then(json => {
@@ -448,7 +450,7 @@ describe('Routes - ', function () {
 
         it(`connections - ${connection.dialect} - fails if the connections are not valid`, function(done) {
             this.timeout(5 * 1000);
-            fs.unlinkSync(CREDENTIALS_PATH);
+            fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
             assert.deepEqual(getConnections(), [], 'connections are empty at start');
 
             let connectionTypo;
@@ -535,7 +537,7 @@ describe('Routes - ', function () {
     });
 
     it('connections - returns an empty array of connections', function(done) {
-        fs.unlinkSync(CREDENTIALS_PATH);
+        fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
         GET('connections')
         .then(res => {
             assert.equal(res.status, 200);
@@ -688,11 +690,12 @@ describe('Routes - ', function () {
         })).catch(done);
     });
 
+    // TODO - Getting intermittent FetchError: request to http://localhost:9494/queries failed, reason: socket hang up
     it("queries - POST /queries fails when it can't connect to the plotly server", function(done) {
         this.timeout(70*1000);
-        const nonExistantServer = 'https://plotly.lah-lah-lemons.com';
-        saveSetting('PLOTLY_API_URL', nonExistantServer);
-        assert.deepEqual(getSetting('PLOTLY_API_URL'), nonExistantServer);
+        const nonExistantServer = 'plotly.lah-lah-lemons.com';
+        saveSetting('PLOTLY_API_DOMAIN', nonExistantServer);
+        assert.deepEqual(getSetting('PLOTLY_API_URL'), `https://${nonExistantServer}`);
         POST('queries', queryObject)
         .then(res => res.json().then(json => {
             assert.deepEqual(

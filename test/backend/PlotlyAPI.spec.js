@@ -5,8 +5,8 @@ chai.use(spies);
 import {
     PlotlyAPIRequest,
     updateGrid
-} from '../../../backend/persistent/PlotlyAPI.js';
-import {names, createGrid, username, apiKey} from '../utils.js';
+} from '../../backend/persistent/PlotlyAPI.js';
+import {names, createGrid, username, apiKey} from './utils.js';
 
 describe('Grid API Functions', function () {
     it ('updateGrid overwrites a grid with new data', function (done) {

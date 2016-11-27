@@ -2,11 +2,11 @@ import fs from 'fs';
 import {findIndex, propEq} from 'ramda';
 import YAML from 'yamljs';
 
+import {getSetting} from '../settings.js';
 import {
-    CONNECTOR_FOLDER_PATH,
-    QUERIES_PATH,
-    createConnectorFolder
+    createStoragePath
 } from '../utils/homeFiles';
+
 
 export function getQuery(fid) {
     const queries = getQueries();
@@ -14,8 +14,8 @@ export function getQuery(fid) {
 }
 
 export function getQueries() {
-    if (fs.existsSync(QUERIES_PATH)) {
-        return YAML.load(QUERIES_PATH.toString());
+    if (fs.existsSync(getSetting('QUERIES_PATH'))) {
+        return YAML.load(getSetting('QUERIES_PATH').toString());
     } else {
         return [];
     }
@@ -24,10 +24,10 @@ export function getQueries() {
 export function saveQuery(queryObject) {
     const queries = getQueries();
     queries.push(queryObject);
-    if (!fs.existsSync(CONNECTOR_FOLDER_PATH)) {
-        createConnectorFolder();
+    if (!fs.existsSync(getSetting('STORAGE_PATH'))) {
+        createStoragePath();
     }
-    fs.writeFileSync(QUERIES_PATH, YAML.stringify(queries, 4));
+    fs.writeFileSync(getSetting('QUERIES_PATH'), YAML.stringify(queries, 4));
 }
 
 export function deleteQuery(fid) {
@@ -36,7 +36,7 @@ export function deleteQuery(fid) {
 
     if (index > -1) {
         queries.splice(index, 1);
-        fs.writeFileSync(QUERIES_PATH, YAML.stringify(queries, 4));
+        fs.writeFileSync(getSetting('QUERIES_PATH'), YAML.stringify(queries, 4));
     }
 
 }

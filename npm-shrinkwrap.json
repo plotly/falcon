@@ -4332,7 +4332,7 @@
     },
     "mkdirp": {
       "version": "0.5.1",
-      "from": "mkdirp@>=0.5.0 <0.6.0",
+      "from": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
       "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
       "dependencies": {
         "minimist": {

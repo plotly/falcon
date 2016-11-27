@@ -1,11 +1,11 @@
 import bunyan from 'bunyan';
-import {createConnectorFolder} from './utils/homeFiles';
+import {createStoragePath} from './utils/homeFiles';
 import {getSetting} from './settings';
 
 // TODO - Set max size of the log file
 export class Logger {
     constructor() {
-        createConnectorFolder();
+        createStoragePath();
         const streams = [
             {
                 level: 'info',

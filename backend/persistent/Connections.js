@@ -5,15 +5,15 @@ import {assoc, dissoc, findIndex} from 'ramda';
 import uuid from 'node-uuid';
 import YAML from 'yamljs';
 
+import {getSetting} from '../settings';
+
 import {
-    CONNECTOR_FOLDER_PATH,
-    CREDENTIALS_PATH,
-    createConnectorFolder
+    createStoragePath
 } from '../utils/homeFiles';
 
 export function getConnections() {
-    if (fs.existsSync(CREDENTIALS_PATH)) {
-        return YAML.load(CREDENTIALS_PATH.toString());
+    if (fs.existsSync(getSetting('CONNECTIONS_PATH'))) {
+        return YAML.load(getSetting('CONNECTIONS_PATH').toString());
     } else {
         return [];
     }
@@ -39,7 +39,7 @@ export function deleteConnectionById(id) {
     const index = findIndex(connection => connection.id === id, connections);
     if (index > -1) {
         connections.splice(index, 1);
-        fs.writeFileSync(CREDENTIALS_PATH, YAML.stringify(connections, 4));
+        fs.writeFileSync(getSetting('CONNECTIONS_PATH'), YAML.stringify(connections, 4));
     }
 }
 
@@ -52,10 +52,10 @@ export function saveConnection(connectionObject) {
     const connections = getConnections();
     const connectionId = `${connectionObject.dialect}-${uuid.v4()}`;
     connections.push(assoc('id', connectionId, connectionObject));
-    if (!fs.existsSync(CONNECTOR_FOLDER_PATH)) {
-        createConnectorFolder();
+    if (!fs.existsSync(getSetting('STORAGE_PATH'))) {
+        createStoragePath();
     }
-    fs.writeFileSync(CREDENTIALS_PATH, YAML.stringify(connections, 4));
+    fs.writeFileSync(getSetting('CONNECTIONS_PATH'), YAML.stringify(connections, 4));
     return connectionId;
 }
 

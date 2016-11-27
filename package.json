@@ -116,6 +116,7 @@
     "jsdom": "^8.4.0",
     "json-loader": "^0.5.4",
     "minimist": "^1.2.0",
+    "mkdirp": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
     "mysql": "^2.10.2",
     "node-fetch": "^1.5.3",
     "node-gyp": "^3.3.1",

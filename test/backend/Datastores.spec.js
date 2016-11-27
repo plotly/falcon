@@ -6,11 +6,11 @@ import {
     publicReadableS3Connections,
     apacheDrillConnections,
     apacheDrillStorage
-} from '../utils.js';
+} from './utils.js';
 
 import {
     query, connect, files, storage, listS3Files, elasticsearchMappings
-} from '../../../backend/persistent/datastores/Datastores.js';
+} from '../../backend/persistent/datastores/Datastores.js';
 
 const transpose = m => m[0].map((x, i) => m.map(x => x[i]));
 

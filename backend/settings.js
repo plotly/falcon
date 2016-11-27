@@ -1,16 +1,20 @@
 import fs from 'fs';
-import {has} from 'ramda';
+import {contains, has} from 'ramda';
 import YAML from 'yamljs';
 import {
-    LOG_PATH,
-    SETTINGS_PATH,
-    CONNECTOR_FOLDER_PATH,
-    createConnectorFolder
+    createStoragePath
 } from './utils/homeFiles';
+import path from 'path';
+import os from 'os';
 
 const DEFAULT_SETTINGS = {
-    LOG_PATH: LOG_PATH,
     HEADLESS: false,
+
+    STORAGE_PATH: path.join(
+        os.homedir(),
+        '.plotly',
+        'connector'
+    ),
 
     // TODO - Needs to be set for on-prem
     PLOTLY_API_SSL_ENABLED: true,
@@ -39,17 +43,48 @@ const DEFAULT_SETTINGS = {
 };
 
 // Settings that depend on other settings are described here
+const derivedSettingsNames = [
+    'PLOTLY_API_URL',
+    'CONNECTIONS_PATH',
+    'QUERIES_PATH',
+    'LOG_PATH',
+    'SETTINGS_PATH'
+];
 function getDerivedSetting(settingName) {
-    if (settingName === 'PLOTLY_API_URL') {
-        return (
-            (getSetting('PLOTLY_API_SSL_ENABLED') ? 'https://' : 'http://') +
-             getSetting('PLOTLY_API_DOMAIN')
-        );
-    } else {
-        throw new Error(`Derived setting ${settingName} does not exist.`);
-    }
-}
+    switch (settingName) {
+        case 'PLOTLY_API_URL':
+            return (
+                (getSetting('PLOTLY_API_SSL_ENABLED') ? 'https://' : 'http://') +
+                 getSetting('PLOTLY_API_DOMAIN')
+            );
 
+        case 'CONNECTIONS_PATH':
+            return path.join(
+                getSetting('STORAGE_PATH'),
+                'connections.yaml'
+            );
+
+        case 'QUERIES_PATH':
+            return path.join(
+                getSetting('STORAGE_PATH'),
+                'queries.yaml'
+            );
+
+        case 'LOG_PATH':
+            return path.join(
+                getSetting('STORAGE_PATH'),
+                'log.log'
+            );
+
+        case 'SETTINGS_PATH':
+            return path.join(
+                getSetting('STORAGE_PATH'),
+                'settings.yaml'
+            );
+        default:
+            return null;
+    };
+}
 
 /*
  * Load settings from process.env prefixed with `PLOTLY_CONNECTOR_`
@@ -57,26 +92,37 @@ function getDerivedSetting(settingName) {
  * then from the defaults above
  */
 export function getSetting(settingName) {
-    const settingsOnFile = loadSettings();
-    if (has(`PLOTLY_CONNECTOR_${settingName}`, process.env)) {
+    if (contains(settingName, derivedSettingsNames)) {
+        return getDerivedSetting(settingName);
+    } else if (has(`PLOTLY_CONNECTOR_${settingName}`, process.env)) {
         let envObject = process.env[`PLOTLY_CONNECTOR_${settingName}`];
         try {
             return JSON.parse(envObject);
         } catch (e) {
             return envObject;
         }
-    } else if (has(settingName, settingsOnFile)) {
-        return settingsOnFile[settingName];
-    } else if (has(settingName, DEFAULT_SETTINGS)) {
-        return DEFAULT_SETTINGS[settingName];
     } else {
-        getDerivedSetting(settingName);
+        /*
+         * STORAGE_PATH is the only variable that can't be saved in the
+         * settings file because of recursion.
+         */
+        if (settingName !== 'STORAGE_PATH') {
+            const settingsOnFile = loadSettings();
+            if (has(settingName, settingsOnFile)) {
+                return settingsOnFile[settingName];
+            }
+        }
+        if (has(settingName, DEFAULT_SETTINGS)) {
+            return DEFAULT_SETTINGS[settingName];
+        } else {
+            throw new Error(`Setting ${settingName} does not exist`);
+        }
     }
 }
 
 function loadSettings() {
-    if (fs.existsSync(SETTINGS_PATH)) {
-        return YAML.load(SETTINGS_PATH);
+    if (fs.existsSync(getSetting('SETTINGS_PATH'))) {
+        return YAML.load(getSetting('SETTINGS_PATH'));
     } else {
         return {};
     }
@@ -84,8 +130,10 @@ function loadSettings() {
 
 // Save settings to a file - primarily used for setting up tests
 export function saveSetting(settingName, settingValue) {
-    if (!fs.existsSync(CONNECTOR_FOLDER_PATH)) {
-        createConnectorFolder();
+    if (settingName !== 'STORAGE_PATH') {
+        if (!fs.existsSync(getSetting('STORAGE_PATH'))) {
+            createStoragePath();
+        }
     }
     const settingsOnFile = loadSettings();
     settingsOnFile[settingName] = settingValue;
@@ -105,5 +153,5 @@ export function saveSetting(settingName, settingValue) {
      * Converting empty objects or arrays to nulls could break some code
      * without a more thorough investigation.
      */
-    fs.writeFileSync(SETTINGS_PATH, YAML.stringify(settingsOnFile));
+    fs.writeFileSync(getSetting('SETTINGS_PATH'), YAML.stringify(settingsOnFile));
 }
