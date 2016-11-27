@@ -94,7 +94,6 @@ class QueryScheduler {
     }
 
     queryAndUpdateGrid (fid, uids, queryString, connectionId) {
-        // TODO - look up username and API key
         const requestedDBConnections = getConnectionById(connectionId);
         let startTime = process.hrtime();
 
@@ -121,7 +120,6 @@ class QueryScheduler {
             throw new Error(errorMessage);
         }
         const {apiKey, accessToken} = user;
-
         // Check if the credentials are valid
         return PlotlyAPIRequest('users/current', {
             method: 'GET', username, apiKey, accessToken
@@ -149,7 +147,6 @@ class QueryScheduler {
             2);
 
             startTime = process.hrtime();
-
             return updateGrid(
                 rowsAndColumns.rows,
                 fid,
@@ -205,7 +202,7 @@ class QueryScheduler {
 
             }
 
-        })
+        });
 
     }
 

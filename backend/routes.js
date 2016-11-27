@@ -342,10 +342,6 @@ export default class Server {
          * the endpoint `/queries/:fid`
          */
         server.post('/queries', function postQueriesHandler(req, res, next) {
-            // TODO - Verify that the app has access to
-            // the user's API key and attempt to make a
-            // request to see if it is valid.
-
             // Make the query and update the user's grid
             const {fid, uids, query, connectionId} = req.params;
             that.queryScheduler.queryAndUpdateGrid(
