@@ -366,6 +366,7 @@ export default class Server {
 
         });
 
+        // TODO - This endpoint is untested
         server.get('has-certs', (req, res, next) => {
             if (isEmpty(getCerts())) {
                 res.json(404, false);
@@ -374,6 +375,7 @@ export default class Server {
             }
         });
 
+        // TODO - This endpoint is untested
         server.get('is-url-redirected', (req, res, next) => {
             const contents = fs.readFileSync(HOSTS);
             if (contents.indexOf(getSetting('CONNECTOR_HTTPS_DOMAIN')) > -1) {
@@ -383,6 +385,7 @@ export default class Server {
             }
         });
 
+        // TODO - This endpoint is untested
         server.get('start-temp-https-server', (req, res, next) => {
             // can't install certificates without having visited the https server
             // and can't start a https app without having installed certificates ...
