@@ -56,7 +56,7 @@ export const LOGOS = {
 };
 
 
-export const INITIAL_CREDENTIALS = {
+export const INITIAL_CONNECTIONS = {
     username: '',
     password: '',
     database: '',

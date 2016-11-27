@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import uuid from 'node-uuid';
 import {createAction} from 'redux-actions';
-import {DIALECTS, INITIAL_CREDENTIALS} from '../constants/constants';
+import {DIALECTS, INITIAL_CONNECTIONS} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
 import * as httpsUtils from '../utils/https';
 import {contains} from 'ramda';
@@ -11,7 +11,7 @@ export const mergeTabMap = createAction('MERGE_TAB_MAP');
 export const setTab = createAction('SET_TAB');
 export const setTable = createAction('SET_TABLE');
 export const setIndex = createAction('SET_INDEX');
-export const mergeConnections = createAction('MERGE_CREDENTIALS');
+export const mergeConnections = createAction('MERGE_CONNECTIONS');
 export const updateConnection = createAction('UPDATE_CREDENTIAL');
 export const deleteConnection = createAction('DELETE_CREDENTIAL');
 
@@ -248,7 +248,7 @@ export function newTab() {
     return function(dispatch, getState) {
         const newId = uuid.v4();
         dispatch(mergeConnections({
-            [newId]: INITIAL_CREDENTIALS
+            [newId]: INITIAL_CONNECTIONS
         }));
         dispatch(setTab(newId));
     };

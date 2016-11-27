@@ -160,7 +160,7 @@ function selectedIndecies(state = {}, action) {
 }
 
 function connections(state = {}, action) {
-    if (action.type === 'MERGE_CREDENTIALS') {
+    if (action.type === 'MERGE_CONNECTIONS') {
         return merge(state, action.payload);
     } else if (action.type === 'UPDATE_CREDENTIAL') {
         return assoc(
