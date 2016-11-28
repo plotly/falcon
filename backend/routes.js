@@ -37,11 +37,24 @@ export function getCerts() {
 }
 
 export default class Server {
-    constructor() {
+    constructor(args = {}) {
         this.certs = getCerts();
-        this.server = isEmpty(this.certs) ? restify.createServer() : restify.createServer(this.certs);
-        this.domain = isEmpty(this.certs) ? 'localhost' : getSetting('CONNECTOR_HTTPS_DOMAIN');
-        this.protocol = isEmpty(this.certs) ? 'http' : 'https';
+        /*
+        // if server is given a protocol argument, enforce it,
+        // otherwise decide which protocol to use
+        // depending if there are certificates
+        */
+        if (args.protocol === 'HTTP' || isEmpty(this.certs)) {
+            this.server = restify.createServer();
+            this.protocol = 'http';
+            this.domain = 'localhost';
+        } else if (args.protocol === 'HTTPS' || this.certs) {
+            this.server = restify.createServer(this.certs);
+            this.protocol = 'https';
+            this.domain = getSetting('CONNECTOR_HTTPS_DOMAIN');
+        } else {
+            Logger.log('Failed to start the server.');
+        }
 
         this.queryScheduler = new QueryScheduler();
 

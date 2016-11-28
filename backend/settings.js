@@ -83,7 +83,7 @@ function getDerivedSetting(settingName) {
             );
         default:
             return null;
-    };
+    }
 }
 
 /*

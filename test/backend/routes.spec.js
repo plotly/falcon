@@ -29,7 +29,6 @@ import {
 
 // Shortcuts
 function GET(path) {
-
     return fetch(`http://localhost:9494/${path}`, {
         method: 'GET',
         headers: {
@@ -76,31 +75,20 @@ let server;
 let connectionId;
 describe('Routes - ', function () {
     beforeEach(() => {
-        server = new Server();
+        server = new Server({protocol: 'HTTP'});
         server.start();
 
-        // Save some connections to the user's disk
-        try {
-            fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
-        } catch (e) {}
-        try {
-            fs.unlinkSync(getSetting('QUERIES_PATH'));
-        } catch (e) {}
-        try {
-            fs.unlinkSync(getSetting('SETTINGS_PATH'));
-        } catch (e) {}
+        // cleanup
+        ['CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH'].forEach(file => {
+            try {
+                fs.unlinkSync(getSetting(file));
+            } catch (e) {}
+        });
 
+        // Save some connections to the user's disk
         saveSetting('USERS', [{
             username, apiKey
         }]);
-
-        /*
-         * This is a little hacky: replace the default location
-         * of the cert key file to somewhere that doesn't exist
-         * so that when we start the server, the server runs as
-         * HTTP and not HTTPS
-         */
-        saveSetting('KEY_FILE', 'non-existent-file');
 
         connectionId = saveConnection(sqlConnections);
         queryObject = {
