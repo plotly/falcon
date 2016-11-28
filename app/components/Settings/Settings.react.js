@@ -157,7 +157,10 @@ class Settings extends Component {
         }
         // keeps the credentials form open until connected
         if (connectRequest.status !== 200 && !this.state.showConnections) {
-            this.setState({showConnections: true, editMode: true});
+            this.setState({showConnections: true});
+        }
+        if (connectRequest.status !== 200 && !this.state.editMode) {
+            this.setState({editMode: true});
         }
 
         const connectionObject = connections[selectedTab] || {};
@@ -170,7 +173,6 @@ class Settings extends Component {
                 getTables();
             }
             if (tablesRequest.status === 200 && !selectedTable) {
-                this.setState({showConnections: false});
                 setTable(head(tablesRequest.content));
             }
             if (selectedTable && !previewTableRequest.status) {
@@ -182,7 +184,6 @@ class Settings extends Component {
                 getElasticsearchMappings();
             }
             if (selectedTable && !previewTableRequest.status) {
-                this.setState({showConnections: false});
                 previewTables();
             }
         } else if (connectionObject.dialect === DIALECTS.S3) {
@@ -192,11 +193,10 @@ class Settings extends Component {
             }
         } else if (connectionObject.dialect === DIALECTS.APACHE_DRILL) {
             if (connectRequest.status === 200 && !apacheDrillStorageRequest.status) {
-                this.setState({showConnections: false, editMode: false});
+                this.setState({editMode: false});
                 getApacheDrillStorage();
             }
             if (apacheDrillStorageRequest.status === 200 && !apacheDrillS3KeysRequest.status) {
-                this.setState({showConnections: false});
                 getApacheDrillS3Keys();
             }
         }
@@ -352,7 +352,7 @@ function mapStateToProps(state) {
         apacheDrillS3KeysRequest: apacheDrillS3KeysRequests[selectedConnectionId] || {},
         selectedTab,
         connections,
-        connectionNeedToBeSaved: connectionsNeedToBeSaved[selectedTab],
+        connectionNeedToBeSaved: connectionsNeedToBeSaved[selectedTab] || true,
         connectionsHaveBeenSaved,
         connectionObject: connections[selectedTab],
         selectedTable,
@@ -426,6 +426,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     }
 
     /*
+
      * dispatchConnect either saves the connection and then connects
      * or just connects if the connections have already been saved
      */
@@ -443,8 +444,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     } else if (connectionNeedToBeSaved) {
         dispatchConnect = function saveAndConnect() {
             dispatch(Actions.editConnections(connections[selectedTab], selectedConnectionId))
-            .then(() => {dispatch(Actions.reset({id: selectedConnectionId}));})
-            .then(() => {dispatch(Actions.connect(selectedConnectionId));});
+            .then(() => {dispatch(Actions.reset({id: selectedConnectionId}));});
         };
     } else {
         dispatchConnect = () => dispatch(Actions.connect(selectedConnectionId));
