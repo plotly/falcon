@@ -1,8 +1,62 @@
 -
-    username: masteruser
-    password: connecttoplotly
+    dialect: mysql,
+    id: mysql-189ebfb4-e1b4-446c-9b83-b326875fa2d8,
+    username: masteruser,
+    password: connecttoplotly,
+    host: readonly-test-mysql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com,
+    port: 3306,
     database: plotly_datasets
-    port: 5432
-    host: readonly-test-postgres.cwwxgcilxwxw.us-west-2.rds.amazonaws.com
-    dialect: postgres
-    id: postgres-189ebfb4-e1b4-446c-9b83-b326875fa2d8
+
+-
+    dialect: mariadb,
+    id: mariadb-189ebfb4-e1b4-446c-9b83-b326875fa2d8,
+    username: masteruser,
+    password: connecttoplotly,
+    host: readonly-test-mariadb.cwwxgcilxwxw.us-west-2.rds.amazonaws.com,
+    port: 3306,
+    database: plotly_datasets
+
+-
+    dialect: redshift,
+    id: redshift-189ebfb4-e1b4-446c-9b83-b326875fa2d8,
+    username: plotly,
+    password: Qmbdf#3DU]pP8a=CKTK},
+    host: sql-connector-test.cfiaqtidutxu.us-east-1.redshift.amazonaws.com,
+    port: 5439,
+    database: plotly_datasets
+
+-
+    dialect: mssql,
+    id: mssql-189ebfb4-e1b4-446c-9b83-b326875fa2d8,
+    username: masteruser,
+    password: connecttoplotly,
+    host: test-mssql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com,
+    port: 1433,
+    database: plotly_datasets
+
+-
+    dialect: elasticsearch,
+    id: elasticsearch-189ebfb4-e1b4-446c-9b83-b326875fa2d8,
+    host: https://67a7441549120daa2dbeef8ac4f5bb2e.us-east-1.aws.found.io,
+    port: 9243
+
+-
+    dialect: s3,
+    id: s3-189ebfb4-e1b4-446c-9b83-b326875fa2d8,
+    bucket: plotly-s3-connector-test,
+    accessKeyId: AKIAIMHMSHTGARJYSKMQ,
+    secretAccessKey: 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
+
+-
+    dialect: apache drill,
+    id: apache drill-189ebfb4-e1b4-446c-9b83-b326875fa2d8,
+    host: http://ec2-35-160-151-112.us-west-2.compute.amazonaws.com,
+    port: 8047,
+    bucket: plotly-s3-connector-test,
+    accessKeyId: AKIAIMHMSHTGARJYSKMQ,
+    secretAccessKey: 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
+
+-
+    dialect: sqlite,
+    id: sqlite-189ebfb4-e1b4-446c-9b83-b326875fa2d8,
+    storage: /app/test/backend/plotly_datasets.db
