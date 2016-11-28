@@ -10,7 +10,8 @@ import {
     getSanitizedConnections,
     getSanitizedConnectionById,
     lookUpConnections,
-    saveConnection
+    saveConnection,
+    validateConnection
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
@@ -194,20 +195,19 @@ export default class Server {
 
                 // Check that the connections are valid
                 const connectionObject = req.params;
-                try {
-                    Datastores.connect(connectionObject).then(() => {
+                validateConnection(req.params).then(validation => {
+                    if (isEmpty(validation)) {
                         res.json(200, {connectionId: saveConnection(req.params)});
                         return;
-                    }).catch(err => {
-                        Logger.log(err, 2);
-                        res.json(400, {error: {message: err.message}});
+                    } else {
+                        Logger.log(validation, 2);
+                        res.json(400, {error: {message: validation.message}});
                         return;
-                    });
-                } catch (err) {
+                    }
+                }).catch(err => {
                     Logger.log(err, 2);
                     res.json(400, {error: {message: err.message}});
-                }
-
+                });
             }
         });
 
@@ -230,12 +230,23 @@ export default class Server {
         });
 
         server.put('/connections/:id', (req, res, next) => {
-            const connection = getSanitizedConnectionById(req.params.id);
-            if (connection) {
-                res.json(200, editConnectionById(req.params));
-            } else {
+            const connectionExists = getSanitizedConnectionById(req.params.id);
+            if (!connectionExists) {
                 res.json(404, {});
+                return;
             }
+            // continue knowing that the id exists already
+            validateConnection(req.params).then(validation => {
+                if (isEmpty(validation)) {
+                    res.json(200, editConnectionById(req.params));
+                } else {
+                    Logger.log(validation, 2);
+                    res.json(400, {error: validation.message});
+                }
+            }).catch(err => {
+                Logger.log(err, 2);
+                res.json(400, {error: err.message});
+            });
         });
 
         // delete connections
@@ -433,7 +444,7 @@ export default class Server {
                     }
                 });
             } catch (err) {
-                console.log(err);
+                Logger.log(err, 2);
                 res.json(404, false);
             }
             res.json(200, true);

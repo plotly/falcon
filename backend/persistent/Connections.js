@@ -4,6 +4,8 @@ import fs from 'fs';
 import {assoc, assocPath, dissoc, findIndex, merge} from 'ramda';
 import uuid from 'node-uuid';
 import YAML from 'yamljs';
+import Logger from '../logger';
+import * as Datastores from './datastores/Datastores.js';
 
 import {getSetting} from '../settings';
 
@@ -20,7 +22,7 @@ export function getConnections() {
 }
 
 export function getSanitizedConnectionById(id) {
-    const connection = getConnections().find(connection => connection.id === id);
+    const connection = getConnections().find(c => c.id === id);
     if (connection) {
         // TODO - use reduce or w/e
         return dissoc('secretAccessKey', dissoc('password', connection));
@@ -58,6 +60,14 @@ export function saveConnection(connectionObject) {
     return connectionId;
 }
 
+export function validateConnection (connectionObject) {
+    return Datastores.connect(connectionObject).then(() => {
+        return {};
+    }).catch(err => {
+        return err;
+    });
+}
+
 export function editConnectionById(newConnectionObject) {
     const {id} = newConnectionObject;
     const connections = getConnections();
@@ -67,11 +77,11 @@ export function editConnectionById(newConnectionObject) {
         }
         return connection;
     });
-    if (!fs.existsSync(CONNECTOR_FOLDER_PATH)) {
-        createConnectorFolder();
+    if (!fs.existsSync(getSetting('STORAGE_PATH'))) {
+        createStoragePath();
     }
-    fs.writeFileSync(CREDENTIALS_PATH, YAML.stringify(newConnections, 4));
-    return getSanitizedConnectionById(newConnectionObject.id);
+    fs.writeFileSync(getSetting('CONNECTIONS_PATH'), YAML.stringify(newConnections, 4));
+    return {};
 }
 
 
