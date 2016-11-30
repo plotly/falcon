@@ -87,9 +87,7 @@ export function checkWritePermissions(fid, requestor) {
             `authentication credentials for the user "${requestor}" do not exist.`
         );
         Logger.log(errorMessage, 0);
-        return new Promise(function(resolve, reject) {
-            reject(errorMessage);
-        });
+        throw new Error(errorMessage);
     }
     const {apiKey, accessToken} = user;
     if (owner === requestor) {
