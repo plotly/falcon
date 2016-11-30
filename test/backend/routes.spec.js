@@ -107,7 +107,8 @@ describe('Routes - ', function () {
             uids: validUids.slice(0, 2), // since this particular query only has 2 columns
             refreshInterval: 60, // every minute
             query: 'SELECT * FROM ebola_2014 LIMIT 1',
-            connectionId: connectionId
+            connectionId: connectionId,
+            requestor: validFid.split(':')[0]
         };
 
     });
@@ -436,7 +437,10 @@ describe('Routes - ', function () {
         }).catch(done);
     });
 
-    // TODO - Missing elasticsearch and postgis tests
+    /*
+     * TODO - Missing elasticsearch and postgis tests from these routes.
+     * (the tests for elasticsearch exist in Connections.spec.js)
+     */
 
     // Connections
     testConnections.forEach(function(connection) {
@@ -598,6 +602,7 @@ describe('Routes - ', function () {
 
             queryObject = {
                 fid,
+                requestor: fid.split(':')[0],
                 uids,
                 refreshInterval: 60,
                 connectionId,
@@ -617,6 +622,140 @@ describe('Routes - ', function () {
         .then(() => done())
         .catch(done);
     });
+
+    it("queries - can register queries if the user is a collaborator", function(done) {
+        this.timeout(20 * 1000);
+        // Verify that there are no queries saved
+        GET('queries')
+        .then(res => res.json())
+        .then(json => {
+            assert.deepEqual(json, []);
+
+            /*
+             * Plotly doesn't have a v2 endpoint for creating
+             * collaborators, so we'll just use these hardcoded
+             * fids and uids that already have a collaborator
+             * assigned to them.
+             * This test won't work against any plotly server
+             * except https://plot.ly
+             */
+            const collaborator = 'plotly-connector-collaborator'
+            saveSetting('USERS', [{
+                username: collaborator,
+                apiKey: 'I6j80cqCVaBAnvH9ESD2'
+            }]);
+            const fid = 'plotly-database-connector:718';
+            const uids = ['d8ba6c', 'dfa411'];
+
+            queryObject = {
+                fid,
+                requestor: collaborator,
+                uids,
+                refreshInterval: 60,
+                connectionId,
+                query: 'SELECT * from ebola_2014 LIMIT 2'
+            };
+            return POST('queries', queryObject);
+        })
+        .then(res => res.json().then(json => {
+            assert.deepEqual(json, {});
+            assert.equal(res.status, 201, 'Query was saved');
+            return GET('queries');
+        }))
+        .then(res => res.json())
+        .then(json => {
+            assert.deepEqual(json, [queryObject]);
+        })
+        .then(() => done())
+        .catch(done);
+    });
+
+    it("queries - can't register queries if the user can't view it", function(done) {
+        this.timeout(20 * 1000);
+        // Verify that there are no queries saved
+        GET('queries')
+        .then(res => res.json())
+        .then(json => {
+            assert.deepEqual(json, []);
+
+            // The grid is not shared with this user
+            const viewer = 'plotly-connector-viewer';
+            saveSetting('USERS', [{
+                username: viewer,
+                apiKey: 'mUSjMmwa55d6hjvwvgI4'
+            }]);
+            const fid = 'plotly-database-connector:718';
+            const uids = ['d8ba6c', 'dfa411'];
+
+            queryObject = {
+                fid,
+                requestor: viewer,
+                uids,
+                refreshInterval: 60,
+                connectionId,
+                query: 'SELECT * from ebola_2014 LIMIT 2'
+            };
+            return POST('queries', queryObject);
+        })
+        .then(res => res.json().then(json => {
+            assert.deepEqual(json, {error: 'Not found'});
+            assert.equal(res.status, 400);
+            return GET('queries');
+        }))
+        .then(res => res.json())
+        .then(json => {
+            assert.deepEqual(json, [queryObject]);
+        })
+        .then(() => done())
+        .catch(done);
+    });
+
+    it("queries - can't register queries if the user isn't a collaborator", function(done) {
+        this.timeout(20 * 1000);
+        // Verify that there are no queries saved
+        GET('queries')
+        .then(res => res.json())
+        .then(json => {
+            assert.deepEqual(json, []);
+
+            // The grid is not shared with this user
+            const viewer = 'plotly-connector-viewer';
+            saveSetting('USERS', [{
+                username: viewer,
+                apiKey: 'mUSjMmwa55d6hjvwvgI4'
+            }]);
+            /*
+             * Unlike plotly-database-connector:718, this grid is public
+             * so requests won't fail because of a 404. They should, however,
+             * fail because there are no collaborators associated with this
+             * plot
+             */
+            const fid = 'plotly-database-connector:719';
+            const uids = ['3a6df9', 'b95e9d'];
+
+            queryObject = {
+                fid,
+                requestor: viewer,
+                uids,
+                refreshInterval: 60,
+                connectionId,
+                query: 'SELECT * from ebola_2014 LIMIT 2'
+            };
+            return POST('queries', queryObject);
+        })
+        .then(res => res.json().then(json => {
+            assert.deepEqual(json, {error: 'Permission denied'});
+            assert.equal(res.status, 400);
+            return GET('queries');
+        }))
+        .then(res => res.json())
+        .then(json => {
+            assert.deepEqual(json, [queryObject]);
+        })
+        .then(() => done())
+        .catch(done);
+    });
+
 
     it('queries - gets individual queries', function(done) {
         this.timeout(10 * 1000);

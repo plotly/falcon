@@ -14,6 +14,7 @@ import {
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
+import {checkWritePermissions} from './persistent/PlotlyAPI.js';
 import {dissoc, contains, isEmpty, pluck} from 'ramda';
 import Logger from './logger';
 import fetch from 'node-fetch';
@@ -346,17 +347,23 @@ export default class Server {
             }
         });
 
-        // register or update a query
+        // register or overwrite a query
         /*
          * TODO - Updating a query should be a PATCH or PUT under
          * the endpoint `/queries/:fid`
          */
         server.post('/queries', function postQueriesHandler(req, res, next) {
             // Make the query and update the user's grid
-            const {fid, uids, query, connectionId} = req.params;
-            that.queryScheduler.queryAndUpdateGrid(
-                fid, uids, query, connectionId
-            )
+            const {fid, uids, query, connectionId, requestor} = req.params;
+
+            // Check that the user has permission to edit the grid
+
+            checkWritePermissions(fid, requestor)
+            .then(function nowQueryAndUpdateGrid() {
+                return that.queryScheduler.queryAndUpdateGrid(
+                    fid, uids, query, connectionId, requestor
+                )
+            })
             .then(function returnSuccess() {
                 let status;
                 if (getQuery(req.params.fid)) {

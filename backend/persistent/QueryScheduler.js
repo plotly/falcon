@@ -23,11 +23,12 @@ class QueryScheduler {
     }
 
     scheduleQuery({
-        fid: fid,
-        uids: uids,
-        refreshInterval: refreshInterval,
-        query: query,
-        connectionId: connectionId
+        requestor,
+        fid,
+        uids,
+        refreshInterval,
+        query,
+        connectionId
     }) {
         if (!refreshInterval) {
             throw new Error('Refresh interval was not supplied');
@@ -50,6 +51,7 @@ class QueryScheduler {
 
         // Save query to a file
         saveQuery({
+            requestor,
             fid,
             uids,
             refreshInterval,
@@ -68,7 +70,6 @@ class QueryScheduler {
                 } catch (e) {
                     Logger.log(e, 0);
                 }
-
             },
             refreshInterval * 1000
         );
@@ -93,7 +94,7 @@ class QueryScheduler {
         Object.keys(this.queryJobs).forEach(this.clearQuery);
     }
 
-    queryAndUpdateGrid (fid, uids, queryString, connectionId) {
+    queryAndUpdateGrid (fid, uids, queryString, connectionId, requestor) {
         const requestedDBConnections = getConnectionById(connectionId);
         let startTime = process.hrtime();
 
@@ -101,7 +102,11 @@ class QueryScheduler {
          * Do a pre-query check that the user has the correct credentials
          * and that the connector can connect to plotly
          */
-        const username = fid.split(':')[0];
+        /*
+         * If the user is the owner, then requestor === fid.split(':')[0]
+         * If the user is a collaborator, then requestor is different
+         */
+        const username = requestor;
         const user = getSetting('USERS').find(
              u => u.username === username
         );
@@ -126,9 +131,7 @@ class QueryScheduler {
         }).then(res => {
             if (res.status !== 200) {
                 const errorMessage = (
-                    `Yikes! ${getSetting('PLOTLY_API_URL')} failed to identify ${username}. ` +
-                    'These were the credentials supplied: ' +
-                    `Username: ${username}, API Key: ${apiKey}, OAuth Access Token: ${accessToken}.`
+                    `Yikes! ${getSetting('PLOTLY_API_URL')} failed to identify ${username}.`
                 )
                 Logger.log(errorMessage, 0);
                 throw new Error(errorMessage);
@@ -150,7 +153,8 @@ class QueryScheduler {
             return updateGrid(
                 rowsAndColumns.rows,
                 fid,
-                uids
+                uids,
+                requestor
             );
 
         }).then(res => {
@@ -159,40 +163,41 @@ class QueryScheduler {
                 Logger.log(`Error ${res.status} while updating grid ${fid}.`, 0);
 
                 /*
-                 * If it was a 500 error, it might've been because the user
-                 * has deleted their grid.
-                 * Check if the grid exists and the query if it doesn't.
+                 * If it was a 404 error and the requestor was the owner, then
+                 * it might've been because the owner has deleted their grid.
+                 * If it was a 404 and the requestor wasn't the owner,
+                 * then either the owner has deleted the grid or the
+                 * requestor no longer has permission to view the graph.
+                 * In any case, delete the query.
+                 * Note that when a user is requesting to update or save
+                 * a query via `post /queries`, we first check that they have
+                 * permission to edit the file. Otherwise, this code block
+                 * could delete an owner's grid when given any request by
+                 * a non-collaborator.
                  * In Plotly, deletes can either be permenant or non-permentant.
-                 * Delete the grid in either case.
+                 * Delete the query in either case.
                  */
-                return PlotlyAPIRequest(
-                    `grids/${fid}`,
-                    {username, apiKey, accessToken, method: 'GET'}
-                )
-                .then(res => {
-                    // Permenant deletion
-                    if (res.status === 404) {
-                        Logger.log(`
-                            Grid ID ${fid} doesn't exist on Plotly anymore,
-                            removing persistent query.`,
-                             2
-                        );
-                        this.clearQuery(fid);
-                        deleteQuery(fid);
-                    } else {
-                        return res.json().then(filemeta => {
-                            if (filemeta.deleted) {
-                                Logger.log(`
-                                    Grid ID ${fid} was deleted,
-                                    removing persistent query.`,
-                                    2
-                                );
-                                this.clearQuery(fid);
-                                deleteQuery(fid);
-                            }
-                        });
-                    }
-                });
+                if (res.status === 404) {
+                    Logger.log(`
+                        Grid ID ${fid} doesn't exist on Plotly anymore,
+                        removing persistent query.`,
+                         2
+                    );
+                    this.clearQuery(fid);
+                    return deleteQuery(fid);
+                } else {
+                    return res.json().then(filemeta => {
+                        if (filemeta.deleted) {
+                            Logger.log(`
+                                Grid ID ${fid} was deleted,
+                                removing persistent query.`,
+                                2
+                            );
+                            this.clearQuery(fid);
+                            return deleteQuery(fid);
+                        }
+                    });
+                }
 
             } else {
 

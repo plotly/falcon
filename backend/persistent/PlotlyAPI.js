@@ -26,28 +26,12 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
 }
 
 
-export function updateGrid(rows, fid, uids) {
-    /*
-     * TODO - This will not work for collaborators. In addition to saving
-     * the fid we should save the username of the scheduler.
-     */
-    const username = fid.split(':')[0];
+export function updateGrid(rows, fid, uids, requestor) {
+    const username = requestor;
     const users = getSetting('USERS');
     const user = users.find(
         u => u.username === username
     );
-    if (!user || !(user.apiKey || user.accessToken)) {
-        /*
-         * Heads up - the front end looks for "Unauthenticated" in this
-         * error message. So don't change it!
-         */
-        const errorMessage = (
-            `Unauthenticated: Attempting to update grid ${fid} but the ` +
-            `authentication credentials for the user "${username}" do not exist.`
-        );
-        Logger.log(errorMessage, 0);
-        throw new Error(errorMessage);
-    }
     const apiKey = user.apiKey;
     const accessToken = user.accessToken;
 
@@ -83,4 +67,60 @@ export function updateGrid(rows, fid, uids) {
         })))
     };
     return PlotlyAPIRequest(url, {body, username, apiKey, accessToken, method: 'PUT'});
+}
+
+// Resolve if the requestor has permission to update fid, reject otherwise
+export function checkWritePermissions(fid, requestor) {
+    const owner = fid.split(':')[0];
+    const user = getSetting('USERS').find(
+         u => u.username === requestor
+    );
+
+    // Check if the user even exists
+    if (!user || !(user.apiKey || user.accessToken)) {
+        /*
+         * Heads up - the front end looks for "Unauthenticated" in this
+         * error message. So don't change it!
+         */
+        const errorMessage = (
+            `Unauthenticated: Attempting to update grid ${fid} but the ` +
+            `authentication credentials for the user "${username}" do not exist.`
+        );
+        Logger.log(errorMessage, 0);
+        return new Promise(function(resolve, reject) {
+            reject(errorMessage);
+        });
+    }
+    const {apiKey, accessToken} = user;
+    if (owner === requestor) {
+        return new Promise(function(resolve, reject) {
+            return resolve();
+        });
+    } else {
+        return PlotlyAPIRequest(`grids/${fid}`, {
+            username: requestor,
+            apiKey,
+            accessToken,
+            method: 'GET'
+        }).then(function(res){
+            if (res.status === 404) {
+                throw new Error('Not found');
+            } else if (res.status !== 200) {
+                return res.json().then(json => {
+                    throw new Error(`${res.status}: ${JSON.stringify(json, null, 2)}`);
+                });
+            } else {
+                return res.json();
+            }
+        }).then(function(filemeta) {
+            if (filemeta.collaborators &&
+                filemeta.collaborators.results &&
+                Boolean(filemeta.collaborators.results.find(collab => requestor === collab.username))
+            ) {
+                return new Promise(function(resolve){resolve()});
+            } else {
+                throw new Error('Permission denied');
+            }
+        })
+    }
 }
