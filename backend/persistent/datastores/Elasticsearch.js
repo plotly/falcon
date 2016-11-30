@@ -1,6 +1,5 @@
 import {parseElasticsearch} from '../../parse';
 import fetch from 'node-fetch';
-import elasticsearch from 'elasticsearch';
 import {keys} from 'ramda';
 
 function request(relativeUrl, connection, {body, method}) {
@@ -23,7 +22,7 @@ function request(relativeUrl, connection, {body, method}) {
 }
 
 export function connect(connection) {
-    return request(`_cat/indices/`, connection, {method: 'GET'});
+    return request('_cat/indices/', connection, {method: 'GET'});
 }
 
 export function query(query, connection) {

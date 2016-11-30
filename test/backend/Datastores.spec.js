@@ -47,7 +47,31 @@ describe('Elasticsearch - ', function () {
         connect(elasticsearchConnections).then(res => res.json().then(json => {
             assert.deepEqual(
                 json,
-                [{"health":"yellow","status":"open","index":"plotly_datasets","pri":"1","rep":"1","docs.count":"31","docs.deleted":"0","store.size":"8.5kb","pri.store.size":"8.5kb"},{"health":"yellow","status":"open","index":"sample-data","pri":"1","rep":"1","docs.count":"11","docs.deleted":"0","store.size":"9.9kb","pri.store.size":"9.9kb"}]
+                [
+                    {
+                        'health': 'yellow',
+                        'status': 'open',
+                        'index': 'plotly_datasets',
+                        'pri': '1',
+                        'rep': '1',
+                        'docs.count': '28187',
+                        'docs.deleted': '0',
+                        'store.size': '5.8mb',
+                        'pri.store.size': '5.8mb'
+                    },
+                    {
+                        'health': 'yellow',
+                        'status': 'open',
+                        'index': 'sample-data',
+                        'pri': '1',
+                        'rep': '1',
+                        'docs.count': '11',
+                        'docs.deleted': '0',
+                        'store.size':
+                        '9.9kb',
+                        'pri.store.size': '9.9kb'
+                    }
+                ]
             );
             assert.equal(res.status, 200);
             done();
@@ -59,70 +83,87 @@ describe('Elasticsearch - ', function () {
             assert.deepEqual(
                 json,
                 {
-                    "plotly_datasets": {
-                      "mappings": {
-                        "ebola_2014": {
-                          "properties": {
-                            "Country": {
-                              "type": "string"
+                    'plotly_datasets': {
+                      'mappings': {
+                        'consumer_complaints': {
+                            'properties': {
+                              'Company': {'type': 'string'},
+                              'Company response': {'type': 'string'},
+                              'Complaint ID': {'type': 'integer'},
+                              'Consumer disputed?': {'type': 'string'},
+                              'Date received': {'type': 'date', 'format': 'strict_date_optional_time'},
+                              'Date sent to company': {'type': 'date', 'format': 'strict_date_optional_time'},
+                              'Issue': {'type': 'string'},
+                              'Product': {'type': 'string'},
+                              'State': {'type': 'string'},
+                              'Sub-issue': {'type': 'string'},
+                              'Sub-product': {'type': 'string'},
+                              'Timely response?': {'type': 'string'},
+                              'ZIP code': {'type': 'integer'}
+                            }
+                        },
+                        'ebola_2014': {
+                          'properties': {
+                            'Country': {
+                              'type': 'string'
                             },
-                            "Lat": {
-                              "type": "float"
+                            'Lat': {
+                              'type': 'float'
                             },
-                            "Lon": {
-                              "type": "float"
+                            'Lon': {
+                              'type': 'float'
                             },
-                            "Month": {
-                              "type": "integer"
+                            'Month': {
+                              'type': 'integer'
                             },
-                            "Value": {
-                              "type": "float"
+                            'Value': {
+                              'type': 'float'
                             },
-                            "Year": {
-                              "type": "integer"
+                            'Year': {
+                              'type': 'integer'
                             },
-                            "index": {
-                              "type": "integer"
+                            'index': {
+                              'type': 'integer'
                             }
                           }
                         }
                       }
-                  },
-                    "sample-data": {
-                      "mappings": {
-                        "test-type": {
-                          "properties": {
-                            "my-boolean-1": {
-                              "type": "boolean"
+                    },
+                    'sample-data': {
+                      'mappings': {
+                        'test-type': {
+                          'properties': {
+                            'my-boolean-1': {
+                              'type': 'boolean'
                           },
-                            "my-boolean-2": {
-                              "type": "boolean"
+                            'my-boolean-2': {
+                              'type': 'boolean'
                           },
-                            "my-date-1": {
-                              "format": "strict_date_optional_time||epoch_millis",
-                              "type": "date"
+                            'my-date-1': {
+                              'format': 'strict_date_optional_time||epoch_millis',
+                              'type': 'date'
                           },
-                            "my-date-2": {
-                              "format": "strict_date_optional_time||epoch_millis",
-                              "type": "date"
+                            'my-date-2': {
+                              'format': 'strict_date_optional_time||epoch_millis',
+                              'type': 'date'
                           },
-                            "my-geo-point-1": {
-                              "type": "geo_point"
+                            'my-geo-point-1': {
+                              'type': 'geo_point'
                           },
-                            "my-geo-point-2": {
-                              "type": "geo_point"
+                            'my-geo-point-2': {
+                              'type': 'geo_point'
                           },
-                            "my-number-1": {
-                              "type": "long"
+                            'my-number-1': {
+                              'type': 'long'
                           },
-                            "my-number-2": {
-                              "type": "long"
+                            'my-number-2': {
+                              'type': 'long'
                           },
-                            "my-string-1": {
-                              "type": "string"
+                            'my-string-1': {
+                              'type': 'string'
                           },
-                            "my-string-2": {
-                              "type": "string"
+                            'my-string-2': {
+                              'type': 'string'
                             }
                           }
                         }
@@ -284,7 +325,7 @@ describe('Elasticsearch - ', function () {
                 ],
                 rows: transpose([
                     [
-                        '2015-01-01T12:30:40Z',
+                        '2015-01-01T12:30:40Z'
                     ],
 
                     [
@@ -366,7 +407,7 @@ describe('Elasticsearch - ', function () {
             done();
         }).catch(done);
 
-    })
+    });
 
 });
 
@@ -401,14 +442,14 @@ describe('S3 - Connection', function () {
             assert.deepEqual(
                 JSON.stringify(files[0]),
                 JSON.stringify({
-                    "Key":"311.parquet/._SUCCESS.crc",
-                    "LastModified":"2016-10-26T03:27:31.000Z",
-                    "ETag":'"9dfecc15c928c9274ad273719aa7a3c0"',
-                    "Size":8,
-                    "StorageClass":"STANDARD",
-                    "Owner": {
-                        "DisplayName":"chris",
-                        "ID":"655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+                    'Key': '311.parquet/._SUCCESS.crc',
+                    'LastModified': '2016-10-26T03:27:31.000Z',
+                    'ETag': '"9dfecc15c928c9274ad273719aa7a3c0"',
+                    'Size': 8,
+                    'StorageClass': 'STANDARD',
+                    'Owner': {
+                        'DisplayName': 'chris',
+                        'ID': '655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a'
                     }
                 })
             );
@@ -430,7 +471,7 @@ describe('Apache Drill - Connection', function () {
         storage(apacheDrillConnections)
         .then(config => {
             assert.deepEqual(
-                config, apacheDrillStorage)
+                config, apacheDrillStorage);
             done();
         }).catch(done);
     });
@@ -442,14 +483,14 @@ describe('Apache Drill - Connection', function () {
             assert.deepEqual(
                 JSON.stringify(files[0]),
                 JSON.stringify({
-                    "Key":"311.parquet/._SUCCESS.crc",
-                    "LastModified":"2016-10-26T03:27:31.000Z",
-                    "ETag":'"9dfecc15c928c9274ad273719aa7a3c0"',
-                    "Size":8,
-                    "StorageClass":"STANDARD",
-                    "Owner": {
-                        "DisplayName":"chris",
-                        "ID":"655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+                    'Key': '311.parquet/._SUCCESS.crc',
+                    'LastModified': '2016-10-26T03:27:31.000Z',
+                    'ETag': '"9dfecc15c928c9274ad273719aa7a3c0"',
+                    'Size': 8,
+                    'StorageClass': 'STANDARD',
+                    'Owner': {
+                        'DisplayName': 'chris',
+                        'ID': '655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a'
                     }
                 })
             );
