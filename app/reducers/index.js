@@ -93,7 +93,6 @@ import {assoc, assocPath, contains, merge, dissoc} from 'ramda';
 const canBeReset = [
     'apacheDrillStorageRequests',
     'apacheDrillS3KeysRequests',
-    'connectRequests',
     'elasticsearchMappingsRequests',
     'previewTableRequest',
     's3KeysRequests',

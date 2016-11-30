@@ -7,7 +7,7 @@ import {
     getSanitizedConnections,
     saveConnection
 } from '../../backend/persistent/Connections.js';
-import {getSetting, saveSetting}  from '../../backend/Settings.js';
+import {getSetting, saveSetting} from '../../backend/Settings.js';
 import fs from 'fs';
 import {
     username,
@@ -17,6 +17,7 @@ import {
     createGrid,
     configuration,
     sqlConnections,
+    mysqlConnection,
     elasticsearchConnections,
     publicReadableS3Connections,
     apacheDrillConnections,
@@ -28,7 +29,6 @@ import {
 
 // Shortcuts
 function GET(path) {
-
     return fetch(`http://localhost:9494/${path}`, {
         method: 'GET',
         headers: {
@@ -75,31 +75,20 @@ let server;
 let connectionId;
 describe('Routes - ', function () {
     beforeEach(() => {
-        server = new Server();
+        server = new Server({protocol: 'HTTP'});
         server.start();
 
-        // Save some connections to the user's disk
-        try {
-            fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
-        } catch (e) {}
-        try {
-            fs.unlinkSync(getSetting('QUERIES_PATH'));
-        } catch (e) {}
-        try {
-            fs.unlinkSync(getSetting('SETTINGS_PATH'));
-        } catch (e) {}
+        // cleanup
+        ['CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH'].forEach(file => {
+            try {
+                fs.unlinkSync(getSetting(file));
+            } catch (e) {}
+        });
 
+        // Save some connections to the user's disk
         saveSetting('USERS', [{
             username, apiKey
         }]);
-
-        /*
-         * This is a little hacky: replace the default location
-         * of the cert key file to somewhere that doesn't exist
-         * so that when we start the server, the server runs as
-         * HTTP and not HTTPS
-         */
-        saveSetting('KEY_FILE', 'non-existent-file');
 
         connectionId = saveConnection(sqlConnections);
         queryObject = {
@@ -541,16 +530,59 @@ describe('Routes - ', function () {
         }).catch(done);
     });
 
-    it('connections - updates connection by id', function(done) {
+    it('connections - does not update connection if bad connection object', (done) => {
         PUT(`connections/${connectionId}`, assoc('username', 'banana', sqlConnections))
+        .then(res => {
+            assert.equal(res.status, 400);
+            return res.json();
+        })
+        .then(json => {
+            assert.deepEqual(
+                json,
+                {error: 'password authentication failed for user \"banana\"'}
+            );
+            assert.deepEqual(
+                getConnections(),
+                [merge(sqlConnections, {id: connectionId})]
+            );
+            done();
+        }).catch(done);
+    });
+
+    it('connections - does not update connection if connectionId does not exist yet', (done) => {
+        PUT('connections/wrong-connection-id-123', sqlConnections)
+        .then(res => {
+
+            assert.equal(res.status, 404);
+            return res.json();
+        })
+        .then(json => {
+            assert.deepEqual(
+                json,
+                {}
+            );
+            assert.deepEqual(
+                getConnections(),
+                [merge(sqlConnections, {id: connectionId})]
+            );
+            done();
+        }).catch(done);
+    });
+
+    it('connections - updates connection if correct connection object', (done) => {
+        PUT(`connections/${connectionId}`, mysqlConnection)
         .then(res => {
             assert.equal(res.status, 200);
             return res.json();
         })
         .then(json => {
             assert.deepEqual(
-                dissoc('id', json),
-                dissoc('password', assoc('username', 'banana', sqlConnections))
+                json,
+                {}
+            );
+            assert.deepEqual(
+                getConnections(),
+                [merge(mysqlConnection, {id: connectionId})]
             );
             done();
         }).catch(done);
@@ -857,7 +889,7 @@ describe('Routes - ', function () {
 
     // TODO - Getting intermittent FetchError: request to http://localhost:9494/queries failed, reason: socket hang up
     it("queries - POST /queries fails when it can't connect to the plotly server", function(done) {
-        this.timeout(70*1000);
+        this.timeout(70 * 1000);
         const nonExistantServer = 'plotly.lah-lah-lemons.com';
         saveSetting('PLOTLY_API_DOMAIN', nonExistantServer);
         assert.deepEqual(getSetting('PLOTLY_API_URL'), `https://${nonExistantServer}`);
