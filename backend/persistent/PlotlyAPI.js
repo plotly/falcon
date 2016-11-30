@@ -84,7 +84,7 @@ export function checkWritePermissions(fid, requestor) {
          */
         const errorMessage = (
             `Unauthenticated: Attempting to update grid ${fid} but the ` +
-            `authentication credentials for the user "${username}" do not exist.`
+            `authentication credentials for the user "${requestor}" do not exist.`
         );
         Logger.log(errorMessage, 0);
         return new Promise(function(resolve, reject) {
