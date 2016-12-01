@@ -63,7 +63,7 @@ class QueryScheduler {
         this.queryJobs[fid] = setInterval(
             () => {
                 try {
-                    this.job(fid, uids, query, connectionId)
+                    this.job(fid, uids, query, connectionId, requestor)
                     .catch(error => {
                         Logger.log(error, 0);
                     });
