@@ -40,7 +40,6 @@ describe('SQL - ', function () {
 });
 
 
-
 describe('Elasticsearch - ', function () {
     it('connect connects to an index', function(done) {
         this.timeout(4 * 1000);
@@ -68,8 +67,8 @@ describe('Elasticsearch - ', function () {
                         'docs.count': '11',
                         'docs.deleted': '0',
                         'store.size':
-                        '9.9kb',
-                        'pri.store.size': '9.9kb'
+                        '9.8kb',
+                        'pri.store.size': '9.8kb'
                     }
                 ]
             );
@@ -244,7 +243,7 @@ describe('Elasticsearch - ', function () {
                         '1910-01-16T01:10:50Z',
                         '1911-04-19T02:15:38Z',
 
-                        '1912-02-20T03:01:28'
+                        '1912-02-20T03:01:28Z'
                     ],
 
                     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
@@ -327,39 +326,111 @@ describe('Elasticsearch - ', function () {
                     [
                         '2015-01-01T12:30:40Z'
                     ],
-
                     [
                         'NYC'
                     ],
                     [
                         'USA'
                     ],
-
                     [
                         '1915-01-01T12:30:40Z'
                     ],
-
                     [1],
                     [10],
-
                     // TODO - Should we expand out geo-point into 2 columns?
                     [
                         [-10, -10]
                     ],
-
                     [
                         [10, 10]
                     ],
-
                     [true],
                     [true]
-
                 ])
             });
             done();
         }).catch(done);
     });
 
+    it('query returns more than 10K rows', function(done) {
+        this.timeout(60 * 1000);
+        query(JSON.stringify(
+            {
+                body: {
+                    query: {
+                        query_string: {
+                            query: '*'
+                        }
+                    },
+                    size: '10001'
+                },
+                index: 'plotly_datasets',
+                type: 'consumer_complaints'
+            }),
+            elasticsearchConnections
+        ).then(results => {
+            assert.deepEqual(
+                {columnnames: results.columnnames.sort(), rows: results.rows.length},
+                {columnnames:
+                    ['Company',
+                    'Company response',
+                    'Complaint ID',
+                    'Consumer disputed?',
+                    'Date received',
+                    'Date sent to company',
+                    'Issue',
+                    'Product',
+                    'State',
+                    'Sub-issue',
+                    'Sub-product',
+                    'Timely response?',
+                    'ZIP code'],
+                rows: 10001
+                }
+            );
+            done();
+        }).catch(done);
+    });
+
+    it('query returns all the data when size is larger than the dataset', function(done) {
+        this.timeout(60 * 1000);
+        query(JSON.stringify(
+            {
+                body: {
+                    query: {
+                        query_string: {
+                            query: '*'
+                        }
+                    },
+                    size: '30000'
+                },
+                index: 'plotly_datasets',
+                type: 'consumer_complaints'
+            }),
+            elasticsearchConnections
+        ).then(results => {
+            assert.deepEqual(
+                {columnnames: results.columnnames.sort(), rows: results.rows.length},
+                {columnnames:
+                    ['Company',
+                    'Company response',
+                    'Complaint ID',
+                    'Consumer disputed?',
+                    'Date received',
+                    'Date sent to company',
+                    'Issue',
+                    'Product',
+                    'State',
+                    'Sub-issue',
+                    'Sub-product',
+                    'Timely response?',
+                    'ZIP code'],
+                rows: 28156
+                }
+            );
+            done();
+        }).catch(done);
+    });
 
     it('Returns valid aggregated data', function(done) {
         this.timeout(4 * 1000);

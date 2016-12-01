@@ -1,10 +1,12 @@
 import {parseElasticsearch} from '../../parse';
 import fetch from 'node-fetch';
-import {keys} from 'ramda';
 
-function request(relativeUrl, connection, {body, method}) {
+const KEEP_ALIVE_FOR = '1m'; // minutes
+const MAX_RESULTS_SIZE = 10 * 1000;
+
+function request(relativeUrl, connection, {body, method, queryStringParams = ''}) {
     const {host, port, username, password} = connection;
-    const url = `${host}:${port}/${relativeUrl}?format=json`;
+    const url = `${host}:${port}/${relativeUrl}?format=json${queryStringParams}`;
     const headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -28,13 +30,27 @@ export function connect(connection) {
 export function query(query, connection) {
     const queryObject = JSON.parse(query);
     const {body, index, type} = queryObject;
+    /*
+     * If size is not defined or smaller than 10K, keep scroll disabled and
+     * let elasticsearch handle it, which it defaults right now to 10.
+     * If it is, and it is higher than 10K then enable scroll.
+     */
+    const scrollEnabled = parseInt(body.size, 10) > MAX_RESULTS_SIZE;
+    /*
+     * In order to use scrolling, the initial search request should specify
+     * the scroll parameter in the query string, which tells Elasticsearch
+     * how long it should keep the “search context” alive.
+     */
+    const scrollParam = scrollEnabled ? `&scroll=${KEEP_ALIVE_FOR}` : '';
+
     return request(`${index}/${type}/_search`, connection, {
         body,
-        method: 'POST'
+        method: 'POST',
+        queryStringParams: scrollParam
     })
     .then(res => res.json().then(results => {
         if (res.status === 200) {
-            return parseElasticsearch(queryObject.body, results);
+            return parseElasticsearch(body, results);
         } else {
             throw new Error(JSON.stringify(results));
         }
