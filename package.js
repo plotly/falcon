@@ -26,6 +26,7 @@ const DEFAULT_OPTS = {
         '^/test($|/)',
         '^/tools($|/)',
         '^/release($|/)',
+        '^/ssl/certs($|/)',
         '^/backend/main.development.js'
     ]
     .concat(
