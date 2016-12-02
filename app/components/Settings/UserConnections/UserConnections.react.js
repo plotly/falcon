@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './UserConnections.css';
-import {head} from 'ramda';
+import {head, keys, values} from 'ramda';
 import {
     CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS
 } from '../../../constants/constants';
@@ -122,23 +122,23 @@ export default class UserConnections extends Component {
         let options = null;
         if (CONNECTION_OPTIONS[connectionObject.dialect].length !== 0) {
             options = CONNECTION_OPTIONS[connectionObject.dialect]
-                .map((option) => (
+                .map(option => (
                 <div
                     className={styles.options}
-                    key={option}
+                    key={head(keys(option))}
                 >
-                    {option}
                     <label className={styles.label}><input
                         className={styles.checkbox}
                         type="checkbox"
                         onChange={() => {
                             updateConnection(
-                                {[option]: !configuration.get(option)}
+                                {[head(keys(option))]: !configuration.get(head(keys(option)))}
                             );
                         }}
-                        id={`test-option-${option}`}
+                        id={`test-option-${head(keys(option))}`}
                     />
                     </label>
+                    {connectionObject.dialect}&nbsp;{head(values(option))}
                 </div>
             ));
         }
