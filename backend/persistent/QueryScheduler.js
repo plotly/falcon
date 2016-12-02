@@ -5,6 +5,7 @@ import {getQuery, getQueries, saveQuery, deleteQuery} from './Queries';
 import {getSetting} from '../settings';
 import Logger from '../logger';
 import {PlotlyAPIRequest} from './PlotlyAPI';
+import {has} from 'ramda';
 
 class QueryScheduler {
     constructor() {
@@ -45,8 +46,12 @@ class QueryScheduler {
         Logger.log(`Scheduling "${query}" with connection ${connectionId} updating grid ${fid}`);
         // Delete query if it is already saved
         if (getQuery(fid)) {
-            this.clearQuery(fid);
             deleteQuery(fid);
+        }
+
+        // If for some reason it wasn't on file but is in memory, delete it.
+        if (has(fid, this.queryJobs)) {
+            this.clearQuery(fid);
         }
 
         // Save query to a file
@@ -85,7 +90,7 @@ class QueryScheduler {
 
     // Remove query from memory
     clearQuery(fid) {
-        clearInterval(this.queryJobs[fid]);
+        clearInterval(fid);
         delete this.queryJobs[fid];
     }
 
