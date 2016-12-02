@@ -5,7 +5,7 @@ import {getQuery, getQueries, saveQuery, deleteQuery} from './Queries';
 import {getSetting} from '../settings';
 import Logger from '../logger';
 import {PlotlyAPIRequest} from './PlotlyAPI';
-import {has} from 'ramda';
+import {has, merge} from 'ramda';
 
 class QueryScheduler {
     constructor() {
@@ -90,7 +90,7 @@ class QueryScheduler {
 
     // Remove query from memory
     clearQuery(fid) {
-        clearInterval(fid);
+        clearInterval(this.queryJobs[fid]);
         delete this.queryJobs[fid];
     }
 

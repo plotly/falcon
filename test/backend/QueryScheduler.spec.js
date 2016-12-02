@@ -62,6 +62,49 @@ describe('QueryScheduler', () => {
         }, (delay * 3) * 1000);
     });
 
+    it.only('overwrites interval functions', function (done) {
+        const spy1 = chai.spy(() => {});
+        queryScheduler.job = spy1;
+
+        const delay = 1;
+        this.timeout(delay * 20 * 1000);
+
+        const query = {
+            requestor: 'requestor',
+            fid: 'fid',
+            uids: 'uids',
+            refreshInterval: delay,
+            query: 'query-1',
+            connectionId: '1'
+        }
+
+        queryScheduler.scheduleQuery(query);
+
+        setTimeout(function() {
+            expect(spy1).to.have.been.called.exactly(5);
+
+            const spy2 = chai.spy(() => {});
+            queryScheduler.job = spy2;
+            queryScheduler.scheduleQuery(merge(query, {query: 'query-2'}));
+            setTimeout(function() {
+                expect(spy1).to.have.been.called.exactly(5);
+                expect(spy1).to.have.been.called.always.with.exactly(
+                    query.fid, query.uids, query.query,
+                    query.connectionId, query.requestor
+                );
+                expect(spy2).to.have.been.called.exactly(5);
+                expect(spy2).to.have.been.called.always.with.exactly(
+                    query.fid, query.uids, 'query-2',
+                    query.connectionId, query.requestor
+                );
+                done();
+            }, (delay + 1) * 1000 + delay * 4 * 1000);
+
+        }, (delay + 1) * 1000 + delay * 4 * 1000);
+
+
+    });
+
     it('saves queries to file', () => {
         queryScheduler.job = () => {};
 
