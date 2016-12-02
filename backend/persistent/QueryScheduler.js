@@ -49,7 +49,7 @@ class QueryScheduler {
             deleteQuery(fid);
         }
 
-        // If for some reason it wasn't on file but is in memory, delete it.
+        // Remove the query from the in-memory timers
         if (has(fid, this.queryJobs)) {
             this.clearQuery(fid);
         }
