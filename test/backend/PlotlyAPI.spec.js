@@ -7,9 +7,14 @@ import {
     updateGrid
 } from '../../backend/persistent/PlotlyAPI.js';
 import {names, createGrid, username, apiKey} from './utils.js';
+import {saveSetting} from '../../backend/settings.js';
 
 describe('Grid API Functions', function () {
-    it ('updateGrid overwrites a grid with new data', function (done) {
+    beforeEach(() => {
+        saveSetting('USERS', [{username, apiKey}]);
+    });
+
+    it('updateGrid overwrites a grid with new data', function (done) {
         this.timeout(15 * 1000);
         // First, create a new grid.
         // Note that the app never actually does this,
@@ -28,7 +33,8 @@ describe('Grid API Functions', function () {
                     ['z', 30, 60, 90, 120, 150]
                 ],
                 fid,
-                uids
+                uids,
+                username
             );
         })).then(() => {
             const url = `grids/${fid}/content`;
