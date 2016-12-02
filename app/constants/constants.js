@@ -31,11 +31,11 @@ export const CONNECTION_CONFIG = {
 
 // TODO - Combine this with the CONNECTION_CONFIG
 export const CONNECTION_OPTIONS = {
-    [DIALECTS.MYSQL]: ['ssl'],
-    [DIALECTS.MARIADB]: ['ssl'],
-	[DIALECTS.MSSQL]: ['ssl'],
-    [DIALECTS.POSTGRES]: ['ssl'],
-    [DIALECTS.REDSHIFT]: ['ssl'],
+    [DIALECTS.MYSQL]: [{'ssl': 'database has SSL protection enabled'}],
+    [DIALECTS.MARIADB]: [{'ssl': 'database has SSL protection enabled'}],
+	[DIALECTS.MSSQL]: [{'ssl': 'database has SSL protection enabled'}],
+    [DIALECTS.POSTGRES]: [{'ssl': 'database has SSL protection enabled'}],
+    [DIALECTS.REDSHIFT]: [{'ssl': 'database has SSL protection enabled'}],
     [DIALECTS.ELASTICSEARCH]: [],
     [DIALECTS.SQLITE]: [],
     [DIALECTS.S3]: [],

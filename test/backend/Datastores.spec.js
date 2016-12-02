@@ -1,4 +1,5 @@
 import {expect, assert} from 'chai';
+import {head, last} from 'ramda';
 
 import {
     sqlConnections,
@@ -183,10 +184,29 @@ describe('Elasticsearch - ', function () {
                               'type': 'string'
                             }
                           }
-                        }
+                      },
+                    'test-scroll': {
+                      'properties': {
+                        'fifth': {
+                          'type': 'float'
+                      },
+                        'first': {
+                          'type': 'float'
+                      },
+                        'fourth': {
+                          'type': 'float'
+                      },
+                        'second': {
+                          'type': 'float'
+                      },
+                        'third': {
+                          'type': 'float'
                       }
+                     }
                     }
+                  }
                 }
+              }
             );
             done();
         }).catch(done);
@@ -382,28 +402,26 @@ describe('Elasticsearch - ', function () {
                     },
                     size: '10001'
                 },
-                index: 'plotly_datasets',
-                type: 'consumer_complaints'
+                index: 'sample-data',
+                type: 'test-scroll'
             }),
             elasticsearchConnections
         ).then(results => {
             assert.deepEqual(
-                {columnnames: results.columnnames.sort(), rows: results.rows.length},
-                {columnnames:
-                    ['Company',
-                    'Company response',
-                    'Complaint ID',
-                    'Consumer disputed?',
-                    'Date received',
-                    'Date sent to company',
-                    'Issue',
-                    'Product',
-                    'State',
-                    'Sub-issue',
-                    'Sub-product',
-                    'Timely response?',
-                    'ZIP code'],
-                rows: 10001
+                {
+                    columnnames: results.columnnames.sort(),
+                    rows: results.rows.length
+                },
+                {
+                    columnnames:
+                        [
+                            'fifth',
+                            'first',
+                            'fourth',
+                            'second',
+                            'third'
+                        ],
+                    rows: 10001
                 }
             );
             done();
@@ -420,30 +438,28 @@ describe('Elasticsearch - ', function () {
                             query: '*'
                         }
                     },
-                    size: '30000'
+                    size: '200001'
                 },
-                index: 'plotly_datasets',
-                type: 'consumer_complaints'
+                index: 'sample-data',
+                type: 'test-scroll'
             }),
             elasticsearchConnections
         ).then(results => {
             assert.deepEqual(
-                {columnnames: results.columnnames.sort(), rows: results.rows.length},
-                {columnnames:
-                    ['Company',
-                    'Company response',
-                    'Complaint ID',
-                    'Consumer disputed?',
-                    'Date received',
-                    'Date sent to company',
-                    'Issue',
-                    'Product',
-                    'State',
-                    'Sub-issue',
-                    'Sub-product',
-                    'Timely response?',
-                    'ZIP code'],
-                rows: 28156
+                {
+                    columnnames: results.columnnames.sort(),
+                    rows: results.rows.length
+                },
+                {
+                    columnnames:
+                        [
+                            'fifth',
+                            'first',
+                            'fourth',
+                            'second',
+                            'third'
+                        ],
+                    rows: 200000
                 }
             );
             done();
