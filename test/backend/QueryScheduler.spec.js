@@ -67,10 +67,11 @@ describe('QueryScheduler', () => {
 
         const queryObject = {
             refreshInterval: 1,
-            fid: 'test-fid',
+            fid: 'test-fid:10',
             uids: '',
             query: '',
-            connectionId: 'unique-id'
+            connectionId: 'unique-id',
+            requestor: 'test-fid'
         };
         queryScheduler.scheduleQuery(queryObject);
         let queriesFromFile = getQueries();
@@ -89,10 +90,11 @@ describe('QueryScheduler', () => {
 
         const queryObject = {
             refreshInterval: 1,
-            fid: 'test-fid',
+            fid: 'test-fid:10',
             uids: '',
             query: 'my query',
-            connectionId: 'unique-id'
+            connectionId: 'unique-id',
+            requestor: 'test-fid'
         };
 
         assert.deepEqual([], getQueries());
@@ -130,7 +132,8 @@ describe('QueryScheduler', () => {
                  uids,
                  refreshInterval,
                  connectionId,
-                 query: 'SELECT * from ebola_2014 LIMIT 2'
+                 query: 'SELECT * from ebola_2014 LIMIT 2',
+                 requestor: fid.split(':')[0]
              };
              assert.deepEqual(getQueries(), [], 'No queries existed');
              assert(!Boolean(queryScheduler.queryJobs[fid]), 'No queries were scheduled');
@@ -140,7 +143,12 @@ describe('QueryScheduler', () => {
              assert(Boolean(queryScheduler.queryJobs[fid]), 'A query has been scheduled');
 
              PlotlyAPIRequest(`grids/${fid}`, {username, apiKey, method: 'DELETE'}).then(res => {
-                assert.equal(res.status, 204, 'Grid was successfully deleted');
+                 if (res.status !== 204) {
+                     res.json().then(json => {
+                         assert.equal(res.status, 204, 'Grid was successfully deleted: ' + JSON.stringify(json, null, 2));
+                     })
+                 }
+
 
                 setTimeout(function() {
                     /*
@@ -243,7 +251,8 @@ describe('QueryScheduler', () => {
                  uids,
                  refreshInterval,
                  connectionId,
-                 query: 'SELECT * from ebola_2014 LIMIT 2'
+                 query: 'SELECT * from ebola_2014 LIMIT 2',
+                 requestor: fid.split(':')[0]
              };
              queryScheduler.scheduleQuery(queryObject);
 
