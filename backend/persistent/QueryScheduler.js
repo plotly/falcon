@@ -182,27 +182,51 @@ class QueryScheduler {
                  * In Plotly, deletes can either be permenant or non-permentant.
                  * Delete the query in either case.
                  */
-                if (res.status === 404) {
-                    Logger.log(`
-                        Grid ID ${fid} doesn't exist on Plotly anymore,
-                        removing persistent query.`,
-                         2
-                    );
-                    this.clearQuery(fid);
-                    return deleteQuery(fid);
-                } else {
-                    return res.json().then(filemeta => {
-                        if (filemeta.deleted) {
-                            Logger.log(`
-                                Grid ID ${fid} was deleted,
-                                removing persistent query.`,
-                                2
-                            );
-                            this.clearQuery(fid);
-                            return deleteQuery(fid);
-                        }
-                    });
-                }
+
+                /*
+                 * Plotly's API returns a 500 instead of a 404 in these
+                 * PUTs. To check if the file is really there or not,
+                 * make an additional API call to GET it
+                 */
+
+                return PlotlyAPIRequest(
+                    `grids/${fid}`,
+                    {username, apiKey, accessToken, method: 'GET'}
+                ).then(res => {
+
+                    if (res.status === 404) {
+                        Logger.log(('' +
+                            `Grid ID ${fid} doesn't exist on Plotly anymore, ` +
+                            'removing persistent query.'),
+                             2
+                        );
+                        this.clearQuery(fid);
+                        return deleteQuery(fid);
+                    } else {
+                        return res.text()
+                        .then(text => {
+                            let filemeta;
+                            try {
+                                filemeta = JSON.parse(text);
+                            } catch (e) {
+                                // Well, that's annoying.
+                                Logger.log(`Failed to parse the JSON of request ${fid}`, 0);
+                                Logger.log(e)
+                                Logger.log('Text response: ' + text, 0);
+                                throw new Error(e);
+                            }
+                            if (filemeta.deleted) {
+                                Logger.log(`
+                                    Grid ID ${fid} was deleted,
+                                    removing persistent query.`,
+                                    2
+                                );
+                                this.clearQuery(fid);
+                                return deleteQuery(fid);
+                            }
+                        });
+                    }
+                });
 
             } else {
 
