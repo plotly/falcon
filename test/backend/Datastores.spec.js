@@ -64,11 +64,10 @@ describe('Elasticsearch - ', function () {
                         'index': 'sample-data',
                         'pri': '1',
                         'rep': '1',
-                        'docs.count': '11',
+                        'docs.count': '200011',
                         'docs.deleted': '0',
-                        'store.size':
-                        '9.8kb',
-                        'pri.store.size': '9.8kb'
+                        'store.size': '42.8mb',
+                        'pri.store.size': '42.8mb'
                     }
                 ]
             );
@@ -130,6 +129,25 @@ describe('Elasticsearch - ', function () {
                     },
                     'sample-data': {
                       'mappings': {
+                        'test-scroll': {
+                            'properties': {
+                                'first': {
+                                    'type': 'float'
+                                },
+                                'second': {
+                                    'type': 'float'
+                                },
+                                'third': {
+                                    'type': 'float'
+                                },
+                                'fourth': {
+                                    'type': 'float'
+                                },
+                                'fifth': {
+                                    'type': 'float'
+                                }
+                            }
+                        },
                         'test-type': {
                           'properties': {
                             'my-boolean-1': {
