@@ -165,7 +165,7 @@ class QueryScheduler {
         }).then(res => {
             Logger.log(`Request to Plotly for grid ${fid} took ${process.hrtime(startTime)[0]} seconds`, 2);
             if (res.status !== 200) {
-                Logger.log(`Error ${res.status} while updating grid ${fid}.`, 0);
+                Logger.log(`Error ${res.status} while updating grid ${fid}.`, 2);
 
                 /*
                  * If it was a 404 error and the requestor was the owner, then
