@@ -150,8 +150,8 @@ class QueryScheduler {
             Logger.log(`Query "${queryString}" took ${process.hrtime(startTime)[0]} seconds`, 2);
             Logger.log(`Updating grid ${fid} with new data`, 2);
             Logger.log(
-                `First row:
-                ${JSON.stringify(rowsAndColumns.rows.slice(0, 1))}`,
+                'First row: ' +
+                JSON.stringify(rowsAndColumns.rows.slice(0, 1)),
             2);
 
             startTime = process.hrtime();
