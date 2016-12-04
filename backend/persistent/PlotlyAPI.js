@@ -90,35 +90,33 @@ export function checkWritePermissions(fid, requestor) {
         throw new Error(errorMessage);
     }
     const {apiKey, accessToken} = user;
-    if (owner === requestor) {
-        return new Promise(function(resolve, reject) {
-            return resolve();
-        });
-    } else {
-        return PlotlyAPIRequest(`grids/${fid}`, {
-            username: requestor,
-            apiKey,
-            accessToken,
-            method: 'GET'
-        }).then(function(res){
-            if (res.status === 404) {
-                throw new Error('Not found');
-            } else if (res.status !== 200) {
-                return res.json().then(json => {
-                    throw new Error(`${res.status}: ${JSON.stringify(json, null, 2)}`);
-                });
-            } else {
-                return res.json();
-            }
-        }).then(function(filemeta) {
-            if (filemeta.collaborators &&
-                filemeta.collaborators.results &&
-                Boolean(filemeta.collaborators.results.find(collab => requestor === collab.username))
-            ) {
-                return new Promise(function(resolve){resolve()});
-            } else {
-                throw new Error('Permission denied');
-            }
-        })
-    }
+    return PlotlyAPIRequest(`grids/${fid}`, {
+        username: requestor,
+        apiKey,
+        accessToken,
+        method: 'GET'
+    }).then(function(res){
+        if (res.status === 404) {
+            throw new Error('Not found');
+        } else if (res.status === 401) {
+            throw new Error('Unauthenticated');
+        } else if (res.status !== 200) {
+            return res.json().then(json => {
+                throw new Error(`${res.status}: ${JSON.stringify(json, null, 2)}`);
+            });
+        } else {
+            return res.json();
+        }
+    }).then(function(filemeta) {
+        if (filemeta.collaborators &&
+            filemeta.collaborators.results &&
+            Boolean(filemeta.collaborators.results.find(collab => requestor === collab.username))
+        ) {
+            return new Promise(function(resolve){resolve()});
+        } else if (owner === requestor) {
+            return new Promise(function(resolve){resolve()});
+        } else {
+            throw new Error('Permission denied');
+        }
+    })
 }

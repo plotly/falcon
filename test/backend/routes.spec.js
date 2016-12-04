@@ -878,7 +878,7 @@ describe('Routes - ', function () {
                 json,
                 {error: {
                     message: (
-                        `Yikes! ${getSetting('PLOTLY_API_URL')} failed to identify ${username}.`
+                        `Unauthenticated`
                     )
                 }}
             );
@@ -901,7 +901,7 @@ describe('Routes - ', function () {
                     error: {
                         message: (
                             'request to ' +
-                            'https://plotly.lah-lah-lemons.com/v2/users/current ' +
+                            'https://plotly.lah-lah-lemons.com/v2/grids/plotly-database-connector:197 ' +
                             'failed, reason: getaddrinfo ENOTFOUND plotly.lah-lah-lemons.com plotly.lah-lah-lemons.com:443'
                         )
                     }
