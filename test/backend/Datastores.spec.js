@@ -1,5 +1,5 @@
 import {expect, assert} from 'chai';
-import {head, last} from 'ramda';
+import {head, last, range} from 'ramda';
 
 import {
     sqlConnections,
@@ -79,6 +79,7 @@ describe('Elasticsearch - ', function () {
              * an immutable field
              */
             assert.equal(json[2].index, 'live-data');
+            assert.equal(json[3].index, 'test-scroll');
 
             assert.equal(res.status, 200);
 
@@ -91,6 +92,18 @@ describe('Elasticsearch - ', function () {
             assert.deepEqual(
                 json,
                 {
+                    'test-scroll': {
+                        'mappings': {
+                            '200k': {
+                                'properties': {
+                                    'Column 1': {'type': 'double'},
+                                    'Column 2': {'type': 'double'},
+                                    'Column 3': {'type': 'double'},
+                                    'Column 4': {'type': 'double'}
+                                }
+                            }
+                        }
+                    },
                     'live-data': {
                         'mappings': {
                             'test-type': {
@@ -434,33 +447,37 @@ describe('Elasticsearch - ', function () {
                     },
                     size: '10001'
                 },
-                index: 'sample-data',
-                type: 'test-scroll'
+                index: 'test-scroll',
+                type: '200k'
             }),
             elasticsearchConnections
         ).then(results => {
             assert.deepEqual(
                 {
-                    columnnames: results.columnnames.sort(),
-                    rows: results.rows.length
+                    columnnames: results.columnnames,
+                    rows: results.rows
                 },
                 {
                     columnnames:
                         [
-                            'fifth',
-                            'first',
-                            'fourth',
-                            'second',
-                            'third'
+                            'Column 1',
+                            'Column 2',
+                            'Column 3',
+                            'Column 4',
                         ],
-                    rows: 10001
+                    rows: transpose([
+                        range(1, 10001 + 1).map(i => i + 0.1),
+                        range(1, 10001 + 1).map(i => i + 0.2),
+                        range(1, 10001 + 1).map(i => i + 0.3),
+                        range(1, 10001 + 1).map(i => i + 0.4)
+                    ])
                 }
             );
             done();
         }).catch(done);
     });
 
-    it('query returns all the data when size is larger than the dataset', function(done) {
+    it.only('query returns all the data when size is larger than the dataset', function(done) {
         this.timeout(60 * 1000);
         query(JSON.stringify(
             {
@@ -472,28 +489,26 @@ describe('Elasticsearch - ', function () {
                     },
                     size: '200001'
                 },
-                index: 'sample-data',
-                type: 'test-scroll'
+                index: 'test-scroll',
+                type: '200k'
             }),
             elasticsearchConnections
         ).then(results => {
-            assert.deepEqual(
-                {
-                    columnnames: results.columnnames.sort(),
-                    rows: results.rows.length
-                },
-                {
-                    columnnames:
-                        [
-                            'fifth',
-                            'first',
-                            'fourth',
-                            'second',
-                            'third'
-                        ],
-                    rows: 200000
+            for (let j = 0; j < 200 * 1000; j++) {
+                for (let i = 0; i < 4; i++) {
+                    assert.equal(
+                        (j + 1) + ((i + 1) * 0.1),
+                        results.rows[j][i]
+                    );
                 }
-            );
+            }
+            assert.deepEqual(results.columnnames, [
+                'Column 1',
+                'Column 2',
+                'Column 3',
+                'Column 4',
+            ]);
+            assert.equal(results.rows.length, 200 * 1000);
             done();
         }).catch(done);
     });
