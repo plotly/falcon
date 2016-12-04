@@ -1,4 +1,4 @@
-import {keys, replace} from 'ramda';
+import {gt, keys, replace, sort} from 'ramda';
 import parse from 'csv-parse';
 
 export function parseSQL(data) {
@@ -196,14 +196,16 @@ export function parseElasticsearch(inputJson, outputJson) {
      } else {
          const data = outputJson.hits.hits;
 
-         const columnnames = Object.keys(data[0]._source);
-         const ncols = columnnames.length;
-         const nrows = data.length;
+         // Sort the column names
+         const columnnames = sort(
+             (a, b) => gt(a, b) ? 1 : -1,
+             keys(data[0]._source)
+         );
 
          const table = data.map((obj) => {
              // get the value for each column => put them into an array
              // returns: a row
-             return Object.keys(obj._source).map((columnname) => {
+             return columnnames.map((columnname) => {
                  // returns: a column's values
                  return obj._source[columnname];
              });
