@@ -265,14 +265,16 @@ describe('Elasticsearch - ', function () {
         ).then(results => {
             assert.deepEqual(results, {
                 columnnames: [
-                    'my-date-1',
-                    'my-string-1', 'my-string-2',
-                    'my-date-2',
+                    'my-boolean-1','my-boolean-2',
+                    'my-date-1', 'my-date-2',
+                    'my-geo-point-1', 'my-geo-point-2',
                     'my-number-1', 'my-number-2',
-                    'my-geo-point-2', 'my-geo-point-1',
-                    'my-boolean-2', 'my-boolean-1'
+                    'my-string-1', 'my-string-2'
                 ],
                 rows: transpose([
+                    [true, true, true, false, false, true, true, true, false, false, true],
+                    [true, false, true, false, true, false, true, false, true, false, true],
+
                     [
                         '2015-01-01T12:30:40Z',
                         '2015-10-04T12:35:10Z',
@@ -289,15 +291,6 @@ describe('Elasticsearch - ', function () {
                         '2011-04-19T02:15:38Z',
 
                         '2012-02-20T03:01:28Z'
-                    ],
-
-                    [
-                        'NYC', 'NYC', 'NYC', 'Paris', 'Paris',
-                        'Tokyo', 'Tokyo', 'Tokyo', 'SF', 'Sf', 'Montreal'
-                    ],
-                    [
-                        'USA', 'USA', 'USA', 'France', 'France',
-                        'Japan', 'Japan', 'Japan', 'USA', 'USA', 'Canada'
                     ],
 
                     [
@@ -318,28 +311,7 @@ describe('Elasticsearch - ', function () {
                         '1912-02-20T03:01:28Z'
                     ],
 
-                    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-                    [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110],
-
                     // TODO - Should expand these geoPoints out into 2 columns
-                    [
-                        [-10, -10],
-                        [-11, -11],
-                        [-12, -12],
-
-                        [-20, -20],
-                        [-21, -21],
-
-                        [-30, -30],
-                        [-31, -31],
-                        [-32, -32],
-
-                        [-40, -40],
-                        [-41, -41],
-
-                        [-50, -50]
-                    ],
-
                     [
                         [10, 10],
                         [11, 11],
@@ -358,8 +330,35 @@ describe('Elasticsearch - ', function () {
                         [50, 50]
                     ],
 
-                    [true, false, true, false, true, false, true, false, true, false, true],
-                    [true, true, true, false, false, true, true, true, false, false, true]
+                    [
+                        [-10, -10],
+                        [-11, -11],
+                        [-12, -12],
+
+                        [-20, -20],
+                        [-21, -21],
+
+                        [-30, -30],
+                        [-31, -31],
+                        [-32, -32],
+
+                        [-40, -40],
+                        [-41, -41],
+
+                        [-50, -50]
+                    ],
+
+                    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                    [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110],
+
+                    [
+                        'NYC', 'NYC', 'NYC', 'Paris', 'Paris',
+                        'Tokyo', 'Tokyo', 'Tokyo', 'SF', 'Sf', 'Montreal'
+                    ],
+                    [
+                        'USA', 'USA', 'USA', 'France', 'France',
+                        'Japan', 'Japan', 'Japan', 'USA', 'USA', 'Canada'
+                    ]
 
                 ])
             });
@@ -387,37 +386,36 @@ describe('Elasticsearch - ', function () {
         ).then(results => {
             assert.deepEqual(results, {
                 columnnames: [
-                    'my-date-1',
-                    'my-string-1', 'my-string-2',
-                    'my-date-2',
+                    'my-boolean-1', 'my-boolean-2',
+                    'my-date-1', 'my-date-2',
+                    'my-geo-point-1', 'my-geo-point-2',
                     'my-number-1', 'my-number-2',
-                    'my-geo-point-2', 'my-geo-point-1',
-                    'my-boolean-2', 'my-boolean-1'
+                    'my-string-1', 'my-string-2'
                 ],
                 rows: transpose([
+                    [true],
+                    [true],
                     [
                         '2015-01-01T12:30:40Z'
                     ],
+                    [
+                        '1915-01-01T12:30:40Z'
+                    ],
+                    // TODO - Should we expand out geo-point into 2 columns?
+                    [
+                        [10, 10]
+                    ],
+                    [
+                        [-10, -10]
+                    ],
+                    [1],
+                    [10],
                     [
                         'NYC'
                     ],
                     [
                         'USA'
-                    ],
-                    [
-                        '1915-01-01T12:30:40Z'
-                    ],
-                    [1],
-                    [10],
-                    // TODO - Should we expand out geo-point into 2 columns?
-                    [
-                        [-10, -10]
-                    ],
-                    [
-                        [10, 10]
-                    ],
-                    [true],
-                    [true]
+                    ]
                 ])
             });
             done();
