@@ -298,67 +298,29 @@ export const apacheDrillStorage = [
     "config": {
       "type": "file",
       "enabled": true,
-      "connection": "s3a:\/\/plotly-s3-connector-test\/",
-      "config": null,
+      "connection": "s3a:\/\/plotly-s3-connector-test",
+      "config": {
+          'fs.s3a.access.key': 'AKIAIMHMSHTGARJYSKMQ',
+          'fs.s3a.secret.key': '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'
+      },
       "workspaces": {
         "root": {
           "location": "\/",
-          "writable": false,
-          "defaultInputFormat": null
-        },
-        "tmp": {
-          "location": "\/tmp",
           "writable": true,
           "defaultInputFormat": null
         }
       },
       "formats": {
-        "psv": {
-          "type": "text",
-          "extensions": [
-            "tbl"
-          ],
-          "delimiter": "|"
-        },
         "csv": {
           "type": "text",
           "extensions": [
             "csv"
           ],
-          "delimiter": ","
-        },
-        "tsv": {
-          "type": "text",
-          "extensions": [
-            "tsv"
-          ],
-          "delimiter": "\t"
+          "delimiter": ",",
+          'extractHeader': true
         },
         "parquet": {
           "type": "parquet"
-        },
-        "json": {
-          "type": "json",
-          "extensions": [
-            "json"
-          ]
-        },
-        "avro": {
-          "type": "avro"
-        },
-        "sequencefile": {
-          "type": "sequencefile",
-          "extensions": [
-            "seq"
-          ]
-        },
-        "csvh": {
-          "type": "text",
-          "extensions": [
-            "csvh"
-          ],
-          "extractHeader": true,
-          "delimiter": ","
         }
       }
     }

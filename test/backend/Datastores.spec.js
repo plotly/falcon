@@ -46,7 +46,7 @@ describe('Elasticsearch - ', function () {
         this.timeout(4 * 1000);
         connect(elasticsearchConnections).then(res => res.json().then(json => {
             assert.deepEqual(
-                json[0],
+                json[1],
                 {
                     'health': 'yellow',
                     'status': 'open',
@@ -59,27 +59,12 @@ describe('Elasticsearch - ', function () {
                     'pri.store.size': '5.8mb'
                 }
             );
-            assert.deepEqual(
-                json[1],
-                {
-                    'health': 'yellow',
-                    'status': 'open',
-                    'index': 'sample-data',
-                    'pri': '1',
-                    'rep': '1',
-                    'docs.count': '200011',
-                    'docs.deleted': '0',
-                    'store.size': '42.8mb',
-                    'pri.store.size': '42.8mb'
-                }
-            );
 
             /*
              * The 3rd index is frequently changing, so just test against
              * an immutable field
              */
-            assert.equal(json[2].index, 'live-data');
-            assert.equal(json[3].index, 'test-scroll');
+            assert.equal(json[2].index, 'test-scroll');
 
             assert.equal(res.status, 200);
 
