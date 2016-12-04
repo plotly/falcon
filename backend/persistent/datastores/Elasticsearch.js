@@ -43,18 +43,22 @@ export function query(query, connection) {
      */
     const scrollParam = scrollEnabled ? `&scroll=${KEEP_ALIVE_FOR}` : '';
 
-    return request(`${index}/${type}/_search`, connection, {
-        body,
-        method: 'POST',
-        queryStringParams: scrollParam
-    })
-    .then(res => res.json().then(results => {
-        if (res.status === 200) {
-            return parseElasticsearch(body, results);
-        } else {
-            throw new Error(JSON.stringify(results));
-        }
-    }));
+    return elasticsearchMappings(connection)
+    .then(mappings => {
+        const mapping = mappings[index].mappings[type].properties;
+        return request(`${index}/${type}/_search`, connection, {
+            body,
+            method: 'POST',
+            queryStringParams: scrollParam
+        })
+        .then(res => res.json().then(results => {
+            if (res.status === 200) {
+                return parseElasticsearch(body, results, mapping);
+            } else {
+                throw new Error(JSON.stringify(results));
+            }
+        }));
+    });
 }
 
 export function elasticsearchMappings(connection) {
