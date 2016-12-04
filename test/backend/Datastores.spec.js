@@ -46,33 +46,42 @@ describe('Elasticsearch - ', function () {
         this.timeout(4 * 1000);
         connect(elasticsearchConnections).then(res => res.json().then(json => {
             assert.deepEqual(
-                json,
-                [
-                    {
-                        'health': 'yellow',
-                        'status': 'open',
-                        'index': 'plotly_datasets',
-                        'pri': '1',
-                        'rep': '1',
-                        'docs.count': '28187',
-                        'docs.deleted': '0',
-                        'store.size': '5.8mb',
-                        'pri.store.size': '5.8mb'
-                    },
-                    {
-                        'health': 'yellow',
-                        'status': 'open',
-                        'index': 'sample-data',
-                        'pri': '1',
-                        'rep': '1',
-                        'docs.count': '200011',
-                        'docs.deleted': '0',
-                        'store.size': '42.8mb',
-                        'pri.store.size': '42.8mb'
-                    }
-                ]
+                json[0],
+                {
+                    'health': 'yellow',
+                    'status': 'open',
+                    'index': 'plotly_datasets',
+                    'pri': '1',
+                    'rep': '1',
+                    'docs.count': '28187',
+                    'docs.deleted': '0',
+                    'store.size': '5.8mb',
+                    'pri.store.size': '5.8mb'
+                }
             );
+            assert.deepEqual(
+                json[1],
+                {
+                    'health': 'yellow',
+                    'status': 'open',
+                    'index': 'sample-data',
+                    'pri': '1',
+                    'rep': '1',
+                    'docs.count': '200011',
+                    'docs.deleted': '0',
+                    'store.size': '42.8mb',
+                    'pri.store.size': '42.8mb'
+                }
+            );
+
+            /*
+             * The 3rd index is frequently changing, so just test against
+             * an immutable field
+             */
+            assert.equal(json[2].index, 'live-data');
+
             assert.equal(res.status, 200);
+
             done();
         })).catch(done);
     });
@@ -82,6 +91,31 @@ describe('Elasticsearch - ', function () {
             assert.deepEqual(
                 json,
                 {
+                    'live-data': {
+                        'mappings': {
+                            'test-type': {
+                                'properties': {
+                                    'date': {
+                                        'type': 'date',
+                                        'format': 'strict_date_optional_time||epoch_millis'
+                                    },
+                                    'string-1': {'type': 'string'},
+                                    'string-2': {'type': 'string'},
+                                    'token': {
+                                        'analyzer': 'standard',
+                                        'type': 'token_count'
+                                    },
+                                    'integer': {'type': 'integer'},
+                                    'double': {'type': 'double'},
+                                    'boolean': {'type': 'boolean'},
+                                    'geo_point-1': {'type': 'geo_point'},
+                                    'geo_point-2': {'type': 'geo_point'},
+                                    'geo_point-3': {'type': 'geo_point'},
+                                    'ip': {'type': 'ip'}
+                                }
+                            }
+                        }
+                    },
                     'plotly_datasets': {
                       'mappings': {
                         'consumer_complaints': {
@@ -203,7 +237,7 @@ describe('Elasticsearch - ', function () {
                           'type': 'float'
                       }
                      }
-                    }
+                 }
                   }
                 }
               }
@@ -534,7 +568,7 @@ describe('S3 - Connection', function () {
         query('5k-scatter.csv', publicReadableS3Connections)
         .then(grid => {
             assert.deepEqual(grid.rows[0], ['-0.790276857291', '-1.32900495883']);
-            assert.deepEqual(grid.rows.length, 5 * 1000 + 1);
+            assert.deepEqual(grid.rows.length, 5 * 1000);
             assert.deepEqual(grid.columnnames, ['x', 'y']);
             done();
         }).catch(done);

@@ -62,7 +62,7 @@ describe('QueryScheduler', () => {
         }, (delay * 3) * 1000);
     });
 
-    it.only('overwrites interval functions', function (done) {
+    it('overwrites interval functions', function (done) {
         const spy1 = chai.spy(() => {});
         queryScheduler.job = spy1;
 
