@@ -13,7 +13,6 @@ export const columns = [
     [7, 8, 9],           // 'lat'
     [10, 11, 12],       // 'lon'
     [13, 14, 15]        // 'value'
-
 ];
 
 // test account on prod
@@ -98,7 +97,7 @@ export const publicReadableS3Connections = {
 };
 export const apacheDrillConnections = {
     dialect: 'apache drill',
-    host: 'http://ec2-35-160-151-112.us-west-2.compute.amazonaws.com',
+    host: 'http://ec2-35-164-71-216.us-west-2.compute.amazonaws.com',
     port: 8047,
 
     bucket: 'plotly-s3-connector-test',
@@ -110,6 +109,7 @@ export const sqliteConnection = {
     storage: `${__dirname}/plotly_datasets.db`
 };
 
+// TODO - Add sqlite here
 // TODO - Add postgis in here
 
 export const testConnections = [
@@ -129,8 +129,7 @@ export const testSqlConnections = [
     mysqlConnection,
     mariadbConnection,
     redshiftConnection,
-    mssqlConnection,
-    sqliteConnection
+    mssqlConnection
 ];
 
 export const configuration = dissoc('password', sqlConnections);

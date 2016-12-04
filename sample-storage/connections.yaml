@@ -64,7 +64,7 @@
 -
     dialect: apache drill
     id: apache drill-189ebfb4-e1b4-446c-9b83-b326875fa2d8
-    host: http://ec2-35-160-151-112.us-west-2.compute.amazonaws.com
+    host: http://ec2-35-164-71-216.us-west-2.compute.amazonaws.com
     port: 8047
     bucket: plotly-s3-connector-test
     accessKeyId: AKIAIMHMSHTGARJYSKMQ
