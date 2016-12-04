@@ -477,7 +477,7 @@ describe('Elasticsearch - ', function () {
         }).catch(done);
     });
 
-    it.only('query returns all the data when size is larger than the dataset', function(done) {
+    it('query returns all the data when size is larger than the dataset', function(done) {
         this.timeout(60 * 1000);
         query(JSON.stringify(
             {
