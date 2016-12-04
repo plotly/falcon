@@ -136,8 +136,8 @@ class QueryScheduler {
         }).then(res => {
             if (res.status !== 200) {
                 const errorMessage = (
-                    `Yikes! ${getSetting('PLOTLY_API_URL')} failed to identify ${username}.`
-                )
+                    `Unauthenticated: ${getSetting('PLOTLY_API_URL')} failed to identify ${username}.`
+                );
                 Logger.log(errorMessage, 0);
                 throw new Error(errorMessage);
             }
