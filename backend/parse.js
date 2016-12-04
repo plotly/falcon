@@ -1,4 +1,5 @@
 import {keys, replace} from 'ramda';
+import parse from 'csv-parse';
 
 export function parseSQL(data) {
 /*
@@ -211,4 +212,40 @@ export function parseElasticsearch(inputJson, outputJson) {
          return {columnnames, rows: table};
 
      }
+}
+
+export function parseCSV(textData) {
+    return new Promise((resolve, reject) => {
+        parse(
+            textData, {
+                delimeter: ',',
+                rowDelimeter: 'auto',
+                quote: '"',
+                escape: '"',
+                columns: null,
+                comment: '',
+                relax: false,
+                relax_column_count: false,
+                skip_empty_lines: false,
+                trim: true,
+                auto_parse: false,
+                auto_parse_date: false
+            }, function callback(err, allRows) {
+            if (err) {
+                reject(err);
+            }
+            if (!allRows || allRows.length === 0){
+                resolve({
+                    columnnames: [],
+                    rows: [[]]
+                });
+            }
+            const columnnames = allRows[0];
+            const rows = allRows.slice(1);
+            resolve({
+                columnnames,
+                rows
+            });
+        });
+    });
 }

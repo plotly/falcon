@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk';
+import {parseCSV} from '../../parse.js';
 
 function createClient(connection) {
     AWS.config.update({
@@ -38,7 +39,7 @@ export function query(key, connection) {
             }
             const textData = response.Body.toString();
             // TODO ^ handle binary files too
-            resolve(parse(textData));
+            parseCSV(textData).then(resolve);
         });
     });
 }
@@ -59,15 +60,4 @@ export function files(connection) {
             }
         });
     });
-}
-
-function parse(textData) {
-    // TODO - use a more robust and faster parsing algorithm
-    const allRows = textData.split('\n').map(row => row.split(','));
-    const columnnames = allRows[0];
-    const rows = allRows.slice(1);
-    return {
-        columnnames,
-        rows
-    };
 }

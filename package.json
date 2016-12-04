@@ -101,6 +101,7 @@
     "cross-env": "^1.0.7",
     "css-loader": "^0.23.1",
     "css-modules-require-hook": "^4.0.0",
+    "csv-parse": "https://registry.npmjs.org/csv-parse/-/csv-parse-1.1.7.tgz",
     "del": "^2.2.0",
     "elasticsearch": "^11.0.1",
     "electron-debug": "^0.6.0",

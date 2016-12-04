@@ -1771,7 +1771,7 @@
     },
     "csv-parse": {
       "version": "1.1.7",
-      "from": "csv-parse@>=1.0.0 <2.0.0",
+      "from": "https://registry.npmjs.org/csv-parse/-/csv-parse-1.1.7.tgz",
       "resolved": "https://registry.npmjs.org/csv-parse/-/csv-parse-1.1.7.tgz"
     },
     "csv-stringify": {
