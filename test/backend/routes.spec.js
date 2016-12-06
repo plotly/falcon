@@ -433,6 +433,59 @@ describe('Routes - ', function () {
         }).catch(done);
     });
 
+    [
+        {
+            name: 'non existant parquet file',
+            query: 'SELECT * FROM `s3`.root.`non-existant-file.parquet`',
+            error: (
+                'VALIDATION ERROR: From line 1, column 15 to line 1, ' +
+                'column 18: Table \'s3.root.non-existant-file.parquet\' ' +
+                'not found\n\nSQL Query null\n\n'
+            )
+        },
+        {
+            name: 'semi colon at the end',
+            query: 'SELECT * FROM `s3`.root.`311.parquet`;',
+            error: (
+                'PARSE ERROR: Encountered ";" at line 1, column 47.\n' +
+                'Was expecting one of:\n    <EOF> \n    "OFFSET" ...\n' +
+                '    "FETCH" ...\n    \n\nSQL Query SELECT * FROM ' +
+                '`s3`.root.`311.parquet` LIMIT 10;'
+            )
+        },
+        {
+            name: 'unaccepted workspace',
+            query: 'SELECT * FROM `s3`.rootz.`311.parquet` LIMIT 10',
+            error: (
+                'VALIDATION ERROR: From line 1, column 15 to line 1, column 18: ' +
+                'Table \'s3.rootz.311.parquet\' not found\n\nSQL Query null\n\n'
+            )
+        },
+        {
+            name: 'unconfigured plugin',
+            query: 'SELECT * FROM `s3z`.root.`311.parquet` LIMIT 10',
+            error: (
+                'VALIDATION ERROR: From line 1, column 15 to line 1, column 19: ' +
+                'Table \'s3z.root.311.parquet\' not found\n\nSQL Query null\n\n'
+            )
+        }
+    ].forEach(function(testCase) {
+        it(`apache-drill - error message validation - ${testCase.name}`, function(done) {
+            this.timeout(20 * 1000);
+            const drillCredId = saveConnection(apacheDrillConnections);
+            const query = testCase.query;
+            POST(`connections/${drillCredId}/query`, {query})
+            .then(res => res.json())
+            .then(json => {
+                console.warn(json.error.message);
+                assert(
+                    json.error.message.startsWith(testCase.error)
+                );
+                done();
+            }).catch(done);
+        });
+    });
+
     /*
      * TODO - Missing elasticsearch and postgis tests from these routes.
      * (the tests for elasticsearch exist in Connections.spec.js)
@@ -668,7 +721,7 @@ describe('Routes - ', function () {
         .catch(done);
     });
 
-    it("queries - can register queries if the user is a collaborator", function(done) {
+    it('queries - can register queries if the user is a collaborator', function(done) {
         this.timeout(20 * 1000);
         // Verify that there are no queries saved
         GET('queries')
@@ -684,7 +737,7 @@ describe('Routes - ', function () {
              * This test won't work against any plotly server
              * except https://plot.ly
              */
-            const collaborator = 'plotly-connector-collaborator'
+            const collaborator = 'plotly-connector-collaborator';
             saveSetting('USERS', [{
                 username: collaborator,
                 apiKey: 'I6j80cqCVaBAnvH9ESD2'
@@ -889,7 +942,7 @@ describe('Routes - ', function () {
                 json,
                 {error: {
                     message: (
-                        `Unauthenticated`
+                        'Unauthenticated'
                     )
                 }}
             );

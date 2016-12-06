@@ -28,13 +28,11 @@ export function query(queryStatement, connection) {
         .then(json => {
             const {errorMessage, rows, columns} = json;
             if (errorMessage) {
-                reject(errorMessage);
+                reject({message: errorMessage});
             } else {
                 resolve({
                     rows: rows.map(row => columns.map(c => row[c])),
-                    columnnames: columns,
-                    nrows: rows.length,
-                    ncols: columns.length
+                    columnnames: columns
                 });
             }
         })

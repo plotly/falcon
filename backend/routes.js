@@ -386,7 +386,7 @@ export default class Server {
             .then(function nowQueryAndUpdateGrid() {
                 return that.queryScheduler.queryAndUpdateGrid(
                     fid, uids, query, connectionId, requestor
-                )
+                );
             })
             .then(function returnSuccess() {
                 let status;
