@@ -1,7 +1,6 @@
 # Usage:
 # $ PLOTLY_API_DOMAIN="api-local.plot.ly" PLOTLY_STREAMBED_SSL_ENABLED="true" docker build -t chriddyp/database-connector .
-# $ docker run -p 9494:9494 -e PLOTLY_CONNECTOR_PLOTLY_API_DOMAIN=$PLOTLY_DOMAIN_API -e PLOTLY_CONNECTOR_PLOTLY_API_SSL_ENABLED=$PLOTLY_STREAMBED_SSL_ENABLED
- -d chriddyp/database-connector -v ~/.plotly/connector:/plotly-connector
+# $ docker run -p 9494:9494 -e PLOTLY_CONNECTOR_PLOTLY_API_DOMAIN=$PLOTLY_DOMAIN_API -e PLOTLY_CONNECTOR_PLOTLY_API_SSL_ENABLED=$PLOTLY_STREAMBED_SSL_ENABLED -d chriddyp/database-connector -v ~/.plotly/connector:/plotly-connector
 #
 # Depends on the following ENV variables:
 # - PLOTLY_DOMAIN_API (e.g. api-local.plot.ly)
