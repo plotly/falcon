@@ -12,7 +12,11 @@ import ConnectButton from './ConnectButton/ConnectButton.react';
 import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import Preview from './Preview/Preview.react';
 import HttpsSetup from './HttpsServer/HttpsSetup.react';
+import {Link} from '../Link.react';
 import {DIALECTS} from '../../constants/constants.js';
+import {plotlyUrl} from '../../utils/utils';
+
+const WORKSPACE_IMPORT_SQL_URL = `https://${plotlyUrl()}/create?upload=sql`;
 
 const unfoldIcon = (
     <img
@@ -287,6 +291,9 @@ class Settings extends Component {
                         startTempHttpsServer={startTempHttpsServer}
                         startTempHttpsServerRequest={startTempHttpsServerRequest}
                     />
+                    <div className={styles.workspaceLink}>
+                        {Link(WORKSPACE_IMPORT_SQL_URL, 'Make queries from Plotly')}
+                    </div>
 
                 </div>
             </div>

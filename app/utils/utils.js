@@ -1,7 +1,8 @@
-import {contains} from 'ramda';
+import {contains, has, head, replace} from 'ramda';
 import queryString from 'query-string';
 
 const platform = process.platform;
+const webPlotlyDomain = 'plot.ly';
 
 export const canConfigureHTTPS = platform === 'darwin' || platform === 'linux';
 
@@ -40,4 +41,22 @@ export function usesHttpsProtocol() {
 
 export function getQuerystringParam(PARAM) {
     return queryString.parse(location.search)[PARAM];
+}
+
+export function isOnPrem(domain) {
+    return !has(webPlotlyDomain);
+}
+
+export function plotlyUrl() {
+    const plotlyApiDomain = getQuerystringParam('PLOTLY_API_DOMAIN');
+    /*
+     * This connector's settings necesserily contain a plotly api domain which has either
+     * 'plotly.company-name' substring or 'plot.ly'. The latter can specifically only exist for
+     * non on-prem users. Find out if the domain is not on-prem first and replace the 'api-'
+     * substring accordingly to obtain the plotly domain.
+     */
+    if (isOnPrem(plotlyApiDomain)) {
+        return replace('api-plotly', 'plotly', plotlyApiDomain);
+    }
+    return replace('api.plot.ly', 'plot.ly', plotlyApiDomain);
 }
