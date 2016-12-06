@@ -61,10 +61,9 @@ input:hover {
 }
 
 .checkbox {
-    margin-top: 1px;
     display: inline;
     vertical-align: middle;
-    margin: 10px 20px 10px 10px;
+    margin: 5px 20px 10px 60px;
     width: 20px;
 }
 
