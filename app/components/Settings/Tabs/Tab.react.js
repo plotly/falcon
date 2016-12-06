@@ -24,7 +24,7 @@ export default class Tab extends Component {
                 <img
                     className={styles.tabDelete}
                     onClick={() => deleteTab(tabId)}
-                    src="./images/delete.png"
+                    src="images/delete.png"
                     id={`test-tab-delete-${id}`}
                 >
                 </img>

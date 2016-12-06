@@ -20,7 +20,7 @@ const WORKSPACE_IMPORT_SQL_URL = `https://${plotlyUrl()}/create?upload=sql`;
 
 const unfoldIcon = (
     <img
-        src="./images/unfold.png"
+        src="images/unfold.png"
         className={styles.unfoldIcon}
     >
     </img>

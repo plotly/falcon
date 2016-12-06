@@ -29,7 +29,7 @@ export default class Tabs extends Component {
                             <img
                                 className={styles.tabAdd}
                                 onClick={newTab}
-                                src="./images/add.png"
+                                src="images/add.png"
                                 id="test-session-add"
                             >
                             </img>

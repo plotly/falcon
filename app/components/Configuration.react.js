@@ -24,7 +24,7 @@ export default class Configuration extends Component {
                 <div className={styles.header}>
                     <div className={styles.logoAndTitle}>
                         <img className={styles.plotlyLogo}
-                            src="./images/plotly-connector-logo.svg"
+                            src="images/plotly-connector-logo.svg"
                         >
                         </img>
                         <h5 className={styles.applicationTitle}>
