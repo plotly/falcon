@@ -91,7 +91,10 @@
     max-width: 25%;
     padding: 10px;
     text-align: center;
+}
 
+.editButtonContainer {
+    margin: 0px 20px;
 }
 
 .Flipped .unfoldIcon{
