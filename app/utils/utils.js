@@ -2,7 +2,7 @@ import {contains, has, head, replace} from 'ramda';
 import queryString from 'query-string';
 
 const platform = process.platform;
-const webPlotlyDomain = 'plot.ly';
+const webPlotlyDomain = 'api.plot.ly';
 
 export const canConfigureHTTPS = platform === 'darwin' || platform === 'linux';
 
@@ -43,12 +43,13 @@ export function getQuerystringParam(PARAM) {
     return queryString.parse(location.search)[PARAM];
 }
 
-export function isOnPrem(domain) {
-    return !has(webPlotlyDomain);
+export function isOnPrem(apiDomain) {
+    return !contains(webPlotlyDomain, apiDomain);
 }
 
 export function plotlyUrl() {
-    const plotlyApiDomain = getQuerystringParam('PLOTLY_API_DOMAIN');
+    const plotlyApiDomain = getQuerystringParam('PLOTLY_API_DOMAIN') || '';
+
     /*
      * This connector's settings necesserily contain a plotly api domain which has either
      * 'plotly.company-name' substring or 'plot.ly'. The latter can specifically only exist for
@@ -58,5 +59,5 @@ export function plotlyUrl() {
     if (isOnPrem(plotlyApiDomain)) {
         return replace('api-plotly', 'plotly', plotlyApiDomain);
     }
-    return replace('api.plot.ly', 'plot.ly', plotlyApiDomain);
+    return 'plot.ly';
 }
