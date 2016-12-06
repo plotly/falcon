@@ -6,17 +6,20 @@ import {getSetting} from './settings';
 export class Logger {
     constructor() {
         createStoragePath();
-        const streams = [
-            {
-                level: 'info',
-                path: getSetting('LOG_PATH')
-            }
-        ];
+        let streams;
         if (getSetting('LOG_TO_STDOUT')) {
-            streams.push({
+            streams = [{
                 level: 'info',
                 stream: process.stdout
-            });
+            }];
+        } else {
+            streams = [{
+                level: 'info',
+                path: getSetting('LOG_PATH')
+            }];
+        }
+        const
+
         }
         this.logToFile = bunyan.createLogger({
             name: 'plotly-database-connector-logger',
