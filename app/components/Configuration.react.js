@@ -17,24 +17,7 @@ export default class Configuration extends Component {
         super(props);
     }
 
-    componentDidMount() {
-        // this.props.sessionsActions.initializeSessions();
-    }
-
     render() {
-
-        /*
-         * TODO - oauth needs to be part of on-prem and this
-         * app needs to somehow get the client_id from on-prem
-         */
-        const baseURL = 'https://local.plot.ly';
-        const resource = '/o/authorize/';
-        const client_id = 'LX4A5wifVDc06WIU1uWmIm0KgqN9Bs0qsEb1GW3n';
-        const redirect_uri = baseUrl + '/oauth';
-        const queryString = `?response_type=token&client_id=${client_id}&redirect_uri=${redirect_uri}`;
-        const oauthURL = (
-            'https://local.plot.ly/o/authorize' + queryString
-        );
 
         return (
             <div className={styles.fullApp}>
