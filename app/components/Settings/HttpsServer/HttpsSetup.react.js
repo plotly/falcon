@@ -2,7 +2,9 @@ import React, { Component, PropTypes } from 'react';
 import * as styles from './HttpsSetup.css';
 import CreateCertificates from './CreateCertificates.react';
 import DetectCertificates from './DetectCertificates.react';
-import {canConfigureHTTPS, usesHttpsProtocol} from '../../../utils/utils';
+import {
+    canConfigureHTTPS, usesHttpsProtocol, baseUrl
+} from '../../../utils/utils';
 
 const httpVideoLink = 'https://www.youtube.com/embed/S4TXMMn9mh0?rel=0&amp;showinfo=0';
 const httpVideo = (show) => {
@@ -27,14 +29,19 @@ export default class HttpsSetup extends Component {
     }
 
     renderCreateCertificates() {
+        const {
+            createCerts, createCertsRequest, hasCerts,
+            hasCertsRequest, redirectUrl, redirectUrlRequest
+        } = this.props;
+
         return (canConfigureHTTPS || !usesHttpsProtocol()) ? (
             <CreateCertificates
-                createCerts={this.props.createCerts}
-                createCertsRequest={this.props.createCertsRequest}
-                hasCerts={this.props.hasCerts}
-                hasCertsRequest={this.props.hasCertsRequest}
-                redirectUrl={this.props.redirectUrl}
-                redirectUrlRequest={this.props.redirectUrlRequest}
+                createCerts={createCerts}
+                createCertsRequest={createCertsRequest}
+                hasCerts={hasCerts}
+                hasCertsRequest={hasCertsRequest}
+                redirectUrl={redirectUrl}
+                redirectUrlRequest={redirectUrlRequest}
             />
         ) : null;
     }
@@ -69,22 +76,27 @@ export default class HttpsSetup extends Component {
 
         return (
             <div className={styles.httpsSetupWrapper}>
-                {canConfigureHTTPS && !usesHttpsProtocol() ? (
+
                 <div>
-                    <h5>
-                        <a>
-                            {'Secure your connection with HTTPS'}
-                        </a>
-                    </h5>
-                    <div>{httpNote}</div>
-                    <div>
-                        {
-                            [this.renderCreateCertificates(), this.renderDetectCertificates()].map(
-                                step => step ? <div>{step}</div> : null
-                            )
-                        }
-                    </div>
-                </div>) : null}
+                    {canConfigureHTTPS && !usesHttpsProtocol() ? (
+                        <div>
+                            <div>{httpNote}</div>
+                            <div>
+                                {
+                                    [this.renderCreateCertificates(), this.renderDetectCertificates()].map(
+                                        step => step ? <div>{step}</div> : null
+                                    )
+                                }
+                            </div>
+                        </div>) : (
+                            <div>
+                                {"HTTPS is setup. Your connector's endpoint is: "}
+                                <span className={styles.currentUrl}>
+                                    {baseUrl()}
+                                </span>
+                            </div>
+                        )}
+                </div>
 
             </div>
         );

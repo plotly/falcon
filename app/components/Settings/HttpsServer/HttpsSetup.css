@@ -1,3 +1,7 @@
 .httpsSetupWrapper {
     padding: 10px 20px 100px 20px;
 }
+
+.currentUrl {
+    font-weight: 800;
+}

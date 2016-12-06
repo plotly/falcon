@@ -1,10 +1,6 @@
 import {join, slice, replace, splitAt } from 'ramda';
 import {baseUrl, getQuerystringParam} from './utils';
 
-// TODO - Should this file be in the backend folder?
-// TODO - Remove all of these console.logs
-
-
 /*
  * Our app has two build targets - electron and node.
  * The electon target has the `electron` module e.g.
@@ -92,14 +88,10 @@ function waitForRedirect(url) {
         const waitPeriod = 1000;
         const maxWaitPeriod = 10000;
         let waited = 0;
-        console.log('waiting redirect for ', url);
         while (!isUrlRedirected() && (waited < maxWaitPeriod)) {
-            console.log('Waiting for redirect.');
             setTimeout(isUrlRedirected(), waitPeriod);
-            console.log('isUrlRedirected(url)', isUrlRedirected());
             waited += waitPeriod;
         }
-        console.log('Exit waiting for redirect loop.');
         if (!isUrlRedirected()) {
             reject({status: 404, content: 'Failed to redirect to seecure domain.'});
         } else {
@@ -112,7 +104,6 @@ export function redirectUrl() {
     // CONNECTOR_HTTPS_DOMAIN is shared between backend and the app
     const url = getQuerystringParam('CONNECTOR_HTTPS_DOMAIN');
     const redirected = isUrlRedirected(url);
-    console.log('redirected', redirected);
     if (!redirected) {
         try {
             sudo.exec(
@@ -120,13 +111,11 @@ export function redirectUrl() {
                 SUDO_OPTIONS,
                 function(error) {
                     if (error) {
-                        console.log('error', error);
                         return {status: 500, content: error};
                     }
                 }
             );
         } catch (error) {
-            console.log(error);
             return {status: 500, content: error};
         }
     }
@@ -143,25 +132,13 @@ export function createCerts() {
                 SUDO_OPTIONS,
                 function(error) {
                     if (error) {
-                        console.log('error', error);
                         resolve({status: 500, content: error});
                     }
                 }
             );
         } catch (error) {
-            console.log('error', error);
             resolve({status: 500, content: error});
         }
         resolve({status: 200, content: {}});
     });
-}
-
-// TODO: complete this function using sudo
-export function deleteCerts() {
-    try {
-        console.log('delete certs');
-        // deleting certs
-    } catch (error) {
-        return error;
-    }
 }

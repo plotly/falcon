@@ -45,10 +45,10 @@ class Settings extends Component {
                         [`show${name}`]: !this.state[`show${name}`]
                     })}
                 >
-                    <a>
-                        {name}
-                    </a>
-                    {this.state[`show${name}`] ? null : unfoldIcon}
+                    <span>{name}</span>
+                    <span className={this.state[`show${name}`] ? styles.Flipped : null}>
+                        {unfoldIcon}
+                    </span>
                 </h5>
                 {this.state[`show${name}`] ? reactComponent : null}
             </div>
@@ -281,16 +281,19 @@ class Settings extends Component {
                         </div>
                     )}
 
-                    <HttpsSetup
-                        hasCertsRequest={hasCertsRequest}
-                        createCertsRequest={createCertsRequest}
-                        redirectUrlRequest={redirectUrlRequest}
-                        createCerts={createCerts}
-                        hasCerts={hasCerts}
-                        redirectUrl={redirectUrl}
-                        startTempHttpsServer={startTempHttpsServer}
-                        startTempHttpsServerRequest={startTempHttpsServerRequest}
-                    />
+                    {this.wrapWithAutoHide('HTTPS',
+                        <HttpsSetup
+                            hasCertsRequest={hasCertsRequest}
+                            createCertsRequest={createCertsRequest}
+                            redirectUrlRequest={redirectUrlRequest}
+                            createCerts={createCerts}
+                            hasCerts={hasCerts}
+                            redirectUrl={redirectUrl}
+                            startTempHttpsServer={startTempHttpsServer}
+                            startTempHttpsServerRequest={startTempHttpsServerRequest}
+                        />
+                    )}
+
                     <div className={styles.workspaceLink}>
                         {Link(WORKSPACE_IMPORT_SQL_URL, 'Make queries from Plotly')}
                     </div>
