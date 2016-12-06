@@ -253,6 +253,8 @@ class Settings extends Component {
                     deleteTab={deleteTab}
                 />
 
+                <h1>Test change</h1>
+
                 <div className={styles.openTab}>
                     {this.wrapWithAutoHide('Connections',
                         this.renderSettingsForm()
