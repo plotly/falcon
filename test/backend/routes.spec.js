@@ -320,7 +320,7 @@ describe('Routes - ', function () {
                     'weather_data_seattle_2016',
                     'world_gdp_with_codes_2014'
                 ];
-                if (connetion.dialect === 'postgres') {
+                if (connection.dialect === 'postgres') {
                     tables = concat(tables, [
                         'geography_columns',
                         'geometry_columns',
