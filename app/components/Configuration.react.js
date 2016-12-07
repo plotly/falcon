@@ -41,7 +41,7 @@ export default class Configuration extends Component {
                                     'external-data-connector',
                                     window.location.href
                                 ) ?
-                                null : Link(LINKS.PLANS, 'Upgrade for Support')
+                                null : Link(LINKS.PLANS, 'Plans and Pricing')
                             }
                             {Link(LINKS.DOCS, 'Documentation')}
                             {Link(LINKS.TYPEFORM, 'Request a Connector')}
