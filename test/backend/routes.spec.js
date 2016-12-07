@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import {assert} from 'chai';
-import {assoc, contains, dissoc, gt, keys, merge, sort, without} from 'ramda';
+import {assoc, concat, contains, dissoc, gt, keys, merge, sort, without} from 'ramda';
 import Server from '../../backend/routes.js';
 import {
     getConnections,
