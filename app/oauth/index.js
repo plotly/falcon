@@ -24,7 +24,7 @@ class Status extends Component {
         window.queryString = queryString;
 
         this.setState({status: 'loading'});
-        fetch('/oauth2/token', {
+        fetch('oauth2/token', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -71,7 +71,9 @@ class Status extends Component {
                     </div>
 
                     <div>
-                    	 <a href="https://help.plot.ly/updating-data-on-a-schedule">
+                    	 <a href="https://help.plot.ly/updating-data-on-a-schedule"
+                            target="_blank"
+            >
                             {'Learn more'}
                         </a>
                         {' about how scheduling queries works in Plotly.'}
