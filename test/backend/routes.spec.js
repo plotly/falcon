@@ -7,7 +7,7 @@ import {
     getSanitizedConnections,
     saveConnection
 } from '../../backend/persistent/Connections.js';
-import {getSetting, saveSetting} from '../../backend/Settings.js';
+import {getSetting, saveSetting} from '../../backend/settings.js';
 import fs from 'fs';
 import {
     username,
