@@ -14,7 +14,7 @@
     "heroku-postbuild": "npm run build-headless && npm run build-web",
     "hot-server": "node -r babel-register devServer.js",
     "lint": "eslint app test *.js",
-    "test": "npm run build && npm run test-e2e",
+    "test": "npm run build && npm run test-unit-all",
     "test-e2e": "cross-env NODE_ENV=test mocha --compilers js:babel-register --require ./test/setup.js --require co-mocha ./test/e2e.js",
     "test-e2e-local": "source test/set_creds.sh && npm run test-e2e",
     "test-unit": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --compilers js:babel-register ",
