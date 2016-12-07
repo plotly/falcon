@@ -461,7 +461,7 @@ describe('Elasticsearch - ', function () {
                             'Column 1',
                             'Column 2',
                             'Column 3',
-                            'Column 4',
+                            'Column 4'
                         ],
                     rows: transpose([
                         range(1, 10001 + 1).map(i => i + 0.1),
@@ -504,7 +504,7 @@ describe('Elasticsearch - ', function () {
                 'Column 1',
                 'Column 2',
                 'Column 3',
-                'Column 4',
+                'Column 4'
             ]);
             assert.equal(results.rows.length, 200 * 1000);
             done();
@@ -621,7 +621,8 @@ describe('Apache Drill - Connection', function () {
         storage(apacheDrillConnections)
         .then(config => {
             assert.deepEqual(
-                config, apacheDrillStorage);
+                config, apacheDrillStorage
+            );
             done();
         }).catch(done);
     });
