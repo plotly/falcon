@@ -18,6 +18,7 @@ let queryScheduler;
 let savedUsers;
 describe('QueryScheduler', () => {
     beforeEach(() => {
+        this.timeout(1000 * 5);
         try {
             fs.unlinkSync(getSetting('QUERIES_PATH'));
         } catch (e) {}
@@ -34,6 +35,7 @@ describe('QueryScheduler', () => {
     });
 
     afterEach(() => {
+        this.timeout(1000 * 5);
         queryScheduler.clearQueries();
         queryScheduler = null;
         saveSetting('USERS', savedUsers);
