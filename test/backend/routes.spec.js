@@ -306,22 +306,31 @@ describe('Routes - ', function () {
             POST(`connections/${connectionId}/sql-tables`)
             .then(res => res.json())
             .then(json => {
+                let tables = [
+                    'alcohol_consumption_by_country_2010',
+                    'apple_stock_2014',
+                    'ebola_2014',
+                    'february_aa_flight_paths_2011',
+                    'february_us_airport_traffic_2011',
+                    'precipitation_2015_06_30',
+                    'us_ag_exports_2011',
+                    'us_cities_2014',
+                    'usa_states_2014',
+                    'walmart_store_openings_1962_2006',
+                    'weather_data_seattle_2016',
+                    'world_gdp_with_codes_2014'
+                ];
+                if (connetion.dialect === 'postgres') {
+                    tables = concat(tables, [
+                        'geography_columns',
+                        'geometry_columns',
+                        'raster_columns',
+                        'raster_overviews',
+                        'spatial_ref_sys'
+                    ]).sort();
+                }
                 assert.deepEqual(
-                    json,
-                    [
-                        'alcohol_consumption_by_country_2010',
-                        'apple_stock_2014',
-                        'ebola_2014',
-                        'february_aa_flight_paths_2011',
-                        'february_us_airport_traffic_2011',
-                        'precipitation_2015_06_30',
-                        'us_ag_exports_2011',
-                        'us_cities_2014',
-                        'usa_states_2014',
-                        'walmart_store_openings_1962_2006',
-                        'weather_data_seattle_2016',
-                        'world_gdp_with_codes_2014'
-                    ]
+                    json, tables
                 );
                 done();
             }).catch(done);
@@ -501,7 +510,10 @@ describe('Routes - ', function () {
 
         it(`connections - ${connection.dialect} - saves connections to a file if they are valid and if they do not exist`, function(done) {
             this.timeout(5 * 1000);
-            fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
+            try {
+                fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
+            } catch (e) {}
+
             assert.deepEqual(getConnections(), []);
             POST('connections', connection)
             .then(res => res.json().then(json => {
@@ -520,7 +532,11 @@ describe('Routes - ', function () {
 
         it(`connections - ${connection.dialect} - fails if the connections are not valid`, function(done) {
             this.timeout(5 * 1000);
-            fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
+
+            try {
+                fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
+            } catch (e) {}
+
             assert.deepEqual(getConnections(), [], 'connections are empty at start');
 
             let connectionTypo;
@@ -665,7 +681,10 @@ describe('Routes - ', function () {
     });
 
     it('connections - returns an empty array of connections', function(done) {
-        fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
+        try {
+            fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
+        } catch (e) {}
+
         GET('connections')
         .then(res => {
             assert.equal(res.status, 200);

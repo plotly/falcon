@@ -136,193 +136,193 @@ export const configuration = dissoc('password', sqlConnections);
 
 export const apacheDrillStorage = [
   {
-    "name": "cp",
-    "config": {
-      "type": "file",
-      "enabled": true,
-      "connection": "classpath:\/\/\/",
-      "config": null,
-      "workspaces": null,
-      "formats": {
-        "csv": {
-          "type": "text",
-          "extensions": [
-            "csv"
+    'name': 'cp',
+    'config': {
+      'type': 'file',
+      'enabled': false,
+      'connection': 'classpath:\/\/\/',
+      'config': null,
+      'workspaces': null,
+      'formats': {
+        'csv': {
+          'type': 'text',
+          'extensions': [
+            'csv'
           ],
-          "delimiter": ","
+          'delimiter': ','
         },
-        "tsv": {
-          "type": "text",
-          "extensions": [
-            "tsv"
+        'tsv': {
+          'type': 'text',
+          'extensions': [
+            'tsv'
           ],
-          "delimiter": "\t"
+          'delimiter': '\t'
         },
-        "json": {
-          "type": "json",
-          "extensions": [
-            "json"
+        'json': {
+          'type': 'json',
+          'extensions': [
+            'json'
           ]
         },
-        "parquet": {
-          "type": "parquet"
+        'parquet': {
+          'type': 'parquet'
         },
-        "avro": {
-          "type": "avro"
+        'avro': {
+          'type': 'avro'
         },
-        "csvh": {
-          "type": "text",
-          "extensions": [
-            "csvh"
+        'csvh': {
+          'type': 'text',
+          'extensions': [
+            'csvh'
           ],
-          "extractHeader": true,
-          "delimiter": ","
+          'extractHeader': true,
+          'delimiter': ','
         }
       }
     }
   },
   {
-    "name": "dfs",
-    "config": {
-      "type": "file",
-      "enabled": true,
-      "connection": "file:\/\/\/",
-      "config": null,
-      "workspaces": {
-        "root": {
-          "location": "\/",
-          "writable": false,
-          "defaultInputFormat": null
+    'name': 'dfs',
+    'config': {
+      'type': 'file',
+      'enabled': false,
+      'connection': 'file:\/\/\/',
+      'config': null,
+      'workspaces': {
+        'root': {
+          'location': '\/',
+          'writable': false,
+          'defaultInputFormat': null
         },
-        "tmp": {
-          "location": "\/tmp",
-          "writable": true,
-          "defaultInputFormat": null
+        'tmp': {
+          'location': '\/tmp',
+          'writable': true,
+          'defaultInputFormat': null
         }
       },
-      "formats": {
-        "psv": {
-          "type": "text",
-          "extensions": [
-            "tbl"
+      'formats': {
+        'psv': {
+          'type': 'text',
+          'extensions': [
+            'tbl'
           ],
-          "delimiter": "|"
+          'delimiter': '|'
         },
-        "csv": {
-          "type": "text",
-          "extensions": [
-            "csv"
+        'csv': {
+          'type': 'text',
+          'extensions': [
+            'csv'
           ],
-          "delimiter": ","
+          'delimiter': ','
         },
-        "tsv": {
-          "type": "text",
-          "extensions": [
-            "tsv"
+        'tsv': {
+          'type': 'text',
+          'extensions': [
+            'tsv'
           ],
-          "delimiter": "\t"
+          'delimiter': '\t'
         },
-        "parquet": {
-          "type": "parquet"
+        'parquet': {
+          'type': 'parquet'
         },
-        "json": {
-          "type": "json",
-          "extensions": [
-            "json"
+        'json': {
+          'type': 'json',
+          'extensions': [
+            'json'
           ]
         },
-        "avro": {
-          "type": "avro"
+        'avro': {
+          'type': 'avro'
         },
-        "sequencefile": {
-          "type": "sequencefile",
-          "extensions": [
-            "seq"
+        'sequencefile': {
+          'type': 'sequencefile',
+          'extensions': [
+            'seq'
           ]
         },
-        "csvh": {
-          "type": "text",
-          "extensions": [
-            "csvh"
+        'csvh': {
+          'type': 'text',
+          'extensions': [
+            'csvh'
           ],
-          "extractHeader": true,
-          "delimiter": ","
+          'extractHeader': true,
+          'delimiter': ','
         }
       }
     }
   },
   {
-    "name": "hbase",
-    "config": {
-      "type": "hbase",
-      "config": {
-        "hbase.zookeeper.quorum": "localhost",
-        "hbase.zookeeper.property.clientPort": "2181"
+    'name': 'hbase',
+    'config': {
+      'type': 'hbase',
+      'config': {
+        'hbase.zookeeper.quorum': 'localhost',
+        'hbase.zookeeper.property.clientPort': '2181'
       },
-      "size.calculator.enabled": false,
-      "enabled": false
+      'size.calculator.enabled': false,
+      'enabled': false
     }
   },
   {
-    "name": "hive",
-    "config": {
-      "type": "hive",
-      "enabled": false,
-      "configProps": {
-        "hive.metastore.uris": "",
-        "javax.jdo.option.ConnectionURL": "jdbc:derby:;databaseName=..\/sample-data\/drill_hive_db;create=true",
-        "hive.metastore.warehouse.dir": "\/tmp\/drill_hive_wh",
-        "fs.default.name": "file:\/\/\/",
-        "hive.metastore.sasl.enabled": "false"
+    'name': 'hive',
+    'config': {
+      'type': 'hive',
+      'enabled': false,
+      'configProps': {
+        'hive.metastore.uris': '',
+        'javax.jdo.option.ConnectionURL': 'jdbc:derby:;databaseName=..\/sample-data\/drill_hive_db;create=true',
+        'hive.metastore.warehouse.dir': '\/tmp\/drill_hive_wh',
+        'fs.default.name': 'file:\/\/\/',
+        'hive.metastore.sasl.enabled': 'false'
       }
     }
   },
   {
-    "name": "kudu",
-    "config": {
-      "type": "kudu",
-      "masterAddresses": "1.2.3.4",
-      "enabled": false
+    'name': 'kudu',
+    'config': {
+      'type': 'kudu',
+      'masterAddresses': '1.2.3.4',
+      'enabled': false
     }
   },
   {
-    "name": "mongo",
-    "config": {
-      "type": "mongo",
-      "connection": "mongodb:\/\/localhost:27017\/",
-      "enabled": false
+    'name': 'mongo',
+    'config': {
+      'type': 'mongo',
+      'connection': 'mongodb:\/\/localhost:27017\/',
+      'enabled': false
     }
   },
   {
-    "name": "s3",
-    "config": {
-      "type": "file",
-      "enabled": true,
-      "connection": "s3a:\/\/plotly-s3-connector-test",
-      "config": {
+    'name': 's3',
+    'config': {
+      'type': 'file',
+      'enabled': true,
+      'connection': 's3a:\/\/plotly-s3-connector-test',
+      'config': {
           'fs.s3a.access.key': 'AKIAIMHMSHTGARJYSKMQ',
           'fs.s3a.secret.key': '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'
       },
-      "workspaces": {
-        "root": {
-          "location": "\/",
-          "writable": true,
-          "defaultInputFormat": null
+      'workspaces': {
+        'root': {
+          'location': '\/',
+          'writable': true,
+          'defaultInputFormat': null
         }
       },
-      "formats": {
-        "csv": {
-          "type": "text",
-          "extensions": [
-            "csv"
+      'formats': {
+        'csv': {
+          'type': 'text',
+          'extensions': [
+            'csv'
           ],
-          "delimiter": ",",
+          'delimiter': ',',
           'extractHeader': true
         },
-        "parquet": {
-          "type": "parquet"
+        'parquet': {
+          'type': 'parquet'
         }
       }
     }
   }
-]
+];
