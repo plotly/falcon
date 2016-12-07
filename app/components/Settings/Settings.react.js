@@ -16,7 +16,7 @@ import {Link} from '../Link.react';
 import {DIALECTS} from '../../constants/constants.js';
 import {plotlyUrl} from '../../utils/utils';
 
-const WORKSPACE_IMPORT_SQL_URL = `https://${plotlyUrl()}/create?upload=sql`;
+const WORKSPACE_IMPORT_SQL_URL = `${plotlyUrl()}/create?upload=sql`;
 
 const unfoldIcon = (
     <img

@@ -2,12 +2,14 @@ import {contains, has, head, replace} from 'ramda';
 import queryString from 'query-string';
 
 const platform = process.platform;
-const webPlotlyDomain = 'api.plot.ly';
+const connectorOnPremPath = 'external';
 
 export const canConfigureHTTPS = platform === 'darwin' || platform === 'linux';
 
+export const isWebBrowser = contains(window.location.protocol, ['http:', 'https:']);
+
 export function baseUrl() {
-     if (contains(window.location.protocol, ['http:', 'https:'])) {
+     if (isWebBrowser) {
          /*
           * Use the full URL of the page if the app is running headlessly
           * with a web front-end served by the app.
@@ -43,21 +45,18 @@ export function getQuerystringParam(PARAM) {
     return queryString.parse(location.search)[PARAM];
 }
 
-export function isOnPrem(apiDomain) {
-    return !contains(webPlotlyDomain, apiDomain);
+export function isOnPrem() {
+    if (isWebBrowser) {
+        // on prem has a specific path for the app; it is simply '/' otherwise
+        return contains('external', baseUrl());
+    }
+    // TODO: is this always the case for the electron process?
+    return false;
 }
 
 export function plotlyUrl() {
-    const plotlyApiDomain = getQuerystringParam('PLOTLY_API_DOMAIN') || '';
-
-    /*
-     * This connector's settings necesserily contain a plotly api domain which has either
-     * 'plotly.company-name' substring or 'plot.ly'. The latter can specifically only exist for
-     * non on-prem users. Find out if the domain is not on-prem first and replace the 'api-'
-     * substring accordingly to obtain the plotly domain.
-     */
-    if (isOnPrem(plotlyApiDomain)) {
-        return replace('api-plotly', 'plotly', plotlyApiDomain);
+    if (isOnPrem()) {
+        return window.location.origin || 'https://plot.ly';
     }
-    return 'plot.ly';
+    return 'https://plot.ly';
 }
