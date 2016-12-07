@@ -456,10 +456,8 @@ describe('Routes - ', function () {
             name: 'semi colon at the end',
             query: 'SELECT * FROM `s3`.root.`311.parquet`;',
             error: (
-                'PARSE ERROR: Encountered ";" at line 1, column 47.\n' +
-                'Was expecting one of:\n    <EOF> \n    "OFFSET" ...\n' +
-                '    "FETCH" ...\n    \n\nSQL Query SELECT * FROM ' +
-                '`s3`.root.`311.parquet` LIMIT 10;'
+                'PARSE ERROR: Encountered ";" at line 1, column 38.\n' +
+                'Was expecting one of:\n    <EOF> \n    "ORDER" ...\n'
             )
         },
         {
