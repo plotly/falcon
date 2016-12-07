@@ -76,27 +76,28 @@ export default class HttpsSetup extends Component {
 
         return (
             <div className={styles.httpsSetupWrapper}>
-
-                <div>
-                    {canConfigureHTTPS && !usesHttpsProtocol() ? (
-                        <div>
-                            <div>{httpNote}</div>
+                {canConfigureHTTPS ? (
+                    <div>
+                        {!usesHttpsProtocol() ? (
                             <div>
-                                {
-                                    [this.renderCreateCertificates(), this.renderDetectCertificates()].map(
-                                        step => step ? <div>{step}</div> : null
-                                    )
-                                }
-                            </div>
-                        </div>) : (
-                            <div>
-                                {"HTTPS is setup. Your connector's endpoint is: "}
-                                <span className={styles.currentUrl}>
-                                    {baseUrl()}
-                                </span>
-                            </div>
-                        )}
-                </div>
+                                <div>{httpNote}</div>
+                                <div>
+                                    {
+                                        [this.renderCreateCertificates(), this.renderDetectCertificates()].map(
+                                            step => step ? <div>{step}</div> : null
+                                        )
+                                    }
+                                </div>
+                            </div>) : (
+                                <div>
+                                    {"HTTPS is setup. Your connector's endpoint is: "}
+                                    <span className={styles.currentUrl}>
+                                        {baseUrl()}
+                                    </span>
+                                </div>
+                            )}
+                    </div>
+                ) : null}
 
             </div>
         );
