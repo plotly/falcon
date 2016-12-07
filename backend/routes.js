@@ -51,7 +51,7 @@ export default class Server {
             this.protocol = 'http';
             this.domain = 'localhost';
         } else if (args.protocol === 'HTTPS' || this.certs) {
-            this.server = restify.createServer(merge({version: apiVersion} this.certs));
+            this.server = restify.createServer(merge({version: apiVersion}, this.certs));
             this.protocol = 'https';
             this.domain = getSetting('CONNECTOR_HTTPS_DOMAIN');
         } else {
