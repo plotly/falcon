@@ -16,7 +16,7 @@ import {
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
 import {checkWritePermissions} from './persistent/PlotlyAPI.js';
-import {dissoc, contains, isEmpty, pluck} from 'ramda';
+import {dissoc, contains, isEmpty, merge, pluck} from 'ramda';
 import Logger from './logger';
 import fetch from 'node-fetch';
 
@@ -45,12 +45,13 @@ export default class Server {
         // otherwise decide which protocol to use
         // depending if there are certificates
         */
+        const apiVersion = '1.0.0';
         if (args.protocol === 'HTTP' || isEmpty(this.certs)) {
-            this.server = restify.createServer();
+            this.server = restify.createServer({version: apiVersion});
             this.protocol = 'http';
             this.domain = 'localhost';
         } else if (args.protocol === 'HTTPS' || this.certs) {
-            this.server = restify.createServer(this.certs);
+            this.server = restify.createServer(merge({version: apiVersion} this.certs));
             this.protocol = 'https';
             this.domain = getSetting('CONNECTOR_HTTPS_DOMAIN');
         } else {
