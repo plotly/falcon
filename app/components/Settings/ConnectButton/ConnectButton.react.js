@@ -22,7 +22,6 @@ export default class ConnectButton extends Component {
         if (connectRequest.status >= 400 || saveConnectionsRequest.status >= 400) {
            buttonText = 'Connect';
            buttonClick = connect;
-           // TODO - Try out bad connections to verify this.
            // TODO - Try out locking the home folder and verifying this.
            let errorMessage = 'Hm... had trouble connecting.';
            if (connectRequest.content && connectRequest.content.error) {

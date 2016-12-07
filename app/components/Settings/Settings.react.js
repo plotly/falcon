@@ -452,8 +452,6 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
                     dispatch(Actions.connect(json.connectionId));
                 }
             });
-            // TODO - If connecting *fails* then we should delete the connection
-            // so that the user can re-try.
         };
     } else if (connectionNeedToBeSaved) {
         dispatchConnect = function editAndReset() {
