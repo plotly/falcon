@@ -19,19 +19,7 @@ export default class ConnectButton extends Component {
         let buttonClick = () => {};
         let error = null;
 
-        if (!connectRequest.status) {
-            buttonText = 'Connect';
-            buttonClick = connect;
-        } else if (connectRequest.status === 'loading') {
-            buttonText = 'Connecting...';
-        } else if (connectRequest.status >= 200 && connectRequest.status < 300) {
-            if (editMode) {
-                buttonText = 'Save changes';
-                buttonClick = connect;
-            } else {
-                buttonText = 'Connected';
-            }
-        } else if (connectRequest.status >= 400 || saveConnectionsRequest.status >= 400) {
+        if (connectRequest.status >= 400 || saveConnectionsRequest.status >= 400) {
            buttonText = 'Connect';
            buttonClick = connect;
            // TODO - Try out bad connections to verify this.
@@ -43,7 +31,19 @@ export default class ConnectButton extends Component {
                errorMessage = saveConnectionsRequest.content.error.message;
            }
            error = <div className={styles.errorMessage}>{errorMessage}</div>;
-       }
+       } else if (!connectRequest.status) {
+            buttonText = 'Connect';
+            buttonClick = connect;
+        } else if (connectRequest.status === 'loading') {
+            buttonText = 'Connecting...';
+        } else if (connectRequest.status >= 200 && connectRequest.status < 300) {
+            if (editMode) {
+                buttonText = 'Save changes';
+                buttonClick = connect;
+            } else {
+                buttonText = 'Connected';
+            }
+        }
 
        return (
             <div className={styles.connectButtonContainer}>

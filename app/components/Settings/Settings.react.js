@@ -334,7 +334,7 @@ function mapStateToProps(state) {
     } = state;
 
     const selectedConnectionId = tabMap[selectedTab];
-    const connectionsHaveBeenSaved = Boolean(selectedConnectionId);
+    const connectionsHaveBeenSaved = Boolean(selectedConnectionId) && connectRequests[selectedConnectionId];
     const selectedTable = selectedTables[selectedConnectionId] || null;
     const index = selectedIndecies[selectedConnectionId] || null;
 
@@ -436,7 +436,6 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     }
 
     /*
-
      * dispatchConnect either saves the connection and then connects
      * or just connects if the connections have already been saved
      */
@@ -445,14 +444,19 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         dispatchConnect = function saveAndConnect() {
             dispatch(Actions.saveConnections(connections[selectedTab], selectedTab))
             .then(json => {
-                dispatch(Actions.connect(json.connectionId));
+                /*
+                 * Do not try connecting because saving of credentials
+                 * will not have happened on error
+                 */
+                if (!json.error) {
+                    dispatch(Actions.connect(json.connectionId));
+                }
             });
             // TODO - If connecting *fails* then we should delete the connection
             // so that the user can re-try.
-            // TODO - support updating connections.
         };
     } else if (connectionNeedToBeSaved) {
-        dispatchConnect = function saveAndConnect() {
+        dispatchConnect = function editAndReset() {
             dispatch(Actions.editConnections(connections[selectedTab], selectedConnectionId))
             .then(() => {dispatch(Actions.reset({id: selectedConnectionId}));});
         };

@@ -216,12 +216,14 @@ export default class Server {
                         return;
                     } else {
                         Logger.log(validation, 2);
-                        res.json(400, {error: {message: validation.message}});
+                        res.json(400, {error: {message: validation.message}
+                        });
                         return;
                     }
                 }).catch(err => {
                     Logger.log(err, 2);
-                    res.json(400, {error: {message: err.message}});
+                    res.json(400, {error: {message: err.message}
+                    });
                 });
             }
         });
