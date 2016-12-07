@@ -16,8 +16,8 @@ import {createGrid, names, sqlConnections, username, apiKey} from './utils.js';
 
 let queryScheduler;
 let savedUsers;
-describe('QueryScheduler', () => {
-    beforeEach(() => {
+describe('QueryScheduler', function() {
+    beforeEach(function () {
         this.timeout(1000 * 5);
         try {
             fs.unlinkSync(getSetting('QUERIES_PATH'));
@@ -34,7 +34,7 @@ describe('QueryScheduler', () => {
         saveSetting('USERS', [{username, apiKey}]);
     });
 
-    afterEach(() => {
+    afterEach(function () {
         this.timeout(1000 * 5);
         queryScheduler.clearQueries();
         queryScheduler = null;
