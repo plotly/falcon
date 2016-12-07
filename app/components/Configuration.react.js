@@ -3,6 +3,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import Settings from './Settings/Settings.react';
 import {baseUrl} from '../utils/utils';
 import {Link} from './Link.react';
+import {contains} from 'ramda';
 
 import * as styles from './Configuration.css';
 
@@ -34,7 +35,14 @@ export default class Configuration extends Component {
 
                     <div className={styles.supportLinks}>
                         <div className={styles.externalLinkContainer}>
-                            {Link(LINKS.PLANS, 'Upgrade for Support')}
+                            {/* Hide Upgrade button for on-prem */}
+                            {
+                                contains(
+                                    'external-data-connector',
+                                    window.location.href
+                                ) ?
+                                null : Link(LINKS.PLANS, 'Upgrade for Support')
+                            }
                             {Link(LINKS.DOCS, 'Documentation')}
                             {Link(LINKS.TYPEFORM, 'Request a Connector')}
                         </div>
