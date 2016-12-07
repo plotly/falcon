@@ -76,7 +76,6 @@
 }
 
 .unfoldIcon {
-    height: 18px;
     width: 18px;
     padding-left: 10px;
 }
@@ -97,8 +96,8 @@
     margin: 0px 20px;
 }
 
-.Flipped .unfoldIcon{
-    transform:rotateX(180deg);
-    -ms-transform:rotateX(180deg); /* IE 9 */
-    -webkit-transform:rotateX(180deg); /* Safari and Chrome */
+.collapsed .unfoldIcon{
+    transform:rotate(-90deg);
+    -ms-transform:rotate(-90deg); /* IE 9 */
+    -webkit-transform:rotate(-90deg); /* Safari and Chrome */
 }

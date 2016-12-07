@@ -46,7 +46,7 @@ class Settings extends Component {
                     })}
                 >
                     <span>{name}</span>
-                    <span className={this.state[`show${name}`] ? styles.Flipped : null}>
+                    <span className={this.state[`show${name}`] ? null : styles.collapsed}>
                         {unfoldIcon}
                     </span>
                 </h5>
