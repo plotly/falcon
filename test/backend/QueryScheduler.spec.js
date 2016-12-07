@@ -66,7 +66,7 @@ describe('QueryScheduler', () => {
         const spy1 = chai.spy(() => {});
         queryScheduler.job = spy1;
 
-        const delay = 1;
+        const delay = 2;
         this.timeout(delay * 20 * 1000);
 
         const query = {
@@ -76,7 +76,7 @@ describe('QueryScheduler', () => {
             refreshInterval: delay,
             query: 'query-1',
             connectionId: '1'
-        }
+        };
 
         queryScheduler.scheduleQuery(query);
 
@@ -189,7 +189,7 @@ describe('QueryScheduler', () => {
                  if (res.status !== 204) {
                      res.json().then(json => {
                          assert.equal(res.status, 204, 'Grid was successfully deleted: ' + JSON.stringify(json, null, 2));
-                     })
+                     });
                  }
 
 
