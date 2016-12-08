@@ -1,6 +1,5 @@
 import {app, BrowserWindow, ipcMain} from 'electron';
 import {contains, join} from 'ramda';
-
 import Logger from './logger';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {setupMenus} from './menus';
@@ -23,7 +22,6 @@ Logger.log('Loading persistent queries', 2);
 server.queryScheduler.loadQueries();
 
 app.on('ready', () => {
-    trackStartup();
 
     let mainWindow = new BrowserWindow({
         show: true,
