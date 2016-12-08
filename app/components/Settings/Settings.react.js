@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {contains, dissoc, flip, head, isEmpty, reduce } from 'ramda';
+import {contains, dissoc, flip, head, keys, isEmpty, reduce } from 'ramda';
 import {connect} from 'react-redux';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
@@ -152,8 +152,10 @@ class Settings extends Component {
             selectedTable,
             setConnectionNeedToBeSaved,
             setTable,
+            setIndex,
             s3KeysRequest,
             selectedTab,
+            selectedIndex,
             tablesRequest
         } = this.props;
         if (connectionsRequest && !connectionsRequest.status ) {
@@ -187,6 +189,14 @@ class Settings extends Component {
                 this.setState({editMode: false});
                 getElasticsearchMappings();
             }
+            if (elasticsearchMappingsRequest.status === 200 && !selectedIndex) {
+                setIndex(head(keys(elasticsearchMappingsRequest.content)));
+            }
+            if (selectedIndex && !selectedTable) {
+                setTable(head(keys(
+                    elasticsearchMappingsRequest.content[selectedIndex].mappings
+                )));
+            }
             if (selectedTable && !previewTableRequest.status) {
                 previewTables();
             }
@@ -219,7 +229,6 @@ class Settings extends Component {
             deleteConnectionsRequest,
             deleteTab,
             elasticsearchMappingsRequest,
-            index,
             hasCerts,
             hasCertsRequest,
             newTab,
@@ -232,6 +241,7 @@ class Settings extends Component {
             setIndex,
             setTable,
             selectedTable,
+            selectedIndex,
             setTab,
             startTempHttpsServer,
             startTempHttpsServerRequest,
@@ -269,7 +279,7 @@ class Settings extends Component {
                                 tablesRequest={tablesRequest}
                                 setTable={setTable}
                                 setIndex={setIndex}
-                                index={index}
+                                selectedIndex={selectedIndex}
                             />
 
                             <Preview
@@ -336,7 +346,7 @@ function mapStateToProps(state) {
     const selectedConnectionId = tabMap[selectedTab];
     const connectionsHaveBeenSaved = Boolean(selectedConnectionId) && connectRequests[selectedConnectionId];
     const selectedTable = selectedTables[selectedConnectionId] || null;
-    const index = selectedIndecies[selectedConnectionId] || null;
+    const selectedIndex = selectedIndecies[selectedConnectionId] || null;
 
     let previewTableRequest = {};
     if (previewTableRequests[selectedConnectionId] &&
@@ -366,7 +376,7 @@ function mapStateToProps(state) {
         connectionsHaveBeenSaved,
         connectionObject: connections[selectedTab],
         selectedTable,
-        index,
+        selectedIndex,
         selectedConnectionId
     };
 }
@@ -387,6 +397,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         selectedTable,
         connections,
         selectedConnectionId,
+        selectedIndex,
         connectionNeedToBeSaved,
         connectionsHaveBeenSaved,
         connectionObject
@@ -425,7 +436,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             selectedConnectionId,
             connectionObject.dialect,
             selectedTable,
-            connectionObject.database
+            connectionObject.database || selectedIndex
         ));
     }
     function boundSetConnectionNeedToBeSaved(bool) {

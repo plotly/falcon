@@ -342,14 +342,14 @@ function PREVIEW_QUERY (dialect, table, database = '') {
             return 'SELECT TOP 5 * FROM ' +
                 `${database}.dbo.${table}`;
         case DIALECTS.ELASTICSEARCH:
-            return {
+            return JSON.stringify({
                 index: database || '_all',
                 type: table || '_all',
                 body: {
                     query: { 'match_all': {} },
                     size: 5
                 }
-            };
+            });
         default:
             throw new Error(`Dialect ${dialect} is not one of the DIALECTS`);
     }

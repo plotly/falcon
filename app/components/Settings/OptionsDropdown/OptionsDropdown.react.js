@@ -10,13 +10,8 @@ export default class OptionsDropdown extends Component {
         this.renderSQLOptions = this.renderSQLOptions.bind(this);
         this.renderElasticsearchIndecies = this.renderElasticsearchIndecies.bind(this);
         this.renderElasticsearchDocs = this.renderElasticsearchDocs.bind(this);
-        this.testClass = this.testClass.bind(this);
-        this.state = {elasticsearchIndex: ''};
     }
 
-    testClass() {
-        return 'test-connected';
-    }
 
     renderSQLOptions() {
         const {selectedTable, tablesRequest, setTable} = this.props;
@@ -51,7 +46,7 @@ export default class OptionsDropdown extends Component {
 
     renderElasticsearchIndecies() {
         const {
-            elasticsearchMappingsRequest: EMR, setIndex, index
+            elasticsearchMappingsRequest: EMR, setIndex, selectedIndex
         } = this.props;
         if (!EMR.status) {
             return null;
@@ -71,7 +66,7 @@ export default class OptionsDropdown extends Component {
                     >
                         <Select
                             options={indeciesList.map(t => ({label: t, value: t}))}
-                            value={index}
+                            value={selectedIndex}
                             onChange={option => {
                                 setIndex(option.value);
                             }}
@@ -84,12 +79,12 @@ export default class OptionsDropdown extends Component {
 
     renderElasticsearchDocs() {
         const {
-            selectedTable, index, elasticsearchMappingsRequest: EMR, setTable, connectionObject
+            selectedTable, selectedIndex, elasticsearchMappingsRequest: EMR, setTable, connectionObject
         } = this.props;
-        if (!index) {
+        if (!selectedIndex) {
             return null;
         } else {
-            const tablesList = keys(EMR.content[index].mappings);
+            const tablesList = keys(EMR.content[selectedIndex].mappings);
             if (tablesList.length === 0) {
                 return <div>{'No docs found'}</div>;
             } else {
