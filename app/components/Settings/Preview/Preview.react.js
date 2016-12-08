@@ -16,8 +16,8 @@ export default class Preview extends Component {
         const tableHeaders = columnnames.map(
             column => <th>{column}</th>
         );
-
-        const renderCell = cell => <td>{JSON.stringify(cell)}</td>;
+        const isObject = (arg) => typeof arg === 'object';
+        const renderCell = cell => <td>{isObject(cell) ? JSON.stringify(cell) : cell}</td>;
         const tableRows = rows.map(
             row => <tr>{row.map(renderCell)}</tr>
         );
