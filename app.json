@@ -1,0 +1,23 @@
+{
+  "name": "plotly-database-connector",
+  "scripts": {
+  },
+  "env": {
+    "PLOTLY_CONNECTOR_STORAGE_PATH": {
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "addons": [
+    "papertrail"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}
