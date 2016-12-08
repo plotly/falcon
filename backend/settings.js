@@ -1,9 +1,7 @@
 import fs from 'fs';
 import {contains, has} from 'ramda';
 import YAML from 'yamljs';
-import {
-    createStoragePath
-} from './utils/homeFiles';
+import {createStoragePath} from './utils/homeFiles';
 import path from 'path';
 import os from 'os';
 
