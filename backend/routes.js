@@ -124,12 +124,12 @@ export default class Server {
             directory: `${__dirname}/../app/`
         }));
 
-        server.get('/oauth2/callback', restify.serveStatic({
+        server.get(/\/oauth2\/callback\/?$/, restify.serveStatic({
             directory: `${__dirname}/../static`,
             file: 'oauth.html'
         }));
 
-        server.post('/oauth2/token', function saveOauth(req, res, next) {
+        server.post(/\/oauth2\/token\/?$/, function saveOauth(req, res, next) {
             const {access_token} = req.params;
             fetch(`${getSetting('PLOTLY_API_URL')}/v2/users/current`, {
                 headers: {'Authorization': `Bearer ${access_token}`}
