@@ -344,7 +344,7 @@ function mapStateToProps(state) {
     } = state;
 
     const selectedConnectionId = tabMap[selectedTab];
-    const connectionsHaveBeenSaved = Boolean(selectedConnectionId) && connectRequests[selectedConnectionId];
+    const connectionsHaveBeenSaved = Boolean(selectedConnectionId);
     const selectedTable = selectedTables[selectedConnectionId] || null;
     const selectedIndex = selectedIndecies[selectedConnectionId] || null;
 
@@ -362,7 +362,7 @@ function mapStateToProps(state) {
         startTempHttpsServerRequest,
         redirectUrlRequest,
         connectRequest: connectRequests[selectedConnectionId] || {},
-        saveConnectionsRequest: saveConnectionsRequests[selectedConnectionId] || {},
+        saveConnectionsRequest: saveConnectionsRequests[selectedTab] || {},
         deleteConnectionsRequest: deleteConnectionsRequests[selectedConnectionId] || {},
         previewTableRequest,
         tablesRequest: tablesRequests[selectedConnectionId] || {},
@@ -465,7 +465,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             });
         };
     } else if (connectionNeedToBeSaved) {
-        dispatchConnect = function editAndReset() {
+        dispatchConnect = function editConnectionsAndResetRequests() {
             dispatch(Actions.editConnections(connections[selectedTab], selectedConnectionId))
             .then(() => {dispatch(Actions.reset({id: selectedConnectionId}));});
         };

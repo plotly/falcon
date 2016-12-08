@@ -133,7 +133,9 @@ export function saveConnections(connectionsObject, tabId) {
             tabId,
             connectionsObject
         )).then(json => {
-            dispatch(mergeTabMap({[tabId]: json.connectionId || tabId}));
+            if (!json.error) {
+               dispatch(mergeTabMap({[tabId]: json.connectionId}));
+            }
             return json;
         });
     };
