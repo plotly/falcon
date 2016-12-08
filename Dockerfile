@@ -6,7 +6,7 @@
 # - PLOTLY_DOMAIN_API (e.g. api-local.plot.ly)
 # - PLOTLY_STREAMBED_SSL_ENABLED (e.g. true)
 # Adapted from https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
-FROM node:6.6
+FROM node:6.9.2
 
 # I'd like to install the latest version of npm with something like this:
 # RUN npm install --global npm@4.0.3
