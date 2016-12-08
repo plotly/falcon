@@ -53,7 +53,7 @@ const config = {
         new webpack.NoErrorsPlugin(),
         new webpack.DefinePlugin({
             __DEV__: true,
-            'process.env.NODE_ENV': JSON.stringify('production')
+            'process.env.NODE_ENV': JSON.stringify('development')
         })
     ],
 

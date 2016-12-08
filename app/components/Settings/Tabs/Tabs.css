@@ -1,0 +1,104 @@
+
+.tabManagerWrapper {
+    /* display: inline-block; */
+    /* vertical-align: middle; */
+    text-align: left;
+    width: 100%;
+    /* margin-left: auto; */
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.tabManagerContainer {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
+
+
+.tabAddWrapper {
+    background-color: white;
+    display: inline-block;
+    border-width: 1px;
+    border-color: #E7E8E9;
+    border-style: solid;
+    vertical-align: middle;
+    height: 36px;
+    width: 36px;
+}
+
+.tabWrapper {
+    display: inline-block;
+    cursor: pointer;
+    /*margin: 0px;
+    margin-bottom: -1px;*/
+    border-left: 1px solid #E7E8E9;
+    border-bottom: 1px solid #E7E8E9;
+    border-top: 1px solid #E7E8E9;
+    background-color: white;
+    color: #687ba6;
+    padding: 5px 10px 5px 10px;
+    vertical-align: middle;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    /*padding-top: 50px;
+    padding-bottom: 50px;*/
+}
+
+.tabLogo {
+    height: 20px;
+    display: inline;
+    vertical-align: middle;
+    padding-right: 5px;
+}
+
+.tabIdentifier {
+    margin: 0px 20px 0px 0px;
+    display: inline;
+    vertical-align: middle;
+}
+
+.tabDelete {
+    width: 12px;
+    padding-right: 5px;
+    vertical-align: middle;
+}
+
+.tabAdd {
+    width: 20px;
+    padding: 8px;
+}
+
+
+.tabWrapper:hover, tabWrapper:focus{
+    cursor: pointer;
+}
+
+.tabAdd:hover, tab:focus{
+    cursor: pointer;
+}
+
+.tabDelete:hover, tab:focus{
+    cursor: pointer;
+}
+
+.tabWrapperSelected {
+    border-bottom: 1px solid #fff;
+}
+
+.tabAddText {
+    display: inline-block;;
+    padding: 10px 20px 10px 20px;
+    color: #8BB5FE;
+}
+
+/* this flips the scroll y bar from bottom to up of the tab tab */
+.Flipped, .Flipped .tabWrapper, .Flipped .tabAddText
+{
+    transform:rotateX(180deg);
+    -ms-transform:rotateX(180deg); /* IE 9 */
+    -webkit-transform:rotateX(180deg); /* Safari and Chrome */
+}

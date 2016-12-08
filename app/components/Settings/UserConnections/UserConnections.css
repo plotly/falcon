@@ -1,0 +1,90 @@
+.inputContainer {
+    padding-top: 10px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+input {
+    display: inline-block !important;
+    padding: 5px;
+    border: none;
+    border-bottom-width: 1px;
+    border-bottom-color: #BEC8D9;
+    border-bottom-style: solid;
+    color: #6D6D6D;
+    width: 80%;
+    font-size: 18px;
+    font-weight: 100;
+    margin: 10px 40px 0px 40px;
+    text-align: left;
+    height: 39px;
+}
+
+input:hover {
+    border-bottom-color: #8BB5FE;
+}
+
+.inputNamesContainer {
+    width: 25%;
+    vertical-align: top;
+    position: absolute;
+}
+
+.inputFieldsContainer {
+    display: inline-block;
+    width: 50%;
+}
+
+.inputName {
+    text-transform: capitalize;
+    padding: 5px;
+    display: inline-block;
+    text-align: right;
+    margin: 10px 0px 0px 0px;
+    height: 40px;
+    width: 100%;
+}
+
+.documentationLink {
+    display: inline-block !important;
+    padding: 5px;
+    text-transform: capitalize;
+    /*color: #6D6D6D;*/
+    font-size: 18px;
+    font-weight: 100;
+    margin: 10px 40px 0px 40px;
+    text-align: left;
+    height: 30px;
+    width: 80%;
+}
+
+.checkbox {
+    display: inline;
+    vertical-align: middle;
+    margin: 5px 20px 10px 60px;
+    width: 20px;
+}
+
+.label {
+    display: inline;
+}
+
+.optionsContainer {
+    text-align: left;
+    padding-top: 15px;
+}
+
+.options {
+}
+
+.option {
+    text-transform: capitalize;
+    padding: 5px;
+    display: inline;
+    text-align: right;
+    margin: 10px 0px 0px 0px;
+    height: 40px;
+    width: 100%;
+}

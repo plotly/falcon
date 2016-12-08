@@ -1,5 +1,3 @@
-/* eslint no-console: 0 */
-
 import express from 'express';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
@@ -9,7 +7,7 @@ import config from './webpack.config.development';
 
 const app = express();
 const compiler = webpack(config);
-const PORT = 3000;
+export const PORT = 3000;
 
 app.use(webpackDevMiddleware(compiler, {
     quiet: true,
@@ -23,6 +21,7 @@ app.use(webpackHotMiddleware(compiler, {
     log: () => {}
 }));
 
+/* eslint no-console: 0 */
 app.listen(PORT, 'localhost', err => {
     if (err) {
         console.error(err);

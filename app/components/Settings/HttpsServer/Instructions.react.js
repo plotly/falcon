@@ -1,8 +1,24 @@
 import React from 'react';
-import {shell} from 'electron';
-import {BACKEND} from '../../../constants/constants';
 
-const HTML_STATUS_PAGE = `https://${BACKEND.CONNECTOR_URL}:${BACKEND.OPTIONS.port}/status`;
+/*
+ * We're sharing most of the same components for the web-app and the
+ * electron interface. In the electron app, we walk the user through
+ * setting up self-signed HTTPS certs but we don't show those instructions
+ * in the web-app since it requires `electron` specific modules
+ * (like sudo prompt).
+ * This component is imported in both modules but only rendered in the
+ * electron app. So, shim out the `electron` require so that this still
+ * runs in the web.
+ */
+let shell;
+try {
+    shell = require('electron').shell;
+} catch (e) {
+
+}
+import {getQuerystringParam} from '../../../utils/utils';
+const tempHttpsPort = parseInt(getQuerystringParam('PORT'), 10) + 1;
+const HTML_STATUS_PAGE = `https://${getQuerystringParam('CONNECTOR_HTTPS_DOMAIN')}:${tempHttpsPort}/status`;
 
 const Instructions = () => (
     <div>
@@ -19,10 +35,7 @@ const Instructions = () => (
             <ol>
                 <li>
                     Visit&nbsp;
-                    <a onClick={() => {
-                        shell.openExternal(HTML_STATUS_PAGE);
-                    }}
-                    >
+                    <a onClick={() => {shell.openExternal(HTML_STATUS_PAGE);}}>
                         {HTML_STATUS_PAGE}
                     </a>
                 </li>

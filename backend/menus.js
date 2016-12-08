@@ -107,6 +107,14 @@ export function setupMenus(app, mainWindow) {
                 click() {
                     mainWindow.setFullScreen(!mainWindow.isFullScreen());
                 }
+            }, {
+                type: 'separator'
+            }, {
+                label: 'Toggle Developer Tools',
+                accelerator: 'Alt+Command+I',
+                click() {
+                    mainWindow.toggleDevTools();
+                }
             }]
         }, {
             label: 'Window',
@@ -165,6 +173,14 @@ export function setupMenus(app, mainWindow) {
                 accelerator: 'F11',
                 click() {
                     mainWindow.setFullScreen(!mainWindow.isFullScreen());
+                }
+            }, {
+                type: 'separator'
+            }, {
+                label: 'Toggle Developer Tools',
+                accelerator: 'Alt+Command+I',
+                click() {
+                    mainWindow.toggleDevTools();
                 }
             }]
         }, help];

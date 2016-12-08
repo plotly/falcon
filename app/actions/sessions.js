@@ -1,112 +1,358 @@
+import fetch from 'isomorphic-fetch';
+import uuid from 'node-uuid';
 import {createAction} from 'redux-actions';
-import {CHANNEL} from './../../backend/messageHandler';
-import {TASKS} from './../../backend/tasks';
-const ipcRenderer = require('electron').ipcRenderer;
+import {DIALECTS, INITIAL_CONNECTIONS} from '../constants/constants';
+import {baseUrl} from '../utils/utils';
+import * as httpsUtils from '../utils/https';
+import {contains} from 'ramda';
+import queryString from 'query-string';
 
-export const NEW_SESSION = 'NEW_SESSION';
-export const SWITCH_SESSION = 'SWITCH_SESSION';
-export const FORGET_SESSION = 'FORGET_SESSION';
+export const reset = createAction('RESET');
+export const mergeTabMap = createAction('MERGE_TAB_MAP');
+export const setTab = createAction('SET_TAB');
+export const setTable = createAction('SET_TABLE');
+export const setIndex = createAction('SET_INDEX');
+export const mergeConnections = createAction('MERGE_CONNECTIONS');
+export const updateConnection = createAction('UPDATE_CREDENTIAL');
+export const deleteConnection = createAction('DELETE_CREDENTIAL');
 
-export const newSession = createAction(NEW_SESSION);
-export const switchSession = createAction(SWITCH_SESSION);
-export const forgetSession = createAction(FORGET_SESSION);
+const DELETE_TAB_MESSAGE = 'You are about to delete a connection. ' +
+'If you have scheduled persistent queries with that connection, they ' +
+'will stop refreshing. Are you sure you want to continue?';
 
-// update calls
-export const UPDATE_CONNECTION = 'UPDATE_CONNECTION';
-export const UPDATE_CONFIGURATION = 'UPDATE_CONFIGURATION';
-export const UPDATE_IPC_STATE = 'UPDATE_IPC_STATE';
+const request = {GET, DELETE, POST, PUT};
 
-export const updateConnection = createAction(UPDATE_CONNECTION);
-export const updateConfiguration = createAction(UPDATE_CONFIGURATION);
-export const updateIpcState = createAction(UPDATE_IPC_STATE);
+function GET(path) {
+    return fetch(`${baseUrl()}/${path}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    });
+}
 
-// ipc specific ->
+function DELETE(path) {
+    return fetch(`${baseUrl()}/${path}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    });
+}
 
-export function query (statement) {
-    return (_, getState) => {
+function POST(path, body = {}) {
+    return fetch(`${baseUrl()}/${path}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: body ? JSON.stringify(body) : null
+    });
+}
+
+function PUT(path, body = {}) {
+    return fetch(`${baseUrl()}/${path}`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: body ? JSON.stringify(body) : null
+    });
+}
+
+function apiThunk(endpoint, method, store, id, body) {
+    return dispatch => {
+        dispatch({
+            type: store,
+            payload: {id, status: 'loading'}
+        });
+        return request[method](endpoint, body)
+        .then(res => res.json().then(
+            json => {
+                dispatch({
+                    type: store,
+                    payload: {
+                        status: res.status,
+                        content: json,
+                        id
+                    }
+                });
+                return json;
+            }
+        ))
+        .catch(err => {
+            console.error(err);
+            dispatch({
+                type: store,
+                payload: {
+                    id,
+                    status: 500
+                }
+            });
+        });
+    };
+}
+
+export function getConnections() {
+    return apiThunk(
+        'connections',
+        'GET',
+        'connectionsRequest'
+    );
+}
+
+export function editConnections(connectionObject, connectionId) {
+    return apiThunk(
+        `connections/${connectionId}`,
+        'PUT',
+        'connectRequests',
+        connectionId,
+        connectionObject
+    );
+}
+
+export function connect(connectionId) {
+    return apiThunk(
+        `connections/${connectionId}/connect`,
+        'POST',
+        'connectRequests',
+        connectionId
+    );
+}
+
+export function saveConnections(connectionsObject, tabId) {
+    return dispatch => {
+        return dispatch(apiThunk(
+            'connections',
+            'POST',
+            'saveConnectionsRequests',
+            tabId,
+            connectionsObject
+        )).then(json => {
+            if (!json.error) {
+               dispatch(mergeTabMap({[tabId]: json.connectionId}));
+            }
+            return json;
+        });
+    };
+}
+
+export function getTables(connectionId) {
+    return apiThunk(
+        `connections/${connectionId}/sql-tables`,
+        'POST',
+        'tablesRequests',
+        connectionId
+    );
+}
+
+export function getElasticsearchMappings(connectionId) {
+    return apiThunk(
+        `connections/${connectionId}/elasticsearch-mappings`,
+        'POST',
+        'elasticsearchMappingsRequests',
+        connectionId
+    );
+}
+
+export function getS3Keys(connectionId) {
+    return apiThunk(
+        `connections/${connectionId}/s3-keys`,
+        'POST',
+        's3KeysRequests',
+        connectionId
+    );
+}
+
+export function getApacheDrillStorage(connectionId) {
+    return apiThunk(
+        `connections/${connectionId}/apache-drill-storage`,
+        'POST',
+        'apacheDrillStorageRequests',
+        connectionId
+    );
+}
+
+export function getApacheDrillS3Keys(connectionId) {
+    return apiThunk(
+        `connections/${connectionId}/apache-drill-s3-keys`,
+        'POST',
+        'apacheDrillS3KeysRequests',
+        connectionId
+    );
+}
+
+export function previewTable (connectionId, dialect, table, database) {
+    const body = {
+        query: PREVIEW_QUERY(dialect, table, database)
+    };
+    return apiThunk(
+        `connections/${connectionId}/query`,
+        'POST',
+        'previewTableRequest',
+        [connectionId, table],
+        body
+    );
+}
+
+export function initializeTabs() {
+    return function(dispatch, getState) {
         const state = getState();
-        const sessionSelectedId = state.sessions.get('sessionSelectedId');
-        const database = state.sessions[sessionSelectedId].configuration.database;
-        ipcSend(TASKS.QUERY, sessionSelectedId, database, statement);
+        const {connectionsRequest} = state;
+        if (connectionsRequest.status !== 200) {
+            console.error(
+                "Can't initialize tabs - credentials haven't been retreived yet."
+            );
+            return;
+        }
+        const savedConnections = connectionsRequest.content;
+        if (savedConnections.length > 0) {
+            const tabs = savedConnections.map(() => uuid.v4());
+            const tabMap = {};
+            const connections = {};
+            savedConnections.forEach((cred, i) => {
+                tabMap[tabs[i]] = cred.id;
+                connections[tabs[i]] = cred;
+            });
+            dispatch(mergeTabMap(tabMap));
+            dispatch(mergeConnections(connections));
+            dispatch(setTab(tabs[0]));
+            savedConnections.forEach(cred => {
+                dispatch(connect(cred.id));
+            });
+        } else {
+            dispatch(newTab());
+        }
     };
 }
 
-export function connect () {
-    return (_, getState) => {
-        const state = getState();
-        const sessionSelectedId = state.sessions.get('sessionSelectedId');
-        const configuration = state.sessions.getIn(
-            ['list', sessionSelectedId, 'configuration']
-        ).toJS();
-        ipcSend(
-            TASKS.CONNECT_AND_SHOW_DATABASES,
-            sessionSelectedId,
-            configuration.database,
-            configuration
-        );
+export function newTab() {
+    return function(dispatch, getState) {
+        const newId = uuid.v4();
+        dispatch(mergeConnections({
+            [newId]: INITIAL_CONNECTIONS
+        }));
+        dispatch(setTab(newId));
     };
 }
 
-export function deleteSession (sessionId) {
-    return (_, getState) => {
-        ipcSend(TASKS.DELETE_SESSION, sessionId, null, sessionId);
+export function deleteTab(tabId) {
+    return function (dispatch, getState) {
+        /* eslint no-alert: 0 */
+        if (confirm(DELETE_TAB_MESSAGE)) {
+        /* eslint no-alert: 0 */
+            if (tabId === getState().selectedTab) {
+                const tabIds = Object.keys(getState().connections);
+                const currentIdIndex = tabIds.indexOf(tabId);
+                const connectionId = getState().connections[tabId].id;
+                let nextIdIndex;
+                if (currentIdIndex === 0) {
+                    if (tabIds.length > 1) {
+                        nextIdIndex = 1;
+                    } else {
+                        nextIdIndex = -1; // null out
+                    }
+                } else {
+                    nextIdIndex = currentIdIndex - 1;
+                }
+                dispatch(setTab(tabIds[nextIdIndex]));
+                dispatch(apiThunk(
+                    `connections/${connectionId}`,
+                    'DELETE',
+                    'deleteConnectionsRequests',
+                    connectionId
+                ));
+            }
+            dispatch(deleteConnection(tabId));
+        } else {
+            return;
+        }
     };
 }
 
-export function selectDatabase () {
-    return (_, getState) => {
-        const state = getState();
-        const sessionSelectedId = state.sessions.get('sessionSelectedId');
-        const configuration = state.sessions.getIn(
-            ['list', sessionSelectedId, 'configuration']
-        ).toJS();
-        ipcSend(
-            TASKS.SELECT_DATABASE_AND_SHOW_TABLES,
-            sessionSelectedId,
-            configuration.database,
-            configuration.database
-        );
+// https ->
+export function hasCerts() {
+    return apiThunk(
+        'has-certs',
+        'GET',
+        'hasCertsRequest'
+    );
+}
+
+export function createCerts() {
+    return dispatch => {
+        httpsUtils.createCerts()
+            .then(res => {
+                dispatch({
+                    type: 'createCertsRequest',
+                    payload: {
+                        status: res.status,
+                        content: res.content
+                    }
+                });
+            });
     };
 }
 
-export function previewTables (tableNames) {
-    return (_, getState) => {
-        const state = getState();
-        const sessionSelectedId = state.sessions.get('sessionSelectedId');
-        const database = state.sessions.getIn(
-            ['list', sessionSelectedId, 'configuration', 'database']);
-        ipcSend(TASKS.PREVIEW, sessionSelectedId, database, tableNames);
+export function redirectUrl() {
+    return dispatch => {
+        httpsUtils.redirectUrl()
+            .then(res => {
+                dispatch({
+                    type: 'redirectUrlRequest',
+                    payload: {
+                        status: res.status,
+                        content: res.content
+                    }
+                });
+            });
     };
 }
 
-export function disconnect () {
-    return (_, getState) => {
-        const state = getState();
-        const sessionSelectedId = state.sessions.get('sessionSelectedId');
-        const database = state.sessions.getIn(
-            ['list', sessionSelectedId, 'configuration', 'database']);
-        ipcSend(TASKS.DISCONNECT, sessionSelectedId, database);
+export function startTempHttpsServer () {
+    return apiThunk(
+        'start-temp-https-server',
+        'GET',
+        'startTempHttpsServerRequest'
+    );
+}
+
+export function setConnectionNeedToBeSaved(tabId, bool) {
+    return dispatch => {
+        dispatch({
+            type: 'SET_CONNECTIONS_NEED_TO_BE_SAVED',
+            payload: {
+                tabId,
+                content: bool
+            }
+        });
     };
 }
 
-export function setupHttpsServer () {
-    return (__, getState) => {
-        const state = getState();
-        const sessionSelectedId = state.sessions.get('sessionSelectedId');
-        ipcSend(TASKS.SETUP_HTTPS_SERVER, sessionSelectedId);
-    };
+function PREVIEW_QUERY (dialect, table, database = '') {
+    switch (dialect) {
+        case DIALECTS.MYSQL:
+        case DIALECTS.SQLITE:
+        case DIALECTS.MARIADB:
+        case DIALECTS.POSTGRES:
+            return `SELECT * FROM ${table} LIMIT 5`;
+        case DIALECTS.MSSQL:
+            return 'SELECT TOP 5 * FROM ' +
+                `${database}.dbo.${table}`;
+        case DIALECTS.ELASTICSEARCH:
+            return JSON.stringify({
+                index: database || '_all',
+                type: table || '_all',
+                body: {
+                    query: { 'match_all': {} },
+                    size: 5
+                }
+            });
+        default:
+            throw new Error(`Dialect ${dialect} is not one of the DIALECTS`);
+    }
 }
-
-export function newOnPremSession (domain) {
-    return (__, getState) => {
-        const state = getState();
-        const sessionSelectedId = state.sessions.get('sessionSelectedId');
-        ipcSend(TASKS.NEW_ON_PREM_SESSION, sessionSelectedId, null, domain);
-    };
-}
-
-function ipcSend(task, sessionSelectedId, database, message = {}) {
-    ipcRenderer.send(CHANNEL, {task, sessionSelectedId, database, message});
-}
-
-// <- ipc specific

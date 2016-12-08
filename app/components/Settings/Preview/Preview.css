@@ -11,6 +11,12 @@ th, td {
     text-align: left;
 }
 
+.previewContainer {
+    margin: 25px;
+    overflow: auto;
+    border-radius: 3px;
+}
+
 .tableHeader {
     padding-top: 6px;
     padding-bottom: 6px;

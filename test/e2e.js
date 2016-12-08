@@ -4,7 +4,6 @@ import webdriver from 'selenium-webdriver';
 import {expect} from 'chai';
 import electronPath from 'electron-prebuilt';
 import fetch from 'node-fetch';
-import {split} from 'ramda';
 import {productName, version} from '../package.json';
 var FormData = require('form-data');
 
@@ -12,7 +11,7 @@ var FormData = require('form-data');
 import {
     APP_STATUS,
     DIALECTS,
-    CONNETION_CONFIG
+    CONNECTION_CONFIG
 } from '../app/constants/constants';
 
 // import styles to use for tests
@@ -118,8 +117,8 @@ describe('plotly database connector', function Spec() {
             byId(`test-logo-${dialect}`)
         );
 
-        this.getInputField = (credential) => findEl(
-            byId(`test-input-${credential}`)
+        this.getInputField = (connection) => findEl(
+            byId(`test-input-${connection}`)
         );
 
         this.getConnectBtn = () => findEl(
@@ -172,17 +171,17 @@ describe('plotly database connector', function Spec() {
 
         // user inputs
         this.fillInputs = async (testedDialect) => {
-            CONNETION_CONFIG[testedDialect].forEach(credential => {
-                this.getInputField(credential)
+            CONNECTION_CONFIG[testedDialect].forEach(connection => {
+                this.getInputField(connection)
                 .then(input => {
-                    input.sendKeys(CREDENTIALS[testedDialect][credential]);
+                    input.sendKeys(CREDENTIALS[testedDialect][connection]);
                 });
             });
         };
 
         this.wrongInputs = async (testedDialect) => {
-            CONNETION_CONFIG[testedDialect].forEach(credential => {
-                this.getInputField(credential)
+            CONNECTION_CONFIG[testedDialect].forEach(connection => {
+                this.getInputField(connection)
                 .then(input => input.sendKeys('blah'));
             });
         };
@@ -192,10 +191,10 @@ describe('plotly database connector', function Spec() {
 
         this.waitFor = async (expectedClass, element) => {
             let currentClass = await this.getClassOf(element);
-            console.log(split('test-', currentClass)[1]);
+            console.log(currentClass.split('test-')[1]);
             while (!currentClass.includes(expectedClass)) {
                 currentClass = await this.getClassOf(element);
-                console.log(split('test-', currentClass)[1]);
+                console.log(currentClass.split('test-'))[1]);
                 await delay(500);
             }
         };
@@ -217,7 +216,7 @@ describe('plotly database connector', function Spec() {
             const conerror = `test-${APP_STATUS.CON_ERROR}`;
             const btn = await this.getConnectBtn();
             const testClass = await this.getClassOf(btn);
-            console.log(split('test-', testClass)[1]);
+            console.log(testClass.split('test-')[1]);
             return !(testClass.includes(disconnected) ||
                     testClass.includes(conerror));
         };
@@ -493,12 +492,12 @@ describe('plotly database connector', function Spec() {
 
         const testedDialect = dialectUnderTest;
 
-        it('set state to "con_error" when connecting using wrong credentials',
+        it('set state to "con_error" when connecting using wrong connections',
         async () => {
             const logo = await this.getLogo(testedDialect);
             const btn = await this.getConnectBtn();
             await logo.click();
-            // connect with wrong credentials
+            // connect with wrong connections
             this.wrongInputs(testedDialect)
             .then(await delay(1000))
             // click to connect

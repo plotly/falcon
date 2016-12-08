@@ -1,8 +1,3 @@
-export const BACKEND = {
-    CONNECTOR_URL: 'connector.plot.ly',
-    OPTIONS: {port: 5000}
-};
-
 export const DIALECTS = {
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
@@ -10,58 +5,65 @@ export const DIALECTS = {
     REDSHIFT: 'redshift',
     ELASTICSEARCH: 'elasticsearch',
     MSSQL: 'mssql',
-    SQLITE: 'sqlite'
+    SQLITE: 'sqlite',
+    S3: 's3',
+    APACHE_DRILL: 'apache drill'
 };
 
-export const APP_STATUS = {
-    INITIALIZED: 'INITIALIZED',
-    CON_ERROR: 'CON_ERROR',
-    ERROR: 'ERROR',
-    CONNECTED: 'CONNECTED',
-    CONNECTING: 'CONNECTING',
-    DISCONNECTED: 'DISCONNECTED'
-};
-
-export const CONNETION_CONFIG = {
-    [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port'],
-    [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port'],
-	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port'],
+export const CONNECTION_CONFIG = {
+    [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port', 'database'],
+    [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port', 'database'],
+	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.REDSHIFT]: ['username', 'password', 'host', 'port', 'database'],
+    [DIALECTS.SQLITE]: ['storage'],
+    // TODO - What are the actual elasticsearch connection options?
     [DIALECTS.ELASTICSEARCH]: ['username', 'password', 'host', 'port'],
-    [DIALECTS.SQLITE]: ['storage']
+    [DIALECTS.S3]: ['bucket', 'accessKeyId', 'secretAccessKey'],
+    [DIALECTS.APACHE_DRILL]: [
+        'host',
+        'port',
+        'bucket',
+        'accessKeyId',
+        'secretAccessKey'
+    ] // TODO - password for apache drill?
 };
 
-export const CONNETION_OPTIONS = {
-    [DIALECTS.MYSQL]: ['ssl'],
-    [DIALECTS.MARIADB]: ['ssl'],
-	[DIALECTS.MSSQL]: ['ssl'],
-    [DIALECTS.POSTGRES]: ['ssl'],
-    [DIALECTS.REDSHIFT]: ['ssl'],
+// TODO - Combine this with the CONNECTION_CONFIG
+export const CONNECTION_OPTIONS = {
+    [DIALECTS.MYSQL]: [{'ssl': 'SSL enabled'}],
+    [DIALECTS.MARIADB]: [{'ssl': 'SSL enabled'}],
+	[DIALECTS.MSSQL]: [{'ssl': 'SSL enabled'}],
+    [DIALECTS.POSTGRES]: [{'ssl': 'SSL enabled'}],
+    [DIALECTS.REDSHIFT]: [{'ssl': 'SSL enabled'}],
     [DIALECTS.ELASTICSEARCH]: [],
-    [DIALECTS.SQLITE]: []
+    [DIALECTS.SQLITE]: [],
+    [DIALECTS.S3]: [],
+    [DIALECTS.APACHE_DRILL]: []
+
 };
 
-export const BUTTON_MESSAGE = {
-    INITIALIZED: 'connect',
-    CON_ERROR: 'try again',
-    ERROR: 'connected',
-    CONNECTED: 'connected',
-    CONNECTING: 'connecting...',
-    DISCONNECTED: 'connect'
+export const LOGOS = {
+    [DIALECTS.REDSHIFT]: 'images/redshift-logo.png',
+    [DIALECTS.POSTGRES]: 'images/postgres-logo.png',
+    [DIALECTS.ELASTICSEARCH]: 'images/elastic-logo.png',
+    [DIALECTS.MYSQL]: 'images/mysql-logo.png',
+    [DIALECTS.MARIADB]: 'images/mariadb-logo.png',
+    [DIALECTS.MSSQL]: 'images/mssql-logo.png',
+    [DIALECTS.SQLITE]: 'images/sqlite-logo.png',
+    [DIALECTS.S3]: 'images/s3-logo.png',
+    [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png'
 };
 
-export const EMPTY_SESSION =
-{
-    CONFIGURATION: {
-        username: '',
-        password: '',
-        database: '',
-        dialect: DIALECTS.MYSQL,
-        port: '',
-        storage: '',
-        host: '',
-        ssl: false
-    },
-    CONNECTION: {status: APP_STATUS.INITIALIZED}
+
+export const INITIAL_CONNECTIONS = {
+    username: '',
+    password: '',
+    database: '',
+    index: '',
+    doc: '',
+    dialect: DIALECTS.MYSQL,
+    port: '',
+    host: '',
+    ssl: false
 };

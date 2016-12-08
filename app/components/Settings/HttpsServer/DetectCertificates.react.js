@@ -1,9 +1,10 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Instructions from './Instructions.react';
-import {BACKEND} from '../../../constants/constants';
+import {baseUrl, usesHttpsProtocol} from '../../../utils/utils';
+import {RED_DOT, YELLOW_DOT, GREEN_DOT} from './Buttons.js';
 
-let INTERVAL_ID;
+let INTERVAL_SERVER_STATUS;
 
 export default class DetectCertificates extends Component {
     constructor(props) {
@@ -13,41 +14,43 @@ export default class DetectCertificates extends Component {
             expandInstructions: false
         };
     }
-    componentWillMount() {
 
-        INTERVAL_ID = setInterval(() => {
-            fetch(
-                `https://${BACKEND.CONNECTOR_URL}:${BACKEND.OPTIONS.port}/status`
-            )
-            .then(() => {
-                this.setState({successfulFetch: true});
-            })
-            .catch(err => {
-                if (err.message === 'failed to fetch') {
+    componentWillMount() {
+        if (usesHttpsProtocol()) {
+            INTERVAL_SERVER_STATUS = setInterval(() => {
+                fetch(
+                    `${baseUrl()}/status`
+                )
+                .then(() => {
+                    this.setState({successfulFetch: true});
+                })
+                .catch(err => {
                     this.setState({successfulFetch: false});
-                }
-            });
-        }, 1000);
+                });
+            }, 1000);
+        }
     }
 
     componentWillUnmount() {
-        clearInterval(INTERVAL_ID);
+        clearInterval(INTERVAL_SERVER_STATUS);
     }
 
+    componentWillUpdate() {
+        if (usesHttpsProtocol() && this.state.successfulFetch) {
+            clearInterval(INTERVAL_SERVER_STATUS);
+        }
+    }
 
     render() {
-
-        let httpsServerStatus;
-        if (this.state.successfulFetch) {
-            httpsServerStatus = (
-                <div>✓ Your certificates are installed on this computer.</div>
-            );
-        } else {
-            httpsServerStatus = (
+        const {startTempHttpsServerRequest} = this.props;
+        let installCertsMessage;
+        if (startTempHttpsServerRequest.status === 200 && startTempHttpsServerRequest.content) {
+            installCertsMessage = (
                 <div>
                     <div>
-                        Install your self-signed certificates.&nbsp;
-                        <a onClick={() => {
+                        {YELLOW_DOT}{'Install your certificate from the browser. '}
+                        <a
+                            onClick={() => {
                                 this.setState({
                                     expandInstructions:
                                         !this.state.expandInstructions
@@ -59,8 +62,9 @@ export default class DetectCertificates extends Component {
                                 ? 'Hide '
                                 : 'View '
                             }
-                            instructions.
+                            {'instructions. '}
                         </a>
+                        {'When done, Restart the app.'}
                     </div>
                     {
                         this.state.expandInstructions
@@ -69,11 +73,24 @@ export default class DetectCertificates extends Component {
                     }
                 </div>
             );
+        } else {
+            installCertsMessage = (
+                <div>
+                    {RED_DOT}{'Create a browser certificate from your self-signed keys. '}
+                    <a
+                       onClick={() => {
+                           this.props.startTempHttpsServer();
+                       }}
+                    >
+                        {'Click to create your certificate. '}
+                    </a>
+                </div>
+            );
         }
 
         return (
             <div>
-                {httpsServerStatus}
+                {installCertsMessage}
             </div>
         );
     }
@@ -82,6 +99,5 @@ export default class DetectCertificates extends Component {
 
 
 DetectCertificates.propTypes = {
-    sessionsActions: PropTypes.object,
-    ipc: ImmutablePropTypes.map.isRequired
+
 };

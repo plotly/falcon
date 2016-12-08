@@ -1,7 +1,61 @@
+.fullApp {
+
+}
+
+.header {
+    vertical-align: top;
+}
+
+.logoAndTitle {
+    display: inline-block;
+    width: 50%;
+}
+
 .plotlyLogo {
-	width: 12%;
-	margin-bottom: 12px;
-	display: block;
-	margin-left: auto;
-	margin-right:auto;
+    width: 100px;
+	display: inline-block;
+}
+
+.applicationTitle {
+    margin-top: 25px;
+    display: inline-block;
+    vertical-align: top;
+    color: #096CB3;
+}
+
+.supportLinks {
+    display: inline-block;
+    direction: rtl;
+    text-align: start;
+    vertical-align: top;
+    width: 50%;
+    margin-top: 30px;
+}
+
+.externalLinkContainer {
+    display: inline-block;
+}
+
+.externalLink {
+    cursor: pointer;
+    padding: 10px;
+}
+
+.settings {
+    background-color: white;
+    padding-top: 20px;
+    margin: 0px 20px 0px 20px;
+}
+
+.onPremForm {
+    text-align: center;
+}
+
+.onPremDomainInput {
+    text-align: center;
+}
+
+.addOnPremLink {
+    cursor: pointer;
+    text-align: center;
 }

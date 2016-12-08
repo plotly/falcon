@@ -1,8 +1,17 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Settings from './Settings/Settings.react';
-import SessionsManager from './SessionsManager/SessionsManager.react';
+import {baseUrl} from '../utils/utils';
+import {Link} from './Link.react';
+import {contains} from 'ramda';
+
 import * as styles from './Configuration.css';
+
+const LINKS = {
+    PLANS: 'http://plot.ly/plans/',
+    DOCS: 'http://help.plot.ly/database-connectors/',
+    TYPEFORM: 'https://plotly.typeform.com/to/KUiCSl'
+};
 
 export default class Configuration extends Component {
     constructor(props) {
@@ -10,48 +19,37 @@ export default class Configuration extends Component {
     }
 
     render() {
-        let settings = null;
-        const {
-            sessionsActions,
-            sessions
-        } = this.props;
-        // debugger;
-        const sessionSelectedId = sessions.getIn(
-            ['list', `${this.props.sessions.get('sessionSelectedId')}`]
-        );
-
-        if (this.props.sessions.get('list').size > 0) {
-
-            settings = (
-                <Settings
-                    configuration={sessionSelectedId.get('configuration')}
-                    connection={sessionSelectedId.get('connection')}
-                    ipc={sessionSelectedId.get('ipc')}
-
-                    sessionsActions={sessionsActions}
-                />
-            );
-        }
 
         return (
-            <div>
+            <div className={styles.fullApp}>
+                <div className={styles.header}>
+                    <div className={styles.logoAndTitle}>
+                        <img className={styles.plotlyLogo}
+                            src="images/plotly-connector-logo.svg"
+                        >
+                        </img>
+                        <h5 className={styles.applicationTitle}>
+                            Plotly Database Connector
+                        </h5>
+                    </div>
 
-                <img
-                    src="./images/plotly-logo-no-name.png"
-                    className={styles.plotlyLogo}
-                >
-                </img>
+                    <div className={styles.supportLinks}>
+                        <div className={styles.externalLinkContainer}>
+                            {/* Hide Upgrade button for on-prem */}
+                            {
+                                contains(
+                                    'external-data-connector',
+                                    window.location.href
+                                ) ?
+                                null : Link(LINKS.PLANS, 'Plans and Pricing')
+                            }
+                            {Link(LINKS.DOCS, 'Documentation')}
+                            {Link(LINKS.TYPEFORM, 'Request a Connector')}
+                        </div>
+                    </div>
+                </div>
 
-                <h4>
-                    Plotly 2.0 Database Connector
-                </h4>
-
-                <SessionsManager
-                    sessionsActions={this.props.sessionsActions}
-                    sessions={this.props.sessions}
-                />
-
-                {settings}
+                <Settings/>
 
             </div>
 
@@ -60,6 +58,5 @@ export default class Configuration extends Component {
 }
 
 Configuration.propTypes = {
-    sessionsActions: PropTypes.object,
-    sessions: ImmutablePropTypes.map.isRequired
+    sessionsActions: PropTypes.object
 };
