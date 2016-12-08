@@ -17,7 +17,7 @@ export default class Preview extends Component {
             column => <th>{column}</th>
         );
 
-        const renderCell = cell => <td>{cell}</td>;
+        const renderCell = cell => <td>{JSON.stringify(cell)}</td>;
         const tableRows = rows.map(
             row => <tr>{row.map(renderCell)}</tr>
         );
