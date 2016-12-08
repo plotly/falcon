@@ -1,6 +1,6 @@
 {
   "name": "plotly-database-connector",
-  "version": "0.0.9-alpha",
+  "version": "1.0.0",
   "dependencies": {
     "abab": {
       "version": "1.0.3",
@@ -1974,18 +1974,6 @@
       "version": "0.0.2",
       "from": "duplexer2@0.0.2",
       "resolved": "https://registry.npmjs.org/duplexer2/-/duplexer2-0.0.2.tgz"
-    },
-    "elasticsearch": {
-      "version": "11.0.1",
-      "from": "elasticsearch@>=11.0.1 <12.0.0",
-      "resolved": "https://registry.npmjs.org/elasticsearch/-/elasticsearch-11.0.1.tgz",
-      "dependencies": {
-        "lodash": {
-          "version": "3.10.1",
-          "from": "lodash@>=3.10.0 <4.0.0",
-          "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
-        }
-      }
     },
     "electron-debug": {
       "version": "0.6.0",
@@ -4004,11 +3992,6 @@
       "version": "3.5.0",
       "from": "lodash@>=3.5.0 <3.6.0",
       "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.5.0.tgz"
-    },
-    "lodash-compat": {
-      "version": "3.10.2",
-      "from": "lodash-compat@>=3.0.0 <4.0.0",
-      "resolved": "https://registry.npmjs.org/lodash-compat/-/lodash-compat-3.10.2.tgz"
     },
     "lodash-es": {
       "version": "4.17.2",
