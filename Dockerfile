@@ -9,8 +9,8 @@
 FROM node:6.6
 
 # I'd like to install the latest version of npm with something like this:
-# RUN npm install --global npm@4.0.3
-# But unforunately that fails with
+# RUN npm install --global npm@4.0.5
+# But unfortunately that fails with
 # It doesn't seem like there is a good solution in the community yet
 # See: https://github.com/npm/npm/issues/9863
 
