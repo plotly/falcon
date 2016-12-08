@@ -7,11 +7,19 @@ export default {
 
     devtool: 'source-map',
 
+<<<<<<< HEAD
     entry: './backend/headless.development.js',
 
     output: {
         path: __dirname,
         filename: './dist/headless-bundle.js'
+=======
+    entry: './backend/headlessServer.js',
+
+    output: {
+        path: __dirname,
+        filename: './backend/headlessBundle.js'
+>>>>>>> master
     },
 
     plugins: [

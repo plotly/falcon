@@ -268,7 +268,7 @@ export function parseCSV(textData) {
             if (err) {
                 reject(err);
             }
-            if (!allRows || allRows.length === 0){
+            if (!allRows || allRows.length === 0) {
                 resolve({
                     columnnames: [],
                     rows: [[]]

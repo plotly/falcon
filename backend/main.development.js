@@ -23,6 +23,7 @@ Logger.log('Loading persistent queries', 2);
 server.queryScheduler.loadQueries();
 
 app.on('ready', () => {
+    trackStartup();
 
     let mainWindow = new BrowserWindow({
         show: true,

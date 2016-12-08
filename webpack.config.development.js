@@ -1,6 +1,7 @@
 /* eslint max-len: 0 */
 import webpack from 'webpack';
 import baseConfig from './webpack.config.base';
+import {merge} from 'ramda';
 
 // Import the plugin:
 var DashboardPlugin = require('webpack-dashboard/plugin');

@@ -39,8 +39,11 @@ static/style.css
 
 # Local tests
 test/set_creds.sh
-
 *.pem
+
+# bundles
+backend/headlessBundle.js
+backend/headlessBundle.js.map
 
 *.srl
 
