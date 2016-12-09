@@ -1,7 +1,7 @@
 {
   "name": "plotly-database-connector",
   "productName": "Plotly Database Connector",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
   "main": "./backend/main.js",
   "scripts": {
@@ -72,6 +72,7 @@
     "eslint-plugin-import": "^1.8.0",
     "eslint-plugin-jsx-a11y": "^0.6.2",
     "eslint-plugin-react": "^4.3.0",
+    "express": "^4.14.0",
     "mocha": "^2.4.5",
     "react-addons-test-utils": "^15.0.1",
     "redux-devtools": "^3.2.0",

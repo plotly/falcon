@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Display error messages in OAuth login page
 
+## [1.0.2] - 2016-12-09
+
+### Changed
+Removed mixpanel from the app completely
+
+### Added
+Express to dev dependencies
+
 ## [1.0.1] - 2016-12-08
 
 ### Changed
