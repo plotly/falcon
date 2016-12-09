@@ -239,7 +239,7 @@ export default class Server {
          * ids are assigned by the server on connection save
          */
         server.get('/connections/:id', function getDatastoresIdHandler(req, res, next) {
-            const connection = getSanitizedConnectionById(req.id);
+            const connection = getSanitizedConnectionById(req.params.id);
             if (connection) {
                 res.json(200, connection);
             } else {
