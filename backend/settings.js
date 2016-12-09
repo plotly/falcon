@@ -16,7 +16,6 @@ const DEFAULT_SETTINGS = {
         'connector'
     ),
 
-    // TODO - Needs to be set for on-prem
     PLOTLY_API_SSL_ENABLED: true,
     PLOTLY_API_DOMAIN: 'api.plot.ly',
 
