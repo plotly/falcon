@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './UserConnections.css';
-import {head, flatten, keys, values} from 'ramda';
+import {contains, head, flatten, keys, values} from 'ramda';
 import {
     CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS
 } from '../../../constants/constants';
@@ -51,8 +51,11 @@ export default class UserConnections extends Component {
 		return 'test-input-created';
 	}
 
-	getInputType (connection) {
-		return (connection === 'password') ? 'password' : 'text';
+	getInputType (setting) {
+		return (
+            contains(setting, ['secretAccessKey', 'password']) ?
+            'password' : 'text'
+        );
 	}
 
 	getPlaceholder(connection) {
