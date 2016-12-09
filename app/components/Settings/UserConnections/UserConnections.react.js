@@ -58,8 +58,8 @@ export default class UserConnections extends Component {
         );
 	}
 
-	getPlaceholder(connection) {
-		switch (connection) {
+	getPlaceholder(setting) {
+		switch (setting) {
 			case 'port':
 				return 'server port number (e.g. 3306)';
 			case 'storage':
@@ -67,14 +67,14 @@ export default class UserConnections extends Component {
             case 'host':
                 return 'server name (e.g. localhost)';
 			default:
-				return connection;
+				return setting;
 		}
 	}
 
-	getOnClick(connection) {
+	getOnClick(setting) {
         // sqlite requires a path
 		return () => {
-			if (connection === 'storage') {
+			if (setting === 'storage') {
 				dialog.showOpenDialog({
 					properties: ['openFile', 'openDirectory'],
 					filters: [{name: 'databases', extensions: ['db']}]
@@ -87,7 +87,7 @@ export default class UserConnections extends Component {
 					const splitPath = path.split('/');
 					const fileName = splitPath.length - 1;
 					this.props.updateConnection({
-						[connection]: paths[0],
+						[setting]: paths[0],
 						'username': splitPath[fileName]
 					});
 				});
@@ -112,17 +112,17 @@ export default class UserConnections extends Component {
         });
 
 		let inputs = CONNECTION_CONFIG[connectionObject.dialect]
-			.map(connection => (
-            <div key={connection}>
+			.map(setting => (
+            <div key={setting}>
                 <input className={this.testClass()}
-                    placeholder={this.getPlaceholder(connection)}
-                    type={this.getInputType(connection)}
+                    placeholder={this.getPlaceholder(setting)}
+                    type={this.getInputType(setting)}
                     onChange={e => (
-                        updateConnection({[connection]: e.target.value})
+                        updateConnection({[setting]: e.target.value})
                     )}
-                    onClick={this.getOnClick(connection)}
-                    value={connectionObject[connection]}
-                    id={`test-input-${connection}`}
+                    onClick={this.getOnClick(setting)}
+                    value={connectionObject[setting]}
+                    id={`test-input-${setting}`}
                 />
             </div>
 		));
