@@ -124,13 +124,14 @@ export default class Server {
             directory: `${__dirname}/../app/`
         }));
 
-        server.get('/oauth2/callback', restify.serveStatic({
+        server.get(/\/oauth2\/callback\/?$/, restify.serveStatic({
             directory: `${__dirname}/../static`,
             file: 'oauth.html'
         }));
 
-        server.post('/oauth2/token', function saveOauth(req, res, next) {
+        server.post(/\/oauth2\/token\/?$/, function saveOauth(req, res, next) {
             const {access_token} = req.params;
+            Logger.log(`Checking token ${access_token} against ${getSetting('PLOTLY_API_URL')}/v2/users/current`);
             fetch(`${getSetting('PLOTLY_API_URL')}/v2/users/current`, {
                 headers: {'Authorization': `Bearer ${access_token}`}
             })
@@ -138,7 +139,7 @@ export default class Server {
                 if (userRes.status === 200) {
                     const {username} = userMeta;
                     if (!username) {
-                        res.json(500, {error: {message: 'User was not found.'}});
+                        res.json(500, {error: {message: `User was not found at ${getSetting('PLOTLY_API_URL')}`}});
                         return;
                     }
                     const existingUsers = getSetting('USERS');

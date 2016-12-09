@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import * as styles from './Tabs.css';
 import classnames from 'classnames';
-import {LOGOS} from '../../../constants/constants';
+import {LOGOS, DIALECTS} from '../../../constants/constants';
 
 export default class Tab extends Component {
     constructor(props) {
@@ -10,7 +10,21 @@ export default class Tab extends Component {
 
     render() {
         const {tabId, isSelected, connectionObject, setTab, deleteTab} = this.props;
-        const {username, host, dialect, id} = connectionObject;
+        const {dialect, id} = connectionObject;
+
+        // Heads up - these should match the same labels in plot.ly/create
+        let label;
+        if (dialect === DIALECTS.S3) {
+            label = `S3 - (${connectionObject.bucket})`;
+        } else if (dialect === DIALECTS.APACHE_DRILL) {
+            label = `Apache Drill (${connectionObject.host})`;
+        } else if (connectionObject.dialect === DIALECTS.ELASTICSEARCH) {
+            label = `Elasticsearch (${connectionObject.host})`;
+        } else if (connectionObject.dialect === DIALECTS.SQLITE) {
+            label = connectionObject.storage;
+        } else {
+            label = `${connectionObject.database} (${connectionObject.username}@${connectionObject.host})`;
+        }
 
         return (
             <div
@@ -38,7 +52,7 @@ export default class Tab extends Component {
 
                 <p className={styles.tabIdentifier}>
                     <span>
-                        {username}@{host}
+                        {label}
                     </span>
                 </p>
 

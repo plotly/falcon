@@ -7,7 +7,8 @@ class Status extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            status: ''
+            status: '',
+            errorMessage: ''
         };
     }
 
@@ -38,7 +39,10 @@ class Status extends Component {
             if (res.status >= 200 && res.status < 400) {
                 this.setState({status: 'success'});
             } else if (res.status >= 400) {
-                this.setState({status: 'failure'});
+                this.setState({
+                    status: 'failure',
+                    errorMessage: json.error.message
+                });
             }
         }))
         .catch(err => {
@@ -48,7 +52,7 @@ class Status extends Component {
 
     render() {
 
-        const {status} = this.state;
+        const {errorMessage, status} = this.state;
         let content = null;
         if (status === 'loading') {
             content = (
@@ -83,13 +87,20 @@ class Status extends Component {
             );
         } else if (status === 'failure') {
             content = (
-                <h4>
-                    {'Yikes! An error occurred while trying to authorize.'}
-                </h4>
+                <div>
+                    <h4>
+                        {'Yikes! An error occurred while trying to authorize.'}
+                    </h4>
+                    {errorMessage ? (
+                        <pre>
+                            {`Error: ${errorMessage}`}
+                        </pre>
+                    ) : null}
+                </div>
             );
         }
         return (
-            <div style={{marginTop: '30%', textAlign: 'center'}}>
+            <div style={{paddingTop: '30%', textAlign: 'center'}}>
                 {content}
             </div>
         );

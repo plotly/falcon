@@ -183,7 +183,7 @@ describe('Routes - ', function () {
         .then(res => res.json().then(json => {
             assert.deepEqual(json, {
                 error: {
-                    message: 'User was not found.'
+                    message: 'User was not found at https://api.plot.ly'
                 }
             });
             assert.equal(res.status, 500);
