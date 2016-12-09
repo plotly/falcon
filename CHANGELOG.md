@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Changed
+- Display error messages in OAuth login page
+
 ## [1.0.1] - 2016-12-08
 
 ### Changed
