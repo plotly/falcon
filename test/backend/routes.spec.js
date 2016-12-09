@@ -596,7 +596,11 @@ describe('Routes - ', function () {
     });
 
     it('connections - returns sanitized connections', function(done) {
-        GET('connections')
+        POST('connections', publicReadableS3Connections)
+        .then(function(res) {
+            assert.equal(res.status, 200);
+            return GET('connections');
+        })
         .then(res => {
             assert.equal(res.status, 200);
             return res.json();
@@ -604,10 +608,48 @@ describe('Routes - ', function () {
         .then(json => {
             assert.deepEqual(
                 json.map(dissoc('id')),
-                [dissoc('password', sqlConnections)]
+                [
+                    // The SQL connection we save in beforeEach
+                    dissoc('password', sqlConnections),
+                    // The S3 connection we save above
+                    dissoc('secretAccessKey', publicReadableS3Connections)
+                ]
             );
             done();
         }).catch(done);
+    });
+
+    it('connection/:id - returns sanitized connections', function(done) {
+        let connections;
+        POST('connections', publicReadableS3Connections)
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 200);
+            return GET('connections');
+        }))
+        .then(res => res.json().then(connections => {
+            return GET(`connections/${connections[0].id}`)
+            .then(res => res.json().then(function(connection) {
+
+                assert.deepEqual(
+                    dissoc('id', connection),
+                    dissoc('password', sqlConnections)
+                );
+
+                return GET(`connections/${connections[1].id}`);
+
+            }));
+
+        }))
+        .then(res => res.json().then(function(connection) {
+
+            assert.deepEqual(
+                dissoc('id', connection),
+                dissoc('secretAccessKey', publicReadableS3Connections)
+            );
+
+            done();
+
+        })).catch(done);
     });
 
     it('connections - does not update connection if bad connection object', (done) => {
