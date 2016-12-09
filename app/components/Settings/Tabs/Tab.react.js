@@ -10,7 +10,21 @@ export default class Tab extends Component {
 
     render() {
         const {tabId, isSelected, connectionObject, setTab, deleteTab} = this.props;
-        const {username, host, dialect, id} = connectionObject;
+        const {dialect, id} = connectionObject;
+
+        // Heads up - these should match the same labels in plot.ly/create
+        let label;
+        if (dialect === 's3') {
+            label = `S3 - (${connectionObject.bucket})`;
+        } else if (dialect === 'apache drill') {
+            label = `Apache Drill (${connectionObject.host})`;
+        } else if (connectionObject.dialect === 'elasticsearch') {
+            label = `Elasticsearch (${connectionObject.host})`;
+        } else if (connectionObject.dialect === 'sqlite') {
+            label = connectionObject.storage;
+        } else {
+            label = `${connectionObject.database} (${connectionObject.username}@${connectionObject.host})`;
+        }
 
         return (
             <div
@@ -38,7 +52,7 @@ export default class Tab extends Component {
 
                 <p className={styles.tabIdentifier}>
                     <span>
-                        {username}@{host}
+                        {label}
                     </span>
                 </p>
 
