@@ -100,7 +100,7 @@ class Status extends Component {
             );
         }
         return (
-            <div style={{marginTop: '30%', textAlign: 'center'}}>
+            <div style={{paddingTop: '30%', textAlign: 'center'}}>
                 {content}
             </div>
         );
