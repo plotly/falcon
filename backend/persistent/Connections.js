@@ -13,6 +13,10 @@ import {
     createStoragePath
 } from '../utils/homeFiles';
 
+export function sanitize(connection) {
+    return dissoc('secretAccessKey', dissoc('password', connection));
+}
+
 export function getConnections() {
     if (fs.existsSync(getSetting('CONNECTIONS_PATH'))) {
         return YAML.load(getSetting('CONNECTIONS_PATH').toString());
@@ -24,8 +28,7 @@ export function getConnections() {
 export function getSanitizedConnectionById(id) {
     const connection = getConnections().find(c => c.id === id);
     if (connection) {
-        // TODO - use reduce or w/e
-        return dissoc('secretAccessKey', dissoc('password', connection));
+        return sanitize(connection);
     } else {
         return null;
     }
@@ -46,7 +49,7 @@ export function deleteConnectionById(id) {
 
 export function getSanitizedConnections() {
     const connections = getConnections();
-    return connections.map(cred => dissoc('password', cred));
+    return connections.map(cred => sanitize(cred));
 }
 
 export function saveConnection(connectionObject) {

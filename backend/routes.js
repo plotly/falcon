@@ -11,7 +11,8 @@ import {
     getSanitizedConnectionById,
     lookUpConnections,
     saveConnection,
-    validateConnection
+    validateConnection,
+    sanitize
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
@@ -202,7 +203,7 @@ export default class Server {
                  * supply a password if it originally loaded up these creds
                  * via `GET /connections`.
                  */
-                dissoc('password', req.params)
+                sanitize(req.params)
             );
             if (connectionsOnFile) {
                 res.send(409, {connectionId: connectionsOnFile.id});
