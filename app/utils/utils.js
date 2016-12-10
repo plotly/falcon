@@ -56,7 +56,7 @@ export function isOnPrem() {
 
 export function plotlyUrl() {
     if (isOnPrem()) {
-        return window.location.origin || 'https://plot.ly';
+        return window.location.origin;
     }
     return 'https://plot.ly';
 }
