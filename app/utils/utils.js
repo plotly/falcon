@@ -46,7 +46,6 @@ export function getQuerystringParam(PARAM) {
 }
 
 export function isOnPrem() {
-    return true;
     // on prem has a specific path for the app; it is simply '/' otherwise
     return (isWebBrowser && contains('external-data-connector', baseUrl()));
 }
