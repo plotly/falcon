@@ -31,11 +31,22 @@ export function parseSQL(data) {
 
     // iterate over each object (each object becomes a row)
     // returns: a row of rows (table)
-    const rows = data.map(row =>
-        Object.keys(row).map(
-            columnname => row[columnname]
-        )
-    );
+    const rows = [];
+    for (let i = 0; i < data.length; i++) {
+        rows[i] = [];
+        for (let j = 0; j < columnnames.length; j++) {
+            let cell = data[i][columnnames[j]];
+            // Like PostGIS's GeoJSON
+            if (type(cell) === 'Object') {
+                try {
+                    cell = JSON.stringify(cell);
+                } catch (e) {
+                    cell = cell;
+                }
+            }
+            rows[i][j] = cell;
+        }
+    }
 
     // plotly workspace requires keys (columnnames, ncols, nrows, rows)
     // and they should be in this format
