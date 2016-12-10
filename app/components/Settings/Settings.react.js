@@ -14,8 +14,14 @@ import Preview from './Preview/Preview.react';
 import HttpsSetup from './HttpsServer/HttpsSetup.react';
 import {Link} from '../Link.react';
 import {DIALECTS} from '../../constants/constants.js';
-import {plotlyUrl} from '../../utils/utils';
+import {plotlyUrl, isOnPrem} from '../../utils/utils';
 
+/*
+ * TODO - If the user is running the app locally but connecting to their
+ * on-prem instance then this will send them to the cloud instead of
+ * on-prem. We should use the PLOTLY_API_DOMAIN setting to send people
+ * to the right place.
+ */
 const WORKSPACE_IMPORT_SQL_URL = `${plotlyUrl()}/create?upload=sql`;
 
 const unfoldIcon = (
