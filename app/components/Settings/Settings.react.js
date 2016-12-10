@@ -291,18 +291,19 @@ class Settings extends Component {
                         </div>
                     )}
 
-                    {this.wrapWithAutoHide('HTTPS',
-                        <HttpsSetup
-                            hasCertsRequest={hasCertsRequest}
-                            createCertsRequest={createCertsRequest}
-                            redirectUrlRequest={redirectUrlRequest}
-                            createCerts={createCerts}
-                            hasCerts={hasCerts}
-                            redirectUrl={redirectUrl}
-                            startTempHttpsServer={startTempHttpsServer}
-                            startTempHttpsServerRequest={startTempHttpsServerRequest}
-                        />
-                    )}
+                    {isOnPrem() ? null : this.wrapWithAutoHide('HTTPS',
+                            <HttpsSetup
+                                hasCertsRequest={hasCertsRequest}
+                                createCertsRequest={createCertsRequest}
+                                redirectUrlRequest={redirectUrlRequest}
+                                createCerts={createCerts}
+                                hasCerts={hasCerts}
+                                redirectUrl={redirectUrl}
+                                startTempHttpsServer={startTempHttpsServer}
+                                startTempHttpsServerRequest={startTempHttpsServerRequest}
+                            />
+                        )
+                    }
 
                     <div className={styles.workspaceLink}>
                         {Link(WORKSPACE_IMPORT_SQL_URL, 'Make queries from Plotly')}
