@@ -46,17 +46,13 @@ export function getQuerystringParam(PARAM) {
 }
 
 export function isOnPrem() {
-    if (isWebBrowser) {
-        // on prem has a specific path for the app; it is simply '/' otherwise
-        return contains('external', baseUrl());
-    }
-    // TODO: is this always the case for the electron process?
-    return false;
+    // on prem has a specific path for the app; it is simply '/' otherwise
+    return (isWebBrowser && contains('external-data-connector', baseUrl()));
 }
 
 export function plotlyUrl() {
     if (isOnPrem()) {
-        return window.location.origin || 'https://plot.ly';
+        return window.location.origin;
     }
     return 'https://plot.ly';
 }
