@@ -1,7 +1,7 @@
 import {
     PlotlyAPIRequest
 } from '../../backend/persistent/PlotlyAPI.js';
-import {dissoc} from 'ramda';
+import {dissoc, merge} from 'ramda';
 
 export const names = [
     'country', 'month', 'year', 'lat', 'lon', 'value'
@@ -52,6 +52,9 @@ export const sqlConnections = {
 };
 
 export const postgresConnection = sqlConnections;
+export const postgisConnection = merge(
+    postgresConnection, {database: 'postgis'}
+);
 export const mysqlConnection = {
     dialect: 'mysql',
     username: 'masteruser',
