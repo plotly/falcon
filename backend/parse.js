@@ -1,4 +1,4 @@
-import {contains, gt, keys, replace, type} from 'ramda';
+import {contains, gt, keys, replace, toString, type} from 'ramda';
 import parse from 'csv-parse';
 
 export function parseSQL(data) {
@@ -36,13 +36,19 @@ export function parseSQL(data) {
         rows[i] = [];
         for (let j = 0; j < columnnames.length; j++) {
             let cell = data[i][columnnames[j]];
-            // Like PostGIS's GeoJSON
-            if (type(cell) === 'Object') {
+            // Like PostGIS's GeoJSON or Dates
+            const cellType = type(cell);
+            if (contains(cellType, ['Object', 'Boolean'])) {
                 try {
                     cell = JSON.stringify(cell);
                 } catch (e) {
-                    cell = cell;
                 }
+            } else if (cellType === 'Date') {
+                /*
+                 * JSON.stringify on a date wraps the date in 2 sets of quotes,
+                 * toJSON just wraps it in one.
+                 */
+                cell = cell.toJSON();
             }
             rows[i][j] = cell;
         }
