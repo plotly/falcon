@@ -6,7 +6,8 @@ import {
     elasticsearchConnections,
     publicReadableS3Connections,
     apacheDrillConnections,
-    apacheDrillStorage
+    apacheDrillStorage,
+    postgisConnection
 } from './utils.js';
 
 import {
@@ -38,6 +39,42 @@ describe('SQL - ', function () {
             done();
         }).catch(done);
     });
+
+    /*
+     * Unfortunately we don't have a PostGIS table that doesn't update
+     * with random data yet, so we have to skip this test on CI.
+     * It worked at a single point in time.
+     * TODO - Create a static PostGIS table for testing
+     */
+    xit('query stringifies boolean, date, and geojson objects', function(done) {
+        this.timeout(5 * 1000);
+
+        query(
+            'SELECT * from test LIMIT 1',
+            postgisConnection
+        ).then(results => {
+            assert.deepEqual(
+                results.rows,
+                [[
+                    1,
+                    '2016-12-12T07:46:36.144Z',
+                    'blue',
+                    0,
+                    0.641140648704853,
+                    'true',
+                    '{"type":"Point","coordinates":[7,9]}',
+                    '{"type":"LineString","coordinates":[[6,6],[8,2],[7,5]]}',
+                    '{"type":"Polygon","coordinates":[[[0,0],[3,0],[3,3],[0,3],[0,0]]]}',
+                    '{"type":"MultiPoint","coordinates":[[0,1],[0,1]]}',
+                    '{"type":"MultiLineString","coordinates":[[[3,8],[4,5],[9,5]],[[8,6],[4,8],[0,3]]]}',
+                    '{"type":"MultiPolygon","coordinates":[[[[0,0],[7,0],[7,7],[0,7],[0,0]]],[[[0,0],[7,0],[7,7],[0,7],[0,0]]]]}',
+                    '{"type":"GeometryCollection","geometries":[{"type":"Point","coordinates":[9,8]},{"type":"Polygon","coordinates":[[[0,0],[7,0],[7,7],[0,7],[0,0]]]}]}'
+                ]]
+            );
+            done();
+        }).catch(done);
+    });
+
 });
 
 
