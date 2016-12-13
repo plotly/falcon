@@ -185,7 +185,10 @@ class Settings extends Component {
                 getTables();
             }
             if (tablesRequest.status === 200 && !selectedTable) {
-                setTable(head(tablesRequest.content));
+                // Don't set the table to be undefined; causes inf loop.
+                if (!isEmpty(tablesRequest.content)) {
+                    setTable(head(tablesRequest.content));
+                }
             }
             if (selectedTable && !previewTableRequest.status) {
                 previewTables();
@@ -196,7 +199,10 @@ class Settings extends Component {
                 getElasticsearchMappings();
             }
             if (elasticsearchMappingsRequest.status === 200 && !selectedIndex) {
-                setIndex(head(keys(elasticsearchMappingsRequest.content)));
+                // Don't set the index to be undefined; causes inf loop.
+                if (!isEmpty(keys(elasticsearchMappingsRequest.content))) {
+                    setIndex(head(keys(elasticsearchMappingsRequest.content)));
+                }
             }
             if (selectedIndex && !selectedTable) {
                 setTable(head(keys(
