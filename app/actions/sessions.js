@@ -4,8 +4,7 @@ import {createAction} from 'redux-actions';
 import {DIALECTS, INITIAL_CONNECTIONS} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
 import * as httpsUtils from '../utils/https';
-import {contains} from 'ramda';
-import queryString from 'query-string';
+import {remove} from 'ramda';
 
 export const reset = createAction('RESET');
 export const mergeTabMap = createAction('MERGE_TAB_MAP');
@@ -243,13 +242,22 @@ export function newTab() {
 export function deleteTab(tabId) {
     return function (dispatch, getState) {
         /* eslint no-alert: 0 */
+        /*
+         * Throw a dialog box at the user because deleting a connection erases
+         * it from disk permanently and persistent queries may fail onwards.
+         */
         if (confirm(DELETE_TAB_MESSAGE)) {
         /* eslint no-alert: 0 */
+            const connectionId = getState().tabMap[tabId];
+            const tabIds = Object.keys(getState().connections);
+            const currentIdIndex = tabIds.indexOf(getState().selectedTab);
+            const connectRequest = getState().connectRequests[connectionId];
+            /*
+             * Logic to dermine which tab index we should switch to once
+             * the current tab is deleted.
+             */
+            let nextIdIndex = currentIdIndex;
             if (tabId === getState().selectedTab) {
-                const tabIds = Object.keys(getState().connections);
-                const currentIdIndex = tabIds.indexOf(tabId);
-                const connectionId = getState().connections[tabId].id;
-                let nextIdIndex;
                 if (currentIdIndex === 0) {
                     if (tabIds.length > 1) {
                         nextIdIndex = 1;
@@ -259,15 +267,33 @@ export function deleteTab(tabId) {
                 } else {
                     nextIdIndex = currentIdIndex - 1;
                 }
-                dispatch(setTab(tabIds[nextIdIndex]));
+            } else {
+                // Stay on the same tab if deleting another one.
+                nextIdIndex = currentIdIndex;
+            }
+            const nextIdTab = tabIds[nextIdIndex];
+            console.warn('nextIdTab', nextIdTab);
+            /*
+             * If the connection has been successfully saved to disk,
+             * we want to send an API call to delete it. Delete the tab after.
+             * Otherwise, we simply want to delete the unsaved or failed connection.
+             */
+            if (connectionId && connectRequest.status === 200) {
                 dispatch(apiThunk(
                     `connections/${connectionId}`,
                     'DELETE',
                     'deleteConnectionsRequests',
                     connectionId
-                ));
+                )).then(json => {
+                    if (!json.error) {
+                        dispatch(setTab(tabIds[nextIdIndex]));
+                        dispatch(deleteConnection(tabId));
+                    }
+                });
+            } else {
+                dispatch(deleteConnection(tabId));
+                dispatch(setTab(tabIds[nextIdIndex]));
             }
-            dispatch(deleteConnection(tabId));
         } else {
             return;
         }
