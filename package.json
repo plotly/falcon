@@ -2,7 +2,7 @@
   "name": "plotly-database-connector",
   "productName": "Plotly Database Connector",
   "version": "1.0.2",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
+  "description": "Plotly Database Connector for https://plot.ly/create. Connect your database and query your data to use in your charts.",
   "main": "./backend/main.js",
   "scripts": {
     "build": "npm run build-main && npm run build-renderer && npm run build-web",
