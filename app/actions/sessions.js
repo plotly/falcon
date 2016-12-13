@@ -241,43 +241,43 @@ export function newTab() {
 
 export function deleteTab(tabId) {
     return function (dispatch, getState) {
-        /* eslint no-alert: 0 */
+        const connectionId = getState().tabMap[tabId];
+        const tabIds = Object.keys(getState().connections);
+        const currentIdIndex = tabIds.indexOf(getState().selectedTab);
+        const connectRequest = getState().connectRequests[connectionId];
         /*
-         * Throw a dialog box at the user because deleting a connection erases
-         * it from disk permanently and persistent queries may fail onwards.
+         * Logic to dermine which tab index we should switch to once
+         * the current tab is deleted.
          */
-        if (confirm(DELETE_TAB_MESSAGE)) {
-        /* eslint no-alert: 0 */
-            const connectionId = getState().tabMap[tabId];
-            const tabIds = Object.keys(getState().connections);
-            const currentIdIndex = tabIds.indexOf(getState().selectedTab);
-            const connectRequest = getState().connectRequests[connectionId];
-            /*
-             * Logic to dermine which tab index we should switch to once
-             * the current tab is deleted.
-             */
-            let nextIdIndex = currentIdIndex;
-            if (tabId === getState().selectedTab) {
-                if (currentIdIndex === 0) {
-                    if (tabIds.length > 1) {
-                        nextIdIndex = 1;
-                    } else {
-                        nextIdIndex = -1; // null out
-                    }
+        let nextIdIndex = currentIdIndex;
+        if (tabId === getState().selectedTab) {
+            if (currentIdIndex === 0) {
+                if (tabIds.length > 1) {
+                    nextIdIndex = 1;
                 } else {
-                    nextIdIndex = currentIdIndex - 1;
+                    nextIdIndex = -1; // null out
                 }
             } else {
-                // Stay on the same tab if deleting another one.
-                nextIdIndex = currentIdIndex;
+                nextIdIndex = currentIdIndex - 1;
             }
-            const nextIdTab = tabIds[nextIdIndex];
+        } else {
+            // Stay on the same tab if deleting another one.
+            nextIdIndex = currentIdIndex;
+        }
+        const nextIdTab = tabIds[nextIdIndex];
+        /*
+         * If the connection has been successfully saved to disk,
+         * we want to send an API call to delete it. Delete the tab after.
+         * Otherwise, we simply want to delete the unsaved or failed connection.
+         */
+        if (connectionId && connectRequest.status === 200) {
             /*
-             * If the connection has been successfully saved to disk,
-             * we want to send an API call to delete it. Delete the tab after.
-             * Otherwise, we simply want to delete the unsaved or failed connection.
+             * Throw a dialog box at the user because deleting a connection erases
+             * it from disk permanently and persistent queries may fail onwards.
              */
-            if (connectionId && connectRequest.status === 200) {
+             /* eslint no-alert: 0 */
+            if (confirm(DELETE_TAB_MESSAGE)) {
+            /* eslint no-alert: 0 */
                 dispatch(apiThunk(
                     `connections/${connectionId}`,
                     'DELETE',
@@ -285,13 +285,13 @@ export function deleteTab(tabId) {
                     connectionId
                 )).then(json => {
                     if (!json.error) {
-                        dispatch(setTab(tabIds[nextIdIndex]));
+                        dispatch(setTab(nextIdTab));
                         dispatch(deleteConnection(tabId));
                     }
                 });
             } else {
+                dispatch(setTab(nextIdTab));
                 dispatch(deleteConnection(tabId));
-                dispatch(setTab(tabIds[nextIdIndex]));
             }
         } else {
             return;
