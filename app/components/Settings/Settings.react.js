@@ -72,7 +72,7 @@ class Settings extends Component {
 
     renderEditButton(show) {
         return (
-            <div calssName={styles.editButtonContainer}>
+            <div className={styles.editButtonContainer}>
                 {show ? (
                     <div
                         className={buttonStyles.buttonPrimary}
