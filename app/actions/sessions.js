@@ -364,6 +364,7 @@ function PREVIEW_QUERY (dialect, table, database = '') {
         case DIALECTS.SQLITE:
         case DIALECTS.MARIADB:
         case DIALECTS.POSTGRES:
+        case DIALECTS.REDSHIFT:
             return `SELECT * FROM ${table} LIMIT 5`;
         case DIALECTS.MSSQL:
             return 'SELECT TOP 5 * FROM ' +
