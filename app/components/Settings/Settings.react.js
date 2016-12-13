@@ -129,11 +129,11 @@ class Settings extends Component {
 
     componentWillReceiveProps(nextProps) {
         // if status goes to 200, credentials have been successfully saved to disk
-        if (this.props.connectionNeedToBeSaved &&
-            nextProps.connectRequest.status === 200 &&
+        if (nextProps.connectRequest.status === 200 &&
             this.props.connectRequest.status !== 200)
         {
-            this.props.setConnectionNeedToBeSaved(false);
+            if (this.state.editMode) this.setState({editMode: false});
+            if (this.props.connectionNeedToBeSaved) this.props.setConnectionNeedToBeSaved(false);
         }
     }
 
@@ -192,7 +192,6 @@ class Settings extends Component {
             }
         } else if (connectionObject.dialect === DIALECTS.ELASTICSEARCH) {
             if (connectRequest.status === 200 && !elasticsearchMappingsRequest.status) {
-                this.setState({editMode: false});
                 getElasticsearchMappings();
             }
             if (elasticsearchMappingsRequest.status === 200 && !selectedIndex) {
@@ -208,12 +207,10 @@ class Settings extends Component {
             }
         } else if (connectionObject.dialect === DIALECTS.S3) {
             if (connectRequest.status === 200 && !s3KeysRequest.status) {
-                this.setState({editMode: false});
                 getS3Keys();
             }
         } else if (connectionObject.dialect === DIALECTS.APACHE_DRILL) {
             if (connectRequest.status === 200 && !apacheDrillStorageRequest.status) {
-                this.setState({editMode: false});
                 getApacheDrillStorage();
             }
             if (apacheDrillStorageRequest.status === 200 && !apacheDrillS3KeysRequest.status) {
