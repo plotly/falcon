@@ -272,7 +272,6 @@ export function deleteTab(tabId) {
                 nextIdIndex = currentIdIndex;
             }
             const nextIdTab = tabIds[nextIdIndex];
-            console.warn('nextIdTab', nextIdTab);
             /*
              * If the connection has been successfully saved to disk,
              * we want to send an API call to delete it. Delete the tab after.
