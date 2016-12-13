@@ -224,25 +224,26 @@ describe('Elasticsearch - ', function () {
                     },
                     'sample-data': {
                       'mappings': {
-                        'test-scroll': {
+                         'test-ranges': {
                             'properties': {
-                                'first': {
-                                    'type': 'float'
+                              'Date': {
+                                'format': 'strict_date_optional_time||epoch_millis',
+                                'type': 'date'
                                 },
-                                'second': {
-                                    'type': 'float'
+                              'Float': {
+                                'type': 'float'
                                 },
-                                'third': {
-                                    'type': 'float'
+                              'Integer': {
+                                'type': 'integer'
                                 },
-                                'fourth': {
-                                    'type': 'float'
+                              'Ipv4': {
+                                'type': 'ip'
                                 },
-                                'fifth': {
-                                    'type': 'float'
+                              'String': {
+                                'type': 'string'
                                 }
-                            }
-                        },
+                              }
+                          },
                         'test-type': {
                           'properties': {
                             'my-boolean-1': {
@@ -324,7 +325,7 @@ describe('Elasticsearch - ', function () {
             elasticsearchConnections
         ).then(results => {
             assert.deepEqual(results, {
-               'columnnames':[
+               'columnnames': [
                   'boolean',
                   'date',
                   'double',
@@ -340,7 +341,7 @@ describe('Elasticsearch - ', function () {
                   'string-2',
                   'token'
                ],
-               'rows':[
+               'rows': [
                   [
                      true,
                      '2016-12-04T16:05:13.816943-05:00',

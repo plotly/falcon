@@ -4,8 +4,7 @@ import {createAction} from 'redux-actions';
 import {DIALECTS, INITIAL_CONNECTIONS} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
 import * as httpsUtils from '../utils/https';
-import {contains} from 'ramda';
-import queryString from 'query-string';
+import {remove} from 'ramda';
 
 export const reset = createAction('RESET');
 export const mergeTabMap = createAction('MERGE_TAB_MAP');
@@ -242,34 +241,60 @@ export function newTab() {
 
 export function deleteTab(tabId) {
     return function (dispatch, getState) {
-        /* eslint no-alert: 0 */
-        if (confirm(DELETE_TAB_MESSAGE)) {
-        /* eslint no-alert: 0 */
-            if (tabId === getState().selectedTab) {
-                const tabIds = Object.keys(getState().connections);
-                const currentIdIndex = tabIds.indexOf(tabId);
-                const connectionId = getState().connections[tabId].id;
-                let nextIdIndex;
-                if (currentIdIndex === 0) {
-                    if (tabIds.length > 1) {
-                        nextIdIndex = 1;
-                    } else {
-                        nextIdIndex = -1; // null out
-                    }
+        const connectionId = getState().tabMap[tabId];
+        const tabIds = Object.keys(getState().connections);
+        const currentIdIndex = tabIds.indexOf(getState().selectedTab);
+        const connectRequest = getState().connectRequests[connectionId];
+        /*
+         * Logic to dermine which tab index we should switch to once
+         * the current tab is deleted.
+         */
+        let nextIdIndex = currentIdIndex;
+        if (tabId === getState().selectedTab) {
+            if (currentIdIndex === 0) {
+                if (tabIds.length > 1) {
+                    nextIdIndex = 1;
                 } else {
-                    nextIdIndex = currentIdIndex - 1;
+                    nextIdIndex = -1; // null out
                 }
-                dispatch(setTab(tabIds[nextIdIndex]));
+            } else {
+                nextIdIndex = currentIdIndex - 1;
+            }
+        } else {
+            // Stay on the same tab if deleting another one.
+            nextIdIndex = currentIdIndex;
+        }
+        const nextIdTab = tabIds[nextIdIndex];
+        /*
+         * If the connection has been successfully saved to disk,
+         * we want to send an API call to delete it. Delete the tab after.
+         * Otherwise, we simply want to delete the unsaved or failed connection.
+         */
+        if (connectionId && connectRequest.status === 200) {
+            /*
+             * Throw a dialog box at the user because deleting a connection erases
+             * it from disk permanently and persistent queries may fail onwards.
+             */
+             /* eslint no-alert: 0 */
+            if (confirm(DELETE_TAB_MESSAGE)) {
+            /* eslint no-alert: 0 */
                 dispatch(apiThunk(
                     `connections/${connectionId}`,
                     'DELETE',
                     'deleteConnectionsRequests',
                     connectionId
-                ));
+                )).then(json => {
+                    if (!json.error) {
+                        dispatch(setTab(nextIdTab));
+                        dispatch(deleteConnection(tabId));
+                    }
+                });
+            } else {
+                return;
             }
-            dispatch(deleteConnection(tabId));
         } else {
-            return;
+            dispatch(setTab(nextIdTab));
+            dispatch(deleteConnection(tabId));
         }
     };
 }
@@ -339,6 +364,7 @@ function PREVIEW_QUERY (dialect, table, database = '') {
         case DIALECTS.SQLITE:
         case DIALECTS.MARIADB:
         case DIALECTS.POSTGRES:
+        case DIALECTS.REDSHIFT:
             return `SELECT * FROM ${table} LIMIT 5`;
         case DIALECTS.MSSQL:
             return 'SELECT TOP 5 * FROM ' +

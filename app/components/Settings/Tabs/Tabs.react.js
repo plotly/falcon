@@ -22,6 +22,7 @@ export default class Tabs extends Component {
                                 key={tabId}
                                 setTab={setTab}
                                 tabId={tabId}
+                                isDeletable={keys(connections).length > 1}
                             />
                         )}
 

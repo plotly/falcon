@@ -9,7 +9,7 @@ export default class Tab extends Component {
     }
 
     render() {
-        const {tabId, isSelected, connectionObject, setTab, deleteTab} = this.props;
+        const {tabId, isSelected, connectionObject, setTab, deleteTab, isDeletable} = this.props;
         const {dialect, id} = connectionObject;
 
         // Heads up - these should match the same labels in plot.ly/create
@@ -32,29 +32,31 @@ export default class Tab extends Component {
                     styles.tabWrapper,
                     {[styles.tabWrapperSelected]: isSelected}
                 )}
-                onClick={() => setTab(tabId)}
             >
+                {isDeletable ?
+                    <img
+                        className={styles.tabDelete}
+                        onClick={() => deleteTab(tabId)}
+                        src="images/delete.png"
+                        id={`test-tab-delete-${id}`}
+                    >
+                    </img> : null
+                }
 
-                <img
-                    className={styles.tabDelete}
-                    onClick={() => deleteTab(tabId)}
-                    src="images/delete.png"
-                    id={`test-tab-delete-${id}`}
-                >
-                </img>
+                <span onClick={() => setTab(tabId)}>
+                    <img
+                        className={styles.tabLogo}
+                        src={LOGOS[dialect]}
+                        id={`test-tab-id-${id}`}
+                    >
+                    </img>
 
-                <img
-                    className={styles.tabLogo}
-                    src={LOGOS[dialect]}
-                    id={`test-tab-id-${id}`}
-                >
-                </img>
-
-                <p className={styles.tabIdentifier}>
-                    <span>
-                        {label}
-                    </span>
-                </p>
+                    <p className={styles.tabIdentifier}>
+                        <span>
+                            {label}
+                        </span>
+                    </p>
+                </span>
 
             </div>
 
