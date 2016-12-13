@@ -290,11 +290,11 @@ export function deleteTab(tabId) {
                     }
                 });
             } else {
-                dispatch(setTab(nextIdTab));
-                dispatch(deleteConnection(tabId));
+                return;
             }
         } else {
-            return;
+            dispatch(setTab(nextIdTab));
+            dispatch(deleteConnection(tabId));
         }
     };
 }
