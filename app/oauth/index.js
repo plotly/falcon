@@ -62,7 +62,7 @@ class Status extends Component {
             );
         } else if (status === 'success') {
             // TODO - Need to write this tutorial:
-            // https://help.plot.ly/updating-data-on-a-schedule
+            // http://help.plot.ly/updating-data-on-a-schedule
             content = (
                 <div>
                     <h4>{'Authorized!'}</h4>
@@ -75,7 +75,7 @@ class Status extends Component {
                     </div>
 
                     <div>
-                    	 <a href="https://help.plot.ly/updating-data-on-a-schedule"
+                    	 <a href="http://help.plot.ly/updating-data-on-a-schedule"
                             target="_blank"
             >
                             {'Learn more'}
