@@ -156,17 +156,9 @@ export default class UserConnections extends Component {
             <div className={styles.inputContainer}>
 
                     <div className={styles.inputNamesContainer}>
-                        <span className ={styles.inputName}>{'Documentation'}</span>
                         {inputNames}
                     </div>
                     <div className={styles.inputFieldsContainer}>
-                        <a className={styles.documentationLink}
-                            onClick={() => {
-                            shell.openExternal(documentationLink(connectionObject.dialect));
-                        }}
-                        >
-                            plotly &nbsp;{connectionObject.dialect}&nbsp; documentation
-                        </a>
                         {inputs}
                         <div className={styles.optionsContainer}>
                             {options}
