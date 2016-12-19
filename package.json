@@ -36,11 +36,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/plotly/electron-sql-connector"
+    "url": "git+https://github.com/plotly/plotly-database-connector"
   },
   "author": {
     "name": "Plotly",
-    "email": "",
+    "email": "alexandres@plot.ly",
     "url": ""
   },
   "license": "MIT",
@@ -49,12 +49,14 @@
   },
   "keywords": [
     "electron",
-    "react",
-    "react-router",
-    "flux",
-    "webpack",
-    "react-hot",
+    "plotly",
     "sql",
+    "postgres",
+    "redshift",
+    "elasticsearch",
+    "drill",
+    "s3",
+    "persistent",
     "connector"
   ],
   "homepage": "",
