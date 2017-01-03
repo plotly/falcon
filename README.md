@@ -2,8 +2,7 @@
 
 The Plotly database connector is a cross-platform desktop application that connects [Plotly 2.0](https://plot.ly/alpha/workspace) to your database.
 
-![](http://g.recordit.co/NHyqNZEj2i.gif)
-![](http://g.recordit.co/BAyBgt0iRb.gif)
+![](http://g.recordit.co/LqhQcEcwti.gif)
 
 Plotly 2.0 makes HTTP requests from the local web browser directly to this database connector app. This database connector runs as a server on localhost and forwards queries from the Plotly 2.0 web-application to the database that connect to. Requests are made client-side, so you don't need to open up the connector or your database to the world, you just need to be able to access it from the machine that is running this connector app.
 
@@ -11,7 +10,7 @@ Plotly 2.0 makes HTTP requests from the local web browser directly to this datab
 
 
 #### Contact
-- Chris - chris@plot.ly
+
 - Alexandre - alexandres@plot.ly
 
 ## Development
@@ -51,7 +50,7 @@ Note: Currently access to remote databases is required to run local tests. These
 
 ```bash
 $ npm run build
-$ npm run local-test-e2e
+$ npm run test-unit-all
 ```
 
 ## License

@@ -27,6 +27,7 @@ input:hover {
 }
 
 .inputNamesContainer {
+    margin-top: 8px;
     width: 25%;
     vertical-align: top;
     position: absolute;
