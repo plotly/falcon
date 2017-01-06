@@ -36,7 +36,18 @@ const DEFAULT_SETTINGS = {
     CSR_FILE: '/ssl/certs/server/fullchain.pem',
     APP_DIRECTORY: `${__dirname}/../`,
 
-    LOG_TO_STDOUT: false
+    LOG_TO_STDOUT: false,
+
+    /*
+     * Whether or not this is running on the on-premise server.
+     * Note that if the connector is running on a user's local machine
+     * but accessing a remote on-premise instance, then this should remain
+     * false.
+     *
+     * Generally set through the ENV variable:
+     * PLOTLY_CONNECTOR_IS_RUNNING_INSIDE_ON_PREM
+     */
+    IS_RUNNING_INSIDE_ON_PREM: false
 };
 
 // Settings that depend on other settings are described here
@@ -78,6 +89,7 @@ function getDerivedSetting(settingName) {
                 getSetting('STORAGE_PATH'),
                 'settings.yaml'
             );
+
         default:
             return null;
     }
