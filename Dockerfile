@@ -1,11 +1,18 @@
 # Usage:
 # $ docker build -t chriddyp/database-connector .
-# $ PLOTLY_DOMAIN_API="api-local.plot.ly" PLOTLY_STREAMBED_SSL_ENABLED="true" docker run -p 9494:9494 -v ~/.plotly/connector:/home -e PLOTLY_CONNECTOR_PLOTLY_API_DOMAIN=$PLOTLY_DOMAIN_API -e PLOTLY_CONNECTOR_PLOTLY_API_SSL_ENABLED=$PLOTLY_STREAMBED_SSL_ENABLED PLOTLY_CONNECTOR_STORAGE_PATH="/home" -d chriddyp/database-connector
+# $ PLOTLY_DOMAIN_API="api-local.plot.ly" PLOTLY_STREAMBED_SSL_ENABLED="true" docker run -p 9494:9494 -v ~/.plotly/connector:/home -e PLOTLY_CONNECTOR_PLOTLY_API_DOMAIN=$PLOTLY_DOMAIN_API -e PLOTLY_CONNECTOR_PLOTLY_API_SSL_ENABLED=$PLOTLY_STREAMBED_SSL_ENABLED -e PLOTLY_CONNECTOR_IS_RUNNING_INSIDE_ON_PREM="true" PLOTLY_CONNECTOR_STORAGE_PATH="/home" -d chriddyp/database-connector
 #
 # Depends on the following ENV variables:
 # - PLOTLY_DOMAIN_API (e.g. api-local.plot.ly)
 # - PLOTLY_STREAMBED_SSL_ENABLED (e.g. true)
+#
+# Note that the command line argument PLOTLY_CONNECTOR_IS_RUNNING_INSIDE_ON_PREM="true"
+# should only be set if the connector is running on an on prem server.
+# If it is running on a local machine but it is targeting a remote on prem server,
+# then it should not be set.
+#
 # Adapted from https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
+
 FROM node:6.9.2
 
 # I'd like to install the latest version of npm with something like this:
