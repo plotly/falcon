@@ -5,15 +5,13 @@
   "description": "Plotly Database Connector for https://plot.ly/create. Connect your database and query your data to use in your charts.",
   "main": "./backend/main.js",
   "scripts": {
-    "build": "npm run build-main && npm run build-renderer && npm run build-web",
+    "build-all": "npm run build-main && npm run build-renderer && npm run build-web",
     "build-headless": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.headless.js --progress --profile --colors",
     "build-main": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.electron.js --progress --profile --colors",
-    "build-headless": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.headless.js --progress --profile --colors",
-    "heroku-postbuild": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.headless.js --progress --profile --colors",
+    "heroku-postbuild": "npm run build-headless && npm run build-web",
     "build-renderer": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.production.js --progress --profile --colors",
     "build-web": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.web.js --progress --profile --colors",
     "dev": "webpack-dashboard -- concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\"",
-    "heroku-postbuild": "npm run build-headless && npm run build-web",
     "hot-server": "node -r babel-register devServer.js",
     "lint": "eslint app test *.js",
     "test": "npm run build && npm run test-unit-all",
@@ -25,11 +23,57 @@
     "test-watch": "npm test -- --watch",
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
     "package-all": "npm run package -- --all",
+    "postinstall": "install-app-deps",
     "rebuild-and-e2e": "npm run build && npm run test-e2e",
-    "start": "cross-env NODE_ENV=production electron ./",
+    "start": "cross-env NODE_ENV=production electron ./app",
     "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./backend/main.development",
     "watch-headless": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.headless.js --progress --profile --colors --watch",
-    "watch-web": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.web.js --progress --profile --colors --watch"
+    "watch-web": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.web.js --progress --profile --colors --watch",
+    "dist-w": "build -w",
+    "dist-m": "build -m"
+  },
+  "build": {
+    "appId": "org.develar.onshape",
+    "asar": false,
+    "category": "public.app-category.graphics-design",
+    "files": [
+      "app",
+      "dist",
+      "backend",
+      "ssl",
+      "static",
+      "node_modules"
+    ],
+    "dmg": {
+      "background": "app/background.png",
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+        "target": ["nsis", "zip", "7z"],
+        "icon": "app/app.ico"
+    },
+    "mac": {
+        "target": ["dmg", "zip"],
+        "icon": "app/app.icns"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "directories": {"output": "release"}
   },
   "bin": {
     "electron": "./node_modules/.bin/electron"
@@ -69,6 +113,7 @@
     "chromedriver": "^2.21.2",
     "co-mocha": "^1.1.2",
     "devtron": "^1.3.0",
+    "electron-builder": "^11.2.4",
     "eslint": "^2.10.1",
     "eslint-config-airbnb": "^7.0.0",
     "eslint-plugin-import": "^1.8.0",
@@ -109,8 +154,6 @@
     "csv-parse": "https://registry.npmjs.org/csv-parse/-/csv-parse-1.1.7.tgz",
     "del": "^2.2.0",
     "electron-debug": "^0.6.0",
-    "electron-packager": "^6.0.2",
-    "electron-prebuilt": "1.2.0",
     "electron-rebuild": "^1.1.3",
     "electron-sudo": "^3.0.13",
     "eslint-plugin-import": "^1.8.0",
@@ -162,7 +205,7 @@
     "npm": "3.10.9"
   },
   "devEngines": {
-      "node": "6.9.2",
-      "npm": "3.10.9"
+    "node": "6.9.2",
+    "npm": "3.10.9"
   }
 }
