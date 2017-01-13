@@ -1,7 +1,7 @@
 {
   "name": "plotly-database-connector",
   "productName": "Plotly Database Connector",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Plotly Database Connector for https://plot.ly/create. Connect your database and query your data to use in your charts.",
   "main": "./backend/main.js",
   "scripts": {
