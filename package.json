@@ -23,17 +23,16 @@
     "test-watch": "npm test -- --watch",
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
     "package-all": "npm run package -- --all",
-    "postinstall": "install-app-deps",
     "rebuild-and-e2e": "npm run build && npm run test-e2e",
     "start": "cross-env NODE_ENV=production electron ./app",
     "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./backend/main.development",
     "watch-headless": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.headless.js --progress --profile --colors --watch",
     "watch-web": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.web.js --progress --profile --colors --watch",
-    "dist-w": "dist -w",
-    "dist-m": "dist -m",
-    "dist-l": "dist -l"
+    "dist-w": "build -w",
+    "dist-m": "build -m",
+    "dist-l": "build -l"
   },
-  "dist": {
+  "build": {
     "appId": "org.plotly.connector",
     "asar": false,
     "category": "public.app-category.tools",
@@ -49,12 +48,12 @@
       "background": "app/background.png",
       "contents": [
         {
-          "x": 110,
-          "y": 150
+          "x": 250,
+          "y": 50
         },
         {
-          "x": 240,
-          "y": 150,
+          "x": 250,
+          "y": 300,
           "type": "link",
           "path": "/Applications"
         }
@@ -65,14 +64,11 @@
         "icon": "app/app.ico"
     },
     "mac": {
-        "target": ["dmg", "zip"],
+        "target": ["dmg"],
         "icon": "app/app.icns"
     },
     "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ]
+      "target": ["AppImage", "deb"]
     },
     "directories": {"output": "release"}
   },
