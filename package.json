@@ -45,15 +45,15 @@
       "node_modules"
     ],
     "dmg": {
-      "background": "app/background.png",
+      "background": "app/background.tiff",
       "contents": [
         {
-          "x": 250,
-          "y": 50
+          "x": 160,
+          "y": 220
         },
         {
-          "x": 250,
-          "y": 300,
+          "x": 380,
+          "y": 220,
           "type": "link",
           "path": "/Applications"
         }
