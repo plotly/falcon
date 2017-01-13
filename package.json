@@ -5,7 +5,7 @@
   "description": "Plotly Database Connector for https://plot.ly/create. Connect your database and query your data to use in your charts.",
   "main": "./backend/main.js",
   "scripts": {
-    "build-all": "npm run build-main && npm run build-renderer && npm run build-web",
+    "build": "npm run build-main && npm run build-renderer && npm run build-web",
     "build-headless": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.headless.js --progress --profile --colors",
     "build-main": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.electron.js --progress --profile --colors",
     "heroku-postbuild": "npm run build-headless && npm run build-web",
@@ -29,13 +29,14 @@
     "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./backend/main.development",
     "watch-headless": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.headless.js --progress --profile --colors --watch",
     "watch-web": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.web.js --progress --profile --colors --watch",
-    "dist-w": "build -w",
-    "dist-m": "build -m"
+    "dist-w": "dist -w",
+    "dist-m": "dist -m",
+    "dist-l": "dist -l"
   },
-  "build": {
-    "appId": "org.develar.onshape",
+  "dist": {
+    "appId": "org.plotly.connector",
     "asar": false,
-    "category": "public.app-category.graphics-design",
+    "category": "public.app-category.tools",
     "files": [
       "app",
       "dist",
