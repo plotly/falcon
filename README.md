@@ -12,16 +12,11 @@ Plotly 2.0 makes HTTP requests from the local web browser directly to this datab
 [Learn more in our online documentation](http://help.plot.ly/database-connectors/) or just give it a try in [Plotly 2.0](https://plot.ly/alpha/workspace).
 
 
-### Contact
-
-- Alexandre - alexandres@plot.ly
-
-
-## Develop, run, contribute
+### Develop and Contribute
 
 Note that this section targets contributers and those who wish to set up and run the server themselves. If you're interested in using the distributed App, [download the latest release.](https://github.com/plotly/plotly-database-connector/releases)
 
-#### Installation
+##### Installation
 Start by cloning the repo via git:
 
 ```bash
@@ -36,14 +31,14 @@ $ cd your-project-name && npm install
 
 *Note: requires a node version >= 4 and an npm version >= 2.*
 
-#### Run as Electron App
+##### Run as Electron App
 Run the app with
 ```bash
 $ npm run build
 $ npm run start
 ```
 
-#### Run as Headless Server
+##### Run as Headless Server
 Modify app's settings to your requirements.
 If it does not exist, create a  file at `{your-home-directory}/.plotly/connector/settings.yaml`.
 The file may take the following attributes and their respeective default values, (ensure to use the correct YAML syntax)
@@ -72,7 +67,7 @@ $ npm run build-headless
 $ node ./dist/headless-bundle.js
 ```
 
-#### Contributing and Developing
+##### Developing
 Run the app in dev mode with
 ```bash
 $ npm run dev
@@ -86,6 +81,10 @@ Note: Currently access to remote databases is required to run local tests. These
 $ npm run build
 $ npm run test-unit-all
 ```
+
+### Contact
+
+- Alexandre - alexandres@plot.ly
 
 ### Credit
 
