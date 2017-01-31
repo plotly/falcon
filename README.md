@@ -38,36 +38,37 @@ $ npm run build
 $ npm run start
 ```
 
-##### Run as Headless Server
-Modify app's settings to your requirements.
-If it does not exist, create a  file at `{your-home-directory}/.plotly/connector/settings.yaml`.
-The file may take the following attributes and their respeective default values, (ensure to use the correct YAML syntax)
+##### Run On A Server
 
-*Note: If you are an on-prem user, ensure that you have modified the `PLOTLY_API_DOMAIN` value to your on-prem Plotly base domain (such as `PLOTLY_API_DOMAIN: 'api-plotly.your-company-name.com`).
-
-```
-HEADLESS: false
-STORAGE_PATH: 'os.homedir()/.plotly/connector'
-PLOTLY_API_DOMAIN: 'api.plot.ly'
-CONNECTOR_HTTPS_DOMAIN: 'connector.plot.ly'
-CORS_ALLOWED_ORIGINS: 
-    - 'https://plot.ly'
-    - 'https://stage.plot.ly'
-    - 'https://local.plot.ly'
-PORT: 9494
-KEY_FILE: '/ssl/certs/server/privkey.pem'
-CSR_FILE: '/ssl/certs/server/fullchain.pem'
-APP_DIRECTORY: `${__dirname}/../`
-LOG_TO_STDOUT: false
-```
-
-Run the app with
+Build and run the app:
 ```bash
 $ npm run build-headless
 $ node ./dist/headless-bundle.js
 ```
 
-Visit `localhost:9494`.
+Visit the app in your web browser at `http://localhost:9494`.
+
+Note that the API requests to the connector are not authenticated. Only run the app as a server on trusted networks, do not run the app on public networks.
+
+By default, the connector app will connect to Plotly Cloud. If you would like to connect the app to your private [Plotly On-Premise](https://plot.ly/products/on-premise) server, then modify the app's settings in `~/.plotly/connector/settings.yaml` with:
+
+```
+PLOTLY_API_DOMAIN: 'plotly.your-company.com'
+CORS_ALLOWED_ORIGINS: 
+    - 'https://plotly.your-company.com'
+```
+
+If you have issued an SSL certificate for your app, modify your `settings.yaml` file to include the location of the cert and its key:
+```
+KEY_FILE: '/ssl/certs/server/privkey.pem'
+CSR_FILE: '/ssl/certs/server/fullchain.pem'
+```
+
+The database connector runs as a server by default as part of [Plotly On-Premise](https://plot.ly/products/on-premise). On Plotly On-Premise, every user who has access to the on-premise server also has access to the database connector, no extra installation or SSL configuration is necessary. If you would like to try out Plotly On-Premise at your company, please [get in touch with our team](https://plotly.typeform.com/to/seG7Vb), we'd love to help you out.
+
+##### Run as a docker image
+
+See the [Dockerfile](https://github.com/plotly/plotly-database-connector/blob/master/Dockerfile) for more information.
 
 ##### Developing
 Run the app in dev mode with
