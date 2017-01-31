@@ -67,6 +67,8 @@ $ npm run build-headless
 $ node ./dist/headless-bundle.js
 ```
 
+Visit `localhost:9494`.
+
 ##### Developing
 Run the app in dev mode with
 ```bash
