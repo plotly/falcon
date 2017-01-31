@@ -38,7 +38,7 @@ $ npm run build
 $ npm run start
 ```
 
-##### Run On A Server
+##### Run on a Server
 
 Build and run the app:
 ```bash
