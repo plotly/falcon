@@ -34,6 +34,34 @@ export function saveCertsLocally(json) {
     saveSetting('CONNECTOR_HOST_INFO', hostInfo);
     return {};
 }
+
+export function fetchCertsFromCA() {
+    // TODO: What to do when more than one user?
+    // TODO: Should I try getting the api_key if no access_token?
+    const {username, accessToken} = getSetting('USERS')[0];
+    return fetch(
+        `${CA_HOST_URL}`, {
+            method: 'POST',
+            body: JSON.stringify({credentials: {username, access_token: accessToken}})
+        }
+    ).then(res => res.json()).then(json => {
+        return json;
+    });
+}
+
+export function fetchAndSaveCerts() {
+    return fetchCertsFromCA().then(response => {
+        if (!response.error) {
+            Logger.log('Successfully received certs from CA.');
+            if (!saveCertsLocally(response).error) {
+                Logger.log('Saved certificates to local storage.');
+            }
+        } else {
+            Logger.log('An error returned from the CA.' + response.error);
+        }
+    });
+}
+
 export const msInOneDay = 1000 * 3600 * 24;
 
 export function calculateDaysToRenewal() {

@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import {assert} from 'chai';
-import {assoc, concat, contains, dissoc, gt, keys, merge, sort, without} from 'ramda';
+import {assoc, concat, contains, dissoc, isEmpty, keys, merge, sort, without} from 'ramda';
 import Server from '../../backend/routes.js';
 import {
     getConnections,
@@ -76,9 +76,49 @@ function DELETE(path) {
 let queryObject;
 let server;
 let connectionId;
+
+describe.only('Server - ', () => {
+    beforeEach(() => {
+        ['KEY_FILE', 'CERT_FILE'].forEach(fileName => {
+            try {
+                fs.unlinkSync(getSetting(fileName));
+            } catch (e) {}
+        });
+    });
+
+    afterEach(() => {
+        ['KEY_FILE', 'CERT_FILE'].forEach(fileName => {
+            try {
+                fs.unlinkSync(getSetting(fileName));
+            } catch (e) {}
+        });
+    });
+
+    it('Sets HTTP protocol and locolhost as domain if there are no certs.', () => {
+        server = new Server({skipFetchCerts: true});
+        assert.equal(server.protocol, 'http');
+        assert.equal(server.domain, 'localhost');
+        server.close();
+        server = null;
+    });
+
+    it('Starts an https server if there are certs and host info in settings.', () => {
+        fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
+        fs.writeFileSync(getSetting('KEY_FILE'), fakeCerts.key);
+        saveSetting('USERS', [{username: accessToken}]);
+        saveSetting('CONNECTOR_HOST_INFO', {
+            host: 'subdomain.domain.com', lastUpdated: new Date()}
+        );
+        server = new Server();
+        assert.equal(server.protocol, 'https');
+        assert.equal(server.domain, 'subdomain.domain.com');
+    });
+
+});
+
 describe('Routes - ', function () {
     beforeEach(() => {
-        server = new Server({protocol: 'HTTP'});
+        server = new Server({protocol: 'HTTP', skipFetchCerts: true});
         server.start();
 
         // cleanup

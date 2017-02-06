@@ -17,44 +17,67 @@ import {
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
 import {checkWritePermissions} from './persistent/PlotlyAPI.js';
-import {dissoc, contains, isEmpty, merge, pluck} from 'ramda';
+import {contains, has, isEmpty, merge, pluck} from 'ramda';
+import {getCerts, fetchAndSaveCerts, setRenewalJob} from './certificates';
 import Logger from './logger';
 import fetch from 'node-fetch';
 
+const opn = require('opn');
 const HOSTS = '/etc/hosts';
-
-
-// return HTTPS certs if they exist for a server to use when created or null
-export function getCerts() {
-    try {
-        const keyFile = `${__dirname}/..${getSetting('KEY_FILE')}`;
-        const certFile = `${__dirname}/..${getSetting('CSR_FILE')}`;
-        return {
-            key: fs.readFileSync(keyFile),
-            certificate: fs.readFileSync(certFile)
-        };
-    } catch (e) {
-        return {};
-    }
-}
 
 export default class Server {
     constructor(args = {}) {
         this.certs = getCerts();
         /*
-        // if server is given a protocol argument, enforce it,
-        // otherwise decide which protocol to use
-        // depending if there are certificates
+         * If server is given a protocol argument, enforce it,
+         * otherwise decide which protocol to use
+         * depending if there are certificates. This is mainly
+         * used in tests.
         */
         const apiVersion = '1.0.0';
+        this.apiVersion = apiVersion;
         if (args.protocol === 'HTTP' || isEmpty(this.certs)) {
             this.server = restify.createServer({version: apiVersion});
             this.protocol = 'http';
             this.domain = 'localhost';
+            const redirectBaseUrl = `${this.protocol}://${this.domain}:${getSetting('PORT')}`;
+            const oauthClientId = 'isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt';
+            const oauthUrl = (
+                'https://plot.ly/o/authorize/?response_type=token&' +
+                `client_id=${oauthClientId}&` +
+                `redirect_uri=${redirectBaseUrl}/oauth2/callback`
+            );
+            // We wanna skip fetching certs in cases such as tests.
+            if (!args.skipFetchCerts) {
+                const users = getSetting('USERS');
+                /*
+                 * If no USERS in settings we need to go through OAuth before
+                 * being able to ask for a certificate from the CA.
+                 * Let the app load for a while before launching OAuth
+                 * to avoid opening the new tab in the browser without
+                 * the attention of the user.
+                 */
+                if (isEmpty(users)) {
+                    // `opn` module opens a tab in the default browser.
+                    setTimeout(() => opn(oauthUrl), 10000);
+                }
+                const checkOauthComplete = setInterval(() => {
+                    // TODO: As metnioned in ./certificates, not sure what
+                    // the way to go for multiple users should be.
+                    if (users[0]) {
+                        if (has('username', users[0]) && has('accessToken', users[0])) {
+                            fetchAndSaveCerts();
+                            clearInterval(checkOauthComplete);
+                        }
+                    }
+                }, 1000);
+            }
         } else if (args.protocol === 'HTTPS' || this.certs) {
+            setRenewalJob();
             this.server = restify.createServer(merge({version: apiVersion}, this.certs));
             this.protocol = 'https';
-            this.domain = getSetting('CONNECTOR_HTTPS_DOMAIN');
+            // TODO: Need to find better names for these or simplify them into one.
+            this.domain = getSetting('CONNECTOR_HOST_INFO').host || getSetting('CONNECTOR_HTTPS_DOMAIN');
         } else {
             Logger.log('Failed to start the server.');
         }
@@ -149,7 +172,7 @@ export default class Server {
                     if (contains(username, existingUsernames)) {
                         existingUsers[
                             existingUsernames.indexOf(username)
-                        ]['access_token'] = access_token;
+                        ].accessToken = access_token;
                         status = 200;
                     } else {
                         existingUsers.push({username, accessToken: access_token});
