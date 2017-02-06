@@ -11,7 +11,7 @@
     "heroku-postbuild": "npm run build-headless && npm run build-web",
     "build-renderer": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.production.js --progress --profile --colors",
     "build-web": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.web.js --progress --profile --colors",
-    "dev": "webpack-dashboard -- concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\"",
+    "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\"",
     "hot-server": "node -r babel-register devServer.js",
     "lint": "eslint app test *.js",
     "test": "npm run build && npm run test-unit-all",
@@ -123,7 +123,6 @@
     "redux-devtools-dock-monitor": "^1.1.1",
     "redux-devtools-log-monitor": "^1.0.11",
     "selenium-webdriver": "^2.53.1",
-    "webpack-dashboard": "^0.1.1",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-hot-middleware": "^2.10.0"
   },
