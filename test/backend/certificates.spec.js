@@ -85,4 +85,25 @@ describe('Certificates', function() {
         assert.deepEqual(savingResponse, {}, 'Saving resopnse has no error.');
         assert.deepEqual(getCerts(), {key: 'key', certificate: 'cert'}, 'Certs returned.');
     });
+
+    it('Can calculate the amount of days left before certificate renewal.', () => {
+        // Created just now shows 0 days.
+        saveSetting('CONNECTOR_HOST_INFO', {lastUpdated: new Date()});
+        const thirtyDaysLeft = calculateDaysToRenewal();
+        assert.equal(thirtyDaysLeft, 24, 'If last update is today, 29 days left.');
+        // Created 30 days ago shows 0 days.
+        const now = new Date();
+        const oneMonthOldTimestamp = now.setDate(now.getDate() - 24);
+        saveSetting('CONNECTOR_HOST_INFO', {lastUpdated: oneMonthOldTimestamp});
+        const noDaysLeft = calculateDaysToRenewal();
+        assert.equal(noDaysLeft, 0, 'If last update was 30 days ago, 0 days left.');
+    });
+
+    it('Can set a timeout for renewal of certificate.', () => {
+        saveSetting('CONNECTOR_HOST_INFO', {lastUpdated: new Date()});
+        const renewalJob = setRenewalJob();
+        assert.equal(renewalJob._idleTimeout, 2073600000); // 24 days.
+        // No good way to compare functions.
+        assert.isNotNull(renewalJob._onTimeout);
+    });
 });
