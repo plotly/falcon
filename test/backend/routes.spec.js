@@ -10,23 +10,25 @@ import {
 import {getSetting, saveSetting} from '../../backend/settings.js';
 import fs from 'fs';
 import {
-    username,
     accessToken,
-    apiKey,
-    validFid,
-    validUids,
-    createGrid,
-    configuration,
-    sqlConnections,
-    mysqlConnection,
-    elasticsearchConnections,
-    publicReadableS3Connections,
     apacheDrillConnections,
     apacheDrillStorage,
+    apiKey,
+    configuration,
+    createGrid,
+    elasticsearchConnections,
+    fakeCerts,
+    mysqlConnection,
+    publicReadableS3Connections,
+    sqlConnections,
     testConnections,
-    testSqlConnections
+    testSqlConnections,
+    username,
+    validFid,
+    validUids
 } from './utils.js';
 
+const access_token = accessToken;
 
 // Shortcuts
 function GET(path) {
@@ -151,7 +153,7 @@ describe('Routes - ', function () {
             assert.equal(res.status, 201);
             assert.deepEqual(
                 getSetting('USERS'),
-                [{username: 'plotly-database-connector', accessToken: access_token}]
+                [{username, accessToken}]
             );
 
             // We can save it again and we'll get a 200 instead of a 201
