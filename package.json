@@ -20,7 +20,7 @@
     "test-unit": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --compilers js:babel-register ",
     "test-unit-all": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --compilers js:babel-register --recursive test/**/*.spec.js",
     "test-unit-all-watch": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --compilers js:babel-register --recursive test/**/*.spec.js --watch",
-    "test-watch": "npm test -- --watch",
+    "test-unit-watch": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --watch --compilers js:babel-register ",
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
     "package-all": "npm run package -- --all",
     "rebuild-and-e2e": "npm run build && npm run test-e2e",
