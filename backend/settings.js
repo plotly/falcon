@@ -30,10 +30,6 @@ const DEFAULT_SETTINGS = {
     ],
     PORT: 9494,
 
-    // certificates paths
-    // TODO - This isn't portable - should move this to the home folder
-    KEY_FILE: '/ssl/certs/server/privkey.pem',
-    CSR_FILE: '/ssl/certs/server/fullchain.pem',
     APP_DIRECTORY: `${__dirname}/../`,
 
     LOG_TO_STDOUT: false,
@@ -56,7 +52,9 @@ const derivedSettingsNames = [
     'CONNECTIONS_PATH',
     'QUERIES_PATH',
     'LOG_PATH',
-    'SETTINGS_PATH'
+    'SETTINGS_PATH',
+    'KEY_FILE',
+    'CERT_FILE'
 ];
 function getDerivedSetting(settingName) {
     switch (settingName) {
@@ -88,6 +86,18 @@ function getDerivedSetting(settingName) {
             return path.join(
                 getSetting('STORAGE_PATH'),
                 'settings.yaml'
+            );
+
+        case 'KEY_FILE':
+            return path.join(
+                getSetting('STORAGE_PATH'),
+                'privkey.pem'
+            );
+
+        case 'CERT_FILE':
+            return path.join(
+                getSetting('STORAGE_PATH'),
+                'fullchain.pem'
             );
 
         default:
