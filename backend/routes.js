@@ -72,6 +72,12 @@ export default class Server {
                     }
                 }, 1000);
             }
+            const awaitCertsAndStartHTTPS = setInterval(() => {
+                if (!isEmpty(getCerts())) {
+                    clearInterval(awaitCertsAndStartHTTPS);
+                    this.restartWithSSL();
+                }
+            }, 2000);
         } else if (args.protocol === 'HTTPS' || this.certs) {
             setRenewalJob();
             this.server = restify.createServer(merge({version: apiVersion}, this.certs));
@@ -88,9 +94,29 @@ export default class Server {
         this.close = this.close.bind(this);
     }
 
+    restartWithSSL() {
+        // saveSetting('PORT', 9595);
+        // We have certs, thus we have a user, we can thus close the HTTP server.
+        this.close();
+        // Reference the new certs into the instance.;
+        this.certs = getCerts();
+        // Start the interval to renew the certifications in 24 days.
+        setRenewalJob();
+        // Create a new server and attach it to the class instance.
+        this.server = restify.createServer(merge(
+            {version: this.apiVersion}, this.certs)
+        );
+        this.protocol = 'https';
+        this.domain = getSetting('CONNECTOR_HOST_INFO').host || getSetting('CONNECTOR_HTTPS_DOMAIN');
+        this.start();
+    }
+
     start() {
         const that = this;
         const server = this.server;
+
+        server.port = parseInt(getSetting('PORT'), 10);
+
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
         server.pre(function (request, response, next) {
@@ -137,9 +163,23 @@ export default class Server {
             );
             res.send(204);
         });
-        server.listen(
-            parseInt(getSetting('PORT'), 10)
-        );
+
+        /*
+         * For some reason restartWithSSL() is triggered twice even if I
+         * properly delete the interval that is calling it ... TODO: investigate.
+         * For now a workaround is to catch the error when in use.
+         * There is nothing else besides the app that starts the server so
+         * there should be no real conflict or need to debug other in use
+         */
+        server.on('error', (e) => {
+            if (e.code == 'EADDRINUSE') {
+                console.log('The app is already running or your port is busy. ' +
+                'If you think the case is the latter, kill the process and ' +
+                'make sure the port is free.');
+            }
+        });
+        console.log(`Listening at: ${this.protocol}://${this.domain}:${server.port}`);
+        server.listen(server.port);
 
         server.get(/\/static\/?.*/, restify.serveStatic({
             directory: `${__dirname}/../`
@@ -438,7 +478,7 @@ export default class Server {
         // TODO - This endpoint is untested
         server.get('has-certs', (req, res, next) => {
             if (isEmpty(getCerts())) {
-                res.json(404, false);
+                res.json(200, false);
             } else {
                 res.json(200, true);
             }
@@ -453,6 +493,8 @@ export default class Server {
                 res.json(404, false);
             }
         });
+
+        /* HTTPS Setup */
 
         // TODO - This endpoint is untested
         server.get('start-temp-https-server', (req, res, next) => {

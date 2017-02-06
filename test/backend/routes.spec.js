@@ -114,6 +114,23 @@ describe.only('Server - ', () => {
         assert.equal(server.domain, 'subdomain.domain.com');
     });
 
+    it('Start an https server after an http server was started but certs were created.', (done) => {
+        server = new Server({skipFetchCerts: true});
+        assert.equal(server.protocol, 'http');
+        assert.equal(server.domain, 'localhost');
+        fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
+        fs.writeFileSync(getSetting('KEY_FILE'), fakeCerts.key);
+        saveSetting('USERS', [{username: accessToken}]);
+        saveSetting('CONNECTOR_HOST_INFO', {
+            host: 'subdomain.domain.com', lastUpdated: new Date()}
+        );
+        setTimeout(() => {
+            assert.equal(server.protocol, 'https', 'Has the right protocol.');
+            assert.equal(server.domain, 'subdomain.domain.com', 'Has the right domain.');
+            assert.isFalse(isEmpty(server.certs), 'Has certs.');
+            done();
+        }, 5000);
+    }).timeout(10000);
 });
 
 describe('Routes - ', function () {
