@@ -105,7 +105,7 @@ describe.only('Server - ', () => {
     it('Starts an https server if there are certs and host info in settings.', () => {
         fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
         fs.writeFileSync(getSetting('KEY_FILE'), fakeCerts.key);
-        saveSetting('USERS', [{username: accessToken}]);
+        saveSetting('USERS', [{username, accessToken}]);
         saveSetting('CONNECTOR_HOST_INFO', {
             host: 'subdomain.domain.com', lastUpdated: new Date()}
         );
@@ -120,7 +120,7 @@ describe.only('Server - ', () => {
         assert.equal(server.domain, 'localhost');
         fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
         fs.writeFileSync(getSetting('KEY_FILE'), fakeCerts.key);
-        saveSetting('USERS', [{username: accessToken}]);
+        saveSetting('USERS', [{username, accessToken}]);
         saveSetting('CONNECTOR_HOST_INFO', {
             host: 'subdomain.domain.com', lastUpdated: new Date()}
         );
