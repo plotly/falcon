@@ -39,13 +39,12 @@ app.on('ready', () => {
             return `${s}=${getSetting(s)}`;
     }));
 
-    console.log(`Visit ${URL}`);
+    console.log(`Visit ${URL}:${getSetting('PORT')}`);
     // TODO - Does this work too?
     // mainWindow.loadURL(`http://localhost:${getSetting('PORT')}`);
 
     // Provide the port of the server to the front-end as a query string param.
-    mainWindow.loadURL(`file://${__dirname}/../app/app.html?URL=${URL}&${SETTINGS}`);
-
+    mainWindow.loadURL(`file://${__dirname}/../static/setup.html?URL=${URL}&${SETTINGS}`);
     // startup main window
     mainWindow.webContents.on('did-finish-load', () => {
 
