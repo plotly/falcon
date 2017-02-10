@@ -95,7 +95,7 @@ describe.only('Server - ', () => {
     });
 
     it('Sets HTTP protocol and locolhost as domain if there are no certs.', () => {
-        server = new Server({skipFetchCerts: true});
+        server = new Server({createCerts: false});
         assert.equal(server.protocol, 'http');
         assert.equal(server.domain, 'localhost');
         server.close();
@@ -109,13 +109,13 @@ describe.only('Server - ', () => {
         saveSetting('CONNECTOR_HOST_INFO', {
             host: 'subdomain.domain.com', lastUpdated: new Date()}
         );
-        server = new Server();
+        server = new Server({createCerts: false});
         assert.equal(server.protocol, 'https');
         assert.equal(server.domain, 'subdomain.domain.com');
     });
 
     it('Start an https server after an http server was started but certs were created.', (done) => {
-        server = new Server({skipFetchCerts: true});
+        server = new Server({createCerts: false});
         assert.equal(server.protocol, 'http');
         assert.equal(server.domain, 'localhost');
         fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);

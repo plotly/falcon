@@ -11,6 +11,7 @@ const config = {
     entry: {
         'web': './app/index',
         'oauth': './app/oauth/index',
+        'setup': './app/setup/index'
     },
 
     output: {

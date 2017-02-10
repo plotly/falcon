@@ -8,6 +8,10 @@ export const canConfigureHTTPS = platform === 'darwin' || platform === 'linux';
 
 export const isWebBrowser = contains(window.location.protocol, ['http:', 'https:']);
 
+export function dynamicRequireElectron() {
+    return window.require('electron');
+}
+
 export function baseUrl() {
      if (isWebBrowser) {
          /*
