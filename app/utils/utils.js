@@ -3,8 +3,6 @@ import queryString from 'query-string';
 
 const platform = process.platform;
 
-export const canConfigureHTTPS = platform === 'darwin' || platform === 'linux';
-
 export const isWebBrowser = contains(window.location.protocol, ['http:', 'https:']);
 
 export function dynamicRequireElectron() {

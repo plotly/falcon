@@ -31,7 +31,6 @@ app.on('ready', () => {
     const URL = `${server.protocol}://${server.domain}`;
     const SETTINGS = join('&',
         [
-            'CONNECTOR_HTTPS_DOMAIN',
             'APP_DIRECTORY',
             'PLOTLY_API_DOMAIN',
             'PORT'

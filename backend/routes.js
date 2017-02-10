@@ -469,62 +469,6 @@ export default class Server {
             }
         });
 
-        // TODO - This endpoint is untested
-        server.get('is-url-redirected', (req, res, next) => {
-            const contents = fs.readFileSync(HOSTS);
-            if (contents.indexOf(getSetting('CONNECTOR_HTTPS_DOMAIN')) > -1) {
-                res.json(200, true);
-            } else {
-                res.json(404, false);
-            }
-        });
-
-        /* HTTPS Setup */
-
-        // TODO - This endpoint is untested
-        server.get('start-temp-https-server', (req, res, next) => {
-            // can't install certificates without having visited the https server
-            // and can't start a https app without having installed certificates ...
-            // so while an http one is up this endpoint starts a https one for the sole
-            // purpose of installing certificates into the user's keychain
-            // before restarting the app and simply running a single https instance
-            try {
-                const certs = getCerts();
-                if (isEmpty(certs)) {
-                    throw new Error('No certs found.');
-                }
-                const tempServer = restify.createServer(certs);
-                tempServer.use(restify.CORS({
-                    origins: getSetting('CORS_ALLOWED_ORIGINS'),
-                    credentials: false,
-                    headers: headers
-                }));
-                tempServer.listen(getSetting('PORT') + 1); // not to clash with the open http port
-                tempServer.opts( /.*/, (req, res) => res.send(204));
-                tempServer.get(/\/ssl\/?.*/, restify.serveStatic({
-                    directory: `${__dirname}/../`
-                }));
-                tempServer.get('/status', (req, res) => {
-                    if (req.isSecure()) {
-                        fs.readFile(
-                            `${__dirname}/../ssl/status.html`, 'utf8', function(err, file) {
-                            if (err) {
-                                res.send(500);
-                            }
-                            res.write(file);
-                            res.end();
-                        });
-                    } else {
-                        res.send(404, false);
-                    }
-                });
-            } catch (err) {
-                Logger.log(err, 2);
-                res.json(404, false);
-            }
-            res.json(200, true);
-        });
-
         // delete a query
         server.del('/queries/:fid', function delQueriesHandler(req, res, next) {
             const {fid} = req.params;

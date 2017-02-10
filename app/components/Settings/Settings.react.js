@@ -11,10 +11,9 @@ import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import Preview from './Preview/Preview.react';
-import HttpsSetup from './HttpsServer/HttpsSetup.react';
 import {Link} from '../Link.react';
 import {DIALECTS} from '../../constants/constants.js';
-import {plotlyUrl, isOnPrem} from '../../utils/utils';
+import {plotlyUrl} from '../../utils/utils';
 
 /*
  * TODO - If the user is running the app locally but connecting to their
@@ -229,7 +228,6 @@ class Settings extends Component {
         const {
             apacheDrillStorageRequest,
             apacheDrillS3KeysRequest,
-            createCertsRequest,
             connect,
             connectRequest,
             connections,
@@ -238,8 +236,6 @@ class Settings extends Component {
             deleteConnectionsRequest,
             deleteTab,
             elasticsearchMappingsRequest,
-            hasCerts,
-            hasCertsRequest,
             newTab,
             previewTableRequest,
             redirectUrl,
@@ -252,8 +248,6 @@ class Settings extends Component {
             selectedTable,
             selectedIndex,
             setTab,
-            startTempHttpsServer,
-            startTempHttpsServerRequest,
             tablesRequest,
             updateConnection
         } = this.props;
@@ -300,20 +294,6 @@ class Settings extends Component {
                         </div>
                     )}
 
-                    {isOnPrem() ? null : this.wrapWithAutoHide('HTTPS',
-                            <HttpsSetup
-                                hasCertsRequest={hasCertsRequest}
-                                createCertsRequest={createCertsRequest}
-                                redirectUrlRequest={redirectUrlRequest}
-                                createCerts={createCerts}
-                                hasCerts={hasCerts}
-                                redirectUrl={redirectUrl}
-                                startTempHttpsServer={startTempHttpsServer}
-                                startTempHttpsServerRequest={startTempHttpsServerRequest}
-                            />
-                        )
-                    }
-
                     <div className={styles.workspaceLink}>
                         {Link(WORKSPACE_IMPORT_SQL_URL, 'Make queries from Plotly')}
                     </div>
@@ -335,10 +315,6 @@ function mapStateToProps(state) {
         tabMap,
         connections,
         connectionsRequest,
-        hasCertsRequest,
-        startTempHttpsServerRequest,
-        redirectUrlRequest,
-        createCertsRequest,
         connectRequests,
         connectionsNeedToBeSaved,
         saveConnectionsRequests,
@@ -367,10 +343,6 @@ function mapStateToProps(state) {
 
     return {
         connectionsRequest,
-        hasCertsRequest,
-        createCertsRequest,
-        startTempHttpsServerRequest,
-        redirectUrlRequest,
         connectRequest: connectRequests[selectedConnectionId] || {},
         saveConnectionsRequest: saveConnectionsRequests[selectedTab] || {},
         deleteConnectionsRequest: deleteConnectionsRequests[selectedConnectionId] || {},
@@ -502,10 +474,6 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             deleteTab: tab => dispatch(Actions.deleteTab(tab)),
             setTab: tab => dispatch(Actions.setTab(tab)),
             connect: dispatchConnect,
-            createCerts: () => dispatch(Actions.createCerts()),
-            hasCerts: () => dispatch(Actions.hasCerts()),
-            redirectUrl: () => dispatch(Actions.redirectUrl()),
-            startTempHttpsServer: () => dispatch(Actions.startTempHttpsServer()),
             editCredential: c => dispatch(Actions.editCredential(c))
         }
     );
