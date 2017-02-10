@@ -60,17 +60,28 @@
       ]
     },
     "win": {
-        "target": ["nsis", "zip", "7z"],
-        "icon": "app/app.ico"
+      "target": [
+        "nsis",
+        "zip",
+        "7z"
+      ],
+      "icon": "app/app.ico"
     },
     "mac": {
-        "target": ["dmg"],
-        "icon": "app/app.icns"
+      "target": [
+        "dmg"
+      ],
+      "icon": "app/app.icns"
     },
     "linux": {
-      "target": ["AppImage", "deb"]
+      "target": [
+        "AppImage",
+        "deb"
+      ]
     },
-    "directories": {"output": "release"}
+    "directories": {
+      "output": "release"
+    }
   },
   "bin": {
     "electron": "./node_modules/.bin/electron"

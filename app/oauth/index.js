@@ -62,8 +62,6 @@ class Status extends Component {
                 </h4>
             );
         } else if (status === 'success') {
-            // TODO - Need to write this tutorial:
-            // http://help.plot.ly/updating-data-on-a-schedule
             content = (
                 <div>
                     <h4>{'Authorized!'}</h4>

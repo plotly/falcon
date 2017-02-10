@@ -2,7 +2,6 @@ import {contains, has, head, replace} from 'ramda';
 import queryString from 'query-string';
 
 const platform = process.platform;
-const connectorOnPremPath = 'external';
 
 export const canConfigureHTTPS = platform === 'darwin' || platform === 'linux';
 
