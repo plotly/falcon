@@ -17,16 +17,15 @@ import {
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
 import {checkWritePermissions} from './persistent/PlotlyAPI.js';
-import {contains, has, isEmpty, merge, pluck} from 'ramda';
+import {contains, has, keys, isEmpty, merge, pluck} from 'ramda';
 import {getCerts, fetchAndSaveCerts, setRenewalJob} from './certificates';
 import Logger from './logger';
 import fetch from 'node-fetch';
 
-const opn = require('opn');
 const HOSTS = '/etc/hosts';
 
 export default class Server {
-    constructor(args = {}) {
+    constructor(args = {createCerts: true}) {
         this.certs = getCerts();
         /*
          * If server is given a protocol argument, enforce it,
@@ -36,49 +35,26 @@ export default class Server {
         */
         const apiVersion = '1.0.0';
         this.apiVersion = apiVersion;
+        this.port = parseInt(getSetting('PORT'), 10);
         if (args.protocol === 'HTTP' || isEmpty(this.certs)) {
             this.server = restify.createServer({version: apiVersion});
             this.protocol = 'http';
             this.domain = 'localhost';
-            const redirectBaseUrl = `${this.protocol}://${this.domain}:${getSetting('PORT')}`;
-            const oauthClientId = 'isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt';
-            const oauthUrl = (
-                'https://plot.ly/o/authorize/?response_type=token&' +
-                `client_id=${oauthClientId}&` +
-                `redirect_uri=${redirectBaseUrl}/oauth2/callback`
-            );
-            // We wanna skip fetching certs in cases such as tests.
-            if (!args.skipFetchCerts) {
-                const users = getSetting('USERS');
-                /*
-                 * If no USERS in settings we need to go through OAuth before
-                 * being able to ask for a certificate from the CA.
-                 * Let the app load for a while before launching OAuth
-                 * to avoid opening the new tab in the browser without
-                 * the attention of the user.
-                 */
-                if (isEmpty(users)) {
-                    // `opn` module opens a tab in the default browser.
-                    setTimeout(() => opn(oauthUrl), 10000);
-                }
-                const checkOauthComplete = setInterval(() => {
-                    // TODO: As metnioned in ./certificates, not sure what
-                    // the way to go for multiple users should be.
-                    if (users[0]) {
-                        if (has('username', users[0]) && has('accessToken', users[0])) {
-                            fetchAndSaveCerts();
-                            clearInterval(checkOauthComplete);
-                        }
+            if (args.createCerts) {
+                const createCertificates = setInterval(() => {
+                    if (!isEmpty(getSetting('USERS'))) {
+                        clearInterval(createCertificates);
+                        fetchAndSaveCerts();
                     }
-                }, 1000);
+                }, 2000);
             }
-            const awaitCertsAndStartHTTPS = setInterval(() => {
+            const restartAsHTTPS = setInterval(() => {
                 if (!isEmpty(getCerts())) {
-                    clearInterval(awaitCertsAndStartHTTPS);
+                    clearInterval(restartAsHTTPS);
                     this.restartWithSSL();
                 }
             }, 2000);
-        } else if (args.protocol === 'HTTPS' || this.certs) {
+        } else if (args.protocol || !isEmpty(this.certs)) {
             setRenewalJob();
             this.server = restify.createServer(merge({version: apiVersion}, this.certs));
             this.protocol = 'https';
@@ -95,7 +71,6 @@ export default class Server {
     }
 
     restartWithSSL() {
-        // saveSetting('PORT', 9595);
         // We have certs, thus we have a user, we can thus close the HTTP server.
         this.close();
         // Reference the new certs into the instance.;
@@ -114,8 +89,6 @@ export default class Server {
     start() {
         const that = this;
         const server = this.server;
-
-        server.port = parseInt(getSetting('PORT'), 10);
 
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
@@ -178,12 +151,13 @@ export default class Server {
                 'make sure the port is free.');
             }
         });
-        console.log(`Listening at: ${this.protocol}://${this.domain}:${server.port}`);
-        server.listen(server.port);
+        console.log(`Listening at: ${this.protocol}://${this.domain}:${this.port}`);
+        server.listen(this.port);
 
         server.get(/\/static\/?.*/, restify.serveStatic({
             directory: `${__dirname}/../`
         }));
+
         server.get(/\/images\/?.*/, restify.serveStatic({
             directory: `${__dirname}/../app/`
         }));
@@ -192,6 +166,17 @@ export default class Server {
             directory: `${__dirname}/../static`,
             file: 'oauth.html'
         }));
+
+        server.get(/\/setup\/?$/, restify.serveStatic({
+            directory: `${__dirname}/../static`,
+            file: 'setup.html'
+        }));
+
+        server.post(/\/hasauth\/?$/, function hasAuth(req, res, next) {
+            const users = getSetting('USERS');
+            const allUserNames = pluck('username', users);
+            res.json(200, {hasAuth: contains(req.params.username, allUserNames)});
+        });
 
         server.post(/\/oauth2\/token\/?$/, function saveOauth(req, res, next) {
             const {access_token} = req.params;
