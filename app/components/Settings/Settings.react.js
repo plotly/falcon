@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {contains, dissoc, flip, head, keys, isEmpty, reduce } from 'ramda';
+import {contains, dissoc, eqProps, hasIn, flip, head, keys, isEmpty, reduce } from 'ramda';
 import {connect} from 'react-redux';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
@@ -13,7 +13,7 @@ import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import Preview from './Preview/Preview.react';
 import {Link} from '../Link.react';
 import {DIALECTS} from '../../constants/constants.js';
-import {plotlyUrl} from '../../utils/utils';
+import {plotlyUrl, getAllBaseUrls} from '../../utils/utils';
 
 /*
  * TODO - If the user is running the app locally but connecting to their
@@ -31,6 +31,8 @@ const unfoldIcon = (
     </img>
 );
 
+let checkConnectorSettings;
+
 class Settings extends Component {
     constructor(props) {
         super(props);
@@ -38,7 +40,7 @@ class Settings extends Component {
         this.renderEditButton = this.renderEditButton.bind(this);
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
         this.wrapWithAutoHide = this.wrapWithAutoHide.bind(this);
-        this.state = {showConnections: true, showPreview: true, editMode: true};
+        this.state = {showConnections: true, showPreview: true, editMode: true, url: {}};
     }
 
     wrapWithAutoHide(name, reactComponent) {
@@ -62,7 +64,9 @@ class Settings extends Component {
 
     componentDidMount() {
         this.fetchData();
-        this.props.dispatch(Actions.hasCerts());
+        checkConnectorSettings = setInterval(() => {
+            this.props.dispatch(Actions.getConnectorSettings());
+        }, 2000);
     }
 
     componentDidUpdate() {
@@ -134,6 +138,9 @@ class Settings extends Component {
             if (this.state.editMode) this.setState({editMode: false});
             if (this.props.connectionNeedToBeSaved) this.props.setConnectionNeedToBeSaved(false);
         }
+        if (nextProps.connectorSettingsRequest.status === 200 && this.props.connectorSettingsRequest.status !== 200) {
+            this.setState({urls: nextProps.connectorSettingsRequest.content});
+        }
     }
 
     fetchData() {
@@ -148,6 +155,7 @@ class Settings extends Component {
             elasticsearchMappingsRequest,
             getApacheDrillStorage,
             getApacheDrillS3Keys,
+            getConnectorSettings,
             getElasticsearchMappings,
             getTables,
             getS3Keys,
@@ -232,6 +240,7 @@ class Settings extends Component {
             connectRequest,
             connections,
             connectionsHaveBeenSaved,
+            connectorSettingsRequest,
             createCerts,
             deleteConnectionsRequest,
             deleteTab,
@@ -267,6 +276,7 @@ class Settings extends Component {
                 />
 
                 <div className={styles.openTab}>
+
                     {this.wrapWithAutoHide('Connections',
                         this.renderSettingsForm()
                     )}
@@ -294,6 +304,19 @@ class Settings extends Component {
                         </div>
                     )}
 
+                    {this.wrapWithAutoHide('Endpoints',
+                        <div>
+                            <div>{'Your connector is running on '}</div>
+                            {keys(this.state.urls).map(url => {
+                                return (
+                                    <div className={styles.url}>
+                                        {`${this.state.urls[url]}`}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
                     <div className={styles.workspaceLink}>
                         {Link(WORKSPACE_IMPORT_SQL_URL, 'Make queries from Plotly')}
                     </div>
@@ -317,6 +340,7 @@ function mapStateToProps(state) {
         connectionsRequest,
         connectRequests,
         connectionsNeedToBeSaved,
+        connectorSettingsRequest,
         saveConnectionsRequests,
         deleteConnectionsRequests,
         previewTableRequests,
@@ -359,7 +383,8 @@ function mapStateToProps(state) {
         connectionObject: connections[selectedTab],
         selectedTable,
         selectedIndex,
-        selectedConnectionId
+        selectedConnectionId,
+        connectorSettingsRequest
     };
 }
 

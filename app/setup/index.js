@@ -1,7 +1,17 @@
 import fetch from 'isomorphic-fetch';
 import React, {Component} from 'react';
 import {render} from 'react-dom';
-import {baseUrl, isWebBrowser, dynamicRequireElectron} from '../utils/utils';
+import {
+    baseUrl,
+    dynamicRequireElectron,
+    isWebBrowser
+} from '../utils/utils';
+
+// TODO: could be a conflict if OnPrem url for connector is `/setup`,
+// chances are slim - is there a better way to drop the trailing route
+// on which this page is server?
+const currentEndpoint = '/setup';
+const baseUrlWrapped = baseUrl().replace(currentEndpoint, '');
 
 const CLOUD = 'cloud';
 const ONPREM = 'onprem';
@@ -16,7 +26,6 @@ class Setup extends Component {
         this.state = {
             domain: '',
             errorMessage: '',
-            loggedIn: false,
             serverType: '',
             status: '',
             username: ''
@@ -24,7 +33,7 @@ class Setup extends Component {
         this.authenticateUser = this.authenticateUser.bind(this);
         this.buildOauthUrl = this.buildOauthUrl.bind(this);
         this.chooseServerType = this.chooseServerType.bind(this);
-        this.setTimeoutAuthDone = this.setTimeoutAuthDone.bind(this);
+        this.logIn = this.logIn.bind(this);
         this.updateStateWithEvent = this.updateStateWithEvent.bind(this);
         this.verifyAuthDone = this.verifyAuthDone.bind(this);
     }
@@ -33,12 +42,10 @@ class Setup extends Component {
         const oauthClientId = 'isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt';
         const isOnPrem = this.state.serverType === ONPREM;
         const plotlyDomain = isOnPrem ? this.state.domain : 'plot.ly';
-        const redirect_uri = baseUrl().replace('/setup', '');
+        const redirect_uri = baseUrlWrapped;
         return (
             `https://${plotlyDomain}/o/authorize/?response_type=token&` +
             `client_id=${oauthClientId}&` +
-            // TODO: Is there a better way? On premise has the `external-data-connector`
-            // route so cant use window.location.origin.
             `redirect_uri=${redirect_uri}/oauth2/callback`
         );
     }
@@ -49,8 +56,7 @@ class Setup extends Component {
 
     verifyAuthDone() {
         const {username} = this.state;
-        console.log(`baseUrl() ${baseUrl()}`);
-        fetch(`${baseUrl()}/hasauth`, {
+        return fetch(`${baseUrlWrapped}/hasauth`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -62,47 +68,12 @@ class Setup extends Component {
         }).then(res => res.json().then(json => {
             if (res.status !== 200) {
                 this.setState({status: 'failure', errorMessage: json.error.message});
+                return false;
             }
-            this.setState({loggedIn: json.hasAuth});
-        }));
-        // TODO: More error handling here? Probably need a catch here.
-    }
-
-    createCertificates() {
-        const {username} = this.state;
-        fetch(`${baseUrl()}/hasauth`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username
-            })
-        }).then(res => res.json().then(json => {
-            if (res.status !== 200) {
-                this.setState({status: 'failure', errorMessage: json.error.message});
-            }
-            this.setState({loggedIn: json.hasAuth});
-        }));
-    }
-
-    setTimeoutAuthDone () {
-        const {username} = this.state;
-        const checkAuth = setInterval(() => {
-            // TODO: This is not very clear for a message. Show them a link to the
-            // maybe in case they closed it or want to try again?
-            this.setState({
-                errorMessage: `We\'re waiting for authorization of [${username}].`});
-            this.verifyAuthDone();
-            if (this.state.loggedIn) {
-                // TODO: Is there a better way? On premise has the `external-data-connector`
-                // route so cant use window.location.origin.
-                clearInterval(checkAuth);
-                const appRoute = baseUrl().replace('/setup', '/');
-                window.location.assign(appRoute);
-            }
-        }, 1000);
+            return true;
+        })).catch( e => {
+            return false;
+        });
     }
 
     authenticateUser () {
@@ -126,6 +97,26 @@ class Setup extends Component {
             window.open(this.buildOauthUrl(), '_blank');
         } else {
             dynamicRequireElectron().shell.openExternal(this.buildOauthUrl());
+        }
+    }
+
+    logIn () {
+        const {username} = this.state;
+        if (!this.verifyAuthDone()) {
+            const checkAuth = setInterval(() => {
+                // TODO: This is not very clear for a message. Show them a link to the oauth
+                // maybe in case they closed it or want to try again?
+                this.setState({
+                    errorMessage: `We\'re waiting for authorization of [${username}].`
+                });
+
+                if (this.verifyAuthDone()) {
+                    clearInterval(checkAuth);
+                    window.location.assign(baseUrlWrapped);
+                }
+            }, 1000);
+        } else {
+            this.authenticateUser();
         }
     }
 
@@ -153,7 +144,7 @@ class Setup extends Component {
                 <button
                     className="btn btn-large btn-primary"
                     style={{display: 'block', margin: 'auto'}}
-                    onClick={() => this.authenticateUser()}
+                    onClick={() => this.logIn()}
                 >{'Login'}</button>
             );
         };

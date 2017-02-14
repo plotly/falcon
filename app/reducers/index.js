@@ -140,6 +140,8 @@ export const connectionsRequest = createApiReducer('connectionsRequest');
 export const deleteConnectionsRequests = createApiReducer('deleteConnectionsRequests');
 export const saveConnectionsRequests = createApiReducer('saveConnectionsRequests');
 
+export const connectorSettingsRequest = createApiReducer('connectorSettingsRequest');
+
 export const apacheDrillStorageRequests = createApiReducer('apacheDrillStorageRequests');
 export const apacheDrillS3KeysRequests = createApiReducer('apacheDrillS3KeysRequests');
 export const createCertsRequest = createApiReducer('createCertsRequest');
@@ -229,6 +231,7 @@ const rootReducer = combineReducers({
     connectRequests,
     connectionsRequest,
     connectionsNeedToBeSaved,
+    connectorSettingsRequest,
     saveConnectionsRequests,
     deleteConnectionsRequests,
     tablesRequests,

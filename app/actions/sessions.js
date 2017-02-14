@@ -98,6 +98,15 @@ function apiThunk(endpoint, method, store, id, body) {
     };
 }
 
+
+export function getConnectorSettings() {
+    return apiThunk(
+        'settings',
+        'GET',
+        'connectorSettingsRequest'
+    );
+}
+
 export function getConnections() {
     return apiThunk(
         'connections',

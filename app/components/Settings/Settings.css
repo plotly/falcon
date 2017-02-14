@@ -78,6 +78,8 @@
 .unfoldIcon {
     width: 18px;
     padding-left: 10px;
+    position: relative;
+    top: 3px;
 }
 
 .workspaceLink {
@@ -97,7 +99,13 @@
 }
 
 .collapsed .unfoldIcon{
+    position: relative;
+    top: 6px;
     transform:rotate(-90deg);
     -ms-transform:rotate(-90deg); /* IE 9 */
     -webkit-transform:rotate(-90deg); /* Safari and Chrome */
+}
+
+.url {
+    text-decoration: underline;
 }
