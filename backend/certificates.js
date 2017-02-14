@@ -3,6 +3,8 @@ import * as fs from 'fs';
 import fetch from 'node-fetch';
 import Logger from './logger';
 
+import {fakeCerts} from '../test/backend/utils';
+
 // TODO: Move these constants to settings?
 const CA_HOST = {
     DOMAIN: 'plotly-connector-test.com',
@@ -50,6 +52,15 @@ export function fetchCertsFromCA() {
 }
 
 export function fetchAndSaveCerts() {
+    /*
+     * When developing and debuggin, you may want to skip this part as it
+     * takes around 1 minute of your time.
+     * You may want to comment out the returned function and uncomment
+     * the below instead.
+     *
+     * saveCertsLocally(fakeCerts);
+     *
+     */
     return fetchCertsFromCA().then(response => {
         if (!response.error) {
             Logger.log('Successfully received certs from CA.');
@@ -60,6 +71,7 @@ export function fetchAndSaveCerts() {
             Logger.log('An error returned from the CA.' + response.error);
         }
     });
+
 }
 
 export const msInOneDay = 1000 * 3600 * 24;
