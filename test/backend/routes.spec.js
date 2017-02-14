@@ -21,6 +21,7 @@ import {
     mysqlConnection,
     publicReadableS3Connections,
     sqlConnections,
+    testCA,
     testConnections,
     testSqlConnections,
     username,
@@ -77,7 +78,7 @@ let queryObject;
 let server;
 let connectionId;
 
-describe.only('Server - ', () => {
+describe('Server - ', () => {
     beforeEach(() => {
         ['KEY_FILE', 'CERT_FILE'].forEach(fileName => {
             try {
@@ -94,48 +95,26 @@ describe.only('Server - ', () => {
         });
     });
 
-    it('Sets HTTP protocol and locolhost as domain if there are no certs.', () => {
-        server = new Server({createCerts: false});
-        assert.equal(server.protocol, 'http');
-        assert.equal(server.domain, 'localhost');
-        server.close();
-        server = null;
-    });
-
-    it('Starts an https server if there are certs and host info in settings.', () => {
-        fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
-        fs.writeFileSync(getSetting('KEY_FILE'), fakeCerts.key);
-        saveSetting('USERS', [{username, accessToken}]);
-        saveSetting('CONNECTOR_HOST_INFO', {
-            host: 'subdomain.domain.com', lastUpdated: new Date()}
-        );
-        server = new Server({createCerts: false});
-        assert.equal(server.protocol, 'https');
-        assert.equal(server.domain, 'subdomain.domain.com');
-    });
-
     it('Start an https server after an http server was started but certs were created.', (done) => {
-        server = new Server({createCerts: false});
-        assert.equal(server.protocol, 'http');
-        assert.equal(server.domain, 'localhost');
+        server = new Server();
+        assert.isTrue(isEmpty(server.certs), 'Has no certs in the beginning.');
         fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
         fs.writeFileSync(getSetting('KEY_FILE'), fakeCerts.key);
         saveSetting('USERS', [{username, accessToken}]);
         saveSetting('CONNECTOR_HOST_INFO', {
-            host: 'subdomain.domain.com', lastUpdated: new Date()}
-        );
+            host: `${fakeCerts.subdomain}.${testCA}`, lastUpdated: new Date()
+        });
         setTimeout(() => {
-            assert.equal(server.protocol, 'https', 'Has the right protocol.');
-            assert.equal(server.domain, 'subdomain.domain.com', 'Has the right domain.');
             assert.isFalse(isEmpty(server.certs), 'Has certs.');
-            done();
+            // Can't fetch directly for now the https server because mockes certs
+            // were generated from staging LE server - not real certs.
         }, 5000);
     }).timeout(10000);
 });
 
 describe('Routes - ', function () {
     beforeEach(() => {
-        server = new Server({protocol: 'HTTP', skipFetchCerts: true});
+        server = new Server({createCerts: false, startHttps: false});
         server.start();
 
         // cleanup

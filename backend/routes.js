@@ -22,25 +22,29 @@ import {getCerts, fetchAndSaveCerts, setRenewalJob} from './certificates';
 import Logger from './logger';
 import fetch from 'node-fetch';
 
-const HOSTS = '/etc/hosts';
-
 export default class Server {
-    constructor(args = {createCerts: true}) {
-        this.certs = getCerts();
+    constructor(args = {createCerts: true, startHttps: true}) {
         /*
-         * If server is given a protocol argument, enforce it,
-         * otherwise decide which protocol to use
-         * depending if there are certificates. This is mainly
-         * used in tests.
-        */
-        const apiVersion = '1.0.0';
-        this.apiVersion = apiVersion;
-        this.port = parseInt(getSetting('PORT'), 10);
-        if (args.protocol === 'HTTP' || isEmpty(this.certs)) {
-            this.server = restify.createServer({version: apiVersion});
-            this.protocol = 'http';
-            this.domain = 'localhost';
-            if (args.createCerts) {
+         * `args` is of form {protocol: 'HTTP', createCerts: true}
+         * `args` is used to control whether we want to start the server initiall as http or
+         * https and whether we want to create certs if none found if started as http.
+         * It's main use is to control the flow during tests.
+         */
+        this.certs = getCerts();
+        this.apiVersion = '1.0.0';
+
+        this.httpServer = {};
+        this.httpsServer = {};
+
+        // Alwasy start the HTTP server.
+        this.httpServer.port = parseInt(getSetting('PORT'), 10);
+        this.httpServer.server = restify.createServer({version: this.apiVersion});
+        this.httpServer.protocol = 'http';
+        this.httpServer.domain = 'localhost';
+
+        if (args.startHttps) {
+            // Create certs if necessary.
+            if (args.createCerts && isEmpty(this.certs)) {
                 const createCertificates = setInterval(() => {
                     if (!isEmpty(getSetting('USERS'))) {
                         clearInterval(createCertificates);
@@ -48,48 +52,42 @@ export default class Server {
                     }
                 }, 2000);
             }
-            const restartAsHTTPS = setInterval(() => {
+            const startHTTPS = setInterval(() => {
                 if (!isEmpty(getCerts())) {
-                    clearInterval(restartAsHTTPS);
-                    this.restartWithSSL();
+                    clearInterval(startHTTPS);
+                    this.startSslServer();
                 }
             }, 2000);
-        } else if (args.protocol || !isEmpty(this.certs)) {
-            setRenewalJob();
-            this.server = restify.createServer(merge({version: apiVersion}, this.certs));
-            this.protocol = 'https';
-            // TODO: Need to find better names for these or simplify them into one.
-            this.domain = getSetting('CONNECTOR_HOST_INFO').host || getSetting('CONNECTOR_HTTPS_DOMAIN');
-        } else {
-            Logger.log('Failed to start the server.');
         }
 
         this.queryScheduler = new QueryScheduler();
 
+        this.startSslServer = this.startSslServer.bind(this);
         this.start = this.start.bind(this);
         this.close = this.close.bind(this);
     }
 
-    restartWithSSL() {
-        // We have certs, thus we have a user, we can thus close the HTTP server.
-        this.close();
+    startSslServer() {
         // Reference the new certs into the instance.;
         this.certs = getCerts();
-        // Start the interval to renew the certifications in 24 days.
+        // TODO: Should HTTPS port be a setting too?
+        this.httpsServer.port = parseInt(getSetting('PORT'), 10) + 1;
+        // Start the interval to renew the certifications.
         setRenewalJob();
+        this.httpsServer.protocol = 'https';
         // Create a new server and attach it to the class instance.
-        this.server = restify.createServer(merge(
-            {version: this.apiVersion}, this.certs)
+        this.httpsServer.server = restify.createServer(merge(
+            {version: this.httpsServer.apiVersion}, this.certs)
         );
-        this.protocol = 'https';
-        this.domain = getSetting('CONNECTOR_HOST_INFO').host || getSetting('CONNECTOR_HTTPS_DOMAIN');
-        this.start();
+        this.httpsServer.domain = getSetting('CONNECTOR_HOST_INFO').host;
+        saveSetting('CONNECTOR_HTTPS_DOMAIN', this.httpsServer.domain);
+        this.start('https');
     }
 
-    start() {
+    start(type = 'http') {
         const that = this;
-        const server = this.server;
-
+        const restifyServer = type === 'https' ? that.httpsServer : that.httpServer;
+        const {server} = restifyServer;
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
         server.pre(function (request, response, next) {
@@ -151,8 +149,9 @@ export default class Server {
                 'make sure the port is free.');
             }
         });
-        console.log(`Listening at: ${this.protocol}://${this.domain}:${this.port}`);
-        server.listen(this.port);
+        const {protocol, domain, port} = restifyServer;
+        console.log(`Listening at: ${protocol}://${domain}:${port}`);
+        server.listen(port);
 
         server.get(/\/static\/?.*/, restify.serveStatic({
             directory: `${__dirname}/../`
@@ -176,6 +175,15 @@ export default class Server {
             const users = getSetting('USERS');
             const allUserNames = pluck('username', users);
             res.json(200, {hasAuth: contains(req.params.username, allUserNames)});
+        });
+
+        server.get(/\/settings\/?$/, function settings(req, res, next) {
+            const {httpServer, httpsServer} = that;
+            const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;
+            const HTTPS_URL = httpsServer.domain
+                ? `${httpsServer.protocol}://${httpsServer.domain}:${httpsServer.port}`
+                : 'is not setup';
+            res.json(200, {http: HTTP_URL, https: HTTPS_URL});
         });
 
         server.post(/\/oauth2\/token\/?$/, function saveOauth(req, res, next) {
@@ -507,7 +515,10 @@ export default class Server {
 
     }
 
-    close() {
-        this.server.close();
+    close(type = 'http') {
+        const that = this;
+        const restifyServer = type === 'https' ? that.httpsServer : that.httpServer;
+        const {server} = restifyServer;
+        server.close();
     }
 }

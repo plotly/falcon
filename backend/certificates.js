@@ -65,7 +65,9 @@ export function fetchAndSaveCerts() {
 export const msInOneDay = 1000 * 3600 * 24;
 
 export function calculateDaysToRenewal() {
-    const daysCertificateIsGoodFor = 24; // Because max setTimout value is 24 days.
+    // setInterval is using a 32 bit int to store the delay so the max value allowed
+    // would be 2147483647 => 24.8 days.
+    const daysCertificateIsGoodFor = 24;
     const {lastUpdated} = getSetting('CONNECTOR_HOST_INFO');
     const timePassed = Math.abs(new Date().getTime() - new Date(lastUpdated).getTime());
     return Math.ceil(daysCertificateIsGoodFor - timePassed / msInOneDay);
@@ -81,8 +83,6 @@ export const renewCertificate = () => {
 };
 
 export function setRenewalJob() {
-    // setInterval is using a 32 bit int to store the delay so the max value allowed
-    // would be 2147483647 => 24.8 days.
     return setInterval(() => {
         renewCertificate();
     }, toMilliseconds(calculateDaysToRenewal()));
