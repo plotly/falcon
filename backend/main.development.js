@@ -1,5 +1,5 @@
 import {app, BrowserWindow} from 'electron';
-import {contains, join} from 'ramda';
+import {contains, join, isEmpty} from 'ramda';
 import Logger from './logger';
 import {setupMenus} from './menus';
 import {getSetting} from './settings';
@@ -28,22 +28,14 @@ app.on('ready', () => {
         height: 1024
     });
 
-    const URL = `${server.protocol}://${server.domain}`;
-    const SETTINGS = join('&',
-        [
-            'APP_DIRECTORY',
-            'PLOTLY_API_DOMAIN',
-            'PORT'
-        ].map(s => {
-            return `${s}=${getSetting(s)}`;
-    }));
+    const {httpServer, httpsServer} = server;
+    const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;
+    const HTTPS_URL = `${httpsServer.protocol}://${httpsServer.domain}:${httpsServer.port}`;
 
-    console.log(`Visit ${URL}:${getSetting('PORT')}`);
-    // TODO - Does this work too?
-    // mainWindow.loadURL(`http://localhost:${getSetting('PORT')}`);
+    console.log(`Visit ${HTTP_URL}`);
 
     // Provide the port of the server to the front-end as a query string param.
-    mainWindow.loadURL(`file://${__dirname}/../static/setup.html?URL=${URL}&${SETTINGS}`);
+    mainWindow.loadURL(`${HTTP_URL}/setup`);
     // startup main window
     mainWindow.webContents.on('did-finish-load', () => {
 
