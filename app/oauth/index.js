@@ -26,6 +26,7 @@ class Status extends Component {
 
         this.setState({status: 'loading'});
         fetch('./token', {
+            credentials: 'include',
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
