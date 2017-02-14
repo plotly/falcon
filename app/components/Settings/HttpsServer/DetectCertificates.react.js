@@ -19,7 +19,7 @@ export default class DetectCertificates extends Component {
         if (usesHttpsProtocol()) {
             INTERVAL_SERVER_STATUS = setInterval(() => {
                 fetch(
-                    `${baseUrl()}/status`
+                    `${baseUrl()}/status`, {credentials: 'include'}
                 )
                 .then(() => {
                     this.setState({successfulFetch: true});

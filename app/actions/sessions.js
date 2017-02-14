@@ -24,6 +24,7 @@ const request = {GET, DELETE, POST, PUT};
 function GET(path) {
     return fetch(`${baseUrl()}/${path}`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -34,6 +35,7 @@ function GET(path) {
 function DELETE(path) {
     return fetch(`${baseUrl()}/${path}`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -44,6 +46,7 @@ function DELETE(path) {
 function POST(path, body = {}) {
     return fetch(`${baseUrl()}/${path}`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -55,6 +58,7 @@ function POST(path, body = {}) {
 function PUT(path, body = {}) {
     return fetch(`${baseUrl()}/${path}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
