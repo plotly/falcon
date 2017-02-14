@@ -68,11 +68,11 @@ class Setup extends Component {
         }).then(res => res.json().then(json => {
             if (res.status !== 200) {
                 this.setState({status: 'failure', errorMessage: json.error.message});
-                return false;
+                this.setState({loggedIn: false});
             }
-            return true;
+            this.setState({loggedIn: json.hasAuth});
         })).catch( e => {
-            return false;
+            this.setState({loggedIn: false});
         });
     }
 
@@ -92,7 +92,6 @@ class Setup extends Component {
             return;
         }
         this.setState({errorMessage: ''});
-        this.setTimeoutAuthDone();
         if (isWebBrowser) {
             window.open(this.buildOauthUrl(), '_blank');
         } else {
@@ -102,21 +101,23 @@ class Setup extends Component {
 
     logIn () {
         const {username} = this.state;
-        if (!this.verifyAuthDone()) {
+        this.verifyAuthDone();
+        if (!this.state.loggedIn) {
+            this.authenticateUser();
             const checkAuth = setInterval(() => {
+                this.verifyAuthDone();
                 // TODO: This is not very clear for a message. Show them a link to the oauth
                 // maybe in case they closed it or want to try again?
                 this.setState({
                     errorMessage: `We\'re waiting for authorization of [${username}].`
                 });
-
-                if (this.verifyAuthDone()) {
+                if (this.state.loggedIn) {
                     clearInterval(checkAuth);
                     window.location.assign(baseUrlWrapped);
                 }
             }, 1000);
         } else {
-            this.authenticateUser();
+            window.location.assign(baseUrlWrapped);
         }
     }
 
@@ -125,7 +126,6 @@ class Setup extends Component {
     }
 
     render() {
-        const {errorMessage, status} = this.state;
         const submitButton = (value) => {
             return (
                 <button
