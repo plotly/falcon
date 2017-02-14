@@ -75,6 +75,7 @@ const showSudoMessage = () => {
 
 function isUrlRedirected() {
     return fetch(`${baseUrl()}/is-url-redirected`, {
+        credentials: 'include',
         method: 'GET',
         headers: {
             'Accept': 'application/json',
