@@ -99,7 +99,7 @@ export default class Server {
         ];
         server.use(restify.CORS({
             origins: getSetting('CORS_ALLOWED_ORIGINS'),
-            credentials: false,
+            credentials: true,
             headers: headers
         }));
         headers.forEach(header => restify.CORS.ALLOW_HEADERS.push(header));
