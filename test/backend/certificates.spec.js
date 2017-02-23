@@ -2,27 +2,24 @@ import {assert, expect} from 'chai';
 import fs from 'fs';
 import {contains, dissoc, merge} from 'ramda';
 
+import {fakeCerts} from './utils';
 import {getSetting, saveSetting} from '../../backend/settings.js';
 import {
     getCerts,
     CA_HOST_URL,
     calculateDaysToRenewal,
-    fetchCertsFromCA,
+    fetchAndSaveCerts,
     saveCertsLocally,
     setRenewalJob,
     renewCertificate
 } from '../../backend/certificates';
-import {username, accessToken} from './utils';
 
 const cleanUp = () => {
-    ['KEY_FILE', 'CERT_FILE'].forEach(fileName => {
+    ['KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH'].forEach(fileName => {
         try {
             fs.unlinkSync(getSetting(fileName));
         } catch (e) {}
     });
-    try {
-        fs.unlinkSync(getSetting('SETTINGS_PATH'));
-    } catch (e) {}
 };
 
 describe('Certificates', function() {
@@ -34,11 +31,7 @@ describe('Certificates', function() {
         cleanUp();
     });
 
-    it('The CA URL is correctly defined.', () => {
-        assert.equal(CA_HOST_URL, 'http://plotly-connector-test.com/certificate');
-    });
-
-    it('Can populate relevant certs files to local storage path.', () => {
+    it('Can populate relevant certs files to local storage path.', (done) => {
         ['KEY_FILE', 'CERT_FILE'].forEach(fileName => {
             assert.isFalse(
                 fs.existsSync(getSetting(fileName)),
@@ -51,46 +44,54 @@ describe('Certificates', function() {
         const expectedCert = 'cert';
         const expectedHost = 'subdomain.plotly-connector-test.com';
 
-        const response = saveCertsLocally(json);
-
-        assert.isNotOk(response.error);
-        assert.equal(
-            fs.readFileSync(getSetting('KEY_FILE'), 'utf-8', (err, data) => {
-                return data;
-            }),
-            expectedKey,
-            'KEY_FILE populated fine.'
-        );
-        assert.equal(
-            fs.readFileSync(getSetting('CERT_FILE'), 'utf-8', (err, data) => {
-                return data;
-            }),
-            expectedCert,
-            'CERT_FILE populated fine.'
-        );
-        const hostInfo = getSetting('CONNECTOR_HOST_INFO');
-        assert.equal(hostInfo.host, expectedHost, 'HOST name is correct.');
-        assert(
-            (new Date().getTime() - Date.parse(hostInfo.lastUpdated)) / 1000 < 1,
-            'HOST lastUpdated is recent.'
-        );
+        saveCertsLocally(json).then(() => {
+            assert.equal(
+                fs.readFileSync(getSetting('KEY_FILE'), 'utf-8', (err, data) => {
+                    return data;
+                }),
+                expectedKey,
+                'KEY_FILE populated fine.'
+            );
+            assert.equal(
+                fs.readFileSync(getSetting('CERT_FILE'), 'utf-8', (err, data) => {
+                    return data;
+                }),
+                expectedCert,
+                'CERT_FILE populated fine.'
+            );
+            const hostInfo = getSetting('CONNECTOR_HOST_INFO');
+            assert.equal(hostInfo.host, expectedHost, 'HOST name is correct.');
+            assert(
+                (new Date().getTime() - Date.parse(hostInfo.lastUpdated)) / 1000 < 1,
+                'HOST lastUpdated is recent.'
+            );
+            done();
+        });
     });
 
-    it('Can retrieve certifications from local files.', () => {
+    it('Can fetch certificates and save them', (done) => {
+        const {cert, key} = fakeCerts;
+        fetchAndSaveCerts(true).then(() => {
+            expect(getCerts()).to.deep.equal({cert, key});
+            done();
+        });
+    });
+
+    it('Can retrieve certifications from local files.', (done) => {
         // beforeEach() should delete all relevant files, make sure that's true.
         expect(getCerts()).to.deep.equal({});
-
         const json = {key: 'key', cert: 'cert', subdomain: 'subdomain'};
-        const savingResponse = saveCertsLocally(json);
-        assert.deepEqual(savingResponse, {}, 'Saving resopnse has no error.');
-        assert.deepEqual(getCerts(), {key: 'key', certificate: 'cert'}, 'Certs returned.');
+        saveCertsLocally(json).then(() => {
+            assert.deepEqual(getCerts(), {key: 'key', cert: 'cert'}, 'Certs returned.');
+            done();
+        });
     });
 
     it('Can calculate the amount of days left before certificate renewal.', () => {
         // Created just now shows 0 days.
         saveSetting('CONNECTOR_HOST_INFO', {lastUpdated: new Date()});
-        const thirtyDaysLeft = calculateDaysToRenewal();
-        assert.equal(thirtyDaysLeft, 24, 'If last update is today, 29 days left.');
+        const daysToRenewal = calculateDaysToRenewal();
+        assert.equal(daysToRenewal, 24, 'If last update is today, 24 days left.');
         // Created 30 days ago shows 0 days.
         const now = new Date();
         const oneMonthOldTimestamp = now.setDate(now.getDate() - 24);
