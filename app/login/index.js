@@ -16,6 +16,26 @@ const SERVER_TYPES = {
     [ONPREM]: 'Plotly On-Premise'
 };
 
+// http://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen
+const PopupCenter = (url, title, w, h) => {
+    // Fixes dual-screen position
+    const dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
+    const dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
+
+    const width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+    const height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+    const left = ((width / 2) - (w / 2)) + dualScreenLeft;
+    const top = ((height / 2) - (h / 2)) + dualScreenTop;
+    const popupWindow = window.open(url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+
+    if (window.focus) {
+        newWindow.focus();
+    }
+
+    return popupWindow;
+};
+
 class Login extends Component {
     constructor(props) {
         super(props);
@@ -50,7 +70,9 @@ class Login extends Component {
         try {
             dynamicRequireElectron().shell.openExternal(this.buildOauthUrl());
         } catch (e) {
-            const popupWindow = window.open(this.buildOauthUrl(), 'Authorization', 'width=500,height=500,top=100,left=100');
+            const popupWindow = PopupCenter(
+                this.buildOauthUrl(), 'Authorization', '500', '500'
+            );
             if (window.focus) {
                 popupWindow.focus();
             }
@@ -70,7 +92,10 @@ class Login extends Component {
             })
         }).then((res) => res.json().then((json) => {
             if (res.status !== 200) {
-                this.setState({status: 'failure', statusMessasge: json.error.message});
+                this.setState({
+                    status: 'failure',
+                    statusMessasge: json.error.message
+                });
                 this.setState({loggedIn: false});
             }
             this.setState({loggedIn: json.approved});
@@ -106,7 +131,8 @@ class Login extends Component {
             const checkAuth = setInterval(() => {
                 this.verifyAuthDone();
                 this.setState({
-                    statusMessasge: `Loading. User authorization of [${username}] in process.`
+                    statusMessasge:
+                    `Loading. User authorization of [${username}] in process.`
                 });
                 if (this.state.loggedIn) {
                     clearInterval(checkAuth);
