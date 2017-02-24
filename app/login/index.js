@@ -8,6 +8,7 @@ import {
 
 const currentEndpoint = '/login';
 const baseUrlWrapped = baseUrl().replace(currentEndpoint, '');
+const connectorUrl = baseUrlWrapped() + '/database-connector';
 
 const CLOUD = 'cloud';
 const ONPREM = 'onprem';
@@ -28,11 +29,6 @@ const PopupCenter = (url, title, w, h) => {
     const left = ((width / 2) - (w / 2)) + dualScreenLeft;
     const top = ((height / 2) - (h / 2)) + dualScreenTop;
     const popupWindow = window.open(url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
-
-    if (window.focus) {
-        newWindow.focus();
-    }
-
     return popupWindow;
 };
 
@@ -136,11 +132,11 @@ class Login extends Component {
                 });
                 if (this.state.loggedIn) {
                     clearInterval(checkAuth);
-                    window.location.assign(baseUrlWrapped);
+                    window.location.assign(connectorUrl);
                 }
             }, 1000);
         } else {
-            window.location.assign(baseUrlWrapped);
+            window.location.assign(connectorUrl);
         }
     }
 

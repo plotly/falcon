@@ -217,13 +217,18 @@ export default class Servers {
             });
         });
 
+        // Keeping the base route to have backwards compatibility.
         server.get('/', restify.serveStatic({
+            directory: `${__dirname}/../static`,
+            file: 'login.html'
+        }));
+
+        server.get('/data-connector', restify.serveStatic({
             directory: `${__dirname}/../static`,
             file: 'index.html'
         }));
 
         server.get('/status', function statusHandler(req, res, next) {
-            // TODO - Maybe fix up this copy
             res.send('Connector status - running and available for requests.');
         });
 
