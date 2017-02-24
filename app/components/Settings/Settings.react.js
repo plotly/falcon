@@ -31,7 +31,7 @@ const unfoldIcon = (
     </img>
 );
 
-let checkConnectorSettings;
+let checkconnectorUrls;
 
 class Settings extends Component {
     constructor(props) {
@@ -64,8 +64,8 @@ class Settings extends Component {
 
     componentDidMount() {
         this.fetchData();
-        checkConnectorSettings = setInterval(() => {
-            this.props.dispatch(Actions.getConnectorSettings());
+        checkconnectorUrls = setInterval(() => {
+            this.props.dispatch(Actions.getConnectorUrls());
         }, 2000);
     }
 
@@ -138,8 +138,8 @@ class Settings extends Component {
             if (this.state.editMode) this.setState({editMode: false});
             if (this.props.connectionNeedToBeSaved) this.props.setConnectionNeedToBeSaved(false);
         }
-        if (nextProps.connectorSettingsRequest.status === 200 && this.props.connectorSettingsRequest.status !== 200) {
-            this.setState({urls: nextProps.connectorSettingsRequest.content});
+        if (nextProps.connectorUrlsRequest.status === 200 && this.props.connectorUrlsRequest.status !== 200) {
+            this.setState({urls: nextProps.connectorUrlsRequest.content});
         }
     }
 
@@ -155,7 +155,7 @@ class Settings extends Component {
             elasticsearchMappingsRequest,
             getApacheDrillStorage,
             getApacheDrillS3Keys,
-            getConnectorSettings,
+            getConnectorUrls,
             getElasticsearchMappings,
             getTables,
             getS3Keys,
@@ -240,7 +240,7 @@ class Settings extends Component {
             connectRequest,
             connections,
             connectionsHaveBeenSaved,
-            connectorSettingsRequest,
+            connectorUrlsRequest,
             createCerts,
             deleteConnectionsRequest,
             deleteTab,
@@ -340,7 +340,7 @@ function mapStateToProps(state) {
         connectionsRequest,
         connectRequests,
         connectionsNeedToBeSaved,
-        connectorSettingsRequest,
+        connectorUrlsRequest,
         saveConnectionsRequests,
         deleteConnectionsRequests,
         previewTableRequests,
@@ -384,7 +384,7 @@ function mapStateToProps(state) {
         selectedTable,
         selectedIndex,
         selectedConnectionId,
-        connectorSettingsRequest
+        connectorUrlsRequest
     };
 }
 

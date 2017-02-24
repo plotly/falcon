@@ -95,7 +95,7 @@ describe('Server - ', () => {
         });
     });
 
-    it('Start an https server after an http server was started but certs were created.', (done) => {
+    it('Server has certs after an http server was started and certs were created.', (done) => {
         server = new Server({createCerts: false, startHttps: true});
         assert.isTrue(isEmpty(server.certs), 'Has no certs in the beginning.');
         fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
@@ -106,8 +106,10 @@ describe('Server - ', () => {
         });
         setTimeout(() => {
             assert.isFalse(isEmpty(server.certs), 'Has certs.');
-            // Can't fetch directly for now the https server because mockes certs
+            // Can't fetch directly for now the https server because mocked certs
             // were generated from staging LE server - not real certs.
+            server.close();
+            server.close('https');
             done();
         }, 5000);
     }).timeout(10000);

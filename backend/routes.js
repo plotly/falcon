@@ -46,18 +46,19 @@ export default class Server {
             // Create certs if necessary.
             if (args.createCerts && isEmpty(this.certs)) {
                 const createCertificates = setInterval(() => {
+                    // Can't create until user was authenticated.
                     if (!isEmpty(getSetting('USERS'))) {
                         clearInterval(createCertificates);
                         fetchAndSaveCerts();
                     }
-                }, 2000);
+                }, 500);
             }
             const startHTTPS = setInterval(() => {
                 if (!isEmpty(getCerts())) {
                     clearInterval(startHTTPS);
                     this.startSslServer();
                 }
-            }, 2000);
+            }, 500);
         }
 
         this.queryScheduler = new QueryScheduler();
@@ -68,7 +69,7 @@ export default class Server {
     }
 
     startSslServer() {
-        // Reference the new certs into the instance.;
+        // Reference the new certs into the instance.
         this.certs = getCerts();
         // TODO: Should HTTPS port be a setting too?
         this.httpsServer.port = parseInt(getSetting('PORT'), 10) + 1;
@@ -135,22 +136,8 @@ export default class Server {
             res.send(204);
         });
 
-        /*
-         * For some reason restartWithSSL() is triggered twice even if I
-         * properly delete the interval that is calling it ... TODO: investigate.
-         * For now a workaround is to catch the error when in use.
-         * There is nothing else besides the app that starts the server so
-         * there should be no real conflict or need to debug other in use
-         */
-        server.on('error', (e) => {
-            if (e.code == 'EADDRINUSE') {
-                console.log('The app is already running or your port is busy. ' +
-                'If you think the case is the latter, kill the process and ' +
-                'make sure the port is free.');
-            }
-        });
         const {protocol, domain, port} = restifyServer;
-        console.log(`Listening at: ${protocol}://${domain}:${port}`);
+        Logger.log(`Listening at: ${protocol}://${domain}:${port}`);
         server.listen(port);
 
         server.get(/\/static\/?.*/, restify.serveStatic({
@@ -166,15 +153,15 @@ export default class Server {
             file: 'oauth.html'
         }));
 
-        server.get(/\/setup\/?$/, restify.serveStatic({
+        server.get(/\/login\/?$/, restify.serveStatic({
             directory: `${__dirname}/../static`,
-            file: 'setup.html'
+            file: 'login.html'
         }));
 
-        server.post(/\/hasauth\/?$/, function hasAuth(req, res, next) {
+        server.post('/approved/:username', function hasAuth(req, res, next) {
             const users = getSetting('USERS');
             const allUserNames = pluck('username', users);
-            res.json(200, {hasAuth: contains(req.params.username, allUserNames)});
+            res.json(200, {approved: contains(req.params.username, allUserNames)});
         });
 
         server.get(/\/settings\/?$/, function settings(req, res, next) {

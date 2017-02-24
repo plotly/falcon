@@ -35,7 +35,7 @@ app.on('ready', () => {
     console.log(`Visit ${HTTP_URL}`);
 
     // Provide the port of the server to the front-end as a query string param.
-    mainWindow.loadURL(`${HTTP_URL}/setup`);
+    mainWindow.loadURL(`${HTTP_URL}/login`);
     // startup main window
     mainWindow.webContents.on('did-finish-load', () => {
 

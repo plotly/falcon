@@ -1,7 +1,5 @@
 import {contains, has, head, replace} from 'ramda';
 
-export const isWebBrowser = contains(window.location.protocol, ['http:', 'https:']);
-
 export function dynamicRequireElectron() {
     return window.require('electron');
 }
@@ -30,7 +28,7 @@ export function usesHttpsProtocol() {
 
 export function isOnPrem() {
     // on prem has a specific path for the app; it is simply '/' otherwise
-    return (isWebBrowser && contains('external-data-connector', baseUrl()));
+    return (contains('external-data-connector', baseUrl()));
 }
 
 export function plotlyUrl() {

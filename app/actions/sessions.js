@@ -99,11 +99,11 @@ function apiThunk(endpoint, method, store, id, body) {
 }
 
 
-export function getConnectorSettings() {
+export function getConnectorUrls() {
     return apiThunk(
         'settings',
         'GET',
-        'connectorSettingsRequest'
+        'connectorUrlsRequest'
     );
 }
 
