@@ -29,4 +29,4 @@ const servers = new Servers();
 Logger.log('Starting server', 2);
 servers.httpServer.start();
 Logger.log('Loading persistent queries', 2);
-servers.httpsServer.queryScheduler.loadQueries();
+servers.queryScheduler.loadQueries();

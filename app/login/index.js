@@ -21,13 +21,14 @@ class Login extends Component {
         super(props);
         this.state = {
             domain: '',
-            errorMessage: '',
+            statusMessasge: '',
             serverType: CLOUD,
             status: '',
             username: ''
         };
         this.authenticateUser = this.authenticateUser.bind(this);
         this.buildOauthUrl = this.buildOauthUrl.bind(this);
+        this.oauthPopUp = this.oauthPopUp.bind(this);
         this.logIn = this.logIn.bind(this);
         this.updateStateWithEvent = this.updateStateWithEvent.bind(this);
         this.verifyAuthDone = this.verifyAuthDone.bind(this);
@@ -45,6 +46,17 @@ class Login extends Component {
         );
     }
 
+    oauthPopUp() {
+        try {
+            dynamicRequireElectron().shell.openExternal(this.buildOauthUrl());
+        } catch (e) {
+            const popupWindow = window.open(this.buildOauthUrl(), 'Authorization', 'width=500,height=500,top=100,left=100');
+            if (window.focus) {
+                popupWindow.focus();
+            }
+        }
+    }
+
     verifyAuthDone() {
         const {username} = this.state;
         return fetch(`${baseUrlWrapped}/approved/${username}`, {
@@ -56,13 +68,13 @@ class Login extends Component {
             body: JSON.stringify({
                 username
             })
-        }).then(res => res.json().then(json => {
+        }).then((res) => res.json().then((json) => {
             if (res.status !== 200) {
-                this.setState({status: 'failure', errorMessage: json.error.message});
+                this.setState({status: 'failure', statusMessasge: json.error.message});
                 this.setState({loggedIn: false});
             }
             this.setState({loggedIn: json.approved});
-        })).catch( e => {
+        })).catch((e) => {
             this.setState({loggedIn: false});
         });
     }
@@ -71,23 +83,19 @@ class Login extends Component {
         if (!this.state.username) {
             this.setState({
                 status: 'failure',
-                errorMessage: 'Enter your Plotly username.'
+                statusMessasge: 'Enter your Plotly username.'
             });
             return;
         }
         if (!this.state.domain && this.state.serverType === ONPREM) {
             this.setState({
                 status: 'failure',
-                errorMessage: 'Enter your Plotly On Premise domain.'
+                statusMessasge: 'Enter your Plotly On Premise domain.'
             });
             return;
         }
-        this.setState({errorMessage: ''});
-        try {
-            dynamicRequireElectron().shell.openExternal(this.buildOauthUrl());
-        } catch (e) {
-            window.open(this.buildOauthUrl(), '_blank');
-        }
+        this.setState({statusMessasge: ''});
+        this.oauthPopUp();
     }
 
     logIn () {
@@ -97,10 +105,8 @@ class Login extends Component {
             this.authenticateUser();
             const checkAuth = setInterval(() => {
                 this.verifyAuthDone();
-                // TODO: This is not very clear for a message. Show them a link to the oauth
-                // maybe in case they closed it or want to try again?
                 this.setState({
-                    errorMessage: `We\'re waiting for authorization of [${username}].`
+                    statusMessasge: `Loading. User authorization of [${username}] in process.`
                 });
                 if (this.state.loggedIn) {
                     clearInterval(checkAuth);
@@ -217,7 +223,7 @@ class Login extends Component {
                         {loginOptions[this.state.serverType]}
                     </div>
                     <div style={{textAlign: 'center'}}>
-                        {this.state.errorMessage}
+                        {this.state.statusMessasge}
                     </div>
                 </div>
             </div>

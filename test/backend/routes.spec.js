@@ -77,7 +77,7 @@ let queryObject;
 let servers;
 let connectionId;
 
-describe('Servers - ', () => {
+describe('Server - ', () => {
     beforeEach(() => {
         ['KEY_FILE', 'CERT_FILE'].forEach(fileName => {
             try {
@@ -97,6 +97,7 @@ describe('Servers - ', () => {
     it('Servers has certs after an http server was started and certs were created.', (done) => {
         servers = new Servers({createCerts: false, startHttps: true});
         assert.isNull(servers.httpsServer.certs, 'Has no certs in the beginning.');
+        assert.isNull(servers.httpsServer.server, 'Https server does not exists initially');
         fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
         fs.writeFileSync(getSetting('KEY_FILE'), fakeCerts.key);
         saveSetting('USERS', [{username, accessToken}]);
@@ -105,6 +106,9 @@ describe('Servers - ', () => {
         });
         setTimeout(() => {
             assert.isFalse(isEmpty(servers.httpsServer.certs), 'Has certs.');
+            assert.equal(servers.httpsServer.protocol, 'https', 'Correct protocol.');
+            assert.equal(servers.httpsServer.domain, `${fakeCerts.subdomain}.${testCA}`, 'Correct domain');
+            assert.isNotNull(servers.httpsServer.server, 'Https server is non null');
             // Can't fetch directly for now the https server because mocked certs
             // were generated from staging LE server - not real certs.
             servers.httpServer.close();
