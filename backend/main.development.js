@@ -4,7 +4,7 @@ import Logger from './logger';
 import {setupMenus} from './menus';
 import {getSetting} from './settings';
 
-import Server from './routes.js';
+import Servers from './routes.js';
 
 Logger.log('Starting application', 2);
 
@@ -14,7 +14,7 @@ if (process.env.NODE_ENV === 'development') {
 
 const isTestRun = contains('--test-type=webdriver', process.argv.slice(2));
 
-const server = new Server();
+const server = new Servers();
 Logger.log('Starting server', 2);
 server.start();
 Logger.log('Loading persistent queries', 2);

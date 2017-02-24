@@ -22,7 +22,12 @@ import {getCerts, fetchAndSaveCerts, setRenewalJob} from './certificates';
 import Logger from './logger';
 import fetch from 'node-fetch';
 
-export default class Server {
+export default class Servers {
+    /*
+     * Returns an object {httpServer, httpsServer}
+     * The httpServer is always open for oauth.
+     * The httpsServer starts when certificates have been created.
+     */
     constructor(args = {createCerts: true, startHttps: true}) {
         /*
          * `args` is of form {protocol: 'HTTP', createCerts: true}
@@ -30,21 +35,20 @@ export default class Server {
          * https and whether we want to create certs if none found if started as http.
          * It's main use is to control the flow during tests.
          */
-        this.certs = getCerts();
         this.apiVersion = '1.0.0';
 
-        this.httpServer = {};
-        this.httpsServer = {};
+        this.httpServer = {port: null, server: null, protocol: null, domain: null};
+        this.httpsServer = {certs: null, port: null, server: null, protocol: null, domain: null};
 
-        // Alwasy start the HTTP server.
+        // Always start the HTTP server and keep it running.
         this.httpServer.port = parseInt(getSetting('PORT'), 10);
         this.httpServer.server = restify.createServer({version: this.apiVersion});
         this.httpServer.protocol = 'http';
         this.httpServer.domain = 'localhost';
 
         if (args.startHttps) {
-            // Create certs if necessary.
-            if (args.createCerts && isEmpty(this.certs)) {
+            // Create certs if necessary when we have an approved user.
+            if (args.createCerts && isEmpty(getCerts())) {
                 const createCertificates = setInterval(() => {
                     // Can't create until user was authenticated.
                     if (!isEmpty(getSetting('USERS'))) {
@@ -56,29 +60,31 @@ export default class Server {
             const startHTTPS = setInterval(() => {
                 if (!isEmpty(getCerts())) {
                     clearInterval(startHTTPS);
-                    this.startSslServer();
+                    this.httpsServer.start();
                 }
             }, 500);
         }
 
         this.queryScheduler = new QueryScheduler();
 
-        this.startSslServer = this.startSslServer.bind(this);
-        this.start = this.start.bind(this);
-        this.close = this.close.bind(this);
+        this.httpServer.start = this.start.bind(this);
+        this.httpsServer.start = this.startHttpsServer.bind(this);
+
+        this.httpServer.close = this.close.bind(this);
+        this.httpsServer.close = this.closeHttpsServer.bind(this);
     }
 
-    startSslServer() {
+    startHttpsServer() {
         // Reference the new certs into the instance.
-        this.certs = getCerts();
+        this.httpsServer.certs = getCerts();
         // TODO: Should HTTPS port be a setting too?
-        this.httpsServer.port = parseInt(getSetting('PORT'), 10) + 1;
+        this.httpsServer.port = parseInt(getSetting('PORT_HTTPS'), 10);
         // Start the interval to renew the certifications.
         setRenewalJob();
         this.httpsServer.protocol = 'https';
         // Create a new server and attach it to the class instance.
         this.httpsServer.server = restify.createServer(merge(
-            {version: this.httpsServer.apiVersion}, this.certs)
+            {version: this.httpsServer.apiVersion}, this.httpsServer.certs)
         );
         this.httpsServer.domain = getSetting('CONNECTOR_HOST_INFO').host;
         saveSetting('CONNECTOR_HTTPS_DOMAIN', this.httpsServer.domain);
@@ -499,7 +505,11 @@ export default class Server {
                 error: {message: err.message}
             });
         });
+    }
 
+    closeHttpsServer() {
+        const that = this;
+        that.close('https');
     }
 
     close(type = 'http') {

@@ -30,6 +30,7 @@ const DEFAULT_SETTINGS = {
         'https://local.plot.ly'
     ],
     PORT: 9494,
+    PORT_HTTPS: 9495,
 
     APP_DIRECTORY: `${__dirname}/../`,
 

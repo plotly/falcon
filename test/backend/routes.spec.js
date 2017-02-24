@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import {assert} from 'chai';
 import {assoc, concat, contains, dissoc, isEmpty, keys, merge, sort, without} from 'ramda';
-import Server from '../../backend/routes.js';
+import Servers from '../../backend/routes.js';
 import {
     getConnections,
     getSanitizedConnections,
@@ -29,7 +29,6 @@ import {
     validUids
 } from './utils.js';
 
-const access_token = accessToken;
 
 // Shortcuts
 function GET(path) {
@@ -75,10 +74,10 @@ function DELETE(path) {
 }
 
 let queryObject;
-let server;
+let servers;
 let connectionId;
 
-describe('Server - ', () => {
+describe('Servers - ', () => {
     beforeEach(() => {
         ['KEY_FILE', 'CERT_FILE'].forEach(fileName => {
             try {
@@ -95,9 +94,9 @@ describe('Server - ', () => {
         });
     });
 
-    it('Server has certs after an http server was started and certs were created.', (done) => {
-        server = new Server({createCerts: false, startHttps: true});
-        assert.isTrue(isEmpty(server.certs), 'Has no certs in the beginning.');
+    it('Servers has certs after an http server was started and certs were created.', (done) => {
+        servers = new Servers({createCerts: false, startHttps: true});
+        assert.isNull(servers.httpsServer.certs, 'Has no certs in the beginning.');
         fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
         fs.writeFileSync(getSetting('KEY_FILE'), fakeCerts.key);
         saveSetting('USERS', [{username, accessToken}]);
@@ -105,11 +104,11 @@ describe('Server - ', () => {
             host: `${fakeCerts.subdomain}.${testCA}`, lastUpdated: new Date()
         });
         setTimeout(() => {
-            assert.isFalse(isEmpty(server.certs), 'Has certs.');
+            assert.isFalse(isEmpty(servers.httpsServer.certs), 'Has certs.');
             // Can't fetch directly for now the https server because mocked certs
             // were generated from staging LE server - not real certs.
-            server.close();
-            server.close('https');
+            servers.httpServer.close();
+            servers.httpsServer.close();
             done();
         }, 5000);
     }).timeout(10000);
@@ -117,8 +116,8 @@ describe('Server - ', () => {
 
 describe('Routes - ', function () {
     beforeEach(() => {
-        server = new Server({createCerts: false, startHttps: false});
-        server.start();
+        servers = new Servers({createCerts: false, startHttps: false});
+        servers.httpServer.start();
 
         // cleanup
         ['CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH'].forEach(file => {
@@ -146,8 +145,8 @@ describe('Routes - ', function () {
     });
 
     afterEach(() => {
-        server.close();
-        server.queryScheduler.clearQueries();
+        servers.httpServer.close();
+        servers.queryScheduler.clearQueries();
     });
 
 
@@ -185,7 +184,7 @@ describe('Routes - ', function () {
         );
 
         POST('oauth2/token', {
-            access_token
+            access_token: accessToken
         })
         .then(res => res.json().then(json => {
             assert.deepEqual(json, {});
@@ -196,7 +195,7 @@ describe('Routes - ', function () {
             );
 
             // We can save it again and we'll get a 200 instead of a 201
-            POST('oauth2/token', {access_token})
+            POST('oauth2/token', {access_token: accessToken})
             .then(res => res.json().then(json => {
                 assert.deepEqual(json, {});
                 assert.equal(res.status, 200);
