@@ -18,7 +18,7 @@ import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
 import {checkWritePermissions} from './persistent/PlotlyAPI.js';
 import {contains, has, keys, isEmpty, merge, pluck} from 'ramda';
-import {getCerts, fetchAndSaveCerts, setRenewalJob} from './certificates';
+import {getCerts, fetchAndSaveCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
 import Logger from './logger';
 import fetch from 'node-fetch';
 
@@ -29,6 +29,20 @@ export default class Servers {
      * The httpsServer starts when certificates have been created.
      */
     constructor(args = {createCerts: true, startHttps: true}) {
+        this.httpServer = {
+            port: null,
+            server: null,
+            protocol: null,
+            domain: null
+        };
+        this.httpsServer = {
+            certs: null,
+            port: null,
+            server: null,
+            protocol: null,
+            domain: null
+        };
+
         /*
          * `args` is of form {protocol: 'HTTP', createCerts: true}
          * `args` is used to control whether we want to start the server initiall as http or
@@ -36,9 +50,6 @@ export default class Servers {
          * It's main use is to control the flow during tests.
          */
         this.apiVersion = '1.0.0';
-
-        this.httpServer = {port: null, server: null, protocol: null, domain: null};
-        this.httpsServer = {certs: null, port: null, server: null, protocol: null, domain: null};
 
         // Always start the HTTP server and keep it running.
         this.httpServer.port = parseInt(getSetting('PORT'), 10);
@@ -223,7 +234,7 @@ export default class Servers {
             file: 'login.html'
         }));
 
-        server.get('/data-connector', restify.serveStatic({
+        server.get('/database-connector', restify.serveStatic({
             directory: `${__dirname}/../static`,
             file: 'index.html'
         }));

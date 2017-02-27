@@ -11,6 +11,12 @@ const CA_HOST = {
     ROUTE: 'certificate'
 };
 
+var MOCK_CERTS = true;
+
+export function setMockCerts(boolean) {
+    MOCK_CERTS = boolean;
+}
+
 const daysCertificateIsGoodFor = 24;
 
 export const CA_HOST_URL = `${CA_HOST.PROTOCOL}://${CA_HOST.DOMAIN}/${CA_HOST.ROUTE}`;
@@ -59,7 +65,13 @@ export function fetchCertsFromCA() {
     return fetch(
         `${CA_HOST_URL}`, {
             method: 'POST',
-            body: JSON.stringify({credentials: {username, access_token: accessToken}})
+            body: JSON.stringify({
+                credentials: {
+                    username,
+                    access_token: accessToken,
+                    plotly_api_domain: getSetting('PLOTLY_API_URL')
+                }
+            })
         }
     ).then(res => res.json()).then(json => {
         return json;
@@ -72,25 +84,38 @@ export function mockFetchCertsFromCA() {
     });
 }
 
-export function fetchAndSaveCerts(mockCerts = false) {
+export function fetchAndSaveCerts() {
     /*
      * This returns a promise to save certificates.
-     * When developing and debuggin, you may want to skip this part as it
-     * takes around 1 minute of your time and use the mocked certs.
+     * When developing and debugging, you may want to skip this part as it
+     * takes around 1 minute of your time and use the
+     * mocked certs (MOCK_CERTS=true).
      */
     let fetchCerts;
-    if (mockCerts) {
+    if (MOCK_CERTS) {
         fetchCerts = mockFetchCertsFromCA;
     } else {
         fetchCerts = fetchCertsFromCA;
     }
     return fetchCerts().then(response => {
-        Logger.log('Successfully received certs from CA.');
         return saveCertsLocally(response);
     })
     .catch((e) => {
         Logger.log('An error returned from the CA.' + JSON.stringify(e));
     });
+}
+
+// Wrapper around fetchAndSaveCerts to try again with a sleep period specified.
+export function timeoutFetchAndSaveCerts(seconds = 0) {
+    var triesCounter = 0;
+    setTimeout(() => fetchAndSaveCerts()
+    .then (() => {
+        Logger.log('Successfully received certs from CA.');
+    }).catch(() => {
+        triesCounter += 1;
+        // Retry in five seconds
+        timeoutFetchAndSaveCerts(5);
+    }), seconds * 1000);
 }
 
 export const msInOneDay = 1000 * 3600 * 24;
@@ -115,6 +140,8 @@ export const renewCertificate = () => {
     })
     .catch((e) => {
         Logger.log('Error occured during rewnewal of the certificate' + JSON.stringify(e));
+        Logger.log('Trying again.');
+        setTimeout(renewCertificate, 5000);
     });
 };
 

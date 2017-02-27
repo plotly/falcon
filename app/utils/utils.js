@@ -19,6 +19,9 @@ export function baseUrl() {
     if (url.endsWith('/')) {
         url = url.slice(0, url.length - 1);
     }
+    if (url.endsWith('database-connector')) {
+        url = url.slice(0, url.length - 'database-connector'.length);
+    }
     return url;
 }
 

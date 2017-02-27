@@ -10,6 +10,7 @@ import {
     calculateDaysToRenewal,
     fetchAndSaveCerts,
     saveCertsLocally,
+    setMockCerts,
     setRenewalJob,
     renewCertificate
 } from '../../backend/certificates';
@@ -24,6 +25,7 @@ const cleanUp = () => {
 
 describe('Certificates', function() {
     beforeEach(() => {
+        setMockCerts(true);
         cleanUp();
     });
 
@@ -71,7 +73,7 @@ describe('Certificates', function() {
 
     it('Can fetch certificates and save them', (done) => {
         const {cert, key} = fakeCerts;
-        fetchAndSaveCerts(true).then(() => {
+        fetchAndSaveCerts().then(() => {
             expect(getCerts()).to.deep.equal({cert, key});
             done();
         });

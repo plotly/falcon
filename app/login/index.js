@@ -8,7 +8,7 @@ import {
 
 const currentEndpoint = '/login';
 const baseUrlWrapped = baseUrl().replace(currentEndpoint, '');
-const connectorUrl = baseUrlWrapped() + '/database-connector';
+const connectorUrl = baseUrlWrapped + '/database-connector';
 
 const CLOUD = 'cloud';
 const ONPREM = 'onprem';
