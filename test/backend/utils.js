@@ -2,6 +2,7 @@ import {
     PlotlyAPIRequest
 } from '../../backend/persistent/PlotlyAPI.js';
 import {dissoc, merge} from 'ramda';
+var restify = require('restify');
 
 export const names = [
     'country', 'month', 'year', 'lat', 'lon', 'value'
@@ -154,6 +155,84 @@ export const fakeCerts = {
     key: '-----BEGIN RSA PRIVATE KEY-----\nMIIEpQIBAAKCAQEA1QxXJcx3H5rk/ZHphnmCKTl8pY5TGVg0XsRw33y3kG+AUeZV\nD1Dp0YXFfHzpnUbtZRF3ktKAPBTofbzlVmzwUv9NoDuG7aPMTBiYEZW8Ct+z/zlu\nfhYlOsJ2icqMM9aPCfIzJ29BrzuWBCKdGwCCBLJKP4mgVsJqNh9Gtzmbpbv+D4Oz\nWnHiO0j8OXvmMiRX1+/8WOQEkh0PAhxmuAZkNRwQd15NwwljXlns7dmWZiPcMIyD\n4qJVWX27uim5JTVG5BwR3DWC1dMgwipgeE1P4VRBy5C334Rhl/kAlofiyab/roq+\n/lru/pFMLeNwgZSm+3IW7S4MRPzuvR7lPEZplwIDAQABAoIBAQDPJreZ5iwxy985\n+uUwvvbjdKURKMj+DLinKKSDeXXW98OyXp54TPl8o3B5cc+JAI0VR52XYhwTz1Sb\n5c6scTJf0SO+WAMDD9A2cXdzKb90Zz1SPZqE+K1sa+bsZchbIxVj218HyfL5Gpvs\nG2fc+GpzfJQbIYuIsHKre0+8GkSQKOtbg/V/19QkgIxNGtvtTfeYreo9E8s+7U7p\n1PSKe1aXuFEI0XgBBIGZLj8B7hm7bOH291eaBZ0xoiJCWadFw2SAQVoCiE7+aJQD\ny/ui7aDfBQHO+8xvlYNVa8SngScQyWB4OwsMI3vz12eRuH+AZS0Ys0emU92iOA6/\nTcboXF95AoGBAOut68Eacl+pu9I5p0ENwAP6AjtXOE76WAJ4Zh8MoE/6DfG4EQwX\nmyEf2vAjQgXDLWbdflmVcF6A68guwA4AXtrF9FSjymwYj53uEdkphON349v0ruyW\n3KSPoaIJ8Gl10wDL+zdXJ/blwvKVa0Y0aloBOo48rNOPOg2lXGulEpyLAoGBAOdq\n43UBNHq2lsZBzK2wxJSh9IHq4UWZ67qhgOdIWLV34wXGT2LugcjpiG58nC+z8yV6\nvetuljq18WSSZC2jl27CNboD1VzZDsbxGfLvFWnbtMMr3xWtH0za9uhUE2uMTYIv\n1kqB++DZ2ibDWMGkEAh1FEWc25CP2Kx5wwEg8wylAoGABshEhpQaQoKB8zTRiV+5\n7ONe+RIzfqJZsgiA99fHLUYG7LPdWbm8LyHZjRuWpM/PGKy7HBze1Plkz6f4wu5j\nzGvx8hWcl6vFRkg5n0RAnMMwfX33IrvcsaeogR9EGeTYI6e7HQaXEdXe3FhMdALC\nJMDwTHOWjagLhaUCmd5wQK0CgYEA4Yf8UMVx3b4gxurNjODfVHNaFVtRXEGbyPEo\n7T5GpeRG7hPMvn/vIFzoR7VNiff4GSi7+rx10JYMwZUh6JCsPpcrQTQHNkub6SqD\nvYxf9CDY0/TnnvpvrLkhNF7r5j6AM0Zns4lmbkYiIvDyiRVZQsTHkuhB22s1ITIx\nZ+IyvLkCgYEAtj45fqxTpLp0fa2M6+sO5olZz44Vjo8kFVqVsLkDiJKVj+dm3wGc\nIzkhL4Uh9Fw/OFgAj13qyD4xrKczO/tbyqS6/nBTya+9jM46MzJ8qAGBDPXHKqOt\nvL/55yfNkKvUSSAJux15rBvSUgb/vtz/raKwdNNNxdB3gaITUKQeeGM=\n-----END RSA PRIVATE KEY-----\n',
     subdomain: 'plotly--33ffba0f-fc02-4f41-a338-d5f5ff'
 };
+
+
+export class MockedServerCA {
+
+    constructor() {
+        this.port = 9494;
+        this.count = 0;
+        this.server = restify.createServer({});
+
+        this.countUp = this.countUp.bind(this);
+        this.start = this.start.bind(this);
+        this.stop = this.stop.bind(this);
+    }
+
+    countUp() {
+        this.count += 1;
+    }
+
+    start(returnStatus, returnContent) {
+        let that = this;
+        const server = this.server;
+        server.use(restify.queryParser());
+        server.use(restify.bodyParser({mapParams: true}));
+
+        /*
+         * CORS doesn't quite work by default in restify,
+         * see https://github.com/restify/node-restify/issues/664
+         */
+        const headers = [
+            'authorization',
+            'withcredentials',
+            'x-requested-with',
+            'x-forwarded-for',
+            'x-real-ip',
+            'x-customheader',
+            'user-agent',
+            'keep-alive',
+            'host',
+            'accept',
+            'connection',
+            'upgrade',
+            'content-type',
+            'dnt',
+            'if-modified-since',
+            'cache-control'
+        ];
+        server.use(restify.CORS({
+            origins: ['*'],
+            headers: headers
+        }));
+        headers.forEach(header => restify.CORS.ALLOW_HEADERS.push(header));
+        server.opts( /.*/, function (req, res) {
+            res.header(
+                'Access-Control-Allow-Headers',
+                restify.CORS.ALLOW_HEADERS.join( ', ' )
+            );
+            res.header(
+                'Access-Control-Allow-Methods',
+                'POST, GET, DELETE, OPTIONS'
+            );
+            res.send(204);
+        });
+
+        server.listen(this.port);
+
+        server.post('/certificate', function pingHandler(req, res, next) {
+            that.countUp();
+            res.json(returnStatus, returnContent);
+        });
+    }
+
+    stop() {
+        const server = this.server;
+        server.close();
+    }
+}
+
+
 export const apacheDrillStorage = [
   {
     'name': 'cp',

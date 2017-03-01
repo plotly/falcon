@@ -11,15 +11,19 @@ const CA_HOST = {
     ROUTE: 'certificate'
 };
 
-var MOCK_CERTS = true;
-
-export function setMockCerts(boolean) {
-    MOCK_CERTS = boolean;
-}
-
 const daysCertificateIsGoodFor = 24;
 
-export const CA_HOST_URL = `${CA_HOST.PROTOCOL}://${CA_HOST.DOMAIN}/${CA_HOST.ROUTE}`;
+const LOCAL_SETTINGS = {
+    CA_HOST_URL: `${CA_HOST.PROTOCOL}://${CA_HOST.DOMAIN}/${CA_HOST.ROUTE}`,
+    MAX_TRIES_COUNT: 5,
+    ONGOING_COUNT: 0,
+    TIMEOUT_BETWEEN_TRIES: 5,  // seconds
+    USE_MOCK_CERTS: false
+};
+
+export function setCertificatesSettings(setting, value) {
+    LOCAL_SETTINGS[setting] = value;
+}
 
 // return HTTPS certs if they exist for a server to use when created or null
 export function getCerts() {
@@ -47,12 +51,11 @@ export function saveCertsLocally({key, cert, subdomain}) {
             else resolve();
         });
     });
-    // const saveCert = fs.writeFile(getSetting('CERT_FILE'), cert);
-    // const saveKey = fs.writeFile(getSetting('KEY_FILE'), key);
     const hostInfo = {
         host: `${subdomain}.${CA_HOST.DOMAIN}`,
         lastUpdated: new Date()
     };
+
     return Promise.all([saveCert, saveKey])
     .then(() => {
         saveSetting('CONNECTOR_HOST_INFO', hostInfo);
@@ -63,7 +66,7 @@ export function saveCertsLocally({key, cert, subdomain}) {
 export function fetchCertsFromCA() {
     const {username, accessToken} = getSetting('USERS')[0];
     return fetch(
-        `${CA_HOST_URL}`, {
+        `${LOCAL_SETTINGS.CA_HOST_URL}`, {
             method: 'POST',
             body: JSON.stringify({
                 credentials: {
@@ -73,8 +76,13 @@ export function fetchCertsFromCA() {
                 }
             })
         }
-    ).then(res => res.json()).then(json => {
-        return json;
+    ).then((res) => {
+        if (res.status !== 201) {
+            throw `An error occured requesting certificates from the CA. Status ${res.status} was returned.`;
+        }
+        return res.json().then(json => {
+            return json;
+        });
     });
 }
 
@@ -87,35 +95,43 @@ export function mockFetchCertsFromCA() {
 export function fetchAndSaveCerts() {
     /*
      * This returns a promise to save certificates.
-     * When developing and debugging, you may want to skip this part as it
-     * takes around 1 minute of your time and use the
-     * mocked certs (MOCK_CERTS=true).
+     * When developing and debugging, you may want to quickly use the
+     * mocked certs (MOCK_CERTS=true) returned as a promise.
      */
     let fetchCerts;
-    if (MOCK_CERTS) {
+    if (LOCAL_SETTINGS.USE_MOCK_CERTS) {
         fetchCerts = mockFetchCertsFromCA;
     } else {
         fetchCerts = fetchCertsFromCA;
     }
     return fetchCerts().then(response => {
+        if (!response.key || !response.cert || !response.subdomain) {
+            throw 'CA did not return one or more of [key, cert, subdomain].';
+        }
         return saveCertsLocally(response);
-    })
-    .catch((e) => {
-        Logger.log('An error returned from the CA.' + JSON.stringify(e));
     });
 }
 
 // Wrapper around fetchAndSaveCerts to try again with a sleep period specified.
-export function timeoutFetchAndSaveCerts(seconds = 0) {
-    var triesCounter = 0;
+
+export function timeoutFetchAndSaveCerts() {
+    // Call CA right away if it's the first try.
+    const timeout = LOCAL_SETTINGS.ONGOING_COUNT === 0
+        ? 0
+        : LOCAL_SETTINGS.TIMEOUT_BETWEEN_TRIES;
+    // Increment tries.
+    setCertificatesSettings('ONGOING_COUNT', LOCAL_SETTINGS.ONGOING_COUNT + 1);
+
     setTimeout(() => fetchAndSaveCerts()
     .then (() => {
         Logger.log('Successfully received certs from CA.');
-    }).catch(() => {
-        triesCounter += 1;
-        // Retry in five seconds
-        timeoutFetchAndSaveCerts(5);
-    }), seconds * 1000);
+    }).catch((e) => {
+        Logger.log(`Failed to receive certs from CA. ${e}`);
+        // Retry calling CA if less than max count of tries.
+        if (LOCAL_SETTINGS.ONGOING_COUNT < LOCAL_SETTINGS.MAX_TRIES_COUNT) {
+            timeoutFetchAndSaveCerts();
+        }
+    }), timeout * 1000);
 }
 
 export const msInOneDay = 1000 * 3600 * 24;
