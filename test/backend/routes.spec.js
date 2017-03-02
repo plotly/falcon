@@ -8,6 +8,7 @@ import {
     saveConnection
 } from '../../backend/persistent/Connections.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
+import {setCertificatesSettings} from '../../backend/certificates';
 import fs from 'fs';
 import {
     accessToken,
@@ -79,7 +80,7 @@ let connectionId;
 
 describe('Server - ', () => {
     beforeEach(() => {
-        ['KEY_FILE', 'CERT_FILE'].forEach(fileName => {
+        ['KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH'].forEach(fileName => {
             try {
                 fs.unlinkSync(getSetting(fileName));
             } catch (e) {}
@@ -87,7 +88,7 @@ describe('Server - ', () => {
     });
 
     afterEach(() => {
-        ['KEY_FILE', 'CERT_FILE'].forEach(fileName => {
+        ['KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH'].forEach(fileName => {
             try {
                 fs.unlinkSync(getSetting(fileName));
             } catch (e) {}
@@ -116,9 +117,28 @@ describe('Server - ', () => {
             done();
         }, 5000);
     }).timeout(10000);
+
+    it('No certs are created after an http server was started in onprem.', (done) => {
+        setCertificatesSettings('USE_MOCK_CERTS', true);
+        saveSetting('USERS', [{username, accessToken}]);
+        saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
+
+        setTimeout(() => {
+            servers = new Servers({createCerts: true, startHttps: true});
+            assert.isNull(servers.httpsServer.certs, 'Has no certs in the beginning.');
+            assert.isNull(servers.httpsServer.server, 'Https server does not exists initially');
+        }, 100);
+
+        setTimeout(() => {
+            assert.isNull(servers.httpsServer.certs, 'Still has no certs.');
+            assert.isNull(servers.httpsServer.server, 'Https server does not exists either.');
+            servers.httpServer.close();
+            done();
+        }, 2000);
+    }).timeout(10000);
 });
 
-describe('Routes - ', function () {
+describe('Routes - ', () => {
     beforeEach(() => {
         servers = new Servers({createCerts: false, startHttps: false});
         servers.httpServer.start();
@@ -152,7 +172,6 @@ describe('Routes - ', function () {
         servers.httpServer.close();
         servers.queryScheduler.clearQueries();
     });
-
 
     it('ping - responds', function(done) {
         GET('ping')
@@ -945,7 +964,6 @@ describe('Routes - ', function () {
         .then(() => done())
         .catch(done);
     });
-
 
     it('queries - gets individual queries', function(done) {
         this.timeout(10 * 1000);

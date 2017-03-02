@@ -57,7 +57,7 @@ export default class Servers {
         this.httpServer.protocol = 'http';
         this.httpServer.domain = 'localhost';
 
-        if (args.startHttps) {
+        if (args.startHttps && !getSetting('IS_RUNNING_INSIDE_ON_PREM')) {
             // Create certs if necessary when we have an approved user.
             if (args.createCerts && isEmpty(getCerts())) {
                 const createCertificates = setInterval(() => {
