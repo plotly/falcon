@@ -13,7 +13,8 @@ import {
     saveCertsLocally,
     setCertificatesSettings,
     setRenewalJob,
-    timeoutFetchAndSaveCerts
+    timeoutFetchAndSaveCerts,
+    LOCAL_SETTINGS as certificateSettings
 } from '../../backend/certificates';
 
 const cleanUp = () => {
@@ -137,12 +138,29 @@ describe('Certificates', function() {
         }, 500);
     });
 
+    it('timeoutFetchAndSaveCerts - Can handle an unreachable CA server.', (done) => {
+        // Start server that returns the correct response.
+        // ServerCA.start(201, fakeCerts); We're not starting the mocked CA server as if its down.
+        // Oauth flow will create a username and an accessToken.
+        saveSetting('USERS', [{username, accessToken}]);
+        assert.equal(certificateSettings.TIMEOUT_BETWEEN_TRIES, 1);
+
+        timeoutFetchAndSaveCerts();
+        const {cert, key} = fakeCerts;
+        setTimeout(() => {
+            // Check that timout was increased
+            assert.equal(certificateSettings.TIMEOUT_BETWEEN_TRIES, 60);
+            assert.equal(certificateSettings.ONGOING_COUNT, 1);
+            expect(getCerts()).to.deep.equal({});
+            done();
+        }, 3000);
+    }).timeout(5000);
+
     it('timeoutFetchAndSaveCerts - Will create certs if returned status 201 with certificates.', (done) => {
         // Start server that returns the correct response.
         ServerCA.start(201, fakeCerts);
         // Oauth flow will create a username and an accessToken.
         saveSetting('USERS', [{username, accessToken}]);
-
 
         timeoutFetchAndSaveCerts();
         const {cert, key} = fakeCerts;

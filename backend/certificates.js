@@ -13,11 +13,11 @@ const CA_HOST = {
 
 const daysCertificateIsGoodFor = 24;
 
-const LOCAL_SETTINGS = {
+export const LOCAL_SETTINGS = {
     CA_HOST_URL: `${CA_HOST.PROTOCOL}://${CA_HOST.DOMAIN}/${CA_HOST.ROUTE}`,
     MAX_TRIES_COUNT: 5,
     ONGOING_COUNT: 0,
-    TIMEOUT_BETWEEN_TRIES: 5,  // seconds
+    TIMEOUT_BETWEEN_TRIES: 1,  // seconds
     USE_MOCK_CERTS: false
 };
 
@@ -83,6 +83,13 @@ export function fetchCertsFromCA() {
         return res.json().then(json => {
             return json;
         });
+    }).catch((e) => {
+        Logger.log(`CA Server fails to responsd. ${JSON.stringify(e)}`);
+        if (e.code === 'ECONNREFUSED') {
+            Logger.log('Caught ECONNREFUSED from CA server.');
+            // If server is down, increase TIMEOUT to try a 1 minute later.
+            setCertificatesSettings('TIMEOUT_BETWEEN_TRIES', 60);
+        }
     });
 }
 
@@ -115,23 +122,21 @@ export function fetchAndSaveCerts() {
 // Wrapper around fetchAndSaveCerts to try again with a sleep period specified.
 
 export function timeoutFetchAndSaveCerts() {
-    // Call CA right away if it's the first try.
-    const timeout = LOCAL_SETTINGS.ONGOING_COUNT === 0
-        ? 0
-        : LOCAL_SETTINGS.TIMEOUT_BETWEEN_TRIES;
     // Increment tries.
     setCertificatesSettings('ONGOING_COUNT', LOCAL_SETTINGS.ONGOING_COUNT + 1);
 
-    setTimeout(() => fetchAndSaveCerts()
+    fetchAndSaveCerts()
     .then (() => {
         Logger.log('Successfully received certs from CA.');
     }).catch((e) => {
         Logger.log(`Failed to receive certs from CA. ${e}`);
         // Retry calling CA if less than max count of tries.
         if (LOCAL_SETTINGS.ONGOING_COUNT < LOCAL_SETTINGS.MAX_TRIES_COUNT) {
-            timeoutFetchAndSaveCerts();
+            setTimeout(() => {
+                timeoutFetchAndSaveCerts();
+            }, LOCAL_SETTINGS.TIMEOUT_BETWEEN_TRIES * 1000);
         }
-    }), timeout * 1000);
+    });
 }
 
 export const msInOneDay = 1000 * 3600 * 24;
@@ -148,7 +153,7 @@ export function toMilliseconds(days) {
     return days * msInOneDay;
 }
 
-// Renewing for now is the same as fetching a new cert because we are
+// Renewing is the same as fetching a new cert because we are
 // generating a new hash each time.
 export const renewCertificate = () => {
     fetchAndSaveCerts().then(() => {
