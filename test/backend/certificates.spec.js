@@ -71,10 +71,11 @@ describe('Certificates', function() {
                 expectedCert,
                 'CERT_FILE populated fine.'
             );
-            const hostInfo = getSetting('CONNECTOR_HOST_INFO');
-            assert.equal(hostInfo.host, expectedHost, 'HOST name is correct.');
+            const lastUpdated = getSetting('CERTIFICATE_LAST_UPDATED');
+            const host = getSetting('CONNECTOR_HTTPS_DOMAIN');
+            assert.equal(host, expectedHost, 'HOST name is correct.');
             assert(
-                (new Date().getTime() - Date.parse(hostInfo.lastUpdated)) / 1000 < 1,
+                (new Date().getTime() - Date.parse(lastUpdated)) / 1000 < 1,
                 'HOST lastUpdated is recent.'
             );
             done();
@@ -107,19 +108,19 @@ describe('Certificates', function() {
 
     it('Can calculate the amount of days left before certificate renewal.', () => {
         // Created just now shows 24 days.
-        saveSetting('CONNECTOR_HOST_INFO', {lastUpdated: new Date()});
+        saveSetting('CERTIFICATE_LAST_UPDATED', new Date());
         const daysToRenewal = calculateDaysToRenewal();
         assert.equal(daysToRenewal, 24, 'If last update is today, 24 days left.');
         // Created 30 days ago shows 0 days.
         const now = new Date();
         const oneMonthOldTimestamp = now.setDate(now.getDate() - 24);
-        saveSetting('CONNECTOR_HOST_INFO', {lastUpdated: oneMonthOldTimestamp});
+        saveSetting('CERTIFICATE_LAST_UPDATED', oneMonthOldTimestamp);
         const noDaysLeft = calculateDaysToRenewal();
         assert.equal(noDaysLeft, 0, 'If last update was 24 days ago, 0 days left.');
     });
 
     it('Can set a timeout for renewal of certificate.', () => {
-        saveSetting('CONNECTOR_HOST_INFO', {lastUpdated: new Date()});
+        saveSetting('CERTIFICATE_LAST_UPDATED', new Date());
         const renewalJob = setRenewalJob();
         assert.equal(renewalJob._idleTimeout, 2073600000); // 24 days.
         // No good way to compare functions.
@@ -184,12 +185,63 @@ describe('Certificates', function() {
         setCertificatesSettings('TIMEOUT_BETWEEN_TRIES', 1);
 
         timeoutFetchAndSaveCerts();
-        const {cert, key} = fakeCerts;
         setTimeout(() => {
             assert.isTrue(isEmpty(getCerts()));
             assert.equal(ServerCA.count, 2);
             done();
         }, 6000);
+    }).timeout(10000);
+
+    it('setRenewalJob - renews certificate after a given time if receives 201 from CA', (done) => {
+        ServerCA.start(201, fakeCerts);
+        saveSetting('USERS', [{username, accessToken}]);
+        const {cert, key} = fakeCerts;
+
+        // Check that certs were created by timeoutFetchAndSaveCerts.
+        timeoutFetchAndSaveCerts();
+        setTimeout(() => {
+            assert.deepEqual(getCerts(), {cert, key});
+            assert.equal(ServerCA.count, 1, 'Took one hit to get certificates.');
+            assert.equal(getSetting('CONNECTOR_HTTPS_DOMAIN'), 'plotly--33ffba0f-fc02-4f41-a338-d5f5ff.plotly-connector-test.com');
+            assert.isTrue(
+                (new Date().getTime() - Date.parse(getSetting('CERTIFICATE_LAST_UPDATED'))) / 1000 < 2,
+                'Certificate\'s last update is recent.'
+            );
+        }, 1000);
+
+        // Set a renewal job.
+        setRenewalJob(5000); // Renew the certificates in 5s.
+
+        // Check that certificates were renewed.
+        setTimeout(() => {
+            assert.equal(ServerCA.count, 2, 'Made a second hit to renew.');
+            assert.isTrue(
+                (new Date().getTime() - Date.parse(getSetting('CERTIFICATE_LAST_UPDATED'))) / 1000 < 2,
+                'Certificate\'s last update is again recent.'
+            );
+            done();
+        }, 6000);
+    }).timeout(10000);
+
+    it('setRenewalJob - tries again if received a 500 status from CA', (done) => {
+        ServerCA.start(500, {error: 'An error occurred.'});
+        saveSetting('USERS', [{username, accessToken}]);
+        saveSetting('CERTIFICATE_LAST_UPDATED', new Date());
+
+        const {cert, key} = fakeCerts;
+        // Set max tries to 2.
+        setCertificatesSettings('MAX_TRIES_COUNT', 2);
+        assert.equal(ServerCA.count, 0, 'Make sure initially count is zero.');
+
+        // Check that certs were created by timeoutFetchAndSaveCerts.
+        setRenewalJob(5000); // Renew the certificates in 5s.
+
+        // Check that certificates were renewed.
+        setTimeout(() => {
+            assert.equal(ServerCA.count, 2, 'Made two tries to renew.');
+            assert.deepEqual(getCerts(), {});
+            done();
+        }, 7000);
     }).timeout(10000);
 
 });

@@ -15,13 +15,8 @@ import {Link} from '../Link.react';
 import {DIALECTS} from '../../constants/constants.js';
 import {plotlyUrl, getAllBaseUrls} from '../../utils/utils';
 
-/*
- * TODO - If the user is running the app locally but connecting to their
- * on-prem instance then this will send them to the cloud instead of
- * on-prem. We should use the PLOTLY_API_DOMAIN setting to send people
- * to the right place.
- */
-const WORKSPACE_IMPORT_SQL_URL = `${plotlyUrl()}/create?upload=sql`;
+
+const WORKSPACE_IMPORT_SQL_URL = `${plotlyUrl()}/create?upload=sql&url=`;
 
 const unfoldIcon = (
     <img
@@ -40,7 +35,7 @@ class Settings extends Component {
         this.renderEditButton = this.renderEditButton.bind(this);
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
         this.wrapWithAutoHide = this.wrapWithAutoHide.bind(this);
-        this.state = {showConnections: true, showPreview: true, editMode: true, url: {}};
+        this.state = {showConnections: true, showPreview: true, editMode: true, urls: {}};
     }
 
     wrapWithAutoHide(name, reactComponent) {
@@ -265,6 +260,8 @@ class Settings extends Component {
             return null; // initializing
         }
 
+        const connectorUrl = this.state.urls.https || this.state.urls.http;
+
         return (
             <div>
                 <Tabs
@@ -318,7 +315,10 @@ class Settings extends Component {
                     )}
 
                     <div className={styles.workspaceLink}>
-                        {Link(WORKSPACE_IMPORT_SQL_URL, 'Make queries from Plotly')}
+                        {
+                            Link(WORKSPACE_IMPORT_SQL_URL + connectorUrl,
+                            'Make queries from Plotly')
+                        }
                     </div>
 
                 </div>

@@ -88,17 +88,14 @@ export default class Servers {
     startHttpsServer() {
         // Reference the new certs into the instance.
         this.httpsServer.certs = getCerts();
-        // TODO: Should HTTPS port be a setting too?
         this.httpsServer.port = parseInt(getSetting('PORT_HTTPS'), 10);
-        // Start the interval to renew the certifications.
         setRenewalJob();
         this.httpsServer.protocol = 'https';
         // Create a new server and attach it to the class instance.
         this.httpsServer.server = restify.createServer(merge(
             {version: this.httpsServer.apiVersion}, this.httpsServer.certs)
         );
-        this.httpsServer.domain = getSetting('CONNECTOR_HOST_INFO').host;
-        saveSetting('CONNECTOR_HTTPS_DOMAIN', this.httpsServer.domain);
+        this.httpsServer.domain = getSetting('CONNECTOR_HTTPS_DOMAIN');
         this.start('https');
     }
 
@@ -170,23 +167,18 @@ export default class Servers {
             file: 'oauth.html'
         }));
 
-        server.get(/\/login\/?$/, restify.serveStatic({
-            directory: `${__dirname}/../static`,
-            file: 'login.html'
-        }));
-
-        server.post('/approved/:username', function hasAuth(req, res, next) {
+        server.post('/settings/approved/:username', function hasAuth(req, res, next) {
             const users = getSetting('USERS');
             const allUserNames = pluck('username', users);
             res.json(200, {approved: contains(req.params.username, allUserNames)});
         });
 
-        server.get(/\/settings\/?$/, function settings(req, res, next) {
+        server.get('/settings/urls', function settings(req, res, next) {
             const {httpServer, httpsServer} = that;
             const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;
             const HTTPS_URL = httpsServer.domain
                 ? `${httpsServer.protocol}://${httpsServer.domain}:${httpsServer.port}`
-                : 'is not setup';
+                : '';
             res.json(200, {http: HTTP_URL, https: HTTPS_URL});
         });
 
@@ -475,15 +467,6 @@ export default class Servers {
                 res.json(400, {error: {message: error.message}});
             });
 
-        });
-
-        // TODO - This endpoint is untested
-        server.get('has-certs', (req, res, next) => {
-            if (isEmpty(getCerts())) {
-                res.json(200, false);
-            } else {
-                res.json(200, true);
-            }
         });
 
         // delete a query

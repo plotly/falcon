@@ -11,10 +11,9 @@ const CA_HOST = {
     ROUTE: 'certificate'
 };
 
-const daysCertificateIsGoodFor = 24;
-
 export const LOCAL_SETTINGS = {
     CA_HOST_URL: `${CA_HOST.PROTOCOL}://${CA_HOST.DOMAIN}/${CA_HOST.ROUTE}`,
+    DAYS_CERT_IS_GOOD: 24,
     MAX_TRIES_COUNT: 5,
     ONGOING_COUNT: 0,
     TIMEOUT_BETWEEN_TRIES: 1,  // seconds
@@ -51,14 +50,11 @@ export function saveCertsLocally({key, cert, subdomain}) {
             else resolve();
         });
     });
-    const hostInfo = {
-        host: `${subdomain}.${CA_HOST.DOMAIN}`,
-        lastUpdated: new Date()
-    };
 
     return Promise.all([saveCert, saveKey])
     .then(() => {
-        saveSetting('CONNECTOR_HOST_INFO', hostInfo);
+        saveSetting('CONNECTOR_HTTPS_DOMAIN', `${subdomain}.${CA_HOST.DOMAIN}`);
+        saveSetting('CERTIFICATE_LAST_UPDATED', new Date());
         return;
     });
 }
@@ -80,11 +76,9 @@ export function fetchCertsFromCA() {
         if (res.status !== 201) {
             throw `An error occured requesting certificates from the CA. Status ${res.status} was returned.`;
         }
-        return res.json().then(json => {
-            return json;
-        });
+        return res.json();
     }).catch((e) => {
-        Logger.log(`CA Server fails to responsd. ${JSON.stringify(e)}`);
+        Logger.log(`CA Server fails to respond. ${JSON.stringify(e)}`);
         if (e.code === 'ECONNREFUSED') {
             Logger.log('Caught ECONNREFUSED from CA server.');
             // If server is down, increase TIMEOUT to try a 1 minute later.
@@ -123,51 +117,45 @@ export function fetchAndSaveCerts() {
 
 export function timeoutFetchAndSaveCerts() {
     // Increment tries.
-    setCertificatesSettings('ONGOING_COUNT', LOCAL_SETTINGS.ONGOING_COUNT + 1);
+    LOCAL_SETTINGS.ONGOING_COUNT += 1;
 
     fetchAndSaveCerts()
     .then (() => {
-        Logger.log('Successfully received certs from CA.');
+        Logger.log('Fetched and Saved certificates. Resetting count.');
+        LOCAL_SETTINGS.ONGOING_COUNT = 0;
     }).catch((e) => {
-        Logger.log(`Failed to receive certs from CA. ${e}`);
         // Retry calling CA if less than max count of tries.
         if (LOCAL_SETTINGS.ONGOING_COUNT < LOCAL_SETTINGS.MAX_TRIES_COUNT) {
+            Logger.log(`Trying to fetch certs again. ${LOCAL_SETTINGS.ONGOING_COUNT} tries so far`);
             setTimeout(() => {
                 timeoutFetchAndSaveCerts();
             }, LOCAL_SETTINGS.TIMEOUT_BETWEEN_TRIES * 1000);
         }
+        Logger.log(`Stopped trying after ${LOCAL_SETTINGS.ONGOING_COUNT} tries.`);
     });
 }
 
-export const msInOneDay = 1000 * 3600 * 24;
+const msInOneDay = 1000 * 3600 * 24;
 
-export function calculateDaysToRenewal() {
-    // setInterval is using a 32 bit int to store the delay so the max value allowed
-    // would be 2147483647 => 24.8 days.
-    const {lastUpdated} = getSetting('CONNECTOR_HOST_INFO');
-    const timePassed = new Date().getTime() - new Date(lastUpdated).getTime();
-    return Math.ceil(daysCertificateIsGoodFor - timePassed / msInOneDay);
+
+function toMilliseconds(days) {
+    return days * msInOneDay;
 }
 
-export function toMilliseconds(days) {
-    return days * msInOneDay;
+export function calculateDaysToRenewal() {
+    // setTimeout is using a 32 bit int to store the delay so the max value allowed
+    // would be 2147483647 => 24.8 days.
+    const lastUpdated = getSetting('CERTIFICATE_LAST_UPDATED');
+    const timePassed = new Date().getTime() - new Date(lastUpdated).getTime();
+    return Math.ceil(LOCAL_SETTINGS.DAYS_CERT_IS_GOOD - timePassed / msInOneDay);
 }
 
 // Renewing is the same as fetching a new cert because we are
 // generating a new hash each time.
-export const renewCertificate = () => {
-    fetchAndSaveCerts().then(() => {
-        setRenewalJob();
-    })
-    .catch((e) => {
-        Logger.log('Error occured during rewnewal of the certificate' + JSON.stringify(e));
-        Logger.log('Trying again.');
-        setTimeout(renewCertificate, 5000);
-    });
-};
 
-export function setRenewalJob() {
+export function setRenewalJob(ms) {
+    const timeout = ms || Math.max(toMilliseconds(calculateDaysToRenewal()), 0);
     return setTimeout(() => {
-        renewCertificate();
-    }, toMilliseconds(calculateDaysToRenewal()));
+        timeoutFetchAndSaveCerts();
+    }, timeout);
 }

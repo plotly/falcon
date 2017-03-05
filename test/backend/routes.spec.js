@@ -78,7 +78,7 @@ let queryObject;
 let servers;
 let connectionId;
 
-describe('Server - ', () => {
+describe('Servers - ', () => {
     beforeEach(() => {
         ['KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH'].forEach(fileName => {
             try {
@@ -95,16 +95,16 @@ describe('Server - ', () => {
         });
     });
 
-    it('Servers has certs after an http server was started and certs were created.', (done) => {
+    it('Https server is up and running after an http server was started and certs were created.', (done) => {
         servers = new Servers({createCerts: false, startHttps: true});
+        servers.httpServer.start();
+        saveSetting('USERS', [{username, accessToken}]);
+        saveSetting('CONNECTOR_HTTPS_DOMAIN', `${fakeCerts.subdomain}.${testCA}`);
         assert.isNull(servers.httpsServer.certs, 'Has no certs in the beginning.');
         assert.isNull(servers.httpsServer.server, 'Https server does not exists initially');
         fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
         fs.writeFileSync(getSetting('KEY_FILE'), fakeCerts.key);
-        saveSetting('USERS', [{username, accessToken}]);
-        saveSetting('CONNECTOR_HOST_INFO', {
-            host: `${fakeCerts.subdomain}.${testCA}`, lastUpdated: new Date()
-        });
+
         setTimeout(() => {
             assert.isFalse(isEmpty(servers.httpsServer.certs), 'Has certs.');
             assert.equal(servers.httpsServer.protocol, 'https', 'Correct protocol.');
@@ -112,9 +112,16 @@ describe('Server - ', () => {
             assert.isNotNull(servers.httpsServer.server, 'Https server is non null');
             // Can't fetch directly for now the https server because mocked certs
             // were generated from staging LE server - not real certs.
-            servers.httpServer.close();
-            servers.httpsServer.close();
-            done();
+
+            GET('settings/urls')
+            .then(res => res.json().then(json => {
+                assert.equal(json.http, 'http://localhost:9494');
+                assert.isNotNull(json.https, `${fakeCerts.subdomain}.${testCA}`);
+                servers.httpServer.close();
+                servers.httpsServer.close();
+                done();
+            }))
+            .catch(done);
         }, 5000);
     }).timeout(10000);
 
@@ -185,6 +192,40 @@ describe('Routes - ', () => {
             assert.equal(res.status, 200);
             done();
         })
+        .catch(done);
+    });
+
+    // Settings
+    it('ssettings/urls - returns 200 and the urls', function(done) {
+        GET('settings/urls')
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 200);
+            assert.equal(json.http, 'http://localhost:9494');
+            assert.equal(json.https, '');
+            done();
+        }))
+        .catch(done);
+    });
+
+    it('settings/approved/:username - returns 200 and {approved: false}', function(done) {
+        POST('settings/approved/thor')
+        .then(res => res.json().then(json => {
+            console.log(json);
+            assert.equal(res.status, 200);
+            assert.equal(json.approved, false);
+            done();
+        }))
+        .catch(done);
+    });
+
+    it('ssettings/approved/:username - returns 200 and {approved: true}', function(done) {
+        saveSetting('USERS', [{username: 'thor', accessToken: 'accessToken'}]);
+        POST('settings/approved/thor')
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 200);
+            assert.equal(json.approved, true);
+            done();
+        }))
         .catch(done);
     });
 

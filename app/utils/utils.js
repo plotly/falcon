@@ -6,14 +6,14 @@ export function dynamicRequireElectron() {
 
 export function baseUrl() {
      /*
-      * Use the full URL of the page if the app is running headlessly
-      * with a web front-end served by the app.
-      *
-      * Note that href includes the pathname - this is intentional:
-      * in on-prem instances this app will be served behind some relative
-      * url like https://plotly.acme.com/connector and all subsequent
-      * requests need to be made against that full path, e.g.
-      * https://plotly.acme.com/connector/queries
+     * Return the base URL of the app.
+     * If the user is running this app locally and is configuring their database,
+     * then they will be at https://their-subdomain.plot.ly/database-connector
+     * and this function will return https://their-subdomain.plot.ly
+     * If the user is on on-prem, then the connector is prefixed behind
+     * /external-data-connector, so they will be configuring their connections at
+     * https://plotly.acme.com/external-data-connector/database-connector and this function
+     * will return https://plotly.acme.com/external-data-connector/
       */
     let url = window.location.href;
     if (url.endsWith('/')) {
@@ -30,7 +30,6 @@ export function usesHttpsProtocol() {
 }
 
 export function isOnPrem() {
-    // on prem has a specific path for the app; it is simply '/' otherwise
     return (contains('external-data-connector', baseUrl()));
 }
 

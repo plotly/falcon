@@ -32,7 +32,7 @@ app.on('ready', () => {
     const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;
     const HTTPS_URL = `${httpsServer.protocol}://${httpsServer.domain}:${httpsServer.port}`;
 
-    mainWindow.loadURL(`${HTTP_URL}/login`);
+    mainWindow.loadURL(`${HTTP_URL}/`);
     // startup main window
     mainWindow.webContents.on('did-finish-load', () => {
 

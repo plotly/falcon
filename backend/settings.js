@@ -17,9 +17,8 @@ const DEFAULT_SETTINGS = {
     PLOTLY_API_SSL_ENABLED: true,
     PLOTLY_API_DOMAIN: 'api.plot.ly',
 
-    // TODO - Should this be configurable or should it just be a constant?
-    CONNECTOR_HOST_INFO: {host: '', lastUpdated: ''},
-    CONNECTOR_HTTPS_DOMAIN: '',
+    CERTIFICATE_LAST_UPDATED: '',
+    CONNECTOR_HTTPS_DOMAIN: 'default',
 
     // TODO - This should just be an object keyed by username
     USERS: [],

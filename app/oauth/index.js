@@ -39,7 +39,7 @@ class Status extends Component {
         .then(res => res.json().then(json => {
             if (res.status >= 200 && res.status < 400) {
                 this.setState({status: 'success'});
-                setTimeout(() => window.close(), 2000);
+                setTimeout(() => window.close(), 1000);
             } else if (res.status >= 400) {
                 this.setState({
                     status: 'failure',
@@ -66,23 +66,6 @@ class Status extends Component {
             content = (
                 <div>
                     <h4>{'Authorized!'}</h4>
-
-                    <h5>{'You are good to go.'}</h5>
-
-                    <div>
-                        {'The Connector is now authorized to schedule queries and update your datasets. '}
-                        {'Return to Plotly to start scheduling queries.'}
-                    </div>
-
-                    <div>
-                    	 <a href="http://help.plot.ly/updating-data-on-a-schedule"
-                            target="_blank"
-            >
-                            {'Learn more'}
-                        </a>
-                        {' about how scheduling queries works in Plotly.'}
-                    </div>
-
                 </div>
             );
         } else if (status === 'failure') {

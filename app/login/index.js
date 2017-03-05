@@ -5,6 +5,7 @@ import {
     baseUrl,
     dynamicRequireElectron
 } from '../utils/utils';
+import {Link} from '../components/Link.react';
 
 const currentEndpoint = '/login';
 const baseUrlWrapped = baseUrl().replace(currentEndpoint, '');
@@ -77,7 +78,7 @@ class Login extends Component {
 
     verifyAuthDone() {
         const {username} = this.state;
-        return fetch(`${baseUrlWrapped}/approved/${username}`, {
+        return fetch(`${baseUrlWrapped}/settings/approved/${username}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -121,23 +122,25 @@ class Login extends Component {
 
     logIn () {
         const {username} = this.state;
+        this.setState({
+            statusMessasge:
+            `Authorizing [${username}] ...`
+        });
         this.verifyAuthDone();
-        if (!this.state.loggedIn) {
-            this.authenticateUser();
-            const checkAuth = setInterval(() => {
-                this.verifyAuthDone();
-                this.setState({
-                    statusMessasge:
-                    `Loading. User authorization of [${username}] in process.`
-                });
-                if (this.state.loggedIn) {
-                    clearInterval(checkAuth);
-                    window.location.assign(connectorUrl);
-                }
-            }, 1000);
-        } else {
-            window.location.assign(connectorUrl);
-        }
+        setTimeout(() => {
+            if (!this.state.loggedIn) {
+                this.authenticateUser();
+                const checkAuth = setInterval(() => {
+                    this.verifyAuthDone();
+                    if (this.state.loggedIn) {
+                        clearInterval(checkAuth);
+                        window.location.assign(connectorUrl);
+                    }
+                }, 1000);
+            } else {
+                window.location.assign(connectorUrl);
+            }
+        }, 1000);
     }
 
     updateStateWithEvent(e) {
@@ -170,16 +173,17 @@ class Login extends Component {
         const serverTypeOptions = (
             <div className="control-group">
             <h3 className="block-center-heading">
-                Choose Your Plotly Use Case
+                {'I am connecting to...'}
             </h3>
                 <div className="controls" style={{padding: '20px'}}>
                     {renderOption(CLOUD)}
                     {renderOption(ONPREM)}
                 </div>
-                <span>
-                    {'Learn more about our '}
-                    <a href="https://plot.ly/products/cloud/">
-                    {'products'}</a>.
+                <span style={{borderBottom: '2px solid #E7E8E9', cursor: 'pointer'}}>
+                    {Link(
+                        'https://plot.ly/products/cloud/',
+                        'Learn more about our products.'
+                    )}
                 </span>
             </div>
         );

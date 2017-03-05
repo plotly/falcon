@@ -101,7 +101,7 @@ function apiThunk(endpoint, method, store, id, body) {
 
 export function getConnectorUrls() {
     return apiThunk(
-        'settings',
+        'settings/urls',
         'GET',
         'connectorUrlsRequest'
     );
@@ -308,15 +308,6 @@ export function deleteTab(tabId) {
             dispatch(deleteConnection(tabId));
         }
     };
-}
-
-// https ->
-export function hasCerts() {
-    return apiThunk(
-        'has-certs',
-        'GET',
-        'hasCertsRequest'
-    );
 }
 
 export function setConnectionNeedToBeSaved(tabId, bool) {
