@@ -115,7 +115,7 @@ export function fetchAndSaveCerts() {
 
 // Wrapper around fetchAndSaveCerts to try again with a sleep period specified.
 
-export function timeoutFetchAndSaveCerts() {
+export function timeoutFetchAndSaveCerts(callback = () => {}) {
     // Increment tries.
     LOCAL_SETTINGS.ONGOING_COUNT += 1;
 
@@ -123,20 +123,27 @@ export function timeoutFetchAndSaveCerts() {
     .then (() => {
         Logger.log('Fetched and Saved certificates. Resetting count.');
         LOCAL_SETTINGS.ONGOING_COUNT = 0;
+        try {
+            callback();
+        } catch (e) {
+            Logger.log(
+                `Failed to restart the https server. Please restart manually. ${e}.
+            `);
+        }
     }).catch((e) => {
         // Retry calling CA if less than max count of tries.
-        if (LOCAL_SETTINGS.ONGOING_COUNT < LOCAL_SETTINGS.MAX_TRIES_COUNT) {
-            Logger.log(`Trying to fetch certs again. ${LOCAL_SETTINGS.ONGOING_COUNT} tries so far`);
+        const {ONGOING_COUNT, MAX_TRIES_COUNT, TIMEOUT_BETWEEN_TRIES} = LOCAL_SETTINGS;
+        if (ONGOING_COUNT < MAX_TRIES_COUNT) {
+            Logger.log(`Trying to fetch certs again. ${ONGOING_COUNT} tries so far`);
             setTimeout(() => {
-                timeoutFetchAndSaveCerts();
-            }, LOCAL_SETTINGS.TIMEOUT_BETWEEN_TRIES * 1000);
+                timeoutFetchAndSaveCerts(callback);
+            }, TIMEOUT_BETWEEN_TRIES * 1000);
         }
-        Logger.log(`Stopped trying after ${LOCAL_SETTINGS.ONGOING_COUNT} tries.`);
+        Logger.log(`Stopped trying after ${ONGOING_COUNT} tries.`);
     });
 }
 
 const msInOneDay = 1000 * 3600 * 24;
-
 
 function toMilliseconds(days) {
     return days * msInOneDay;
@@ -153,9 +160,11 @@ export function calculateDaysToRenewal() {
 // Renewing is the same as fetching a new cert because we are
 // generating a new hash each time.
 
-export function setRenewalJob(ms) {
-    const timeout = ms || Math.max(toMilliseconds(calculateDaysToRenewal()), 0);
+export function setRenewalJob(args) {
+    const callback = args.server ? args.server.restart : () => {};
+    const timeout = args.timeout || Math.max(toMilliseconds(calculateDaysToRenewal()), 0);
     return setTimeout(() => {
-        timeoutFetchAndSaveCerts();
+        Logger.log('Renewing certificates.');
+        timeoutFetchAndSaveCerts(callback);
     }, timeout);
 }

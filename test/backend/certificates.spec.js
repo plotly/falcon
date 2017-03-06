@@ -1,8 +1,9 @@
-import {assert, expect, spy} from 'chai';
+import chai, {assert, expect} from 'chai';
+import spies from 'chai-spies';
 import fs from 'fs';
 import {contains, dissoc, merge, isEmpty} from 'ramda';
 import fetch from 'node-fetch';
-
+import Servers from '../../backend/routes.js';
 
 import {fakeCerts, MockedServerCA, username, accessToken} from './utils';
 import {getSetting, saveSetting} from '../../backend/settings.js';
@@ -25,9 +26,12 @@ const cleanUp = () => {
     });
 };
 
+chai.use(spies);
+
 const mockedCaServerURL = 'http://localhost:9494/certificate';
 
 let ServerCA;
+let ServerUnderTest;
 
 describe('Certificates', function() {
     beforeEach(() => {
@@ -43,7 +47,7 @@ describe('Certificates', function() {
         cleanUp();
     });
 
-    it('Can populate relevant certs files to local storage path.', (done) => {
+    it('saveCertsLocally - populates relevant cert files to local storage.', (done) => {
         ['KEY_FILE', 'CERT_FILE'].forEach(fileName => {
             assert.isFalse(
                 fs.existsSync(getSetting(fileName)),
@@ -82,7 +86,7 @@ describe('Certificates', function() {
         });
     });
 
-    it('Can fetch certificates and save them', (done) => {
+    it('fetchAndSaveCerts - fetches certificates and saves to local storage', (done) => {
         // Start server that returns a server side error.
         ServerCA.start(201, fakeCerts);
         // Oauth flow will create a username and an accessToken.
@@ -117,14 +121,6 @@ describe('Certificates', function() {
         saveSetting('CERTIFICATE_LAST_UPDATED', oneMonthOldTimestamp);
         const noDaysLeft = calculateDaysToRenewal();
         assert.equal(noDaysLeft, 0, 'If last update was 24 days ago, 0 days left.');
-    });
-
-    it('Can set a timeout for renewal of certificate.', () => {
-        saveSetting('CERTIFICATE_LAST_UPDATED', new Date());
-        const renewalJob = setRenewalJob();
-        assert.equal(renewalJob._idleTimeout, 2073600000); // 24 days.
-        // No good way to compare functions.
-        assert.isNotNull(renewalJob._onTimeout);
     });
 
     it('Mocks CA server properly. Changed CA url, can take a status, object and return it when endpoint is hit.', (done) => {
@@ -210,7 +206,7 @@ describe('Certificates', function() {
         }, 1000);
 
         // Set a renewal job.
-        setRenewalJob(5000); // Renew the certificates in 5s.
+        setRenewalJob({timeout: 5000}); // Renew the certificates in 5s.
 
         // Check that certificates were renewed.
         setTimeout(() => {
@@ -228,20 +224,44 @@ describe('Certificates', function() {
         saveSetting('USERS', [{username, accessToken}]);
         saveSetting('CERTIFICATE_LAST_UPDATED', new Date());
 
-        const {cert, key} = fakeCerts;
         // Set max tries to 2.
         setCertificatesSettings('MAX_TRIES_COUNT', 2);
         assert.equal(ServerCA.count, 0, 'Make sure initially count is zero.');
 
         // Check that certs were created by timeoutFetchAndSaveCerts.
-        setRenewalJob(5000); // Renew the certificates in 5s.
+        setRenewalJob({timeout: 5000}); // Renew the certificates in 5s.
 
-        // Check that certificates were renewed.
         setTimeout(() => {
             assert.equal(ServerCA.count, 2, 'Made two tries to renew.');
             assert.deepEqual(getCerts(), {});
             done();
         }, 7000);
+    }).timeout(10000);
+
+    it('setRenewalJob - Restarts the https server.', (done) => { ServerCA.start(201, fakeCerts);
+        const {cert, key} = fakeCerts;
+        // Save bogus certs.
+        saveCertsLocally({cert: 'cert', key: 'key'});
+        setTimeout(() => {
+            assert.deepEqual(getCerts(), {cert: 'cert', key: 'key'});
+        }, 200);
+        // Don't create certs because we want to see if renewing replaces the
+        // above bogus certs.
+        ServerUnderTest = new Servers({startHTTPS: true, createCerts: false});
+        // Set a spy on ServerUnderTest.httpsServer.restart
+        saveSetting('USERS', [{username, accessToken}]);
+        ServerUnderTest.httpsServer.restart = chai.spy(() => {});
+        // Make sure restart has not been called yet.
+        const {restart} = ServerUnderTest.httpsServer;
+        // Renew the certificates in 1s.
+        expect(restart).not.to.have.been.called();
+        setRenewalJob({server: ServerUnderTest.httpsServer, timeout: 1000});
+        setTimeout(() => {
+            assert.equal(ServerCA.count, 1, 'Made a call to renew.');
+            assert.deepEqual(getCerts(), {cert, key}, 'Real certificates appeared.');
+            expect(restart).to.have.been.called();
+            done();
+        }, 5000);
     }).timeout(10000);
 
 });

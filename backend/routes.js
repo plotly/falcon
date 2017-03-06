@@ -80,6 +80,7 @@ export default class Servers {
 
         this.httpServer.start = this.start.bind(this);
         this.httpsServer.start = this.startHttpsServer.bind(this);
+        this.httpsServer.restart = this.restartHttpsServer.bind(this);
 
         this.httpServer.close = this.close.bind(this);
         this.httpsServer.close = this.closeHttpsServer.bind(this);
@@ -89,7 +90,7 @@ export default class Servers {
         // Reference the new certs into the instance.
         this.httpsServer.certs = getCerts();
         this.httpsServer.port = parseInt(getSetting('PORT_HTTPS'), 10);
-        setRenewalJob();
+        setRenewalJob({server: this.httpsServer});
         this.httpsServer.protocol = 'https';
         // Create a new server and attach it to the class instance.
         this.httpsServer.server = restify.createServer(merge(
@@ -97,6 +98,13 @@ export default class Servers {
         );
         this.httpsServer.domain = getSetting('CONNECTOR_HTTPS_DOMAIN');
         this.start('https');
+    }
+
+    restartHttpsServer() {
+        this.httpsServer.close();
+        setTimeout(() => {
+            this.httpsServer.start();
+        }, 1000);
     }
 
     start(type = 'http') {
@@ -512,6 +520,7 @@ export default class Servers {
     }
 
     close(type = 'http') {
+        Logger.log(`Closing the ${type} server.`);
         const that = this;
         const restifyServer = type === 'https' ? that.httpsServer : that.httpServer;
         const {server} = restifyServer;
