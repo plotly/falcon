@@ -1,8 +1,8 @@
-import {assert} from 'chai';
+import {assert, expect} from 'chai';
 import fs from 'fs';
 import {contains, dissoc, merge} from 'ramda';
 
-import {getSetting} from '../../backend/settings.js';
+import {getSetting, saveSetting} from '../../backend/settings.js';
 
 describe('Settings', function() {
     beforeEach(() => {
@@ -16,7 +16,7 @@ describe('Settings', function() {
 
     afterEach(() => {
         delete process.env.PLOTLY_CONNECTOR_STORAGE_PATH;
-    })
+    });
 
     it('Loads default settings OK', function() {
         const storagePath = getSetting('STORAGE_PATH');
@@ -30,6 +30,12 @@ describe('Settings', function() {
         const storagePath = getSetting('STORAGE_PATH');
         assert.equal(storagePath, __dirname);
         assert.equal(getSetting('LOG_PATH'), `${__dirname}/log.log`);
+    });
+
+    it('Can save settings to local settings file.', () => {
+        expect(getSetting('USERS')).to.deep.equal([]);
+        saveSetting('USERS', [{username: 'username', apiKey: 'apiKey'}]);
+        expect(getSetting('USERS')).to.deep.equal([{username: 'username', apiKey: 'apiKey'}]);
     });
 
 });

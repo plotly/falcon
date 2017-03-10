@@ -10,15 +10,16 @@ const compiler = webpack(config);
 export const PORT = 3000;
 
 app.use(webpackDevMiddleware(compiler, {
-    quiet: true,
     publicPath: config.output.publicPath,
     stats: {
+        chunks: false,
         colors: true
     }
 }));
 
 app.use(webpackHotMiddleware(compiler, {
-    log: () => {}
+    quiet: true,
+    stats: { colors: true }
 }));
 
 /* eslint no-console: 0 */

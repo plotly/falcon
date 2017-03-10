@@ -1,53 +1,36 @@
 import {contains, has, head, replace} from 'ramda';
-import queryString from 'query-string';
 
-const platform = process.platform;
-const connectorOnPremPath = 'external';
-
-export const canConfigureHTTPS = platform === 'darwin' || platform === 'linux';
-
-export const isWebBrowser = contains(window.location.protocol, ['http:', 'https:']);
+export function dynamicRequireElectron() {
+    return window.require('electron');
+}
 
 export function baseUrl() {
-     if (isWebBrowser) {
-         /*
-          * Use the full URL of the page if the app is running headlessly
-          * with a web front-end served by the app.
-          *
-          * Note that href includes the pathname - this is intentional:
-          * in on-prem instances this app will be served behind some relative
-          * url like https://plotly.acme.com/connector and all subsequent
-          * requests need to be made against that full path, e.g.
-          * https://plotly.acme.com/connector/queries
-          */
-         let url = window.location.href;
-         if (url.endsWith('/')) {
-             url = url.slice(0, url.length - 1);
-         }
-         return url;
-      } else {
-         /*
-          * Use the server location if the app is running in electron
-          * with electron serving the app file. The electron backend
-          * provides the port env variable as a query string param.
-          */
-        const URL = queryString.parse(location.search).URL;
-        const PORT = queryString.parse(location.search).PORT;
-        return `${URL}:${PORT}`;
-     }
+     /*
+     * Return the base URL of the app.
+     * If the user is running this app locally and is configuring their database,
+     * then they will be at https://their-subdomain.plot.ly/database-connector
+     * and this function will return https://their-subdomain.plot.ly
+     * If the user is on on-prem, then the connector is prefixed behind
+     * /external-data-connector, so they will be configuring their connections at
+     * https://plotly.acme.com/external-data-connector/database-connector and this function
+     * will return https://plotly.acme.com/external-data-connector/
+      */
+    let url = window.location.href;
+    if (url.endsWith('/')) {
+        url = url.slice(0, url.length - 1);
+    }
+    if (url.endsWith('database-connector')) {
+        url = url.slice(0, url.length - 'database-connector'.length);
+    }
+    return url;
 }
 
 export function usesHttpsProtocol() {
     return contains('https://', baseUrl());
 }
 
-export function getQuerystringParam(PARAM) {
-    return queryString.parse(location.search)[PARAM];
-}
-
 export function isOnPrem() {
-    // on prem has a specific path for the app; it is simply '/' otherwise
-    return (isWebBrowser && contains('external-data-connector', baseUrl()));
+    return (contains('external-data-connector', baseUrl()));
 }
 
 export function plotlyUrl() {

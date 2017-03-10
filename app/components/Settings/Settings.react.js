@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {contains, dissoc, flip, head, keys, isEmpty, reduce } from 'ramda';
+import {contains, dissoc, eqProps, hasIn, flip, head, keys, isEmpty, reduce } from 'ramda';
 import {connect} from 'react-redux';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
@@ -11,18 +11,12 @@ import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import Preview from './Preview/Preview.react';
-import HttpsSetup from './HttpsServer/HttpsSetup.react';
 import {Link} from '../Link.react';
 import {DIALECTS} from '../../constants/constants.js';
-import {plotlyUrl, isOnPrem} from '../../utils/utils';
+import {plotlyUrl, getAllBaseUrls} from '../../utils/utils';
 
-/*
- * TODO - If the user is running the app locally but connecting to their
- * on-prem instance then this will send them to the cloud instead of
- * on-prem. We should use the PLOTLY_API_DOMAIN setting to send people
- * to the right place.
- */
-const WORKSPACE_IMPORT_SQL_URL = `${plotlyUrl()}/create?upload=sql`;
+
+const WORKSPACE_IMPORT_SQL_URL = `${plotlyUrl()}/create?upload=sql&url=`;
 
 const unfoldIcon = (
     <img
@@ -32,6 +26,8 @@ const unfoldIcon = (
     </img>
 );
 
+let checkconnectorUrls;
+
 class Settings extends Component {
     constructor(props) {
         super(props);
@@ -39,7 +35,7 @@ class Settings extends Component {
         this.renderEditButton = this.renderEditButton.bind(this);
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
         this.wrapWithAutoHide = this.wrapWithAutoHide.bind(this);
-        this.state = {showConnections: true, showPreview: true, editMode: true};
+        this.state = {showConnections: true, showPreview: true, editMode: true, urls: {}};
     }
 
     wrapWithAutoHide(name, reactComponent) {
@@ -63,7 +59,9 @@ class Settings extends Component {
 
     componentDidMount() {
         this.fetchData();
-        this.props.dispatch(Actions.hasCerts());
+        checkconnectorUrls = setInterval(() => {
+            this.props.dispatch(Actions.getConnectorUrls());
+        }, 2000);
     }
 
     componentDidUpdate() {
@@ -135,6 +133,9 @@ class Settings extends Component {
             if (this.state.editMode) this.setState({editMode: false});
             if (this.props.connectionNeedToBeSaved) this.props.setConnectionNeedToBeSaved(false);
         }
+        if (nextProps.connectorUrlsRequest.status === 200 && this.props.connectorUrlsRequest.status !== 200) {
+            this.setState({urls: nextProps.connectorUrlsRequest.content});
+        }
     }
 
     fetchData() {
@@ -149,6 +150,7 @@ class Settings extends Component {
             elasticsearchMappingsRequest,
             getApacheDrillStorage,
             getApacheDrillS3Keys,
+            getConnectorUrls,
             getElasticsearchMappings,
             getTables,
             getS3Keys,
@@ -229,17 +231,15 @@ class Settings extends Component {
         const {
             apacheDrillStorageRequest,
             apacheDrillS3KeysRequest,
-            createCertsRequest,
             connect,
             connectRequest,
             connections,
             connectionsHaveBeenSaved,
+            connectorUrlsRequest,
             createCerts,
             deleteConnectionsRequest,
             deleteTab,
             elasticsearchMappingsRequest,
-            hasCerts,
-            hasCertsRequest,
             newTab,
             previewTableRequest,
             redirectUrl,
@@ -252,8 +252,6 @@ class Settings extends Component {
             selectedTable,
             selectedIndex,
             setTab,
-            startTempHttpsServer,
-            startTempHttpsServerRequest,
             tablesRequest,
             updateConnection
         } = this.props;
@@ -261,6 +259,8 @@ class Settings extends Component {
         if (!selectedTab) {
             return null; // initializing
         }
+
+        const connectorUrl = this.state.urls.https || this.state.urls.http;
 
         return (
             <div>
@@ -273,6 +273,7 @@ class Settings extends Component {
                 />
 
                 <div className={styles.openTab}>
+
                     {this.wrapWithAutoHide('Connections',
                         this.renderSettingsForm()
                     )}
@@ -300,22 +301,24 @@ class Settings extends Component {
                         </div>
                     )}
 
-                    {isOnPrem() ? null : this.wrapWithAutoHide('HTTPS',
-                            <HttpsSetup
-                                hasCertsRequest={hasCertsRequest}
-                                createCertsRequest={createCertsRequest}
-                                redirectUrlRequest={redirectUrlRequest}
-                                createCerts={createCerts}
-                                hasCerts={hasCerts}
-                                redirectUrl={redirectUrl}
-                                startTempHttpsServer={startTempHttpsServer}
-                                startTempHttpsServerRequest={startTempHttpsServerRequest}
-                            />
-                        )
-                    }
+                    {this.wrapWithAutoHide('Endpoints',
+                        <div>
+                            <div>{'Your connector is running on '}</div>
+                            {keys(this.state.urls).map(url => {
+                                return (
+                                    <div className={styles.url}>
+                                        {`${this.state.urls[url]}`}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
 
                     <div className={styles.workspaceLink}>
-                        {Link(WORKSPACE_IMPORT_SQL_URL, 'Make queries from Plotly')}
+                        {
+                            Link(WORKSPACE_IMPORT_SQL_URL + connectorUrl,
+                            'Make queries from Plotly')
+                        }
                     </div>
 
                 </div>
@@ -335,12 +338,9 @@ function mapStateToProps(state) {
         tabMap,
         connections,
         connectionsRequest,
-        hasCertsRequest,
-        startTempHttpsServerRequest,
-        redirectUrlRequest,
-        createCertsRequest,
         connectRequests,
         connectionsNeedToBeSaved,
+        connectorUrlsRequest,
         saveConnectionsRequests,
         deleteConnectionsRequests,
         previewTableRequests,
@@ -367,10 +367,6 @@ function mapStateToProps(state) {
 
     return {
         connectionsRequest,
-        hasCertsRequest,
-        createCertsRequest,
-        startTempHttpsServerRequest,
-        redirectUrlRequest,
         connectRequest: connectRequests[selectedConnectionId] || {},
         saveConnectionsRequest: saveConnectionsRequests[selectedTab] || {},
         deleteConnectionsRequest: deleteConnectionsRequests[selectedConnectionId] || {},
@@ -387,7 +383,8 @@ function mapStateToProps(state) {
         connectionObject: connections[selectedTab],
         selectedTable,
         selectedIndex,
-        selectedConnectionId
+        selectedConnectionId,
+        connectorUrlsRequest
     };
 }
 
@@ -502,10 +499,6 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             deleteTab: tab => dispatch(Actions.deleteTab(tab)),
             setTab: tab => dispatch(Actions.setTab(tab)),
             connect: dispatchConnect,
-            createCerts: () => dispatch(Actions.createCerts()),
-            hasCerts: () => dispatch(Actions.hasCerts()),
-            redirectUrl: () => dispatch(Actions.redirectUrl()),
-            startTempHttpsServer: () => dispatch(Actions.startTempHttpsServer()),
             editCredential: c => dispatch(Actions.editCredential(c))
         }
     );

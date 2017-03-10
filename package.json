@@ -11,7 +11,7 @@
     "heroku-postbuild": "npm run build-headless && npm run build-web",
     "build-renderer": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.production.js --progress --profile --colors",
     "build-web": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.web.js --progress --profile --colors",
-    "dev": "webpack-dashboard -- concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\"",
+    "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\"",
     "hot-server": "node -r babel-register devServer.js",
     "lint": "eslint app test *.js",
     "test": "npm run build && npm run test-unit-all",
@@ -20,7 +20,7 @@
     "test-unit": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --compilers js:babel-register ",
     "test-unit-all": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --compilers js:babel-register --recursive test/**/*.spec.js",
     "test-unit-all-watch": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --compilers js:babel-register --recursive test/**/*.spec.js --watch",
-    "test-watch": "npm test -- --watch",
+    "test-unit-watch": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --watch --compilers js:babel-register ",
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
     "package-all": "npm run package -- --all",
     "rebuild-and-e2e": "npm run build && npm run test-e2e",
@@ -28,6 +28,7 @@
     "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./backend/main.development",
     "watch-headless": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.headless.js --progress --profile --colors --watch",
     "watch-web": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.web.js --progress --profile --colors --watch",
+    "watch-main": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.electron.js --progress --profile --colors --watch",
     "dist-w": "build -w",
     "dist-m": "build -m",
     "dist-l": "build -l"
@@ -60,17 +61,28 @@
       ]
     },
     "win": {
-        "target": ["nsis", "zip", "7z"],
-        "icon": "app/app.ico"
+      "target": [
+        "nsis",
+        "zip",
+        "7z"
+      ],
+      "icon": "app/app.ico"
     },
     "mac": {
-        "target": ["dmg"],
-        "icon": "app/app.icns"
+      "target": [
+        "dmg"
+      ],
+      "icon": "app/app.icns"
     },
     "linux": {
-      "target": ["AppImage", "deb"]
+      "target": [
+        "AppImage",
+        "deb"
+      ]
     },
-    "directories": {"output": "release"}
+    "directories": {
+      "output": "release"
+    }
   },
   "bin": {
     "electron": "./node_modules/.bin/electron"
@@ -123,7 +135,6 @@
     "redux-devtools-dock-monitor": "^1.1.1",
     "redux-devtools-log-monitor": "^1.0.11",
     "selenium-webdriver": "^2.53.1",
-    "webpack-dashboard": "^0.1.1",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-hot-middleware": "^2.10.0"
   },

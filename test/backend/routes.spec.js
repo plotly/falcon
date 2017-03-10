@@ -1,29 +1,33 @@
 import fetch from 'node-fetch';
 import {assert} from 'chai';
-import {assoc, concat, contains, dissoc, gt, keys, merge, sort, without} from 'ramda';
-import Server from '../../backend/routes.js';
+import {assoc, concat, contains, dissoc, isEmpty, keys, merge, sort, without} from 'ramda';
+import Servers from '../../backend/routes.js';
 import {
     getConnections,
     getSanitizedConnections,
     saveConnection
 } from '../../backend/persistent/Connections.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
+import {setCertificatesSettings} from '../../backend/certificates';
 import fs from 'fs';
 import {
-    username,
-    apiKey,
-    validFid,
-    validUids,
-    createGrid,
-    configuration,
-    sqlConnections,
-    mysqlConnection,
-    elasticsearchConnections,
-    publicReadableS3Connections,
+    accessToken,
     apacheDrillConnections,
     apacheDrillStorage,
+    apiKey,
+    configuration,
+    createGrid,
+    elasticsearchConnections,
+    fakeCerts,
+    mysqlConnection,
+    publicReadableS3Connections,
+    sqlConnections,
+    testCA,
     testConnections,
-    testSqlConnections
+    testSqlConnections,
+    username,
+    validFid,
+    validUids
 } from './utils.js';
 
 
@@ -71,12 +75,81 @@ function DELETE(path) {
 }
 
 let queryObject;
-let server;
+let servers;
 let connectionId;
-describe('Routes - ', function () {
+
+describe('Servers - ', () => {
     beforeEach(() => {
-        server = new Server({protocol: 'HTTP'});
-        server.start();
+        ['KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH'].forEach(fileName => {
+            try {
+                fs.unlinkSync(getSetting(fileName));
+            } catch (e) {}
+        });
+    });
+
+    afterEach(() => {
+        ['KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH'].forEach(fileName => {
+            try {
+                fs.unlinkSync(getSetting(fileName));
+            } catch (e) {}
+        });
+    });
+
+    it('Https server is up and running after an http server was started and certs were created.', (done) => {
+        servers = new Servers({createCerts: false, startHttps: true});
+        servers.httpServer.start();
+        saveSetting('USERS', [{username, accessToken}]);
+        saveSetting('CONNECTOR_HTTPS_DOMAIN', `${fakeCerts.subdomain}.${testCA}`);
+        assert.isNull(servers.httpsServer.certs, 'Has no certs in the beginning.');
+        assert.isNull(servers.httpsServer.server, 'Https server does not exists initially');
+        fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
+        fs.writeFileSync(getSetting('KEY_FILE'), fakeCerts.key);
+
+        setTimeout(() => {
+            assert.isFalse(isEmpty(servers.httpsServer.certs), 'Has certs.');
+            assert.equal(servers.httpsServer.protocol, 'https', 'Correct protocol.');
+            assert.equal(servers.httpsServer.domain, `${fakeCerts.subdomain}.${testCA}`, 'Correct domain');
+            assert.isNotNull(servers.httpsServer.server, 'Https server is non null');
+            // Can't fetch directly for now the https server because mocked certs
+            // were generated from staging LE server - not real certs.
+
+            GET('settings/urls')
+            .then(res => res.json().then(json => {
+                assert.equal(json.http, 'http://localhost:9494');
+                assert.isNotNull(json.https, `${fakeCerts.subdomain}.${testCA}`);
+                servers.httpServer.close();
+                servers.httpsServer.close();
+                done();
+            }))
+            .catch(done);
+        }, 5000);
+    }).timeout(10000);
+
+    it('No certs are created after an http server was started in onprem.', (done) => {
+        setCertificatesSettings('USE_MOCK_CERTS', true);
+        saveSetting('USERS', [{username, accessToken}]);
+        saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
+
+        setTimeout(() => {
+            servers = new Servers({createCerts: true, startHttps: true});
+            assert.isNull(servers.httpsServer.certs, 'Has no certs in the beginning.');
+            assert.isNull(servers.httpsServer.server, 'Https server does not exists initially');
+        }, 100);
+
+        setTimeout(() => {
+            assert.isNull(servers.httpsServer.certs, 'Still has no certs.');
+            assert.isNull(servers.httpsServer.server, 'Https server does not exists either.');
+            servers.httpServer.close();
+            done();
+        }, 2000);
+    }).timeout(10000);
+
+});
+
+describe('Routes - ', () => {
+    beforeEach(() => {
+        servers = new Servers({createCerts: false, startHttps: false});
+        servers.httpServer.start();
 
         // cleanup
         ['CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH'].forEach(file => {
@@ -104,10 +177,9 @@ describe('Routes - ', function () {
     });
 
     afterEach(() => {
-        server.close();
-        server.queryScheduler.clearQueries();
+        servers.httpServer.close();
+        servers.queryScheduler.clearQueries();
     });
-
 
     it('ping - responds', function(done) {
         GET('ping')
@@ -121,6 +193,40 @@ describe('Routes - ', function () {
             assert.equal(res.status, 200);
             done();
         })
+        .catch(done);
+    });
+
+    // Settings
+    it('ssettings/urls - returns 200 and the urls', function(done) {
+        GET('settings/urls')
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 200);
+            assert.equal(json.http, 'http://localhost:9494');
+            assert.equal(json.https, '');
+            done();
+        }))
+        .catch(done);
+    });
+
+    it('settings/approved/:username - returns 200 and {approved: false}', function(done) {
+        POST('settings/approved/thor')
+        .then(res => res.json().then(json => {
+            console.log(json);
+            assert.equal(res.status, 200);
+            assert.equal(json.approved, false);
+            done();
+        }))
+        .catch(done);
+    });
+
+    it('ssettings/approved/:username - returns 200 and {approved: true}', function(done) {
+        saveSetting('USERS', [{username: 'thor', accessToken: 'accessToken'}]);
+        POST('settings/approved/thor')
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 200);
+            assert.equal(json.approved, true);
+            done();
+        }))
         .catch(done);
     });
 
@@ -142,31 +248,19 @@ describe('Routes - ', function () {
             []
         );
 
-        /*
-         * This is a real live access token associated with
-         * the user account plotly-database-connector on
-         * https://plot.ly.
-         *
-         * This token is generated by visiting
-         * https://plot.ly/o/authorize/?response_type=token&client_id=isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt&redirect_uri=http://localhost:9494/oauth2/callback
-         * in your web browser.
-         */
-
-        const access_token = '2MiYq1Oive6RRjC6y9D4u7DjlXSs7k';
-
         POST('oauth2/token', {
-            access_token
+            access_token: accessToken
         })
         .then(res => res.json().then(json => {
             assert.deepEqual(json, {});
             assert.equal(res.status, 201);
             assert.deepEqual(
                 getSetting('USERS'),
-                [{username: 'plotly-database-connector', accessToken: access_token}]
+                [{username, accessToken}]
             );
 
             // We can save it again and we'll get a 200 instead of a 201
-            POST('oauth2/token', {access_token})
+            POST('oauth2/token', {access_token: accessToken})
             .then(res => res.json().then(json => {
                 assert.deepEqual(json, {});
                 assert.equal(res.status, 200);
@@ -912,7 +1006,6 @@ describe('Routes - ', function () {
         .then(() => done())
         .catch(done);
     });
-
 
     it('queries - gets individual queries', function(done) {
         this.timeout(10 * 1000);

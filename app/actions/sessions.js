@@ -3,8 +3,6 @@ import uuid from 'node-uuid';
 import {createAction} from 'redux-actions';
 import {DIALECTS, INITIAL_CONNECTIONS} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
-import * as httpsUtils from '../utils/https';
-import {remove} from 'ramda';
 
 export const reset = createAction('RESET');
 export const mergeTabMap = createAction('MERGE_TAB_MAP');
@@ -98,6 +96,15 @@ function apiThunk(endpoint, method, store, id, body) {
             });
         });
     };
+}
+
+
+export function getConnectorUrls() {
+    return apiThunk(
+        'settings/urls',
+        'GET',
+        'connectorUrlsRequest'
+    );
 }
 
 export function getConnections() {
@@ -301,53 +308,6 @@ export function deleteTab(tabId) {
             dispatch(deleteConnection(tabId));
         }
     };
-}
-
-// https ->
-export function hasCerts() {
-    return apiThunk(
-        'has-certs',
-        'GET',
-        'hasCertsRequest'
-    );
-}
-
-export function createCerts() {
-    return dispatch => {
-        httpsUtils.createCerts()
-            .then(res => {
-                dispatch({
-                    type: 'createCertsRequest',
-                    payload: {
-                        status: res.status,
-                        content: res.content
-                    }
-                });
-            });
-    };
-}
-
-export function redirectUrl() {
-    return dispatch => {
-        httpsUtils.redirectUrl()
-            .then(res => {
-                dispatch({
-                    type: 'redirectUrlRequest',
-                    payload: {
-                        status: res.status,
-                        content: res.content
-                    }
-                });
-            });
-    };
-}
-
-export function startTempHttpsServer () {
-    return apiThunk(
-        'start-temp-https-server',
-        'GET',
-        'startTempHttpsServerRequest'
-    );
 }
 
 export function setConnectionNeedToBeSaved(tabId, bool) {

@@ -1,16 +1,11 @@
 import React from 'react';
 import * as styles from './Configuration.css';
-
-function dynamicRequire(module) {
-    return require(module);
-}
+import {dynamicRequireElectron} from '../utils/utils';
 
 let shell = null;
 try {
-    shell = require('electron').shell;
-} catch (e) {
-
-}
+    shell = dynamicRequireElectron().shell;
+} catch (e) {}
 
 export function Link(href, text) {
 
