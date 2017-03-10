@@ -18,7 +18,7 @@ import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
 import {checkWritePermissions} from './persistent/PlotlyAPI.js';
 import {contains, has, keys, isEmpty, merge, pluck} from 'ramda';
-import {getCerts, fetchAndSaveCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
+import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
 import Logger from './logger';
 import fetch from 'node-fetch';
 
@@ -64,7 +64,7 @@ export default class Servers {
                     // Can't create until user was authenticated.
                     if (!isEmpty(getSetting('USERS'))) {
                         clearInterval(createCertificates);
-                        fetchAndSaveCerts();
+                        timeoutFetchAndSaveCerts();
                     }
                 }, 500);
             }
@@ -87,6 +87,7 @@ export default class Servers {
     }
 
     startHttpsServer() {
+        Logger.log('Starting HTTPS server');
         // Reference the new certs into the instance.
         this.httpsServer.certs = getCerts();
         this.httpsServer.port = parseInt(getSetting('PORT_HTTPS'), 10);
@@ -101,6 +102,7 @@ export default class Servers {
     }
 
     restartHttpsServer() {
+        Logger.log('Restarting HTTPS server.');
         this.httpsServer.close();
         setTimeout(() => {
             this.httpsServer.start();

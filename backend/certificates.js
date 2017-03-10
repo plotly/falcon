@@ -37,6 +37,7 @@ export function getCerts() {
 }
 
 export function saveCertsLocally({key, cert, subdomain}) {
+    Logger.log('Saving certificates locally.');
     // (renewal) -> fs.writeFile replaces the file if it already exists
     const saveCert = new Promise((resolve, reject) => {
         fs.writeFile(getSetting('CERT_FILE'), cert, (err) => {
@@ -61,6 +62,7 @@ export function saveCertsLocally({key, cert, subdomain}) {
 
 export function fetchCertsFromCA() {
     const {username, accessToken} = getSetting('USERS')[0];
+    Logger.log('Sending request to the CA:' + LOCAL_SETTINGS.CA_HOST_URL);
     return fetch(
         `${LOCAL_SETTINGS.CA_HOST_URL}`, {
             method: 'POST',
@@ -99,6 +101,9 @@ export function fetchAndSaveCerts() {
      * When developing and debugging, you may want to quickly use the
      * mocked certs (MOCK_CERTS=true) returned as a promise.
      */
+
+    Logger.log('Fetching the CA for new certificates.');
+    Logger.log('Mocking certs is ' + LOCAL_SETTINGS.USE_MOCK_CERTS);
     let fetchCerts;
     if (LOCAL_SETTINGS.USE_MOCK_CERTS) {
         fetchCerts = mockFetchCertsFromCA;
@@ -109,16 +114,16 @@ export function fetchAndSaveCerts() {
         if (!response.key || !response.cert || !response.subdomain) {
             throw 'CA did not return one or more of [key, cert, subdomain].';
         }
+        Logger.log('Received a successful response from the CA.');
         return saveCertsLocally(response);
     });
 }
 
 // Wrapper around fetchAndSaveCerts to try again with a sleep period specified.
-
+// Callback is used for renewals as a function that restarts the https server.
 export function timeoutFetchAndSaveCerts(callback = () => {}) {
     // Increment tries.
     LOCAL_SETTINGS.ONGOING_COUNT += 1;
-
     fetchAndSaveCerts()
     .then (() => {
         Logger.log('Fetched and Saved certificates. Resetting count.');

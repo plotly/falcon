@@ -39,7 +39,7 @@ class Status extends Component {
         .then(res => res.json().then(json => {
             if (res.status >= 200 && res.status < 400) {
                 this.setState({status: 'success'});
-                setTimeout(() => window.close(), 1000);
+                setTimeout(() => window.close(), 500 );
             } else if (res.status >= 400) {
                 this.setState({
                     status: 'failure',
