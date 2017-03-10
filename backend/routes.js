@@ -17,100 +17,57 @@ import {
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
 import {checkWritePermissions} from './persistent/PlotlyAPI.js';
-import {contains, has, keys, isEmpty, merge, pluck} from 'ramda';
-import {getCerts, fetchAndSaveCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
+import {dissoc, contains, isEmpty, merge, pluck} from 'ramda';
 import Logger from './logger';
 import fetch from 'node-fetch';
 
-export default class Servers {
-    /*
-     * Returns an object {httpServer, httpsServer}
-     * The httpServer is always open for oauth.
-     * The httpsServer starts when certificates have been created.
-     */
-    constructor(args = {createCerts: true, startHttps: true}) {
-        this.httpServer = {
-            port: null,
-            server: null,
-            protocol: null,
-            domain: null
-        };
-        this.httpsServer = {
-            certs: null,
-            port: null,
-            server: null,
-            protocol: null,
-            domain: null
-        };
+const HOSTS = '/etc/hosts';
 
+
+// return HTTPS certs if they exist for a server to use when created or null
+export function getCerts() {
+    try {
+        const keyFile = `${__dirname}/..${getSetting('KEY_FILE')}`;
+        const certFile = `${__dirname}/..${getSetting('CSR_FILE')}`;
+        return {
+            key: fs.readFileSync(keyFile),
+            certificate: fs.readFileSync(certFile)
+        };
+    } catch (e) {
+        return {};
+    }
+}
+
+export default class Server {
+    constructor(args = {}) {
+        this.certs = getCerts();
         /*
-         * `args` is of form {protocol: 'HTTP', createCerts: true}
-         * `args` is used to control whether we want to start the server initiall as http or
-         * https and whether we want to create certs if none found if started as http.
-         * It's main use is to control the flow during tests.
-         */
-        this.apiVersion = '1.0.0';
-
-        // Always start the HTTP server and keep it running.
-        this.httpServer.port = parseInt(getSetting('PORT'), 10);
-        this.httpServer.server = restify.createServer({version: this.apiVersion});
-        this.httpServer.protocol = 'http';
-        this.httpServer.domain = 'localhost';
-
-        if (args.startHttps && !getSetting('IS_RUNNING_INSIDE_ON_PREM')) {
-            // Create certs if necessary when we have an approved user.
-            if (args.createCerts && isEmpty(getCerts())) {
-                const createCertificates = setInterval(() => {
-                    // Can't create until user was authenticated.
-                    if (!isEmpty(getSetting('USERS'))) {
-                        clearInterval(createCertificates);
-                        fetchAndSaveCerts();
-                    }
-                }, 500);
-            }
-            const startHTTPS = setInterval(() => {
-                if (!isEmpty(getCerts())) {
-                    clearInterval(startHTTPS);
-                    this.httpsServer.start();
-                }
-            }, 500);
+        // if server is given a protocol argument, enforce it,
+        // otherwise decide which protocol to use
+        // depending if there are certificates
+        */
+        const apiVersion = '1.0.0';
+        if (args.protocol === 'HTTP' || isEmpty(this.certs)) {
+            this.server = restify.createServer({version: apiVersion});
+            this.protocol = 'http';
+            this.domain = 'localhost';
+        } else if (args.protocol === 'HTTPS' || this.certs) {
+            this.server = restify.createServer(merge({version: apiVersion}, this.certs));
+            this.protocol = 'https';
+            this.domain = getSetting('CONNECTOR_HTTPS_DOMAIN');
+        } else {
+            Logger.log('Failed to start the server.');
         }
 
         this.queryScheduler = new QueryScheduler();
 
-        this.httpServer.start = this.start.bind(this);
-        this.httpsServer.start = this.startHttpsServer.bind(this);
-        this.httpsServer.restart = this.restartHttpsServer.bind(this);
-
-        this.httpServer.close = this.close.bind(this);
-        this.httpsServer.close = this.closeHttpsServer.bind(this);
+        this.start = this.start.bind(this);
+        this.close = this.close.bind(this);
     }
 
-    startHttpsServer() {
-        // Reference the new certs into the instance.
-        this.httpsServer.certs = getCerts();
-        this.httpsServer.port = parseInt(getSetting('PORT_HTTPS'), 10);
-        setRenewalJob({server: this.httpsServer});
-        this.httpsServer.protocol = 'https';
-        // Create a new server and attach it to the class instance.
-        this.httpsServer.server = restify.createServer(merge(
-            {version: this.httpsServer.apiVersion}, this.httpsServer.certs)
-        );
-        this.httpsServer.domain = getSetting('CONNECTOR_HTTPS_DOMAIN');
-        this.start('https');
-    }
-
-    restartHttpsServer() {
-        this.httpsServer.close();
-        setTimeout(() => {
-            this.httpsServer.start();
-        }, 1000);
-    }
-
-    start(type = 'http') {
+    start() {
         const that = this;
-        const restifyServer = type === 'https' ? that.httpsServer : that.httpServer;
-        const {server} = restifyServer;
+        const server = this.server;
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
         server.pre(function (request, response, next) {
@@ -157,15 +114,13 @@ export default class Servers {
             );
             res.send(204);
         });
-
-        const {protocol, domain, port} = restifyServer;
-        Logger.log(`Listening at: ${protocol}://${domain}:${port}`);
-        server.listen(port);
+        server.listen(
+            parseInt(getSetting('PORT'), 10)
+        );
 
         server.get(/\/static\/?.*/, restify.serveStatic({
             directory: `${__dirname}/../`
         }));
-
         server.get(/\/images\/?.*/, restify.serveStatic({
             directory: `${__dirname}/../app/`
         }));
@@ -174,21 +129,6 @@ export default class Servers {
             directory: `${__dirname}/../static`,
             file: 'oauth.html'
         }));
-
-        server.post('/settings/approved/:username', function hasAuth(req, res, next) {
-            const users = getSetting('USERS');
-            const allUserNames = pluck('username', users);
-            res.json(200, {approved: contains(req.params.username, allUserNames)});
-        });
-
-        server.get('/settings/urls', function settings(req, res, next) {
-            const {httpServer, httpsServer} = that;
-            const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;
-            const HTTPS_URL = httpsServer.domain
-                ? `${httpsServer.protocol}://${httpsServer.domain}:${httpsServer.port}`
-                : '';
-            res.json(200, {http: HTTP_URL, https: HTTPS_URL});
-        });
 
         server.post(/\/oauth2\/token\/?$/, function saveOauth(req, res, next) {
             const {access_token} = req.params;
@@ -209,7 +149,7 @@ export default class Servers {
                     if (contains(username, existingUsernames)) {
                         existingUsers[
                             existingUsernames.indexOf(username)
-                        ].accessToken = access_token;
+                        ]['access_token'] = access_token;
                         status = 200;
                     } else {
                         existingUsers.push({username, accessToken: access_token});
@@ -228,18 +168,13 @@ export default class Servers {
             });
         });
 
-        // Keeping the base route to have backwards compatibility.
         server.get('/', restify.serveStatic({
-            directory: `${__dirname}/../static`,
-            file: 'login.html'
-        }));
-
-        server.get('/database-connector', restify.serveStatic({
             directory: `${__dirname}/../static`,
             file: 'index.html'
         }));
 
         server.get('/status', function statusHandler(req, res, next) {
+            // TODO - Maybe fix up this copy
             res.send('Connector status - running and available for requests.');
         });
 
@@ -477,6 +412,69 @@ export default class Servers {
 
         });
 
+        // TODO - This endpoint is untested
+        server.get('has-certs', (req, res, next) => {
+            if (isEmpty(getCerts())) {
+                res.json(404, false);
+            } else {
+                res.json(200, true);
+            }
+        });
+
+        // TODO - This endpoint is untested
+        server.get('is-url-redirected', (req, res, next) => {
+            const contents = fs.readFileSync(HOSTS);
+            if (contents.indexOf(getSetting('CONNECTOR_HTTPS_DOMAIN')) > -1) {
+                res.json(200, true);
+            } else {
+                res.json(404, false);
+            }
+        });
+
+        // TODO - This endpoint is untested
+        server.get('start-temp-https-server', (req, res, next) => {
+            // can't install certificates without having visited the https server
+            // and can't start a https app without having installed certificates ...
+            // so while an http one is up this endpoint starts a https one for the sole
+            // purpose of installing certificates into the user's keychain
+            // before restarting the app and simply running a single https instance
+            try {
+                const certs = getCerts();
+                if (isEmpty(certs)) {
+                    throw new Error('No certs found.');
+                }
+                const tempServer = restify.createServer(certs);
+                tempServer.use(restify.CORS({
+                    origins: getSetting('CORS_ALLOWED_ORIGINS'),
+                    credentials: false,
+                    headers: headers
+                }));
+                tempServer.listen(getSetting('PORT') + 1); // not to clash with the open http port
+                tempServer.opts( /.*/, (req, res) => res.send(204));
+                tempServer.get(/\/ssl\/?.*/, restify.serveStatic({
+                    directory: `${__dirname}/../`
+                }));
+                tempServer.get('/status', (req, res) => {
+                    if (req.isSecure()) {
+                        fs.readFile(
+                            `${__dirname}/../ssl/status.html`, 'utf8', function(err, file) {
+                            if (err) {
+                                res.send(500);
+                            }
+                            res.write(file);
+                            res.end();
+                        });
+                    } else {
+                        res.send(404, false);
+                    }
+                });
+            } catch (err) {
+                Logger.log(err, 2);
+                res.json(404, false);
+            }
+            res.json(200, true);
+        });
+
         // delete a query
         server.del('/queries/:fid', function delQueriesHandler(req, res, next) {
             const {fid} = req.params;
@@ -512,18 +510,10 @@ export default class Servers {
                 error: {message: err.message}
             });
         });
+
     }
 
-    closeHttpsServer() {
-        const that = this;
-        that.close('https');
-    }
-
-    close(type = 'http') {
-        Logger.log(`Closing the ${type} server.`);
-        const that = this;
-        const restifyServer = type === 'https' ? that.httpsServer : that.httpServer;
-        const {server} = restifyServer;
-        server.close();
+    close() {
+        this.server.close();
     }
 }

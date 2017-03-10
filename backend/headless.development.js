@@ -1,6 +1,6 @@
 // Entry point for running the app without electron
 import Logger from './logger';
-import Servers from './routes.js';
+import Server from './routes.js';
 import {getSetting} from './settings.js';
 
 /*
@@ -25,8 +25,8 @@ if (getSetting('IS_RUNNING_INSIDE_ON_PREM')) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 
-const servers = new Servers();
+const server = new Server();
 Logger.log('Starting server', 2);
-servers.httpServer.start();
+server.start();
 Logger.log('Loading persistent queries', 2);
-servers.queryScheduler.loadQueries();
+server.queryScheduler.loadQueries();

@@ -138,9 +138,10 @@ function createApiReducer(store) {
 
 export const connectionsRequest = createApiReducer('connectionsRequest');
 export const deleteConnectionsRequests = createApiReducer('deleteConnectionsRequests');
+export const hasCertsRequest = createApiReducer('hasCertsRequest');
+export const redirectUrlRequest = createApiReducer('redirectUrlRequest');
 export const saveConnectionsRequests = createApiReducer('saveConnectionsRequests');
-
-export const connectorUrlsRequest = createApiReducer('connectorUrlsRequest');
+export const startTempHttpsServerRequest = createApiReducer('startTempHttpsServerRequest');
 
 export const apacheDrillStorageRequests = createApiReducer('apacheDrillStorageRequests');
 export const apacheDrillS3KeysRequests = createApiReducer('apacheDrillS3KeysRequests');
@@ -224,14 +225,16 @@ function connections(state = {}, action) {
 const rootReducer = combineReducers({
     tabMap,
     connections,
+    hasCertsRequest,
+    redirectUrlRequest,
     createCertsRequest,
+    startTempHttpsServerRequest,
     selectedTab,
     selectedTables,
     selectedIndecies,
     connectRequests,
     connectionsRequest,
     connectionsNeedToBeSaved,
-    connectorUrlsRequest,
     saveConnectionsRequests,
     deleteConnectionsRequests,
     tablesRequests,

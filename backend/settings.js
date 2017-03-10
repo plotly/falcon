@@ -17,8 +17,8 @@ const DEFAULT_SETTINGS = {
     PLOTLY_API_SSL_ENABLED: true,
     PLOTLY_API_DOMAIN: 'api.plot.ly',
 
-    CERTIFICATE_LAST_UPDATED: '',
-    CONNECTOR_HTTPS_DOMAIN: 'default',
+    // TODO - Should this be configurable or should it just be a constant?
+    CONNECTOR_HTTPS_DOMAIN: 'connector.plot.ly',
 
     // TODO - This should just be an object keyed by username
     USERS: [],
@@ -29,8 +29,11 @@ const DEFAULT_SETTINGS = {
         'https://local.plot.ly'
     ],
     PORT: 9494,
-    PORT_HTTPS: 9495,
 
+    // certificates paths
+    // TODO - This isn't portable - should move this to the home folder
+    KEY_FILE: '/ssl/certs/server/privkey.pem',
+    CSR_FILE: '/ssl/certs/server/fullchain.pem',
     APP_DIRECTORY: `${__dirname}/../`,
 
     LOG_TO_STDOUT: false,
@@ -53,9 +56,7 @@ const derivedSettingsNames = [
     'CONNECTIONS_PATH',
     'QUERIES_PATH',
     'LOG_PATH',
-    'SETTINGS_PATH',
-    'KEY_FILE',
-    'CERT_FILE'
+    'SETTINGS_PATH'
 ];
 function getDerivedSetting(settingName) {
     switch (settingName) {
@@ -87,18 +88,6 @@ function getDerivedSetting(settingName) {
             return path.join(
                 getSetting('STORAGE_PATH'),
                 'settings.yaml'
-            );
-
-        case 'KEY_FILE':
-            return path.join(
-                getSetting('STORAGE_PATH'),
-                'privkey.pem'
-            );
-
-        case 'CERT_FILE':
-            return path.join(
-                getSetting('STORAGE_PATH'),
-                'fullchain.pem'
             );
 
         default:

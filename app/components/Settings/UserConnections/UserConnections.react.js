@@ -5,21 +5,33 @@ import {contains, head, flatten, keys, values} from 'ramda';
 import {
     CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS
 } from '../../../constants/constants';
-import {dynamicRequireElectron} from '../../../utils/utils';
 import classnames from 'classnames';
 
 let dialog;
+let shell;
 try {
-    dialog = dynamicRequireElectron().remote.dialog;
+    shell = require('electron').shell;
+} catch (e) {
+    const shell = {
+        openExternal: function openExternal(link) {
+            console.warn(link);
+        }
+    };
+}
+try {
+    dialog = require('electron').remote.dialog;
 } catch (e) {
     dialog = null;
 }
 
 /*
- *	Displays and alters user inputs for `configuration`
- *	username, password, and local port number.
+	Displays and alters user inputs for `configuration`
+	username, password, and local port number.
 */
 
+const documentationLink = (dialect) => {
+    return `http://help.plot.ly/database-connectors/${dialect}/`;
+};
 
 export default class UserConnections extends Component {
     constructor(props) {
