@@ -54,7 +54,7 @@ By default, the connector app will connect to Plotly Cloud. If you would like to
 
 ```
 PLOTLY_API_DOMAIN: 'plotly.your-company.com'
-CORS_ALLOWED_ORIGINS:
+CORS_ALLOWED_ORIGINS: 
     - 'https://plotly.your-company.com'
 ```
 
@@ -71,35 +71,9 @@ The database connector runs as a server by default as part of [Plotly On-Premise
 See the [Dockerfile](https://github.com/plotly/plotly-database-connector/blob/master/Dockerfile) for more information.
 
 ##### Developing
-
-Run the electron app in dev mode with
+Run the app in dev mode with
 ```bash
 $ npm run dev
-```
-
-Run watchers for the electron main process and web bundle.
-```bash
-$ npm run watch-main
-```
-
-```bash
-$ npm run watch-web
-```
-
-
-Or, develop using the headless server by running watchers on headless and web bundles
-```bash
-$ npm run watch-headless
-```
-
-```bash
-$ npm run watch-web
-```
-
-as well as hot-relaoding the updated server side bundle with nodemon
-(`npm install -g nodemon` if you do not have it already)
-```bash
-$ nodemon ./dist/headless-bundle.js
 ```
 
 ### Testing

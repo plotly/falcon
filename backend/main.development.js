@@ -1,10 +1,10 @@
 import {app, BrowserWindow} from 'electron';
-import {contains, join, isEmpty} from 'ramda';
+import {contains, join} from 'ramda';
 import Logger from './logger';
 import {setupMenus} from './menus';
 import {getSetting} from './settings';
 
-import Servers from './routes.js';
+import Server from './routes.js';
 
 Logger.log('Starting application', 2);
 
@@ -14,7 +14,7 @@ if (process.env.NODE_ENV === 'development') {
 
 const isTestRun = contains('--test-type=webdriver', process.argv.slice(2));
 
-const server = new Servers();
+const server = new Server();
 Logger.log('Starting server', 2);
 server.start();
 Logger.log('Loading persistent queries', 2);
@@ -28,11 +28,24 @@ app.on('ready', () => {
         height: 1024
     });
 
-    const {httpServer, httpsServer} = server;
-    const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;
-    const HTTPS_URL = `${httpsServer.protocol}://${httpsServer.domain}:${httpsServer.port}`;
+    const URL = `${server.protocol}://${server.domain}`;
+    const SETTINGS = join('&',
+        [
+            'CONNECTOR_HTTPS_DOMAIN',
+            'APP_DIRECTORY',
+            'PLOTLY_API_DOMAIN',
+            'PORT'
+        ].map(s => {
+            return `${s}=${getSetting(s)}`;
+    }));
 
-    mainWindow.loadURL(`${HTTP_URL}/`);
+    console.log(`Visit ${URL}`);
+    // TODO - Does this work too?
+    // mainWindow.loadURL(`http://localhost:${getSetting('PORT')}`);
+
+    // Provide the port of the server to the front-end as a query string param.
+    mainWindow.loadURL(`file://${__dirname}/../app/app.html?URL=${URL}&${SETTINGS}`);
+
     // startup main window
     mainWindow.webContents.on('did-finish-load', () => {
 
