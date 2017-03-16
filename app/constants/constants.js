@@ -13,7 +13,7 @@ export const DIALECTS = {
 export const CONNECTION_CONFIG = {
     [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port', 'database'],
-	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port', 'database'],
+	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'instanceName', 'port', 'database'],
     [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.REDSHIFT]: ['username', 'password', 'host', 'port', 'database'],
     [DIALECTS.SQLITE]: ['storage'],
