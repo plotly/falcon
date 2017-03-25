@@ -58,7 +58,7 @@ describe('Certificates', function() {
         const json = {key: 'key', cert: 'cert', subdomain: 'subdomain'};
         const expectedKey = 'key';
         const expectedCert = 'cert';
-        const expectedHost = 'subdomain.plotly-connector-test.com';
+        const expectedHost = 'subdomain.plotly-connector.com';
 
         saveCertsLocally(json).then(() => {
             assert.equal(
@@ -198,7 +198,7 @@ describe('Certificates', function() {
         setTimeout(() => {
             assert.deepEqual(getCerts(), {cert, key});
             assert.equal(ServerCA.count, 1, 'Took one hit to get certificates.');
-            assert.equal(getSetting('CONNECTOR_HTTPS_DOMAIN'), 'plotly--33ffba0f-fc02-4f41-a338-d5f5ff.plotly-connector-test.com');
+            assert.equal(getSetting('CONNECTOR_HTTPS_DOMAIN'), 'plotly--33ffba0f-fc02-4f41-a338-d5f5ff.plotly-connector.com');
             assert.isTrue(
                 (new Date().getTime() - Date.parse(getSetting('CERTIFICATE_LAST_UPDATED'))) / 1000 < 2,
                 'Certificate\'s last update is recent.'

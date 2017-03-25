@@ -7,7 +7,7 @@ import {fakeCerts} from '../test/backend/utils';
 
 const CA_HOST = {
     PROTOCOL: 'http',
-    DOMAIN: 'plotly-connector-test.com',
+    DOMAIN: 'plotly-connector.com',
     ROUTE: 'certificate'
 };
 
