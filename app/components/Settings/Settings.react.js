@@ -5,6 +5,7 @@ import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
 import * as styles from './Settings.css';
 import * as buttonStyles from './ConnectButton/ConnectButton.css';
+import fetch from 'isomorphic-fetch';
 import Tabs from './Tabs/Tabs.react';
 import UserConnections from './UserConnections/UserConnections.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
@@ -18,6 +19,8 @@ import {plotlyUrl, getAllBaseUrls} from '../../utils/utils';
 
 const WORKSPACE_IMPORT_SQL_URL = `${plotlyUrl()}/create?upload=sql&url=`;
 
+let STARTED_AT = null;
+
 const unfoldIcon = (
     <img
         src="images/unfold.png"
@@ -27,6 +30,26 @@ const unfoldIcon = (
 );
 
 let checkconnectorUrls;
+let checkDNS;
+
+const isStatusOK = (url) => {
+    return fetch(url, {
+        method: 'GET'
+        // credentials: 'include',
+        // headers: {
+        //     'Accept': 'application/json',
+        //     'Content-Type': 'application/json'
+        // }
+    })
+    .then(res => {
+        console.log('fetched');
+        return true;
+    })
+    .catch((e) => {
+        console.log('failed');
+        return false;
+    });
+};
 
 class Settings extends Component {
     constructor(props) {
@@ -61,7 +84,7 @@ class Settings extends Component {
         this.fetchData();
         checkconnectorUrls = setInterval(() => {
             this.props.dispatch(Actions.getConnectorUrls());
-        }, 2000);
+        }, 5000);
     }
 
     componentDidUpdate() {
@@ -262,6 +285,23 @@ class Settings extends Component {
 
         const connectorUrl = this.state.urls.https || this.state.urls.http;
 
+        let httpsServerIsOK = false;
+        if (!STARTED_AT && this.state.urls.https) {
+            STARTED_AT = new Date();
+            checkDNS = setInterval(() => {
+                console.log('trying');
+                if (isStatusOK(`${this.state.urls.https}/ping`)) {
+                    httpsServerIsOK = true;
+                }
+            }, 5000);
+        }
+
+        let timeElapsed = null;
+        if (STARTED_AT) {
+            const seconds = Math.round((new Date().getTime() - STARTED_AT.getTime()) / 1000);
+            timeElapsed = seconds > 60 ? `${Math.round(seconds / 60)} minutes ${seconds % 60} seconds` : `${seconds} seconds`;
+        }
+
         return (
             <div>
                 <Tabs
@@ -306,11 +346,22 @@ class Settings extends Component {
                             <div>{'Your connector is running on '}</div>
                             {keys(this.state.urls).map(url => {
                                 return (
-                                    <div className={styles.url}>
-                                        {`${this.state.urls[url]}`}
+                                    <div>
+                                        <div className={styles.url}>
+                                            {`${this.state.urls[url]}`}
+                                        </div>
                                     </div>
                                 );
                             })}
+                            {httpsServerIsOK ? (
+                                <div>
+                                    {'HTTPS server is up and running.'}
+                                </div>
+                            ) : (
+                                <div>
+                                    {`HTTPS server is getting set-up. It may take several minutes. It has been ${timeElapsed}.`}
+                                </div>
+                            )}
                         </div>
                     )}
 
