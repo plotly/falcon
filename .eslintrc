@@ -102,7 +102,7 @@
             "react/no-is-mounted": 2,
             "react/no-unknown-property": 2,
             "react/prop-types": 1,
-            "react/no-deprecated": [2, {"react": 0.14.3}],
+            "react/no-deprecated": [2, {"react": "0.14.3"}],
             "react/no-did-update-set-state": 2,
             "react/prefer-es6-class": [1, "always"],
             "import/no-unresolved": 0,
