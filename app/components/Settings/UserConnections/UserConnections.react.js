@@ -24,11 +24,8 @@ try {
 export default class UserConnections extends Component {
     constructor(props) {
         super(props);
-		this.getPlaceholder = this.getPlaceholder.bind(this);
-		this.getInputType = this.getInputType.bind(this);
-		this.getOnClick = this.getOnClick.bind(this);
+		this.getStorageOnClick = this.getStorageOnClick.bind(this);
 		this.testClass = this.testClass.bind(this);
-        this.state = {showOptions: false};
     }
 
 	testClass() {
@@ -39,27 +36,7 @@ export default class UserConnections extends Component {
 		return 'test-input-created';
 	}
 
-	getInputType (setting) {
-		return (
-            contains(setting, ['secretAccessKey', 'password']) ?
-            'password' : 'text'
-        );
-	}
-
-	getPlaceholder(setting) {
-		switch (setting) {
-			case 'port':
-				return 'server port number (e.g. 3306)';
-			case 'storage':
-				return 'path to database';
-            case 'host':
-                return 'server name (e.g. localhost)';
-			default:
-				return setting;
-		}
-	}
-
-	getOnClick(setting) {
+	getStorageOnClick(setting) {
         // sqlite requires a path
 		return () => {
 			if (setting === 'storage') {
@@ -87,72 +64,85 @@ export default class UserConnections extends Component {
 
 		const {connectionObject, updateConnection} = this.props;
 
-        const namesToDisplay = flatten([
-            CONNECTION_CONFIG[connectionObject.dialect],
-            values(head(CONNECTION_OPTIONS[connectionObject.dialect]))
-        ]);
-        let inputNames = namesToDisplay.map(connection => {
-            return (
-                <div key={connection}>
-                    <span className ={styles.inputName}>{connection}</span>
-                </div>
-            );
-        });
-
 		let inputs = CONNECTION_CONFIG[connectionObject.dialect]
-			.map(setting => (
-            <div key={setting}>
-                <input className={this.testClass()}
-                    placeholder={this.getPlaceholder(setting)}
-                    type={this.getInputType(setting)}
-                    onChange={e => (
-                        updateConnection({[setting]: e.target.value})
-                    )}
-                    onClick={this.getOnClick(setting)}
-                    value={connectionObject[setting]}
-                    id={`test-input-${setting}`}
-                />
-            </div>
-		));
+			.map(setting => {
+                let input;
+                if (contains(setting.type, ['text', 'number', 'password'])) {
+                    input = (
+                        <div className={styles.inputContainer}>
+                            <label className={styles.label}>
+                                {setting.label}
+                            </label>
+                            <div className={styles.wrapInput}>
+                                <input className={this.testClass()}
+                                    onChange={e => (updateConnection({
+                                        [setting.value]: e.target.value
+                                    }))}
+                                    value={connectionObject[setting]}
+                                    id={`test-input-${setting.value}`}
+                                    placeholder={setting.placeholder}
+                                    type={setting.type}
+                                />
+                            </div>
+                        </div>
+                    );
+                } else if (setting.type === 'path') {
+                    input = (
+                        <div className={styles.inputContainer}>
+                            <label className={styles.label}>
+                                {setting.label}
+                            </label>
+                            <div className={styles.wrapInput}>
+                                <input className={this.testClass()}
+                                    onClick={this.getStorageOnClick()}
+                                    value={connectionObject[setting]}
+                                    id={`test-input-${setting.value}`}
+                                    placeholder={setting.placeholder}
+                                    type={'text'}
+                                />
+                            </div>
+                        </div>
+                    );
+                } else if (setting.type === 'checkbox') {
+                    input = (
+                        <div className={styles.inputContainer}>
+                            <label className={styles.label}>
+                                {setting.label}
+                            </label>
+                            <div className={styles.wrapInput}>
+                                <input
+                                    type="checkbox"
+                                    onChange={() => {
+                                        updateConnection({
+                                            [setting.value]: (
+                                                !connectionObject[setting.value]
+                                            )
+                                        });
+                                    }}
+                                    id={`test-option-${setting.value}`}
+                                />
+                            </div>
+                        </div>
+                    );
+                }
 
-        let options = null;
-        if (CONNECTION_OPTIONS[connectionObject.dialect].length !== 0) {
-            options = CONNECTION_OPTIONS[connectionObject.dialect]
-                .map(option => (
-                <div
-                    className={styles.options}
-                    key={head(keys(option))}
-                >
-                    <label className={styles.label}><input
-                        className={styles.checkbox}
-                        type="checkbox"
-                        onChange={() => {
-                            updateConnection(
-                                {[head(keys(option))]: !connectionObject.get(head(keys(option)))}
-                            );
-                        }}
-                        id={`test-option-${head(keys(option))}`}
-                    />
-                    </label>
-                </div>
-            ));
-        }
+                return (
+                    <div>
+                        {input}
+                        {
+                            setting.description ? (
+                                <div className={styles.description}>
+                                    {setting.description}
+                                </div>
+                            ) : null
+                        }
+                    </div>
+                );
+        });
 
 		return (
             <div>
-
-            <div className={styles.inputContainer}>
-
-                    <div className={styles.inputNamesContainer}>
-                        {inputNames}
-                    </div>
-                    <div className={styles.inputFieldsContainer}>
-                        {inputs}
-                        <div className={styles.optionsContainer}>
-                            {options}
-                        </div>
-                    </div>
-                </div>
+                {inputs}
             </div>
 		);
 	}

@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import {parseSQL} from '../../parse';
-import {contains, dissoc, flatten, gt, merge, mergeAll, sort, uniq, values} from 'ramda';
+import {contains, dissoc, flatten, gt, has, merge, mergeAll, sort, uniq, values} from 'ramda';
 import {DIALECTS} from '../../../app/constants/constants';
 import Logger from '../../logger';
 import fs from 'fs';
@@ -53,7 +53,18 @@ function createClient(connection) {
         Sequelize.HSTORE.types.postgres.oids.push('dummy');
         options = merge(options, REDSHIFT_OPTIONS);
     } else if (dialect === 'mssql') {
+        /*
+         * See all options here:
+         * http://tediousjs.github.io/tedious/api-connection.html
+         */
         options.dialectOptions.encrypt = true;
+        ['connectTimeout', 'requestTimeout'].forEach(timeoutSetting => {
+            if (has(timeoutSetting, connection) &&
+                !isNaN(parseInt(connection[timeoutSetting], 10))) {
+                options.dialectOptions[timeoutSetting] =
+                    connection[timeoutSetting];
+            }
+        });
     }
 
     return new Sequelize(

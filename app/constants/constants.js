@@ -1,3 +1,5 @@
+import {concat} from 'ramda';
+
 export const DIALECTS = {
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
@@ -10,38 +12,86 @@ export const DIALECTS = {
     APACHE_DRILL: 'apache drill'
 };
 
+const commonSqlOptions = [
+    {'label': 'Username', 'value': 'username', 'type': 'text'},
+    {'label': 'Password', 'value': 'password', 'type': 'password'},
+    {
+        'label': 'Host',
+        'value': 'host',
+        'type': 'text'
+    },
+    {
+        'label': 'Port',
+        'value': 'port',
+        'type': 'number',
+        'description': 'Server port number (e.g. 3306)'
+    },
+    {'label': 'Database', 'value': 'database', 'type': 'text'},
+    {'label': 'SSL Enabled', 'value': 'ssl', 'type': 'checkbox'}
+];
 export const CONNECTION_CONFIG = {
-    [DIALECTS.MYSQL]: ['username', 'password', 'host', 'port', 'database'],
-    [DIALECTS.MARIADB]: ['username', 'password', 'host', 'port', 'database'],
-	[DIALECTS.MSSQL]: ['username', 'password', 'host', 'port', 'database'],
-    [DIALECTS.POSTGRES]: ['username', 'password', 'host', 'port', 'database'],
-    [DIALECTS.REDSHIFT]: ['username', 'password', 'host', 'port', 'database'],
-    [DIALECTS.SQLITE]: ['storage'],
+    [DIALECTS.MYSQL]: commonSqlOptions,
+    [DIALECTS.MARIADB]: commonSqlOptions,
+	[DIALECTS.MSSQL]: concat(
+        commonSqlOptions, [
+            {
+                'label': 'Connection Timeout',
+                'value': 'connectTimeout',
+                'description': `
+                    The number of milliseconds before the
+                    attempt to connect is considered failed
+                    (default: 15000).
+                `,
+                'placeholder': 15000,
+                'type': 'number'
+            },
+            {
+                'label': 'Request Timeout',
+                'value': 'requestTimeout',
+                'description': `
+                    The number of milliseconds before a request is considered
+                    failed, or 0 for no timeout (default: 15000).
+                `,
+                'placeholder': 15000,
+                'type': 'number'
+            }
+        ]
+    ),
+    [DIALECTS.POSTGRES]: commonSqlOptions,
+    [DIALECTS.REDSHIFT]: commonSqlOptions,
+    [DIALECTS.SQLITE]: [
+        {'label': 'Path to SQLite File', 'value': 'storage', 'type': 'path'}
+    ],
+
     // TODO - What are the actual elasticsearch connection options?
-    [DIALECTS.ELASTICSEARCH]: ['username', 'password', 'host', 'port'],
-    [DIALECTS.S3]: ['bucket', 'accessKeyId', 'secretAccessKey'],
+    [DIALECTS.ELASTICSEARCH]: [
+        {'label': 'Username', 'value': 'username', 'type': 'text'},
+        {'label': 'Password', 'value': 'password', 'type': 'text'},
+        {'label': 'Host', 'value': 'host', 'type': 'text'},
+        {'label': 'Port', 'value': 'port', 'type': 'text'}
+    ],
+    [DIALECTS.S3]: [
+        {'label': 's3 Bucket', 'value': 'bucket', 'type': 'text'},
+        {'label': 'S3 Access Key ID', 'value': 'accessKeyId', 'type': 'text'},
+        {
+            'label': 'S3 Secret Access Key',
+            'value': 'secretAccessKey',
+            'type': 'password'
+        }
+    ],
     [DIALECTS.APACHE_DRILL]: [
-        'host',
-        'port',
-        'bucket',
-        'accessKeyId',
-        'secretAccessKey'
-    ] // TODO - password for apache drill?
+        {'label': 'Host', 'value': 'host', 'type': 'text'},
+        {'label': 'Port', 'value': 'port', 'type': 'text'},
+        {'label': 'S3 Bucket Name', 'value': 'bucket', 'type': 'text'},
+        {'label': 'S3 Access Key ID', 'value': 'accessKeyId', 'type': 'text'},
+        {
+            'label': 'S3 Secret Access Key',
+            'value': 'secretAccessKey',
+            'type': 'password'
+        }
+    ] // TODO - password options for apache drill
 };
 
-// TODO - Combine this with the CONNECTION_CONFIG
-export const CONNECTION_OPTIONS = {
-    [DIALECTS.MYSQL]: [{'ssl': 'SSL enabled'}],
-    [DIALECTS.MARIADB]: [{'ssl': 'SSL enabled'}],
-	[DIALECTS.MSSQL]: [{'ssl': 'SSL enabled'}],
-    [DIALECTS.POSTGRES]: [{'ssl': 'SSL enabled'}],
-    [DIALECTS.REDSHIFT]: [{'ssl': 'SSL enabled'}],
-    [DIALECTS.ELASTICSEARCH]: [],
-    [DIALECTS.SQLITE]: [],
-    [DIALECTS.S3]: [],
-    [DIALECTS.APACHE_DRILL]: []
-
-};
 
 export const LOGOS = {
     [DIALECTS.REDSHIFT]: 'images/redshift-logo.png',
