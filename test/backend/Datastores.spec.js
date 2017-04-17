@@ -1,8 +1,9 @@
 import {expect, assert} from 'chai';
-import {head, last, range} from 'ramda';
+import {head, merge, last, range} from 'ramda';
 
 import {
     sqlConnections,
+    mssqlConnection,
     elasticsearchConnections,
     publicReadableS3Connections,
     apacheDrillConnections,
@@ -77,6 +78,34 @@ describe('SQL - ', function () {
 
 });
 
+
+describe('MSSQL - ', function () {
+    it('times out after 15 seconds by default', function(done) {
+        this.timeout(20 * 1000);
+        query(
+            'WAITFOR DELAY \'00:00:16\'',
+            mssqlConnection
+        ).then(() => {
+            done('Was supposed to fail');
+        }).catch(e => {
+            assert.equal(
+                e.message,
+                'Timeout: Request failed to complete in 15000ms'
+            );
+            done();
+        }).catch(done);
+    });
+
+    it('doesn\'t timeout if requestTimeout was set', function(done) {
+        this.timeout(20 * 1000);
+        query(
+            'WAITFOR DELAY \'00:00:16\'',
+            merge(mssqlConnection, {requestTimeout: 18 * 1000})
+        ).then(() => {
+            done();
+        }).catch(done);
+    });
+});
 
 describe('Elasticsearch - ', function () {
     it('connect connects to an index', function(done) {
