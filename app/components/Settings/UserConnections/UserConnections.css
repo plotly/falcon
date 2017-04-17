@@ -1,91 +1,56 @@
-.inputContainer {
-    padding-top: 10px;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
+label {
+    text-align: right;
+    float: left;
+    width: 35%;
+    line-height: 40px;
+    font-size: 16px;
+}
+
+.wrapInput {
+    width: 65%;
+    float: right;
 }
 
 input {
-    display: inline-block !important;
-    padding: 5px;
     border: none;
     border-bottom-width: 1px;
     border-bottom-color: #BEC8D9;
     border-bottom-style: solid;
     color: #6D6D6D;
-    width: 80%;
-    font-size: 18px;
     font-weight: 100;
-    margin: 10px 40px 0px 40px;
-    text-align: left;
-    height: 39px;
+    width: 56%;
+    margin-left: 20px;
+    float: left;
+    font-size: 18px;
+    height: 40px;
 }
 
 input:hover {
     border-bottom-color: #8BB5FE;
 }
 
-.inputNamesContainer {
-    margin-top: 8px;
-    width: 25%;
-    vertical-align: top;
-    position: absolute;
+.inputContainer {
+    clear: both;
+    overflow: hidden;
+    padding: 1px;
+    margin: 0 0 10px 0;
 }
 
-.inputFieldsContainer {
-    display: inline-block;
-    width: 50%;
-}
-
-.inputName {
-    text-transform: capitalize;
-    padding: 5px;
-    display: inline-block;
-    text-align: right;
-    margin: 10px 0px 0px 0px;
-    height: 40px;
-    width: 100%;
+.description {
+    font-size: 12px;
+    text-align: left;
+    margin-left: calc(35% + 20px);
+    max-width: 35%;
 }
 
 .documentationLink {
     display: inline-block !important;
     padding: 5px;
     text-transform: capitalize;
-    /*color: #6D6D6D;*/
     font-size: 18px;
     font-weight: 100;
     margin: 10px 40px 0px 40px;
     text-align: left;
     height: 30px;
     width: 80%;
-}
-
-.checkbox {
-    display: inline;
-    vertical-align: middle;
-    margin: 5px 20px 10px 60px;
-    width: 20px;
-}
-
-.label {
-    display: inline;
-}
-
-.optionsContainer {
-    text-align: left;
-    padding-top: 15px;
-}
-
-.options {
-}
-
-.option {
-    text-transform: capitalize;
-    padding: 5px;
-    display: inline;
-    text-align: right;
-    margin: 10px 0px 0px 0px;
-    height: 40px;
-    width: 100%;
 }
