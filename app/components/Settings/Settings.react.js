@@ -21,14 +21,6 @@ const WORKSPACE_IMPORT_SQL_URL = `${plotlyUrl()}/create?upload=sql&url=`;
 
 let STARTED_AT = null;
 
-const unfoldIcon = (
-    <img
-        src="images/unfold.png"
-        className={styles.unfoldIcon}
-    >
-    </img>
-);
-
 let checkconnectorUrls;
 let checkDNS;
 
@@ -57,27 +49,7 @@ class Settings extends Component {
         this.fetchData = this.fetchData.bind(this);
         this.renderEditButton = this.renderEditButton.bind(this);
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
-        this.wrapWithAutoHide = this.wrapWithAutoHide.bind(this);
-        this.state = {showConnections: true, showPreview: true, editMode: true, urls: {}};
-    }
-
-    wrapWithAutoHide(name, reactComponent) {
-        return (
-            <div className={styles.stepTitleContainer}>
-                <h5
-                    className={styles.stepTitle}
-                    onClick={() => this.setState({
-                        [`show${name}`]: !this.state[`show${name}`]
-                    })}
-                >
-                    <span>{name}</span>
-                    <span className={this.state[`show${name}`] ? null : styles.collapsed}>
-                        {unfoldIcon}
-                    </span>
-                </h5>
-                {this.state[`show${name}`] ? reactComponent : null}
-            </div>
-        );
+        this.state = {editMode: true, urls: {}};
     }
 
     componentDidMount() {
@@ -314,56 +286,56 @@ class Settings extends Component {
 
                 <div className={styles.openTab}>
 
-                    {this.wrapWithAutoHide('Connections',
-                        this.renderSettingsForm()
-                    )}
+                    <h3>Connections</h3>
+                    {this.renderSettingsForm()}
 
                     {this.renderEditButton(!this.state.editMode)}
 
-                    {this.wrapWithAutoHide('Preview',
-                        <div>
-                            <OptionsDropdown
-                                connectionObject={connections[selectedTab]}
-                                selectedTable={selectedTable}
-                                elasticsearchMappingsRequest={elasticsearchMappingsRequest}
-                                tablesRequest={tablesRequest}
-                                setTable={setTable}
-                                setIndex={setIndex}
-                                selectedIndex={selectedIndex}
-                            />
+                    <h3>Preview</h3>
 
-                            <Preview
-                                previewTableRequest={previewTableRequest}
-                                s3KeysRequest={s3KeysRequest}
-                                apacheDrillStorageRequest={apacheDrillStorageRequest}
-                                apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
-                            />
-                        </div>
-                    )}
+                    <div>
+                        <OptionsDropdown
+                            connectionObject={connections[selectedTab]}
+                            selectedTable={selectedTable}
+                            elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                            tablesRequest={tablesRequest}
+                            setTable={setTable}
+                            setIndex={setIndex}
+                            selectedIndex={selectedIndex}
+                        />
 
-                    {this.wrapWithAutoHide('Endpoints',
-                        <div>
-                            <div>{'Your connector is running on '}</div>
-                            {keys(this.state.urls).map(url => {
-                                return (
-                                    <div>
-                                        <div className={styles.url}>
-                                            {`${this.state.urls[url]}`}
-                                        </div>
+                        <Preview
+                            previewTableRequest={previewTableRequest}
+                            s3KeysRequest={s3KeysRequest}
+                            apacheDrillStorageRequest={apacheDrillStorageRequest}
+                            apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+                        />
+                    </div>
+
+                    <h3>Endpoints</h3>
+                    <div>
+                        <div>{'Your connector is running on '}</div>
+                        {keys(this.state.urls).map(url => {
+                            return (
+                                <div>
+                                    <div className={styles.url}>
+                                        {`${this.state.urls[url]}`}
                                     </div>
-                                );
-                            })}
-                            {httpsServerIsOK ? (
-                                <div>
-                                    {'HTTPS server is up and running.'}
                                 </div>
-                            ) : (
-                                <div>
-                                    {`HTTPS server is getting set-up. It may take several minutes. It has been ${timeElapsed}.`}
-                                </div>
-                            )}
-                        </div>
-                    )}
+                            );
+                        })}
+                        {httpsServerIsOK ? (
+                            <div>
+                                {'HTTPS server is up and running.'}
+                            </div>
+                        ) : (
+                            <div>
+                                {`HTTPS support is initializing.
+                                  This may take several minutes
+                                  (It has been ${timeElapsed})`}
+                            </div>
+                        )}
+                    </div>
 
                     <div className={styles.workspaceLink}>
                         {
