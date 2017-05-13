@@ -71,7 +71,7 @@ export const CONNECTION_CONFIG = {
         {'label': 'Port', 'value': 'port', 'type': 'text'}
     ],
     [DIALECTS.S3]: [
-        {'label': 's3 Bucket', 'value': 'bucket', 'type': 'text'},
+        {'label': 'S3 Bucket', 'value': 'bucket', 'type': 'text'},
         {'label': 'S3 Access Key ID', 'value': 'accessKeyId', 'type': 'text'},
         {
             'label': 'S3 Secret Access Key',
