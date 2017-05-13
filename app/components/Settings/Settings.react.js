@@ -19,29 +19,8 @@ import {plotlyUrl, getAllBaseUrls} from '../../utils/utils';
 
 const WORKSPACE_IMPORT_SQL_URL = `${plotlyUrl()}/create?upload=sql&url=`;
 
-let STARTED_AT = null;
-
 let checkconnectorUrls;
 let checkDNS;
-
-const isStatusOK = (url) => {
-    return fetch(url, {
-        method: 'GET'
-        // credentials: 'include',
-        // headers: {
-        //     'Accept': 'application/json',
-        //     'Content-Type': 'application/json'
-        // }
-    })
-    .then(res => {
-        console.log('fetched');
-        return true;
-    })
-    .catch((e) => {
-        console.log('failed');
-        return false;
-    });
-};
 
 class Settings extends Component {
     constructor(props) {
@@ -49,14 +28,46 @@ class Settings extends Component {
         this.fetchData = this.fetchData.bind(this);
         this.renderEditButton = this.renderEditButton.bind(this);
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
-        this.state = {editMode: true, urls: {}};
+        this.state = {
+            editMode: true,
+            urls: {
+                https: null,
+                http: null
+            },
+            timeElapsed: 0,
+            httpsServerIsOK: false
+        };
+        this.intervals = {
+            timeElapsedInterval: null,
+            checkHTTPSEndpointInterval: null,
+            getConnectorUrlsInterval: null
+        }
     }
 
     componentDidMount() {
         this.fetchData();
-        checkconnectorUrls = setInterval(() => {
+        this.intervals.getConnectorUrlsInterval = setInterval(() => {
+            // TODO - Clear this?
             this.props.dispatch(Actions.getConnectorUrls());
-        }, 5000);
+        }, 5 * 1000);
+        let timeElapsed = 0;
+
+        this.intervals.timeElapsedInterval = setInterval(() => {
+            const seconds = Math.round((new Date().getTime() - STARTED_AT.getTime()) / 1000);
+            timeElapsed = seconds > 60 ?
+                `${Math.round(seconds / 60)} minutes ${seconds % 60} seconds` :
+                `${seconds} seconds`;
+            this.setState({timeElapsed});
+        }, 5 * 1000);
+
+        this.intervals.checkHTTPSEndpointInterval = setInterval(() => {
+            fetch(this.state.urls.https).then(() => {
+                this.setState({httpsServerIsOK: true});
+                clearInterval(this.intervals.checkHTTPSEndpointInterval);
+                clearInterval(this.intervals.timeElapsedInterval);
+            });
+        }, 5 * 1000);
+
     }
 
     componentDidUpdate() {
@@ -67,15 +78,19 @@ class Settings extends Component {
         return (
             <div className={styles.editButtonContainer}>
                 {show ? (
-                    <div
-                        className={buttonStyles.buttonPrimary}
+                    <button
+                        style={{
+                            'display': 'block',
+                            'marginLeft': 'auto',
+                            'marginRight': 'auto'
+                        }}
                         onClick={() => {
                             this.setState({showConnections: true, editMode: true});
                             this.props.setConnectionNeedToBeSaved(true);
                         }}
                     >
                         {'Edit Credentials'}
-                    </div>
+                    </button>
                 ) : null}
             </div>
         );
@@ -255,24 +270,8 @@ class Settings extends Component {
             return null; // initializing
         }
 
-        const connectorUrl = this.state.urls.https || this.state.urls.http;
-
-        let httpsServerIsOK = false;
-        if (!STARTED_AT && this.state.urls.https) {
-            STARTED_AT = new Date();
-            checkDNS = setInterval(() => {
-                console.log('trying');
-                if (isStatusOK(`${this.state.urls.https}/ping`)) {
-                    httpsServerIsOK = true;
-                }
-            }, 5000);
-        }
-
-        let timeElapsed = null;
-        if (STARTED_AT) {
-            const seconds = Math.round((new Date().getTime() - STARTED_AT.getTime()) / 1000);
-            timeElapsed = seconds > 60 ? `${Math.round(seconds / 60)} minutes ${seconds % 60} seconds` : `${seconds} seconds`;
-        }
+        const connectorUrl = this.state.urls.https;
+        const {httpsServerIsOK, timeElapsed} = this.state;
 
         return (
             <div>
@@ -284,66 +283,69 @@ class Settings extends Component {
                     deleteTab={deleteTab}
                 />
 
-                <div className={styles.openTab}>
+                <div className={styles.openTab} style={{'padding': 30}}>
 
                     <h3>Connections</h3>
                     {this.renderSettingsForm()}
 
                     {this.renderEditButton(!this.state.editMode)}
 
-                    <h3>Preview</h3>
-
+                    {this.props.connectRequest.status === 200 ? (
                     <div>
-                        <OptionsDropdown
-                            connectionObject={connections[selectedTab]}
-                            selectedTable={selectedTable}
-                            elasticsearchMappingsRequest={elasticsearchMappingsRequest}
-                            tablesRequest={tablesRequest}
-                            setTable={setTable}
-                            setIndex={setIndex}
-                            selectedIndex={selectedIndex}
-                        />
+                        <h3>Preview</h3>
 
-                        <Preview
-                            previewTableRequest={previewTableRequest}
-                            s3KeysRequest={s3KeysRequest}
-                            apacheDrillStorageRequest={apacheDrillStorageRequest}
-                            apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
-                        />
-                    </div>
+                        <div>
+                            <OptionsDropdown
+                                connectionObject={connections[selectedTab]}
+                                selectedTable={selectedTable}
+                                elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                                tablesRequest={tablesRequest}
+                                setTable={setTable}
+                                setIndex={setIndex}
+                                selectedIndex={selectedIndex}
+                            />
 
-                    <h3>Endpoints</h3>
-                    <div>
-                        <div>{'Your connector is running on '}</div>
-                        {keys(this.state.urls).map(url => {
-                            return (
-                                <div>
-                                    <div className={styles.url}>
-                                        {`${this.state.urls[url]}`}
-                                    </div>
-                                </div>
-                            );
-                        })}
+                            <Preview
+                                previewTableRequest={previewTableRequest}
+                                s3KeysRequest={s3KeysRequest}
+                                apacheDrillStorageRequest={apacheDrillStorageRequest}
+                                apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+                            />
+                        </div>
+
+                        <h3>Make SQL Queries</h3>
+
                         {httpsServerIsOK ? (
                             <div>
-                                {'HTTPS server is up and running.'}
+                                <div>
+                                    {'The connector is up and running.'}
+                                </div>
+                                <div>
+                                    A unique SSL and URL has been created
+                                    for you: <b>{this.state.urls.https}</b>.&nbsp;
+                                    Use this URL when you when you connect to
+                                    the SQL Connector inside the&nbsp;
+                                    <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
+                                        Plotly Chart Creator
+                                     </Link>
+                                     &nbsp;
+                                     <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
+                                         ({WORKSPACE_IMPORT_SQL_URL + connectorUrl})
+                                      </Link>
+                                </div>
+
                             </div>
                         ) : (
                             <div>
-                                {`HTTPS support is initializing.
+                                {`Plotly is initializing a unique SSL
+                                  certificate and URL for you.
                                   This may take several minutes
                                   (It has been ${timeElapsed})`}
                             </div>
                         )}
-                    </div>
 
-                    <div className={styles.workspaceLink}>
-                        {
-                            Link(WORKSPACE_IMPORT_SQL_URL + connectorUrl,
-                            'Make queries from Plotly')
-                        }
                     </div>
-
+                    ) : null}
                 </div>
             </div>
         );
