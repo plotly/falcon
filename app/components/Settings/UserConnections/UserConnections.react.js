@@ -63,8 +63,7 @@ export default class UserConnections extends Component {
 	render() {
 
 		const {connectionObject, updateConnection} = this.props;
-
-		let inputs = CONNECTION_CONFIG[connectionObject.dialect]
+		const inputs = CONNECTION_CONFIG[connectionObject.dialect]
 			.map(setting => {
                 let input;
                 if (contains(setting.type, ['text', 'number', 'password'])) {
