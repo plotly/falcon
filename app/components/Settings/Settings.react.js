@@ -291,17 +291,18 @@ class Settings extends Component {
 
                     <h3>Step 1. Set Up Connections</h3>
                     <div>
-                        The Plotly Database Connector is local web server that
+                        {`The Plotly Database Connector is local web server that
                         forwards requests directly from your web browser in via
-                        the &nbsp;
+                        the`}
+                        &nbsp;
                         <Link href="https://plot.ly/create">Plotly Chart Creator</Link>
-                        &nbsp; to your databases.
-                        Since these requests are made locally from your web browser
+                        &nbsp;
+                        {`to your databases. Since these requests are made locally from your web browser
                         to this application, you do not need to open up
                         your database's network: you just need to make sure
                         that you can connect to your database from this computer.
                         Your database credentials are only stored on your
-                        computer (they are not saved on any plotly servers).
+                        computer (they are not saved on any plotly servers).`}
                     </div>
 
                     {this.renderSettingsForm()}
@@ -351,7 +352,7 @@ class Settings extends Component {
 
                                      (Direct link: &nbsp;
                                      <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
-                                         {WORKSPACE_IMPORT_SQL_URL + connectorUrl})
+                                         {WORKSPACE_IMPORT_SQL_URL + connectorUrl}
                                       </Link>
                                     )
                                 </div>
@@ -362,7 +363,7 @@ class Settings extends Component {
                                 {`Plotly is initializing a unique SSL
                                   certificate and URL for you.
                                   This can take several minutes
-                                  (it has been ${timeElapsed})`.}
+                                  (it has been ${timeElapsed}).`}
                             </div>
                         )}
 
