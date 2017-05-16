@@ -26,7 +26,8 @@ const DEFAULT_SETTINGS = {
     CORS_ALLOWED_ORIGINS: [
         'https://plot.ly',
         'https://stage.plot.ly',
-        'https://local.plot.ly'
+        'https://local.plot.ly',
+        'http://localhost:9494'
     ],
     PORT: 9494,
     PORT_HTTPS: 9495,
