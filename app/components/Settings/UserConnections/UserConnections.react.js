@@ -78,7 +78,7 @@ export default class UserConnections extends Component {
                                     onChange={e => (updateConnection({
                                         [setting.value]: e.target.value
                                     }))}
-                                    value={connectionObject[setting]}
+                                    value={connectionObject[setting.value]}
                                     id={`test-input-${setting.value}`}
                                     placeholder={setting.placeholder}
                                     type={setting.type}
