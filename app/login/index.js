@@ -167,7 +167,7 @@ class Login extends Component {
                 id="test-login-button"
                 className="btn btn-large btn-primary"
                 style={{display: 'block', margin: 'auto'}}
-                onClick={() => this.logIn()}
+                onClick={this.logIn}
             >{'Login'}</button>
         );
 
