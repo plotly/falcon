@@ -164,6 +164,7 @@ class Login extends Component {
 
         const loginButton = (
             <button
+                id="test-login-button"
                 className="btn btn-large btn-primary"
                 style={{display: 'block', margin: 'auto'}}
                 onClick={() => this.logIn()}
@@ -195,7 +196,7 @@ class Login extends Component {
                     <div className="form-group">
                         <label>Your Plotly Username</label>
                         <input
-                            id="username"
+                            id="test-username"
                             type="text"
                             className="form-control"
                             placeholder="johndoe"
@@ -215,7 +216,7 @@ class Login extends Component {
                     <div className="form-group">
                         <label>Your On-Prem Plotly Username</label>
                         <input
-                            id="username"
+                            id="test-username"
                             type="text"
                             className="form-control"
                             placeholder="johndoe"

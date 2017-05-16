@@ -56,6 +56,7 @@ export default class ConnectButton extends Component {
        return (
             <div className={styles.connectButtonContainer}>
                 <button
+                    id="test-connect-button"
                     onClick={buttonClick}
                 >
                     {buttonText}

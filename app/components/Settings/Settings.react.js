@@ -368,7 +368,7 @@ class Settings extends Component {
 
                         {
                             httpsServerIsOK ? (
-                                <div>
+                                <div id="test-ssl-initialized">
                                     <h3>Final Step. Query Data on Plotly</h3>
                                     <h5>
                                         <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
