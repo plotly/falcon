@@ -195,6 +195,7 @@ class Login extends Component {
                     <div className="form-group">
                         <label>Your Plotly Username</label>
                         <input
+                            id="username"
                             type="text"
                             className="form-control"
                             placeholder="johndoe"
@@ -214,6 +215,7 @@ class Login extends Component {
                     <div className="form-group">
                         <label>Your On-Prem Plotly Username</label>
                         <input
+                            id="username"
                             type="text"
                             className="form-control"
                             placeholder="johndoe"
