@@ -30,5 +30,6 @@ export default function configureStore(initialState) {
         );
     }
 
+    window.store = store;
     return store;
 }
