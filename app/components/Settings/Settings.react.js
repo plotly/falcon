@@ -52,6 +52,7 @@ class Settings extends Component {
         }, 5 * 1000);
         let timeElapsed = 0;
 
+        const STARTED_AT = new Date();
         this.intervals.timeElapsedInterval = setInterval(() => {
             const seconds = Math.round((new Date().getTime() - STARTED_AT.getTime()) / 1000);
             timeElapsed = seconds > 60 ?
@@ -61,11 +62,14 @@ class Settings extends Component {
         }, 5 * 1000);
 
         this.intervals.checkHTTPSEndpointInterval = setInterval(() => {
-            fetch(this.state.urls.https).then(() => {
-                this.setState({httpsServerIsOK: true});
-                clearInterval(this.intervals.checkHTTPSEndpointInterval);
-                clearInterval(this.intervals.timeElapsedInterval);
-            });
+            console.warn(`Attempting a connection at ${this.state.urls.https}`);
+            if (this.state.urls.https) {
+                fetch(this.state.urls.https).then(() => {
+                    this.setState({httpsServerIsOK: true});
+                    clearInterval(this.intervals.checkHTTPSEndpointInterval);
+                    clearInterval(this.intervals.timeElapsedInterval);
+                });
+            }
         }, 5 * 1000);
 
     }
