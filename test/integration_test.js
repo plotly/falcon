@@ -77,7 +77,6 @@ describe('plotly database connector', function Spec() {
 
     it('should work', async () => {
         const title = await this.driver.getTitle();
-        expect(title).to.equal('Plotly Database Connector');
 
         // Login (credentials are already saved so skip the oauth flow)
 
