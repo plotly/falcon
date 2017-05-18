@@ -98,7 +98,7 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": ""
+    "url": "https://github.com/plotly/plotly-database-connector/issues"
   },
   "keywords": [
     "electron",
@@ -112,7 +112,7 @@
     "persistent",
     "connector"
   ],
-  "homepage": "",
+  "homepage": "https://github.com/plotly/plotly-database-connector",
   "optionalDependencies": {
     "fsevents": "*"
   },
