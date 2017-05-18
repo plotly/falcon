@@ -341,7 +341,7 @@ class Settings extends Component {
                                     {'The connector is up and running.'}
                                 </div>
                                 <div>
-                                    A unique SSL and URL has been created
+                                    A unique SSL certificate and URL has been created
                                     for you: <b>{this.state.urls.https}</b>.&nbsp;
                                     Use this URL when you when you connect to
                                     the SQL Connector inside the&nbsp;
@@ -373,7 +373,7 @@ class Settings extends Component {
                                     <h3>Final Step. Query Data on Plotly</h3>
                                     <h5>
                                         <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
-                                            Open Query Editor
+                                                Open Query Editor
                                          </Link>
                                          &nbsp; on the Plotly Chart Creator
                                     </h5>
