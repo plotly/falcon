@@ -56,7 +56,7 @@ class Settings extends Component {
         this.intervals.timeElapsedInterval = setInterval(() => {
             const seconds = Math.round((new Date().getTime() - STARTED_AT.getTime()) / 1000);
             timeElapsed = seconds > 60 ?
-                `${Math.round(seconds / 60)} minutes ${seconds % 60} seconds` :
+                `${Math.floor(seconds / 60)} minutes ${seconds % 60} seconds` :
                 `${seconds} seconds`;
             this.setState({timeElapsed});
         }, 5 * 1000);
@@ -360,10 +360,19 @@ class Settings extends Component {
                             </div>
                         ) : (
                             <div>
-                                {`Plotly is initializing a unique SSL
-                                  certificate and URL for you.
-                                  This can take several minutes
-                                  (it has been ${timeElapsed}).`}
+                                <div>
+                                    {`Plotly is initializing a unique SSL
+                                      certificate and URL for you.
+                                      This can take several minutes
+                                      (it has been ${timeElapsed}).`}
+                                </div>
+                                <div>
+                                    {`Once this is complete, you'll be able to
+                                      connect to your databases from the `}&nbsp;
+                                    <Link href="https://plot.ly/create?upload=sql">
+                                            Plotly Chart Creator
+                                    </Link>
+                                </div>
                             </div>
                         )}
 
