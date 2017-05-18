@@ -63,8 +63,7 @@ export default class UserConnections extends Component {
 	render() {
 
 		const {connectionObject, updateConnection} = this.props;
-
-		let inputs = CONNECTION_CONFIG[connectionObject.dialect]
+		const inputs = CONNECTION_CONFIG[connectionObject.dialect]
 			.map(setting => {
                 let input;
                 if (contains(setting.type, ['text', 'number', 'password'])) {
@@ -78,7 +77,7 @@ export default class UserConnections extends Component {
                                     onChange={e => (updateConnection({
                                         [setting.value]: e.target.value
                                     }))}
-                                    value={connectionObject[setting]}
+                                    value={connectionObject[setting.value]}
                                     id={`test-input-${setting.value}`}
                                     placeholder={setting.placeholder}
                                     type={setting.type}

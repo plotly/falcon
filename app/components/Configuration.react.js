@@ -23,7 +23,7 @@ export default class Configuration extends Component {
         return (
             <div className={styles.fullApp}>
                 <div className={styles.header}>
-                    <div className={styles.logoAndTitle}>
+                    <span className={styles.logoAndTitle}>
                         <img className={styles.plotlyLogo}
                             src="images/plotly-connector-logo.svg"
                         >
@@ -31,9 +31,9 @@ export default class Configuration extends Component {
                         <h5 className={styles.applicationTitle}>
                             Plotly Database Connector
                         </h5>
-                    </div>
+                    </span>
 
-                    <div className={styles.supportLinks}>
+                    <span className={styles.supportLinksContainer}>
                         <div className={styles.externalLinkContainer}>
                             {/* Hide Upgrade button for on-prem */}
                             {
@@ -41,12 +41,20 @@ export default class Configuration extends Component {
                                     'external-data-connector',
                                     window.location.href
                                 ) ?
-                                null : Link(LINKS.PLANS, 'Plans and Pricing')
+                                null : <Link className={styles.supportLinks} href={LINKS.PLANS}>Plans and Pricing</Link>
                             }
-                            {Link(LINKS.DOCS, 'Documentation')}
-                            {Link(LINKS.TYPEFORM, 'Request a Connector')}
+                            {/* TODO - Template in ONPREM */}
+                            {
+                                contains(
+                                    'external-data-connector',
+                                    window.location.href
+                                ) ?
+                                null : <Link className={styles.supportLinks} href={'https://plot.ly/create'}>Chart Creator and SQL Editor</Link>
+                            }
+                            <Link className={styles.supportLinks} href={LINKS.DOCS}>Documentation</Link>
+                            <Link className={styles.supportLinks} href={LINKS.TYPEFORM}>Request a Connector</Link>
                         </div>
-                    </div>
+                    </span>
                 </div>
 
                 <Settings/>

@@ -6,6 +6,8 @@ import {
     dynamicRequireElectron
 } from '../utils/utils';
 import {Link} from '../components/Link.react';
+import {productName, version} from '../../package.json';
+
 
 const currentEndpoint = '/login';
 const baseUrlWrapped = baseUrl().replace(currentEndpoint, '');
@@ -17,6 +19,8 @@ const SERVER_TYPES = {
     [CLOUD]: 'Plotly Cloud',
     [ONPREM]: 'Plotly On-Premise'
 };
+
+window.document.title = `${productName} v${version}`;
 
 // http://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen
 const PopupCenter = (url, title, w, h) => {
@@ -164,9 +168,10 @@ class Login extends Component {
 
         const loginButton = (
             <button
+                id="test-login-button"
                 className="btn btn-large btn-primary"
                 style={{display: 'block', margin: 'auto'}}
-                onClick={() => this.logIn()}
+                onClick={this.logIn}
             >{'Login'}</button>
         );
 
@@ -195,6 +200,7 @@ class Login extends Component {
                     <div className="form-group">
                         <label>Your Plotly Username</label>
                         <input
+                            id="test-username"
                             type="text"
                             className="form-control"
                             placeholder="johndoe"
@@ -214,6 +220,7 @@ class Login extends Component {
                     <div className="form-group">
                         <label>Your On-Prem Plotly Username</label>
                         <input
+                            id="test-username"
                             type="text"
                             className="form-control"
                             placeholder="johndoe"

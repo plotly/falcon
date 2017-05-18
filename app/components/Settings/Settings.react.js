@@ -5,6 +5,7 @@ import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
 import * as styles from './Settings.css';
 import * as buttonStyles from './ConnectButton/ConnectButton.css';
+import fetch from 'isomorphic-fetch';
 import Tabs from './Tabs/Tabs.react';
 import UserConnections from './UserConnections/UserConnections.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
@@ -18,15 +19,8 @@ import {plotlyUrl, getAllBaseUrls} from '../../utils/utils';
 
 const WORKSPACE_IMPORT_SQL_URL = `${plotlyUrl()}/create?upload=sql&url=`;
 
-const unfoldIcon = (
-    <img
-        src="images/unfold.png"
-        className={styles.unfoldIcon}
-    >
-    </img>
-);
-
 let checkconnectorUrls;
+let checkDNS;
 
 class Settings extends Component {
     constructor(props) {
@@ -34,34 +28,50 @@ class Settings extends Component {
         this.fetchData = this.fetchData.bind(this);
         this.renderEditButton = this.renderEditButton.bind(this);
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
-        this.wrapWithAutoHide = this.wrapWithAutoHide.bind(this);
-        this.state = {showConnections: true, showPreview: true, editMode: true, urls: {}};
-    }
-
-    wrapWithAutoHide(name, reactComponent) {
-        return (
-            <div className={styles.stepTitleContainer}>
-                <h5
-                    className={styles.stepTitle}
-                    onClick={() => this.setState({
-                        [`show${name}`]: !this.state[`show${name}`]
-                    })}
-                >
-                    <span>{name}</span>
-                    <span className={this.state[`show${name}`] ? null : styles.collapsed}>
-                        {unfoldIcon}
-                    </span>
-                </h5>
-                {this.state[`show${name}`] ? reactComponent : null}
-            </div>
-        );
+        this.state = {
+            editMode: true,
+            urls: {
+                https: null,
+                http: null
+            },
+            timeElapsed: 0,
+            httpsServerIsOK: false
+        };
+        this.intervals = {
+            timeElapsedInterval: null,
+            checkHTTPSEndpointInterval: null,
+            getConnectorUrlsInterval: null
+        }
     }
 
     componentDidMount() {
         this.fetchData();
-        checkconnectorUrls = setInterval(() => {
+        this.intervals.getConnectorUrlsInterval = setInterval(() => {
+            // TODO - Clear this?
             this.props.dispatch(Actions.getConnectorUrls());
-        }, 2000);
+        }, 5 * 1000);
+        let timeElapsed = 0;
+
+        const STARTED_AT = new Date();
+        this.intervals.timeElapsedInterval = setInterval(() => {
+            const seconds = Math.round((new Date().getTime() - STARTED_AT.getTime()) / 1000);
+            timeElapsed = seconds > 60 ?
+                `${Math.floor(seconds / 60)} minutes ${seconds % 60} seconds` :
+                `${seconds} seconds`;
+            this.setState({timeElapsed});
+        }, 5 * 1000);
+
+        this.intervals.checkHTTPSEndpointInterval = setInterval(() => {
+            console.warn(`Attempting a connection at ${this.state.urls.https}`);
+            if (this.state.urls.https) {
+                fetch(this.state.urls.https).then(() => {
+                    this.setState({httpsServerIsOK: true});
+                    clearInterval(this.intervals.checkHTTPSEndpointInterval);
+                    clearInterval(this.intervals.timeElapsedInterval);
+                });
+            }
+        }, 5 * 1000);
+
     }
 
     componentDidUpdate() {
@@ -72,15 +82,19 @@ class Settings extends Component {
         return (
             <div className={styles.editButtonContainer}>
                 {show ? (
-                    <div
-                        className={buttonStyles.buttonPrimary}
+                    <button
+                        style={{
+                            'display': 'block',
+                            'marginLeft': 'auto',
+                            'marginRight': 'auto'
+                        }}
                         onClick={() => {
                             this.setState({showConnections: true, editMode: true});
                             this.props.setConnectionNeedToBeSaved(true);
                         }}
                     >
                         {'Edit Credentials'}
-                    </div>
+                    </button>
                 ) : null}
             </div>
         );
@@ -260,7 +274,8 @@ class Settings extends Component {
             return null; // initializing
         }
 
-        const connectorUrl = this.state.urls.https || this.state.urls.http;
+        const connectorUrl = this.state.urls.https;
+        const {httpsServerIsOK, timeElapsed} = this.state;
 
         return (
             <div>
@@ -272,15 +287,32 @@ class Settings extends Component {
                     deleteTab={deleteTab}
                 />
 
-                <div className={styles.openTab}>
+                <div className={styles.openTab} style={{'padding': 30}}>
 
-                    {this.wrapWithAutoHide('Connections',
-                        this.renderSettingsForm()
-                    )}
+                    <h3>Step 1. Set Up Connections</h3>
+                    <div>
+                        {`The Plotly Database Connector is local web server that
+                        forwards requests directly from your web browser in via
+                        the`}
+                        &nbsp;
+                        <Link href="https://plot.ly/create">Plotly Chart Creator</Link>
+                        &nbsp;
+                        {`to your databases. Since these requests are made locally from your web browser
+                        to this application, you do not need to open up
+                        your database's network: you just need to make sure
+                        that you can connect to your database from this computer.
+                        Your database credentials are only stored on your
+                        computer (they are not saved on any plotly servers).`}
+                    </div>
+
+                    {this.renderSettingsForm()}
 
                     {this.renderEditButton(!this.state.editMode)}
 
-                    {this.wrapWithAutoHide('Preview',
+                    {this.props.connectRequest.status === 200 ? (
+                    <div>
+                        <h3>Step 2. Preview Database</h3>
+
                         <div>
                             <OptionsDropdown
                                 connectionObject={connections[selectedTab]}
@@ -299,28 +331,67 @@ class Settings extends Component {
                                 apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
                             />
                         </div>
-                    )}
 
-                    {this.wrapWithAutoHide('Endpoints',
-                        <div>
-                            <div>{'Your connector is running on '}</div>
-                            {keys(this.state.urls).map(url => {
-                                return (
-                                    <div className={styles.url}>
-                                        {`${this.state.urls[url]}`}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
+                        <h3>Step 3. Initialize SSL Certificates</h3>
 
-                    <div className={styles.workspaceLink}>
+                        {httpsServerIsOK ? (
+                            <div>
+
+                                <div>
+                                    {'The connector is up and running.'}
+                                </div>
+                                <div>
+                                    A unique SSL certificate and URL has been created
+                                    for you: <b>{this.state.urls.https}</b>.&nbsp;
+                                    Use this URL when you when you connect to
+                                    the SQL Connector inside the&nbsp;
+                                    <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
+                                        Plotly Chart Creator
+                                     </Link>
+                                     &nbsp;
+
+                                     (Direct link: &nbsp;
+                                     <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
+                                         {WORKSPACE_IMPORT_SQL_URL + connectorUrl}
+                                      </Link>
+                                    )
+                                </div>
+
+                            </div>
+                        ) : (
+                            <div>
+                                <div>
+                                    {`Plotly is initializing a unique SSL
+                                      certificate and URL for you.
+                                      This can take several minutes
+                                      (it has been ${timeElapsed}).`}
+                                </div>
+                                <div>
+                                    {`Once this is complete, you'll be able to
+                                      connect to your databases from the `}&nbsp;
+                                    <Link href="https://plot.ly/create?upload=sql">
+                                            Plotly Chart Creator
+                                    </Link>
+                                </div>
+                            </div>
+                        )}
+
                         {
-                            Link(WORKSPACE_IMPORT_SQL_URL + connectorUrl,
-                            'Make queries from Plotly')
+                            httpsServerIsOK ? (
+                                <div id="test-ssl-initialized">
+                                    <h3>Final Step. Query Data on Plotly</h3>
+                                    <h5>
+                                        <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
+                                                Open Query Editor
+                                         </Link>
+                                         &nbsp; on the Plotly Chart Creator
+                                    </h5>
+                                </div>
+                            ) : null
                         }
-                    </div>
 
+                    </div>
+                    ) : null}
                 </div>
             </div>
         );

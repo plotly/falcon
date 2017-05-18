@@ -1,14 +1,9 @@
-.fullApp {
-
-}
-
 .header {
     vertical-align: top;
 }
 
 .logoAndTitle {
     display: inline-block;
-    width: 50%;
 }
 
 .plotlyLogo {
@@ -23,13 +18,12 @@
     color: #096CB3;
 }
 
+.supportLinksContainer {
+    float: right;
+}
+
 .supportLinks {
-    display: inline-block;
-    direction: rtl;
-    text-align: start;
-    vertical-align: top;
-    width: 50%;
-    margin-top: 30px;
+    margin-left: 15px;
 }
 
 .externalLinkContainer {

@@ -1,7 +1,7 @@
 {
   "name": "plotly-database-connector",
   "productName": "Plotly Database Connector",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "Plotly Database Connector for https://plot.ly/create. Connect your database and query your data to use in your charts.",
   "main": "./backend/main.js",
   "scripts": {
@@ -14,8 +14,8 @@
     "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\"",
     "hot-server": "node -r babel-register devServer.js",
     "lint": "eslint app test *.js",
-    "test": "npm run build && npm run test-unit-all",
-    "test-e2e": "cross-env NODE_ENV=test mocha --compilers js:babel-register --require ./test/setup.js --require co-mocha ./test/e2e.js",
+    "test": "npm run build && npm run test-unit-all && npm run test-e2e",
+    "test-e2e": "cross-env NODE_ENV=test mocha --compilers js:babel-register --require ./test/setup.js --require co-mocha ./test/integration_test.js",
     "test-e2e-local": "source test/set_creds.sh && npm run test-e2e",
     "test-unit": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --compilers js:babel-register ",
     "test-unit-all": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --compilers js:babel-register --recursive test/**/*.spec.js",
@@ -168,6 +168,7 @@
     "extract-text-webpack-plugin": "^1.0.1",
     "fbjs-scripts": "^0.6.0",
     "font-awesome": "^4.6.1",
+    "fs-extra": "https://registry.npmjs.org/fs-extra/-/fs-extra-0.26.7.tgz",
     "immutable": "^3.8.1",
     "jsdom": "^8.4.0",
     "json-loader": "^0.5.4",

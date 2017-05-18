@@ -55,13 +55,13 @@ export default class ConnectButton extends Component {
         }
        return (
             <div className={styles.connectButtonContainer}>
-                <div
-                    className={styles.buttonPrimary}
+                <button
+                    id="test-connect-button"
                     onClick={buttonClick}
                 >
                     {buttonText}
-                </div>
-                    {error}
+                </button>
+                {error}
             </div>
        );
     }

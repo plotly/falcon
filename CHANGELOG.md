@@ -7,8 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [2.0.0] - 2017-05-18
+
 ### Changed
-- Display error messages in OAuth login page
+- The SQL connector app runs on HTTPS by default. While the application is still
+  running as a server on localhost, a TLS certificate issuing server
+  ([open source and built and maintained by plotly](https://github.com/plotly/le-bot))
+  creates a unique DNS entry that points to `localhost:9495` and creates a unique
+  TLS certificate. This happens when the user first starts the app and the
+  certificate and the domain entry is saved to the user's plotly connector directory
+  in `~/.plotly/connector`.
+  These certificates should renew every 60-90 days automatically, generating
+  a new unique URL each time.
+- The user goes through an Oauth flow when starting the application.
+  This flow saves an oauth token to the user's `~/.plotly/connector` directory
+  and is used when scheduling updates to grids.
 
 ## [1.0.2] - 2016-12-09
 

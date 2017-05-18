@@ -66,6 +66,7 @@ class Status extends Component {
             content = (
                 <div>
                     <h4>{'Authorized!'}</h4>
+                    <div>{'You may now return to the application'}</div>
                 </div>
             );
         } else if (status === 'failure') {
