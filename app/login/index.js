@@ -6,7 +6,7 @@ import {
     dynamicRequireElectron
 } from '../utils/utils';
 import {Link} from '../components/Link.react';
-import {productName, version} from '../package.json';
+import {productName, version} from '../../package.json';
 
 
 const currentEndpoint = '/login';
