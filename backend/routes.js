@@ -61,7 +61,15 @@ export default class Servers {
             // Create certs if necessary when we have an approved user.
             if (args.createCerts && isEmpty(getCerts())) {
                 const createCertificates = setInterval(() => {
-                    // Can't create until user was authenticated.
+                    /*
+                     * Can't create until user was authenticated.
+                     * We wait until the user was authenticated in case
+                     * the user is logging in to their on-prem server.
+                     * In that case, we need to make sure that we have the
+                     * appropriate CORS domain of the on-prem server before
+                     * we start up the HTTPS server.
+                     *
+                     */
                     if (!isEmpty(getSetting('USERS'))) {
                         clearInterval(createCertificates);
                         timeoutFetchAndSaveCerts();
