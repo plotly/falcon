@@ -13,10 +13,10 @@ init:
 
 install:
   - ps: Install-Product node 7 x64
-  - yarn install
-  - yarn add electron-builder@next --dev # force install next version to test electron-builder
+  - npm install
+  - npm install electron-builder@next --dev # force install next version to test electron-builder
 
 build_script:
-  - yarn run dist-w
+  - npm run package
 
 test: off
