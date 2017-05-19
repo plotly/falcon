@@ -51,7 +51,6 @@ class Login extends Component {
         this.buildOauthUrl = this.buildOauthUrl.bind(this);
         this.oauthPopUp = this.oauthPopUp.bind(this);
         this.logIn = this.logIn.bind(this);
-        this.updateStateWithEvent = this.updateStateWithEvent.bind(this);
         this.checkIfUserAccountIsSaved = this.checkIfUserAccountIsSaved.bind(this);
     }
 
@@ -210,118 +209,93 @@ class Login extends Component {
 
     }
 
-    updateStateWithEvent(e) {
-        this.setState({[e.target.name]: e.target.value});
-    }
 
     render() {
-        const renderOption = (value) => {
-            const selected = this.state.serverType === value;
-            return (
-                <span>
-                    <button
-                        className={selected ? 'button-primary' : 'button'}
-                        onClick={(e) => this.setState({serverType: e.target.value})}
-                        value={value}
-                        style={{margin: '10px'}}
-                    >{SERVER_TYPES[value]}</button>
-                </span>
-            );
-        };
-
-        const loginButton = (
-            <button
-                id="test-login-button"
-                className="btn btn-large btn-primary"
-                style={{display: 'block', margin: 'auto'}}
-                onClick={this.logIn}
-            >{'Login'}</button>
-        );
-
-        const serverTypeOptions = (
-            <div className="control-group">
-            <h3 className="block-center-heading">
-                {'I am connecting to...'}
-            </h3>
-                <div className="controls" style={{padding: '20px'}}>
-                    {renderOption(CLOUD)}
-                    {renderOption(ONPREM)}
-                </div>
-                <span style={{borderBottom: '2px solid #E7E8E9', cursor: 'pointer'}}>
-                    {Link(
-                        'https://plot.ly/products/cloud/',
-                        'Learn more about our products.'
-                    )}
-                </span>
-            </div>
-        );
-
-        const loginCloud = (
-            <div className="control-group">
-                <h3 className="block-center-heading">{'Plotly Log In'}</h3>
-                <div className="controls" style={{padding: '20px'}}>
-                    <div className="form-group">
-                        <label>Your Plotly Username</label>
-                        <input
-                            id="test-username"
-                            type="text"
-                            className="form-control"
-                            placeholder="johndoe"
-                            name="username"
-                            onChange={(e) => this.updateStateWithEvent(e)}
-                        ></input>
-                        {loginButton}
-                    </div>
-                </div>
-            </div>
-        );
-
-        const loginOnPrem = (
-            <div className="control-group">
-                <h3 className="block-center-heading">{'Login Into Your Account'}</h3>
-                <div className="controls" style={{padding: '20px'}}>
-                    <div className="form-group">
-                        <label>Your On-Prem Plotly Username</label>
-                        <input
-                            id="test-username"
-                            type="text"
-                            className="form-control"
-                            placeholder="johndoe"
-                            name="username"
-                            onChange={(e) => this.updateStateWithEvent(e)}
-                        ></input>
-                        <label>Your On-Prem Plotly Domain</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            placeholder="https://plotly.your-company.com"
-                            name="domain"
-                            onChange={(e) => this.updateStateWithEvent(e)}
-                        ></input>
-                        {loginButton}
-                    </div>
-                </div>
-            </div>
-        );
-
-        const loginOptions = {
-            cloud: loginCloud,
-            onprem: loginOnPrem
-        };
 
         return (
-            <div className="container">
-                <div className="block-center">
-                    <div style={{textAlign: 'center'}}>
-                        {serverTypeOptions}
+            <div style={{
+                'width': '80%',
+                'backgroundColor': 'white',
+                'border': 'thin lightgrey solid',
+                'borderRadius': '5px',
+                'textAlign': 'center',
+                'marginLeft': 'auto',
+                'marginRight': 'auto',
+            }}>
+                <h2>
+                    {'Plotly Database Connector'}
+                </h2>
+                <h4>
+                    {'Log in to Plotly to continue'}
+                </h4>
+
+                <div style={{'height': '160px'}}>
+                    <div>
+                        <label>Connect to Plotly Cloud</label>
+                        <input
+                            type="radio"
+                            checked={this.state.serverType !== ONPREM}
+                            onChange={() => {this.setState({serverType: CLOUD})}}
+                        />
                     </div>
-                    <div style={{textAlign: 'center'}}>
-                        {loginOptions[this.state.serverType]}
+
+                    <div>
+                        <label>Connect to Plotly On Premise</label>
+                        <input
+                            type="radio"
+                            checked={this.state.serverType === ONPREM}
+                            onChange={() => {this.setState({serverType: ONPREM})}}
+                        />
                     </div>
-                    <div style={{textAlign: 'center'}}>
-                        {this.state.statusMessage}
+
+                    {
+                        this.state.serverType == ONPREM ? (
+                            <div>
+                                <label>Your Plotly On-Premise Domain</label>
+                                <input
+                                    type="text"
+                                    placeholder="https://plotly.your-company.com"
+                                    onChange={e => this.setState({
+                                        domain: e.target.value
+                                    })}
+                                />
+                            </div>
+                        ) : null
+                    }
+
+                    <div>
+                        <label>Your Plotly Username</label>
+                        <input
+                            type="text"
+                            placeholder=""
+                            onChange={e => this.setState({
+                                username: e.target.value
+                            })}
+                        />
                     </div>
                 </div>
+
+                <div>
+                    <button onClick={this.logIn}>
+                        {'Log in'}
+                    </button>
+                </div>
+
+                <div style={{textAlign: 'center'}}>
+                    {this.state.statusMessage}
+                </div>
+
+                <div style={{'marginTop': '30px'}}>
+                    <span>
+                        {`This dash app requires a plotly login to view.
+                          Don't have an account yet?`}
+                    </span>
+                </div>
+
+                <Link href={`${this.state.plotlyDomain}/accounts/login/?action=signup`}>
+                    {'Create an account '}
+                </Link>
+
             </div>
         );
     }
