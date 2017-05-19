@@ -5,6 +5,7 @@ environment:
 
 platform:
   - x64
+  - x86
 
 services:
   - postgresql96
