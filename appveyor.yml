@@ -27,4 +27,11 @@ install:
 build_script:
   - npm run package
 
+after_build:
+  - 7z a release.zip release
+
+artifacts:
+  - path: release.zip
+    name: release
+
 test: off
