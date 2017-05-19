@@ -1,7 +1,13 @@
 version: 0.4.{build}
 
+environment:
+  POSTGRES_PATH: C:\Program Files\PostgreSQL\9.6
+
 platform:
   - x64
+
+services:
+  - postgresql96
 
 cache:
   - node_modules
@@ -10,6 +16,8 @@ cache:
 
 init:
   - git config --global core.autocrlf input
+  - SET PATH=%POSTGRES_PATH%\bin;%PATH%
+
 
 install:
   - ps: Install-Product node 7 x64
