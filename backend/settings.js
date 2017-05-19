@@ -195,6 +195,9 @@ export function saveSetting(settingName, settingValue) {
             createStoragePath();
         }
     }
+    if (!has(settingName, DEFAULT_SETTINGS)) {
+        throw new Error(`Setting ${settingName} does not exist`);
+    }
     const settingsOnFile = loadSettings();
     settingsOnFile[settingName] = settingValue;
     /*
