@@ -1,3 +1,10 @@
 machine:
     node:
         version: 6.9.2
+
+test:
+    post:
+        - npm install electron-builder@next --dev
+        - npm run build
+        - npm run package
+        - zip release.zip release
