@@ -216,6 +216,7 @@ export default class Servers {
             return res.json(200, {});
         });
 
+        // TODO - urls isn't actually a setting, it's more of a config
         server.get('/settings/urls', function settings(req, res, next) {
             const {httpServer, httpsServer} = that;
             const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;
