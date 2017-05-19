@@ -291,8 +291,8 @@ class Settings extends Component {
 
                     <h3>Step 1. Set Up Connections</h3>
                     <div>
-                        {`The Plotly Database Connector is local web server that
-                        forwards requests directly from your web browser in via
+                        {`The Plotly Database Connector is a local web server that
+                        forwards requests directly from your web browser in
                         the`}
                         &nbsp;
                         <Link href="https://plot.ly/create">Plotly Chart Creator</Link>
@@ -343,7 +343,7 @@ class Settings extends Component {
                                 <div>
                                     A unique SSL certificate and URL has been created
                                     for you: <b>{this.state.urls.https}</b>.&nbsp;
-                                    Use this URL when you when you connect to
+                                    Use this URL when you connect to
                                     the SQL Connector inside the&nbsp;
                                     <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
                                         Plotly Chart Creator
@@ -384,7 +384,7 @@ class Settings extends Component {
                                         <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
                                                 Open Query Editor
                                          </Link>
-                                         &nbsp; on the Plotly Chart Creator
+                                         &nbsp; in the Plotly Chart Creator
                                     </h5>
                                 </div>
                             ) : null
