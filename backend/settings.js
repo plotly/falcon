@@ -51,6 +51,7 @@ const DEFAULT_SETTINGS = {
 // Settings that depend on other settings are described here
 const derivedSettingsNames = [
     'PLOTLY_API_URL',
+    'PLOTLY_URL',
     'CONNECTIONS_PATH',
     'QUERIES_PATH',
     'LOG_PATH',
@@ -60,6 +61,15 @@ const derivedSettingsNames = [
 ];
 function getDerivedSetting(settingName) {
     switch (settingName) {
+        case 'PLOTLY_URL': {
+            if (getSetting('PLOTLY_API_DOMAIN') ===
+                DEFAULT_SETTINGS['PLOTLY_API_DOMAIN']) {
+                return 'https://plot.ly'
+            } else {
+                return getSetting('PLOTLY_API_URL');
+            }
+        }
+
         case 'PLOTLY_API_URL':
             return (
                 (getSetting('PLOTLY_API_SSL_ENABLED') ? 'https://' : 'http://') +
