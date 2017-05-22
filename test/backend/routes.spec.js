@@ -241,6 +241,7 @@ describe('Routes - ', () => {
     });
 
     it('oauth - saves oauth access token with a username if valid', function(done) {
+        this.timeout(10 * 1000);
         saveSetting('USERS', []);
 
         assert.deepEqual(
