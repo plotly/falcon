@@ -221,6 +221,7 @@ class Login extends Component {
                 'textAlign': 'center',
                 'marginLeft': 'auto',
                 'marginRight': 'auto',
+                'minWidth': '800px'
             }}>
                 <h2>
                     {'Plotly Database Connector'}
@@ -229,8 +230,8 @@ class Login extends Component {
                     {'Log in to Plotly to continue'}
                 </h4>
 
-                <div style={{'height': '160px'}}>
-                    <div>
+                <div>
+                    <div style={{'height': 60}}>
                         <label>Connect to Plotly Cloud</label>
                         <input
                             type="radio"
@@ -239,7 +240,7 @@ class Login extends Component {
                         />
                     </div>
 
-                    <div>
+                    <div style={{'height': 60}}>
                         <label>Connect to Plotly On Premise</label>
                         <input
                             type="radio"
@@ -250,7 +251,7 @@ class Login extends Component {
 
                     {
                         this.state.serverType == ONPREM ? (
-                            <div>
+                            <div style={{'height': 60}}>
                                 <label>Your Plotly On-Premise Domain</label>
                                 <input
                                     type="text"
@@ -263,7 +264,7 @@ class Login extends Component {
                         ) : null
                     }
 
-                    <div>
+                    <div style={{'height': 60}}>
                         <label>Your Plotly Username</label>
                         <input
                             type="text"
