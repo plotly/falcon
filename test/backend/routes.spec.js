@@ -42,6 +42,17 @@ function GET(path) {
     });
 }
 
+function PATCH(path, body = {}) {
+    return fetch(`http://localhost:9494/${path}`, {
+        method: 'PATCH',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: body ? JSON.stringify(body) : null
+    });
+}
+
 function POST(path, body = {}) {
     return fetch(`http://localhost:9494/${path}`, {
         method: 'POST',
@@ -197,7 +208,7 @@ describe('Routes - ', () => {
     });
 
     // Settings
-    it('ssettings/urls - returns 200 and the urls', function(done) {
+    it('settings/urls - returns 200 and the urls', function(done) {
         GET('settings/urls')
         .then(res => res.json().then(json => {
             assert.equal(res.status, 200);
@@ -208,26 +219,37 @@ describe('Routes - ', () => {
         .catch(done);
     });
 
-    it('settings/approved/:username - returns 200 and {approved: false}', function(done) {
-        POST('settings/approved/thor')
+    it('GET /settings returns some of the settings', function(done) {
+        saveSetting(
+            'USERS',
+            [{'username': 'chris', 'accessToken': 'lahlahlemons'}]
+        );
+        GET('settings')
         .then(res => res.json().then(json => {
-            console.log(json);
-            assert.equal(res.status, 200);
-            assert.equal(json.approved, false);
+            assert.deepEqual({
+                'PLOTLY_URL': 'https://plot.ly',
+                'USERS': [{'username': 'chris'}]
+            });
             done();
-        }))
-        .catch(done);
+        })).catch(done);
     });
 
-    it('ssettings/approved/:username - returns 200 and {approved: true}', function(done) {
-        saveSetting('USERS', [{username: 'thor', accessToken: 'accessToken'}]);
-        POST('settings/approved/thor')
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 200);
-            assert.equal(json.approved, true);
+    it('PATCH /settings sets some settings', function(done) {
+        const newSettings = {
+            'PLOTLY_API_DOMAIN': 'acme.plot.ly',
+            'PLOTLY_API_SSL_ENABLED': false
+        };
+        PATCH('settings', newSettings).then(res => res.json().then(json => {
+            assert.equal(
+                getSetting('PLOTLY_API_SSL_ENABLED'),
+                newSettings.PLOTLY_API_SSL_ENABLED
+            );
+            assert.equal(
+                getSetting('PLOTLY_API_DOMAIN'),
+                newSettings.PLOTLY_API_DOMAIN
+            );
             done();
-        }))
-        .catch(done);
+        })).catch(done);
     });
 
     // OAuth

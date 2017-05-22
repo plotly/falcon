@@ -38,4 +38,17 @@ describe('Settings', function() {
         expect(getSetting('USERS')).to.deep.equal([{username: 'username', apiKey: 'apiKey'}]);
     });
 
+    it('PLOTLY_URL is derived from PLOTLY_API_DOMAIN', () => {
+        expect(getSetting('PLOTLY_URL'), 'https://plot.ly');
+        expect(getSetting('PLOTLY_API_URL'), 'https://api.plot.ly');
+
+        saveSetting('PLOTLY_API_DOMAIN', 'plotly.acme.com');
+        expect(getSetting('PLOTLY_URL'), 'https://plotly.acme.com');
+        expect(getSetting('PLOTLY_API_URL'), 'https://plotly.acme.com');
+
+        saveSetting('PLOTLY_API_SSL_ENABLED', false);
+        expect(getSetting('PLOTLY_URL'), 'http://plotly.acme.com');
+        expect(getSetting('PLOTLY_API_URL'), 'http://plotly.acme.com');
+    });
+
 });

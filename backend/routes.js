@@ -208,7 +208,7 @@ export default class Servers {
         });
 
         // Patch on /settings does a merge
-        server.patch('/settings/', function mergeSettings(req, res, next) {
+        server.patch('/settings', function mergeSettings(req, res, next) {
             const partialSettings = req.params;
             keys(partialSettings).forEach(settingName =>
                 saveSetting(settingName, partialSettings[settingName])
