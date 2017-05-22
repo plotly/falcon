@@ -288,7 +288,7 @@ class Login extends Component {
 
                 <div style={{'marginTop': '30px'}}>
                     <span>
-                        {`This dash app requires a plotly login to view.
+                        {`The Plotly Database Connector requires a plotly login to use.
                           Don't have an account yet?`}
                     </span>
                 </div>
