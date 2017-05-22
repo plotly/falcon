@@ -226,7 +226,7 @@ describe('Routes - ', () => {
         );
         GET('settings')
         .then(res => res.json().then(json => {
-            assert.deepEqual({
+            assert.deepEqual(json, {
                 'PLOTLY_URL': 'https://plot.ly',
                 'USERS': [{'username': 'chris'}]
             });
