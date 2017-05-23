@@ -55,7 +55,7 @@ export function saveCertsLocally({key, cert, subdomain}) {
     return Promise.all([saveCert, saveKey])
     .then(() => {
         saveSetting('CONNECTOR_HTTPS_DOMAIN', `${subdomain}.${CA_HOST.DOMAIN}`);
-        saveSetting('CERTIFICATE_LAST_UPDATED', new Date());
+        saveSetting('CERTIFICATE_LAST_UPDATED', (new Date()).toJSON());
         return;
     });
 }
