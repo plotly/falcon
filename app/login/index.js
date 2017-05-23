@@ -46,6 +46,7 @@ class Login extends Component {
             statusMessage: '',
             serverType: CLOUD,
             status: '',
+            statusMessage: '',
             username: ''
         };
         this.buildOauthUrl = this.buildOauthUrl.bind(this);
@@ -107,6 +108,8 @@ class Login extends Component {
 
     logIn () {
         const {domain, serverType, username} = this.state;
+
+        this.setState({status: '', statusMessage: ''});
 
         if (!username) {
             this.setState({
