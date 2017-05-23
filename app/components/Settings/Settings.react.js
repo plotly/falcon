@@ -55,8 +55,9 @@ class Settings extends Component {
         const STARTED_AT = new Date();
         this.intervals.timeElapsedInterval = setInterval(() => {
             const seconds = Math.round((new Date().getTime() - STARTED_AT.getTime()) / 1000);
+            const minutes = Math.floor(seconds / 60);
             timeElapsed = seconds > 60 ?
-                `${Math.floor(seconds / 60)} minutes ${seconds % 60} seconds` :
+                `${minutes} ${minutes > 1 ? 'minutes' : 'minute'} and ${seconds % 60} ${seconds % 60 > 1 ? 'seconds' : 'second'}` :
                 `${seconds} seconds`;
             this.setState({timeElapsed});
         }, 5 * 1000);
