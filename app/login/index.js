@@ -244,7 +244,7 @@ class Login extends Component {
                     </div>
 
                     <div style={{'height': 60}}>
-                        <label>Connect to Plotly On Premise</label>
+                        <label>Connect to <Link href="https://plot.ly/products/on-premise/">Plotly On-Premise</Link></label>
                         <input
                             type="radio"
                             checked={this.state.serverType === ONPREM}
