@@ -39,24 +39,18 @@ export default class UserConnections extends Component {
 	getStorageOnClick(setting) {
         // sqlite requires a path
 		return () => {
-			if (setting === 'storage') {
-				dialog.showOpenDialog({
-					properties: ['openFile', 'openDirectory'],
-					filters: [{name: 'databases', extensions: ['db']}]
-				}, (paths) => {
-					// result returned in an array
-					// TODO: add length of paths === 0 check
-					// TODO: add path non null check
-					const path = head(paths);
-					// get the filename to use as username in the logs
-					const splitPath = path.split('/');
-					const fileName = splitPath.length - 1;
-					this.props.updateConnection({
-						[setting]: paths[0],
-						'username': splitPath[fileName]
-					});
+			dialog.showOpenDialog({
+				properties: ['openFile', 'openDirectory'],
+				filters: [{name: 'databases', extensions: ['db']}]
+			}, (paths) => {
+				// result returned in an array
+				// TODO: add length of paths === 0 check
+				// TODO: add path non null check
+				const path = head(paths);
+				this.props.updateConnection({
+					[setting.value]: paths[0]
 				});
-			}
+			});
 		};
 	}
 
@@ -93,10 +87,10 @@ export default class UserConnections extends Component {
                             </label>
                             <div className={styles.wrapInput}>
                                 <input className={this.testClass()}
-                                    onClick={this.getStorageOnClick()}
-                                    value={connectionObject[setting]}
+                                    onClick={this.getStorageOnClick(setting)}
+                                    value={connectionObject[setting.value]}
                                     id={`test-input-${setting.value}`}
-                                    placeholder={setting.placeholder}
+                                    placeholder={'Click to find a SQLite file'}
                                     type={'text'}
                                 />
                             </div>
