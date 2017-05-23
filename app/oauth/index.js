@@ -84,7 +84,17 @@ class Status extends Component {
             );
         }
         return (
-            <div style={{paddingTop: '30%', textAlign: 'center'}}>
+            <div style={{
+                marginTop: '100px',
+                textAlign: 'center',
+                padding: '50px',
+                backgroundColor: 'white',
+                border: 'thin lightgrey solid',
+                borderRadius: '5px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                width: '400px'
+            }}>
                 {content}
             </div>
         );
