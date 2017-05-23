@@ -75,12 +75,22 @@ describe('Certificates', function() {
                 expectedCert,
                 'CERT_FILE populated fine.'
             );
+            saveSetting('PLOTLY_API_DOMAIN', 'https://buildly.plot.ly');
+            saveSetting('PLOTLY_API_SSL_ENABLED', true);
             const lastUpdated = getSetting('CERTIFICATE_LAST_UPDATED');
             const host = getSetting('CONNECTOR_HTTPS_DOMAIN');
             assert.equal(host, expectedHost, 'HOST name is correct.');
             assert(
                 (new Date().getTime() - Date.parse(lastUpdated)) / 1000 < 1,
                 'HOST lastUpdated is recent.'
+            );
+            assert.equal(
+                getSetting('PLOTLY_API_DOMAIN'),
+                'https://buildly.plot.ly'
+            );
+            assert.equal(
+                getSetting('PLOTLY_API_SSL_ENABLED'),
+                true
             );
             done();
         });
