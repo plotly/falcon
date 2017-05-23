@@ -7,4 +7,5 @@ test:
         - npm install electron-builder@next --dev
         - npm run build
         - npm run package
-        - zip release.zip release
+        - zip -r release.zip release
+        - mv release.zip $CIRCLE_ARTIFACTS
