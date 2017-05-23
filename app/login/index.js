@@ -125,8 +125,8 @@ class Login extends Component {
                     statusMessage: 'Enter your Plotly On Premise domain.'
                 });
                 return;
-            } else if (!domain.startsWith('http://') ||
-                    !domain.startsWith('https://')) {
+            } else if (!(domain.startsWith('http://') ||
+                         domain.startsWith('https://'))) {
 
                 this.setState({
                     status: 'failure',
