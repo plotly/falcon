@@ -358,9 +358,34 @@ class Settings extends Component {
                                     )
                                 </div>
                                 <div>
-                                    (Note: This URL will expire every three weeks.
-                                     A new URL and SSL certificate will be generated
-                                     for you automatically.)
+                                    {'A few things to note:'}
+                                    <ol>
+                                        <li>
+                                            This URL will expire every three weeks.
+                                            A new URL and SSL certificate will be generated
+                                            for you automatically. You can always find the URL
+                                            inside this app.
+                                        </li>
+
+                                        <li>
+                                            {`Keep this application open when you're making queries!
+                                            The Plotly Chart Creator connects to your database through
+                                            this application.`}
+                                        </li>
+
+                                        <li>
+                                            {`You can run queries on a schedule (e.g. daily or hourly) in the`}
+                                            &nbsp;
+                                            <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
+                                                Plotly Chart Creator
+                                             </Link>
+                                             {`. Scheduled queries are saved and managed by this application,
+                                             so keep this app open if you want your queries to run and your
+                                             datasets to update. When you start the application, all of the
+                                             scheduled queries will run automatically and their scheduling timer
+                                             will reset.`}
+                                        </li>
+                                    </ol>
                                 </div>
                             </div>
                         ) : (
