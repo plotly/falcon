@@ -377,6 +377,7 @@ class Settings extends Component {
                                     <Link href="https://plot.ly/create?upload=sql">
                                             Plotly Chart Creator
                                     </Link>
+                                    {'.'}
                                 </div>
                             </div>
                         )}
