@@ -357,7 +357,11 @@ class Settings extends Component {
                                       </Link>
                                     )
                                 </div>
-
+                                <div>
+                                    (Note: This URL will expire every three weeks.
+                                     A new URL and SSL certificate will be generated
+                                     for you automatically.)
+                                </div>
                             </div>
                         ) : (
                             <div>
