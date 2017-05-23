@@ -58,7 +58,7 @@ class Login extends Component {
     buildOauthUrl() {
         const oauthClientId = 'isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt';
         const isOnPrem = this.state.serverType === ONPREM;
-        const plotlyDomain = isOnPrem ? this.state.domain : 'plot.ly';
+        const plotlyDomain = isOnPrem ? this.state.domain : 'https://plot.ly';
         const redirect_uri = baseUrlWrapped;
         return (
             `${plotlyDomain}/o/authorize/?response_type=token&` +
@@ -69,8 +69,12 @@ class Login extends Component {
 
     oauthPopUp() {
         try {
-            dynamicRequireElectron().shell.openExternal(this.buildOauthUrl());
+            const electron = dynamicRequireElectron();
+            const oauthUrl = this.buildOauthUrl();
+            electron.shell.openExternal(oauthUrl);
         } catch (e) {
+            console.log('Unable to openExternal, opening a popupWindow instead:');
+            console.log(e);
             const popupWindow = PopupCenter(
                 this.buildOauthUrl(), 'Authorization', '500', '500'
             );
@@ -146,8 +150,29 @@ class Login extends Component {
                         {`Authorizing ${username}...`}
                     </div>
                     <div>
-                        {`You may be redirected to ${domain} and asked to log in.`}
+                        {`You may be redirected to ${domain ? domain : 'https://plot.ly'} and asked to log in.`}
                     </div>
+
+                    <div style={{
+                        'marginTop': '14px',
+                        'fontStyle': 'italic',
+                        'textAlign': 'left',
+                        'fontSize': '10px',
+                        'marginLeft': '10px',
+                        'marginRight': '10px',
+                        'border': 'thin lightgrey solid',
+                        'borderLeft': 'none',
+                        'borderRight': 'none'
+                    }}>
+                        {`(If a login or authorization window does not pop up, visit `}
+                        <div>
+                            <Link href={this.buildOauthUrl()}>
+                                {this.buildOauthUrl()}
+                            </Link>
+                        </div>
+                        {` in your web browser.)`}
+                    </div>
+
                 </div>
             )
         });
