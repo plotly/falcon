@@ -296,6 +296,7 @@ class Login extends Component {
                     <div style={{'height': 60}}>
                         <label>Your Plotly Username</label>
                         <input
+                            id="test-username"
                             type="text"
                             placeholder=""
                             onChange={e => this.setState({
@@ -306,7 +307,7 @@ class Login extends Component {
                 </div>
 
                 <div>
-                    <button onClick={this.logIn}>
+                    <button id="test-login-button" onClick={this.logIn}>
                         {'Log in'}
                     </button>
                 </div>
