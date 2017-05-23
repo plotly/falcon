@@ -55,8 +55,9 @@ class Settings extends Component {
         const STARTED_AT = new Date();
         this.intervals.timeElapsedInterval = setInterval(() => {
             const seconds = Math.round((new Date().getTime() - STARTED_AT.getTime()) / 1000);
+            const minutes = Math.floor(seconds / 60);
             timeElapsed = seconds > 60 ?
-                `${Math.floor(seconds / 60)} minutes ${seconds % 60} seconds` :
+                `${minutes} ${minutes > 1 ? 'minutes' : 'minute'} and ${seconds % 60} ${seconds % 60 > 1 ? 'seconds' : 'second'}` :
                 `${seconds} seconds`;
             this.setState({timeElapsed});
         }, 5 * 1000);
@@ -291,8 +292,8 @@ class Settings extends Component {
 
                     <h3>Step 1. Set Up Connections</h3>
                     <div>
-                        {`The Plotly Database Connector is local web server that
-                        forwards requests directly from your web browser in via
+                        {`The Plotly Database Connector is a local web server that
+                        forwards requests directly from your web browser in
                         the`}
                         &nbsp;
                         <Link href="https://plot.ly/create">Plotly Chart Creator</Link>
@@ -343,7 +344,7 @@ class Settings extends Component {
                                 <div>
                                     A unique SSL certificate and URL has been created
                                     for you: <b>{this.state.urls.https}</b>.&nbsp;
-                                    Use this URL when you when you connect to
+                                    Use this URL when you connect to
                                     the SQL Connector inside the&nbsp;
                                     <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
                                         Plotly Chart Creator
@@ -356,7 +357,36 @@ class Settings extends Component {
                                       </Link>
                                     )
                                 </div>
+                                <div>
+                                    {'A few things to note:'}
+                                    <ol>
+                                        <li>
+                                            This URL will expire every three weeks.
+                                            A new URL and SSL certificate will be generated
+                                            for you automatically. You can always find the URL
+                                            inside this app.
+                                        </li>
 
+                                        <li>
+                                            {`Keep this application open when you're making queries!
+                                            The Plotly Chart Creator connects to your database through
+                                            this application.`}
+                                        </li>
+
+                                        <li>
+                                            {`You can run queries on a schedule (e.g. daily or hourly) in the`}
+                                            &nbsp;
+                                            <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
+                                                Plotly Chart Creator
+                                             </Link>
+                                             {`. Scheduled queries are saved and managed by this application,
+                                             so keep this app open if you want your queries to run and your
+                                             datasets to update. When you start the application, all of the
+                                             scheduled queries will run automatically and their scheduling timer
+                                             will reset.`}
+                                        </li>
+                                    </ol>
+                                </div>
                             </div>
                         ) : (
                             <div>
@@ -372,6 +402,7 @@ class Settings extends Component {
                                     <Link href="https://plot.ly/create?upload=sql">
                                             Plotly Chart Creator
                                     </Link>
+                                    {'.'}
                                 </div>
                             </div>
                         )}
@@ -384,7 +415,7 @@ class Settings extends Component {
                                         <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
                                                 Open Query Editor
                                          </Link>
-                                         &nbsp; on the Plotly Chart Creator
+                                         &nbsp; in the Plotly Chart Creator
                                     </h5>
                                 </div>
                             ) : null

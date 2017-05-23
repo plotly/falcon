@@ -63,15 +63,26 @@ export const CONNECTION_CONFIG = {
         {'label': 'Path to SQLite File', 'value': 'storage', 'type': 'path'}
     ],
 
-    // TODO - What are the actual elasticsearch connection options?
     [DIALECTS.ELASTICSEARCH]: [
-        {'label': 'Username', 'value': 'username', 'type': 'text'},
+        {'label': 'Username', 'value': 'username', 'type': 'text',
+         'description': `
+            These credentials are used to authenticate Elasticsearch instances
+            that are protected with HTTP Basic Auth.
+            You can leave this blank if your instance does not have
+            HTTP Basic Auth.`},
         {'label': 'Password', 'value': 'password', 'type': 'text'},
         {'label': 'Host', 'value': 'host', 'type': 'text'},
         {'label': 'Port', 'value': 'port', 'type': 'text'}
     ],
     [DIALECTS.S3]: [
-        {'label': 'S3 Bucket', 'value': 'bucket', 'type': 'text'},
+        {
+            'label': 'S3 Bucket',
+            'value': 'bucket',
+            'type': 'text',
+            'description': `
+                The S3 connection will import CSV files from any
+                directory in your S3 bucket.`
+        },
         {'label': 'S3 Access Key ID', 'value': 'accessKeyId', 'type': 'text'},
         {
             'label': 'S3 Secret Access Key',
@@ -82,7 +93,15 @@ export const CONNECTION_CONFIG = {
     [DIALECTS.APACHE_DRILL]: [
         {'label': 'Host', 'value': 'host', 'type': 'text'},
         {'label': 'Port', 'value': 'port', 'type': 'text'},
-        {'label': 'S3 Bucket Name', 'value': 'bucket', 'type': 'text'},
+        {
+            'label': 'S3 Bucket Name',
+            'value': 'bucket',
+            'type': 'text',
+            'description': `
+                The Apache Drill connection will query and parse any Parquet
+                files that are hosted in your S3 bucket through your
+                Apache Drill instance.
+            `},
         {'label': 'S3 Access Key ID', 'value': 'accessKeyId', 'type': 'text'},
         {
             'label': 'S3 Secret Access Key',

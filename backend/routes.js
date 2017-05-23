@@ -61,7 +61,15 @@ export default class Servers {
             // Create certs if necessary when we have an approved user.
             if (args.createCerts && isEmpty(getCerts())) {
                 const createCertificates = setInterval(() => {
-                    // Can't create until user was authenticated.
+                    /*
+                     * Can't create until user was authenticated.
+                     * We wait until the user was authenticated in case
+                     * the user is logging in to their on-prem server.
+                     * In that case, we need to make sure that we have the
+                     * appropriate CORS domain of the on-prem server before
+                     * we start up the HTTPS server.
+                     *
+                     */
                     if (!isEmpty(getSetting('USERS'))) {
                         clearInterval(createCertificates);
                         timeoutFetchAndSaveCerts();
@@ -155,7 +163,7 @@ export default class Servers {
             );
             res.header(
                 'Access-Control-Allow-Methods',
-                'POST, GET, DELETE, OPTIONS'
+                'PATCH, POST, GET, DELETE, OPTIONS'
             );
             res.send(204);
         });
@@ -177,12 +185,38 @@ export default class Servers {
             file: 'oauth.html'
         }));
 
-        server.post('/settings/approved/:username', function hasAuth(req, res, next) {
-            const users = getSetting('USERS');
-            const allUserNames = pluck('username', users);
-            res.json(200, {approved: contains(req.params.username, allUserNames)});
+        /*
+         * Endpoints around the settings from settings.js as needed.
+         * Each setting is a resource.
+         * Careful if you want to serve USERS - it contains oauth tokens which
+         * shouldn't be served to the front-end.
+         */
+        server.get('/settings', function serveSettings(req, res, next) {
+            const sanitizedUsers = pluck('username', getSetting('USERS'));
+
+            /*
+             * Some of the settings the front-end needs.
+             * Not serving all of them by default in case there are sensitive
+             * settings that shouldn't be served in the on-prem context
+             */
+            const filteredSettings = {
+                USERS: sanitizedUsers,
+                PLOTLY_URL: getSetting('PLOTLY_URL')
+            };
+
+            return res.json(200, filteredSettings)
         });
 
+        // Patch on /settings does a merge
+        server.patch('/settings', function mergeSettings(req, res, next) {
+            const partialSettings = req.params;
+            keys(partialSettings).forEach(settingName =>
+                saveSetting(settingName, partialSettings[settingName])
+            );
+            return res.json(200, {});
+        });
+
+        // TODO - urls isn't actually a setting, it's more of a config
         server.get('/settings/urls', function settings(req, res, next) {
             const {httpServer, httpsServer} = that;
             const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;

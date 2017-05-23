@@ -1,7 +1,14 @@
 version: 0.4.{build}
 
+environment:
+  POSTGRES_PATH: C:\Program Files\PostgreSQL\9.6
+
 platform:
   - x64
+  - x86
+
+services:
+  - postgresql96
 
 cache:
   - node_modules
@@ -10,13 +17,23 @@ cache:
 
 init:
   - git config --global core.autocrlf input
+  - SET PATH=%POSTGRES_PATH%\bin;%PATH%
+
 
 install:
   - ps: Install-Product node 7 x64
-  - yarn install
-  - yarn add electron-builder@next --dev # force install next version to test electron-builder
+  - npm install
+  - npm install electron-builder@next --dev # force install next version to test electron-builder
 
 build_script:
-  - yarn run dist-w
+  - npm run build
+  - npm run package
+
+after_build:
+  - 7z a release.zip release
+
+artifacts:
+  - path: release.zip
+    name: release
 
 test: off

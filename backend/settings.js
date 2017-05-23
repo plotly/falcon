@@ -1,5 +1,5 @@
 import fs from 'fs';
-import {contains, has} from 'ramda';
+import {concat, contains, has, keys} from 'ramda';
 import YAML from 'yamljs';
 import {createStoragePath} from './utils/homeFiles';
 import path from 'path';
@@ -23,12 +23,20 @@ const DEFAULT_SETTINGS = {
     // TODO - This should just be an object keyed by username
     USERS: [],
 
-    CORS_ALLOWED_ORIGINS: [
+    /*
+     * The actual CORS origins is a "derived" setting
+     * that is composed of ADDITIONAL_CORS_ALLOWED_ORIGINS,
+     * DEFAULT_CORS_ALLOWED_ORIGINS, and the PLOTLY_API_DOMAIN if on-prem
+     */
+    ADDITIONAL_CORS_ALLOWED_ORIGINS: [],
+
+    DEFAULT_CORS_ALLOWED_ORIGINS: [
         'https://plot.ly',
         'https://stage.plot.ly',
         'https://local.plot.ly',
         'http://localhost:9494'
     ],
+
     PORT: 9494,
     PORT_HTTPS: 9495,
 
@@ -51,15 +59,27 @@ const DEFAULT_SETTINGS = {
 // Settings that depend on other settings are described here
 const derivedSettingsNames = [
     'PLOTLY_API_URL',
+    'PLOTLY_URL',
     'CONNECTIONS_PATH',
     'QUERIES_PATH',
     'LOG_PATH',
     'SETTINGS_PATH',
     'KEY_FILE',
-    'CERT_FILE'
+    'CERT_FILE',
+    'CORS_ALLOWED_ORIGINS'
 ];
+
 function getDerivedSetting(settingName) {
     switch (settingName) {
+        case 'PLOTLY_URL': {
+            if (getSetting('PLOTLY_API_DOMAIN') ===
+                DEFAULT_SETTINGS['PLOTLY_API_DOMAIN']) {
+                return 'https://plot.ly'
+            } else {
+                return getSetting('PLOTLY_API_URL');
+            }
+        }
+
         case 'PLOTLY_API_URL':
             return (
                 (getSetting('PLOTLY_API_SSL_ENABLED') ? 'https://' : 'http://') +
@@ -101,6 +121,25 @@ function getDerivedSetting(settingName) {
                 getSetting('STORAGE_PATH'),
                 'fullchain.pem'
             );
+
+        case 'CORS_ALLOWED_ORIGINS': {
+            const corsOrigins = concat(
+                getSetting('DEFAULT_CORS_ALLOWED_ORIGINS'),
+                getSetting('ADDITIONAL_CORS_ALLOWED_ORIGINS')
+            );
+
+            /*
+             * Add the on-prem domain if the user is using the connector with
+             * on-prem
+             */
+            if (getSetting('PLOTLY_API_DOMAIN') !==
+                    DEFAULT_SETTINGS['PLOTLY_API_DOMAIN']) {
+
+                corsOrigins.push(getSetting('PLOTLY_API_DOMAIN'));
+
+            }
+            return corsOrigins;
+        }
 
         default:
             return null;
@@ -155,6 +194,9 @@ export function saveSetting(settingName, settingValue) {
         if (!fs.existsSync(getSetting('STORAGE_PATH'))) {
             createStoragePath();
         }
+    }
+    if (!has(settingName, DEFAULT_SETTINGS)) {
+        throw new Error(`Setting ${settingName} does not exist`);
     }
     const settingsOnFile = loadSettings();
     settingsOnFile[settingName] = settingValue;

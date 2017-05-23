@@ -2,7 +2,7 @@ import path from 'path';
 import chromedriver from 'chromedriver';
 import webdriver from 'selenium-webdriver';
 import {expect} from 'chai';
-import electronPath from 'electron-prebuilt';
+import electronPath from 'electron';
 import fetch from 'node-fetch';
 import {productName, version} from '../package.json';
 import fs from 'fs';
