@@ -30,6 +30,16 @@
 </head>
 <body>
     <div id="root"></div>
-    <script type="text/javascript" src="static/web-bundle.min.js"></script>
+
+    <script>
+    (function() {
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        var timestamp = +(new Date());
+        script.src = 'static/web-bundle.min.js?t=' + timestamp;
+        document.write(script.outerHTML);
+    }());
+    </script>
+
 </body>
 </html>

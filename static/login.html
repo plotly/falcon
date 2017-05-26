@@ -12,6 +12,16 @@
 
 <body>
     <div id="root" ></div>
-    <script type="text/javascript" src="../static/login-bundle.min.js"></script>
+
+    <script>
+    (function() {
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        var timestamp = +(new Date());
+        script.src = '../static/login-bundle.min.js?t=' + timestamp;
+        document.write(script.outerHTML);
+    }());
+    </script>
+
 </body>
 </html>
