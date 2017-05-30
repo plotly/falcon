@@ -17,7 +17,8 @@ export const LOCAL_SETTINGS = {
     MAX_TRIES_COUNT: 5,
     ONGOING_COUNT: 0,
     TIMEOUT_BETWEEN_TRIES: 1,  // seconds
-    USE_MOCK_CERTS: false
+    USE_MOCK_CERTS: false,
+    CERT_DOMAIN: 'plotly-connector.com'
 };
 
 export function setCertificatesSettings(setting, value) {
@@ -54,7 +55,7 @@ export function saveCertsLocally({key, cert, subdomain}) {
 
     return Promise.all([saveCert, saveKey])
     .then(() => {
-        saveSetting('CONNECTOR_HTTPS_DOMAIN', `${subdomain}.${CA_HOST.DOMAIN}`);
+        saveSetting('CONNECTOR_HTTPS_DOMAIN', `${subdomain}.${LOCAL_SETTINGS.CERT_DOMAIN}`);
         saveSetting('CERTIFICATE_LAST_UPDATED', (new Date()).toJSON());
         return;
     });
