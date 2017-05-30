@@ -333,13 +333,13 @@ class Settings extends Component {
                             />
                         </div>
 
-                        <h3>Step 3. Initialize SSL Certificates</h3>
+                        <h3>Step 3. Wait For SSL Certificate</h3>
 
                         {httpsServerIsOK ? (
                             <div>
 
                                 <div>
-                                    {'The connector is up and running.'}
+                                    {'Step 3 is now complete, the connector is up and running.'}
                                 </div>
                                 <div>
                                     A unique SSL certificate and URL has been created
@@ -390,6 +390,7 @@ class Settings extends Component {
                             </div>
                         ) : (
                             <div>
+
                                 <div>
                                     {`Plotly is initializing a unique SSL
                                       certificate and URL for you.
