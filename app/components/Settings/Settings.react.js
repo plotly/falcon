@@ -468,7 +468,12 @@ class Settings extends Component {
                                         {`An SSL certificate is used to encrypt the requests between your
                                           web browser and this connector. Unencrypted requests are blocked by
                                           default in modern web browsers. We generate these certificates for you
-                                          automatically through the Let's Encrypt service. This certificate takes
+                                          automatically through the `}
+                                        &nbsp;
+                                        <Link href="https://letsencrypt.org/">
+                                            {`Let's Encrypt service`}
+                                        </Link>
+                                        {`. This certificate takes
                                           a several minutes to generate.`}
                                     </p>
 
