@@ -52,7 +52,23 @@ class Login extends Component {
         this.buildOauthUrl = this.buildOauthUrl.bind(this);
         this.oauthPopUp = this.oauthPopUp.bind(this);
         this.logIn = this.logIn.bind(this);
-        this.checkIfUserAccountIsSaved = this.checkIfUserAccountIsSaved.bind(this);
+        this.checkAnyUserAccountIsSaved = this.checkAnyUserAccountIsSaved.bind(this);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.checkAnyUserAccountIsSaved().then(isSaved => {
+            if (isSaved) {
+                window.location.assign(connectorUrl);
+            }
+        });
+    }
+
+    componentDidMount() {
+        this.checkAnyUserAccountIsSaved().then(isSaved => {
+            if (isSaved) {
+                window.location.assign(connectorUrl);
+            }
+        });
     }
 
     buildOauthUrl() {
@@ -84,8 +100,7 @@ class Login extends Component {
         }
     }
 
-    checkIfUserAccountIsSaved() {
-        const {username} = this.state;
+    checkAnyUserAccountIsSaved() {
         return fetch(`${baseUrlWrapped}/settings`, {
             method: 'GET',
             headers: {
@@ -101,7 +116,8 @@ class Login extends Component {
                 this.setState({loggedIn: false});
                 return false;
             }
-            const userAccountIsSaved = contains(username, json.USERS);
+            const userAccountIsSaved = json.USERS.length > 0;
+            console.warn('userAccountIsSaved: ', userAccountIsSaved);
             this.setState({loggedIn: userAccountIsSaved});
             return userAccountIsSaved;
         })).catch((e) => {
@@ -179,7 +195,7 @@ class Login extends Component {
 
         const repeatedlyCheckIfLoggedIn = () => {
             const checkAuth = setInterval(() => {
-                this.checkIfUserAccountIsSaved().then(isLoggedIn => {
+                this.checkAnyUserAccountIsSaved().then(isLoggedIn => {
                     if (isLoggedIn) {
                         clearInterval(checkAuth);
                         window.location.assign(connectorUrl);
@@ -192,7 +208,7 @@ class Login extends Component {
          * If the user is on-prem, then set the domain as a setting,
          * and after that's done send them through the oauth redirect.
          */
-        this.checkIfUserAccountIsSaved().then(isLoggedIn => {
+        this.checkAnyUserAccountIsSaved().then(isLoggedIn => {
             if (!isLoggedIn) {
                 if (this.state.serverType === ONPREM) {
                     let PLOTLY_API_SSL_ENABLED;
