@@ -156,6 +156,9 @@ export default class Servers {
             headers: headers
         }));
         headers.forEach(header => restify.CORS.ALLOW_HEADERS.push(header));
+        Logger.log('CORS_ALLOWED_ORIGINS: ' + JSON.stringify(
+            getSetting('CORS_ALLOWED_ORIGINS')
+        ), 2);
         server.opts( /.*/, function (req, res) {
             res.header(
                 'Access-Control-Allow-Headers',
