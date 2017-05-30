@@ -2,7 +2,7 @@ label {
     text-align: right;
     float: left;
     width: 35%;
-    line-height: 40px;
+    line-height: 35px;
     font-size: 16px;
 }
 
@@ -13,6 +13,7 @@ label {
 
 input {
     border: none;
+    box-sizing: border-box;
     border-bottom-width: 1px;
     border-bottom-color: #BEC8D9;
     border-bottom-style: solid;
@@ -22,7 +23,7 @@ input {
     margin-left: 20px;
     float: left;
     font-size: 18px;
-    height: 40px;
+    height: 35px;
 }
 
 input:hover,input:focus {
@@ -34,8 +35,6 @@ input:hover,input:focus {
 .inputContainer {
     clear: both;
     overflow: hidden;
-    padding: 1px;
-    margin: 0 0 10px 0;
 }
 
 .description {
