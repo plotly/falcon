@@ -358,11 +358,11 @@ class Settings extends Component {
                             </div>
                         )}
 
-                        <div id="test-ssl-initialized">
+                        <div>
                             <h3>Final Step. Query Data on Plotly</h3>
 
                             {httpsServerIsOK ? (
-                                <div>
+                                <div id="test-ssl-initialized">
                                     <p>
                                         <Link href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}>
                                             Click to Open Query Editor
