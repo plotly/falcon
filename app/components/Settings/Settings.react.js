@@ -57,7 +57,7 @@ class Settings extends Component {
             const seconds = Math.round((new Date().getTime() - STARTED_AT.getTime()) / 1000);
             const minutes = Math.floor(seconds / 60);
             timeElapsed = seconds > 60 ?
-                `${minutes} ${minutes > 1 ? 'minutes' : 'minute'} and ${seconds % 60} ${seconds % 60 > 1 ? 'seconds' : 'second'}` :
+                `${minutes} ${minutes > 1 ? 'minutes' : 'minute'} and ${seconds % 60} seconds}` :
                 `${seconds} seconds`;
             this.setState({timeElapsed});
         }, 5 * 1000);
@@ -291,20 +291,6 @@ class Settings extends Component {
                 <div className={styles.openTab} style={{'padding': 30}}>
 
                     <h3>Step 1. Set Up Connections</h3>
-                    <div>
-                        {`The Plotly Database Connector is a local web server that
-                        forwards requests directly from your web browser in
-                        the`}
-                        &nbsp;
-                        <Link href="https://plot.ly/create">Plotly Chart Creator</Link>
-                        &nbsp;
-                        {`to your databases. Since these requests are made locally from your web browser
-                        to this application, you do not need to open up
-                        your database's network: you just need to make sure
-                        that you can connect to your database from this computer.
-                        Your database credentials are only stored on your
-                        computer (they are not saved on any plotly servers).`}
-                    </div>
 
                     {this.renderSettingsForm()}
 
@@ -337,7 +323,6 @@ class Settings extends Component {
 
                         {httpsServerIsOK ? (
                             <div>
-
                                 <div>
                                     {'Step 3 is now complete, the connector is up and running.'}
                                 </div>
@@ -357,40 +342,9 @@ class Settings extends Component {
                                       </Link>
                                     )
                                 </div>
-                                <div>
-                                    {'A few things to note:'}
-                                    <ol>
-                                        <li>
-                                            This URL will expire every three weeks.
-                                            A new URL and SSL certificate will be generated
-                                            for you automatically. You can always find the URL
-                                            inside this app.
-                                        </li>
-
-                                        <li>
-                                            {`Keep this application open when you're making queries!
-                                            The Plotly Chart Creator connects to your database through
-                                            this application.`}
-                                        </li>
-
-                                        <li>
-                                            {`You can run queries on a schedule (e.g. daily or hourly) in the`}
-                                            &nbsp;
-                                            <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
-                                                Plotly Chart Creator
-                                             </Link>
-                                             {`. Scheduled queries are saved and managed by this application,
-                                             so keep this app open if you want your queries to run and your
-                                             datasets to update. When you start the application, all of the
-                                             scheduled queries will run automatically and their scheduling timer
-                                             will reset.`}
-                                        </li>
-                                    </ol>
-                                </div>
                             </div>
                         ) : (
                             <div>
-
                                 <div>
                                     {`Plotly is initializing a unique SSL
                                       certificate and URL for you.
@@ -424,6 +378,128 @@ class Settings extends Component {
 
                     </div>
                     ) : null}
+
+                    <hr/>
+
+                    <div>
+                        <h3>FAQ</h3>
+
+                        <div>
+                            <ul>
+                                <li>
+                                    <strong>{`How does this app work?`}</strong>
+
+                                    <p>
+                                        {`The Plotly Database Connector is a local web server that
+                                        listens for requests from your web browser in
+                                        the`}
+                                        &nbsp;
+                                        <Link href="https://plot.ly/create">Plotly Chart Creator</Link>
+                                        &nbsp;
+                                        {`This application makes queries against the databases that you have
+                                          connected to and returns the results to the Plotly Chart Creator.`}
+                                    </p>
+                                </li>
+
+                                <li>
+                                    <strong>{`Are these database credentials shared on the Plotly server?`}</strong>
+                                    <p>
+                                        {`Your database credentials are only stored on your
+                                          computer (they are not saved on any plotly servers).`}
+                                    </p>
+                                </li>
+
+                                <li>
+                                    <strong>{`Do I need to expose my database to your servers?`}</strong>
+                                    <p>
+                                          {`Since these requests are made locally from your web browser
+                                          to this application, you do not need to open up
+                                          your database's network: you just need to make sure
+                                          that you can connect to your database from this computer.`}
+                                    </p>
+                                </li>
+
+                                <li>
+                                    <strong>{`Where do I make SQL queries?`}</strong>
+                                    <p>
+                                        {`The`}
+                                        &nbsp;
+                                        <Link href="https://plot.ly/create">Plotly Chart Creator</Link>
+                                        &nbsp;
+                                        {`includes a SQL editor that you can use
+                                          to import data from your databases into Plotly.`}
+                                    </p>
+
+                                </li>
+
+                                <li>
+                                    <strong>{`Do I need to keep this application open?`}</strong>
+
+                                    <p>
+                                        {`Keep this application open when you're making queries!
+                                        The Plotly Chart Creator connects to your database through
+                                        this application.`}
+                                    </p>
+
+                                </li>
+
+                                <li>
+                                    <strong>{`How do scheduled queries work?`}</strong>
+
+                                    <p>
+                                        {`You can run queries on a schedule (e.g. daily or hourly) in the`}
+                                        &nbsp;
+                                        <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
+                                            Plotly Chart Creator
+                                         </Link>
+                                         {`. Scheduled queries are saved and managed by this application,
+                                         so keep this app open if you want your queries to run and your
+                                         datasets to update. When you start the application, all of the
+                                         scheduled queries will run automatically and their scheduling timer
+                                         will reset.`}
+
+                                    </p>
+                                </li>
+
+                                <li>
+                                    <strong>{`What's a SSL certificate and why do I need it?`}</strong>
+
+                                    <p>
+                                        {`An SSL certificate is used to encrypt the requests between your
+                                          web browser and this connector. Unencrypted requests are blocked by
+                                          default in modern web browsers. We generate these certificates for you
+                                          automatically through the Let's Encrypt service. This certificate takes
+                                          a several minutes to generate.`}
+                                    </p>
+
+                                </li>
+
+                                <li>
+                                    <strong>{`How do you generate certificates for a localhost web server?`}</strong>
+
+                                    <p>
+                                        {`This application runs a server on localhost:
+                                          it is not exposed to the network.
+                                          SSL certificates can not be issued for localhost servers,
+                                          so we create a unique URL for you and a global DNS entry that points
+                                          that URL to localhost. We use the Let's Encrypt service to
+                                          generate certificates on that unique URL.`}
+                                    </p>
+                                </li>
+
+                                <li>
+                                    <strong>{`Is this app open source?`}</strong>
+                                    <p>
+                                        {`Yes! You can view the code in our GitHub repo: `}
+                                        <Link href={'https://github.com/plotly/plotly-database-connector'}>
+                                            {'https://github.com/plotly/plotly-database-connector'}
+                                         </Link>
+                                    </p>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
