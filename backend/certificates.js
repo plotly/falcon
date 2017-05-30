@@ -6,8 +6,8 @@ import Logger from './logger';
 import {fakeCerts} from '../test/backend/utils';
 
 const CA_HOST = {
-    PROTOCOL: 'http',
-    DOMAIN: 'plotly-connector.com',
+    PROTOCOL: 'https',
+    DOMAIN: 'certs.plot.ly',
     ROUTE: 'certificate'
 };
 
