@@ -319,7 +319,7 @@ class Settings extends Component {
                             />
                         </div>
 
-                        <h3>Step 3. Wait For SSL Certificate</h3>
+                        <h3>Step 3. Wait for a SSL Certificate</h3>
 
                         {httpsServerIsOK ? (
                             <div>
