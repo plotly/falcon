@@ -137,6 +137,7 @@ function createApiReducer(store) {
 }
 
 export const connectionsRequest = createApiReducer('connectionsRequest');
+export const settingsRequest = createApiReducer('settingsRequest');
 export const deleteConnectionsRequests = createApiReducer('deleteConnectionsRequests');
 export const saveConnectionsRequests = createApiReducer('saveConnectionsRequests');
 
@@ -228,6 +229,7 @@ const rootReducer = combineReducers({
     selectedTab,
     selectedTables,
     selectedIndecies,
+    settingsRequest,
     connectRequests,
     connectionsRequest,
     connectionsNeedToBeSaved,

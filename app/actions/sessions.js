@@ -99,6 +99,14 @@ function apiThunk(endpoint, method, store, id, body) {
 }
 
 
+export function getSettings() {
+    return apiThunk(
+        'settings',
+        'GET',
+        'settingsRequest'
+    );
+}
+
 export function getConnectorUrls() {
     return apiThunk(
         'settings/urls',

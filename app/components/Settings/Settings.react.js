@@ -14,10 +14,8 @@ import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import Preview from './Preview/Preview.react';
 import {Link} from '../Link.react';
 import {DIALECTS} from '../../constants/constants.js';
-import {plotlyUrl, getAllBaseUrls} from '../../utils/utils';
+import {getAllBaseUrls} from '../../utils/utils';
 
-
-const WORKSPACE_IMPORT_SQL_URL = `${plotlyUrl()}/create?upload=sql&url=`;
 
 let checkconnectorUrls;
 let checkDNS;
@@ -169,10 +167,12 @@ class Settings extends Component {
             getElasticsearchMappings,
             getTables,
             getS3Keys,
+            getSettings,
             initialize,
             previewTables,
             previewTableRequest,
             selectedTable,
+            settingsRequest,
             setConnectionNeedToBeSaved,
             setTable,
             setIndex,
@@ -190,6 +190,11 @@ class Settings extends Component {
         }
         if (connectRequest.status !== 200 && !this.state.editMode) {
             this.setState({editMode: true});
+        }
+
+        // // get the settings to prefill the URL
+        if (!settingsRequest.status) {
+            getSettings();
         }
 
         const connectionObject = connections[selectedTab] || {};
@@ -261,6 +266,7 @@ class Settings extends Component {
             redirectUrlRequest,
             s3KeysRequest,
             selectedTab,
+            settingsRequest,
             saveConnectionsRequest,
             setIndex,
             setTable,
@@ -277,6 +283,10 @@ class Settings extends Component {
 
         const connectorUrl = this.state.urls.https;
         const {httpsServerIsOK, timeElapsed} = this.state;
+
+        const plotlyUrl = (settingsRequest.status === 200 ?
+            settingsRequest.content.PLOTLY_URL : 'https://plot.ly'
+        );
 
         return (
             <div>
@@ -532,6 +542,7 @@ function mapStateToProps(state) {
         elasticsearchMappingsRequests,
         selectedTables,
         selectedIndecies,
+        settingsRequest,
         s3KeysRequests,
         apacheDrillStorageRequests,
         apacheDrillS3KeysRequests
@@ -568,6 +579,7 @@ function mapStateToProps(state) {
         selectedTable,
         selectedIndex,
         selectedConnectionId,
+        settingsRequest,
         connectorUrlsRequest
     };
 }
@@ -636,6 +648,9 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             bool
         ));
     }
+    function boundGetSettings() {
+        return dispatch(Actions.getSettings());
+    }
 
     /*
      * dispatchConnect either saves the connection and then connects
@@ -677,6 +692,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             setIndex: boundSetIndex,
             previewTables: boundPreviewTables,
             getS3Keys: boundGetS3Keys,
+            getSettings: boundGetSettings,
             getApacheDrillStorage: boundGetApacheDrillStorage,
             getApacheDrillS3Keys: boundGetApacheDrillS3Keys,
             newTab: () => dispatch(Actions.newTab()),
