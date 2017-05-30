@@ -349,7 +349,7 @@ class Settings extends Component {
                                 </p>
                                 <p>
                                     {`Once this is complete, you'll be able to
-                                      query your databases from the `}&nbsp;
+                                      query your databases from the `}
                                     <Link href={`${plotlyUrl}/create?upload=sql`}>
                                             Plotly Chart Creator
                                     </Link>
@@ -402,7 +402,7 @@ class Settings extends Component {
                                         listens for requests from your web browser in
                                         the`}
                                         &nbsp;
-                                        <Link href={`${plotlyUrl}/create`}>Plotly Chart Creator</Link>
+                                        <Link href={`${plotlyUrl}/create`}>Plotly Chart Creator</Link>.
                                         &nbsp;
                                         {`This application makes queries against the databases that you have
                                           connected to and returns the results to the Plotly Chart Creator.`}
@@ -447,7 +447,7 @@ class Settings extends Component {
                                     <strong>{`Are these database credentials shared on the Plotly server?`}</strong>
                                     <p>
                                         {`Your database credentials are only stored on your
-                                          computer (they are not saved on any plotly servers).`}
+                                          computer (they are not saved on any Plotly servers).`}
                                     </p>
                                 </li>
 
@@ -477,7 +477,6 @@ class Settings extends Component {
                                           web browser and this connector. Unencrypted requests are blocked by
                                           default in modern web browsers. We generate these certificates for you
                                           automatically through the `}
-                                        &nbsp;
                                         <Link href="https://letsencrypt.org/">
                                             {`Let's Encrypt service`}
                                         </Link>
@@ -506,7 +505,7 @@ class Settings extends Component {
                                         {`Yes! You can view the code in our GitHub repo: `}
                                         <Link href={'https://github.com/plotly/plotly-database-connector'}>
                                             {'https://github.com/plotly/plotly-database-connector'}
-                                         </Link>
+                                         </Link>.
                                     </p>
                                 </li>
 
