@@ -135,7 +135,7 @@ function getDerivedSetting(settingName) {
             if (getSetting('PLOTLY_API_DOMAIN') !==
                     DEFAULT_SETTINGS['PLOTLY_API_DOMAIN']) {
 
-                corsOrigins.push(getSetting('PLOTLY_API_DOMAIN'));
+                corsOrigins.push(getSetting('PLOTLY_URL'));
 
             }
             return corsOrigins;
