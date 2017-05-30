@@ -372,7 +372,11 @@ class Settings extends Component {
                                     </p>
 
                                     <p>
-                                        Plotly has generated this secure URL for you: <b>{connectorUrl}</b>
+                                        {`Plotly has generated this secure URL for you: `}
+                                        <br/>
+                                        <b><code>{connectorUrl}</code></b>
+                                        <br/>
+                                        {`use this URL when you connect in the Plotly Chart Creator.`}
                                     </p>
                                 </div>
                             ) : (
