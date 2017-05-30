@@ -57,7 +57,7 @@ class Settings extends Component {
             const seconds = Math.round((new Date().getTime() - STARTED_AT.getTime()) / 1000);
             const minutes = Math.floor(seconds / 60);
             timeElapsed = seconds > 60 ?
-                `${minutes} ${minutes > 1 ? 'minutes' : 'minute'} and ${seconds % 60} seconds}` :
+                `${minutes} ${minutes > 1 ? 'minutes' : 'minute'} and ${seconds % 60} seconds` :
                 `${seconds} seconds`;
             this.setState({timeElapsed});
         }, 5 * 1000);
@@ -348,7 +348,7 @@ class Settings extends Component {
                                 <div>
                                     {`Plotly is initializing a unique SSL
                                       certificate and URL for you.
-                                      This can take several minutes
+                                      This can take up to 10 minutes
                                       (it has been ${timeElapsed}).`}
                                 </div>
                                 <div>
