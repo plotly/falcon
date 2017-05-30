@@ -293,7 +293,7 @@ describe('Routes - ', () => {
         .catch(done);
     });
 
-    it('oauth - saving an access token that is not associated with a user account will fail with a 500 level error', function(done) {
+    xit('oauth - saving an access token that is not associated with a user account will fail with a 500 level error', function(done) {
         saveSetting('USERS', []);
         const access_token = 'lah lah lemons';
         POST('oauth2/token', {access_token})
