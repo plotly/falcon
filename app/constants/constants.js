@@ -27,7 +27,9 @@ const commonSqlOptions = [
         'description': 'Server port number (e.g. 3306)'
     },
     {'label': 'Database', 'value': 'database', 'type': 'text'},
-    {'label': 'SSL Enabled', 'value': 'ssl', 'type': 'checkbox'}
+    {
+        'label': 'SSL Enabled', 'value': 'ssl', 'type': 'checkbox',
+        'description': 'Check if your database is built with SSL support. Note that this is different than the SSL connection that Plotly initializes for you automatically.'}
 ];
 export const CONNECTION_CONFIG = {
     [DIALECTS.MYSQL]: commonSqlOptions,
