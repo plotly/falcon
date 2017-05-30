@@ -18,6 +18,8 @@ const server = new Servers();
 Logger.log('Starting server', 2);
 server.start();
 Logger.log('Loading persistent queries', 2);
+Logger.log('Electron version: ' + process.versions.electron, 2);
+Logger.log('Chrome version: ' + process.versions.chrome, 2);
 server.queryScheduler.loadQueries();
 
 app.on('ready', () => {
