@@ -334,62 +334,60 @@ class Settings extends Component {
                         {httpsServerIsOK ? (
                             <div>
                                 <div>
-                                    {'Step 3 is now complete, the connector is up and running.'}
-                                </div>
-                                <div>
-                                    A unique SSL certificate and URL has been created
-                                    for you: <b>{this.state.urls.https}</b>.&nbsp;
-                                    Use this URL when you connect to
-                                    the SQL Connector inside the&nbsp;
-                                    <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
-                                        Plotly Chart Creator
-                                     </Link>
-                                     &nbsp;
-
-                                     (Direct link: &nbsp;
-                                     <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
-                                         {WORKSPACE_IMPORT_SQL_URL + connectorUrl}
-                                      </Link>
-                                    )
+                                    {'Step 3 is now complete, Plotly has generated a unique SSL certificate for you.'}
                                 </div>
                             </div>
                         ) : (
                             <div>
-                                <div>
-                                    {`Plotly is initializing a unique SSL
-                                      certificate and URL for you.
-                                      This can take up to 10 minutes
-                                      (it has been ${timeElapsed}).`}
-                                </div>
-                                <div>
+                                <p>
+                                    {`Plotly is automatically initializing a
+                                      unique SSL certificate and URL for you.
+                                      This can take up to 10 minutes.`}
+                                </p>
+                                <p>
+                                    {`It has been ${timeElapsed}`}.
+                                </p>
+                                <p>
                                     {`Once this is complete, you'll be able to
-                                      connect to your databases from the `}&nbsp;
-                                    <Link href="https://plot.ly/create?upload=sql">
+                                      query your databases from the `}&nbsp;
+                                    <Link href={`${plotlyUrl}/create?upload=sql`}>
                                             Plotly Chart Creator
                                     </Link>
                                     {'.'}
-                                </div>
+                                </p>
                             </div>
                         )}
 
-                        {
-                            httpsServerIsOK ? (
-                                <div id="test-ssl-initialized">
-                                    <h3>Final Step. Query Data on Plotly</h3>
-                                    <h5>
-                                        <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
-                                                Open Query Editor
+                        <div id="test-ssl-initialized">
+                            <h3>Final Step. Query Data on Plotly</h3>
+
+                            {httpsServerIsOK ? (
+                                <div>
+                                    <p>
+                                        <Link href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}>
+                                            Click to Open Query Editor
                                          </Link>
-                                         &nbsp; in the Plotly Chart Creator
-                                    </h5>
+                                        &nbsp;
+                                        {`in the Plotly Chart Creator.`}
+                                    </p>
+
+                                    <p>
+                                        Plotly has generated this secure URL for you: <b>{connectorUrl}</b>
+                                    </p>
                                 </div>
-                            ) : null
-                        }
+                            ) : (
+                                <div>
+                                    {`Before you can query, wait until Plotly has
+                                      finished Step 3 for you.`}
+                                </div>
+                            )
+                            }
+                        </div>
 
                     </div>
                     ) : null}
 
-                    <hr/>
+                    <hr style={{'marginTop': '60px'}}/>
 
                     <div>
                         <h3>FAQ</h3>
@@ -404,7 +402,7 @@ class Settings extends Component {
                                         listens for requests from your web browser in
                                         the`}
                                         &nbsp;
-                                        <Link href="https://plot.ly/create">Plotly Chart Creator</Link>
+                                        <Link href={`${plotlyUrl}/create`}>Plotly Chart Creator</Link>
                                         &nbsp;
                                         {`This application makes queries against the databases that you have
                                           connected to and returns the results to the Plotly Chart Creator.`}
@@ -412,11 +410,14 @@ class Settings extends Component {
                                 </li>
 
                                 <li>
-                                    <strong>{`Are these database credentials shared on the Plotly server?`}</strong>
+                                    <strong>{`Do I need to keep this application open?`}</strong>
+
                                     <p>
-                                        {`Your database credentials are only stored on your
-                                          computer (they are not saved on any plotly servers).`}
+                                        {`Keep this application open when you're making queries!
+                                        The Plotly Chart Creator connects to your database through
+                                        this application.`}
                                     </p>
+
                                 </li>
 
                                 <li>
@@ -434,7 +435,7 @@ class Settings extends Component {
                                     <p>
                                         {`The`}
                                         &nbsp;
-                                        <Link href="https://plot.ly/create">Plotly Chart Creator</Link>
+                                        <Link href={`${plotlyUrl}/create`}>Plotly Chart Creator</Link>
                                         &nbsp;
                                         {`includes a SQL editor that you can use
                                           to import data from your databases into Plotly.`}
@@ -443,14 +444,11 @@ class Settings extends Component {
                                 </li>
 
                                 <li>
-                                    <strong>{`Do I need to keep this application open?`}</strong>
-
+                                    <strong>{`Are these database credentials shared on the Plotly server?`}</strong>
                                     <p>
-                                        {`Keep this application open when you're making queries!
-                                        The Plotly Chart Creator connects to your database through
-                                        this application.`}
+                                        {`Your database credentials are only stored on your
+                                          computer (they are not saved on any plotly servers).`}
                                     </p>
-
                                 </li>
 
                                 <li>
@@ -459,7 +457,7 @@ class Settings extends Component {
                                     <p>
                                         {`You can run queries on a schedule (e.g. daily or hourly) in the`}
                                         &nbsp;
-                                        <Link href={WORKSPACE_IMPORT_SQL_URL + connectorUrl}>
+                                        <Link href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}>
                                             Plotly Chart Creator
                                          </Link>
                                          {`. Scheduled queries are saved and managed by this application,
