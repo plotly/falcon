@@ -78,10 +78,6 @@ describe('plotly database connector', function Spec() {
     it('should work', async () => {
         const title = await this.driver.getTitle();
 
-        // Login (credentials are already saved so skip the oauth flow)
-
-        this.fillInput('test-username', TEST_USER);
-        (await this.findEl(this.byId('test-login-button'))).click();
         await delay(3000);
 
         // Fill out SQL Credentials
