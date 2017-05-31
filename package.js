@@ -23,6 +23,7 @@ const userFriendlyAppNames = {
 };
 
 const DEFAULT_OPTS = {
+    electronVersion: devDeps.electron,
     dir: './',
     name: appName,
     asar: shouldUseAsar,
@@ -49,25 +50,7 @@ if (icon) {
     DEFAULT_OPTS.icon = icon;
 }
 
-const electronVersion = argv.electronVersion || argv.v;
-
-if (electronVersion) {
-    DEFAULT_OPTS.electronVersion = electronVersion;
-    startPack();
-} else {
-    // use the same version as the currently-installed electron-prebuilt
-    exec('npm list electron --dev', (err, stdout) => {
-        if (err) {
-            throw new Exception(err);
-        } else {
-            DEFAULT_OPTS.electronVersion =
-                stdout.split('electron@')[1].replace(/\s/g, '');
-        }
-
-        startPack();
-    });
-}
-
+startPack();
 
 function build(cfg) {
     return new Promise((resolve, reject) => {
