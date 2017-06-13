@@ -4,7 +4,6 @@ machine:
 
 test:
     post:
-        - npm install electron-builder@next --dev
         - npm run build
         - npm run package
         - zip -r release.zip release
