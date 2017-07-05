@@ -32,6 +32,7 @@ export default {
     ],
     externals: [
         {
+            'ibm_db': 'commonjs ibm_db',
             'mysql': 'mysql',
             'pg': 'pg',
             'pg-native': 'pg-native',
