@@ -332,6 +332,8 @@ export function setConnectionNeedToBeSaved(tabId, bool) {
 
 function PREVIEW_QUERY (dialect, table, database = '') {
     switch (dialect) {
+        case DIALECTS.IBM_DB2:
+            return `SELECT * FROM ${table} FETCH FIRST 5 ROWS ONLY`;
         case DIALECTS.MYSQL:
         case DIALECTS.SQLITE:
         case DIALECTS.MARIADB:

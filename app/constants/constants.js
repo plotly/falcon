@@ -1,6 +1,7 @@
 import {concat} from 'ramda';
 
 export const DIALECTS = {
+    IBM_DB2: 'ibm db2',
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
     POSTGRES: 'postgres',
@@ -32,6 +33,7 @@ const commonSqlOptions = [
         'description': 'Check if your database is built with SSL support. Note that this is different than the SSL connection that Plotly initializes for you automatically.'}
 ];
 export const CONNECTION_CONFIG = {
+    [DIALECTS.IBM_DB2]: commonSqlOptions,
     [DIALECTS.MYSQL]: commonSqlOptions,
     [DIALECTS.MARIADB]: commonSqlOptions,
 	[DIALECTS.MSSQL]: concat(
@@ -115,6 +117,7 @@ export const CONNECTION_CONFIG = {
 
 
 export const LOGOS = {
+    [DIALECTS.IBM_DB2]: 'images/ibmdb2-logo.png',
     [DIALECTS.REDSHIFT]: 'images/redshift-logo.png',
     [DIALECTS.POSTGRES]: 'images/postgres-logo.png',
     [DIALECTS.ELASTICSEARCH]: 'images/elastic-logo.png',

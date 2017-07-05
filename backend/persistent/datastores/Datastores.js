@@ -2,6 +2,7 @@ import * as Sql from './Sql';
 import * as Elasticsearch from './Elasticsearch';
 import * as S3 from './S3';
 import * as ApacheDrill from './ApacheDrill';
+import * as IbmDb2 from './ibmdb2';
 
 /*
  * Switchboard to all of the different types of connections
@@ -30,6 +31,8 @@ function getDatastoreClient(connection) {
         return S3;
     } else if (dialect === 'apache drill') {
         return ApacheDrill;
+    } else if (dialect === 'ibm db2') {
+        return IbmDb2;
     } else {
         return Sql;
     }
