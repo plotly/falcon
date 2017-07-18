@@ -12,6 +12,8 @@
     "build-renderer": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.production.js --progress --profile --colors",
     "build-web": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.web.js --progress --profile --colors",
     "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\"",
+    "docker:db2:build": "docker build test/docker/ibmdb2/ -t pdc-db2 --build-arg LICENSE=accept --build-arg DB2INST1_PASSWORD=${DB2INST1_PASSWORD} --build-arg DB2USER1_PASSWORD=${DB2USER1_PASSWORD} --no-cache",
+    "docker:db2:start": "docker run -ti -p 50000:50000 pdc-db2",
     "fix:ibm_db": "chmod -R +w node_modules/ibm_db/installer",
     "hot-server": "node -r babel-register devServer.js",
     "lint": "eslint app test *.js",
