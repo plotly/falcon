@@ -52,15 +52,17 @@ export function query(query, connection) {
         });
 }
 
-const QUERY_TABLES = 'SELECT NAME FROM SYSIBM.SYSTABLES WHERE TYPE = \'T\' AND DEFINERTYPE = \'U\' AND CREATOR <> \'SYSTOOLS\'';
+const SYSTEM_SCHEMAS = ['SYSCAT', 'SYSIBM', 'SYSIBMADM', 'SYSPUBLIC', 'SYSSTAT', 'SYSTOOLS'];
+const WHERE = SYSTEM_SCHEMAS.map(t => `CREATOR <> '${t}'`).join(' AND ');
+const QUERY = `SELECT NAME, CREATOR FROM SYSIBM.SYSTABLES WHERE ${WHERE}`;
 
 export function tables(connection) {
     return getClient(connection)
         .then(function(client) {
             return new Promise(function(resolve, reject) {
-                client.query(QUERY_TABLES, function(err, rows) {
+                client.query(QUERY, function(err, rows) {
                     if (err) reject(err);
-                    else resolve(rows.map(row => row.NAME));
+                    else resolve(rows.map(row => `${row.CREATOR}.${row.NAME}`));
                 });
             });
         });
