@@ -175,7 +175,7 @@
     "fbjs-scripts": "^0.6.0",
     "font-awesome": "^4.6.1",
     "fs-extra": "https://registry.npmjs.org/fs-extra/-/fs-extra-0.26.7.tgz",
-    "ibm_db": "^2.0.0",
+    "ibm_db": "~2.0.0",
     "immutable": "^3.8.1",
     "jsdom": "^8.4.0",
     "json-loader": "^0.5.4",
