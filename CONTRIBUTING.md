@@ -9,18 +9,18 @@ If you're interested in using the distributed App, [download the latest release.
 Start by cloning the repo via git:
 
 ```bash
-git clone https://github.com/plotly/electron-sql-connector your-project-name
+git clone https://github.com/plotly/plotly-database-connector plotly-database-connector
 ```
 
 And then install dependencies.
 
 ```bash
-$ cd your-project-name && npm install
+$ cd plotly-database-connector && npm install
 ```
 
 *Note: requires a node version >= 4 and an npm version >= 2.*
 
-## Run as Electron App
+## Run as an Electron App
 Run the app with
 ```bash
 $ npm run build
@@ -104,7 +104,7 @@ $ npm run test-e2e
 ## Builds and Releases
 
 - Linux builds are created at the end of CircleCI tests
-- Windows 32bit and 64bit builds are created in AppVeyoer tests
+- Windows 32bit and 64bit builds are created in AppVeyor tests
 - Mac builds are created on an available mac laptop
 
 Releases are uploaded to https://github.com/plotly/plotly-database-connector/releases
