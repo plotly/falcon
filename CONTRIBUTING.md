@@ -55,12 +55,7 @@ See the [Dockerfile](https://github.com/plotly/plotly-database-connector/blob/ma
 
 ## Developing
 
-Run the electron app in dev mode with
-```bash
-$ npm run dev
-```
-
-Run watchers for the electron main process and web bundle.
+Run watchers for the electron main process, the web bundle (the front-end), and the headless-bundle:
 ```bash
 $ npm run watch-main
 ```
@@ -69,21 +64,17 @@ $ npm run watch-main
 $ npm run watch-web
 ```
 
-
-Or, develop using the headless server by running watchers on headless and web bundles
 ```bash
 $ npm run watch-headless
 ```
 
+Then, view the the app in the electron window with
+
 ```bash
-$ npm run watch-web
+$ npm run dev
 ```
 
-as well as hot-relaoding the updated server side bundle with nodemon
-(`npm install -g nodemon` if you do not have it already)
-```bash
-$ nodemon ./dist/headless-bundle.js
-```
+and in your web browser by visiting http://localhost:9494
 
 ## Testing
 
