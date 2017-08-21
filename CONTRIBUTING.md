@@ -20,14 +20,14 @@ $ cd your-project-name && npm install
 
 *Note: requires a node version >= 4 and an npm version >= 2.*
 
-### Run as Electron App
+## Run as Electron App
 Run the app with
 ```bash
 $ npm run build
 $ npm run start
 ```
 
-### Run on a Server
+## Run as a Server
 
 Build and run the app:
 ```bash
@@ -47,19 +47,13 @@ CORS_ALLOWED_ORIGINS:
     - 'https://plotly.your-company.com'
 ```
 
-If you have issued an SSL certificate for your app, modify your `settings.yaml` file to include the location of the cert and its key:
-```
-KEY_FILE: '/ssl/certs/server/privkey.pem'
-CSR_FILE: '/ssl/certs/server/fullchain.pem'
-```
-
 The database connector runs as a server by default as part of [Plotly On-Premise](https://plot.ly/products/on-premise). On Plotly On-Premise, every user who has access to the on-premise server also has access to the database connector, no extra installation or SSL configuration is necessary. If you would like to try out Plotly On-Premise at your company, please [get in touch with our team](https://plotly.typeform.com/to/seG7Vb), we'd love to help you out.
 
-### Run as a docker image
+## Run as a docker image
 
 See the [Dockerfile](https://github.com/plotly/plotly-database-connector/blob/master/Dockerfile) for more information.
 
-### Developing
+## Developing
 
 Run the electron app in dev mode with
 ```bash
@@ -91,11 +85,26 @@ as well as hot-relaoding the updated server side bundle with nodemon
 $ nodemon ./dist/headless-bundle.js
 ```
 
-### Testing
+## Testing
 
-Note: Currently access to remote databases is required to run local tests. These connections are not committed to git at the moment. Contact us if you require running tests locally.
+There are unit tests for the nodejs backend and integration tests to test the flow of the app.
 
+Run unit tests:
 ```bash
 $ npm run build
 $ npm run test-unit-all
 ```
+
+Run integration tests:
+```bash
+$ npm run build
+$ npm run test-e2e
+```
+
+## Builds and Releases
+
+- Linux builds are created at the end of CircleCI tests
+- Windows 32bit and 64bit builds are created in AppVeyoer tests
+- Mac builds are created on an available mac laptop
+
+Releases are uploaded to https://github.com/plotly/plotly-database-connector/releases
