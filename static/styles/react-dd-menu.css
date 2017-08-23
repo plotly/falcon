@@ -1,0 +1,190 @@
+/* Not really sure why, but the inverse version has a bigger gap */
+.grow-from-left-enter {
+  transform: scale(0);
+  transform-origin: 0 0;
+  transition: transform 0.15s cubic-bezier(0.5, 1.8, 0.9, 0.8); }
+  .grow-from-left-enter.grow-from-left-enter-active {
+    transform: scale(1); }
+
+.grow-from-left-leave {
+  transform: scale(1);
+  transform-origin: 0 0;
+  transition: transform 0.15s ease-out; }
+  .grow-from-left-leave.grow-from-left-leave-active {
+    transform: scale(0); }
+
+.grow-from-right-enter {
+  transform: scale(0);
+  transform-origin: 100% 0;
+  transition: transform 0.15s cubic-bezier(0.5, 1.8, 0.9, 0.8); }
+  .grow-from-right-enter.grow-from-right-enter-active {
+    transform: scale(1); }
+
+.grow-from-right-leave {
+  transform: scale(1);
+  transform-origin: 100% 0;
+  transition: transform 0.15s ease-out; }
+  .grow-from-right-leave.grow-from-right-leave-active {
+    transform: scale(0); }
+
+.grow-from-center-enter {
+  transform: scale(0);
+  transform-origin: 50% 0;
+  transition: transform 0.15s cubic-bezier(0.5, 1.8, 0.9, 0.8); }
+  .grow-from-center-enter.grow-from-center-enter-active {
+    transform: scale(1); }
+
+.grow-from-center-leave {
+  transform: scale(1);
+  transform-origin: 50% 0;
+  transition: transform 0.15s ease-out; }
+  .grow-from-center-leave.grow-from-center-leave-active {
+    transform: scale(0); }
+
+.grow-from-up-left-enter {
+  transform: scale(0);
+  transform-origin: 0 100%;
+  transition: transform 0.15s cubic-bezier(0.5, 1.8, 0.9, 0.8); }
+  .grow-from-up-left-enter.grow-from-up-left-enter-active {
+    transform: scale(1); }
+
+.grow-from-up-left-leave {
+  transform: scale(1);
+  transform-origin: 0 100%;
+  transition: transform 0.15s ease-out; }
+  .grow-from-up-left-leave.grow-from-up-left-leave-active {
+    transform: scale(0); }
+
+.grow-from-up-center-enter {
+  transform: scale(0);
+  transform-origin: 50% 100%;
+  transition: transform 0.15s cubic-bezier(0.5, 1.8, 0.9, 0.8); }
+  .grow-from-up-center-enter.grow-from-up-center-enter-active {
+    transform: scale(1); }
+
+.grow-from-up-center-leave {
+  transform: scale(1);
+  transform-origin: 50% 100%;
+  transition: transform 0.15s ease-out; }
+  .grow-from-up-center-leave.grow-from-up-center-leave-active {
+    transform: scale(0); }
+
+.grow-from-up-right-enter {
+  transform: scale(0);
+  transform-origin: 100% 100%;
+  transition: transform 0.15s cubic-bezier(0.5, 1.8, 0.9, 0.8); }
+  .grow-from-up-right-enter.grow-from-up-right-enter-active {
+    transform: scale(1); }
+
+.grow-from-up-right-leave {
+  transform: scale(1);
+  transform-origin: 100% 100%;
+  transition: transform 0.15s ease-out; }
+  .grow-from-up-right-leave.grow-from-up-right-leave-active {
+    transform: scale(0); }
+
+.dd-menu {
+  display: inline-block;
+  position: relative; }
+  .dd-menu.dd-menu-center .dd-menu-items {
+    left: 50%;
+    transform: translateX(-50%); }
+  .dd-menu.dd-menu-left .dd-menu-items {
+    left: 0; }
+    .dd-menu.dd-menu-left .dd-menu-items [class^='nested-']:not(.nested-reverse) > span {
+      right: 100%;
+      padding-right: 0.5em; }
+    .dd-menu.dd-menu-left .dd-menu-items .nested-reverse > span {
+      left: 100%;
+      padding-left: 0.5em; }
+  .dd-menu.dd-menu-left.dd-menu-inverse .dd-menu-items [class^='nested-']:not(.nested-reverse) > span {
+    right: 100%;
+    padding-right: 0.3em; }
+  .dd-menu.dd-menu-left.dd-menu-inverse .dd-menu-items .nested-reverse > span {
+    left: 100%;
+    padding-left: 0.3em; }
+  .dd-menu.dd-menu-right .dd-menu-items {
+    right: 0; }
+    .dd-menu.dd-menu-right .dd-menu-items [class^='nested-']:not(.nested-reverse) > span {
+      left: 100%;
+      padding-left: 0.5em; }
+    .dd-menu.dd-menu-right .dd-menu-items .nested-reverse > span {
+      right: 100%;
+      padding-right: 0.5em; }
+  .dd-menu.dd-menu-right.dd-menu-inverse .dd-menu-items [class^='nested-']:not(.nested-reverse) > span {
+    left: 100%;
+    padding-left: 0.3em; }
+  .dd-menu.dd-menu-right.dd-menu-inverse .dd-menu-items .nested-reverse > span {
+    right: 100%;
+    padding-right: 0.3em; }
+  .dd-menu.dd-menu-sm .dd-menu-items {
+    width: 150px; }
+  .dd-menu.dd-menu-md .dd-menu-items {
+    width: 300px; }
+  .dd-menu.dd-menu-lg .dd-menu-items {
+    width: 450px; }
+  .dd-menu.dd-menu-xl .dd-menu-items {
+    width: 600px; }
+  .dd-menu .dd-menu-items {
+    position: absolute;
+    z-index: 7;
+    margin: 0.5em 0 0 0; }
+    .dd-menu .dd-menu-items.dd-items-upwards {
+      bottom: 100%;
+      margin: 0 0 0.5em; }
+    .dd-menu .dd-menu-items ul, .dd-menu .dd-menu-items ol {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      color: #506784;
+      background-color: #fefefe;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.29); }
+      .dd-menu .dd-menu-items ul.dd-items-right li > *, .dd-menu .dd-menu-items ol.dd-items-right li > * {
+        text-align: right; }
+      .dd-menu .dd-menu-items ul.dd-items-left li > *, .dd-menu .dd-menu-items ol.dd-items-left li > * {
+        text-align: left; }
+      .dd-menu .dd-menu-items ul.dd-items-center li > *, .dd-menu .dd-menu-items ol.dd-items-center li > * {
+        text-align: center; }
+      .dd-menu .dd-menu-items ul li:hover:not([role="separator"]):not(.separator),
+      .dd-menu .dd-menu-items ul li > *:focus, .dd-menu .dd-menu-items ol li:hover:not([role="separator"]):not(.separator),
+      .dd-menu .dd-menu-items ol li > *:focus {
+        color: #2a3f5f;
+        background-color: #f3f6fa;
+        outline: none; }
+      .dd-menu .dd-menu-items ul li > *:not(.dd-item-ignore), .dd-menu .dd-menu-items ol li > *:not(.dd-item-ignore) {
+        display: block;
+        width: auto;
+        padding: 1em 1.5em;
+        white-space: pre;
+        color: inherit;
+        text-decoration: none;
+        font-size: inherit; }
+      .dd-menu .dd-menu-items ul li > button, .dd-menu .dd-menu-items ol li > button {
+        border: none;
+        background: transparent; }
+  .dd-menu.dd-menu-inverse .dd-menu-items ul, .dd-menu.dd-menu-inverse .dd-menu-items ol {
+    color: #fff;
+    background-color: #2c3e50; }
+    .dd-menu.dd-menu-inverse .dd-menu-items ul li:hover:not([role="separator"]):not(.separator),
+    .dd-menu.dd-menu-inverse .dd-menu-items ul li > *:focus, .dd-menu.dd-menu-inverse .dd-menu-items ol li:hover:not([role="separator"]):not(.separator),
+    .dd-menu.dd-menu-inverse .dd-menu-items ol li > *:focus {
+      color: #fff;
+      background-color: #34495e; }
+  .dd-menu.dd-menu-inverse [role="separator"], .dd-menu.dd-menu-inverse .separator {
+    background-color: #45595e; }
+  .dd-menu [role="separator"], .dd-menu .separator {
+    content: '';
+    display: block;
+    height: 2px;
+    background-color: rgba(0, 0, 0, 0.15);
+    margin: 0.5em 0 0.5em 0; }
+  .dd-menu .dd-items-upwards li.nested-dd-menu > span {
+    bottom: 0;
+    top: initial; }
+  .dd-menu li.nested-dd-menu {
+    position: relative; }
+    .dd-menu li.nested-dd-menu > span {
+      position: absolute;
+      top: 0; }
+
+/*# sourceMappingURL=react-dd-menu.css.map */
