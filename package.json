@@ -189,12 +189,14 @@
     "ramda": "^0.21.0",
     "react": "^15.5.1",
     "react-ace": "^3.4.1",
+    "react-dd-menu": "^2.0.2",
     "react-dom": "^15.5.1",
     "react-immutable-proptypes": "^1.7.1",
     "react-redux": "^4.4.5",
     "react-router": "^2.2.4",
     "react-router-redux": "^4.0.2",
     "react-select": "^1.0.0-beta13",
+    "react-tabs": "^1.1.0",
     "react-tooltip": "^3.1.7",
     "redux": "^3.4.0",
     "redux-actions": "^0.9.1",
@@ -216,7 +218,7 @@
     "npm": "3.10.9"
   },
   "devEngines": {
-      "node": "6.11.1",
-      "npm": "3.10.9"
+    "node": "6.11.1",
+    "npm": "3.10.9"
   }
 }
