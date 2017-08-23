@@ -30,9 +30,11 @@ const SHOW_TABLES_QUERY = {
         'information_schema.tables'
     ),
     [DIALECTS.REDSHIFT]: (
-        'SELECT table_name FROM ' +
-        'information_schema.tables WHERE ' +
-        'table_schema = \'public\''
+        'SELECT table_schema || \'.\'  || table_name FROM ' +
+        'information_schema.tables ' +
+        'WHERE table_type != \'VIEW\' and ' +
+        'table_schema != \'pg_catalog\' and ' +
+        'table_schema != \'information_schema\''    
     )
 };
 
@@ -112,10 +114,14 @@ export function tables(connection) {
     ).then(tableList => {
 
         let tableNames;
-
-        if (contains(connection.dialect, ['postgres', 'redshift'])) {
+        
+        if (connection.dialect === 'redshift') {            
             tableNames = tableList.map(data => {
-                return data[0]
+                return data['?column?'];
+            });
+        } else if(connection.dialect === 'postgres') {
+            tableNames = tableList.map(data => {
+                return data[0];
             });
         } else if(connection.dialect === 'sqlite'){
             tableNames = tableList;
