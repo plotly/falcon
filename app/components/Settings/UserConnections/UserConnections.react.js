@@ -3,7 +3,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import * as styles from './UserConnections.css';
 import {contains, head, flatten, keys, values} from 'ramda';
 import {
-    CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS
+    CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS, SAMPLE_DBS
 } from '../../../constants/constants';
 import {dynamicRequireElectron} from '../../../utils/utils';
 import classnames from 'classnames';
@@ -26,6 +26,15 @@ export default class UserConnections extends Component {
         super(props);
 		this.getStorageOnClick = this.getStorageOnClick.bind(this);
 		this.testClass = this.testClass.bind(this);
+        this.toggleSampleCredentials = this.toggleSampleCredentials.bind(this);
+
+        this.state = {showSampleCredentials: false};
+    }
+
+    
+    
+    toggleSampleCredentials() {
+        this.state.showSampleCredentials = !this.state.showSampleCredentials;
     }
 
 	testClass() {
@@ -57,9 +66,23 @@ export default class UserConnections extends Component {
 	render() {
 
 		const {connectionObject, updateConnection} = this.props;
-		const inputs = CONNECTION_CONFIG[connectionObject.dialect]
+        const sampleCredentialsStyle = {
+            lineHeight: 1,
+            textAlign: 'left',
+            width: '100%',
+            maxWidth: 200,
+            display: 'inline-block'
+        };
+
+        if (!this.state.showSampleCredentials) {
+            sampleCredentialsStyle['display'] = 'none';
+        }
+
+		const inputs = CONNECTION_CONFIG[connectionObject.dialect]        
 			.map(setting => {
                 let input;
+                const dialect = connectionObject.dialect;
+                const inputKey = (setting.label).toLowerCase();
                 if (contains(setting.type, ['text', 'number', 'password'])) {
                     input = (
                         <div className={styles.inputContainer}>
@@ -75,7 +98,12 @@ export default class UserConnections extends Component {
                                     id={`test-input-${setting.value}`}
                                     placeholder={setting.placeholder}
                                     type={setting.type}
-                                />
+                                />                            
+                                <div style={sampleCredentialsStyle}>
+                                    <code>
+                                        {(SAMPLE_DBS[dialect]) ? SAMPLE_DBS[dialect][inputKey] : null}
+                                    </code>
+                                </div>
                             </div>
                         </div>
                     );
@@ -136,7 +164,14 @@ export default class UserConnections extends Component {
 		return (
             <div>
                 {inputs}
+                <small style={{float: 'right'}}>
+                    <a onClick={() => {this.toggleSampleCredentials()}}>
+                        {this.state.showSampleCredentials && `Hide Sample Credentials`}
+                        {!this.state.showSampleCredentials && `Show Sample Credentials`}
+                    </a>
+                </small>
             </div>
+
 		);
 	}
 }

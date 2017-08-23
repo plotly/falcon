@@ -86,11 +86,7 @@ p {
 
 /* Buttons */
 
-button {
-    background-color: #119DFF;
-    border: 1px solid #119DFF;
-    color: #ffffff;
-    text-shadow: 0px 1px 2px rgba(42, 63, 95, 0.7);
+button, .btn-primary {
     cursor: pointer;
     font-size: 14px;
     line-height: 24px;
@@ -99,22 +95,60 @@ button {
     padding: 9px 18px;
     line-height: 1;
     letter-spacing: 0.5px;
-    text-transform: capitalize;
+    text-transform: uppercase;
     text-align: center;
     outline: none;
     display: block;
     margin-left: auto;
     margin-right: auto;
+    color: #ffffff;
+    text-shadow: 0px 1px 2px rgba(42, 63, 95, 0.7);
+    background-color: #119DFF;
+    border: 1px solid #119DFF;
+    text-decoration: none;
 }
 
-button:hover {
+button.btn-secondary {
+    color: #506784;    
+    background-color: #ebf0f8;
+    border: 1px solid #dfe8f3;
+    text-shadow: none;
+}
+
+button:hover, .btn-primary:hover {
     background-color: #0f89df;
     border: 1px solid #0f89df;
-    color: #ffffff;
 }
 
-button:active {
+button.btn-secondary:hover {
+    background-color: #dfe8f3;
+    border: 1px solid #c8d4e3;
+    color: #2a3f5f;    
+}
+    
+button:active, .btn-primary:active {
     background-color: #0d76bf;
     border: 1px solid #0d76bf;
-    color: #ffffff;
+}
+
+.dd-menu > button {
+    color: #506784;
+    background: transparent;
+    text-shadow: none;
+    border: none;
+}
+
+.dd-menu > button:hover {
+    color: #2a3f5f;
+    background: transparent;
+    border: none;
+}
+
+/* Tab Panel Content */
+
+.react-tabs__tab-panel p {
+    padding: 20px;
+    margin: 20px 0;
+    background: #f3f6fa;
+    border: 1px solid #ebf0f8;
 }

@@ -5,7 +5,7 @@ import {Provider} from 'react-redux';
 import configureStore from './store/configureStore';
 
 import {productName, version} from '../package.json';
-import './app.global.css';
+import './styles/app.global.css';
 
 const store = configureStore();
 

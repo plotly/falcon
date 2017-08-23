@@ -1,19 +1,20 @@
 import React, {Component, PropTypes} from 'react';
-import {contains, dissoc, eqProps, hasIn, flip, head, keys, isEmpty, reduce } from 'ramda';
+import {contains, dissoc, eqProps, hasIn, flip, head, keys, isEmpty, reduce} from 'ramda';
 import {connect} from 'react-redux';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
 import * as styles from './Settings.css';
 import * as buttonStyles from './ConnectButton/ConnectButton.css';
 import fetch from 'isomorphic-fetch';
-import Tabs from './Tabs/Tabs.react';
+import ConnectionTabs from './Tabs/Tabs.react';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import UserConnections from './UserConnections/UserConnections.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import Preview from './Preview/Preview.react';
 import {Link} from '../Link.react';
-import {DIALECTS} from '../../constants/constants.js';
+import {DIALECTS, FAQ} from '../../constants/constants.js';
 import {getAllBaseUrls} from '../../utils/utils';
 
 
@@ -82,11 +83,7 @@ class Settings extends Component {
             <div className={styles.editButtonContainer}>
                 {show ? (
                     <button
-                        style={{
-                            'display': 'block',
-                            'marginLeft': 'auto',
-                            'marginRight': 'auto'
-                        }}
+                        className = 'btn-secondary'
                         onClick={() => {
                             this.setState({showConnections: true, editMode: true});
                             this.props.setConnectionNeedToBeSaved(true);
@@ -290,7 +287,7 @@ class Settings extends Component {
 
         return (
             <div>
-                <Tabs
+                <ConnectionTabs
                     connections={connections}
                     selectedTab={selectedTab}
                     newTab={newTab}
@@ -300,222 +297,137 @@ class Settings extends Component {
 
                 <div className={styles.openTab} style={{'padding': 30}}>
 
-                    <h3>Step 1. Set Up Connections</h3>
+                    <Tabs>
 
-                    {this.renderSettingsForm()}
+                        <TabList>
+                            <Tab>1. Connection</Tab>
+                            <Tab>2. Preview</Tab>
+                            <Tab>3. SSL Certificate</Tab>
+                            <Tab>4. Open Plotly</Tab>
+                            <Tab>FAQ</Tab>
+                        </TabList>
 
-                    {this.renderEditButton(!this.state.editMode)}
-
-                    {this.props.connectRequest.status === 200 ? (
-                    <div>
-                        <h3>Step 2. Preview Database</h3>
-
-                        <div>
-                            <OptionsDropdown
-                                connectionObject={connections[selectedTab]}
-                                selectedTable={selectedTable}
-                                elasticsearchMappingsRequest={elasticsearchMappingsRequest}
-                                tablesRequest={tablesRequest}
-                                setTable={setTable}
-                                setIndex={setIndex}
-                                selectedIndex={selectedIndex}
-                            />
-
-                            <Preview
-                                previewTableRequest={previewTableRequest}
-                                s3KeysRequest={s3KeysRequest}
-                                apacheDrillStorageRequest={apacheDrillStorageRequest}
-                                apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
-                            />
-                        </div>
-
-                        <h3>Step 3. Wait for a SSL Certificate</h3>
-
-                        {httpsServerIsOK ? (
-                            <div>
+                        <TabPanel>
+                            {this.renderSettingsForm()}
+                            {this.renderEditButton(!this.state.editMode)}
+                        </TabPanel>
+                        
+                        <TabPanel>
+                            {this.props.connectRequest.status === 200 ? (
                                 <div>
-                                    {'Step 3 is now complete, Plotly has generated a unique SSL certificate for you.'}
-                                </div>
-                            </div>
-                        ) : (
-                            <div>
-                                <p>
-                                    {`Plotly is automatically initializing a
-                                      unique SSL certificate and URL for you.
-                                      This can take up to 10 minutes.`}
-                                </p>
-                                <p>
-                                    {`It has been ${timeElapsed}`}.
-                                </p>
-                                <p>
-                                    {`Once this is complete, you'll be able to
-                                      query your databases from the `}
-                                    <Link href={`${plotlyUrl}/create?upload=sql`}>
-                                            Plotly Chart Creator
-                                    </Link>
-                                    {'.'}
-                                </p>
-                            </div>
-                        )}
+                                    <OptionsDropdown
+                                        connectionObject={connections[selectedTab]}
+                                        selectedTable={selectedTable}
+                                        elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                                        tablesRequest={tablesRequest}
+                                        setTable={setTable}
+                                        setIndex={setIndex}
+                                        selectedIndex={selectedIndex}
+                                    />
 
-                        <div>
-                            <h3>Final Step. Query Data on Plotly</h3>
-
-                            {httpsServerIsOK ? (
-                                <div id="test-ssl-initialized">
-                                    <p>
-                                        <Link href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}>
-                                            Click to Open Query Editor
-                                         </Link>
-                                        &nbsp;
-                                        {`in the Plotly Chart Creator.`}
-                                    </p>
-
-                                    <p>
-                                        {`Plotly has generated this secure URL for you: `}
-                                        <br/>
-                                        <b><code>{connectorUrl}</code></b>
-                                        <br/>
-                                        {`use this URL when you connect in the Plotly Chart Creator.`}
-                                    </p>
+                                    <Preview
+                                        previewTableRequest={previewTableRequest}
+                                        s3KeysRequest={s3KeysRequest}
+                                        apacheDrillStorageRequest={apacheDrillStorageRequest}
+                                        apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+                                    />
                                 </div>
                             ) : (
+                                <p>You must connect to a data store first.</p>
+                            )}
+                        </TabPanel>
+
+                        <TabPanel>
+                            {this.props.connectRequest.status === 200 ? (
                                 <div>
-                                    {`Before you can query, wait until Plotly has
-                                      finished Step 3 for you.`}
+                                    {httpsServerIsOK ? (
+                                        <div>
+                                            <div>
+                                                <p> 
+                                                    {'No action required. Plotly has already generated a unique SSL certificate for this app.'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <p>
+                                                {`Plotly is automatically initializing a
+                                                  unique SSL certificate and URL for you.
+                                                  This can take up to 10 minutes.`}
+                                            </p>
+                                            <p>
+                                                {`It has been ${timeElapsed}`}.
+                                            </p>
+                                            <p>
+                                                {`Once this is complete, you'll be able to
+                                                  query your databases from the `}
+                                                <Link href={`${plotlyUrl}/create?upload=sql`}>
+                                                        Plotly
+                                                </Link>
+                                                {'.'}
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
-                            )
-                            }
-                        </div>
+                            ) : (
+                                <p>You must connect to a data store first.</p>
+                            )}
+                        </TabPanel>
 
-                    </div>
-                    ) : null}
+                        <TabPanel>
+                            {this.props.connectRequest.status === 200 ? (
+                                <div>
+                                    {httpsServerIsOK ? (
+                                        <div id="test-ssl-initialized">
+                                            <p>
+                                                You're now ready to explore this datastore on Plotly!
+                                                Plotly has generated a local URL for this app
+                                                through which it will securely send queries: 
+                                            </p>
+                                            <div style={{textAlign: 'center'}}>
+                                                <strong><code>{connectorUrl}</code></strong>
+                                            </div>
+                                            <p>
+                                                This URL is local - no one can access it except this computer or server.
+                                                Click below to connect and start writing queries:
+                                            </p>
+                                            <a 
+                                                className='btn-primary' 
+                                                style={{maxWidth: '100px'}}
+                                                href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`} 
+                                                target="_blank"
+                                            >
+                                                Open Plotly
+                                            </a>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            {`Before you can query, wait until Plotly has
+                                              finished Step 3 for you.`}
+                                        </div>
+                                    )
+                                    }
+                                </div>
+                            ) : (
+                                <p>You must connect to a data store first.</p>
+                            )}
+                        </TabPanel>
 
-                    <hr style={{'marginTop': '60px'}}/>
-
-                    <div>
-                        <h3>FAQ</h3>
-
-                        <div>
-                            <ul>
-                                <li>
-                                    <strong>{`How does this app work?`}</strong>
-
-                                    <p>
-                                        {`The Plotly Database Connector is a local web server that
-                                        listens for requests from your web browser in
-                                        the`}
-                                        &nbsp;
-                                        <Link href={`${plotlyUrl}/create`}>Plotly Chart Creator</Link>.
-                                        &nbsp;
-                                        {`This application makes queries against the databases that you have
-                                          connected to and returns the results to the Plotly Chart Creator.`}
-                                    </p>
-                                </li>
-
-                                <li>
-                                    <strong>{`Do I need to keep this application open?`}</strong>
-
-                                    <p>
-                                        {`Keep this application open when you're making queries!
-                                        The Plotly Chart Creator connects to your database through
-                                        this application.`}
-                                    </p>
-
-                                </li>
-
-                                <li>
-                                    <strong>{`Do I need to expose my database to your servers?`}</strong>
-                                    <p>
-                                          {`Since these requests are made locally from your web browser
-                                          to this application, you do not need to open up
-                                          your database's network: you just need to make sure
-                                          that you can connect to your database from this computer.`}
-                                    </p>
-                                </li>
-
-                                <li>
-                                    <strong>{`Where do I make SQL queries?`}</strong>
-                                    <p>
-                                        {`The`}
-                                        &nbsp;
-                                        <Link href={`${plotlyUrl}/create`}>Plotly Chart Creator</Link>
-                                        &nbsp;
-                                        {`includes a SQL editor that you can use
-                                          to import data from your databases into Plotly.`}
-                                    </p>
-
-                                </li>
-
-                                <li>
-                                    <strong>{`Are these database credentials shared on the Plotly server?`}</strong>
-                                    <p>
-                                        {`Your database credentials are only stored on your
-                                          computer (they are not saved on any Plotly servers).`}
-                                    </p>
-                                </li>
-
-                                <li>
-                                    <strong>{`How do scheduled queries work?`}</strong>
-
-                                    <p>
-                                        {`You can run queries on a schedule (e.g. daily or hourly) in the`}
-                                        &nbsp;
-                                        <Link href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}>
-                                            Plotly Chart Creator
-                                         </Link>
-                                         {`. Scheduled queries are saved and managed by this application,
-                                         so keep this app open if you want your queries to run and your
-                                         datasets to update. When you start the application, all of the
-                                         scheduled queries will run automatically and their scheduling timer
-                                         will reset.`}
-
-                                    </p>
-                                </li>
-
-                                <li>
-                                    <strong>{`What's a SSL certificate and why do I need it?`}</strong>
-
-                                    <p>
-                                        {`An SSL certificate is used to encrypt the requests between your
-                                          web browser and this connector. Unencrypted requests are blocked by
-                                          default in modern web browsers. We generate these certificates for you
-                                          automatically through the `}
-                                        <Link href="https://letsencrypt.org/">
-                                            {`Let's Encrypt service`}
-                                        </Link>
-                                        {`. This certificate takes
-                                          a several minutes to generate.`}
-                                    </p>
-
-                                </li>
-
-                                <li>
-                                    <strong>{`How do you generate certificates for a localhost web server?`}</strong>
-
-                                    <p>
-                                        {`This application runs a server on localhost:
-                                          it is not exposed to the network.
-                                          SSL certificates can not be issued for localhost servers,
-                                          so we create a unique URL for you and a global DNS entry that points
-                                          that URL to localhost. We use the Let's Encrypt service to
-                                          generate certificates on that unique URL.`}
-                                    </p>
-                                </li>
-
-                                <li>
-                                    <strong>{`Is this app open source?`}</strong>
-                                    <p>
-                                        {`Yes! You can view the code in our GitHub repo: `}
-                                        <Link href={'https://github.com/plotly/plotly-database-connector'}>
-                                            {'https://github.com/plotly/plotly-database-connector'}
-                                         </Link>.
-                                    </p>
-                                </li>
-
-                            </ul>
-                        </div>
-                    </div>
+                        <TabPanel>
+                            <div>
+                                <ul>
+                                    {FAQ.map(function(obj, i){
+                                        return (
+                                            <li key={i}>
+                                                <strong>{obj.q}</strong>
+                                                <p>{obj.a}</p>                                                
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
+                        </TabPanel>
+                    </Tabs>
                 </div>
             </div>
         );

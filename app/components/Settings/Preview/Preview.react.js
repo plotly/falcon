@@ -33,7 +33,12 @@ export default class Preview extends Component {
         const TablePreview = () => {
             const {previewTableRequest} = this.props;
             if (previewTableRequest.status >= 400) {
-                return (<div>{'Hm... An error while trying to load this table'}</div>);
+                return (
+                    <div>
+                        <div>{'Hm... An error occurred while trying to load this table'}</div>
+                        <div style={{color: 'red'}}>{JSON.stringify(previewTableRequest)}</div>
+                    </div>    
+                );
             } else if (previewTableRequest.status === 'loading') {
                 return (<div>{'Loading...'}</div>);
             } else if (previewTableRequest.status === 200) {
@@ -49,7 +54,7 @@ export default class Preview extends Component {
         const S3Preview = () => {
             const {s3KeysRequest} = this.props;
             if (s3KeysRequest.status >= 400) {
-                return (<div>{'Hm... An error while trying to load S3 keys'}</div>);
+                return (<div>{'Hm... An error occurred while trying to load S3 keys'}</div>);
             } else if (s3KeysRequest.status === 'loading') {
                 return (<div>{'Loading...'}</div>);
             } else if (s3KeysRequest.status === 200) {

@@ -21,7 +21,12 @@ export default class OptionsDropdown extends Component {
             return <div>{'Loading tables'}</div>;
         } else if (tablesRequest.status > 300) {
             // TODO - Make this prettier.
-            return <div>{'Hm.. there was an error loading up your tables'}</div>;
+            return (
+                <div>
+                    <div>{'Hm.. there was an error loading up your tables'}</div>
+                    <div style={{color:'red'}}>{JSON.stringify(tablesRequest)}</div>
+                </div>
+            );
         } else if (tablesRequest.status === 200) {
             const tablesList = flatten(tablesRequest.content);
             if (tablesList.length === 0) {

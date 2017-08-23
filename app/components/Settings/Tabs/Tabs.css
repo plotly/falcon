@@ -6,7 +6,7 @@
     width: 100%;
     /* margin-left: auto; */
     white-space: nowrap;
-    overflow-x: auto;
+    overflow-x: hidden;
     overflow-y: hidden;
 }
 

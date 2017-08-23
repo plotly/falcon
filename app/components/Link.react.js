@@ -1,7 +1,7 @@
 import R from 'ramda';
 import React from 'react';
 import {dynamicRequireElectron} from '../utils/utils';
-import * as styles from './Link.css';
+import * as styles from './styles/Link.css';
 
 
 let shell = null;
