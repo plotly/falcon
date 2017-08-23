@@ -29,8 +29,12 @@ const commonSqlOptions = [
     {'label': 'Database', 'value': 'database', 'type': 'text'},
     {
         'label': 'SSL Enabled', 'value': 'ssl', 'type': 'checkbox',
-        'description': 'Check if your database is built with SSL support. Note that this is different than the SSL connection that Plotly initializes for you automatically.'}
+        'description': 'Does your database require that you connect to it via SSL? \
+                        Note that this is just the connection between this app and your database; \
+                        connections to plot.ly or your plotly instance are always encrypted.'
+    }
 ];
+
 export const CONNECTION_CONFIG = {
     [DIALECTS.MYSQL]: commonSqlOptions,
     [DIALECTS.MARIADB]: commonSqlOptions,
@@ -138,3 +142,117 @@ export const INITIAL_CONNECTIONS = {
     host: '',
     ssl: false
 };
+
+export const FAQ = [
+    {
+        q: 'How does this app work?',
+        a: 'This app listens for query requests from the plot.ly online chart editor. This application \
+            queries the databases to which you have connected, then returns the results to plot.ly where \
+            you can compose charts and dashbords with the data.'
+    }, {
+        q: 'Do I need this application open while making database queries?',
+        a: 'Yes, keep this application open while making queries from within plot.ly.'
+    }, {
+        q: 'Do I need to expose my database to plot.ly?',
+        a: 'No. Since this app sits between plot.ly and your database, you just need to make sure that you \
+            can connect to your database from the computer or server this app is running on.'
+    }, {
+        q: 'Where do I make SQL queries?',
+        a: 'The online plot.ly chart editor includes an SQL editor that you can use to import data from \
+            your databases into Plotly. You can access the chart editor at plot.ly/create?upload=sql'
+    }, {
+        q: 'Are these database credentials shared on the Plotly server?',
+        a: 'Your database credentials are only stored on your computer (they are not saved on any Plotly \
+            servers). We do not recommmend giving your database credentials to any online service.'
+    }, {
+        q: 'Is this app open-source?',
+        a: 'Yep! You can view and contribute to the code on GitHub: \
+            https://github.com/plotly/plotly-database-connector.'
+    }, {        
+        q: '[Advanced] Can I schedule queries?',
+        a: 'You can set queries to runon a scheduler (ie daily or hourly) from the plot.ly online chart editor. ' +
+            'Scheduled queries are saved and managed by this application, so keep this app open ' +
+            'if you want your queries to run and your datasets to update. When you restart this ' +
+            'application, all of the scheduled queries will run automatically and their scheduling ' +
+            'timer will reset.'
+    }, {
+        q: '[Advanced] What\'s an SSL certificate (and why do I need it?)',
+        a: 'An SSL certificate is used to encrypt the requests between your web browser and this ' +
+            'connector. Unencrypted requests are blocked by default in modern web browsers. ' +
+            'We generate these certificates for you automatically through Let\'s Encrypt. ' +
+            'This certificate takes a several minutes to generate.'
+    }, {
+        q: '[Advanced] How do you generate certificates for a localhost web server?',
+        a: 'This application runs a server on localhost: it is not exposed to the network. SSL ' +
+            'certificates cannot be issued for localhost servers, so we create a unique URL for you  ' +
+            'and a global DNS entry that points that URL to localhost. We use Let\'s Encrypt ' +
+            'to generate certificates on that unique URL.' 
+    }                  
+];
+
+export const SAMPLE_DBS = {
+    postgres: {
+        username: 'masteruser',
+        password: 'connecttoplotly',
+        database: 'plotly_datasets',
+        port: 5432,
+        host: 'readonly-test-postgres.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
+        dialect: 'postgres'
+    },
+    mysql: {
+        dialect: 'mysql',
+        username: 'masteruser',
+        password: 'connecttoplotly',
+        host: 'readonly-test-mysql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
+        port: 3306,
+        database: 'plotly_datasets'
+    },
+    mariadb: {
+        dialect: 'mariadb',
+        username: 'masteruser',
+        password: 'connecttoplotly',
+        host: 'readonly-test-mariadb.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
+        port: 3306,
+        database: 'plotly_datasets'
+    },
+    redshift: {
+        dialect: 'redshift',
+        username: 'plotly',
+        password: 'Qmbdf#3DU]pP8a=CKTK}',
+        host: 'sql-connector-test.cfiaqtidutxu.us-east-1.redshift.amazonaws.com',
+        port: 5439,
+        database: 'plotly_datasets'
+    },
+    mssql: {
+        dialect: 'mssql',
+        username: 'masteruser',
+        password: 'connecttoplotly',
+        host: 'test-mssql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
+        port: 1433,
+        database: 'plotly_datasets'
+    },
+    elasticsearch: {
+        dialect: 'elasticsearch',
+        host: 'https://67a7441549120daa2dbeef8ac4f5bb2e.us-east-1.aws.found.io',
+        port: '9243'
+    },
+    s3: {
+        dialect: 's3',
+        bucket: 'plotly-s3-connector-test',
+        accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
+        secretAccessKey: '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'
+    },
+    'apache drill': {
+        dialect: 'apache drill',
+        host: 'http://ec2-35-164-71-216.us-west-2.compute.amazonaws.com',
+        port: 8047,
+
+        bucket: 'plotly-s3-connector-test',
+        accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
+        secretAccessKey: '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'
+    },
+    sqlite: {
+        dialect: 'sqlite',
+        storage: `${__dirname}/plotly_datasets.db`
+    }
+}

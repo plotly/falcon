@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import {keys} from 'ramda';
 import Tab from './Tab.react';
 
-export default class Tabs extends Component {
+export default class ConnectionTabs extends Component {
     constructor(props) {
         super(props);
     }

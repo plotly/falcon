@@ -3,7 +3,7 @@ import * as styles from './Tabs.css';
 import classnames from 'classnames';
 import {LOGOS, DIALECTS} from '../../../constants/constants';
 
-export default class Tab extends Component {
+export default class ConnectionTab extends Component {
     constructor(props) {
         super(props);
     }
