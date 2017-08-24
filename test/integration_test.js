@@ -94,6 +94,8 @@ describe('plotly database connector', function Spec() {
         // Connect
         (await this.findEl(this.byId('test-connect-button'))).click();
 
+        (await this.findEl(this.byClass('test-ssl-tab'))).click();        
+
         // Wait for certificate to be initialized - could take several minutes
         const isInitialized = () => this.findEl(
             this.byId('test-ssl-initialized'));

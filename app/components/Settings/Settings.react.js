@@ -302,7 +302,11 @@ class Settings extends Component {
                         <TabList>
                             <Tab>1. Connection</Tab>
                             <Tab>2. Preview</Tab>
-                            <Tab>3. SSL Certificate</Tab>
+                            <Tab
+                                className="test-ssl-tab react-tabs__tab"
+                            >
+                                3. SSL Certificate
+                            </Tab>
                             <Tab>4. Open Plotly</Tab>
                             <Tab>FAQ</Tab>
                         </TabList>
@@ -360,7 +364,7 @@ class Settings extends Component {
                                             </p>
                                             <p>
                                                 {`Once this is complete, you'll be able to
-                                                  query your databases from the `}
+                                                  query your databases from `}
                                                 <Link href={`${plotlyUrl}/create?upload=sql`}>
                                                         Plotly
                                                 </Link>
