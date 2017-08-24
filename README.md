@@ -1,4 +1,6 @@
 # Plotly Database Connector
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/plotly/plotly-database-connector.svg)](https://greenkeeper.io/)
 <p align="center">
 <img src="https://raw.githubusercontent.com/plotly/plotly-database-connector/master/app/app.ico">
 </p>
