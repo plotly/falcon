@@ -1,6 +1,6 @@
 machine:
     node:
-        version: 6.9.2
+        version: 6.11.1
 
 test:
     post:
