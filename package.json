@@ -181,6 +181,7 @@
     "node-gyp": "^3.3.1",
     "node-libs-browser": "^1.0.0",
     "node-restify": "^0.2.1",
+    "node-uuid": "^1.4.8",
     "pg": "^4.5.5",
     "pg-hstore": "^2.3.2",
     "pg-native": "^1.10.0",
