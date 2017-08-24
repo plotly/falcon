@@ -395,14 +395,14 @@ class Settings extends Component {
                                                 This URL is local - no one can access it except this computer or server.
                                                 Click below to connect and start writing queries:
                                             </p>
-                                            <a 
+                                            <Link 
                                                 className='btn-primary' 
                                                 style={{maxWidth: '100px'}}
                                                 href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`} 
                                                 target="_blank"
                                             >
                                                 Open Plotly
-                                            </a>
+                                            </Link>
                                         </div>
                                     ) : (
                                         <div>
