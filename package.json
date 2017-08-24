@@ -184,7 +184,6 @@
     "node-uuid": "^1.4.8",
     "pg": "^4.5.5",
     "pg-hstore": "^2.3.2",
-    "pg-native": "^1.10.0",
     "postcss": "^5.0.19",
     "query-string": "^4.2.3",
     "ramda": "^0.21.0",
