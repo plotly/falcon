@@ -21,7 +21,7 @@ init:
 
 
 install:
-  - ps: Install-Product node 7 x64
+  - ps: Install-Product node 6.11.1
   - yarn install
 
 build_script:
