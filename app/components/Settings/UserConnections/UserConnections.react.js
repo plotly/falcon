@@ -82,7 +82,6 @@ export default class UserConnections extends Component {
 			.map(setting => {
                 let input;
                 const dialect = connectionObject.dialect;
-                const inputKey = (setting.label).toLowerCase();
                 if (contains(setting.type, ['text', 'number', 'password'])) {
                     input = (
                         <div className={styles.inputContainer}>
@@ -101,7 +100,7 @@ export default class UserConnections extends Component {
                                 />                            
                                 <div style={sampleCredentialsStyle}>
                                     <code>
-                                        {(SAMPLE_DBS[dialect]) ? SAMPLE_DBS[dialect][inputKey] : null}
+                                        {(SAMPLE_DBS[dialect]) ? SAMPLE_DBS[dialect][setting.value] : null}
                                     </code>
                                 </div>
                             </div>

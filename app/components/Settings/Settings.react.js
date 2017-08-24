@@ -302,12 +302,12 @@ class Settings extends Component {
                         <TabList>
                             <Tab>1. Connection</Tab>
                             <Tab>2. Preview</Tab>
+                            <Tab>3. SSL Certificate</Tab>
                             <Tab
                                 className="test-ssl-tab react-tabs__tab"
                             >
-                                3. SSL Certificate
+                                4. Open Plotly
                             </Tab>
-                            <Tab>4. Open Plotly</Tab>
                             <Tab>FAQ</Tab>
                         </TabList>
 
