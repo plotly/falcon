@@ -116,6 +116,7 @@ button.btn-secondary {
 }
 
 button:hover, .btn-primary:hover {
+    color: #ffffff;    
     background-color: #0f89df;
     border: 1px solid #0f89df;
 }
@@ -127,6 +128,7 @@ button.btn-secondary:hover {
 }
     
 button:active, .btn-primary:active {
+    color: #ffffff;    
     background-color: #0d76bf;
     border: 1px solid #0d76bf;
 }
