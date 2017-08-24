@@ -12,7 +12,6 @@ services:
 
 cache:
   - node_modules
-  - "%LOCALAPPDATA%\\Yarn"
   - '%USERPROFILE%\.electron'
 
 init:
@@ -22,7 +21,7 @@ init:
 
 install:
   - ps: Install-Product node 6.11.1
-  - yarn install
+  - yarn install --force
 
 build_script:
   - npm run build
