@@ -12,7 +12,7 @@ services:
 
 cache:
   - node_modules
-  - '%APPDATA%\npm-cache'
+  - "%LOCALAPPDATA%\\Yarn"
   - '%USERPROFILE%\.electron'
 
 init:
@@ -22,7 +22,7 @@ init:
 
 install:
   - ps: Install-Product node 7 x64
-  - npm install
+  - yarn install
 
 build_script:
   - npm run build

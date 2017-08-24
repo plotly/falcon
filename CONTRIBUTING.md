@@ -12,13 +12,13 @@ Start by cloning the repo via git:
 git clone https://github.com/plotly/plotly-database-connector plotly-database-connector
 ```
 
-And then install dependencies.
+And then install dependencies with **yarn**.
 
 ```bash
-$ cd plotly-database-connector && npm install
+$ cd plotly-database-connector && yarn install
 ```
 
-*Note: requires a node version >= 4 and an npm version >= 2.*
+*Note: See package.json for the version of node that is required*
 
 ## Run as an Electron App
 Run the app with
