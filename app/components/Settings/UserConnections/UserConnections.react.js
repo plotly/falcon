@@ -34,7 +34,7 @@ export default class UserConnections extends Component {
     
     
     toggleSampleCredentials() {
-        this.state.showSampleCredentials = !this.state.showSampleCredentials;
+        this.setState({showSampleCredentials: !this.state.showSampleCredentials});
     }
 
 	testClass() {
@@ -63,9 +63,9 @@ export default class UserConnections extends Component {
 		};
 	}
 
-	render() {
+    render() {
 
-		const {connectionObject, updateConnection} = this.props;
+        const {connectionObject, updateConnection} = this.props;
         const sampleCredentialsStyle = {
             lineHeight: 1,
             textAlign: 'left',
@@ -78,7 +78,7 @@ export default class UserConnections extends Component {
             sampleCredentialsStyle['display'] = 'none';
         }
 
-		const inputs = CONNECTION_CONFIG[connectionObject.dialect]        
+        const inputs = CONNECTION_CONFIG[connectionObject.dialect]        
 			.map(setting => {
                 let input;
                 const dialect = connectionObject.dialect;
