@@ -71,12 +71,8 @@ export default class UserConnections extends Component {
             textAlign: 'left',
             width: '100%',
             maxWidth: 200,
-            display: 'inline-block'
+            display: this.state.showSampleCredentials ? 'inline-block': 'none'
         };
-
-        if (!this.state.showSampleCredentials) {
-            sampleCredentialsStyle['display'] = 'none';
-        }
 
         const inputs = CONNECTION_CONFIG[connectionObject.dialect]        
 			.map(setting => {
@@ -164,7 +160,7 @@ export default class UserConnections extends Component {
             <div>
                 {inputs}
                 <small style={{float: 'right'}}>
-                    <a onClick={() => {this.toggleSampleCredentials()}}>
+                    <a onClick={this.toggleSampleCredentials}>
                         {this.state.showSampleCredentials && `Hide Sample Credentials`}
                         {!this.state.showSampleCredentials && `Show Sample Credentials`}
                     </a>
