@@ -41,8 +41,8 @@ ENV PLOTLY_CONNECTOR_LOG_TO_STDOUT="true"
 
 # Install app dependencies
 COPY package.json /usr/src/app
-COPY npm-shrinkwrap.json /usr/src/app
-RUN npm install --no-optional
+COPY yarn.lock /usr/src/app
+RUN npm install
 
 COPY . /usr/src/app
 RUN npm run heroku-postbuild
