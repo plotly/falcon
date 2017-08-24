@@ -1,6 +1,14 @@
 machine:
     node:
         version: 6.11.1
+    environment:
+        PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
+
+dependencies:
+    override:
+        - yarn
+    cache_directories:
+        - ~/.cache/yarn
 
 test:
     post:
