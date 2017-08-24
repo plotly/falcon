@@ -94,8 +94,9 @@ $ npm run test-e2e
 
 ## Builds and Releases
 
-- Linux builds are created at the end of CircleCI tests
-- Windows 32bit and 64bit builds are created in AppVeyor tests
-- Mac builds are created on an available mac laptop
+- Update package.json with the new semver version
+- Linux builds are created at the end of CircleCI tests (under Artifacts)
+- Windows 32bit and 64bit builds are created in AppVeyor tests (under Artifacts)
+- Mac builds are created on any available Mac laptop - run `npm run package` and zip the resulting build
 
 Releases are uploaded to https://github.com/plotly/plotly-database-connector/releases
