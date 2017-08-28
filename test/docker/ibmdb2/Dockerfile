@@ -6,8 +6,10 @@ ARG LICENSE
 
 COPY "build.sh" "/build.sh"
 
+RUN curl https://raw.githubusercontent.com/plotly/datasets/master/2010_alcohol_consumption_by_country.csv -o /2010_alcohol_consumption_by_country.csv
+
 # Install DB2 Express-C
-RUN /entrypoint.sh "true" 
+RUN /entrypoint.sh "true"
 
 # Setup sample database
 RUN /build.sh
