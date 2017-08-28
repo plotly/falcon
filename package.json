@@ -19,7 +19,7 @@
     "install:modules:electron": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/install-modules.js --electron",
     "install:modules:node": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/install-modules.js",
     "lint": "eslint app test *.js",
-    "test": "npm run build && npm run test-unit-all && npm run test-e2e",
+    "test": "npm run build && npm run test-unit-all && npm run install:modules:electron && npm run test-e2e",
     "test-e2e": "cross-env NODE_ENV=test mocha --compilers js:babel-register --require ./test/setup.js --require co-mocha ./test/integration_test.js",
     "test-e2e-local": "source test/set_creds.sh && npm run test-e2e",
     "test-unit": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --compilers js:babel-register ",
