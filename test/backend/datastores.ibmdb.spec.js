@@ -10,7 +10,7 @@ const connection = {
     dialect: DIALECTS.IBM_DB2,
     username: 'db2user1',
     password: 'w8wfy99DvEmgkBsE',
-    host: '127.0.0.1',
+    host: '35.184.35.183',
     port: 50000,
     database: 'SAMPLE'
 };
