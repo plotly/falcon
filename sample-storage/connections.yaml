@@ -75,6 +75,6 @@
     id: ibm db2-f51f57b6-d00b-478a-b502-8e201ae70e74
     username: db2user1
     password: w8wfy99DvEmgkBsE
-    database: SAMPLE
+    database: plotly
     port: 50000
     host: 35.184.35.183
