@@ -4,7 +4,7 @@ machine:
 
 dependencies:
         override:
-            - echo Skipping `npm install` to prevent cache
+            - echo Skipping \'npm install\' to prevent cache
 
 test:
     pre:
