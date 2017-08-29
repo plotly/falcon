@@ -14,7 +14,6 @@
     "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\"",
     "docker:db2:build": "docker build test/docker/ibmdb2/ -t pdc-db2 --build-arg LICENSE=accept --build-arg DB2INST1_PASSWORD=${DB2INST1_PASSWORD} --build-arg DB2USER1_PASSWORD=${DB2USER1_PASSWORD} --no-cache",
     "docker:db2:start": "docker run --rm -ti -p 50000:50000 pdc-db2",
-    "fix:ibm_db": "chmod -R +w node_modules/ibm_db/installer",
     "hot-server": "node -r babel-register devServer.js",
     "install:modules:electron": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/install-modules.js --electron",
     "install:modules:node": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/install-modules.js",
