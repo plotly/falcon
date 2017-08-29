@@ -13,7 +13,6 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
     } else {
         throw new Error('Missing apiKey or accessToken');
     }
-    console.log("PlotlyAPIRequest: before fetch");
     return fetch(`${getSetting('PLOTLY_API_URL')}/v2/${relativeUrl}`, {
         method,
         headers: {
@@ -67,7 +66,6 @@ export function updateGrid(rows, fid, uids, requestor) {
             data: column
         })))
     };
-    console.log("updateGrid: before PlotlyAPIRequest");
     return PlotlyAPIRequest(url, {body, username, apiKey, accessToken, method: 'PUT'});
 }
 
