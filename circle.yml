@@ -6,6 +6,10 @@ dependencies:
     post:
         - npm run install:modules:electron
 
+compile:
+    override:
+        - npm run build
+
 test:
     post:
         - npm run build
