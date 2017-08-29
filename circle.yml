@@ -2,10 +2,16 @@ machine:
     node:
         version: 6.9.2
 
+dependencies:
+        override:
+            - echo Skipping `npm install` to prevent cache
+
 test:
+    pre:
+        - npm install
+
     post:
         - npm run build
         - npm run package
         - zip -r release.zip release
         - mv release.zip $CIRCLE_ARTIFACTS
-        - rm -rf node_modules
