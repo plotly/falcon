@@ -14,7 +14,7 @@ describe('Grid API Functions', function () {
         saveSetting('USERS', [{username, apiKey}]);
     });
 
-    it('updateGrid overwrites a grid with new data', function (done) {
+    xit('updateGrid overwrites a grid with new data', function (done) {
         this.timeout(15 * 1000);
         // First, create a new grid.
         // Note that the app never actually does this,
