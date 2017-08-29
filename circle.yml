@@ -7,9 +7,6 @@ dependencies:
         - npm run install:modules:electron
 
 test:
-    pre:
-        - Xvfb +extension RANDR
-
     post:
         - npm run build
         - npm run package
