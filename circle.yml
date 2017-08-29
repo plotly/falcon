@@ -8,4 +8,4 @@ test:
         - npm run package
         - zip -r release.zip release
         - mv release.zip $CIRCLE_ARTIFACTS
-        - rm -r node_modules
+        - rm -rf node_modules
