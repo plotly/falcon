@@ -2,7 +2,7 @@
 
 import fs from 'fs';
 import {assoc, assocPath, dissoc, findIndex, merge} from 'ramda';
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 import YAML from 'yamljs';
 import Logger from '../logger';
 import * as Datastores from './datastores/Datastores.js';
