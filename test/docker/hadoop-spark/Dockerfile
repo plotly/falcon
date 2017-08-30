@@ -15,3 +15,5 @@ RUN /setup_database.sh; exit 0
 RUN /setup_livy.sh; exit 0
 
 EXPOSE 8998
+
+ENTRYPOINT ./livy/bin/livy-server
