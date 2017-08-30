@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 import {createAction} from 'redux-actions';
 import {DIALECTS, INITIAL_CONNECTIONS} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
