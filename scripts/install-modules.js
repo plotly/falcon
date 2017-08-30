@@ -21,6 +21,6 @@ if (electronEnv) {
     if (!winEnv) execSync(`chmod -R +w ${ibmdbInstaller}`);
 
     const localBin = require('child_process').execSync('npm bin').toString().trim();
-    const installAppDeps = path.join(localBin, 'install-app-deps');
+    const installAppDeps = path.join(localBin, 'electron-builder install-app-deps');
     execSync(installAppDeps);
 }
