@@ -17,14 +17,12 @@ const connection = {
 
 describe('IBM DB2:', function () {
     it('connect succeeds', function(done) {
-        this.timeout(4 * 1000);
         connect(connection).then(database => {
             assert(database.connected);
         }).then(done);
     });
 
     it('query returns rows and column names', function(done) {
-        this.timeout(4 * 1000);
         query(
             'SELECT * FROM DB2INST1.ALCOHOL_CONSUMPTION_BY_COUNTRY_2010 FETCH FIRST 5 ROWS ONLY',
             connection
@@ -41,7 +39,6 @@ describe('IBM DB2:', function () {
     });
 
     it('tables returns list of tables', function(done) {
-        this.timeout(4 * 1000);
         tables(connection).then(result => {
             assert.deepEqual(result, ['DB2INST1.ALCOHOL_CONSUMPTION_BY_COUNTRY_2010']);
         }).then(done);
