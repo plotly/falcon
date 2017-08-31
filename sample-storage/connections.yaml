@@ -78,3 +78,8 @@
     database: plotly
     port: 50000
     host: 35.184.35.183
+
+-
+    dialect: apache livy
+    port: 8998
+    host: 104.198.64.55
