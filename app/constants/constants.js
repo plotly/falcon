@@ -194,6 +194,14 @@ export const FAQ = [
 ];
 
 export const SAMPLE_DBS = {
+    [DIALECTS.IBM_DB2]: {
+        username: 'db2user1',
+        password: 'w8wfy99DvEmgkBsE',
+        database: 'plotly',
+        port: 50000,
+        host: '35.184.35.183',
+        dialect: DIALECTS.IBM_DB2
+    },
     postgres: {
         username: 'masteruser',
         password: 'connecttoplotly',
