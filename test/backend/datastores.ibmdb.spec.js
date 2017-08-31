@@ -10,7 +10,7 @@ const connection = {
     dialect: DIALECTS.IBM_DB2,
     username: 'db2user1',
     password: 'w8wfy99DvEmgkBsE',
-    host: '35.184.35.183',
+    host: '104.197.158.0',
     port: 50000,
     database: 'plotly'
 };
