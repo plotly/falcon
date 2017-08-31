@@ -11,9 +11,8 @@ RUN chmod +x /create_hive_tables.py
 RUN chmod +x /setup_database.sh
 RUN chmod +x /setup_livy.sh
 
-RUN /setup_database.sh; exit 0
 RUN /setup_livy.sh; exit 0
 
 EXPOSE 8998
 
-ENTRYPOINT ./livy/bin/livy-server
+ENTRYPOINT /etc/bootstrap.sh && /setup_database.sh && ./livy/bin/livy-server
