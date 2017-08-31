@@ -9,8 +9,8 @@ import {
 import {disconnect, getActiveSessions} from '../../backend/persistent/datastores/livy.js';
 
 const connection = {
-    dialect: DIALECTS.APACHE_LIVY,
-    host: '104.198.58.6',
+    dialect: DIALECTS.APACHE_SPARK,
+    host: '130.211.124.41',
     port: 8998,
     database: 'plotly',
     timeout: 120

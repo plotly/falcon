@@ -196,7 +196,7 @@ class Settings extends Component {
 
         const connectionObject = connections[selectedTab] || {};
         if (contains(connectionObject.dialect, [
-                    DIALECTS.APACHE_LIVY,
+                    DIALECTS.APACHE_SPARK,
                     DIALECTS.IBM_DB2,
                     DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
                     DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE
@@ -317,7 +317,7 @@ class Settings extends Component {
                             {this.renderSettingsForm()}
                             {this.renderEditButton(!this.state.editMode)}
                         </TabPanel>
-                        
+
                         <TabPanel>
                             {this.props.connectRequest.status === 200 ? (
                                 <div>
@@ -349,7 +349,7 @@ class Settings extends Component {
                                     {httpsServerIsOK ? (
                                         <div>
                                             <div>
-                                                <p> 
+                                                <p>
                                                     {'No action required. Plotly has already generated a unique SSL certificate for this app.'}
                                                 </p>
                                             </div>
@@ -388,7 +388,7 @@ class Settings extends Component {
                                             <p>
                                                 You're now ready to explore this datastore on Plotly!
                                                 Plotly has generated a local URL for this app
-                                                through which it will securely send queries: 
+                                                through which it will securely send queries:
                                             </p>
                                             <div style={{textAlign: 'center'}}>
                                                 <strong><code>{connectorUrl}</code></strong>
@@ -397,10 +397,10 @@ class Settings extends Component {
                                                 This URL is local - no one can access it except this computer or server.
                                                 Click below to connect and start writing queries:
                                             </p>
-                                            <Link 
-                                                className='btn-primary' 
+                                            <Link
+                                                className='btn-primary'
                                                 style={{maxWidth: '100px'}}
-                                                href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`} 
+                                                href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}
                                                 target="_blank"
                                             >
                                                 Open Plotly
@@ -426,7 +426,7 @@ class Settings extends Component {
                                         return (
                                             <li key={i}>
                                                 <strong>{obj.q}</strong>
-                                                <p>{obj.a}</p>                                                
+                                                <p>{obj.a}</p>
                                             </li>
                                         );
                                     })}
