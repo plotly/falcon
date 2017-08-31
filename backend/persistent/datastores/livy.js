@@ -16,7 +16,7 @@ export function connect(connection) {
 }
 
 export function tables(connection) {
-    const code = `val r = sql("show tables").toJSON\n%json r`;
+    const code = `r = sqlContext.sql("show tables").toJSON()\n%json r`;
     return sendRequest(connection, code)
         .then(tables => {
             return (Array.isArray(tables)) ?
@@ -26,7 +26,7 @@ export function tables(connection) {
 }
 
 export function query(query, connection) {
-    const code = `val r = sql("""${query}""").toJSON\n%json r`;
+    const code = `r = sqlContext.sql("""${query}""").toJSON()\n%json r`;
     return sendRequest(connection, code)
         .then(data => {
             return (Array.isArray(data)) ?
@@ -56,7 +56,7 @@ export function newSession(connection) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                'kind': 'spark'
+                'kind': 'pyspark'
             })
         })
         .then(response => response.json())
