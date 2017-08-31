@@ -1,6 +1,7 @@
 import {concat} from 'ramda';
 
 export const DIALECTS = {
+    APACHE_LIVY: 'apache livy',
     IBM_DB2: 'ibm db2',
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
@@ -37,6 +38,11 @@ const commonSqlOptions = [
 ];
 
 export const CONNECTION_CONFIG = {
+    [DIALECTS.APACHE_LIVY]: [
+        {'label': 'Host', 'value': 'host', 'type': 'text' },
+        {'label': 'Port', 'value': 'port', 'type': 'number'},
+        {'label': 'Timeout', 'value': 'timeout', 'type': 'number', 'description': 'Number of seconds for a request to timeout.'}
+    ],
     [DIALECTS.IBM_DB2]: commonSqlOptions,
     [DIALECTS.MYSQL]: commonSqlOptions,
     [DIALECTS.MARIADB]: commonSqlOptions,
@@ -121,6 +127,7 @@ export const CONNECTION_CONFIG = {
 
 
 export const LOGOS = {
+    [DIALECTS.APACHE_LIVY]: 'images/livy-logo.png',
     [DIALECTS.IBM_DB2]: 'images/ibmdb2-logo.png',
     [DIALECTS.REDSHIFT]: 'images/redshift-logo.png',
     [DIALECTS.POSTGRES]: 'images/postgres-logo.png',
