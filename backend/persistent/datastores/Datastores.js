@@ -32,7 +32,7 @@ function getDatastoreClient(connection) {
         return S3;
     } else if (dialect === 'apache drill') {
         return ApacheDrill;
-    } else if (dialect === 'apache livy') {
+    } else if (dialect === 'apache spark') {
         return ApacheLivy;
     } else if (dialect === 'ibm db2') {
         return IbmDb2;

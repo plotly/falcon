@@ -80,7 +80,7 @@
     host: 35.184.35.183
 
 -
-    dialect: apache livy
+    dialect: apache spark
     timeout: 180
     database: plotly
     port: 8998
