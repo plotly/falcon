@@ -1,7 +1,7 @@
 import {concat} from 'ramda';
 
 export const DIALECTS = {
-    APACHE_LIVY: 'apache livy',
+    APACHE_Spark: 'apache spark',
     IBM_DB2: 'ibm db2',
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
@@ -38,7 +38,7 @@ const commonSqlOptions = [
 ];
 
 export const CONNECTION_CONFIG = {
-    [DIALECTS.APACHE_LIVY]: [
+    [DIALECTS.APACHE_SPARK]: [
         {'label': 'Host', 'value': 'host', 'type': 'text' },
         {'label': 'Port', 'value': 'port', 'type': 'number'},
         {'label': 'Timeout', 'value': 'timeout', 'type': 'number', 'description': 'Number of seconds for a request to timeout.'}
@@ -178,7 +178,7 @@ export const FAQ = [
         q: 'Is this app open-source?',
         a: 'Yep! You can view and contribute to the code on GitHub: \
             https://github.com/plotly/plotly-database-connector.'
-    }, {        
+    }, {
         q: '[Advanced] Can I schedule queries?',
         a: 'You can set queries to runon a scheduler (ie daily or hourly) from the plot.ly online chart editor. ' +
             'Scheduled queries are saved and managed by this application, so keep this app open ' +
@@ -196,8 +196,8 @@ export const FAQ = [
         a: 'This application runs a server on localhost: it is not exposed to the network. SSL ' +
             'certificates cannot be issued for localhost servers, so we create a unique URL for you  ' +
             'and a global DNS entry that points that URL to localhost. We use Let\'s Encrypt ' +
-            'to generate certificates on that unique URL.' 
-    }                  
+            'to generate certificates on that unique URL.'
+    }
 ];
 
 export const SAMPLE_DBS = {

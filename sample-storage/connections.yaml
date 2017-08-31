@@ -80,6 +80,6 @@
     host: 104.197.158.0
 
 -
-    dialect: apache livy
+    dialect: apache spark
     port: 8998
     host: 104.198.64.55

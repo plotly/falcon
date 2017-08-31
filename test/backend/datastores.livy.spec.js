@@ -9,7 +9,7 @@ import {
 import {getActiveSessions} from '../../backend/persistent/datastores/livy.js';
 
 const connection = {
-    dialect: DIALECTS.APACHE_LIVY,
+    dialect: DIALECTS.APACHE_SPARK,
     host: '104.198.64.55',
     //host: '127.0.0.1',
     port: 8998,
