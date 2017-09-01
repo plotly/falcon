@@ -33,7 +33,7 @@ const mockedCaServerURL = 'http://localhost:9494/certificate';
 let ServerCA;
 let ServerUnderTest;
 
-describe('Certificates', function() {
+xdescribe('Certificates', function() {
     beforeEach(() => {
         setCertificatesSettings('CA_HOST_URL', mockedCaServerURL);
         setCertificatesSettings('MAX_TRIES_COUNT', 2);
@@ -198,7 +198,7 @@ describe('Certificates', function() {
         }, 6000);
     }).timeout(10000);
 
-    xit('setRenewalJob - renews certificate after a given time if receives 201 from CA', (done) => {
+    it('setRenewalJob - renews certificate after a given time if receives 201 from CA', (done) => {
         ServerCA.start(201, fakeCerts);
         saveSetting('USERS', [{username, accessToken}]);
         const {cert, key} = fakeCerts;
@@ -227,9 +227,9 @@ describe('Certificates', function() {
             );
             done();
         }, 6000);
-    });//.timeout(10000);
+    }).timeout(10000);
 
-    xit('setRenewalJob - tries again if received a 500 status from CA', (done) => {
+    it('setRenewalJob - tries again if received a 500 status from CA', (done) => {
         ServerCA.start(500, {error: 'An error occurred.'});
         saveSetting('USERS', [{username, accessToken}]);
         saveSetting('CERTIFICATE_LAST_UPDATED', new Date());
@@ -246,9 +246,9 @@ describe('Certificates', function() {
             assert.deepEqual(getCerts(), {});
             done();
         }, 7000);
-    });//.timeout(10000);
+    }).timeout(10000);
 
-    xit('setRenewalJob - Restarts the https server.', (done) => { ServerCA.start(201, fakeCerts);
+    it('setRenewalJob - Restarts the https server.', (done) => { ServerCA.start(201, fakeCerts);
         const {cert, key} = fakeCerts;
         // Save bogus certs.
         saveCertsLocally({cert: 'cert', key: 'key'});
@@ -272,6 +272,6 @@ describe('Certificates', function() {
             expect(restart).to.have.been.called();
             done();
         }, 5000);
-    });//.timeout(10000);
+    }).timeout(10000);
 
 });
