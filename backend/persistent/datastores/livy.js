@@ -35,6 +35,17 @@ export function query(query, connection) {
         });
 }
 
+export function disconnect(connection) {
+    return fetch(getSessionUrl(connection), {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+}
+
 function getServerUrl(connection) {
     return `http://${connection.host}:${connection.port}/sessions`;
 }

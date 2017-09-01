@@ -6,7 +6,7 @@ import {
     query, connect, tables
 } from '../../backend/persistent/datastores/Datastores.js';
 
-import {getActiveSessions} from '../../backend/persistent/datastores/livy.js';
+import {disconnect, getActiveSessions} from '../../backend/persistent/datastores/livy.js';
 
 const connection = {
     dialect: DIALECTS.APACHE_LIVY,
@@ -32,6 +32,10 @@ function setSessionId(connection) {
 }
 
 describe('Apache Livy:', function () {
+    after(function() {
+        return disconnect(connection);
+    });
+
     it('connect succeeds', function() {
         this.timeout(180 * 1000);
         connection.setup = `
