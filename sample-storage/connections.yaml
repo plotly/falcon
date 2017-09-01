@@ -85,4 +85,4 @@
     username: user
     database: plotly
     port: 8998
-    host: 104.198.64.55
+    host: 104.198.58.6

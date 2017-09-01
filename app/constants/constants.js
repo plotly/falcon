@@ -208,7 +208,7 @@ export const SAMPLE_DBS = {
         username: 'user',
         database: 'plotly',
         port: 8998,
-        host: '104.198.64.55',
+        host: '104.198.58.6',
         dialect: DIALECTS.APACHE_LIVY
     },
     [DIALECTS.IBM_DB2]: {
