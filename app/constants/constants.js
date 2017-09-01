@@ -216,7 +216,7 @@ export const SAMPLE_DBS = {
         password: 'w8wfy99DvEmgkBsE',
         database: 'plotly',
         port: 50000,
-        host: '104.197.158.0',
+        host: '35.184.35.183',
         dialect: DIALECTS.IBM_DB2
     },
     postgres: {
