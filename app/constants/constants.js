@@ -39,6 +39,7 @@ const commonSqlOptions = [
 
 export const CONNECTION_CONFIG = {
     [DIALECTS.APACHE_LIVY]: [
+        {'label': 'Username', 'value': 'username', 'type': 'text'},
         {'label': 'Host', 'value': 'host', 'type': 'text' },
         {'label': 'Port', 'value': 'port', 'type': 'number'},
         {'label': 'Database', 'value': 'database', 'type': 'text'},
@@ -204,6 +205,7 @@ export const FAQ = [
 export const SAMPLE_DBS = {
     [DIALECTS.APACHE_LIVY]: {
         timeout: 180,
+        username: 'user',
         database: 'plotly',
         port: 8998,
         host: '104.198.64.55',

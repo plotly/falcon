@@ -10,7 +10,8 @@ import {disconnect, getActiveSessions} from '../../backend/persistent/datastores
 
 const connection = {
     dialect: DIALECTS.APACHE_LIVY,
-    host: '104.198.64.55',
+    username: 'user',
+    host: '104.154.38.118',
     port: 8998,
     database: 'plotly',
     timeout: 120
