@@ -207,6 +207,14 @@ export const SAMPLE_DBS = {
         host: '104.198.64.55',
         dialect: DIALECTS.APACHE_LIVY
     },
+    [DIALECTS.IBM_DB2]: {
+        username: 'db2user1',
+        password: 'w8wfy99DvEmgkBsE',
+        database: 'plotly',
+        port: 50000,
+        host: '104.197.158.0',
+        dialect: DIALECTS.IBM_DB2
+    },
     postgres: {
         username: 'masteruser',
         password: 'connecttoplotly',
