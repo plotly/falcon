@@ -41,6 +41,7 @@ export const CONNECTION_CONFIG = {
     [DIALECTS.APACHE_LIVY]: [
         {'label': 'Host', 'value': 'host', 'type': 'text' },
         {'label': 'Port', 'value': 'port', 'type': 'number'},
+        {'label': 'Database', 'value': 'database', 'type': 'text'},
         {'label': 'Timeout', 'value': 'timeout', 'type': 'number', 'description': 'Number of seconds for a request to timeout.'}
     ],
     [DIALECTS.IBM_DB2]: commonSqlOptions,
@@ -203,8 +204,9 @@ export const FAQ = [
 export const SAMPLE_DBS = {
     [DIALECTS.APACHE_LIVY]: {
         timeout: 180,
+        database: 'plotly',
         port: 8998,
-        host: '104.198.64.55',
+        host: '130.211.124.41',
         dialect: DIALECTS.APACHE_LIVY
     },
     [DIALECTS.IBM_DB2]: {

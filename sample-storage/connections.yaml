@@ -81,5 +81,7 @@
 
 -
     dialect: apache livy
+    timeout: 180
+    database: plotly
     port: 8998
-    host: 104.198.64.55
+    host: 130.211.124.41

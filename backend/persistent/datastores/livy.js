@@ -16,17 +16,25 @@ export function connect(connection) {
 }
 
 export function tables(connection) {
-    const code = `val r = sql("show tables").toJSON\n%json r`;
+    const code = (connection.database) ?
+        `val r = plotlyContext.sql("show tables in ${connection.database}").toJSON\n%json r` :
+        `val r = plotlyContext.sql("show tables").toJSON\n%json r`;
     return sendRequest(connection, code)
         .then(tables => {
-            return (Array.isArray(tables)) ?
+            let tableNames = (Array.isArray(tables)) ?
                 tables.map(t => JSON.parse(t).tableName) :
                 [];
+
+            if (connection.database) tableNames = tableNames.map(tn => `${connection.database}.${tn}`);
+
+            tableNames = tableNames.map(tn => tn.toUpperCase());
+
+            return tableNames;
         });
 }
 
 export function query(query, connection) {
-    const code = `val r = sql("""${query}""").toJSON\n%json r`;
+    const code = `val r = plotlyContext.sql("""${query}""").toJSON\n%json r`;
     return sendRequest(connection, code)
         .then(data => {
             return (Array.isArray(data)) ?
@@ -77,11 +85,14 @@ export function newSession(connection) {
         })
         .then(function() {
             // Here we run any code needed to setup the session
-            return (!connection.setup) ?
-                connection :
-                sendRequest(connection, connection.setup).then(function() {
-                    return connection;
-                });
+            let setup = (connection.useSqlContext) ?
+                'val plotlyContext = sqlContext\n' :
+                'val plotlyContext = new org.apache.spark.sql.hive.HiveContext(sc)\n';
+            if (connection.setup) setup += connection.setup;
+
+            return sendRequest(connection, setup).then(function() {
+                return connection;
+            });
         });
 }
 
@@ -162,10 +173,16 @@ function getResponse(connection, statementId) {
         })
         .then(response => response.json())
         .then(statement => {
-            return (statement.state === 'available') ?
-                statement.output.data['application/json'] :
-                wait(1000).then(function() {
+            if (statement.state !== 'available') {
+                return wait(1000).then(function() {
                     return getResponse(connection, statementId);
                 });
+            }
+
+            let json;
+            try {
+                json = statement.output.data['application/json'];
+            } catch (err) {};
+            return json;
         });
 }
