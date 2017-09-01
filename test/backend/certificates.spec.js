@@ -198,7 +198,7 @@ describe('Certificates', function() {
         }, 6000);
     }).timeout(10000);
 
-    it('setRenewalJob - renews certificate after a given time if receives 201 from CA', (done) => {
+    xit('setRenewalJob - renews certificate after a given time if receives 201 from CA', (done) => {
         ServerCA.start(201, fakeCerts);
         saveSetting('USERS', [{username, accessToken}]);
         const {cert, key} = fakeCerts;
@@ -227,9 +227,9 @@ describe('Certificates', function() {
             );
             done();
         }, 6000);
-    }).timeout(10000);
+    });//.timeout(10000);
 
-    it('setRenewalJob - tries again if received a 500 status from CA', (done) => {
+    xit('setRenewalJob - tries again if received a 500 status from CA', (done) => {
         ServerCA.start(500, {error: 'An error occurred.'});
         saveSetting('USERS', [{username, accessToken}]);
         saveSetting('CERTIFICATE_LAST_UPDATED', new Date());
@@ -246,9 +246,9 @@ describe('Certificates', function() {
             assert.deepEqual(getCerts(), {});
             done();
         }, 7000);
-    }).timeout(10000);
+    });//.timeout(10000);
 
-    it('setRenewalJob - Restarts the https server.', (done) => { ServerCA.start(201, fakeCerts);
+    xit('setRenewalJob - Restarts the https server.', (done) => { ServerCA.start(201, fakeCerts);
         const {cert, key} = fakeCerts;
         // Save bogus certs.
         saveCertsLocally({cert: 'cert', key: 'key'});
@@ -272,6 +272,6 @@ describe('Certificates', function() {
             expect(restart).to.have.been.called();
             done();
         }, 5000);
-    }).timeout(10000);
+    });//.timeout(10000);
 
 });
