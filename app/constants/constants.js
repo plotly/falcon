@@ -201,6 +201,12 @@ export const FAQ = [
 ];
 
 export const SAMPLE_DBS = {
+    [DIALECTS.APACHE_LIVY]: {
+        timeout: 180,
+        port: 8998,
+        host: '104.198.64.55',
+        dialect: DIALECTS.APACHE_LIVY
+    },
     postgres: {
         username: 'masteruser',
         password: 'connecttoplotly',
