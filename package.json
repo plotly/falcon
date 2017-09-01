@@ -185,7 +185,7 @@
     "minimist": "^1.2.0",
     "mkdirp": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
     "mysql": "^2.10.2",
-    "node-fetch": "^1.5.3",
+    "node-fetch": "^1.7.2",
     "node-gyp": "^3.3.1",
     "node-libs-browser": "^1.0.0",
     "node-restify": "^0.2.1",
