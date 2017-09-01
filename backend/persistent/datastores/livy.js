@@ -107,6 +107,8 @@ function wait(milliseconds) {
 }
 
 function getClient(connection, attempts) {
+    const timeout = connection.timeout || 180;
+
     attempts = attempts || 1
     if (attempts++ > connection.timeout) new Error("livy: connect: timeout");
 
