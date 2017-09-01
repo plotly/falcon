@@ -84,4 +84,4 @@
     timeout: 180
     database: plotly
     port: 8998
-    host: 104.198.58.6
+    host: 130.211.124.41
