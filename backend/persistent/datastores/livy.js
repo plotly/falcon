@@ -25,8 +25,9 @@ export function tables(connection) {
                 tables.map(t => JSON.parse(t).tableName) :
                 [];
 
-            const database = (connection.database || '').toUpperCase();
-            if (database) tableNames = tableNames.map(tn => `${database}.${tn}`);
+            if (connection.database) tableNames = tableNames.map(tn => `${connection.database}.${tn}`);
+
+            tableNames = tableNames.map(tn => tn.toUpperCase());
 
             return tableNames;
         });
@@ -84,9 +85,11 @@ export function newSession(connection) {
         })
         .then(function() {
             // Here we run any code needed to setup the session
-            // let setup = 'val plotlyContext = new org.apache.spark.sql.hive.HiveContext(sc)\n';
-            let setup = 'val plotlyContext = sqlContext\n';
+            let setup = (connection.useSqlContext) ?
+                'val plotlyContext = sqlContext\n' :
+                'val plotlyContext = new org.apache.spark.sql.hive.HiveContext(sc)\n';
             if (connection.setup) setup += connection.setup;
+
             return sendRequest(connection, setup).then(function() {
                 return connection;
             });

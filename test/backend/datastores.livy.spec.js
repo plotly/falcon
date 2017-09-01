@@ -12,7 +12,7 @@ const connection = {
     dialect: DIALECTS.APACHE_LIVY,
     host: '104.198.64.55',
     port: 8998,
-    //database: 'plotly',
+    database: 'plotly',
     timeout: 120
 };
 
@@ -39,9 +39,9 @@ describe('Apache Livy:', function () {
 val a = Array(("Belarus", 17.5), ("Moldova", 16.8), ("Lithuania", 15.4), ("Russia", 15.1), ("Romania", 14.4))
 val rdd = sc.parallelize(a)
 val df = rdd.toDF("LOCATION", "ALCOHOL")
-df.registerTempTable("ALCOHOL_CONSUMPTION_BY_COUNTRY_2010")
-//df.createOrReplaceTempView("ALCOHOL_CONSUMPTION_BY_COUNTRY_2010")
+df.registerTempTable("ALCOHOL")
         `;
+        connection.useSqlContext = false;
     });
 
     after(function() {
@@ -56,8 +56,8 @@ df.registerTempTable("ALCOHOL_CONSUMPTION_BY_COUNTRY_2010")
     it('tables returns list of tables', function() {
         return tables(connection).then(result => {
             const tableName = (connection.database) ?
-                `${connection.database}.ALCOHOL_CONSUMPTION_BY_COUNTRY_2010`.toUpperCase() :
-                'ALCOHOL_CONSUMPTION_BY_COUNTRY_2010';
+                `${connection.database}.ALCOHOL`.toUpperCase() :
+                'ALCOHOL';
 
             assert.deepEqual(result, [tableName]);
         });
@@ -65,8 +65,8 @@ df.registerTempTable("ALCOHOL_CONSUMPTION_BY_COUNTRY_2010")
 
     it('query returns rows and column names', function() {
         let tableName = (connection.database) ?
-            `${connection.database}.ALCOHOL_CONSUMPTION_BY_COUNTRY_2010`.toUpperCase() :
-            'ALCOHOL_CONSUMPTION_BY_COUNTRY_2010';
+            `${connection.database}.ALCOHOL`.toUpperCase() :
+            'ALCOHOL';
 
         return query(`SELECT * FROM ${tableName}\nLIMIT 5`, connection).then(results => {
             assert.deepEqual(results.rows, [
