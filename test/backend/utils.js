@@ -4,6 +4,12 @@ import {
 import {dissoc, merge} from 'ramda';
 var restify = require('restify');
 
+export function wait(milliseconds) {
+    return new Promise(function(resolve) {
+        setTimeout(resolve, milliseconds);
+    });
+}
+
 export const names = [
     'country', 'month', 'year', 'lat', 'lon', 'value'
 ];
