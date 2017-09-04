@@ -6,40 +6,46 @@ import {
     PlotlyAPIRequest,
     updateGrid
 } from '../../backend/persistent/PlotlyAPI.js';
-import {names, createGrid, username, apiKey} from './utils.js';
+import {wait, names, createGrid, username, apiKey} from './utils.js';
 import {saveSetting} from '../../backend/settings.js';
 
 describe('Grid API Functions', function () {
-    beforeEach(() => {
+    before(() => {
         saveSetting('USERS', [{username, apiKey}]);
+        saveSetting('PLOTLY_API_DOMAIN', 'api.plot.ly');
+        saveSetting('PLOTLY_API_SSL_ENABLED', true);
     });
 
-    xit('updateGrid overwrites a grid with new data', function (done) {
+    it('updateGrid overwrites a grid with new data', function () {
         this.timeout(15 * 1000);
         // First, create a new grid.
         // Note that the app never actually does this,
         // it works off of the assumption that a grid exists
 
         let fid;
-        createGrid('Test updateGrid').then(res => res.json().then(json => {
+        return createGrid('Test updateGrid').then(res => res.json().then(json => {
             // Update the grid's data
             fid = json.file.fid;
             const uids = json.file.cols.map(col => col.uid);
 
-            return updateGrid(
-                [
-                    ['x', 10, 40, 70, 100, 130],
-                    ['y', 20, 50, 80, 110, 140],
-                    ['z', 30, 60, 90, 120, 150]
-                ],
-                fid,
-                uids,
-                username
-            );
+            return wait(1000).then(() => {
+                return updateGrid(
+                    [
+                        ['x', 10, 40, 70, 100, 130],
+                        ['y', 20, 50, 80, 110, 140],
+                        ['z', 30, 60, 90, 120, 150]
+                    ],
+                    fid,
+                    uids,
+                    username
+                );
+            });
         })).then(() => {
-            const url = `grids/${fid}/content`;
             // Retrieve the contents from the grid
-            return PlotlyAPIRequest(url, {username, apiKey, method: 'GET'});
+            return wait(1000).then(() => {
+                const url = `grids/${fid}/content`;
+                return PlotlyAPIRequest(url, {username, apiKey, method: 'GET'});
+            });
         }).then(res => res.json().then(json => {
             // Test that the update worked
             assert.deepEqual(
@@ -66,8 +72,7 @@ describe('Grid API Functions', function () {
                 json.cols[names[5]].data,
                 [130, 140, 150]
             );
-            done();
-        })).catch(done);
+        }));
 
     });
 });
