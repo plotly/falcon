@@ -10,9 +10,15 @@ import {disconnect, getActiveSessions} from '../../backend/persistent/datastores
 
 const connection = {
     dialect: DIALECTS.APACHE_SPARK,
-    host: '130.211.124.41',
+    host: '130.211.124.41',  // default: '127.0.0.1'
     port: 8998,
-    database: 'plotly',
+
+    database: 'plotly',  // default: ''
+
+    useSqlContext: false,  // create a HiveContext (default)
+    //useSqlContext: 1,      // use predefined sqlContext (Spark v1)
+    //useSqlContext: 2,      // create a SQLContext (Spark v2)
+
     timeout: 120
 };
 
@@ -35,13 +41,14 @@ describe('Apache Livy:', function () {
     before(function() {
         connection.host = connection.host || '127.0.0.1';
         connection.database = connection.database || '';
-        connection.setup = `
+        if (connection.useSqlContext) {
+            connection.setup = `
 val a = Array(("Belarus", 17.5), ("Moldova", 16.8), ("Lithuania", 15.4), ("Russia", 15.1), ("Romania", 14.4))
 val rdd = sc.parallelize(a)
 val df = rdd.toDF("LOCATION", "ALCOHOL")
 df.registerTempTable("ALCOHOL_CONSUMPTION_BY_COUNTRY_2010")
-        `;
-        connection.useSqlContext = false;
+            `;
+        }
     });
 
     after(function() {

@@ -3,7 +3,6 @@ import fetch from 'node-fetch';
 import {dissoc} from 'ramda';
 
 import Logger from '../../logger';
-import {parseSQL} from '../../parse';
 
 export function connect(connection) {
     Logger.log('' +
@@ -17,13 +16,20 @@ export function connect(connection) {
 
 export function tables(connection) {
     const code = (connection.database) ?
-        `val r = plotlyContext.sql("show tables in ${connection.database}").toJSON\n%json r` :
-        `val r = plotlyContext.sql("show tables").toJSON\n%json r`;
+        `val r = plotlyContext.sql("show tables in ${connection.database}").collect\n%json r` :
+        `val r = plotlyContext.sql("show tables").collect\n%json r`;
     return sendRequest(connection, code)
-        .then(tables => {
-            let tableNames = (Array.isArray(tables)) ?
-                tables.map(t => JSON.parse(t).tableName) :
-                [];
+        .then(json => {
+            if (!Array.isArray(json) || json.length <= 0) {
+                return [];
+            }
+
+            const index = json[0].schema.map(s => s.name).indexOf('tableName');
+            if (index === -1) {
+                return [];
+            }
+
+            let tableNames = json.map(t => t.values[index]);
 
             if (connection.database) tableNames = tableNames.map(tn => `${connection.database}.${tn}`);
 
@@ -34,12 +40,16 @@ export function tables(connection) {
 }
 
 export function query(query, connection) {
-    const code = `val r = plotlyContext.sql("""${query}""").toJSON\n%json r`;
+    const code = `val r = plotlyContext.sql("""${query}""").collect\n%json r`;
     return sendRequest(connection, code)
-        .then(data => {
-            return (Array.isArray(data)) ?
-                parseSQL(data.map(JSON.parse)) :
-                {columnnames: [], rows: []};
+        .then(json => {
+            if (!Array.isArray(json) || json.length <= 0) {
+                return {columnnames: [], rows: []};
+            }
+
+            let columnnames = json[0].schema.map(s => s.name.toUpperCase());
+            let rows = json.map(d => d.values);
+            return {columnnames, rows};
         });
 }
 
@@ -85,9 +95,19 @@ export function newSession(connection) {
         })
         .then(function() {
             // Here we run any code needed to setup the session
-            let setup = (connection.useSqlContext) ?
-                'val plotlyContext = sqlContext\n' :
-                'val plotlyContext = new org.apache.spark.sql.hive.HiveContext(sc)\n';
+            let setup;
+
+            if (!connection.useSqlContext) {
+                // Create a HiveContext
+                setup = 'val plotlyContext = new org.apache.spark.sql.hive.HiveContext(sc)\n';
+            } else if (connection.useSqlContext === 1) {
+                // Use predefined SQLContext (i.e. Spark v1)
+                setup = 'val plotlyContext = sqlContext\n';
+            } else {
+                // Create a SQLContext (i.e. Spark v2)
+                setup = 'val plotlyContext = new org.apache.spark.sql.SQLContext(sc)\n';
+            }
+
             if (connection.setup) setup += connection.setup;
 
             return sendRequest(connection, setup).then(function() {
