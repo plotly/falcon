@@ -62,20 +62,22 @@ export function saveCertsLocally({key, cert, subdomain}) {
 }
 
 export function fetchCertsFromCA() {
-    const {username, accessToken} = getSetting('USERS')[0];
-    Logger.log('Sending request to the CA:' + LOCAL_SETTINGS.CA_HOST_URL);
-    return fetch(
-        `${LOCAL_SETTINGS.CA_HOST_URL}`, {
-            method: 'POST',
-            body: JSON.stringify({
-                credentials: {
-                    username,
-                    access_token: accessToken,
-                    plotly_api_domain: getSetting('PLOTLY_API_URL')
-                }
-            })
-        }
-    ).then((res) => {
+    return new Promise(function(resolve) {
+        const {username, accessToken} = getSetting('USERS')[0];
+        Logger.log('Sending request to the CA:' + LOCAL_SETTINGS.CA_HOST_URL);
+        return resolve(fetch(
+            `${LOCAL_SETTINGS.CA_HOST_URL}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    credentials: {
+                        username,
+                        access_token: accessToken,
+                        plotly_api_domain: getSetting('PLOTLY_API_URL')
+                    }
+                })
+            }
+        ));
+    }).then((res) => {
         if (res.status !== 201) {
             let errorMessage = `An error occured requesting certificates from the CA, status ${res.status} was returned. `;
             res.json().then(json => {
