@@ -23,15 +23,15 @@ $ cd plotly-database-connector && yarn install
 ## Run as an Electron App
 Run the app with
 ```bash
-$ npm run build
-$ npm run start
+$ yarn run build
+$ yarn run start
 ```
 
 ## Run as a Server
 
 Build and run the app:
 ```bash
-$ npm run build-headless
+$ yarn run build-headless
 $ node ./dist/headless-bundle.js
 ```
 
@@ -57,21 +57,21 @@ See the [Dockerfile](https://github.com/plotly/plotly-database-connector/blob/ma
 
 Run watchers for the electron main process, the web bundle (the front-end), and the headless-bundle:
 ```bash
-$ npm run watch-main
+$ yarn run watch-main
 ```
 
 ```bash
-$ npm run watch-web
+$ yarn run watch-web
 ```
 
 ```bash
-$ npm run watch-headless
+$ yarn run watch-headless
 ```
 
 Then, view the the app in the electron window with
 
 ```bash
-$ npm run dev
+$ yarn run dev
 ```
 
 and in your web browser by visiting http://localhost:9494
@@ -82,14 +82,14 @@ There are unit tests for the nodejs backend and integration tests to test the fl
 
 Run unit tests:
 ```bash
-$ npm run build
-$ npm run test-unit-all
+$ yarn run build
+$ yarn run test-unit-all
 ```
 
 Run integration tests:
 ```bash
-$ npm run build
-$ npm run test-e2e
+$ yarn run build
+$ yarn run test-e2e
 ```
 
 ## Builds and Releases
@@ -97,6 +97,6 @@ $ npm run test-e2e
 - Update package.json with the new semver version
 - Linux builds are created at the end of CircleCI tests (under Artifacts)
 - Windows 32bit and 64bit builds are created in AppVeyor tests (under Artifacts)
-- Mac builds are created on any available Mac laptop - run `npm run package` and zip the resulting build
+- Mac builds are created on any available Mac laptop - run `yarn run package` and zip the resulting build
 
 Releases are uploaded to https://github.com/plotly/plotly-database-connector/releases
