@@ -76,7 +76,8 @@ df.registerTempTable("ALCOHOL_CONSUMPTION_BY_COUNTRY_2010")
             'ALCOHOL_CONSUMPTION_BY_COUNTRY_2010';
 
         return query(`SELECT * FROM ${tableName}\nLIMIT 5`, connection).then(results => {
-            assert.deepEqual(results.rows, [
+            const roundedToSinglePrecision = results.rows.map(r => [r[0], Number(r[1].toPrecision(6))]);
+            assert.deepEqual(roundedToSinglePrecision, [
                 ['Belarus', 17.5],
                 ['Moldova', 16.8],
                 ['Lithuania', 15.4],
