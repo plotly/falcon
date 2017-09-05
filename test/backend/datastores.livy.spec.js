@@ -10,7 +10,7 @@ import {disconnect, getActiveSessions} from '../../backend/persistent/datastores
 
 const connection = {
     dialect: DIALECTS.APACHE_SPARK,
-    host: '130.211.124.41',  // default: '127.0.0.1'
+    host: '104.155.170.7',  // default: '127.0.0.1'
     port: 8998,
 
     database: 'plotly',  // default: ''
