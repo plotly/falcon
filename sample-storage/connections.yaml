@@ -77,4 +77,9 @@
     password: w8wfy99DvEmgkBsE
     database: plotly
     port: 50000
-    host: 35.184.35.183
+    host: 104.197.158.0
+
+-
+    dialect: apache spark
+    port: 8998
+    host: 104.198.64.55
