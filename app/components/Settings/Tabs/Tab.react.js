@@ -18,6 +18,8 @@ export default class ConnectionTab extends Component {
             label = `S3 - (${connectionObject.bucket})`;
         } else if (dialect === DIALECTS.APACHE_DRILL) {
             label = `Apache Drill (${connectionObject.host})`;
+        } else if (dialect === DIALECTS.APACHE_LIVY) {
+            label = `Apache Livy (${connectionObject.host}:${connectionObject.port})`;
         } else if (connectionObject.dialect === DIALECTS.ELASTICSEARCH) {
             label = `Elasticsearch (${connectionObject.host})`;
         } else if (connectionObject.dialect === DIALECTS.SQLITE) {

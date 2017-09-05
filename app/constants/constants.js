@@ -1,6 +1,7 @@
 import {concat} from 'ramda';
 
 export const DIALECTS = {
+    APACHE_LIVY: 'apache livy',
     IBM_DB2: 'ibm db2',
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
@@ -37,6 +38,12 @@ const commonSqlOptions = [
 ];
 
 export const CONNECTION_CONFIG = {
+    [DIALECTS.APACHE_LIVY]: [
+        {'label': 'Host', 'value': 'host', 'type': 'text' },
+        {'label': 'Port', 'value': 'port', 'type': 'number'},
+        {'label': 'Database', 'value': 'database', 'type': 'text'},
+        {'label': 'Timeout', 'value': 'timeout', 'type': 'number', 'description': 'Number of seconds for a request to timeout.'}
+    ],
     [DIALECTS.IBM_DB2]: commonSqlOptions,
     [DIALECTS.MYSQL]: commonSqlOptions,
     [DIALECTS.MARIADB]: commonSqlOptions,
@@ -121,6 +128,7 @@ export const CONNECTION_CONFIG = {
 
 
 export const LOGOS = {
+    [DIALECTS.APACHE_LIVY]: 'images/livy-logo.png',
     [DIALECTS.IBM_DB2]: 'images/ibmdb2-logo.png',
     [DIALECTS.REDSHIFT]: 'images/redshift-logo.png',
     [DIALECTS.POSTGRES]: 'images/postgres-logo.png',
@@ -194,6 +202,21 @@ export const FAQ = [
 ];
 
 export const SAMPLE_DBS = {
+    [DIALECTS.APACHE_LIVY]: {
+        timeout: 180,
+        database: 'plotly',
+        port: 8998,
+        host: '130.211.124.41',
+        dialect: DIALECTS.APACHE_LIVY
+    },
+    [DIALECTS.IBM_DB2]: {
+        username: 'db2user1',
+        password: 'w8wfy99DvEmgkBsE',
+        database: 'plotly',
+        port: 50000,
+        host: '35.184.35.183',
+        dialect: DIALECTS.IBM_DB2
+    },
     postgres: {
         username: 'masteruser',
         password: 'connecttoplotly',

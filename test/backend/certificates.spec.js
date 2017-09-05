@@ -33,7 +33,7 @@ const mockedCaServerURL = 'http://localhost:9494/certificate';
 let ServerCA;
 let ServerUnderTest;
 
-describe('Certificates', function() {
+xdescribe('Certificates', function() {
     beforeEach(() => {
         setCertificatesSettings('CA_HOST_URL', mockedCaServerURL);
         setCertificatesSettings('MAX_TRIES_COUNT', 2);
