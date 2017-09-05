@@ -21,10 +21,11 @@ init:
 install:
   - ps: Install-Product node 6.11.1
   - yarn install --force
+  - yarn run rebuild:modules:electron
 
 build_script:
-  - npm run build
-  - npm run package
+  - yarn run build
+  - yarn run package
 
 after_build:
   - 7z a release.zip release

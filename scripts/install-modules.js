@@ -9,18 +9,14 @@ function execSync(command) {
 }
 
 
-const globalBin = require('child_process').execSync('npm bin -g').toString().trim();
-const globalNpm = path.join(globalBin, 'npm');
-
-execSync(`${globalNpm} uninstall --no-save ibm_db`);
-execSync(`${globalNpm} install ibm_db`);
+execSync('yarn remove ibm_db');
+execSync('yarn add ibm_db@2.0.0');
 
 if (electronEnv) {
-    const root = require('child_process').execSync('npm root').toString().trim();
-    const ibmdbInstaller = path.join(root, 'ibm_db', 'installer');
+    const ibmdbInstaller = path.join(__dirname, '..', 'node_modules', 'ibm_db', 'installer');
     if (!winEnv) execSync(`chmod -R +w ${ibmdbInstaller}`);
 
-    const localBin = require('child_process').execSync('npm bin').toString().trim();
+    const localBin = require('child_process').execSync('yarn bin').toString().trim();
     const installAppDeps = path.join(localBin, 'electron-builder install-app-deps');
     execSync(installAppDeps);
 }
