@@ -3,6 +3,9 @@ machine:
         version: 6.11.1
 
 dependencies:
+    override:
+        - yarn install
+
     post:
         - yarn run rebuild:modules:electron
 
@@ -11,6 +14,9 @@ compile:
         - yarn run build
 
 test:
+    override:
+        - yarn run test
+
     post:
         - yarn run build
         - yarn run package
