@@ -78,3 +78,11 @@
     database: plotly
     port: 50000
     host: 35.184.35.183
+
+-
+    dialect: apache spark
+    id: apache spark-7b7bfa1e-cdfa-4001-b326-e0e170667021
+    timeout: 180
+    database: plotly
+    port: 8998
+    host: 104.155.170.7
