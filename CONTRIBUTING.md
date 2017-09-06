@@ -15,7 +15,9 @@ git clone https://github.com/plotly/plotly-database-connector plotly-database-co
 And then install dependencies with **yarn**.
 
 ```bash
-$ cd plotly-database-connector && yarn install
+$ cd plotly-database-connector
+$ yarn install
+$ yarn run rebuild:modules:electron
 ```
 
 *Note: See package.json for the version of node that is required*
@@ -32,7 +34,7 @@ $ yarn run start
 Build and run the app:
 ```bash
 $ yarn run build-headless
-$ node ./dist/headless-bundle.js
+$ yarn run start-headless
 ```
 
 Visit the app in your web browser at `http://localhost:9494`.
@@ -82,13 +84,11 @@ There are unit tests for the nodejs backend and integration tests to test the fl
 
 Run unit tests:
 ```bash
-$ yarn run build
 $ yarn run test-unit-all
 ```
 
 Run integration tests:
 ```bash
-$ yarn run build
 $ yarn run test-e2e
 ```
 

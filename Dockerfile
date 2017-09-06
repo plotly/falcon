@@ -42,11 +42,12 @@ ENV PLOTLY_CONNECTOR_LOG_TO_STDOUT="true"
 # Install app dependencies
 COPY package.json /usr/src/app
 COPY yarn.lock /usr/src/app
-RUN npm install
+RUN yarn install
+RUN yarn run rebuild:modules:electron
 
 COPY . /usr/src/app
-RUN npm run heroku-postbuild
+RUN yarn run heroku-postbuild
 
 ENV PLOTLY_CONNECTOR_PORT 9494
 EXPOSE 9494
-CMD [ "node", "/usr/src/app/dist/headless-bundle.js" ]
+ENTRYPOINT yarn run start-headless

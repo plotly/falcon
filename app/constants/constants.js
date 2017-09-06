@@ -1,6 +1,7 @@
 import {concat} from 'ramda';
 
 export const DIALECTS = {
+    APACHE_SPARK: 'apache spark',
     IBM_DB2: 'ibm db2',
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
@@ -37,6 +38,12 @@ const commonSqlOptions = [
 ];
 
 export const CONNECTION_CONFIG = {
+    [DIALECTS.APACHE_SPARK]: [
+        {'label': 'Host', 'value': 'host', 'type': 'text' },
+        {'label': 'Port', 'value': 'port', 'type': 'number'},
+        {'label': 'Database', 'value': 'database', 'type': 'text'},
+        {'label': 'Timeout', 'value': 'timeout', 'type': 'number', 'description': 'Number of seconds for a request to timeout.'}
+    ],
     [DIALECTS.IBM_DB2]: commonSqlOptions,
     [DIALECTS.MYSQL]: commonSqlOptions,
     [DIALECTS.MARIADB]: commonSqlOptions,
@@ -121,6 +128,7 @@ export const CONNECTION_CONFIG = {
 
 
 export const LOGOS = {
+    [DIALECTS.APACHE_SPARK]: 'images/spark-logo.png',
     [DIALECTS.IBM_DB2]: 'images/ibmdb2-logo.png',
     [DIALECTS.REDSHIFT]: 'images/redshift-logo.png',
     [DIALECTS.POSTGRES]: 'images/postgres-logo.png',
@@ -171,7 +179,7 @@ export const FAQ = [
         q: 'Is this app open-source?',
         a: 'Yep! You can view and contribute to the code on GitHub: \
             https://github.com/plotly/plotly-database-connector.'
-    }, {        
+    }, {
         q: '[Advanced] Can I schedule queries?',
         a: 'You can set queries to runon a scheduler (ie daily or hourly) from the plot.ly online chart editor. ' +
             'Scheduled queries are saved and managed by this application, so keep this app open ' +
@@ -189,11 +197,26 @@ export const FAQ = [
         a: 'This application runs a server on localhost: it is not exposed to the network. SSL ' +
             'certificates cannot be issued for localhost servers, so we create a unique URL for you  ' +
             'and a global DNS entry that points that URL to localhost. We use Let\'s Encrypt ' +
-            'to generate certificates on that unique URL.' 
-    }                  
+            'to generate certificates on that unique URL.'
+    }
 ];
 
 export const SAMPLE_DBS = {
+    [DIALECTS.APACHE_SPARK]: {
+        timeout: 180,
+        database: 'plotly',
+        port: 8998,
+        host: '104.155.170.7',
+        dialect: DIALECTS.APACHE_SPARK
+    },
+    [DIALECTS.IBM_DB2]: {
+        username: 'db2user1',
+        password: 'w8wfy99DvEmgkBsE',
+        database: 'plotly',
+        port: 50000,
+        host: '35.184.35.183',
+        dialect: DIALECTS.IBM_DB2
+    },
     postgres: {
         username: 'masteruser',
         password: 'connecttoplotly',
