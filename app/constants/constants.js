@@ -1,8 +1,6 @@
 import {concat} from 'ramda';
 
 export const DIALECTS = {
-    APACHE_SPARK: 'apache spark',
-    IBM_DB2: 'ibm db2',
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
     POSTGRES: 'postgres',
@@ -11,6 +9,8 @@ export const DIALECTS = {
     MSSQL: 'mssql',
     SQLITE: 'sqlite',
     S3: 's3',
+    IBM_DB2: 'ibm db2',
+    APACHE_SPARK: 'apache spark',
     APACHE_DRILL: 'apache drill'
 };
 
