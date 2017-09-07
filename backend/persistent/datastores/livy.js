@@ -20,7 +20,7 @@ export function tables(connection) {
         `val r = plotlyContext.sql("show tables").collect\n%json r`;
     return sendRequest(connection, code)
         .then(json => {
-            if (!Array.isArray(json) || json.length <= 0) {
+            if (!Array.isArray(json) || json.length === 0) {
                 return [];
             }
 
@@ -43,7 +43,7 @@ export function query(query, connection) {
     const code = `val r = plotlyContext.sql("""${query}""").collect\n%json r`;
     return sendRequest(connection, code)
         .then(json => {
-            if (!Array.isArray(json) || json.length <= 0) {
+            if (!Array.isArray(json) || json.length === 0) {
                 return {columnnames: [], rows: []};
             }
 
