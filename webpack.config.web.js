@@ -24,24 +24,26 @@ const config = {
     module: {
         ...baseConfig.module,
 
-        loaders: [
+        rules: [
             ...baseConfig.module.loaders,
 
             {
                 test: /\.global\.css$/,
-                loader: ExtractTextPlugin.extract(
+                use: [{
+                    loader: ExtractTextPlugin.extract(
                     'style-loader',
                     'css-loader'
-                )
+                )}]
             },
 
             {
                 test: /^((?!\.global).)*\.css$/,
-                loader: ExtractTextPlugin.extract(
-                    'style-loader',
-                    'css-loader?modules&importLoaders=1&localIdentName=' +
-                        '[name]__[local]___[hash:base64:5]'
-                )
+                use: [{
+                    loader: ExtractTextPlugin.extract(
+                        'style-loader',
+                        'css-loader?modules&importLoaders=1&localIdentName=' +
+                            '[name]__[local]___[hash:base64:5]'
+                )}]
             }
         ]
     },

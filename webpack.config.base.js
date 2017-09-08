@@ -2,13 +2,17 @@ import path from 'path';
 
 export default {
     module: {
-        loaders: [{
+        rules: [{
             test: /\.jsx?$/,
-            loaders: ['babel-loader'],
+            use: [{
+                loader: 'babel-loader'
+            }],
             exclude: /node_modules/
         }, {
             test: /\.json$/,
-            loader: 'json-loader'
+            use: [{
+                loader: 'json-loader'
+            }]
         }]
     },
     output: {
@@ -17,7 +21,9 @@ export default {
         libraryTarget: 'commonjs2'
     },
     resolve: {
-        extensions: ['', '.js', '.jsx'],
+        extensions: ['.js', '.jsx'],
+
+        // I'm not sure about this option
         packageMains: [
             'webpack',
             'browser',
