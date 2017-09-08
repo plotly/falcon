@@ -3,16 +3,22 @@ machine:
         version: 6.11.1
 
 dependencies:
+    override:
+        - yarn install
+
     post:
-        - npm run install:modules:electron
+        - yarn run rebuild:modules:electron
 
 compile:
     override:
-        - npm run build
+        - yarn run build
 
 test:
+    override:
+        - yarn run test
+
     post:
-        - npm run build
-        - npm run package
+        - yarn run build
+        - yarn run package
         - zip -r release.zip release
         - mv release.zip $CIRCLE_ARTIFACTS
