@@ -206,7 +206,7 @@ export const SAMPLE_DBS = {
         timeout: 180,
         database: 'plotly',
         port: 8998,
-        host: '104.155.170.7',
+        host: '104.154.141.189',
         dialect: DIALECTS.APACHE_SPARK
     },
     [DIALECTS.IBM_DB2]: {
