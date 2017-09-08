@@ -217,6 +217,32 @@ export function previewTable (connectionId, dialect, table, database) {
     );
 }
 
+export function getSqlSchema (connectionId, dialect, database) {
+    const body = {
+        query: `SELECT * FROM information_schema.columns WHERE table_schema = '${database}' ORDER BY table_name`
+    };
+    return apiThunk(
+        `connections/${connectionId}/query`,
+        'POST',
+        'previewTableRequest',
+        [connectionId],
+        body
+    );
+}
+
+export function runSqlQuery (connectionId, dialect, query) {
+    const body = {
+        query: query
+    };
+    return apiThunk(
+        `connections/${connectionId}/query`,
+        'POST',
+        'previewTableRequest',
+        [connectionId],
+        body
+    );
+}
+
 export function initializeTabs() {
     return function(dispatch, getState) {
         const state = getState();

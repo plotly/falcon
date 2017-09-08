@@ -2,21 +2,24 @@ import React, {Component, PropTypes} from 'react';
 import {contains, dissoc, eqProps, hasIn, flip, head, keys, isEmpty, reduce} from 'ramda';
 import {connect} from 'react-redux';
 import classnames from 'classnames';
-import * as Actions from '../../actions/sessions';
-import * as styles from './Settings.css';
-import * as buttonStyles from './ConnectButton/ConnectButton.css';
 import fetch from 'isomorphic-fetch';
-import ConnectionTabs from './Tabs/Tabs.react';
+import SplitPane from 'react-split-pane';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+
+import * as Actions from '../../actions/sessions';
+import ConnectionTabs from './Tabs/Tabs.react';
 import UserConnections from './UserConnections/UserConnections.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import Preview from './Preview/Preview.react';
+import TableTree from './Preview/TableTree.react.js';
 import {Link} from '../Link.react';
 import {DIALECTS, FAQ} from '../../constants/constants.js';
 import {getAllBaseUrls} from '../../utils/utils';
 
+import * as buttonStyles from './ConnectButton/ConnectButton.css';
+import * as styles from './Settings.css';
 
 let checkconnectorUrls;
 let checkDNS;
@@ -306,7 +309,7 @@ class Settings extends Component {
                             <Tab
                                 className="test-ssl-tab react-tabs__tab"
                             >
-                                4. Open Plotly
+                                4. Connect to Plotly
                             </Tab>
                             <Tab>FAQ</Tab>
                         </TabList>
@@ -318,24 +321,32 @@ class Settings extends Component {
                         
                         <TabPanel>
                             {this.props.connectRequest.status === 200 ? (
-                                <div>
-                                    <OptionsDropdown
-                                        connectionObject={connections[selectedTab]}
-                                        selectedTable={selectedTable}
-                                        elasticsearchMappingsRequest={elasticsearchMappingsRequest}
-                                        tablesRequest={tablesRequest}
-                                        setTable={setTable}
-                                        setIndex={setIndex}
-                                        selectedIndex={selectedIndex}
-                                    />
+                                <SplitPane split="vertical" minSize={100} defaultSize={200} style={{position:'relative !important'}}>
+                                    <div>
+                                        <TableTree
+                                            connectionObject={connections[selectedTab]}
+                                        />
+                                    </div>
+                                    <div>
+                                        {/*<OptionsDropdown
+                                            connectionObject={connections[selectedTab]}
+                                            selectedTable={selectedTable}
+                                            elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                                            tablesRequest={tablesRequest}
+                                            setTable={setTable}
+                                            setIndex={setIndex}
+                                            selectedIndex={selectedIndex}
+                                        />*/}
 
-                                    <Preview
-                                        previewTableRequest={previewTableRequest}
-                                        s3KeysRequest={s3KeysRequest}
-                                        apacheDrillStorageRequest={apacheDrillStorageRequest}
-                                        apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
-                                    />
-                                </div>
+                                        <Preview
+                                            connectionObject={connections[selectedTab]}
+                                            previewTableRequest={previewTableRequest}
+                                            s3KeysRequest={s3KeysRequest}
+                                            apacheDrillStorageRequest={apacheDrillStorageRequest}
+                                            apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+                                        />
+                                    </div>
+                                </SplitPane>
                             ) : (
                                 <p>You must connect to a data store first.</p>
                             )}

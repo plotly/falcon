@@ -1,54 +1,120 @@
 import React, {Component, PropTypes} from 'react';
-import * as styles from './Preview.css';
+import {connect} from 'react-redux';
+import {Table, Column, Cell} from 'fixed-data-table';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import CodeEditorField from './CodeEditorField.react.js';
+import ChartEditor from 'react-plotly-dnd-editor';
 
-export default class Preview extends Component {
+import * as styles from './styles/Preview.css';
+import * as Actions from '../../../actions/sessions';
+
+class Preview extends Component {
+
     constructor(props) {
         super(props);
-        this.renderTable = this.renderTable.bind(this);
         this.testClass = this.testClass.bind(this);
+        this.updateCode = this.updateCode.bind(this);
+        this.toggleEditor = this.toggleEditor.bind(this);
+        this.runQuery = this.runQuery.bind(this);                
+
+        this.state = {
+            code: '',
+            rows: [],
+            columnNames: [],
+            error: '',
+            loading: true,
+            showEditor: true
+        };
+    }
+
+    componentDidMount() {
+        const {previewTableRequest} = this.props;
+        if (previewTableRequest.status >= 400) {
+            this.setState({
+                error: JSON.stringify(previewTableRequest),
+                loading: false
+            });
+        } else if (previewTableRequest.status === 'loading') {
+            this.setState({
+                loading: true
+            });
+        } else if (previewTableRequest.status === 200) {
+            const {columnnames, rows} = previewTableRequest.content;
+            this.setState({
+                columnNames: columnnames,
+                rows: rows,
+                loading: false
+            });
+        } else {
+            return null;
+        }
     }
 
     testClass() {
         return 'test-connected';
     }
 
-    renderTable(columnnames, rows) {
-        const tableHeaders = columnnames.map(
-            column => <th>{column}</th>
-        );
-        const isObject = (arg) => typeof arg === 'object';
-        const renderCell = cell => <td>{isObject(cell) ? JSON.stringify(cell) : cell}</td>;
-        const tableRows = rows.map(
-            row => <tr>{row.map(renderCell)}</tr>
-        );
-        return (
-            <table>
-                <thead>{tableHeaders}</thead>
-                <tbody>{tableRows}</tbody>
-            </table>
-        );
+    runQuery() {
+        const query = this.state.code;
+        const {connectionObject, dispatch} = this.props;
+
+        console.warn('runQuery:', query, connectionObject);
+
+        const p = dispatch(Actions.runSqlQuery(
+            connectionObject.id,
+            connectionObject.dialect,
+            query
+        ));
+
+        p.then( result => {
+            const {columnnames, rows} = result;
+            if (typeof rows !== undefined) {
+                this.setState({
+                    columnNames: columnnames,
+                    rows: rows,
+                    loading: false,
+                    error: ''
+                });
+            }
+        })
+        .catch( error => {
+            this.setState(error: error);
+            console.error(error);            
+        });
+
+    }
+
+    updateCode(newCode) {
+        this.setState({
+            code: newCode
+        });
+    }
+
+    toggleEditor() {
+        this.setState({
+            showEditor: this.state.showEditor ? false : true
+        });       
     }
 
     render() {
-        const TablePreview = () => {
-            const {previewTableRequest} = this.props;
-            if (previewTableRequest.status >= 400) {
+        const ErrorMsg = () => {
+            if (this.state.error) {
                 return (
                     <div>
                         <div>{'Hm... An error occurred while trying to load this table'}</div>
-                        <div style={{color: 'red'}}>{JSON.stringify(previewTableRequest)}</div>
+                        <div style={{color: 'red'}}>{this.state.error}</div>
                     </div>    
                 );
-            } else if (previewTableRequest.status === 'loading') {
-                return (<div>{'Loading...'}</div>);
-            } else if (previewTableRequest.status === 200) {
-                const {columnnames, rows} = previewTableRequest.content;
-                return (
-                    this.renderTable(columnnames, rows)
-                );
-            } else {
-                return null;
             }
+            return null;
+        };
+
+
+        const LoadingMsg = () => {
+            if (this.state.loading) {
+                return (<div>{'Loading...'}</div>);
+            }
+            return null;
         };
 
         const S3Preview = () => {
@@ -112,7 +178,7 @@ export default class Preview extends Component {
                     if (uniqueParquetFiles.length === 0) {
                         availableFiles = (
                             <div>
-                                Heads up! It looks like no .parquet files were
+                                Heads up! It looks like no parquet files were
                                 found in this S3 bucket.
                             </div>
                         );
@@ -140,12 +206,88 @@ export default class Preview extends Component {
             }
         };
 
+        const columnNames = this.state.columnNames; 
+        const rows = this.state.rows;        
+
         return (
             <div className={styles.previewContainer}>
-                {TablePreview()}
-                {S3Preview()}
-                {ApacheDrillPreview()}
+                <code>
+                    <small>
+                        <a onClick={this.toggleEditor}>
+                            {this.state.showEditor ? 'Hide Editor' : 'Show Editor'}
+                        </a>
+                    </small>
+                </code>
+
+                <div style={{display: this.state.showEditor ? 'block' : 'none'}}>
+                    <CodeEditorField 
+                        value={this.state.code} 
+                        onChange={this.updateCode} 
+                        connectionObject={this.props.connectionObject}
+                        runQuery={this.runQuery}
+                    />
+                    <a
+                        className='btn btn-primary'
+                        onClick={this.runQuery}
+                        style={{float: 'right', maxWidth: 100}}
+                    >  
+                        Run
+                    </a>
+                </div>
+
+                {rows &&               
+                    <Tabs>
+                        <TabList>
+                            <Tab>Table</Tab>
+                            <Tab>Chart</Tab>
+                        </TabList>
+
+                        <TabPanel>  
+                            <Table
+                                rowHeight={50}
+                                rowsCount={rows.length}
+                                width={800}
+                                height={200}
+                                headerHeight={40}
+                                {...this.props}>
+                                {columnNames.map(function(colName, colIndex){
+                                    return <Column
+                                        columnKey={colName}
+                                        key={colIndex}
+                                        label={colName}
+                                        flexgrow={1}
+                                        width={200}
+                                        header={<Cell>{colName}</Cell>}
+                                        cell={({rowIndex, ...props}) => (
+                                            <Cell 
+                                                height={20}
+                                                {...props}
+                                            >
+                                                {rows[rowIndex][colIndex]}
+                                            </Cell>
+                                        )}
+                                    />;
+                                })}
+                            </Table>
+                        </TabPanel>
+
+                        <TabPanel>
+                            <ChartEditor
+                                rows={rows}
+                                columnNames={columnNames}
+                            />
+                        </TabPanel>
+                    </Tabs>
+                }
+
+               {S3Preview()}
+               {ApacheDrillPreview()}
+               {LoadingMsg()}               
+               {ErrorMsg()}
             </div>
         );
     }
-}
+};
+
+export default connect()(Preview);
+

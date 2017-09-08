@@ -1,11 +1,16 @@
 import path from 'path';
 
+var HappyPack = require('happypack');
+
 export default {
     module: {
         loaders: [{
             test: /\.jsx?$/,
-            loaders: ['babel-loader'],
-            exclude: /node_modules/
+            loaders: ['happypack/loader?id=jsx'],
+            exclude: /node_modules/,
+            options: {
+                cacheDirectory: true
+            }
         }, {
             test: /\.json$/,
             loader: 'json-loader'
@@ -28,7 +33,14 @@ export default {
         ]
     },
     plugins: [
-
+        new HappyPack({
+            // loaders is the only required parameter:
+            id: 'jsx',
+            loaders: [ 'babel-loader' ],
+            verbose: true,
+            debug: true
+            // More configuration @ https://github.com/amireh/happypack
+        })
     ],
     externals: [
         {
