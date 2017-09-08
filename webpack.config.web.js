@@ -61,7 +61,10 @@ const config = {
                 warnings: false
             }
         }),
-        new ExtractTextPlugin('style.css', { allChunks: true })
+        new ExtractTextPlugin('style.css', { allChunks: true }),
+        new webpack.LoaderOptionsPlugin({
+            minimize: true
+        })        
     ],
 
     target: 'web'
