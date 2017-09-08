@@ -20,13 +20,20 @@ export function tables(connection) {
         `val r = plotlyContext.sql("show tables").collect\n%json r`;
     return sendRequest(connection, code)
         .then(json => {
-            if (!Array.isArray(json) || json.length === 0) {
-                return [];
+            if (json instanceof Error) {
+                Logger.log(json);
+                throw json;
+            }
+
+            if (!Array.isArray(json)) {
+                Logger.log('Error: failed to parse Spark response');
+                throw new Error(json);
             }
 
             const index = json[0].schema.map(s => s.name).indexOf('tableName');
             if (index === -1) {
-                return [];
+                Logger.log('Error: failed to parse Spark response');
+                throw new Error(json);
             }
 
             let tableNames = json.map(t => t.values[index]);
@@ -43,7 +50,17 @@ export function query(query, connection) {
     const code = `val r = plotlyContext.sql("""${query}""").collect\n%json r`;
     return sendRequest(connection, code)
         .then(json => {
-            if (!Array.isArray(json) || json.length === 0) {
+            if (json instanceof Error) {
+                Logger.log(json);
+                throw json;
+            }
+
+            if (!Array.isArray(json)) {
+                Logger.log('Error: failed to parse Spark response');
+                throw new Error(json);
+            }
+
+            if (json.length === 0) {
                 return {columnnames: [], rows: []};
             }
 
@@ -110,7 +127,12 @@ export function newSession(connection) {
 
             if (connection.setup) setup += connection.setup;
 
-            return sendRequest(connection, setup).then(function() {
+            return sendRequest(connection, setup).then(function(json) {
+                if (json instanceof Error) {
+                    Logger.log(json);
+                    throw json;
+                }
+
                 return connection;
             });
         });
@@ -202,7 +224,22 @@ function getResponse(connection, statementId) {
             let json;
             try {
                 json = statement.output.data['application/json'];
-            } catch (err) {};
+            } catch (err) {
+                json = makeError(statement);
+            };
             return json;
         });
+}
+
+function makeError(json) {
+    if (!json || !json.output || !json.output.ename || !json.output.evalue) {
+        return new Error(json);
+    }
+
+    let errorMessage = `${json.output.ename}: ${json.output.evalue}`;
+    if(Array.isArray(json.output.traceback)) {
+        errorMessage += `\n${json.output.traceback.join('')}`;
+    }
+
+    return new Error(errorMessage);
 }
