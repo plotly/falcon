@@ -50,7 +50,6 @@ const config = {
 
     plugins: [
         ...baseConfig.plugins,
-        new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.DefinePlugin({
             __DEV__: false,
             'process.env.NODE_ENV': JSON.stringify('production')
@@ -64,7 +63,7 @@ const config = {
         new ExtractTextPlugin('style.css', { allChunks: true }),
         new webpack.LoaderOptionsPlugin({
             minimize: true
-        })        
+        })
     ],
 
     target: 'web'
