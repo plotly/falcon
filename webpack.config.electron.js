@@ -22,8 +22,8 @@ export default {
             }
         }),
         new webpack.BannerPlugin(
-            'require("source-map-support").install();',
-            { raw: true, entryOnly: false }
+            {banner: 'require("source-map-support").install();',
+             raw: true, entryOnly: false }
         ),
         new webpack.DefinePlugin({
             'process.env': {
