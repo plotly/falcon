@@ -1,5 +1,4 @@
 import React, {Component, PropTypes} from 'react';
-import * as styles from './Preview.css';
 
 export default class Preview extends Component {
     constructor(props) {
@@ -37,7 +36,7 @@ export default class Preview extends Component {
                     <div>
                         <div>{'Hm... An error occurred while trying to load this table'}</div>
                         <div style={{color: 'red'}}>{JSON.stringify(previewTableRequest)}</div>
-                    </div>    
+                    </div>
                 );
             } else if (previewTableRequest.status === 'loading') {
                 return (<div>{'Loading...'}</div>);
@@ -141,7 +140,7 @@ export default class Preview extends Component {
         };
 
         return (
-            <div className={styles.previewContainer}>
+            <div className={'previewContainer'}>
                 {TablePreview()}
                 {S3Preview()}
                 {ApacheDrillPreview()}

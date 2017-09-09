@@ -1,7 +1,6 @@
 import React from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import classnames from 'classnames';
-import * as styles from './Logger.css';
 
 const Logger = props => {
     if (!props.logs || props.logs.length === 0) return null;
@@ -19,7 +18,7 @@ const Logger = props => {
 
     return (
         <div
-            className={classnames(styles.renderLogs, testClass())}
+            className={classnames('renderLogs', testClass())}
             id="test-logs"
         >
             <h5>Logs</h5>

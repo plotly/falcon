@@ -1,5 +1,4 @@
 import React, {Component, PropTypes} from 'react';
-import * as styles from './ConnectButton.css';
 import {has, pathOr} from 'ramda';
 
 const isLoading = (status) => status === 'loading';
@@ -33,7 +32,7 @@ export default class ConnectButton extends Component {
             );
             const genericErrorMessage = 'Hm... had trouble connecting.';
             const errorMessage = connectErrorMessage || saveErrorMessage || genericErrorMessage;
-            error = <div className={styles.errorMessage}>{errorMessage}</div>;
+            error = <div className={'errorMessage'}>{errorMessage}</div>;
         } else if (
             isLoading(connectRequest.status) ||
             isLoading(saveConnectionsRequest.status)
@@ -54,7 +53,7 @@ export default class ConnectButton extends Component {
             buttonClick = connect;
         }
        return (
-            <div className={styles.connectButtonContainer}>
+            <div className={'connectButtonContainer'}>
                 <button
                     id="test-connect-button"
                     onClick={buttonClick}

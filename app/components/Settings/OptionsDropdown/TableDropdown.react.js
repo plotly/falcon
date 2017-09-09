@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import classnames from 'classnames';
-import * as styles from './TableDropdown.css';
 import Select from 'react-select';
 
 export default function TableDropdown(props) {
@@ -23,7 +22,7 @@ export default function TableDropdown(props) {
             return <div>{'No tables found'}</div>;
         } else {
             return (
-                <div className={styles.dropdown}
+                <div className={'dropdown'}
                     id="test-table-dropdown"
                 >
                     <Select

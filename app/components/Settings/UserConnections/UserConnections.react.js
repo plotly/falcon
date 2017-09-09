@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import * as styles from './UserConnections.css';
 import {contains, head, flatten, keys, values} from 'ramda';
 import {
     CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS, SAMPLE_DBS
@@ -31,8 +30,8 @@ export default class UserConnections extends Component {
         this.state = {showSampleCredentials: false};
     }
 
-    
-    
+
+
     toggleSampleCredentials() {
         this.setState({showSampleCredentials: !this.state.showSampleCredentials});
     }
@@ -74,17 +73,17 @@ export default class UserConnections extends Component {
             display: this.state.showSampleCredentials ? 'inline-block': 'none'
         };
 
-        const inputs = CONNECTION_CONFIG[connectionObject.dialect]        
+        const inputs = CONNECTION_CONFIG[connectionObject.dialect]
 			.map(setting => {
                 let input;
                 const dialect = connectionObject.dialect;
                 if (contains(setting.type, ['text', 'number', 'password'])) {
                     input = (
-                        <div className={styles.inputContainer}>
-                            <label className={styles.label}>
+                        <div className={'inputContainer'}>
+                            <label className={'label'}>
                                 {setting.label}
                             </label>
-                            <div className={styles.wrapInput}>
+                            <div className={'wrapInput'}>
                                 <input className={this.testClass()}
                                     onChange={e => (updateConnection({
                                         [setting.value]: e.target.value
@@ -93,7 +92,7 @@ export default class UserConnections extends Component {
                                     id={`test-input-${setting.value}`}
                                     placeholder={setting.placeholder}
                                     type={setting.type}
-                                />                            
+                                />
                                 <div style={sampleCredentialsStyle}>
                                     <code>
                                         {(SAMPLE_DBS[dialect]) ? SAMPLE_DBS[dialect][setting.value] : null}
@@ -104,11 +103,11 @@ export default class UserConnections extends Component {
                     );
                 } else if (setting.type === 'path') {
                     input = (
-                        <div className={styles.inputContainer}>
-                            <label className={styles.label}>
+                        <div className={'inputContainer'}>
+                            <label className={'label'}>
                                 {setting.label}
                             </label>
-                            <div className={styles.wrapInput}>
+                            <div className={'wrapInput'}>
                                 <input className={this.testClass()}
                                     onClick={this.getStorageOnClick(setting)}
                                     value={connectionObject[setting.value]}
@@ -121,11 +120,11 @@ export default class UserConnections extends Component {
                     );
                 } else if (setting.type === 'checkbox') {
                     input = (
-                        <div className={styles.inputContainer}>
-                            <label className={styles.label}>
+                        <div className={'inputContainer'}>
+                            <label className={'label'}>
                                 {setting.label}
                             </label>
-                            <div className={styles.wrapInput}>
+                            <div className={'wrapInput'}>
                                 <input
                                     type="checkbox"
                                     onChange={() => {
@@ -147,7 +146,7 @@ export default class UserConnections extends Component {
                         {input}
                         {
                             setting.description ? (
-                                <div className={styles.description}>
+                                <div className={'description'}>
                                     {setting.description}
                                 </div>
                             ) : null

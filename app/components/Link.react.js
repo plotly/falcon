@@ -1,7 +1,6 @@
 import R from 'ramda';
 import React from 'react';
 import {dynamicRequireElectron} from '../utils/utils';
-import * as styles from './styles/Link.css';
 
 
 let shell = null;
@@ -14,7 +13,7 @@ export function Link(props) {
     if (shell) {
         return (
             <span
-                className={`${styles.a} ${props.className}`}
+                className={`${props.className}`}
                 onClick={() => {shell.openExternal(href);}}
                 {...R.omit(['className'], props)}
             />

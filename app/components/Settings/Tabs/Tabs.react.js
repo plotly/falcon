@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import * as styles from './Tabs.css';
 import classnames from 'classnames';
 import {keys} from 'ramda';
 import Tab from './Tab.react';
@@ -12,8 +11,8 @@ export default class ConnectionTabs extends Component {
     render() {
         const {connections, selectedTab, newTab, setTab, deleteTab} = this.props;
             return (
-                <div className={classnames(styles.tabManagerWrapper, styles.Flipped)}>
-                    <div className={styles.tabManagerContainer}>
+                <div className={classnames('tabManagerWrapper', 'Flipped')}>
+                    <div className={'tabManagerContainer'}>
                         {keys(connections).map(tabId =>
                             <Tab
                                 connectionObject={connections[tabId]}
@@ -26,9 +25,9 @@ export default class ConnectionTabs extends Component {
                             />
                         )}
 
-                        <div className={styles.tabAddWrapper}>
+                        <div className={'tabAddWrapper'}>
                             <img
-                                className={styles.tabAdd}
+                                className={'tabAdd'}
                                 onClick={newTab}
                                 src="images/add.png"
                                 id="test-session-add"

@@ -3,8 +3,6 @@ import {contains, dissoc, eqProps, hasIn, flip, head, keys, isEmpty, reduce} fro
 import {connect} from 'react-redux';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
-import * as styles from './Settings.css';
-import * as buttonStyles from './ConnectButton/ConnectButton.css';
 import fetch from 'isomorphic-fetch';
 import ConnectionTabs from './Tabs/Tabs.react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
@@ -16,7 +14,6 @@ import Preview from './Preview/Preview.react';
 import {Link} from '../Link.react';
 import {DIALECTS, FAQ} from '../../constants/constants.js';
 import {getAllBaseUrls} from '../../utils/utils';
-
 
 let checkconnectorUrls;
 let checkDNS;
@@ -80,7 +77,7 @@ class Settings extends Component {
 
     renderEditButton(show) {
         return (
-            <div className={styles.editButtonContainer}>
+            <div className={'editButtonContainer'}>
                 {show ? (
                     <button
                         className = 'btn-secondary'
@@ -110,11 +107,11 @@ class Settings extends Component {
         return (
             <div
                 className={classnames(
-                    styles.configurationContainer,
-                    this.state.editMode ? null : styles.disabledSection
+                    'configurationContainer',
+                    this.state.editMode ? null : 'disabledSection'
                 )}
             >
-                <div className={styles.dialectSelector}>
+                <div className={'dialectSelector'}>
                     <DialectSelector
                         connectionObject={connectionObject}
                         updateConnection={updateConnection}
@@ -297,7 +294,7 @@ class Settings extends Component {
                     deleteTab={deleteTab}
                 />
 
-                <div className={styles.openTab} style={{'padding': 30}}>
+                <div className={'openTab'} style={{'padding': 30}}>
 
                     <Tabs>
 

@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import * as styles from './Tabs.css';
 import classnames from 'classnames';
 import {LOGOS, DIALECTS} from '../../../constants/constants';
 
@@ -31,13 +30,13 @@ export default class ConnectionTab extends Component {
         return (
             <div
                 className={classnames(
-                    styles.tabWrapper,
-                    {[styles.tabWrapperSelected]: isSelected}
+                    'tabWrapper',
+                    {['tabWrapperSelected']: isSelected}
                 )}
             >
                 {isDeletable ?
                     <img
-                        className={styles.tabDelete}
+                        className={'tabDelete'}
                         onClick={() => deleteTab(tabId)}
                         src="images/delete.png"
                         id={`test-tab-delete-${id}`}
@@ -47,13 +46,13 @@ export default class ConnectionTab extends Component {
 
                 <span onClick={() => setTab(tabId)}>
                     <img
-                        className={styles.tabLogo}
+                        className={'tabLogo'}
                         src={LOGOS[dialect]}
                         id={`test-tab-id-${id}`}
                     >
                     </img>
 
-                    <p className={styles.tabIdentifier}>
+                    <p className={'tabIdentifier'}>
                         <span>
                             {label}
                         </span>

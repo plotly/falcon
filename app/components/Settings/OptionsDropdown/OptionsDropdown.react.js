@@ -1,7 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import classnames from 'classnames';
 import {flatten, keys, isEmpty} from 'ramda';
-import * as styles from './TableDropdown.css';
 import Select from 'react-select';
 
 export default class OptionsDropdown extends Component {
@@ -33,7 +32,7 @@ export default class OptionsDropdown extends Component {
                 return <div>{'No tables found'}</div>;
             } else {
                 return (
-                    <div className={styles.dropdown}
+                    <div className={'dropdown'}
                         id="test-table-dropdown"
                     >
                         <Select
@@ -66,7 +65,7 @@ export default class OptionsDropdown extends Component {
                 return <div>{'No docs found'}</div>;
             } else {
                 return (
-                    <div className={styles.dropdown}
+                    <div className={'dropdown'}
                         id="test-table-dropdown"
                     >
                         <Select
@@ -94,7 +93,7 @@ export default class OptionsDropdown extends Component {
                 return <div>{'No docs found'}</div>;
             } else {
                 return (
-                    <div className={styles.dropdown}
+                    <div className={'dropdown'}
                         id="test-table-dropdown"
                     >
                         <Select
