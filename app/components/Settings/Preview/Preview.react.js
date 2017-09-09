@@ -208,7 +208,7 @@ class Preview extends Component {
         const rows = this.state.rows;
 
         return (
-            <div className={styles.previewContainer}>
+            <div className={'previewContainer'}>
                 <code>
                     <small>
                         <a onClick={this.toggleEditor}>
