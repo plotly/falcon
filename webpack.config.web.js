@@ -25,7 +25,7 @@ const config = {
         ...baseConfig.module,
 
         rules: [
-            ...baseConfig.module.loaders,
+            ...baseConfig.module.rules,
 
             {
                 test: /\.global\.css$/,
