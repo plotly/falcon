@@ -1,5 +1,5 @@
-const ibmdb = require('ibm_db');
-
+//const ibmdb = require('ibm_db');
+const ibmdb = {};
 import {dissoc} from 'ramda';
 
 import Logger from '../../logger';
@@ -22,7 +22,7 @@ function getClient(connection) {
 
         clients[connectionString] = client;
     }
-    
+
     return client;
 }
 
