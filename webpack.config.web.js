@@ -30,20 +30,20 @@ const config = {
             {
                 test: /\.global\.css$/,
                 use: [{
-                    loader: ExtractTextPlugin.extract(
-                    'style-loader',
-                    'css-loader'
-                )}]
+                    loader: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: 'css-loader'
+                })}]
             },
 
             {
                 test: /^((?!\.global).)*\.css$/,
                 use: [{
-                    loader: ExtractTextPlugin.extract(
-                        'style-loader',
-                        'css-loader?modules&importLoaders=1&localIdentName=' +
-                            '[name]__[local]___[hash:base64:5]'
-                )}]
+                    loader: ExtractTextPlugin.extract({
+                        fallback: 'style-loader',
+                        use: 'css-loader?modules&importLoaders=1&localIdentName=' +
+                             '[name]__[local]___[hash:base64:5]'
+                })}]
             }
         ]
     },
@@ -60,7 +60,10 @@ const config = {
                 warnings: false
             }
         }),
-        new ExtractTextPlugin('style.css', { allChunks: true }),
+        new ExtractTextPlugin({
+            filename: 'style.css', 
+            allChunks: true
+        }),
         new webpack.LoaderOptionsPlugin({
             minimize: true
         })
