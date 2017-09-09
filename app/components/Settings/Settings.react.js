@@ -5,9 +5,7 @@ import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
 import fetch from 'isomorphic-fetch';
 import SplitPane from 'react-split-pane';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-
-import * as Actions from '../../actions/sessions';
+import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import ConnectionTabs from './Tabs/Tabs.react';
 import UserConnections from './UserConnections/UserConnections.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
