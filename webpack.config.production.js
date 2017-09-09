@@ -19,7 +19,7 @@ const config = {
         ...baseConfig.module,
 
         loaders: [
-            ...baseConfig.module.loaders,
+            ...baseConfig.module.rules,
         ]
     },
 
