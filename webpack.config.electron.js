@@ -31,7 +31,7 @@ export default {
             }
         }),
         // https://github.com/felixge/node-formidable/issues/337
-        new webpack.DefinePlugin({ 'global.GENTLY': false })
+        new webpack.DefinePlugin({ 'global.GENTLY': false }),
 
         new webpack.LoaderOptionsPlugin({
             minimize: true
