@@ -8,7 +8,6 @@ export default {
                 loader: 'babel-loader'
             }],
             exclude: /node_modules/
-        }
         }]
     },
     output: {
