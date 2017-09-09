@@ -17,16 +17,6 @@ export default {
     },
     resolve: {
         extensions: ['.js', '.jsx'],
-
-        // I'm not sure about this option
-        packageMains: [
-            'webpack',
-            'browser',
-            'web',
-            'browserify',
-            ['jam', 'main'],
-            'main'
-        ]
     },
     plugins: [
 
