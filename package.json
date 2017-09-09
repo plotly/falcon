@@ -31,7 +31,7 @@
     "package-all": "yarn run package -- --all",
     "rebuild-and-e2e": "yarn run build && yarn run test-e2e",
     "start": "cross-env NODE_ENV=production electron ./",
-    "start-headless": "cross-env NODE_ENV=production electron ./dist/headless-bundle.js",
+    "start-headless": "cross-env NODE_ENV=production node ./dist/headless-bundle.js",
     "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./backend/main.development",
     "watch-headless": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.headless.js --progress --profile --colors --watch",
     "watch-web": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.web.js --progress --profile --colors --watch",
