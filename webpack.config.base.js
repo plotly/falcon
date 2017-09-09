@@ -19,7 +19,6 @@ export default {
         extensions: ['.js', '.jsx'],
     },
     plugins: [
-
     ],
     externals: [
         {

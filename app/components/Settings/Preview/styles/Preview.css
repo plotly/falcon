@@ -1,0 +1,25 @@
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+th, td {
+    border: 1px solid #828282;
+    padding: 0.3125rem 0.625rem;
+    color: #828282;
+    font-size: 0.875em;
+    text-align: left;
+}
+
+.previewContainer {
+    margin: 0 25px;
+    overflow: auto;
+    border-radius: 3px;
+}
+
+.tableHeader {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    margin-left: auto;
+    margin-right: auto;
+}
