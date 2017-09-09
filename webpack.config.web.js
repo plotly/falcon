@@ -26,23 +26,6 @@ const config = {
 
         rules: [
             ...baseConfig.module.rules,
-
-            {
-                test: /\.global\.css$/,
-                use: ExtractTextPlugin.extract({
-                        fallback: 'style-loader',
-                        use: 'css-loader'
-                })
-            },
-
-            {
-                test: /^((?!\.global).)*\.css$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: ('css-loader?modules&importLoaders=1&localIdentName=' +
-                          '[name]__[local]___[hash:base64:5]')
-                })
-            }
         ]
     },
 
@@ -57,10 +40,6 @@ const config = {
                 screw_ie8: true,
                 warnings: false
             }
-        }),
-        new ExtractTextPlugin({
-            filename: 'style.css',
-            allChunks: true
         }),
         new webpack.LoaderOptionsPlugin({
             minimize: true
