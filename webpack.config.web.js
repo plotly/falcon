@@ -59,7 +59,7 @@ const config = {
             }
         }),
         new ExtractTextPlugin({
-            filename: 'style.css', 
+            filename: 'style.css',
             allChunks: true
         }),
         new webpack.LoaderOptionsPlugin({
