@@ -6,7 +6,6 @@ import CodeMirror from 'react-codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/sql-hint';
-import 'codemirror/lib/codemirror.css';
 import * as Actions from '../../../actions/sessions';
 
 class CodeEditorField extends Component {
