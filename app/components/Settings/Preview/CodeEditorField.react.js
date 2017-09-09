@@ -35,7 +35,7 @@ class CodeEditorField extends Component {
             let newColumnArray = [];
             const TABLE_NAME = 2;
             const COLUMN_NAME = 3;
-            const DATA_TYPE = 7;            
+            const DATA_TYPE = 7;
             schema.rows.map(function(row) {
                 tableName = row[TABLE_NAME];
                 if (tableName !== lastTableName) {
@@ -61,7 +61,7 @@ class CodeEditorField extends Component {
         // hint options for specific plugin & general show-hint
         // 'tables' is sql-hint specific
         // 'disableKeywords' is also sql-hint specific, and undocumented but referenced in sql-hint plugin
-        // Other general hint config, like 'completeSingle' and 'completeOnSingleClick' 
+        // Other general hint config, like 'completeSingle' and 'completeOnSingleClick'
         // should be specified here and will be honored
         const hintOptions = {
             tables: this.state.tables,
@@ -74,7 +74,7 @@ class CodeEditorField extends Component {
         // (this is mentioned in codemirror addon documentation)
         // Reference the hint function imported here when including other hint addons
         // or supply your own
-        codeMirror.showHint(cm, codeMirror.hint.sql, hintOptions); 
+        codeMirror.showHint(cm, codeMirror.hint.sql, hintOptions);
     }
 
     handleChange(newCode) {
