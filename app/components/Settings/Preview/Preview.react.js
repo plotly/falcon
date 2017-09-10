@@ -55,7 +55,7 @@ class Preview extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.previewTableRequest.status === 200) {
-            const {columnnames, rows} = previewTableRequest.content;
+            const {columnnames, rows} = nextProps.previewTableRequest.content;
             if (!this.state.columnNames.length) {
                 this.setState({
                     columnNames: columnnames,
@@ -138,23 +138,23 @@ class Preview extends Component {
             return null;
         };
 
-        const dialect = this.props.connectionObject.dialect;
+        const { connectionObject, selectedTable, elasticsearchMappingsRequest, tablesRequest,
+            setTable, setIndex, selectedIndex, previewTableRequest} = this.props;
 
-        if (this.props.previewTableRequest.status === 200 && 
-            !SQL_DIALECTS_USING_EDITOR.includes(dialect)) {
-            const {columnnames, rows} = this.props.previewTableRequest.content;
-            const columnNames = columnnames;
-        }
-        else{
-            const {columnNames, rows} = this.state;           
-        }
+        const dialect = connectionObject.dialect;
+
+        const {columnNames, rows, showEditor, code} = this.state;
+
+        /*if (previewTableRequest.status === 200) {
+            rows = previewTableRequest.content.rows;
+            columnNames = previewTableRequest.content.columnnames;
+        }*/
 
         return (
             <div className={'previewContainer'}>
 
                 {/*
-                * Show the SQL code editor for SQL databases
-                * Show the dropdown for ElasticSearch, etc
+                * Only show the SQL code editor for SQL databases
                 */}                
 
                 {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
@@ -162,16 +162,16 @@ class Preview extends Component {
                         <code>
                             <small>
                                 <a onClick={this.toggleEditor}>
-                                    {this.state.showEditor ? 'Hide Editor' : 'Show Editor'}
+                                    {showEditor ? 'Hide Editor' : 'Show Editor'}
                                 </a>
                             </small>
                         </code>
 
-                        <div style={{display: this.state.showEditor ? 'block' : 'none'}}>
+                        <div style={{display: showEditor ? 'block' : 'none'}}>
                             <CodeEditorField
-                                value={this.state.code}
+                                value={code}
                                 onChange={this.updateCode}
-                                connectionObject={this.props.connectionObject}
+                                connectionObject={connectionObject}
                                 runQuery={this.runQuery}
                             />
                             <a
@@ -187,14 +187,13 @@ class Preview extends Component {
 
                 {!SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
                     <OptionsDropdown
-                        connectionObject={this.props.connectionObject}
-                        selectedTable={this.props.selectedTable}
-                        elasticsearchMappingsRequest={this.props.elasticsearchMappingsRequest}
-                        tablesRequest={this.props.tablesRequest}
-                        setTable={this.props.setTable}
-                        setIndex={this.props.setIndex}
-                        selectedIndex={this.props.selectedIndex}
-                        updateRowsAndColumns={this.updateRowsAndColumns}
+                        connectionObject={connectionObject}
+                        selectedTable={selectedTable}
+                        elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                        tablesRequest={tablesRequest}
+                        setTable={setTable}
+                        setIndex={setIndex}
+                        selectedIndex={selectedIndex}
                     />
                 }
 
@@ -243,8 +242,8 @@ class Preview extends Component {
                     </Tabs>                    
                 }
 
-               {S3Preview()}
-               {ApacheDrillPreview()}
+               {S3Preview(this.props)}
+               {ApacheDrillPreview(this.props)}
 
                {SQL_DIALECTS_USING_EDITOR.includes(dialect) && LoadingMsg()}
                {SQL_DIALECTS_USING_EDITOR.includes(dialect) && ErrorMsg()}

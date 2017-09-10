@@ -47,7 +47,6 @@ class CodeEditorField extends Component {
                 }
                 newColumnArray.push(row[COLUMN_NAME]);
             });
-            console.warn(tables);
             this.setState({tables: tables});
         })
         .catch(function(error) {

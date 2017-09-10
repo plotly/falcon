@@ -70,6 +70,7 @@ export default class UserConnections extends Component {
             textAlign: 'left',
             width: '100%',
             maxWidth: 200,
+            overflowWrap: 'break-word',
             display: this.state.showSampleCredentials ? 'inline-block': 'none'
         };
 

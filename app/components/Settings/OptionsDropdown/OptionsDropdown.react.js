@@ -59,7 +59,12 @@ export default class OptionsDropdown extends Component {
             return <div>{'Loading docs'}</div>;
         } else if (EMR.status > 300) {
             // TODO - Make this prettier.
-            return <div>{'Hm.. there was an error loading up your docs'}</div>;
+            return (
+                <div>
+                    <div>{'There was an error loading up your docs'}</div>
+                    <div style={{color:'red'}}>{JSON.stringify(EMR)}</div>
+                </div>
+            );
         } else if (EMR.status === 200) {
             const indeciesList = keys(EMR.content);
             if (indeciesList.length === 0) {

@@ -13,8 +13,9 @@ import ConnectButton from './ConnectButton/ConnectButton.react';
 import Preview from './Preview/Preview.react';
 import TableTree from './Preview/TableTree.react.js';
 import {Link} from '../Link.react';
-import {DIALECTS, FAQ} from '../../constants/constants.js';
+import {DIALECTS, FAQ, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
 import {getAllBaseUrls} from '../../utils/utils';
+
 
 let checkconnectorUrls;
 let checkDNS;
@@ -288,6 +289,8 @@ class Settings extends Component {
             settingsRequest.content.PLOTLY_URL : 'https://plot.ly'
         );
 
+        const dialect = connections[selectedTab].dialect;
+
         return (
             <div>
                 <ConnectionTabs
@@ -313,7 +316,7 @@ class Settings extends Component {
                             <Tab
                                 className="test-ssl-tab react-tabs__tab"
                             >
-                                4. Connect to Plotly
+                                4. External Services
                             </Tab>
                             <Tab>FAQ</Tab>
                         </TabList>
@@ -327,9 +330,11 @@ class Settings extends Component {
                             {this.props.connectRequest.status === 200 ? (
                                 <SplitPane split="vertical" minSize={100} defaultSize={200} style={{position:'relative !important'}}>
                                     <div>
-                                        <TableTree
-                                            connectionObject={connections[selectedTab]}
-                                        />
+                                        {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
+                                            <TableTree
+                                                connectionObject={connections[selectedTab]}
+                                            />
+                                        }
                                     </div>
                                     <div>
                                         <Preview

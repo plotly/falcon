@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import TreeView from 'react-treeview';
 import * as Actions from '../../../actions/sessions'
-import {SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js'
 
 class TableTree extends Component {
 
@@ -17,44 +16,36 @@ class TableTree extends Component {
     componentDidMount() {
         const {connectionObject, dispatch}  = this.props;
 
-        if (SQL_DIALECTS_USING_EDITOR.includes(connectionObject.dialect)) {
+        const p = dispatch(Actions.getSqlSchema(
+            connectionObject.id,
+            connectionObject.dialect,
+            connectionObject.database
+        ));        
 
-            const p = dispatch(Actions.getSqlSchema(
-                connectionObject.id,
-                connectionObject.dialect,
-                connectionObject.database
-            ));        
-
-            console.warn(SQL_DIALECTS_USING_EDITOR, connectionObject.dialect);
-
-            p.then( (schema) => {
-                let lastTableName = '';
-                let tableName;
-                let tables = [];
-                let newTableObject = {};
-                const TABLE_NAME = 0;
-                const COLUMN_NAME = 1;
-                const DATA_TYPE = 2;            
-                schema.rows.map(function(row) {
-                    tableName = row[TABLE_NAME];
-                    if (tableName !== lastTableName) {
-                        if (Object.keys(newTableObject).length !== 0) {
-                            tables.push(newTableObject);
-                        }
-                        newTableObject = {name: tableName};
-                        lastTableName = tableName;
+        p.then( (schema) => {
+            let lastTableName = '';
+            let tableName;
+            let tables = [];
+            let newTableObject = {};
+            const TABLE_NAME = 0;
+            const COLUMN_NAME = 1;
+            const DATA_TYPE = 2;            
+            schema.rows.map(function(row) {
+                tableName = row[TABLE_NAME];
+                if (tableName !== lastTableName) {
+                    if (Object.keys(newTableObject).length !== 0) {
+                        tables.push(newTableObject);
                     }
-                    newTableObject[row[COLUMN_NAME]] = row[DATA_TYPE];
-                });
-                this.setState({tables: tables});
-            })
-            .catch(function(error) {
-                console.error(error);
+                    newTableObject = {name: tableName};
+                    lastTableName = tableName;
+                }
+                newTableObject[row[COLUMN_NAME]] = row[DATA_TYPE];
             });
-        }
-        else{
-            this.setState({tables: []});
-        }
+            this.setState({tables: tables});
+        })
+        .catch(function(error) {
+            console.error(error);
+        });
     }
 
     render() {

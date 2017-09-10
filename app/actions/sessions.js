@@ -42,7 +42,7 @@ function DELETE(path) {
 }
 
 function POST(path, body = {}) {
-    return fetch(`${baseUrl()}/${path}`, {
+    const payload = {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -50,7 +50,11 @@ function POST(path, body = {}) {
             'Content-Type': 'application/json'
         },
         body: body ? JSON.stringify(body) : null
-    });
+    };
+
+    console.warn('POST: ', path, payload);
+
+    return fetch(`${baseUrl()}/${path}`, payload);
 }
 
 function PUT(path, body = {}) {
@@ -221,6 +225,7 @@ export function getSqlSchema (connectionId, dialect, database) {
     const body = {
         query: DATABASE_SCHEMA(dialect, database)
     };
+    console.warn(dialect, database, body);
     return apiThunk(
         `connections/${connectionId}/query`,
         'POST',

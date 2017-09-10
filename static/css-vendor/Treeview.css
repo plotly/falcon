@@ -1,0 +1,62 @@
+/* the tree node's style */
+.tree-view {
+    overflow-y: hidden;
+    overflow-x: hidden;
+    font-size: 13px;
+}
+
+.tree-view_item {
+  /* immediate child of .tree-view, for styling convenience */
+}
+
+/* style for the children nodes container */
+.tree-view_children {
+    margin-left: 16px;
+}
+
+.tree-view_children-collapsed {
+    height: 0px;
+}
+
+.tree-view_arrow {
+    cursor: pointer;
+    margin-right: 6px;
+    display: inline-block;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    display: inline;
+}
+
+.tree-view_arrow:after {
+    content: '▾';
+    font-size: 14px;
+}
+
+.tree-view_arrow-collapsed:after {
+    content: '►';
+    font-size: 8px;
+}
+
+/* rotate the triangle to close it */
+.tree-view_arrow-collapsed {
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+}
+
+.tree-view .info {
+    padding: 0;
+    font-size: 13px;
+}
+
+.tree-view .info code {
+    font-size: 11px;
+    padding: 1px 6px;
+    background: #EBF0F8;
+    color: black;
+    border-radius: 2px;
+    border: 1px solid #C8D4E3;  
+}
