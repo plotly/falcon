@@ -1,5 +1,5 @@
-const ibmdb = require('ibm_db');
-// const ibmdb = {};
+// const ibmdb = require('ibm_db');
+const ibmdb = {};
 import {dissoc} from 'ramda';
 
 import Logger from '../../logger';
