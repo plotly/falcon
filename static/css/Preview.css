@@ -14,6 +14,7 @@ th, td {
 .previewContainer {
     margin: 25px;
     overflow: auto;
+    overflow-x: hidden;
     border-radius: 3px;
 }
 

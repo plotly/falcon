@@ -1,10 +1,12 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 import {Table, Column, Cell} from 'fixed-data-table';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import CodeEditorField from './CodeEditorField.react.js';
-import ChartEditor from 'react-plotly-dnd-editor';
+import ChartEditor from './ChartEditor.react.js';
+import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
 import * as Actions from '../../../actions/sessions';
+import {DIALECTS, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js'
 
 class Preview extends Component {
 
@@ -41,15 +43,44 @@ class Preview extends Component {
             this.setState({
                 columnNames: columnnames,
                 rows: rows,
-                loading: false
+                loading: false,
+                error: ''
             });
         } else {
             return null;
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+
+        const {previewTableRequest} = nextProps;
+
+        if (previewTableRequest.status === 200) {
+
+            const {columnnames, rows} = previewTableRequest.content;
+
+            if (!this.state.columnNames.length) {
+                this.setState({
+                    columnNames: columnnames,
+                    rows: rows,
+                    loading: false,
+                    error: ''
+                });
+            }
+        }
+    }
+
     testClass() {
         return 'test-connected';
+    }
+
+    updateRowsAndColumns(columnnames, rows) {
+        this.setState({
+            columnNames: columnnames,
+            rows: rows,
+            loading: false,
+            error: ''
+        });
     }
 
     runQuery() {
@@ -67,12 +98,7 @@ class Preview extends Component {
         p.then( result => {
             const {columnnames, rows} = result;
             if (typeof rows !== undefined) {
-                this.setState({
-                    columnNames: columnnames,
-                    rows: rows,
-                    loading: false,
-                    error: ''
-                });
+                this.updateRowsAndColumns(columnnames, rows);
             }
         })
         .catch( error => {
@@ -99,7 +125,7 @@ class Preview extends Component {
             if (this.state.error) {
                 return (
                     <div>
-                        <div>{'Hm... An error occurred while trying to load this table'}</div>
+                        <div>{'An error occurred while trying to load this table:'}</div>
                         <div style={{color: 'red'}}>{this.state.error}</div>
                     </div>
                 );
@@ -206,35 +232,59 @@ class Preview extends Component {
 
         const columnNames = this.state.columnNames;
         const rows = this.state.rows;
+        const dialect = this.props.connectionObject.dialect;
 
         return (
             <div className={'previewContainer'}>
-                <code>
-                    <small>
-                        <a onClick={this.toggleEditor}>
-                            {this.state.showEditor ? 'Hide Editor' : 'Show Editor'}
-                        </a>
-                    </small>
-                </code>
 
-                <div style={{display: this.state.showEditor ? 'block' : 'none'}}>
-                    <CodeEditorField
-                        value={this.state.code}
-                        onChange={this.updateCode}
+                {/*
+                * Show the SQL code editor for SQL databases
+                * Show the dropdown for ElasticSearch, etc
+                */}                
+
+                {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
+                    <div>
+                        <code>
+                            <small>
+                                <a onClick={this.toggleEditor}>
+                                    {this.state.showEditor ? 'Hide Editor' : 'Show Editor'}
+                                </a>
+                            </small>
+                        </code>
+
+                        <div style={{display: this.state.showEditor ? 'block' : 'none'}}>
+                            <CodeEditorField
+                                value={this.state.code}
+                                onChange={this.updateCode}
+                                connectionObject={this.props.connectionObject}
+                                runQuery={this.runQuery}
+                            />
+                            <a
+                                className='btn btn-primary'
+                                onClick={this.runQuery}
+                                style={{float: 'right', maxWidth: 100}}
+                            >
+                                Run
+                            </a>
+                        </div>
+                    </div>
+                }
+
+                {!SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
+                    <OptionsDropdown
                         connectionObject={this.props.connectionObject}
-                        runQuery={this.runQuery}
+                        selectedTable={this.props.selectedTable}
+                        elasticsearchMappingsRequest={this.props.elasticsearchMappingsRequest}
+                        tablesRequest={this.props.tablesRequest}
+                        setTable={this.props.setTable}
+                        setIndex={this.props.setIndex}
+                        selectedIndex={this.props.selectedIndex}
+                        updateRowsAndColumns={this.updateRowsAndColumns}
                     />
-                    <a
-                        className='btn btn-primary'
-                        onClick={this.runQuery}
-                        style={{float: 'right', maxWidth: 100}}
-                    >
-                        Run
-                    </a>
-                </div>
+                }
 
-                {rows &&
-                    <Tabs>
+                {rows && dialect !== DIALECTS['APACHE_DRILL'] && dialect !== DIALECTS['S3'] &&
+                    <Tabs forceRenderTabPanel={true}>
                         <TabList>
                             <Tab>Table</Tab>
                             <Tab>Chart</Tab>
@@ -275,13 +325,14 @@ class Preview extends Component {
                                 columnNames={columnNames}
                             />
                         </TabPanel>
-                    </Tabs>
+                    </Tabs>                    
                 }
 
                {S3Preview()}
                {ApacheDrillPreview()}
-               {LoadingMsg()}
-               {ErrorMsg()}
+               
+               {SQL_DIALECTS_USING_EDITOR.includes(dialect) && LoadingMsg()}
+               {SQL_DIALECTS_USING_EDITOR.includes(dialect) && ErrorMsg()}
             </div>
         );
     }

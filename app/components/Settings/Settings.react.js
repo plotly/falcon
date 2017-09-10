@@ -10,7 +10,6 @@ import ConnectionTabs from './Tabs/Tabs.react';
 import UserConnections from './UserConnections/UserConnections.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
-import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import Preview from './Preview/Preview.react';
 import TableTree from './Preview/TableTree.react.js';
 import {Link} from '../Link.react';
@@ -137,10 +136,13 @@ class Settings extends Component {
     componentWillReceiveProps(nextProps) {
         // if status goes to 200, credentials have been successfully saved to disk
         if (nextProps.connectRequest.status === 200 &&
-            this.props.connectRequest.status !== 200)
-        {
-            if (this.state.editMode) this.setState({editMode: false});
-            if (this.props.connectionNeedToBeSaved) this.props.setConnectionNeedToBeSaved(false);
+            this.props.connectRequest.status !== 200) {
+            if (this.state.editMode) {
+                this.setState({editMode: false});
+            }
+            if (this.props.connectionNeedToBeSaved){
+                this.props.setConnectionNeedToBeSaved(false);
+            }
         }
         if (nextProps.connectorUrlsRequest.status === 200 && this.props.connectorUrlsRequest.status !== 200) {
             this.setState({urls: nextProps.connectorUrlsRequest.content});
@@ -296,13 +298,17 @@ class Settings extends Component {
                     deleteTab={deleteTab}
                 />
 
-                <div className={'openTab'} style={{'padding': 30}}>
+                <div className={'openTab'} style={{'padding': '30px 0'}}>
 
-                    <Tabs>
+                    <Tabs defaultIndex={0}>
 
                         <TabList>
                             <Tab>1. Connection</Tab>
-                            <Tab>2. Preview</Tab>
+                            {this.props.connectRequest.status === 200 ? (
+                                <Tab>2. Query</Tab>
+                            ) : (
+                                <Tab>Loading...</Tab>
+                            )}
                             <Tab>3. SSL Certificate</Tab>
                             <Tab
                                 className="test-ssl-tab react-tabs__tab"
@@ -326,22 +332,18 @@ class Settings extends Component {
                                         />
                                     </div>
                                     <div>
-                                        {/*<OptionsDropdown
-                                            connectionObject={connections[selectedTab]}
-                                            selectedTable={selectedTable}
-                                            elasticsearchMappingsRequest={elasticsearchMappingsRequest}
-                                            tablesRequest={tablesRequest}
-                                            setTable={setTable}
-                                            setIndex={setIndex}
-                                            selectedIndex={selectedIndex}
-                                        />*/}
-
                                         <Preview
                                             connectionObject={connections[selectedTab]}
                                             previewTableRequest={previewTableRequest}
                                             s3KeysRequest={s3KeysRequest}
                                             apacheDrillStorageRequest={apacheDrillStorageRequest}
                                             apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+                                            selectedTable={selectedTable}
+                                            elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                                            tablesRequest={tablesRequest}
+                                            setTable={setTable}
+                                            setIndex={setIndex}
+                                            selectedIndex={selectedIndex}                                            
                                         />
                                     </div>
                                 </SplitPane>
@@ -555,6 +557,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         return dispatch(Actions.getApacheDrillS3Keys(selectedConnectionId));
     }
     function boundSetTable(table) {
+        console.warn(table);
         return dispatch(Actions.setTable({[selectedConnectionId]: table}));
     }
     function boundSetIndex(index) {

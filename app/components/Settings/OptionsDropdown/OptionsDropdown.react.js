@@ -38,6 +38,7 @@ export default class OptionsDropdown extends Component {
                         <Select
                             options={tablesList.map(t => ({label: t, value: t}))}
                             value={selectedTable}
+                            searchable={false}
                             onChange={option => {
                                 setTable(option.value);
                             }}
@@ -71,6 +72,7 @@ export default class OptionsDropdown extends Component {
                         <Select
                             options={indeciesList.map(t => ({label: t, value: t}))}
                             value={selectedIndex}
+                            searchable={false}
                             onChange={option => {
                                 setIndex(option.value);
                             }}
@@ -99,6 +101,7 @@ export default class OptionsDropdown extends Component {
                         <Select
                             options={tablesList.map(t => ({label: t, value: t}))}
                             value={selectedTable}
+                            searchable={false}
                             onChange={option => {
                                 setTable(option.value);
                             }}
