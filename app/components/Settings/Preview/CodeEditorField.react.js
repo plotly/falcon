@@ -33,9 +33,9 @@ class CodeEditorField extends Component {
             let tableName;
             let tables = {};
             let newColumnArray = [];
-            const TABLE_NAME = 2;
-            const COLUMN_NAME = 3;
-            const DATA_TYPE = 7;
+            const TABLE_NAME = 0;
+            const COLUMN_NAME = 1;
+            const DATA_TYPE = 2;
             schema.rows.map(function(row) {
                 tableName = row[TABLE_NAME];
                 if (tableName !== lastTableName) {
@@ -47,6 +47,7 @@ class CodeEditorField extends Component {
                 }
                 newColumnArray.push(row[COLUMN_NAME]);
             });
+            console.warn(tables);
             this.setState({tables: tables});
         })
         .catch(function(error) {

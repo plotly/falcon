@@ -298,7 +298,7 @@ class Settings extends Component {
                     deleteTab={deleteTab}
                 />
 
-                <div className={'openTab'} style={{'padding': '30px 0'}}>
+                <div className={'openTab'} style={{'padding': 30}}>
 
                     <Tabs defaultIndex={0}>
 

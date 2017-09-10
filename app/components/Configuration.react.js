@@ -10,6 +10,8 @@ const LINKS = {
     PLANS: 'http://plot.ly/plans/',
     DOCS: 'http://help.plot.ly/database-connectors/',
     TYPEFORM: 'https://plotly.typeform.com/to/KUiCSl'
+    GITHUB: 'https://github.com/plotly/plotly-database-connector'
+    ABOUT: 'https://plot.ly/database-connectors/'
 };
 const ONPREM = contains('external-data-connector', window.location.href);
 
@@ -43,25 +45,14 @@ export default class Configuration extends Component {
         return (
             <div className="fullApp">
                 <div className="header">
-                    <span className="logoAndTitle">
-                        <h5 className="applicationTitle">
-                            Plotly SQL Query Tool
-                        </h5>
-                    </span>
 
                     <span className="supportLinksContainer">
                         <div className="externalLinkContainer">
                             <DropdownMenu {...menuOptions}>
-                                {
-                                    ONPREM ?
-                                    null : <li><Link className="supportLinks" href={LINKS.PLANS}>Plans and Pricing</Link></li>
-                                }
-                                {
-                                    ONPREM ?
-                                    null : <li><Link className="supportLinks" href={'https://plot.ly/create'}>Chart & SQL Editor</Link></li>
-                                }
+                                <li><Link className="supportLinks" href={LINKS.ABOUT}>About this App</Link></li>                            
                                 <li><Link className="supportLinks" href={LINKS.DOCS}>Documentation</Link></li>
                                 <li><Link className="supportLinks" href={LINKS.TYPEFORM}>Request a Connector</Link></li>
+                                <li><Link className="supportLinks" href={LINKS.GITHUB}>Code on GitHub</Link></li>
                             </DropdownMenu>
                         </div>
                     </span>
