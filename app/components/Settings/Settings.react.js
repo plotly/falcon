@@ -303,7 +303,7 @@ class Settings extends Component {
 
                 <div className={'openTab'} style={{'padding': 30}}>
 
-                    <Tabs defaultIndex={0}>
+                    <Tabs forceRenderTabPanel={true}>
 
                         <TabList>
                             <Tab>1. Connection</Tab>
