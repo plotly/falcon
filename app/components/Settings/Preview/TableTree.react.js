@@ -22,17 +22,24 @@ class TableTree extends Component {
             connectionObject.database
         ));        
 
+        /*
+        *   Tree expects form: 
+        *   [ {name: "alcohol_consumption_by_country_2010", location: "varchar", alcohol: "varchar"} ]
+        */
+
         p.then( (schema) => {
             let lastTableName = '';
             let tableName;
             let tables = [];
             let newTableObject = {};
+            let DB_HAS_ONLY_ONE_TABLE;
             const TABLE_NAME = 0;
             const COLUMN_NAME = 1;
             const DATA_TYPE = 2;            
-            schema.rows.map(function(row) {
+            schema.rows.map(function(row, i) {
                 tableName = row[TABLE_NAME];
-                if (tableName !== lastTableName) {
+                DB_HAS_ONLY_ONE_TABLE = (tables.length === 0 && i === schema.rows.length-1);
+                if (tableName !== lastTableName || DB_HAS_ONLY_ONE_TABLE) {
                     if (Object.keys(newTableObject).length !== 0) {
                         tables.push(newTableObject);
                     }
@@ -41,6 +48,7 @@ class TableTree extends Component {
                 }
                 newTableObject[row[COLUMN_NAME]] = row[DATA_TYPE];
             });
+            console.warn(schema, tables);
             this.setState({tables: tables});
         })
         .catch(function(error) {

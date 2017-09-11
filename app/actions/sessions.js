@@ -371,7 +371,7 @@ function PREVIEW_QUERY (dialect, table, database = '') {
         case DIALECTS.MARIADB:
         case DIALECTS.POSTGRES:
         case DIALECTS.REDSHIFT:
-            return `SELECT * FROM ${table} LIMIT 5`;
+            return `SELECT * FROM ${table}`;
         case DIALECTS.MSSQL:
             return 'SELECT TOP 5 * FROM ' +
                 `${database}.dbo.${table}`;
@@ -392,7 +392,8 @@ function PREVIEW_QUERY (dialect, table, database = '') {
 function DATABASE_SCHEMA (dialect, database = ''){
     switch (dialect) {
         case DIALECTS.IBM_DB2:
-        case DIALECTS.APACHE_SPARK:
+            return `SELECT TABNAME, COLNAME, TYPENAME FROM syscat.columns WHERE SUBSTR(TABSCHEMA,1,3) != 'SYS';`
+        case DIALECTS.APACHE_SPARK:            
         case DIALECTS.MYSQL:
         case DIALECTS.SQLITE:
         case DIALECTS.MARIADB:

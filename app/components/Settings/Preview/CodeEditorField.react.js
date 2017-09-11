@@ -33,12 +33,14 @@ class CodeEditorField extends Component {
             let tableName;
             let tables = {};
             let newColumnArray = [];
+            let DB_HAS_ONLY_ONE_TABLE;
             const TABLE_NAME = 0;
             const COLUMN_NAME = 1;
             const DATA_TYPE = 2;
-            schema.rows.map(function(row) {
+            schema.rows.map(function(row, i) {
                 tableName = row[TABLE_NAME];
-                if (tableName !== lastTableName) {
+                DB_HAS_ONLY_ONE_TABLE = (Object.keys(tables).length === 0 && i === schema.rows.length-1);
+                if (tableName !== lastTableName || DB_HAS_ONLY_ONE_TABLE) {
                     if (newColumnArray.length !== 0) {
                         tables[tableName] = newColumnArray;
                     }
@@ -47,6 +49,7 @@ class CodeEditorField extends Component {
                 }
                 newColumnArray.push(row[COLUMN_NAME]);
             });
+            console.warn(schema, tables);
             this.setState({tables: tables});
         })
         .catch(function(error) {

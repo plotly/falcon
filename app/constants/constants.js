@@ -14,7 +14,7 @@ export const DIALECTS = {
     APACHE_DRILL: 'apache drill'
 };
 
-export const SQL_DIALECTS_USING_EDITOR = ['mysql', 'mariadb', 'postgres', 'redshift', 'mssql', 'sqlite'];
+export const SQL_DIALECTS_USING_EDITOR = ['mysql', 'mariadb', 'postgres', 'redshift', 'mssql', 'sqlite', 'ibm db2', 'apache spark'];
 
 const commonSqlOptions = [
     {'label': 'Username', 'value': 'username', 'type': 'text'},
