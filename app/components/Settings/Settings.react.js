@@ -614,10 +614,10 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
 
     function boundUpdatePreview(previewUpdateObject) {
         return dispatch(Actions.updatePreview(
-            merge({
-                connectionId: selectedConnectionId
-                ...previewUpdateObject
-            })
+            merge(
+                {connectionId: selectedConnectionId},
+                previewUpdateObject
+            )
         ));
     }
 
