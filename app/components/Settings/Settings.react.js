@@ -12,6 +12,7 @@ import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import Preview from './Preview/Preview.react';
 import TableTree from './Preview/TableTree.react.js';
+import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../Link.react';
 import {DIALECTS, FAQ, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
 import {getAllBaseUrls} from '../../utils/utils';
@@ -303,7 +304,7 @@ class Settings extends Component {
                     deleteTab={deleteTab}
                 />
 
-                <div className={'openTab'} style={{padding: 30, width:'90%'}}>
+                <div className={'openTab'} style={{padding: 30}}>
 
                     <Tabs defaultIndex={0}>
 
@@ -345,31 +346,21 @@ class Settings extends Component {
                                         }
                                     </div>
                                     <div style={{width: '800px'}}>
-
-                                        {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
-                                            <Preview
-                                                connectionObject={connections[selectedTab]}
-                                                previewTableRequest={previewTableRequest}
-                                                s3KeysRequest={s3KeysRequest}
-                                                apacheDrillStorageRequest={apacheDrillStorageRequest}
-                                                apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
-                                                preview={preview}
-                                                updatePreview={updatePreview}                                            
-                                            />
-                                        }
-
-                                        {!SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
-                                            <OptionsDropdown
-                                                connectionObject={connectionObject}
-                                                selectedTable={selectedTable}
-                                                elasticsearchMappingsRequest={elasticsearchMappingsRequest}
-                                                tablesRequest={tablesRequest}
-                                                setTable={setTable}
-                                                setIndex={setIndex}
-                                                selectedIndex={selectedIndex}
-                                            />
-                                        }
-
+                                        <Preview
+                                            connectionObject={connections[selectedTab]}
+                                            previewTableRequest={previewTableRequest}
+                                            s3KeysRequest={s3KeysRequest}
+                                            apacheDrillStorageRequest={apacheDrillStorageRequest}
+                                            apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+                                            preview={preview || {}}
+                                            updatePreview={updatePreview} 
+                                            selectedTable={selectedTable}
+                                            elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                                            tablesRequest={tablesRequest}
+                                            setTable={setTable}
+                                            setIndex={setIndex}
+                                            selectedIndex={selectedIndex}                                                                                           
+                                        />
                                     </div>
                                 </SplitPane>
                             ) : (

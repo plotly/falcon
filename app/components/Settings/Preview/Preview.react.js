@@ -98,8 +98,9 @@ class Preview extends Component {
     }
 
     toggleEditor() {
+        const showEditor = propOr(true, 'showEditor')(this.props.preview);
         this.props.updatePreview({
-            showEditor: this.props.preview.showEditor ? false : true
+            showEditor: showEditor ? false : true
         });
     }
 
@@ -135,61 +136,84 @@ class Preview extends Component {
         const showEditor = propOr(true, 'showEditor')(this.props.preview);
         const code = propOr('', 'code')(this.props.preview);
 
-        if (columnNames.length === 0) {
+        if (rows.length === 0 || !SQL_DIALECTS_USING_EDITOR.includes(dialect)) {
             if (previewTableRequest.status === 200) {
-                let {columnnames, rows} = previewTableRequest.content;
-                columnNames = columnnames;
+                columnNames = previewTableRequest.content.columnnames;
+                rows = previewTableRequest.content.rows;
             }
         }
+
+        // console.warn(dialect, columnNames.length, rows.length, this.props.preview, this.previewTableRequest);
 
         return (
             <div className={'previewContainer'}>
                 <div>
-                    <code>
-                        <small>
-                            <a onClick={this.toggleEditor}>
-                                {showEditor ? 'Hide Editor' : 'Show Editor'}
-                            </a>
-                        </small>
-                    </code>
+                    {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
+                        <div>
+                            <code>
+                                <small>
+                                    <a onClick={this.toggleEditor}>
+                                        {showEditor ? 'Hide Editor' : 'Show Editor'}
+                                    </a>
+                                </small>
+                            </code>
 
-                    <div style={{display: showEditor ? 'block' : 'none'}}>
-                        <CodeEditorField
-                            value={code}
-                            onChange={this.updateCode}
+                            <div style={{display: showEditor ? 'block' : 'none'}}>
+                                <CodeEditorField
+                                    value={code}
+                                    onChange={this.updateCode}
+                                    connectionObject={connectionObject}
+                                    runQuery={this.runQuery}
+                                />
+                                <a
+                                    className='btn btn-primary'
+                                    onClick={this.runQuery}
+                                    style={{float: 'right', maxWidth: 100}}
+                                >
+                                    Run
+                                </a>
+                            </div>
+                        </div>
+                    }
+
+                    {!SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
+                        <OptionsDropdown
                             connectionObject={connectionObject}
-                            runQuery={this.runQuery}
+                            selectedTable={selectedTable}
+                            elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                            tablesRequest={tablesRequest}
+                            setTable={setTable}
+                            setIndex={setIndex}
+                            selectedIndex={selectedIndex}
                         />
-                        <a
-                            className='btn btn-primary'
-                            onClick={this.runQuery}
-                            style={{float: 'right', maxWidth: 100}}
-                        >
-                            Run
-                        </a>
-                    </div>
+                    }
+
                 </div>
 
-                <Tabs forceRenderTabPanel={true}>
-                    <TabList>
-                        <Tab>Table</Tab>
-                        <Tab>Chart</Tab>
-                    </TabList>
+                {dialect !== DIALECTS['S3'] && dialect !== DIALECTS['APACHE_DRILL'] && 
+                    <div>
+                        <Tabs forceRenderTabPanel={true}>
+                            <TabList>
+                                <Tab>Table</Tab>
+                                <Tab>Chart</Tab>
+                            </TabList>
 
-                    <TabPanel>
-                        <SQLTable
-                            rows={rows}
-                            columnNames={columnNames}
-                        />
-                    </TabPanel>
+                            <TabPanel>
+                                <SQLTable
+                                    rows={rows}
+                                    columnNames={columnNames}
+                                />
+                            </TabPanel>
 
-                    <TabPanel>
-                        <ChartEditor
-                            rows={rows}
-                            columnNames={columnNames}
-                        />
-                    </TabPanel>
-                </Tabs>                    
+                            <TabPanel>
+                                <ChartEditor
+                                    rows={rows}
+                                    columnNames={columnNames}
+                                />
+                            </TabPanel>
+                        </Tabs>
+                    </div>             
+                }
 
                {S3Preview(this.props)}
                {ApacheDrillPreview(this.props)}
