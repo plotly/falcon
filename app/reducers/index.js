@@ -222,6 +222,27 @@ function connections(state = {}, action) {
     }
 }
 
+function previews(state = {}, action) {
+    if (action.type === 'UPDATE_PREVIEW') {
+        /*
+         * deep-merge the new payload with the existing state, indexed
+         * by connectionId
+         */
+        const {connectionId} = action.payload;
+        return merge(
+            state,
+            {
+                [connectionId]: merge(
+                propOr({}, connectionId, state),
+                omit('connectionId', action.payload)
+                )
+            }
+        );
+    } else {
+        return state;
+    }
+}
+
 const rootReducer = combineReducers({
     tabMap,
     connections,
@@ -241,7 +262,8 @@ const rootReducer = combineReducers({
     previewTableRequests,
     s3KeysRequests,
     apacheDrillStorageRequests,
-    apacheDrillS3KeysRequests
+    apacheDrillS3KeysRequests,
+    previews
 });
 
 export default rootReducer;

@@ -15,7 +15,7 @@ class Preview extends Component {
         this.toggleEditor = this.toggleEditor.bind(this);
         this.runQuery = this.runQuery.bind(this);
 
-        this.state = {
+        this.props = {
             code: '',
             rows: [],
             columnNames: [],
@@ -28,17 +28,17 @@ class Preview extends Component {
     componentDidMount() {
         const {previewTableRequest} = this.props;
         if (previewTableRequest.status >= 400) {
-            this.setState({
+            this.props.updatePreview({
                 error: JSON.stringify(previewTableRequest),
                 loading: false
             });
         } else if (previewTableRequest.status === 'loading') {
-            this.setState({
+            this.props.updatePreview({
                 loading: true
             });
         } else if (previewTableRequest.status === 200) {
             const {columnnames, rows} = previewTableRequest.content;
-            this.setState({
+            this.props.updatePreview({
                 columnNames: columnnames,
                 rows: rows,
                 loading: false
@@ -53,7 +53,7 @@ class Preview extends Component {
     }
 
     runQuery() {
-        const query = this.state.code;
+        const query = this.props.code;
         const {connectionObject, dispatch} = this.props;
 
         console.warn('runQuery:', query, connectionObject);
@@ -67,7 +67,7 @@ class Preview extends Component {
         p.then( result => {
             const {columnnames, rows} = result;
             if (typeof rows !== undefined) {
-                this.setState({
+                this.props.updatePreview({
                     columnNames: columnnames,
                     rows: rows,
                     loading: false,
@@ -76,31 +76,31 @@ class Preview extends Component {
             }
         })
         .catch( error => {
-            this.setState(error: error);
+            this.props.updatePreview({error});
             console.error(error);
         });
 
     }
 
     updateCode(newCode) {
-        this.setState({
+        this.props.updatePreview({
             code: newCode
         });
     }
 
     toggleEditor() {
-        this.setState({
-            showEditor: this.state.showEditor ? false : true
+        this.props.updatePreview({
+            showEditor: this.props.showEditor ? false : true
         });
     }
 
     render() {
         const ErrorMsg = () => {
-            if (this.state.error) {
+            if (this.props.error) {
                 return (
                     <div>
                         <div>{'Hm... An error occurred while trying to load this table'}</div>
-                        <div style={{color: 'red'}}>{this.state.error}</div>
+                        <div style={{color: 'red'}}>{this.props.error}</div>
                     </div>
                 );
             }
@@ -109,7 +109,7 @@ class Preview extends Component {
 
 
         const LoadingMsg = () => {
-            if (this.state.loading) {
+            if (this.props.loading) {
                 return (<div>{'Loading...'}</div>);
             }
             return null;
@@ -204,22 +204,22 @@ class Preview extends Component {
             }
         };
 
-        const columnNames = this.state.columnNames;
-        const rows = this.state.rows;
+        const columnNames = this.props.columnNames;
+        const rows = this.props.rows;
 
         return (
             <div className={'previewContainer'}>
                 <code>
                     <small>
                         <a onClick={this.toggleEditor}>
-                            {this.state.showEditor ? 'Hide Editor' : 'Show Editor'}
+                            {this.props.showEditor ? 'Hide Editor' : 'Show Editor'}
                         </a>
                     </small>
                 </code>
 
-                <div style={{display: this.state.showEditor ? 'block' : 'none'}}>
+                <div style={{display: this.props.showEditor ? 'block' : 'none'}}>
                     <CodeEditorField
-                        value={this.state.code}
+                        value={this.props.code}
                         onChange={this.updateCode}
                         connectionObject={this.props.connectionObject}
                         runQuery={this.runQuery}

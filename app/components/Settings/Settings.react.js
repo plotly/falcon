@@ -259,6 +259,7 @@ class Settings extends Component {
             deleteTab,
             elasticsearchMappingsRequest,
             newTab,
+            preview,
             previewTableRequest,
             redirectUrl,
             redirectUrlRequest,
@@ -272,7 +273,8 @@ class Settings extends Component {
             selectedIndex,
             setTab,
             tablesRequest,
-            updateConnection
+            updateConnection,
+            updatePreview
         } = this.props;
 
         if (!selectedTab) {
@@ -342,6 +344,9 @@ class Settings extends Component {
                                             s3KeysRequest={s3KeysRequest}
                                             apacheDrillStorageRequest={apacheDrillStorageRequest}
                                             apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+
+                                            preview={preview}
+                                            updatePreview={updatePreview}
                                         />
                                     </div>
                                 </SplitPane>
@@ -393,7 +398,7 @@ class Settings extends Component {
                                     {httpsServerIsOK ? (
                                         <div id="test-ssl-initialized">
                                             <p>
-                                                You're now ready to explore this datastore on Plotly!
+                                                Youre now ready to explore this datastore on Plotly!
                                                 Plotly has generated a local URL for this app
                                                 through which it will securely send queries:
                                             </p>
@@ -471,7 +476,8 @@ function mapStateToProps(state) {
         settingsRequest,
         s3KeysRequests,
         apacheDrillStorageRequests,
-        apacheDrillS3KeysRequests
+        apacheDrillS3KeysRequests,
+        preview
     } = state;
 
     const selectedConnectionId = tabMap[selectedTab];
@@ -502,6 +508,7 @@ function mapStateToProps(state) {
         connectionNeedToBeSaved: connectionsNeedToBeSaved[selectedTab] || true,
         connectionsHaveBeenSaved,
         connectionObject: connections[selectedTab],
+        preview: previews[selectedConnectionId],
         selectedTable,
         selectedIndex,
         selectedConnectionId,
@@ -605,6 +612,15 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         dispatchConnect = () => dispatch(Actions.connect(selectedConnectionId));
     }
 
+    function boundUpdatePreview(previewUpdateObject) {
+        return dispatch(Actions.updatePreview(
+            merge({
+                connectionId: selectedConnectionId
+                ...previewUpdateObject
+            })
+        ));
+    }
+
     return Object.assign(
         {},
         reduce(flip(dissoc), stateProps, ['dispatch']),
@@ -625,7 +641,8 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             deleteTab: tab => dispatch(Actions.deleteTab(tab)),
             setTab: tab => dispatch(Actions.setTab(tab)),
             connect: dispatchConnect,
-            editCredential: c => dispatch(Actions.editCredential(c))
+            editCredential: c => dispatch(Actions.editCredential(c)),
+            updatePreview: boundUpdatePreview
         }
     );
 }
