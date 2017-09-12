@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {contains, dissoc, eqProps, hasIn, flip, head, keys, isEmpty, reduce} from 'ramda';
+import {contains, dissoc, eqProps, flip, hasIn, head, isEmpty, keys, merge, reduce} from 'ramda';
 import {connect} from 'react-redux';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
@@ -262,6 +262,7 @@ class Settings extends Component {
             deleteTab,
             elasticsearchMappingsRequest,
             newTab,
+            preview,
             previewTableRequest,
             redirectUrl,
             redirectUrlRequest,
@@ -275,7 +276,8 @@ class Settings extends Component {
             selectedIndex,
             setTab,
             tablesRequest,
-            updateConnection
+            updateConnection,
+            updatePreview
         } = this.props;
 
         if (!selectedTab) {
@@ -301,16 +303,16 @@ class Settings extends Component {
                     deleteTab={deleteTab}
                 />
 
-                <div className={'openTab'} style={{'padding': 30}}>
+                <div className={'openTab'} style={{padding: 30, width:'90%'}}>
 
-                    <Tabs forceRenderTabPanel={true}>
+                    <Tabs defaultIndex={0}>
 
                         <TabList>
                             <Tab>1. Connection</Tab>
                             {this.props.connectRequest.status === 200 ? (
                                 <Tab>2. Query</Tab>
                             ) : (
-                                <Tab>Loading...</Tab>
+                                <Tab disabled={true}>Loading...</Tab>
                             )}
                             <Tab>3. SSL Certificate</Tab>
                             <Tab
@@ -328,7 +330,13 @@ class Settings extends Component {
 
                         <TabPanel>
                             {this.props.connectRequest.status === 200 ? (
-                                <SplitPane split="vertical" minSize={100} defaultSize={200} style={{position:'relative !important'}}>
+                                <SplitPane 
+                                    split="vertical" 
+                                    minSize={100} 
+                                    defaultSize={200} 
+                                    maxSize={800}
+                                    style={{position:'relative !important'}}
+                                >
                                     <div>
                                         {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
                                             <TableTree
@@ -336,20 +344,32 @@ class Settings extends Component {
                                             />
                                         }
                                     </div>
-                                    <div>
-                                        <Preview
-                                            connectionObject={connections[selectedTab]}
-                                            previewTableRequest={previewTableRequest}
-                                            s3KeysRequest={s3KeysRequest}
-                                            apacheDrillStorageRequest={apacheDrillStorageRequest}
-                                            apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
-                                            selectedTable={selectedTable}
-                                            elasticsearchMappingsRequest={elasticsearchMappingsRequest}
-                                            tablesRequest={tablesRequest}
-                                            setTable={setTable}
-                                            setIndex={setIndex}
-                                            selectedIndex={selectedIndex}                                            
-                                        />
+                                    <div style={{width: '800px'}}>
+
+                                        {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
+                                            <Preview
+                                                connectionObject={connections[selectedTab]}
+                                                previewTableRequest={previewTableRequest}
+                                                s3KeysRequest={s3KeysRequest}
+                                                apacheDrillStorageRequest={apacheDrillStorageRequest}
+                                                apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+                                                preview={preview}
+                                                updatePreview={updatePreview}                                            
+                                            />
+                                        }
+
+                                        {!SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
+                                            <OptionsDropdown
+                                                connectionObject={connectionObject}
+                                                selectedTable={selectedTable}
+                                                elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                                                tablesRequest={tablesRequest}
+                                                setTable={setTable}
+                                                setIndex={setIndex}
+                                                selectedIndex={selectedIndex}
+                                            />
+                                        }
+
                                     </div>
                                 </SplitPane>
                             ) : (
@@ -478,7 +498,8 @@ function mapStateToProps(state) {
         settingsRequest,
         s3KeysRequests,
         apacheDrillStorageRequests,
-        apacheDrillS3KeysRequests
+        apacheDrillS3KeysRequests,
+        previews
     } = state;
 
     const selectedConnectionId = tabMap[selectedTab];
@@ -509,6 +530,7 @@ function mapStateToProps(state) {
         connectionNeedToBeSaved: connectionsNeedToBeSaved[selectedTab] || true,
         connectionsHaveBeenSaved,
         connectionObject: connections[selectedTab],
+        preview: previews[selectedConnectionId],
         selectedTable,
         selectedIndex,
         selectedConnectionId,
@@ -562,7 +584,6 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         return dispatch(Actions.getApacheDrillS3Keys(selectedConnectionId));
     }
     function boundSetTable(table) {
-        console.warn(table);
         return dispatch(Actions.setTable({[selectedConnectionId]: table}));
     }
     function boundSetIndex(index) {
@@ -574,6 +595,17 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             connectionObject.dialect,
             selectedTable,
             connectionObject.database || selectedIndex
+        ));
+    }
+    function boundUpdatePreview(previewUpdateObject) {
+        if (Object.keys(previewUpdateObject)[0] !== 'code') {
+            console.warn('updatePreview', previewUpdateObject);
+        }
+        return dispatch(Actions.updatePreview(
+            merge(
+                {connectionId: selectedConnectionId},
+                previewUpdateObject
+            )
         ));
     }
     function boundSetConnectionNeedToBeSaved(bool) {
@@ -633,7 +665,8 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             deleteTab: tab => dispatch(Actions.deleteTab(tab)),
             setTab: tab => dispatch(Actions.setTab(tab)),
             connect: dispatchConnect,
-            editCredential: c => dispatch(Actions.editCredential(c))
+            editCredential: c => dispatch(Actions.editCredential(c)),
+            updatePreview: boundUpdatePreview
         }
     );
 }

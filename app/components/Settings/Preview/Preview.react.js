@@ -1,11 +1,14 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
-import {Table, Column, Cell} from 'fixed-data-table';
+import {propOr} from 'ramda';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
+
+import SQLTable from './SQLTable.react.js';
 import CodeEditorField from './CodeEditorField.react.js';
 import ChartEditor from './ChartEditor.react.js';
 import ApacheDrillPreview from './ApacheDrillPreview.js'
 import S3Preview from './S3Preview.js'
+
 import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
 import * as Actions from '../../../actions/sessions';
 import {DIALECTS, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js'
@@ -19,72 +22,49 @@ class Preview extends Component {
         this.toggleEditor = this.toggleEditor.bind(this);
         this.runQuery = this.runQuery.bind(this);
 
-        this.state = {
-            code: '',
-            rows: [],
-            columnNames: [],
-            error: '',
-            loading: true,
-            showEditor: true
-        };
+        console.warn('constructor');
     }
 
-    componentDidMount() {
-        const {previewTableRequest} = this.props;
-        if (previewTableRequest.status >= 400) {
-            this.setState({
-                error: JSON.stringify(previewTableRequest),
+    handlePTR(PTR) {
+        if (PTR.status >= 400) {
+            this.props.updatePreview({
+                error: JSON.stringify(PTR),
                 loading: false
             });
-        } else if (previewTableRequest.status === 'loading') {
-            this.setState({
+        } else if (PTR.status === 'loading') {
+            this.props.updatePreview({
                 loading: true
             });
-        } else if (previewTableRequest.status === 200) {
-            const {columnnames, rows} = previewTableRequest.content;
-            this.setState({
-                columnNames: columnnames,
-                rows: rows,
-                loading: false,
-                error: ''
-            });
-        } else {
-            return null;
-        }
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.previewTableRequest.status === 200) {
-            const {columnnames, rows} = nextProps.previewTableRequest.content;
-            if (!this.state.columnNames.length) {
-                this.setState({
+        } else if (PTR.status === 200) {
+            const {columnnames, rows} = PTR.content;
+            if (columnnames && rows) {
+                this.props.updatePreview({
                     columnNames: columnnames,
                     rows: rows,
                     loading: false,
                     error: ''
                 });
             }
-        }
+            else{
+                console.warn('Undefined cols or rows:', columnNames, rows);
+            }            
+        }        
+    }
+
+    componentDidMount() {
+        const {previewTableRequest} = this.props;
+        this.handlePTR(previewTableRequest);
     }
 
     testClass() {
         return 'test-connected';
     }
 
-    updateRowsAndColumns(columnnames, rows) {
-        this.setState({
-            columnNames: columnnames,
-            rows: rows,
-            loading: false,
-            error: ''
-        });
-    }
-
     runQuery() {
-        const query = this.state.code;
+        const query = propOr('', 'code')(this.props.preview);
         const {connectionObject, dispatch} = this.props;
 
-        console.warn('runQuery:', query, connectionObject);
+        console.warn('runQuery:', query, this.props.preview);
 
         const p = dispatch(Actions.runSqlQuery(
             connectionObject.id,
@@ -93,37 +73,44 @@ class Preview extends Component {
         ));
 
         p.then( result => {
+            console.warn('result', result);
             const {columnnames, rows} = result;
             if (typeof rows !== undefined) {
-                this.updateRowsAndColumns(columnnames, rows);
+                this.props.updatePreview({
+                    columnNames: columnnames,
+                    rows: rows,
+                    loading: false,
+                    error: ''
+                });
             }
         })
         .catch( error => {
-            this.setState(error: error);
+            this.props.updatePreview(error: error);
             console.error(error);
         });
 
     }
 
     updateCode(newCode) {
-        this.setState({
+        this.props.updatePreview({
             code: newCode
         });
     }
 
     toggleEditor() {
-        this.setState({
-            showEditor: this.state.showEditor ? false : true
+        this.props.updatePreview({
+            showEditor: this.props.preview.showEditor ? false : true
         });
     }
 
     render() {
         const ErrorMsg = () => {
-            if (this.state.error) {
+            const error = propOr(false, error)(this.props.preview);
+            if (error) {
                 return (
                     <div>
                         <div>{'An error occurred while trying to load this table:'}</div>
-                        <div style={{color: 'red'}}>{this.state.error}</div>
+                        <div style={{color: 'red'}}>{error}</div>
                     </div>
                 );
             }
@@ -132,121 +119,82 @@ class Preview extends Component {
 
 
         const LoadingMsg = () => {
-            if (this.state.loading) {
+            const loading = propOr(false, loading)(this.props.preview);
+            if (loading) {
                 return (<div>{'Loading...'}</div>);
             }
             return null;
         };
 
-        const { connectionObject, selectedTable, elasticsearchMappingsRequest, tablesRequest,
-            setTable, setIndex, selectedIndex, previewTableRequest} = this.props;
-
+        const {selectedTable, elasticsearchMappingsRequest, tablesRequest,
+            connectionObject, setTable, setIndex, selectedIndex, previewTableRequest} = this.props;            
         const dialect = connectionObject.dialect;
 
-        const {columnNames, rows, showEditor, code} = this.state;
+        let columnNames = propOr([], 'columnNames')(this.props.preview);
+        let rows = propOr([], 'rows')(this.props.preview);
+        const showEditor = propOr(true, 'showEditor')(this.props.preview);
+        const code = propOr('', 'code')(this.props.preview);
 
-        /*if (previewTableRequest.status === 200) {
-            rows = previewTableRequest.content.rows;
-            columnNames = previewTableRequest.content.columnnames;
-        }*/
+        if (columnNames.length === 0) {
+            if (previewTableRequest.status === 200) {
+                let {columnnames, rows} = previewTableRequest.content;
+                columnNames = columnnames;
+            }
+        }
 
         return (
             <div className={'previewContainer'}>
-
-                {/*
-                * Only show the SQL code editor for SQL databases
-                */}                
-
-                {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
-                    <div>
-                        <code>
-                            <small>
-                                <a onClick={this.toggleEditor}>
-                                    {showEditor ? 'Hide Editor' : 'Show Editor'}
-                                </a>
-                            </small>
-                        </code>
-
-                        <div style={{display: showEditor ? 'block' : 'none'}}>
-                            <CodeEditorField
-                                value={code}
-                                onChange={this.updateCode}
-                                connectionObject={connectionObject}
-                                runQuery={this.runQuery}
-                            />
-                            <a
-                                className='btn btn-primary'
-                                onClick={this.runQuery}
-                                style={{float: 'right', maxWidth: 100}}
-                            >
-                                Run
+                <div>
+                    <code>
+                        <small>
+                            <a onClick={this.toggleEditor}>
+                                {showEditor ? 'Hide Editor' : 'Show Editor'}
                             </a>
-                        </div>
+                        </small>
+                    </code>
+
+                    <div style={{display: showEditor ? 'block' : 'none'}}>
+                        <CodeEditorField
+                            value={code}
+                            onChange={this.updateCode}
+                            connectionObject={connectionObject}
+                            runQuery={this.runQuery}
+                        />
+                        <a
+                            className='btn btn-primary'
+                            onClick={this.runQuery}
+                            style={{float: 'right', maxWidth: 100}}
+                        >
+                            Run
+                        </a>
                     </div>
-                }
+                </div>
 
-                {!SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
-                    <OptionsDropdown
-                        connectionObject={connectionObject}
-                        selectedTable={selectedTable}
-                        elasticsearchMappingsRequest={elasticsearchMappingsRequest}
-                        tablesRequest={tablesRequest}
-                        setTable={setTable}
-                        setIndex={setIndex}
-                        selectedIndex={selectedIndex}
-                    />
-                }
+                <Tabs forceRenderTabPanel={true}>
+                    <TabList>
+                        <Tab>Table</Tab>
+                        <Tab>Chart</Tab>
+                    </TabList>
 
-                {rows && dialect !== DIALECTS['APACHE_DRILL'] && dialect !== DIALECTS['S3'] &&
-                    <Tabs forceRenderTabPanel={true}>
-                        <TabList>
-                            <Tab>Table</Tab>
-                            <Tab>Chart</Tab>
-                        </TabList>
+                    <TabPanel>
+                        <SQLTable
+                            rows={rows}
+                            columnNames={columnNames}
+                        />
+                    </TabPanel>
 
-                        <TabPanel>
-                            <Table
-                                rowHeight={50}
-                                rowsCount={rows.length}
-                                width={800}
-                                height={200}
-                                headerHeight={40}
-                                {...this.props}>
-                                {columnNames.map(function(colName, colIndex){
-                                    return <Column
-                                        columnKey={colName}
-                                        key={colIndex}
-                                        label={colName}
-                                        flexgrow={1}
-                                        width={200}
-                                        header={<Cell>{colName}</Cell>}
-                                        cell={({rowIndex, ...props}) => (
-                                            <Cell
-                                                height={20}
-                                                {...props}
-                                            >
-                                                {rows[rowIndex][colIndex]}
-                                            </Cell>
-                                        )}
-                                    />;
-                                })}
-                            </Table>
-                        </TabPanel>
-
-                        <TabPanel>
-                            <ChartEditor
-                                rows={rows}
-                                columnNames={columnNames}
-                            />
-                        </TabPanel>
-                    </Tabs>                    
-                }
+                    <TabPanel>
+                        <ChartEditor
+                            rows={rows}
+                            columnNames={columnNames}
+                        />
+                    </TabPanel>
+                </Tabs>                    
 
                {S3Preview(this.props)}
                {ApacheDrillPreview(this.props)}
-
-               {SQL_DIALECTS_USING_EDITOR.includes(dialect) && LoadingMsg()}
-               {SQL_DIALECTS_USING_EDITOR.includes(dialect) && ErrorMsg()}
+               {LoadingMsg()}
+               {ErrorMsg()}
             </div>
         );
     }

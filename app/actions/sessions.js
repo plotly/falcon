@@ -12,6 +12,7 @@ export const setIndex = createAction('SET_INDEX');
 export const mergeConnections = createAction('MERGE_CONNECTIONS');
 export const updateConnection = createAction('UPDATE_CREDENTIAL');
 export const deleteConnection = createAction('DELETE_CREDENTIAL');
+export const updatePreview = createAction('UPDATE_PREVIEW');
 
 const DELETE_TAB_MESSAGE = 'You are about to delete a connection. ' +
 'If you have scheduled persistent queries with that connection, they ' +
@@ -51,8 +52,6 @@ function POST(path, body = {}) {
         },
         body: body ? JSON.stringify(body) : null
     };
-
-    console.warn('POST: ', path, payload);
 
     return fetch(`${baseUrl()}/${path}`, payload);
 }
@@ -224,9 +223,8 @@ export function previewTable (connectionId, dialect, table, database) {
 export function getSqlSchema (connectionId, dialect, database) {
     const body = {
         query: DATABASE_SCHEMA(dialect, database)
-    };
-    console.warn(dialect, database, body);
-    return apiThunk(
+    }; 
+       return apiThunk(
         `connections/${connectionId}/query`,
         'POST',
         'previewTableRequest',

@@ -5,5 +5,9 @@ import rootReducer from '../reducers';
 const enhancer = applyMiddleware(thunk);
 
 export default function configureStore(initialState) {
-    return createStore(rootReducer, initialState, enhancer);
+    const store = createStore(rootReducer, initialState, enhancer);
+
+    window.store = store;
+
+    return store;
 }

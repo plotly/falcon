@@ -1,7 +1,8 @@
 'use es6';
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
-import CodeMirror from 'react-codemirror';
+// https://github.com/JedWatson/react-codemirror/issues/106
+import CodeMirror from '@skidding/react-codemirror';
 // assuming a setup with webpack/create-react-app import the additional js/css files
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/show-hint';
@@ -16,7 +17,8 @@ class CodeEditorField extends Component {
         this.handleChange = this.handleChange.bind(this);
 
         this.state = {
-            tables: {}
+            tables: {},
+            code: ''
         }
     }
 
@@ -49,7 +51,6 @@ class CodeEditorField extends Component {
                 }
                 newColumnArray.push(row[COLUMN_NAME]);
             });
-            console.warn(schema, tables);
             this.setState({tables: tables});
         })
         .catch(function(error) {
@@ -101,6 +102,8 @@ class CodeEditorField extends Component {
                 'Shift-Enter': this.props.runQuery
             }
         };
+
+        console.log('cm', this.props.value);
 
         return (
             <CodeMirror
