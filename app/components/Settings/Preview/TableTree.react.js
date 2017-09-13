@@ -9,8 +9,8 @@ class TableTree extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { 
-            tables: [{name: 'Loading...'}] 
+        this.state = {
+            tables: [{name: 'Loading...'}]
         };
 
         this.getSchemaTree = this.getSchemaTree.bind(this);
@@ -32,7 +32,7 @@ class TableTree extends Component {
             let DB_HAS_ONLY_ONE_TABLE;
             const TABLE_NAME = 0;
             const COLUMN_NAME = 1;
-            const DATA_TYPE = 2;            
+            const DATA_TYPE = 2;
             schemaRequest.content.rows.map(function(row, i) {
                 tableName = row[TABLE_NAME];
                 DB_HAS_ONLY_ONE_TABLE = (tables.length === 0 && i === schema.rows.length-1);
@@ -45,9 +45,9 @@ class TableTree extends Component {
                 }
                 newTableObject[row[COLUMN_NAME]] = row[DATA_TYPE];
             });
-            
+
             console.warn('Tables ---> ', tables);
-            
+
             this.props.updatePreview({
                 treeSchema: tables
             });

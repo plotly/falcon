@@ -22,7 +22,7 @@ let checkconnectorUrls;
 let checkDNS;
 
 const treeViewContainerStyle = {
-    height:'99%', 
+    height:'99%',
     background:'rgb(251, 252, 253)',
     borderTop: '1px solid #dfe8f3',
     borderLeft: '1px solid #dfe8f3',
@@ -344,10 +344,10 @@ class Settings extends Component {
 
                         <TabPanel>
                             {this.props.connectRequest.status === 200 ? (
-                                <SplitPane 
-                                    split="vertical" 
-                                    minSize={100} 
-                                    defaultSize={200} 
+                                <SplitPane
+                                    split="vertical"
+                                    minSize={100}
+                                    defaultSize={200}
                                     maxSize={800}
                                     style={{position:'relative !important'}}
                                 >
@@ -371,7 +371,7 @@ class Settings extends Component {
                                             apacheDrillStorageRequest={apacheDrillStorageRequest}
                                             apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
                                             preview={preview || {}}
-                                            updatePreview={updatePreview} 
+                                            updatePreview={updatePreview}
                                             selectedTable={selectedTable}
                                             elasticsearchMappingsRequest={elasticsearchMappingsRequest}
                                             tablesRequest={tablesRequest}

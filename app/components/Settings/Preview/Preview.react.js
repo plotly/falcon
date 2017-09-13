@@ -122,7 +122,7 @@ class Preview extends Component {
         };
 
         const {selectedTable, elasticsearchMappingsRequest, tablesRequest,
-            connectionObject, setTable, setIndex, selectedIndex, previewTableRequest} = this.props;            
+            connectionObject, setTable, setIndex, selectedIndex, previewTableRequest} = this.props;
         const dialect = connectionObject.dialect;
 
         let columnNames = propOr([], 'columnNames')(this.props.preview);
@@ -184,7 +184,7 @@ class Preview extends Component {
 
                 </div>
 
-                {dialect !== DIALECTS['S3'] && dialect !== DIALECTS['APACHE_DRILL'] && 
+                {dialect !== DIALECTS['S3'] && dialect !== DIALECTS['APACHE_DRILL'] &&
                     <div>
                         <Tabs forceRenderTabPanel={true}>
                             <TabList>
@@ -206,7 +206,7 @@ class Preview extends Component {
                                 />
                             </TabPanel>
                         </Tabs>
-                    </div>             
+                    </div>
                 }
 
                {S3Preview(this.props)}

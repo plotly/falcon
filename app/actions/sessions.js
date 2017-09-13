@@ -224,8 +224,8 @@ export function previewTable (connectionId, dialect, table, database) {
 export function getSqlSchema (connectionId, dialect, database) {
     const body = {
         query: DATABASE_SCHEMA(dialect, database)
-    }; 
-       return apiThunk(
+    };
+    return apiThunk(
         `connections/${connectionId}/query`,
         'POST',
         'schemaRequests',
@@ -246,6 +246,7 @@ export function runSqlQuery (connectionId, query) {
         body
     );
 }
+
 
 export function initializeTabs() {
     return function(dispatch, getState) {
@@ -392,7 +393,7 @@ function DATABASE_SCHEMA (dialect, database = ''){
     switch (dialect) {
         case DIALECTS.IBM_DB2:
             return `SELECT TABNAME, COLNAME, TYPENAME FROM syscat.columns WHERE SUBSTR(TABSCHEMA,1,3) != 'SYS';`
-        case DIALECTS.APACHE_SPARK:            
+        case DIALECTS.APACHE_SPARK:
         case DIALECTS.MYSQL:
         case DIALECTS.SQLITE:
         case DIALECTS.MARIADB:
@@ -400,7 +401,7 @@ function DATABASE_SCHEMA (dialect, database = ''){
         case DIALECTS.POSTGRES:
             return `SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_catalog = '${database}' AND table_schema = 'public' ORDER BY table_name`;
         case DIALECTS.REDSHIFT:
-            return `SELECT tablename, "column", "type" FROM pg_table_def WHERE schemaname = 'public';` 
+            return `SELECT tablename, "column", "type" FROM pg_table_def WHERE schemaname = 'public';`
         case DIALECTS.MSSQL:
             return `SELECT T.name AS Table_Name, C.name AS Column_Name, P.name AS Data_Type, P.max_length AS Size, CAST(P.precision AS VARCHAR) + '/' + CAST(P.scale AS VARCHAR) \
 AS Precision_Scale FROM sys.objects AS T JOIN sys.columns AS C ON T.object_id = C.object_id JOIN sys.types AS P ON C.system_type_id = P.system_type_id WHERE T.type_desc = 'USER_TABLE';`
