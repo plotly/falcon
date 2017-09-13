@@ -97,6 +97,7 @@ function apiThunk(endpoint, method, store, id, body) {
                     status: 500
                 }
             });
+            throw new Error(err);
         });
     };
 }
