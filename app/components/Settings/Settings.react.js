@@ -356,7 +356,10 @@ class Settings extends Component {
                                             <TableTree
                                                 connectionObject={connections[selectedTab]}
                                                 preview={preview || {}}
-                                                updatePreview={updatePreview}   
+                                                updatePreview={updatePreview}
+
+                                                getSqlSchema={getSqlSchema}
+                                                schemaRequest={schemaRequest}
                                             />
                                         }
                                     </div>
@@ -374,7 +377,13 @@ class Settings extends Component {
                                             tablesRequest={tablesRequest}
                                             setTable={setTable}
                                             setIndex={setIndex}
-                                            selectedIndex={selectedIndex}                                                                                           
+                                            selectedIndex={selectedIndex}
+
+                                            getSqlSchema={getSqlSchema}
+                                            schemaRequest={schemaRequest}
+
+                                            runSqlQuery={runSqlQuery}
+                                            queryRequest={queryRequest}
                                         />
                                     </div>
                                 </SplitPane>
