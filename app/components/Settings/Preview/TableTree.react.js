@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import TreeView from 'react-treeview';
+import {propOr} from 'ramda';
 import * as Actions from '../../../actions/sessions'
 
 class TableTree extends Component {
@@ -11,10 +12,14 @@ class TableTree extends Component {
         this.state = { 
             tables: [{name: 'Loading...'}] 
         };
+
+        this.getSchemaTree = this.getSchemaTree.bind(this);
     }
 
-    componentDidMount() {
+    getSchemaTree() {
         const {connectionObject, dispatch}  = this.props;
+
+        console.warn('Getting Schema for Tree!', connectionObject.id);
 
         const p = dispatch(Actions.getSqlSchema(
             connectionObject.id,
@@ -27,7 +32,7 @@ class TableTree extends Component {
         *   [ {name: "alcohol_consumption_by_country_2010", location: "varchar", alcohol: "varchar"} ]
         */
 
-        p.then( (schema) => {
+        p.then( schema => {
             let lastTableName = '';
             let tableName;
             let tables = [];
@@ -48,24 +53,42 @@ class TableTree extends Component {
                 }
                 newTableObject[row[COLUMN_NAME]] = row[DATA_TYPE];
             });
-            console.warn(schema, tables);
-            this.setState({tables: tables});
+            
+            console.warn('Tables ---> ', tables);
+            
+            this.props.updatePreview({
+                treeSchema: tables
+            });
+
+            //this.setState({tables: tables});
         })
         .catch(function(error) {
             console.error(error);
-        });
+        });        
+    }
+
+    componentDidMount() {
+        this.getSchemaTree();
     }
 
     render() {
         
+        const TREE_DEFAULT = [{name: 'Loading...'}];
+
         const dataSource = [{
             type: this.props.connectionObject.database,
             collapsed: false,
-            tables: this.state.tables
+            tables: propOr(TREE_DEFAULT, 'treeSchema')(this.props.preview)
         }];
 
+        /*console.warn(this.props.preview, dataSource.tables);
+        if (!dataSource.tables || dataSource.tables === TREE_DEFAULT) {
+            console.warn('default tree');
+            this.getSchemaTree();
+        }*/
+
         return (
-            <div>
+            <div style={{padding: '30px 0 0 10px'}}>
                 {dataSource.map((node, i) => {
                     const type = node.type;
                     const label = <span className="node">{type}</span>;

@@ -106,7 +106,7 @@ class Preview extends Component {
 
     render() {
         const ErrorMsg = () => {
-            const error = propOr(false, error)(this.props.preview);
+            const error = propOr(false, 'error')(this.props.preview);
             if (error) {
                 return (
                     <div>
@@ -120,7 +120,7 @@ class Preview extends Component {
 
 
         const LoadingMsg = () => {
-            const loading = propOr(false, loading)(this.props.preview);
+            const loading = propOr(false, 'loading')(this.props.preview);
             if (loading) {
                 return (<div>{'Loading...'}</div>);
             }

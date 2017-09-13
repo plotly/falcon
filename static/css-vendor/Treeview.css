@@ -50,6 +50,8 @@
 .tree-view .info {
     padding: 0;
     font-size: 13px;
+    overflow: hidden;
+    white-space: nowrap;    
 }
 
 .tree-view .info code {

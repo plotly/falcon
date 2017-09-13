@@ -21,6 +21,15 @@ import {getAllBaseUrls} from '../../utils/utils';
 let checkconnectorUrls;
 let checkDNS;
 
+const treeViewContainerStyle = {
+    height:'99%', 
+    background:'rgb(251, 252, 253)',
+    borderTop: '1px solid #dfe8f3',
+    borderLeft: '1px solid #dfe8f3',
+    borderBottom: '1px solid #dfe8f3',
+    borderRadius: '4px 0 0 4px'
+};
+
 class Settings extends Component {
     constructor(props) {
         super(props);
@@ -338,10 +347,12 @@ class Settings extends Component {
                                     maxSize={800}
                                     style={{position:'relative !important'}}
                                 >
-                                    <div>
+                                    <div style={treeViewContainerStyle}>
                                         {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
                                             <TableTree
                                                 connectionObject={connections[selectedTab]}
+                                                preview={preview || {}}
+                                                updatePreview={updatePreview}   
                                             />
                                         }
                                     </div>
