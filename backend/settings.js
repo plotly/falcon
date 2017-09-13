@@ -23,6 +23,7 @@ const DEFAULT_SETTINGS = {
     // TODO - This should just be an object keyed by username
     USERS: [],
 
+    ACCESS_TOKEN: '',
     /*
      * The actual CORS origins is a "derived" setting
      * that is composed of ADDITIONAL_CORS_ALLOWED_ORIGINS,

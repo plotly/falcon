@@ -5,6 +5,7 @@ import os from 'os';
 import path from 'path';
 import webContents from 'electron';
 
+import {PlotlyOAuth} from './plugins/authorization.js'
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
 import {
     deleteConnectionById,
@@ -124,6 +125,7 @@ export default class Servers {
         const that = this;
         const restifyServer = type === 'https' ? that.httpsServer : that.httpServer;
         const {server} = restifyServer;
+        server.use(PlotlyOAuth());
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
         server.pre(function (request, response, next) {
