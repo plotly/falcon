@@ -25,70 +25,15 @@ class Preview extends Component {
         console.warn('constructor');
     }
 
-    handlePTR(PTR) {
-        if (PTR.status >= 400) {
-            this.props.updatePreview({
-                error: JSON.stringify(PTR),
-                loading: false
-            });
-        } else if (PTR.status === 'loading') {
-            this.props.updatePreview({
-                loading: true
-            });
-        } else if (PTR.status === 200) {
-            const {columnnames, rows} = PTR.content;
-            if (columnnames && rows) {
-                this.props.updatePreview({
-                    columnNames: columnnames,
-                    rows: rows,
-                    loading: false,
-                    error: ''
-                });
-            }
-            else{
-                console.warn('Undefined cols or rows:', columnNames, rows);
-            }            
-        }        
-    }
-
-    componentDidMount() {
-        const {previewTableRequest} = this.props;
-        this.handlePTR(previewTableRequest);
-    }
-
     testClass() {
         return 'test-connected';
     }
 
     runQuery() {
-        const query = propOr('', 'code')(this.props.preview);
-        const {connectionObject, dispatch} = this.props;
-
-        console.warn('runQuery:', query, this.props.preview);
-
-        const p = dispatch(Actions.runSqlQuery(
-            connectionObject.id,
-            connectionObject.dialect,
-            query
-        ));
-
-        p.then( result => {
-            console.warn('result', result);
-            const {columnnames, rows} = result;
-            if (typeof rows !== undefined) {
-                this.props.updatePreview({
-                    columnNames: columnnames,
-                    rows: rows,
-                    loading: false,
-                    error: ''
-                });
-            }
-        })
-        .catch( error => {
-            this.props.updatePreview(error: error);
-            console.error(error);
+        this.props.runQuery().then(content => {
+            // Cache the last successful query
+            this.props.updatePreview({lastSuccessfulQuery: content});
         });
-
     }
 
     updateCode(newCode) {
@@ -105,6 +50,55 @@ class Preview extends Component {
     }
 
     render() {
+
+        const lastSuccessfulQuery = this.props.preview.lastSuccessfulQuery;
+
+        let rows = [];
+        let columns = [];
+
+        if (isEmpty(previewTableRequest) || previewTableRequest.status === 'loading') {
+            return 'Loading previews';
+        } else if (previewTableRequest.status !== 200) {
+            return 'There was an error loading tables';
+        } else if (isEmpty(queryRequest)) {
+            {rows, columnnames} = previewTableRequest;
+            return `Here is your preview: ${previewTableRequest.content}`;
+        } else if (queryRequest.status === 'loading') {
+
+            if (R.has('lastSuccessfulQuery', this.props.preview)) {
+                // The is at least the 2nd query the user has run
+                {rows, columnnames} = this.props.preview.lastSuccessfulQuery;
+            } else {
+                // The is the first query the user is running
+                {rows, columnnames} = previewTableRequest;
+            }
+            return `
+                Here is your preview: ${previewTableRequest.content}.
+                Your special query is loading.
+            `;
+        } else if (queryRequest.status !== 200) {
+            if (R.has('lastSuccessfulQuery', this.props.preview)) {
+                // user's query failed but they have made a succesful query in the past
+                {rows, columnnames} = this.props.preview.lastSuccessfulQuery;
+                return `
+                    Here is your preview: ${previewTableRequest.content}.
+                    Your special query failed: ${queryRequest.content}.
+                    Your last successful query was ${this.props.lastSuccessfulQuery.content}
+                `;
+            } else {
+                // User has never made a succesful query on their own
+                {rows, columnnames} = previewTableRequest;
+                return `
+                    Here is your preview: ${previewTableRequest.content}.
+                    Your special query failed: ${queryRequest.content}.
+                `;
+            }
+        } else {
+            // User's query worked
+            {rows, columns} = queryRequest.content;
+            return `Here is your special query ${queryRequest.content}`;
+        }
+
         const ErrorMsg = () => {
             const error = propOr(false, 'error')(this.props.preview);
             if (error) {

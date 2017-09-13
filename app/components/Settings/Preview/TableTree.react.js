@@ -17,22 +17,14 @@ class TableTree extends Component {
     }
 
     getSchemaTree() {
-        const {connectionObject, dispatch}  = this.props;
+        const {schemaRequest, getSqlSchema} = this.props;
 
-        console.warn('Getting Schema for Tree!', connectionObject.id);
-
-        const p = dispatch(Actions.getSqlSchema(
-            connectionObject.id,
-            connectionObject.dialect,
-            connectionObject.database
-        ));        
-
-        /*
-        *   Tree expects form: 
-        *   [ {name: "alcohol_consumption_by_country_2010", location: "varchar", alcohol: "varchar"} ]
-        */
-
-        p.then( schema => {
+        if (isEmpty(schemaRequest)) {
+            getSqlSchema();
+        } else if (
+            schemaRequest.status === 200 &&
+            !isEmpty(this.props.preview.treeSchema)
+        ) {
             let lastTableName = '';
             let tableName;
             let tables = [];
@@ -41,7 +33,7 @@ class TableTree extends Component {
             const TABLE_NAME = 0;
             const COLUMN_NAME = 1;
             const DATA_TYPE = 2;            
-            schema.rows.map(function(row, i) {
+            schemaRequest.content.rows.map(function(row, i) {
                 tableName = row[TABLE_NAME];
                 DB_HAS_ONLY_ONE_TABLE = (tables.length === 0 && i === schema.rows.length-1);
                 if (tableName !== lastTableName || DB_HAS_ONLY_ONE_TABLE) {
@@ -59,20 +51,28 @@ class TableTree extends Component {
             this.props.updatePreview({
                 treeSchema: tables
             });
-
-            //this.setState({tables: tables});
-        })
-        .catch(function(error) {
-            console.error(error);
-        });        
+        }
     }
 
     componentDidMount() {
         this.getSchemaTree();
     }
 
+    componentWillReceiveProps() {
+        this.getSchemaTree();
+    }
+
     render() {
-        
+        const {schemaRequest, preview} = this.props;
+        if (isEmpty(schemaRequest) || schemaRequest.status === 'loading' ||
+            (schemaRequest.status === 200 && isEmpty(preview.treeSchema))) {
+            return 'Loading...';
+        } else if (schemaRequest.status !== 200) {
+            return `Error: ${schemaRequest.content}`;
+        }
+
+        const {treeSchema} = preview;
+
         const TREE_DEFAULT = [{name: 'Loading...'}];
 
         const dataSource = [{
