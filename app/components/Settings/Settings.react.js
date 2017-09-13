@@ -271,11 +271,15 @@ class Settings extends Component {
             deleteConnectionsRequest,
             deleteTab,
             elasticsearchMappingsRequest,
+            getSqlSchema,
+            schemaRequest,
             newTab,
             preview,
             previewTableRequest,
             redirectUrl,
             redirectUrlRequest,
+            runSqlQuery,
+            queryRequest,
             s3KeysRequest,
             selectedTab,
             settingsRequest,
@@ -501,6 +505,8 @@ function mapStateToProps(state) {
         s3KeysRequests,
         apacheDrillStorageRequests,
         apacheDrillS3KeysRequests,
+        schemaRequests,
+        queryRequests,
         previews
     } = state;
 
@@ -533,6 +539,8 @@ function mapStateToProps(state) {
         connectionsHaveBeenSaved,
         connectionObject: connections[selectedTab],
         preview: previews[selectedConnectionId],
+        schemaRequest: schemaRequests[selectedConnectionId],
+        queryRequest: queryRequests[selectedConnectionId],
         selectedTable,
         selectedIndex,
         selectedConnectionId,
@@ -560,7 +568,8 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         selectedIndex,
         connectionNeedToBeSaved,
         connectionsHaveBeenSaved,
-        connectionObject
+        connectionObject,
+        preview
     } = stateProps;
     const {dispatch} = dispatchProps;
 
@@ -619,6 +628,20 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     function boundGetSettings() {
         return dispatch(Actions.getSettings());
     }
+    function boundGetSqlSchema() {
+        return dispatch(Actions.getSqlSchema(
+            selectedConnectionId,
+            connectionObject.dialect,
+            connectionObject.database
+        ));
+    }
+
+    function boundRunSqlQuery() {
+        return dispatch(Actions.runSqlQuery(
+            selectedConnectionId,
+            propOr('', 'code', preview.code)
+        ))
+    }
 
     /*
      * dispatchConnect either saves the connection and then connects
@@ -663,6 +686,8 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             getSettings: boundGetSettings,
             getApacheDrillStorage: boundGetApacheDrillStorage,
             getApacheDrillS3Keys: boundGetApacheDrillS3Keys,
+            runSqlQuery: boundRunSqlQuery,
+            getSqlSchema: boundGetSqlSchema,
             newTab: () => dispatch(Actions.newTab()),
             deleteTab: tab => dispatch(Actions.deleteTab(tab)),
             setTab: tab => dispatch(Actions.setTab(tab)),
