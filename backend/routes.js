@@ -1,4 +1,5 @@
 var restify = require('restify');
+var CookieParser = require('restify-cookies');
 import * as Datastores from './persistent/datastores/Datastores.js';
 import * as fs from 'fs';
 import os from 'os';
@@ -20,6 +21,7 @@ import {
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
+import {generateAndSaveAccessToken} from './utils/authUtils';
 import {checkWritePermissions, newDatacache} from './persistent/PlotlyAPI.js';
 import {contains, has, keys, isEmpty, merge, pluck} from 'ramda';
 import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
@@ -125,6 +127,7 @@ export default class Servers {
         const that = this;
         const restifyServer = type === 'https' ? that.httpsServer : that.httpServer;
         const {server} = restifyServer;
+        server.use(CookieParser.parse);
         server.use(PlotlyOAuth());
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
@@ -260,6 +263,12 @@ export default class Servers {
                         status = 201;
                     }
                     saveSetting('USERS', existingUsers);
+
+                    res.setCookie('plotly-auth-token', access_token, {'path': '/'});
+
+                    const db_connector_access_token = generateAndSaveAccessToken();
+                    res.setCookie('db-connector-auth-token', db_connector_access_token, {'maxAge': 300, 'path': '/'});
+                    res.setCookie('db-connector-user', username, {'path': '/'});
                     res.json(status, {});
                 } else {
                     Logger.log(userMeta, 0);
