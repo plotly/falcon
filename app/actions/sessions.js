@@ -228,8 +228,8 @@ export function getSqlSchema (connectionId, dialect, database) {
        return apiThunk(
         `connections/${connectionId}/query`,
         'POST',
-        'previewTableRequest',
-        [connectionId],
+        'schemaRequests',
+        connectionId,
         body
     );
 }
