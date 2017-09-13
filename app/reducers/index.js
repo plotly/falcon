@@ -151,7 +151,8 @@ export const elasticsearchMappingsRequests = createApiReducer('elasticsearchMapp
 export const previewTableRequests = createApiReducer('previewTableRequest');
 export const s3KeysRequests = createApiReducer('s3KeysRequests');
 export const tablesRequests = createApiReducer('tablesRequests');
-
+export const schemaRequests = createApiReducer('schemaRequests');
+export const queryRequests = createApiReducer('queryRequests');
 
 
 function tabMap(state = {}, action) {
@@ -264,6 +265,8 @@ const rootReducer = combineReducers({
     s3KeysRequests,
     apacheDrillStorageRequests,
     apacheDrillS3KeysRequests,
+    schemaRequests,
+    queryRequests,
     previews
 });
 

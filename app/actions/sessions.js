@@ -234,15 +234,15 @@ export function getSqlSchema (connectionId, dialect, database) {
     );
 }
 
-export function runSqlQuery (connectionId, dialect, query) {
+export function runSqlQuery (connectionId, query) {
     const body = {
         query: query
     };
     return apiThunk(
         `connections/${connectionId}/query`,
         'POST',
-        'previewTableRequest',
-        [connectionId],
+        'queryRequests',
+        connectionId,
         body
     );
 }
