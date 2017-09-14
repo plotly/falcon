@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
 import TreeView from 'react-treeview';
-import {propOr} from 'ramda';
+import {isEmpty, has, propOr} from 'ramda';
 import * as Actions from '../../../actions/sessions'
 
 class TableTree extends Component {
@@ -9,22 +8,19 @@ class TableTree extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            tables: [{name: 'Loading...'}]
-        };
-
-        this.getSchemaTree = this.getSchemaTree.bind(this);
+        this.storeSchemaTree = this.storeSchemaTree.bind(this);
     }
 
-    getSchemaTree() {
-        const {schemaRequest, getSqlSchema} = this.props;
+    storeSchemaTree() {
+        const {schemaRequest, getSqlSchema, updatePreview} = this.props;
 
-        if (isEmpty(schemaRequest)) {
+        if (typeof schemaRequest === 'undefined') {
             getSqlSchema();
-        } else if (
-            schemaRequest.status === 200 &&
-            !isEmpty(this.props.preview.treeSchema)
-        ) {
+        }
+        else if (isEmpty(schemaRequest)) {
+            getSqlSchema();
+        } 
+        else if (schemaRequest.status === 200 && !has('treeSchema', this.props.preview)) {
             let lastTableName = '';
             let tableName;
             let tables = [];
@@ -33,7 +29,8 @@ class TableTree extends Component {
             const TABLE_NAME = 0;
             const COLUMN_NAME = 1;
             const DATA_TYPE = 2;
-            schemaRequest.content.rows.map(function(row, i) {
+            const schema = schemaRequest.content;
+            schema.rows.map(function(row, i) {
                 tableName = row[TABLE_NAME];
                 DB_HAS_ONLY_ONE_TABLE = (tables.length === 0 && i === schema.rows.length-1);
                 if (tableName !== lastTableName || DB_HAS_ONLY_ONE_TABLE) {
@@ -46,29 +43,36 @@ class TableTree extends Component {
                 newTableObject[row[COLUMN_NAME]] = row[DATA_TYPE];
             });
 
-            console.warn('Tables ---> ', tables);
-
-            this.props.updatePreview({
+            updatePreview({
                 treeSchema: tables
             });
         }
     }
 
     componentDidMount() {
-        this.getSchemaTree();
+        this.storeSchemaTree();
     }
 
-    componentWillReceiveProps() {
-        this.getSchemaTree();
+    componentWillReceiveProps(nextProps) {
+        this.storeSchemaTree();
     }
 
     render() {
         const {schemaRequest, preview} = this.props;
-        if (isEmpty(schemaRequest) || schemaRequest.status === 'loading' ||
-            (schemaRequest.status === 200 && isEmpty(preview.treeSchema))) {
-            return 'Loading...';
-        } else if (schemaRequest.status !== 200) {
-            return `Error: ${schemaRequest.content}`;
+
+
+        if (typeof schemaRequest !== 'undefined') {
+            if (isEmpty(schemaRequest) || schemaRequest.status === 'loading' ||
+                (schemaRequest.status === 200 && isEmpty(preview.treeSchema))) {
+
+                return (<div>{'Loading...'}</div>);
+            } 
+            else if (schemaRequest.status !== 200) {
+                return (<div>{`Error: ${JSON.stringify(schemaRequest)}`}</div>);
+            }
+        }
+        else {
+            return (<div>{'Loading'}</div>);
         }
 
         const {treeSchema} = preview;
@@ -80,12 +84,6 @@ class TableTree extends Component {
             collapsed: false,
             tables: propOr(TREE_DEFAULT, 'treeSchema')(this.props.preview)
         }];
-
-        /*console.warn(this.props.preview, dataSource.tables);
-        if (!dataSource.tables || dataSource.tables === TREE_DEFAULT) {
-            console.warn('default tree');
-            this.getSchemaTree();
-        }*/
 
         return (
             <div style={{padding: '30px 0 0 10px'}}>
@@ -116,4 +114,4 @@ class TableTree extends Component {
     }
 };
 
-export default connect()(TableTree);
+export default TableTree;

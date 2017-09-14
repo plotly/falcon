@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
-import {propOr} from 'ramda';
+import {has, isEmpty, propOr} from 'ramda';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 
 import SQLTable from './SQLTable.react.js';
@@ -21,8 +21,6 @@ class Preview extends Component {
         this.updateCode = this.updateCode.bind(this);
         this.toggleEditor = this.toggleEditor.bind(this);
         this.runQuery = this.runQuery.bind(this);
-
-        console.warn('constructor');
     }
 
     testClass() {
@@ -30,9 +28,16 @@ class Preview extends Component {
     }
 
     runQuery() {
-        this.props.runQuery().then(content => {
-            // Cache the last successful query
-            this.props.updatePreview({lastSuccessfulQuery: content});
+        this.props.runSqlQuery().then(content => {
+            /* 
+            * Cache the last successful query
+            * lastSuccessfulQuery is the result of the last successful query
+            * and should have the form {rows:[[]], columnnames:[]}
+            */
+            console.warn(content);
+            if( !has('error', content) && has('rows', content) && has('columnnames', content) ){
+                this.props.updatePreview({lastSuccessfulQuery: content});
+            }
         });
     }
 
@@ -51,53 +56,71 @@ class Preview extends Component {
 
     render() {
 
-        const lastSuccessfulQuery = this.props.preview.lastSuccessfulQuery;
+        const {selectedTable, elasticsearchMappingsRequest, tablesRequest, schemaRequest, connectionObject, 
+            setTable, setIndex, selectedIndex, updatePreview, preview, previewTableRequest, queryRequest} = this.props;
+
+        const lastSuccessfulQuery = preview.lastSuccessfulQuery;        
+        const dialect = connectionObject.dialect;
+        const showEditor = propOr(true, 'showEditor')(preview);
+        const code = propOr('', 'code')(preview);
 
         let rows = [];
-        let columns = [];
+        let columnnames = [];
 
         if (isEmpty(previewTableRequest) || previewTableRequest.status === 'loading') {
-            return 'Loading previews';
-        } else if (previewTableRequest.status !== 200) {
-            return 'There was an error loading tables';
-        } else if (isEmpty(queryRequest)) {
-            {rows, columnnames} = previewTableRequest;
-            return `Here is your preview: ${previewTableRequest.content}`;
-        } else if (queryRequest.status === 'loading') {
+            console.warn('Loading previews');
+        } 
+        else if (previewTableRequest.status !== 200) {
+            console.warn('There was an error loading tables');
+        } 
+        else if (isEmpty(queryRequest)) {
+            rows = previewTableRequest.content.rows;
+            columnnames = previewTableRequest.content.columnnames;
+            console.warn(`Here is your preview: ${previewTableRequest.content.columnnames}`);
+        } 
+        else if (queryRequest.status === 'loading') {
 
-            if (R.has('lastSuccessfulQuery', this.props.preview)) {
+            if (has('lastSuccessfulQuery', preview)) {
                 // The is at least the 2nd query the user has run
-                {rows, columnnames} = this.props.preview.lastSuccessfulQuery;
+                rows = lastSuccessfulQuery.rows;
+                columnnames = lastSuccessfulQuery.columnnames;
             } else {
                 // The is the first query the user is running
-                {rows, columnnames} = previewTableRequest;
+                rows = previewTableRequest.content.rows;
+                columnnames = previewTableRequest.content.columnnames;
             }
-            return `
-                Here is your preview: ${previewTableRequest.content}.
+            console.warn(`
+                Here is your preview: ${rows} ${columnnames}.
                 Your special query is loading.
-            `;
+            `);
         } else if (queryRequest.status !== 200) {
-            if (R.has('lastSuccessfulQuery', this.props.preview)) {
+            if (has('lastSuccessfulQuery', preview)) {
                 // user's query failed but they have made a succesful query in the past
-                {rows, columnnames} = this.props.preview.lastSuccessfulQuery;
-                return `
+                rows = lastSuccessfulQuery.rows;
+                columnnames = lastSuccessfulQuery.columnnames;
+                console.warn(`
                     Here is your preview: ${previewTableRequest.content}.
                     Your special query failed: ${queryRequest.content}.
-                    Your last successful query was ${this.props.lastSuccessfulQuery.content}
-                `;
-            } else {
+                    Your last successful query was ${rows} ${columnnames}.
+                `);
+            } 
+            else {
                 // User has never made a succesful query on their own
-                {rows, columnnames} = previewTableRequest;
-                return `
-                    Here is your preview: ${previewTableRequest.content}.
-                    Your special query failed: ${queryRequest.content}.
-                `;
+                rows = previewTableRequest.content.rows;
+                columnnames = previewTableRequest.content.columnnames;
+                //console.warn(`
+                //    Here is your preview: ${previewTableRequest.content}.
+                //    Your special query failed: ${queryRequest.content}.
+                //`);
             }
-        } else {
+        } 
+        else {
             // User's query worked
-            {rows, columns} = queryRequest.content;
-            return `Here is your special query ${queryRequest.content}`;
+            rows = queryRequest.content.rows;
+            columnnames = queryRequest.content.columnnames;
+            console.warn('Here is your special query result', rows, columnnames);
         }
+
 
         const ErrorMsg = () => {
             const error = propOr(false, 'error')(this.props.preview);
@@ -121,23 +144,12 @@ class Preview extends Component {
             return null;
         };
 
-        const {selectedTable, elasticsearchMappingsRequest, tablesRequest,
-            connectionObject, setTable, setIndex, selectedIndex, previewTableRequest} = this.props;
-        const dialect = connectionObject.dialect;
-
-        let columnNames = propOr([], 'columnNames')(this.props.preview);
-        let rows = propOr([], 'rows')(this.props.preview);
-        const showEditor = propOr(true, 'showEditor')(this.props.preview);
-        const code = propOr('', 'code')(this.props.preview);
-
-        if (rows.length === 0 || !SQL_DIALECTS_USING_EDITOR.includes(dialect)) {
+        /*if (rows.length === 0 || !SQL_DIALECTS_USING_EDITOR.includes(dialect)) {
             if (previewTableRequest.status === 200) {
-                columnNames = previewTableRequest.content.columnnames;
+                columnnames = previewTableRequest.content.columnnames;
                 rows = previewTableRequest.content.rows;
             }
-        }
-
-        // console.warn(dialect, columnNames.length, rows.length, this.props.preview, this.previewTableRequest);
+        }*/
 
         return (
             <div className={'previewContainer'}>
@@ -158,6 +170,9 @@ class Preview extends Component {
                                     onChange={this.updateCode}
                                     connectionObject={connectionObject}
                                     runQuery={this.runQuery}
+                                    schemaRequest={schemaRequest}
+                                    preview={preview}
+                                    updatePreview={updatePreview}
                                 />
                                 <a
                                     className='btn btn-primary'
@@ -195,14 +210,14 @@ class Preview extends Component {
                             <TabPanel>
                                 <SQLTable
                                     rows={rows}
-                                    columnNames={columnNames}
+                                    columnNames={columnnames}
                                 />
                             </TabPanel>
 
                             <TabPanel>
                                 <ChartEditor
                                     rows={rows}
-                                    columnNames={columnNames}
+                                    columnNames={columnnames}
                                 />
                             </TabPanel>
                         </Tabs>

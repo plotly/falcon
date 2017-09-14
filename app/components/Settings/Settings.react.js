@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {contains, dissoc, eqProps, flip, hasIn, head, isEmpty, keys, merge, reduce} from 'ramda';
+import {contains, dissoc, eqProps, flip, hasIn, head, isEmpty, keys, merge, propOr, reduce} from 'ramda';
 import {connect} from 'react-redux';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
@@ -366,7 +366,7 @@ class Settings extends Component {
                                     <div style={{width: '800px'}}>
                                         <Preview
                                             connectionObject={connections[selectedTab]}
-                                            previewTableRequest={previewTableRequest}
+                                            previewTableRequest={previewTableRequest || {}}
                                             s3KeysRequest={s3KeysRequest}
                                             apacheDrillStorageRequest={apacheDrillStorageRequest}
                                             apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
@@ -378,12 +378,9 @@ class Settings extends Component {
                                             setTable={setTable}
                                             setIndex={setIndex}
                                             selectedIndex={selectedIndex}
-
-                                            getSqlSchema={getSqlSchema}
                                             schemaRequest={schemaRequest}
-
                                             runSqlQuery={runSqlQuery}
-                                            queryRequest={queryRequest}
+                                            queryRequest={queryRequest || {}}
                                         />
                                     </div>
                                 </SplitPane>
@@ -648,7 +645,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     function boundRunSqlQuery() {
         return dispatch(Actions.runSqlQuery(
             selectedConnectionId,
-            propOr('', 'code', preview.code)
+            propOr('', 'code', preview)
         ))
     }
 

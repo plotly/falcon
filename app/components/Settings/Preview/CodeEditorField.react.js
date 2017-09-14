@@ -1,9 +1,8 @@
 'use es6';
-import React, { Component } from 'react';
-import {connect} from 'react-redux';
+import React, {Component} from 'react';
+import {has, isEmpty, propOr} from 'ramda';
 // https://github.com/JedWatson/react-codemirror/issues/106
 import CodeMirror from '@skidding/react-codemirror';
-// assuming a setup with webpack/create-react-app import the additional js/css files
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/sql-hint';
@@ -15,22 +14,15 @@ class CodeEditorField extends Component {
         super(props);
         this.autoComplete = this.autoComplete.bind(this);
         this.handleChange = this.handleChange.bind(this);
-
-        this.state = {
-            tables: {},
-            code: ''
-        }
+        this.injectAutocomplete = this.injectAutocomplete.bind(this);
     }
 
-    componentDidMount() {
-        const {connectionObject, dispatch}  = this.props;
-        const p = dispatch(Actions.getSqlSchema(
-            connectionObject.id,
-            connectionObject.dialect,
-            connectionObject.database
-        ));
+    injectAutocomplete() {
+        const {schemaRequest, preview, updatePreview} = this.props;
 
-        p.then( (schema) => {
+        if (typeof schemaRequest !== 'undefined' && typeof preview !== 'undefined' &&
+            schemaRequest.status === 200 && !has('codeSchema', preview)) {
+
             let lastTableName = '';
             let tableName;
             let tables = {};
@@ -39,6 +31,7 @@ class CodeEditorField extends Component {
             const TABLE_NAME = 0;
             const COLUMN_NAME = 1;
             const DATA_TYPE = 2;
+            const schema = schemaRequest.content;
             schema.rows.map(function(row, i) {
                 tableName = row[TABLE_NAME];
                 DB_HAS_ONLY_ONE_TABLE = (Object.keys(tables).length === 0 && i === schema.rows.length-1);
@@ -51,11 +44,19 @@ class CodeEditorField extends Component {
                 }
                 newColumnArray.push(row[COLUMN_NAME]);
             });
-            this.setState({tables: tables});
-        })
-        .catch(function(error) {
-            console.error(error);
-        });
+
+            updatePreview({
+                codeSchema: tables
+            });            
+        }
+    }
+
+    componentDidMount() {
+        this.injectAutocomplete();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.injectAutocomplete();
     }
 
     autoComplete(cm) {
@@ -68,8 +69,7 @@ class CodeEditorField extends Component {
         // Other general hint config, like 'completeSingle' and 'completeOnSingleClick'
         // should be specified here and will be honored
         const hintOptions = {
-            tables: this.state.tables,
-            disableKeywords: false,
+            tables: propOr([], 'codeSchema', this.props.preview),
             completeSingle: false,
             completeOnSingleClick: true
         };
@@ -116,4 +116,4 @@ class CodeEditorField extends Component {
     }
 }
 
-export default connect()(CodeEditorField);
+export default CodeEditorField;
