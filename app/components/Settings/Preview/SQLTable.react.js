@@ -6,9 +6,9 @@ export default function SQLTable(props) {
 
 	return (
 	    <Table
-	        rowHeight={50}
+	        rowHeight={30}
 	        rowsCount={rows.length}
-	        width={800}
+	        width={750}
 	        height={200}
 	        headerHeight={40}>
 	        {columnNames.map(function(colName, colIndex){

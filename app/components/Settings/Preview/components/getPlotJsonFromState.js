@@ -148,7 +148,6 @@ export default function getPlotJsonFromState(state) {
                 lakecolor: 'rgb(255,255,255)',
                 showsubunits: true,
                 showcountries: true,
-                resolution: 50
             };
         }
 

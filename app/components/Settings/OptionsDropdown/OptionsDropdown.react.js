@@ -119,7 +119,7 @@ export default class OptionsDropdown extends Component {
 
     render() {
         return (
-            <div>
+            <div style={{marginTop: '25px'}}>
                 {this.renderSQLOptions()}
                 {this.renderElasticsearchIndecies()}
                 {this.renderElasticsearchDocs()}

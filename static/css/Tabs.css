@@ -1,10 +1,7 @@
 
 .tabManagerWrapper {
-    /* display: inline-block; */
-    /* vertical-align: middle; */
     text-align: left;
     width: 100%;
-    /* margin-left: auto; */
     white-space: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
@@ -21,7 +18,7 @@
     background-color: white;
     display: inline-block;
     border-width: 1px;
-    border-color: #E7E8E9;
+    border-color: #dfe8f3;
     border-style: solid;
     vertical-align: middle;
     height: 36px;
@@ -31,11 +28,9 @@
 .tabWrapper {
     display: inline-block;
     cursor: pointer;
-    /*margin: 0px;
-    margin-bottom: -1px;*/
-    border-left: 1px solid #E7E8E9;
-    border-bottom: 1px solid #E7E8E9;
-    border-top: 1px solid #E7E8E9;
+    border-left: 1px solid #dfe8f3;
+    border-bottom: 1px solid #dfe8f3;
+    border-top: 1px solid #dfe8f3;
     background-color: white;
     color: #687ba6;
     padding: 5px 10px 5px 10px;
@@ -44,8 +39,7 @@
     white-space: nowrap;
     overflow-x: hidden;
     text-overflow: ellipsis;
-    /*padding-top: 50px;
-    padding-bottom: 50px;*/
+    border-top: 3px solid #dfe8f3;
 }
 
 .tabLogo {
@@ -87,6 +81,7 @@
 
 .tabWrapperSelected {
     border-bottom: 1px solid #fff;
+    border-top: 3px solid #119dff;
 }
 
 .tabAddText {

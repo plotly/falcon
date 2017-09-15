@@ -173,7 +173,6 @@ function selectedTab(state = '', action) {
 
 function selectedTables(state = {}, action) {
     if (action.type === 'SET_TABLE') {
-        console.warn('SET_TABLE', state, action.payload);
         return merge(state, action.payload);
     } else if (action.type === 'RESET') {
         return merge(state, assoc(action.payload.id, '', state));

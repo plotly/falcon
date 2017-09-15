@@ -364,6 +364,7 @@ export function setConnectionNeedToBeSaved(tabId, bool) {
 function PREVIEW_QUERY (dialect, table, database = '') {
     switch (dialect) {
         case DIALECTS.IBM_DB2:
+            console.warn('IBM', table);
             return `SELECT * FROM ${table} FETCH FIRST 5 ROWS ONLY`;
         case DIALECTS.APACHE_SPARK:
         case DIALECTS.MYSQL:
@@ -394,6 +395,7 @@ function DATABASE_SCHEMA (dialect, database = ''){
         case DIALECTS.IBM_DB2:
             return `SELECT TABNAME, COLNAME, TYPENAME FROM syscat.columns WHERE SUBSTR(TABSCHEMA,1,3) != 'SYS';`
         case DIALECTS.APACHE_SPARK:
+            return `show tables in ${database}`
         case DIALECTS.MYSQL:
         case DIALECTS.SQLITE:
         case DIALECTS.MARIADB:

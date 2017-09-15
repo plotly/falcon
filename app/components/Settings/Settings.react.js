@@ -21,15 +21,6 @@ import {getAllBaseUrls} from '../../utils/utils';
 let checkconnectorUrls;
 let checkDNS;
 
-const treeViewContainerStyle = {
-    height:'99%',
-    background:'rgb(251, 252, 253)',
-    borderTop: '1px solid #dfe8f3',
-    borderLeft: '1px solid #dfe8f3',
-    borderBottom: '1px solid #dfe8f3',
-    borderRadius: '4px 0 0 4px'
-};
-
 class Settings extends Component {
     constructor(props) {
         super(props);
@@ -322,27 +313,27 @@ class Settings extends Component {
                     <Tabs defaultIndex={0}>
 
                         <TabList>
-                            <Tab>1. Connection</Tab>
+                            <Tab>Connection</Tab>
                             {this.props.connectRequest.status === 200 ? (
-                                <Tab>2. Query</Tab>
+                                <Tab>Query</Tab>
                             ) : (
                                 <Tab disabled={true}>Loading...</Tab>
                             )}
-                            <Tab>3. SSL Certificate</Tab>
+                            <Tab>SSL Certificate</Tab>
                             <Tab
                                 className="test-ssl-tab react-tabs__tab"
                             >
-                                4. External Services
+                                External Apps
                             </Tab>
                             <Tab>FAQ</Tab>
                         </TabList>
 
-                        <TabPanel>
+                        <TabPanel className={['tab-panel-connection','react-tabs__tab-panel']}>
                             {this.renderSettingsForm()}
                             {this.renderEditButton(!this.state.editMode)}
                         </TabPanel>
 
-                        <TabPanel>
+                        <TabPanel className={['tab-panel-query','react-tabs__tab-panel']}>
                             {this.props.connectRequest.status === 200 ? (
                                 <SplitPane
                                     split="vertical"
@@ -351,7 +342,7 @@ class Settings extends Component {
                                     maxSize={800}
                                     style={{position:'relative !important'}}
                                 >
-                                    <div style={treeViewContainerStyle}>
+                                    <div className='tree-view-container'>
                                         {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
                                             <TableTree
                                                 connectionObject={connections[selectedTab]}
@@ -432,16 +423,10 @@ class Settings extends Component {
                                     {httpsServerIsOK ? (
                                         <div id="test-ssl-initialized">
                                             <p>
-                                                You're now ready to explore this datastore on Plotly!
-                                                Plotly has generated a local URL for this app
-                                                through which it will securely send queries:
+                                                {`This App is a secure middleman between your database and external apps`}
                                             </p>
-                                            <div style={{textAlign: 'center'}}>
-                                                <strong><code>{connectorUrl}</code></strong>
-                                            </div>
-                                            <p>
-                                                This URL is local - no one can access it except this computer or server.
-                                                Click below to connect and start writing queries:
+                                            <p>                                            
+                                                {`Click "Open Plotly" below to query directly from within Plotly's chart workspace.`}
                                             </p>
                                             <Link
                                                 className='btn-primary'
@@ -450,12 +435,26 @@ class Settings extends Component {
                                                 target="_blank"
                                             >
                                                 Open Plotly
-                                            </Link>
+                                            </Link>                                            
+                                            <p>
+                                                {`As long as this App stays open, Plotly charts will update 
+                                                automatically with the latest data. Run this app on a 
+                                                server to update charts 24/7. See FAQ for more info.`}
+                                            </p>
+                                            <div style={{textAlign: 'center'}}>
+                                                <small>This App's autogenerated URL: </small>
+                                                <Link
+                                                    href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}
+                                                    target="_blank"
+                                                >
+                                                    <strong><code>{connectorUrl}</code></strong>
+                                                </Link>
+                                            </div>
                                         </div>
                                     ) : (
                                         <div>
-                                            {`Before you can query, wait until Plotly has
-                                              finished Step 3 for you.`}
+                                            <p>{`Before you can query, wait until Plotly has
+                                              finished Step 3 for you.`}</p>
                                         </div>
                                     )
                                     }
@@ -615,9 +614,6 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         ));
     }
     function boundUpdatePreview(previewUpdateObject) {
-        if (Object.keys(previewUpdateObject)[0] !== 'code') {
-            console.warn('updatePreview', previewUpdateObject);
-        }
         return dispatch(Actions.updatePreview(
             merge(
                 {connectionId: selectedConnectionId},

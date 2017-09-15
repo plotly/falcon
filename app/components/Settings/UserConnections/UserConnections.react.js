@@ -159,7 +159,7 @@ export default class UserConnections extends Component {
 		return (
             <div>
                 {inputs}
-                <small style={{float: 'right'}}>
+                <small className='sampleCredentials'>
                     <a onClick={this.toggleSampleCredentials}>
                         {this.state.showSampleCredentials && `Hide Sample Credentials`}
                         {!this.state.showSampleCredentials && `Show Sample Credentials`}

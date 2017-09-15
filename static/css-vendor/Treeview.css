@@ -3,6 +3,8 @@
     overflow-y: hidden;
     overflow-x: hidden;
     font-size: 13px;
+    padding: 2px 0;
+    font-family: 'Ubuntu', courier, monospace;
 }
 
 .tree-view_item {
@@ -27,6 +29,11 @@
     -ms-user-select: none;
     user-select: none;
     display: inline;
+    color: #a2b1c6;
+}
+
+.tree-view_arrow:hover {
+    color: #119DFF;
 }
 
 .tree-view_arrow:after {
@@ -51,7 +58,8 @@
     padding: 0;
     font-size: 13px;
     overflow: hidden;
-    white-space: nowrap;    
+    white-space: nowrap; 
+    padding: 2px 0;   
 }
 
 .tree-view .info code {
@@ -61,4 +69,37 @@
     color: black;
     border-radius: 2px;
     border: 1px solid #C8D4E3;  
+}
+
+.tree-view-container {
+    height: 100%;
+    background: rgb(251, 252, 253);
+    border-radius: 0 0 0 6px;
+    overflow: hidden;
+}
+
+.loading {
+  padding: 10px;
+}
+
+.loading:after {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: bottom;
+  -webkit-animation: ellipsis steps(4,end) 900ms infinite;      
+  animation: ellipsis steps(4,end) 900ms infinite;
+  content: "\2026"; /* ascii code for the ellipsis character */
+  width: 0px;
+}
+
+@keyframes ellipsis {
+  to {
+    width: 1.25em;    
+  }
+}
+
+@-webkit-keyframes ellipsis {
+  to {
+    width: 1.25em;    
+  }
 }

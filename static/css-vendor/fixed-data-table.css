@@ -366,12 +366,12 @@ body[dir="rtl"] .fixedDataTableColumnResizerLineLayout_main {
 
 .public_fixedDataTable_header,
 .public_fixedDataTable_header .public_fixedDataTableCell_main {
-  background-color: #f6f7f8;
+  background-color: #FAFBFD;
   background-image: linear-gradient(#fff, #efefef);
 }
 
 .public_fixedDataTable_footer .public_fixedDataTableCell_main {
-  background-color: #f6f7f8;
+  background-color: #FAFBFD;
   border-color: #d3d3d3;
 }
 
@@ -454,7 +454,7 @@ body[dir="rtl"] .fixedDataTableColumnResizerLineLayout_main {
 
 .public_fixedDataTableRow_highlighted,
 .public_fixedDataTableRow_highlighted .public_fixedDataTableCell_main {
-  background-color: #f6f7f8;
+  background-color: #FAFBFD;
 }
 
 .public_fixedDataTableRow_fixedColumnsDivider {

@@ -12,7 +12,7 @@ th, td {
 }
 
 .previewContainer {
-    margin: 25px;
+    margin: 0 25px 25px 25px;
     overflow: auto;
     overflow-x: hidden;
     border-radius: 3px;
@@ -24,3 +24,39 @@ th, td {
     margin-left: auto;
     margin-right: auto;
 }
+
+.runButton {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 70px;
+}
+
+.errorStatus p {
+    padding: 20px;
+    margin: 0 0 20px 0;
+    background: none;
+    border: none;
+    color: rgb(211, 96, 70);
+    border-bottom: 1px solid #ebf0f8;
+    font-size: 14px;
+    font-family: 'Ubuntu Mono';
+    overflow-x: hidden;
+    overflow-y: scroll;
+    max-height: 150px;
+}
+
+.successMsg p {
+    padding: 20px;
+    margin: 0;
+    background: none;
+    border: none;
+    color: #00cc96;
+    font-size: 14px;
+    font-family: 'Ubuntu Mono';  
+}
+
+
+
+
+

@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
-import {has, isEmpty, propOr} from 'ramda';
+import {has, isEmpty, propOr, transpose} from 'ramda';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 
 import SQLTable from './SQLTable.react.js';
@@ -11,7 +11,8 @@ import S3Preview from './S3Preview.js'
 
 import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
 import * as Actions from '../../../actions/sessions';
-import {DIALECTS, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js'
+import {DIALECTS, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
+import {submitStyle} from './components/editorConstants.js';
 
 class Preview extends Component {
 
@@ -63,20 +64,35 @@ class Preview extends Component {
         const dialect = connectionObject.dialect;
         const showEditor = propOr(true, 'showEditor')(preview);
         const code = propOr('', 'code')(preview);
+        const error = propOr('', 'error')(preview);
 
         let rows = [];
         let columnnames = [];
+        let isLoading = false;
+        let errorMsg = '';
+        let successMsg = '';
 
-        if (isEmpty(previewTableRequest) || previewTableRequest.status === 'loading') {
-            console.warn('Loading previews');
+        const DEBUG = false;
+        let debug = {};
+        debug.warn = msg => {
+            if (DEBUG){
+                console.warn(msg);
+            }
+        };
+
+        if (isEmpty(previewTableRequest) || previewTableRequest.status === 'loading') {            
+            debug.warn('Loading previews');
+            isLoading = true;
         } 
         else if (previewTableRequest.status !== 200) {
-            console.warn('There was an error loading tables');
+            debug.warn('There was an error loading tables');
+            errorMsg = JSON.stringify(previewTableRequest);
         } 
         else if (isEmpty(queryRequest)) {
             rows = previewTableRequest.content.rows;
             columnnames = previewTableRequest.content.columnnames;
-            console.warn(`Here is your preview: ${previewTableRequest.content.columnnames}`);
+            debug.warn(`Here is your preview: ${previewTableRequest.content.columnnames}`);
+            successMsg = `${rows.length} rows retrieved`;
         } 
         else if (queryRequest.status === 'loading') {
 
@@ -89,67 +105,44 @@ class Preview extends Component {
                 rows = previewTableRequest.content.rows;
                 columnnames = previewTableRequest.content.columnnames;
             }
-            console.warn(`
+            debug.warn(`
                 Here is your preview: ${rows} ${columnnames}.
                 Your special query is loading.
             `);
+            isLoading = true;
         } else if (queryRequest.status !== 200) {
             if (has('lastSuccessfulQuery', preview)) {
                 // user's query failed but they have made a succesful query in the past
                 rows = lastSuccessfulQuery.rows;
                 columnnames = lastSuccessfulQuery.columnnames;
-                console.warn(`
+                debug.warn(`
                     Here is your preview: ${previewTableRequest.content}.
                     Your special query failed: ${queryRequest.content}.
                     Your last successful query was ${rows} ${columnnames}.
-                `);
+                `);                
             } 
             else {
                 // User has never made a succesful query on their own
                 rows = previewTableRequest.content.rows;
                 columnnames = previewTableRequest.content.columnnames;
-                //console.warn(`
-                //    Here is your preview: ${previewTableRequest.content}.
-                //    Your special query failed: ${queryRequest.content}.
-                //`);
+                successMsg = `${rows.length} rows retrieved`;
             }
+            errorMsg = JSON.stringify(queryRequest);
         } 
         else {
             // User's query worked
             rows = queryRequest.content.rows;
             columnnames = queryRequest.content.columnnames;
-            console.warn('Here is your special query result', rows, columnnames);
+            debug.warn('Here is your special query result', rows, columnnames);
+            successMsg = `${rows.length} rows retrieved`;
         }
 
 
-        const ErrorMsg = () => {
-            const error = propOr(false, 'error')(this.props.preview);
-            if (error) {
-                return (
-                    <div>
-                        <div>{'An error occurred while trying to load this table:'}</div>
-                        <div style={{color: 'red'}}>{error}</div>
-                    </div>
-                );
-            }
-            return null;
-        };
-
-
-        const LoadingMsg = () => {
-            const loading = propOr(false, 'loading')(this.props.preview);
-            if (loading) {
-                return (<div>{'Loading...'}</div>);
-            }
-            return null;
-        };
-
-        /*if (rows.length === 0 || !SQL_DIALECTS_USING_EDITOR.includes(dialect)) {
-            if (previewTableRequest.status === 200) {
-                columnnames = previewTableRequest.content.columnnames;
-                rows = previewTableRequest.content.rows;
-            }
-        }*/
+        let dataGrid = {cols: {}};
+        const columnData = transpose(rows);
+        columnnames.map((yColName, i) => {
+            dataGrid.cols[yColName] = {data: columnData[i]}
+        })
 
         return (
             <div className={'previewContainer'}>
@@ -164,7 +157,7 @@ class Preview extends Component {
                                 </small>
                             </code>
 
-                            <div style={{display: showEditor ? 'block' : 'none'}}>
+                            <div style={{display: showEditor ? 'block' : 'none', position:'relative'}}>
                                 <CodeEditorField
                                     value={code}
                                     onChange={this.updateCode}
@@ -175,11 +168,11 @@ class Preview extends Component {
                                     updatePreview={updatePreview}
                                 />
                                 <a
-                                    className='btn btn-primary'
+                                    className='btn btn-primary runButton'
                                     onClick={this.runQuery}
-                                    style={{float: 'right', maxWidth: 100}}
+                                    disabled={!isLoading}
                                 >
-                                    Run
+                                    {isLoading ? 'Loading...' : 'Run'}
                                 </a>
                             </div>
                         </div>
@@ -196,8 +189,13 @@ class Preview extends Component {
                             selectedIndex={selectedIndex}
                         />
                     }
-
                 </div>
+
+                {errorMsg &&
+                    <div className="errorStatus">
+                        <p>{`ERROR ${errorMsg}`}</p>
+                    </div>
+                }
 
                 {dialect !== DIALECTS['S3'] && dialect !== DIALECTS['APACHE_DRILL'] &&
                     <div>
@@ -205,9 +203,12 @@ class Preview extends Component {
                             <TabList>
                                 <Tab>Table</Tab>
                                 <Tab>Chart</Tab>
+                                <Tab>Export</Tab>
                             </TabList>
 
-                            <TabPanel>
+                            <TabPanel
+                                style={{fontFamily: `'Ubuntu Mono', courier, monospace`}}
+                            >
                                 <SQLTable
                                     rows={rows}
                                     columnNames={columnnames}
@@ -220,14 +221,34 @@ class Preview extends Component {
                                     columnNames={columnnames}
                                 />
                             </TabPanel>
+
+                            <TabPanel>
+                                <form
+                                    action='https://plot.ly/datagrid'
+                                    method='post'
+                                    target='_blank'
+                                    name='data'
+                                >
+                                    <input type='hidden' name='data' value={JSON.stringify(dataGrid)} />
+                                    <input 
+                                        type="submit" 
+                                        style={submitStyle}
+                                        value={`Export ${rows.length} rows to plot.ly`}
+                                    />
+                                </form>                                
+                            </TabPanel>                            
                         </Tabs>
+                    </div>
+                }
+
+                {successMsg &&
+                    <div className="successMsg">
+                        <p>{successMsg}</p>
                     </div>
                 }
 
                {S3Preview(this.props)}
                {ApacheDrillPreview(this.props)}
-               {LoadingMsg()}
-               {ErrorMsg()}
             </div>
         );
     }

@@ -43,6 +43,14 @@ class TableTree extends Component {
                 newTableObject[row[COLUMN_NAME]] = row[DATA_TYPE];
             });
 
+            /*
+            * This is a hack for SparkSQL/Hive, where we can't return a proper schema            
+            */
+            if (isEmpty(tables) && schema.rows.length===1) {
+                const singleRow = schema.rows[0];
+                tables = [{name: singleRow[0], [singleRow[1]]: singleRow[2].toString()}];
+            }
+
             updatePreview({
                 treeSchema: tables
             });
@@ -65,14 +73,18 @@ class TableTree extends Component {
             if (isEmpty(schemaRequest) || schemaRequest.status === 'loading' ||
                 (schemaRequest.status === 200 && isEmpty(preview.treeSchema))) {
 
-                return (<div>{'Loading...'}</div>);
+                return (<div className='loading'>{'Loading...'}</div>);
             } 
             else if (schemaRequest.status !== 200) {
-                return (<div>{`Error: ${JSON.stringify(schemaRequest)}`}</div>);
+                return (
+                    <div style={{padding: '5px', fontSize: '12px'}}>
+                        {`ERROR ${JSON.stringify(schemaRequest).substr(0,200)}`}
+                    </div>
+                );
             }
         }
         else {
-            return (<div>{'Loading'}</div>);
+            return (<div className='loading'>{'Loading'}</div>);
         }
 
         const {treeSchema} = preview;
@@ -86,7 +98,7 @@ class TableTree extends Component {
         }];
 
         return (
-            <div style={{padding: '30px 0 0 10px'}}>
+            <div style={{padding: '5px 0 0 10px'}}>
                 {dataSource.map((node, i) => {
                     const type = node.type;
                     const label = <span className="node">{type}</span>;
