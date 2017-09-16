@@ -70,10 +70,19 @@ $ yarn run watch-web
 $ yarn run watch-headless
 ```
 
-Then, view the the app in the electron window with
+Then, view the the app in the electron window with:
 
 ```bash
 $ yarn run dev
+```
+
+If you need to fully start over and rebuild the electron app, try:
+```
+$ yarn install
+$ yarn run rebuild:modules:electron
+$ rm -rf dist
+$ yarn run build
+$ yarn start
 ```
 
 and in your web browser by visiting http://localhost:9494
