@@ -21,14 +21,6 @@ const config = {
         libraryTarget: 'var'
     },
 
-    module: {
-        ...baseConfig.module,
-
-        rules: [
-            ...baseConfig.module.rules,
-        ]
-    },
-
     plugins: [
         ...baseConfig.plugins,
         new webpack.DefinePlugin({
