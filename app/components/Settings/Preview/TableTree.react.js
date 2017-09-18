@@ -21,35 +21,23 @@ class TableTree extends Component {
             getSqlSchema();
         } 
         else if (schemaRequest.status === 200 && !has('treeSchema', this.props.preview)) {
-            let lastTableName = '';
-            let tableName;
-            let tables = [];
-            let newTableObject = {};
-            let DB_HAS_ONLY_ONE_TABLE;
-            const TABLE_NAME = 0;
-            const COLUMN_NAME = 1;
-            const DATA_TYPE = 2;
-            const schema = schemaRequest.content;
-            schema.rows.map(function(row, i) {
-                tableName = row[TABLE_NAME];
-                DB_HAS_ONLY_ONE_TABLE = (tables.length === 0 && i === schema.rows.length-1);
-                if (tableName !== lastTableName || DB_HAS_ONLY_ONE_TABLE) {
-                    if (Object.keys(newTableObject).length !== 0) {
-                        tables.push(newTableObject);
-                    }
-                    newTableObject = {name: tableName};
-                    lastTableName = tableName;
+            let tableTree = {};
+            schemaRequest.content.rows.forEach(function(row) {
+                const [tableName, columnName, dataType] = row;
+
+                if (tableTree.hasOwnProperty(tableName)) {
+                    tableTree[tableName][columnName] = dataType;
+                } else {
+                    tableTree[tableName] = {
+                        name: tableName,  // TODO: what if a column name is name?
+                        [columnName]: dataType,
+                    };
                 }
-                newTableObject[row[COLUMN_NAME]] = row[DATA_TYPE];
             });
 
-            /*
-            * This is a hack for SparkSQL/Hive, where we can't return a proper schema            
-            */
-            if (isEmpty(tables) && schema.rows.length===1) {
-                const singleRow = schema.rows[0];
-                tables = [{name: singleRow[0], [singleRow[1]]: singleRow[2].toString()}];
-            }
+            let tables = Object.getOwnPropertyNames(tableTree).sort().map(
+                (tableName) => tableTree[tableName]
+            );
 
             updatePreview({
                 treeSchema: tables
