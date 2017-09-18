@@ -103,8 +103,6 @@ class CodeEditorField extends Component {
             }
         };
 
-        console.log('cm', this.props.value);
-
         return (
             <CodeMirror
                 ref="CodeMirror"
