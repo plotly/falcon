@@ -21,27 +21,20 @@ class TableTree extends Component {
             getSqlSchema();
         } 
         else if (schemaRequest.status === 200 && !has('treeSchema', this.props.preview)) {
-            let tableTree = {};
+            let treeSchema = {};
             schemaRequest.content.rows.forEach(function(row) {
                 const [tableName, columnName, dataType] = row;
 
-                if (tableTree.hasOwnProperty(tableName)) {
-                    tableTree[tableName][columnName] = dataType;
+                if (treeSchema.hasOwnProperty(tableName)) {
+                    treeSchema[tableName][columnName] = dataType;
                 } else {
-                    tableTree[tableName] = {
-                        name: tableName,  // TODO: what if a column name is name?
+                    treeSchema[tableName] = {
                         [columnName]: dataType,
                     };
                 }
             });
 
-            let tables = Object.getOwnPropertyNames(tableTree).sort().map(
-                (tableName) => tableTree[tableName]
-            );
-
-            updatePreview({
-                treeSchema: tables
-            });
+            updatePreview({treeSchema});
         }
     }
 
@@ -54,61 +47,48 @@ class TableTree extends Component {
     }
 
     render() {
-        const {schemaRequest, preview} = this.props;
+        const schemaRequest = this.props.schemaRequest || {};
+        const status = schemaRequest.status;
 
-
-        if (typeof schemaRequest !== 'undefined') {
-            if (isEmpty(schemaRequest) || schemaRequest.status === 'loading' ||
-                (schemaRequest.status === 200 && isEmpty(preview.treeSchema))) {
-
-                return (<div className='loading'>{'Loading...'}</div>);
-            } 
-            else if (schemaRequest.status !== 200) {
-                return (
-                    <div style={{padding: '5px', fontSize: '12px'}}>
-                        {`ERROR ${JSON.stringify(schemaRequest).substr(0,200)}`}
-                    </div>
-                );
-            }
-        }
-        else {
+        if (typeof status === 'undefined' || status === 'loading') {
             return (<div className='loading'>{'Loading'}</div>);
         }
 
-        const {treeSchema} = preview;
+        if (status !== 200) {
+            return (
+                <div style={{padding: '5px', fontSize: '12px'}}>
+                    {`ERROR ${JSON.stringify(schemaRequest).substr(0,200)}`}
+                </div>
+            );
+        }
 
-        const TREE_DEFAULT = [{name: 'Loading...'}];
+        const preview = this.props.preview || {};
+        const treeSchema = preview.treeSchema;
 
-        const dataSource = [{
-            type: this.props.connectionObject.database,
-            collapsed: false,
-            tables: propOr(TREE_DEFAULT, 'treeSchema')(this.props.preview)
-        }];
+        if (!treeSchema) {
+            return (<div className='loading'>{'Updating'}</div>);
+        }
+
+        const database = this.props.connectionObject.database;
+        const databaseLabel = <span className="node">{database}</span>;
 
         return (
             <div style={{padding: '5px 0 0 10px'}}>
-                {dataSource.map((node, i) => {
-                    const type = node.type;
-                    const label = <span className="node">{type}</span>;
-                    return (
-                        <TreeView key={type + '|' + i} nodeLabel={label} defaultCollapsed={false}>
-                            {node.tables.map(tbl => {
-                                const label2 = <span className="node">{tbl.name}</span>;
-                                return (
-                                    <TreeView nodeLabel={label2} key={tbl.name} defaultCollapsed={true}>
-                                        {Object.keys(tbl).map(col => {
-                                            if (col !== 'name') {
-                                                return (
-                                                    <div className="info">{col}: <code>{tbl[col]}</code></div>
-                                                );
-                                            }
-                                        })}
-                                    </TreeView>
-                                );
-                            })}
-                        </TreeView>
-                    );
-                })}
+                <TreeView key={database} nodeLabel={databaseLabel} defaultCollapsed={false}>{
+                    Object.getOwnPropertyNames(treeSchema).sort().map(tableName => {
+                        const tableSchema = treeSchema[tableName];
+                        const tableLabel = <span className="node">{tableName}</span>;
+                        return (
+                            <TreeView nodeLabel={tableLabel} key={tableName} defaultCollapsed={true}>{
+                                Object.getOwnPropertyNames(tableSchema).sort().map(columnName => {
+                                    return (
+                                        <div className="info">{columnName}: <code>{tableSchema[columnName]}</code></div>
+                                    );
+                                })
+                            }</TreeView>
+                        );
+                    })
+                }</TreeView>
             </div>
         );
     }
