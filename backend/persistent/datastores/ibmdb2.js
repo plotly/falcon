@@ -67,3 +67,10 @@ export function tables(connection) {
             });
         });
 }
+
+export function schemas(connection) {
+    return query(
+        `SELECT TABNAME, COLNAME, TYPENAME FROM syscat.columns WHERE SUBSTR(TABSCHEMA,1,3) != 'SYS'`,
+        connection
+    );
+}

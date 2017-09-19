@@ -66,6 +66,15 @@ export function connect(connection) {
 /* SQL-like Connectors */
 
 /*
+ * return a promise that resolves to an array of [table_name, column_name, data_type]
+ * available from a database.
+ *
+ */
+export function schemas(connection) {
+    return getDatastoreClient(connection).schemas(connection);
+}
+
+/*
  * return a promise with the available tables from a database
  *
  * this can have flexible meaning for other datastores.
