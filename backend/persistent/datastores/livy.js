@@ -86,12 +86,14 @@ function getServerUrl(connection) {
 }
 
 function getSessionUrl(connection) {
-    return `http://${connection.host}:${connection.port}/sessions/${connection.sessionId}`;
+    return `http://${connection.host}:${connection.port}/sessions/${clients[connection.id]}`;
 }
 
 function getStatementUrl(connection) {
-    return `http://${connection.host}:${connection.port}/sessions/${connection.sessionId}/statements`;
+    return `http://${connection.host}:${connection.port}/sessions/${clients[connection.id]}/statements`;
 }
+
+const clients = {};
 
 export function newSession(connection) {
     return fetch(getServerUrl(connection), {
@@ -107,10 +109,9 @@ export function newSession(connection) {
         })
         .then(response => response.json())
         .then(session => {
-            connection.sessionId =  session.id;
-            return connection;
-        })
-        .then(function() {
+            // Store the Livy session id
+            clients[connection.id] = session.id;
+
             // Here we run any code needed to setup the session
             let setup;
 
