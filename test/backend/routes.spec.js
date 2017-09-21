@@ -1,4 +1,5 @@
-import fetch from 'node-fetch';
+var fetch = require('fetch-cookie')(require('node-fetch'))
+
 import {assert} from 'chai';
 import {assoc, concat, contains, dissoc, isEmpty, keys, merge, sort, without} from 'ramda';
 import Servers from '../../backend/routes.js';
@@ -85,9 +86,21 @@ function DELETE(path) {
     });
 }
 
+function setCookies() {
+
+  // Sets cookies using `oauth` route, so that other requests can be authenticated:
+  return POST('oauth2/token', {access_token: accessToken})
+  .then(res => res.json().then(json => {
+      assert.deepEqual(json, {});
+      assert.equal(res.status, 200);
+  }));
+
+}
+
 let queryObject;
 let servers;
 let connectionId;
+
 
 describe('Servers - ', () => {
     beforeEach(() => {
@@ -154,6 +167,95 @@ describe('Servers - ', () => {
             done();
         }, 2000);
     }).timeout(10000);
+
+});
+
+describe('Authentication - ', () => {
+    beforeEach(() => {
+        servers = new Servers({createCerts: false, startHttps: false});
+        servers.httpServer.start();
+
+        // cleanup
+        ['CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH'].forEach(file => {
+            try {
+                fs.unlinkSync(getSetting(file));
+            } catch (e) {
+            }
+        });
+
+        // enable authentication:
+        saveSetting('AUTH_ENABLED', 'true');
+
+        // Save some connections to the user's disk
+        saveSetting('USERS', [{
+            username, apiKey
+        }]);
+
+        connectionId = saveConnection(sqlConnections);
+        queryObject = {
+            fid: validFid,
+            uids: validUids.slice(0, 2), // since this particular query only has 2 columns
+            refreshInterval: 60, // every minute
+            query: 'SELECT * FROM ebola_2014 LIMIT 1',
+            connectionId: connectionId,
+            requestor: validFid.split(':')[0]
+        };
+
+    });
+
+    afterEach(() => {
+        servers.httpServer.close();
+        servers.queryScheduler.clearQueries();
+    });
+
+    it('ping - responds', function(done) {
+        GET('ping')
+        .then(() => done())
+        .catch(done);
+    });
+
+    it('works for home-page without logging in', function(done) {
+        GET('/')
+        .then(() => done())
+        .catch(done);
+    });
+
+    it('gives error for connections page when not logged in', function(done) {
+        GET('/')
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 401);
+            assert.deepEqual(json, {
+                'code': 'InvalidCredentials',
+                'message': 'Please login to access this page.'
+            });
+            done();
+        })).catch(done);
+    });
+
+    it('does not allow access to settings when not logged in', function(done) {
+        GET('/settings')
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 401);
+            assert.deepEqual(json, {'code': 'Forbidden', 'message': ''});
+            done();
+        })).catch(done);
+    });
+
+    it('works for connections page when logged in', function(done) {
+
+        // POST to 'oauth2/token' so that cookies are saved, and then
+        // proceed to connections page:
+        setCookies().then(res => {
+
+            GET('/')
+            .then(res => {
+                assert.equal(res.status, 200);
+                done();
+            }).catch(done);
+        });
+
+    });
+
 
 });
 
@@ -262,6 +364,9 @@ describe('Routes - ', () => {
         .catch(done);
     });
 
+    // This tests sets the cookies required for user authentication, so
+    // all the tests requiring user authentication should be put placed
+    // after this one.
     it('oauth - saves oauth access token with a username if valid', function(done) {
         this.timeout(10 * 1000);
         saveSetting('USERS', []);
