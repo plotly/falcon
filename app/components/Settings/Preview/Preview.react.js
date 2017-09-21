@@ -35,7 +35,6 @@ class Preview extends Component {
             * lastSuccessfulQuery is the result of the last successful query
             * and should have the form {rows:[[]], columnnames:[]}
             */
-            console.warn(content);
             if( !has('error', content) && has('rows', content) && has('columnnames', content) ){
                 this.props.updatePreview({lastSuccessfulQuery: content});
             }
@@ -72,26 +71,15 @@ class Preview extends Component {
         let errorMsg = '';
         let successMsg = '';
 
-        const DEBUG = false;
-        let debug = {};
-        debug.warn = msg => {
-            if (DEBUG){
-                console.warn(msg);
-            }
-        };
-
         if (isEmpty(previewTableRequest) || previewTableRequest.status === 'loading') {            
-            debug.warn('Loading previews');
             isLoading = true;
         } 
         else if (previewTableRequest.status !== 200) {
-            debug.warn('There was an error loading tables');
             errorMsg = JSON.stringify(previewTableRequest);
         } 
         else if (isEmpty(queryRequest)) {
             rows = previewTableRequest.content.rows;
             columnnames = previewTableRequest.content.columnnames;
-            debug.warn(`Here is your preview: ${previewTableRequest.content.columnnames}`);
             successMsg = `${rows.length} rows retrieved`;
         } 
         else if (queryRequest.status === 'loading') {
@@ -105,21 +93,12 @@ class Preview extends Component {
                 rows = previewTableRequest.content.rows;
                 columnnames = previewTableRequest.content.columnnames;
             }
-            debug.warn(`
-                Here is your preview: ${rows} ${columnnames}.
-                Your special query is loading.
-            `);
             isLoading = true;
         } else if (queryRequest.status !== 200) {
             if (has('lastSuccessfulQuery', preview)) {
                 // user's query failed but they have made a succesful query in the past
                 rows = lastSuccessfulQuery.rows;
                 columnnames = lastSuccessfulQuery.columnnames;
-                debug.warn(`
-                    Here is your preview: ${previewTableRequest.content}.
-                    Your special query failed: ${queryRequest.content}.
-                    Your last successful query was ${rows} ${columnnames}.
-                `);                
             } 
             else {
                 // User has never made a succesful query on their own
@@ -133,7 +112,6 @@ class Preview extends Component {
             // User's query worked
             rows = queryRequest.content.rows;
             columnnames = queryRequest.content.columnnames;
-            debug.warn('Here is your special query result', rows, columnnames);
             successMsg = `${rows.length} rows retrieved`;
         }
 
