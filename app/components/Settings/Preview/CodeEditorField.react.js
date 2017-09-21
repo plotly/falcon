@@ -7,6 +7,7 @@ import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/sql-hint';
 import * as Actions from '../../../actions/sessions';
+import {DIALECTS} from '../../../constants/constants';
 
 class CodeEditorField extends Component {
 
@@ -93,9 +94,19 @@ class CodeEditorField extends Component {
     }
 
     render() {
+        let mode = {
+            [DIALECTS.APACHE_SPARK]: 'text/x-sparksql',
+            [DIALECTS.MYSQL]: 'text/x-mysql',
+            [DIALECTS.SQLITE]: 'text/x-sqlite',
+            [DIALECTS.MARIADB]: 'text/x-mariadb',
+            [DIALECTS.POSTGRES]: 'text/x-pgsql',
+            [DIALECTS.REDSHIFT]: 'text/x-pgsql',
+            [DIALECTS.MSSQL]: 'text/x-mssql',
+        }[this.props.connectionObject.dialect] || 'text/x-sql';
+
         const options = {
             lineNumbers: true,
-            mode: 'text/x-pgsql',
+            mode: mode,
             tabSize: 4,
             readOnly: false,
             extraKeys: {
