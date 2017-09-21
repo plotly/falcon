@@ -13,7 +13,7 @@ const DEFAULT_SETTINGS = {
         '.plotly',
         'connector'
     ),
-
+    AUTH_ENABLED: true,
     PLOTLY_API_SSL_ENABLED: true,
     PLOTLY_API_DOMAIN: 'api.plot.ly',
 
