@@ -57,7 +57,7 @@ class TableTree extends Component {
         if (status !== 200) {
             return (
                 <div style={{padding: '5px', fontSize: '12px'}}>
-                    {`ERROR ${JSON.stringify(schemaRequest).substr(0,200)}`}
+                    {`ERROR ${JSON.stringify(schemaRequest)}`}
                 </div>
             );
         }
