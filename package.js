@@ -28,6 +28,8 @@ const DEFAULT_OPTS = {
     name: appName,
     asar: shouldUseAsar,
     ignore: [
+        '^/scripts($|/)',
+        '^/spec($|/)',
         '^/test($|/)',
         '^/tools($|/)',
         '^/release($|/)',
@@ -37,11 +39,6 @@ const DEFAULT_OPTS = {
     .concat(
         devDeps
         .map(dep => `/node_modules/${dep}($|/)`))
-    .concat(
-        deps
-        .filter(dep => !Object.keys(electronCfg.externals[0]).includes(dep))
-        .map(dep => `/node_modules/${dep}($|/)`)
-    )
 };
 
 const icon = argv.icon || argv.i || 'app/app';
