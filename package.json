@@ -206,7 +206,6 @@
     "react-dnd-html5-backend": "^2.5.1",
     "react-dom": "^15.5.1",
     "react-immutable-proptypes": "^1.7.1",
-    "react-plotly-dnd-editor": "^0.10.0",
     "react-plotlyjs": "^0.4.3",
     "react-redux": "^4.4.5",
     "react-router": "^2.2.4",
