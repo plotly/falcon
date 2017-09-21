@@ -360,16 +360,16 @@ export function setConnectionNeedToBeSaved(tabId, bool) {
 function PREVIEW_QUERY (dialect, table, database = '') {
     switch (dialect) {
         case DIALECTS.IBM_DB2:
-            return `SELECT * FROM ${table}`;
+            return `SELECT * FROM ${table} FETCH FIRST 1000 ROWS ONLY`;
         case DIALECTS.APACHE_SPARK:
         case DIALECTS.MYSQL:
         case DIALECTS.SQLITE:
         case DIALECTS.MARIADB:
         case DIALECTS.POSTGRES:
         case DIALECTS.REDSHIFT:
-            return `SELECT * FROM ${table}`;
+            return `SELECT * FROM ${table} LIMIT 1000`;
         case DIALECTS.MSSQL:
-            return 'SELECT TOP 5 * FROM ' +
+            return 'SELECT TOP 1000 * FROM ' +
                 `${database}.dbo.${table}`;
         case DIALECTS.ELASTICSEARCH:
             return JSON.stringify({
@@ -377,7 +377,7 @@ function PREVIEW_QUERY (dialect, table, database = '') {
                 type: table || '_all',
                 body: {
                     query: { 'match_all': {} },
-                    size: 5
+                    size: 1000
                 }
             });
         default:
