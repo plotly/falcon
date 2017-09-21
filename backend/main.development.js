@@ -32,6 +32,10 @@ app.on('ready', () => {
     });
 
     const {httpServer, httpsServer} = server;
+
+    httpServer.electronWindow = mainWindow;
+    httpsServer.electronWindow = mainWindow;
+
     const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;
     const HTTPS_URL = `${httpsServer.protocol}://${httpsServer.domain}:${httpsServer.port}`;
 

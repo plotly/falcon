@@ -127,8 +127,12 @@ export default class Servers {
         const that = this;
         const restifyServer = type === 'https' ? that.httpsServer : that.httpServer;
         const {server} = restifyServer;
+
+        that.electronWindow = that.httpsServer.electronWindow || that.httpServer.electronWindow;
+
         server.use(CookieParser.parse);
-        server.use(PlotlyOAuth());
+        server.use(PlotlyOAuth(that.electronWindow));
+
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
         server.pre(function (request, response, next) {
