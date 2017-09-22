@@ -22,6 +22,26 @@ class Preview extends Component {
         this.updateCode = this.updateCode.bind(this);
         this.toggleEditor = this.toggleEditor.bind(this);
         this.runQuery = this.runQuery.bind(this);
+        this.downloadCSV = this.downloadCSV.bind(this);
+    }
+
+    fetchDatacache(gridObj) {
+
+        const gridJSON = JSON.stringify({payload: gridObj, type: 'grid'});
+
+        fetch("/datacache", {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            credentials: 'include',
+            body: gridJSON
+        }).then(function(resp) {
+            return resp;
+        }).then(function(data) {
+            console.warn('***', data);
+        });
     }
 
     testClass() {
@@ -119,7 +139,7 @@ class Preview extends Component {
         let dataGrid = {cols: {}};
         const columnData = transpose(rows);
         columnnames.map((yColName, i) => {
-            dataGrid.cols[yColName] = {data: columnData[i]}
+            dataGrid.cols[yColName] = {data: columnData[i], order: i}
         })
 
         return (
@@ -201,19 +221,42 @@ class Preview extends Component {
                             </TabPanel>
 
                             <TabPanel>
-                                <form
-                                    action='https://plot.ly/datagrid'
-                                    method='post'
-                                    target='_blank'
-                                    name='data'
-                                >
-                                    <input type='hidden' name='data' value={JSON.stringify(dataGrid)} />
-                                    <input 
-                                        type="submit" 
-                                        style={submitStyle}
-                                        value={`Export ${rows.length} rows to plot.ly`}
-                                    />
-                                </form>                                
+                                <div className='export-options-container'>
+                                    <div>
+                                        {/*<form
+                                            action='https://plot.ly/datagrid'
+                                            method='post'
+                                            target='_blank'
+                                            name='data'
+                                        >
+                                            <input type='hidden' name='data' value={JSON.stringify(dataGrid)} />
+                                            <input 
+                                                type="submit" 
+                                                style={Object.assign({}, submitStyle, {
+                                                    width: '230px', 
+                                                    float: 'none', 
+                                                    marginBottom: '20px'})}
+                                                value={`Export ${rows.length} rows to plot.ly`}
+                                            />
+                                        </form>*/}
+                                        <button 
+                                            className='btn btn-outline' 
+                                            style={{margin: 0}}
+                                            onClick={() => this.fetchDatacache(JSON.stringify(dataGrid))}
+                                        >
+                                            Export CSV to plot.ly
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <button 
+                                            className='btn btn-outline' 
+                                            style={{margin: 0}}
+                                            onClick={() => this.downloadCSV(columnnames, rows)}
+                                        >
+                                            Download CSV
+                                        </button>
+                                    </div>
+                                </div>
                             </TabPanel>                            
                         </Tabs>
                     </div>

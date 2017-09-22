@@ -1,4 +1,4 @@
-import {app, BrowserWindow} from 'electron';
+import {app, BrowserWindow, shell} from 'electron';
 import {contains, join, isEmpty} from 'ramda';
 import Logger from './logger';
 import {setupMenus} from './menus';
@@ -21,6 +21,7 @@ Logger.log('Loading persistent queries', 2);
 Logger.log('Electron version: ' + process.versions.electron, 2);
 Logger.log('Chrome version: ' + process.versions.chrome, 2);
 server.queryScheduler.loadQueries();
+
 
 app.on('ready', () => {
 
@@ -53,6 +54,33 @@ app.on('ready', () => {
     mainWindow.on('closed', () => {
         mainWindow = null;
     });
+
+    /*mainWindow.webContents.on("submit", function(event){
+        console.log('yo gaba gaba');
+        event.preventDefault();
+        shell.openExternal(this.action);
+    });*/
+
+    /*mainWindow.webContents.on('new-window', function(event){
+        console.log('-------');
+        event.preventDefault();
+        //shell.openExternal(this.action);
+        mainWindow.loadURL('https://plot.ly/datagrid', {
+          postData: [{
+            type: 'rawData',
+            bytes: Buffer.from(JSON.stringify({ "data": {"cols": {"first": {"data": [1,2,3], "order": 0}}}}))
+          }],
+          extraHeaders: 'Content-Type: application/x-www-form-urlencoded'
+        });     
+    });*/
+
+    /*mainWindow.webContents.on('will-navigate', function(event, url){
+        console.log('-------', url);
+        if (url.indexOf('datagrid') >= 0) {
+            event.preventDefault();
+            shell.openExternal(url);
+        }
+    });*/
 
     setupMenus(app, mainWindow);
 

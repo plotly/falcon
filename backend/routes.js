@@ -1,6 +1,7 @@
 var restify = require('restify');
 import * as Datastores from './persistent/datastores/Datastores.js';
 import * as fs from 'fs';
+import webContents from 'electron';
 
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
 import {
@@ -16,7 +17,7 @@ import {
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
-import {checkWritePermissions} from './persistent/PlotlyAPI.js';
+import {checkWritePermissions, newDatacache} from './persistent/PlotlyAPI.js';
 import {contains, has, keys, isEmpty, merge, pluck} from 'ramda';
 import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
 import Logger from './logger';
@@ -273,6 +274,11 @@ export default class Servers {
             file: 'login.html'
         }));
 
+        server.post('/logout', function logoutHandler(req, res, next) {
+            req.logout();
+            res.redirect('/', next);
+        });
+
         server.get('/database-connector', restify.serveStatic({
             directory: `${__dirname}/../static`,
             file: 'index.html'
@@ -473,6 +479,23 @@ export default class Servers {
                 res.json(500, {error: {message: error.message}});
             });
         });
+
+        /* Plotly v2 API requests */
+
+        server.post('/datacache', function getDatacacheHandler(req, res, next) {
+
+            const {payload, type} = req.params;
+            const gridResp = newDatacache(payload, type);
+
+            gridResp.then(function(resJSON){
+                console.log('>>>>>>>>>>>>>>>>>>>>>>', resJSON);
+                if (resJSON) {
+                    res.json(200, resJSON);
+                } else {
+                    res.json(404, {});
+                }
+            });            
+        });        
 
         /* Persistent Datastores */
 

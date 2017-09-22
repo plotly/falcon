@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import {getSetting} from '../settings.js';
 import Logger from '../logger';
+import FormData from 'form-data';
 
 export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessToken, method}) {
     let authorization;
@@ -25,6 +26,26 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
     });
 }
 
+export function newDatacache(gridJSON, type) {
+
+    let body = JSON.stringify({payload: JSON.stringify({data: JSON.parse(gridJSON)}), type: type});
+    const grid_data = 'a,b,c\n1,2,3\n4,5,6'
+    let form = new FormData();
+    form.append('type', 'grid')
+    form.append('payload', grid_data);
+    body = form;
+
+    console.log('-----------------------', body);
+
+    return fetch("https://plot.ly/datacache", {
+        // headers: {
+        //     'Accept': 'application/json',
+        //     'Content-Type': 'application/json'
+        // },
+        method: 'POST',
+        body: body
+    }).then(res => res.json());
+}
 
 export function updateGrid(rows, fid, uids, requestor) {
     const username = requestor;
