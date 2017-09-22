@@ -1,7 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import classnames from 'classnames';
 import {flatten, keys, isEmpty} from 'ramda';
-import * as styles from './TableDropdown.css';
 import Select from 'react-select';
 
 export default class OptionsDropdown extends Component {
@@ -33,12 +32,13 @@ export default class OptionsDropdown extends Component {
                 return <div>{'No tables found'}</div>;
             } else {
                 return (
-                    <div className={styles.dropdown}
+                    <div className={'dropdown'}
                         id="test-table-dropdown"
                     >
                         <Select
                             options={tablesList.map(t => ({label: t, value: t}))}
                             value={selectedTable}
+                            searchable={false}
                             onChange={option => {
                                 setTable(option.value);
                             }}
@@ -59,19 +59,25 @@ export default class OptionsDropdown extends Component {
             return <div>{'Loading docs'}</div>;
         } else if (EMR.status > 300) {
             // TODO - Make this prettier.
-            return <div>{'Hm.. there was an error loading up your docs'}</div>;
+            return (
+                <div>
+                    <div>{'There was an error loading up your docs'}</div>
+                    <div style={{color:'red'}}>{JSON.stringify(EMR)}</div>
+                </div>
+            );
         } else if (EMR.status === 200) {
             const indeciesList = keys(EMR.content);
             if (indeciesList.length === 0) {
                 return <div>{'No docs found'}</div>;
             } else {
                 return (
-                    <div className={styles.dropdown}
+                    <div className={'dropdown'}
                         id="test-table-dropdown"
                     >
                         <Select
                             options={indeciesList.map(t => ({label: t, value: t}))}
                             value={selectedIndex}
+                            searchable={false}
                             onChange={option => {
                                 setIndex(option.value);
                             }}
@@ -94,12 +100,13 @@ export default class OptionsDropdown extends Component {
                 return <div>{'No docs found'}</div>;
             } else {
                 return (
-                    <div className={styles.dropdown}
+                    <div className={'dropdown'}
                         id="test-table-dropdown"
                     >
                         <Select
                             options={tablesList.map(t => ({label: t, value: t}))}
                             value={selectedTable}
+                            searchable={false}
                             onChange={option => {
                                 setTable(option.value);
                             }}
@@ -112,7 +119,7 @@ export default class OptionsDropdown extends Component {
 
     render() {
         return (
-            <div>
+            <div style={{marginTop: '25px'}}>
                 {this.renderSQLOptions()}
                 {this.renderElasticsearchIndecies()}
                 {this.renderElasticsearchDocs()}

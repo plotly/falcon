@@ -12,6 +12,7 @@ export const setIndex = createAction('SET_INDEX');
 export const mergeConnections = createAction('MERGE_CONNECTIONS');
 export const updateConnection = createAction('UPDATE_CREDENTIAL');
 export const deleteConnection = createAction('DELETE_CREDENTIAL');
+export const updatePreview = createAction('UPDATE_PREVIEW');
 
 const DELETE_TAB_MESSAGE = 'You are about to delete a connection. ' +
 'If you have scheduled persistent queries with that connection, they ' +
@@ -42,7 +43,7 @@ function DELETE(path) {
 }
 
 function POST(path, body = {}) {
-    return fetch(`${baseUrl()}/${path}`, {
+    const payload = {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -50,7 +51,9 @@ function POST(path, body = {}) {
             'Content-Type': 'application/json'
         },
         body: body ? JSON.stringify(body) : null
-    });
+    };
+
+    return fetch(`${baseUrl()}/${path}`, payload);
 }
 
 function PUT(path, body = {}) {
@@ -94,6 +97,7 @@ function apiThunk(endpoint, method, store, id, body) {
                     status: 500
                 }
             });
+            throw new Error(err);
         });
     };
 }
@@ -217,6 +221,29 @@ export function previewTable (connectionId, dialect, table, database) {
     );
 }
 
+export function getSqlSchema (connectionId, dialect, database) {
+    return apiThunk(
+        `connections/${connectionId}/sql-schemas`,
+        'POST',
+        'schemaRequests',
+        connectionId
+    );
+}
+
+export function runSqlQuery (connectionId, query) {
+    const body = {
+        query: query
+    };
+    return apiThunk(
+        `connections/${connectionId}/query`,
+        'POST',
+        'queryRequests',
+        connectionId,
+        body
+    );
+}
+
+
 export function initializeTabs() {
     return function(dispatch, getState) {
         const state = getState();
@@ -333,16 +360,16 @@ export function setConnectionNeedToBeSaved(tabId, bool) {
 function PREVIEW_QUERY (dialect, table, database = '') {
     switch (dialect) {
         case DIALECTS.IBM_DB2:
-            return `SELECT * FROM ${table} FETCH FIRST 5 ROWS ONLY`;
+            return `SELECT * FROM ${table} FETCH FIRST 1000 ROWS ONLY`;
         case DIALECTS.APACHE_SPARK:
         case DIALECTS.MYSQL:
         case DIALECTS.SQLITE:
         case DIALECTS.MARIADB:
         case DIALECTS.POSTGRES:
         case DIALECTS.REDSHIFT:
-            return `SELECT * FROM ${table} LIMIT 5`;
+            return `SELECT * FROM ${table} LIMIT 1000`;
         case DIALECTS.MSSQL:
-            return 'SELECT TOP 5 * FROM ' +
+            return 'SELECT TOP 1000 * FROM ' +
                 `${database}.dbo.${table}`;
         case DIALECTS.ELASTICSEARCH:
             return JSON.stringify({
@@ -350,7 +377,7 @@ function PREVIEW_QUERY (dialect, table, database = '') {
                 type: table || '_all',
                 body: {
                     query: { 'match_all': {} },
-                    size: 5
+                    size: 1000
                 }
             });
         default:

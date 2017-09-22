@@ -1,20 +1,20 @@
 import React, {Component, PropTypes} from 'react';
-import {contains, dissoc, eqProps, hasIn, flip, head, keys, isEmpty, reduce} from 'ramda';
+import {contains, dissoc, eqProps, flip, hasIn, head, isEmpty, keys, merge, propOr, reduce} from 'ramda';
 import {connect} from 'react-redux';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
-import * as styles from './Settings.css';
-import * as buttonStyles from './ConnectButton/ConnectButton.css';
 import fetch from 'isomorphic-fetch';
+import SplitPane from 'react-split-pane';
+import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import ConnectionTabs from './Tabs/Tabs.react';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import UserConnections from './UserConnections/UserConnections.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
-import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import Preview from './Preview/Preview.react';
+import TableTree from './Preview/TableTree.react.js';
+import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../Link.react';
-import {DIALECTS, FAQ} from '../../constants/constants.js';
+import {DIALECTS, FAQ, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
 import {getAllBaseUrls} from '../../utils/utils';
 
 
@@ -80,7 +80,7 @@ class Settings extends Component {
 
     renderEditButton(show) {
         return (
-            <div className={styles.editButtonContainer}>
+            <div className={'editButtonContainer'}>
                 {show ? (
                     <button
                         className = 'btn-secondary'
@@ -110,11 +110,11 @@ class Settings extends Component {
         return (
             <div
                 className={classnames(
-                    styles.configurationContainer,
-                    this.state.editMode ? null : styles.disabledSection
+                    'configurationContainer',
+                    this.state.editMode ? null : 'disabledSection'
                 )}
             >
-                <div className={styles.dialectSelector}>
+                <div className={'dialectSelector'}>
                     <DialectSelector
                         connectionObject={connectionObject}
                         updateConnection={updateConnection}
@@ -138,10 +138,13 @@ class Settings extends Component {
     componentWillReceiveProps(nextProps) {
         // if status goes to 200, credentials have been successfully saved to disk
         if (nextProps.connectRequest.status === 200 &&
-            this.props.connectRequest.status !== 200)
-        {
-            if (this.state.editMode) this.setState({editMode: false});
-            if (this.props.connectionNeedToBeSaved) this.props.setConnectionNeedToBeSaved(false);
+            this.props.connectRequest.status !== 200) {
+            if (this.state.editMode) {
+                this.setState({editMode: false});
+            }
+            if (this.props.connectionNeedToBeSaved){
+                this.props.setConnectionNeedToBeSaved(false);
+            }
         }
         if (nextProps.connectorUrlsRequest.status === 200 && this.props.connectorUrlsRequest.status !== 200) {
             this.setState({urls: nextProps.connectorUrlsRequest.content});
@@ -259,10 +262,15 @@ class Settings extends Component {
             deleteConnectionsRequest,
             deleteTab,
             elasticsearchMappingsRequest,
+            getSqlSchema,
+            schemaRequest,
             newTab,
+            preview,
             previewTableRequest,
             redirectUrl,
             redirectUrlRequest,
+            runSqlQuery,
+            queryRequest,
             s3KeysRequest,
             selectedTab,
             settingsRequest,
@@ -273,7 +281,8 @@ class Settings extends Component {
             selectedIndex,
             setTab,
             tablesRequest,
-            updateConnection
+            updateConnection,
+            updatePreview
         } = this.props;
 
         if (!selectedTab) {
@@ -287,6 +296,8 @@ class Settings extends Component {
             settingsRequest.content.PLOTLY_URL : 'https://plot.ly'
         );
 
+        const dialect = connections[selectedTab].dialect;
+
         return (
             <div>
                 <ConnectionTabs
@@ -297,47 +308,73 @@ class Settings extends Component {
                     deleteTab={deleteTab}
                 />
 
-                <div className={styles.openTab} style={{'padding': 30}}>
+                <div className={'openTab'} style={{padding: 30}}>
 
-                    <Tabs>
+                    <Tabs defaultIndex={0}>
 
                         <TabList>
-                            <Tab>1. Connection</Tab>
-                            <Tab>2. Preview</Tab>
-                            <Tab>3. SSL Certificate</Tab>
+                            <Tab>Connection</Tab>
+                            {this.props.connectRequest.status === 200 ? (
+                                <Tab>Query</Tab>
+                            ) : (
+                                <Tab disabled={true}>Loading...</Tab>
+                            )}
+                            <Tab>SSL Certificate</Tab>
                             <Tab
                                 className="test-ssl-tab react-tabs__tab"
                             >
-                                4. Open Plotly
+                                External Apps
                             </Tab>
                             <Tab>FAQ</Tab>
                         </TabList>
 
-                        <TabPanel>
+                        <TabPanel className={['tab-panel-connection','react-tabs__tab-panel']}>
                             {this.renderSettingsForm()}
                             {this.renderEditButton(!this.state.editMode)}
                         </TabPanel>
 
-                        <TabPanel>
+                        <TabPanel className={['tab-panel-query','react-tabs__tab-panel']}>
                             {this.props.connectRequest.status === 200 ? (
-                                <div>
-                                    <OptionsDropdown
-                                        connectionObject={connections[selectedTab]}
-                                        selectedTable={selectedTable}
-                                        elasticsearchMappingsRequest={elasticsearchMappingsRequest}
-                                        tablesRequest={tablesRequest}
-                                        setTable={setTable}
-                                        setIndex={setIndex}
-                                        selectedIndex={selectedIndex}
-                                    />
+                                <SplitPane
+                                    split="vertical"
+                                    minSize={100}
+                                    defaultSize={200}
+                                    maxSize={800}
+                                    style={{position:'relative !important'}}
+                                >
+                                    <div className='tree-view-container'>
+                                        {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
+                                            <TableTree
+                                                connectionObject={connections[selectedTab]}
+                                                preview={preview || {}}
+                                                updatePreview={updatePreview}
 
-                                    <Preview
-                                        previewTableRequest={previewTableRequest}
-                                        s3KeysRequest={s3KeysRequest}
-                                        apacheDrillStorageRequest={apacheDrillStorageRequest}
-                                        apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
-                                    />
-                                </div>
+                                                getSqlSchema={getSqlSchema}
+                                                schemaRequest={schemaRequest}
+                                            />
+                                        }
+                                    </div>
+                                    <div style={{width: '800px'}}>
+                                        <Preview
+                                            connectionObject={connections[selectedTab]}
+                                            previewTableRequest={previewTableRequest || {}}
+                                            s3KeysRequest={s3KeysRequest}
+                                            apacheDrillStorageRequest={apacheDrillStorageRequest}
+                                            apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+                                            preview={preview || {}}
+                                            updatePreview={updatePreview}
+                                            selectedTable={selectedTable}
+                                            elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                                            tablesRequest={tablesRequest}
+                                            setTable={setTable}
+                                            setIndex={setIndex}
+                                            selectedIndex={selectedIndex}
+                                            schemaRequest={schemaRequest}
+                                            runSqlQuery={runSqlQuery}
+                                            queryRequest={queryRequest || {}}
+                                        />
+                                    </div>
+                                </SplitPane>
                             ) : (
                                 <p>You must connect to a data store first.</p>
                             )}
@@ -386,16 +423,10 @@ class Settings extends Component {
                                     {httpsServerIsOK ? (
                                         <div id="test-ssl-initialized">
                                             <p>
-                                                You're now ready to explore this datastore on Plotly!
-                                                Plotly has generated a local URL for this app
-                                                through which it will securely send queries:
+                                                {`This App is a secure middleman between your database and external apps`}
                                             </p>
-                                            <div style={{textAlign: 'center'}}>
-                                                <strong><code>{connectorUrl}</code></strong>
-                                            </div>
-                                            <p>
-                                                This URL is local - no one can access it except this computer or server.
-                                                Click below to connect and start writing queries:
+                                            <p>                                            
+                                                {`Click "Open Plotly" below to query directly from within Plotly's chart workspace.`}
                                             </p>
                                             <Link
                                                 className='btn-primary'
@@ -404,12 +435,26 @@ class Settings extends Component {
                                                 target="_blank"
                                             >
                                                 Open Plotly
-                                            </Link>
+                                            </Link>                                            
+                                            <p>
+                                                {`As long as this App stays open, Plotly charts will update 
+                                                automatically with the latest data. Run this app on a 
+                                                server to update charts 24/7. See FAQ for more info.`}
+                                            </p>
+                                            <div style={{textAlign: 'center'}}>
+                                                <small>This App's autogenerated URL: </small>
+                                                <Link
+                                                    href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}
+                                                    target="_blank"
+                                                >
+                                                    <strong><code>{connectorUrl}</code></strong>
+                                                </Link>
+                                            </div>
                                         </div>
                                     ) : (
                                         <div>
-                                            {`Before you can query, wait until Plotly has
-                                              finished Step 3 for you.`}
+                                            <p>{`Before you can query, wait until Plotly has
+                                              finished Step 3 for you.`}</p>
                                         </div>
                                     )
                                     }
@@ -464,7 +509,10 @@ function mapStateToProps(state) {
         settingsRequest,
         s3KeysRequests,
         apacheDrillStorageRequests,
-        apacheDrillS3KeysRequests
+        apacheDrillS3KeysRequests,
+        schemaRequests,
+        queryRequests,
+        previews
     } = state;
 
     const selectedConnectionId = tabMap[selectedTab];
@@ -495,6 +543,9 @@ function mapStateToProps(state) {
         connectionNeedToBeSaved: connectionsNeedToBeSaved[selectedTab] || true,
         connectionsHaveBeenSaved,
         connectionObject: connections[selectedTab],
+        preview: previews[selectedConnectionId],
+        schemaRequest: schemaRequests[selectedConnectionId],
+        queryRequest: queryRequests[selectedConnectionId],
         selectedTable,
         selectedIndex,
         selectedConnectionId,
@@ -522,7 +573,8 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         selectedIndex,
         connectionNeedToBeSaved,
         connectionsHaveBeenSaved,
-        connectionObject
+        connectionObject,
+        preview
     } = stateProps;
     const {dispatch} = dispatchProps;
 
@@ -561,6 +613,14 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             connectionObject.database || selectedIndex
         ));
     }
+    function boundUpdatePreview(previewUpdateObject) {
+        return dispatch(Actions.updatePreview(
+            merge(
+                {connectionId: selectedConnectionId},
+                previewUpdateObject
+            )
+        ));
+    }
     function boundSetConnectionNeedToBeSaved(bool) {
         return dispatch(Actions.setConnectionNeedToBeSaved(
             selectedTab,
@@ -569,6 +629,20 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     }
     function boundGetSettings() {
         return dispatch(Actions.getSettings());
+    }
+    function boundGetSqlSchema() {
+        return dispatch(Actions.getSqlSchema(
+            selectedConnectionId,
+            connectionObject.dialect,
+            connectionObject.database
+        ));
+    }
+
+    function boundRunSqlQuery() {
+        return dispatch(Actions.runSqlQuery(
+            selectedConnectionId,
+            propOr('', 'code', preview)
+        ))
     }
 
     /*
@@ -614,11 +688,14 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             getSettings: boundGetSettings,
             getApacheDrillStorage: boundGetApacheDrillStorage,
             getApacheDrillS3Keys: boundGetApacheDrillS3Keys,
+            runSqlQuery: boundRunSqlQuery,
+            getSqlSchema: boundGetSqlSchema,
             newTab: () => dispatch(Actions.newTab()),
             deleteTab: tab => dispatch(Actions.deleteTab(tab)),
             setTab: tab => dispatch(Actions.setTab(tab)),
             connect: dispatchConnect,
-            editCredential: c => dispatch(Actions.editCredential(c))
+            editCredential: c => dispatch(Actions.editCredential(c)),
+            updatePreview: boundUpdatePreview
         }
     );
 }

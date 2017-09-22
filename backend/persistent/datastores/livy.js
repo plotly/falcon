@@ -46,6 +46,37 @@ export function tables(connection) {
         });
 }
 
+export function schemas(connection) {
+    const showTables = (connection.database) ?
+        `"show tables in ${connection.database}"` :
+        `"show tables"`;
+    const describeTable = (connection.database) ?
+        `"describe ${connection.database}."` :
+        `"describe "`;
+    const expression = `plotlyContext.sql(${showTables}).select("tableName").collect().map(tn => plotlyContext.sql(${describeTable} + tn(0)).withColumn("tableName", lit(tn(0).toString)).select("tableName", "col_name", "data_type")).reduce((l,r)=>l.union(r))`;
+    const code = `val r = ${expression}.collect\n%json r`;
+    return sendRequest(connection, code)
+        .then(json => {
+            if (json instanceof Error) {
+                Logger.log(json);
+                throw json;
+            }
+
+            if (!Array.isArray(json)) {
+                Logger.log('Error: failed to parse Spark response');
+                throw new Error(json);
+            }
+
+            if (json.length === 0) {
+                return {columnnames: [], rows: []};
+            }
+
+            let columnnames = json[0].schema.map(s => s.name.toUpperCase());
+            let rows = json.map(d => d.values);
+            return {columnnames, rows};
+        });
+}
+
 export function query(query, connection) {
     const code = `val r = plotlyContext.sql("""${query}""").collect\n%json r`;
     return sendRequest(connection, code)
@@ -86,12 +117,14 @@ function getServerUrl(connection) {
 }
 
 function getSessionUrl(connection) {
-    return `http://${connection.host}:${connection.port}/sessions/${connection.sessionId}`;
+    return `http://${connection.host}:${connection.port}/sessions/${clients[connection.id]}`;
 }
 
 function getStatementUrl(connection) {
-    return `http://${connection.host}:${connection.port}/sessions/${connection.sessionId}/statements`;
+    return `http://${connection.host}:${connection.port}/sessions/${clients[connection.id]}/statements`;
 }
+
+const clients = {};
 
 export function newSession(connection) {
     return fetch(getServerUrl(connection), {
@@ -107,10 +140,9 @@ export function newSession(connection) {
         })
         .then(response => response.json())
         .then(session => {
-            connection.sessionId =  session.id;
-            return connection;
-        })
-        .then(function() {
+            // Store the Livy session id
+            clients[connection.id] = session.id;
+
             // Here we run any code needed to setup the session
             let setup;
 

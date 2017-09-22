@@ -18,7 +18,8 @@ const enhancer = compose(
         window.location.href.match(
             /[?&]debug_session=([^&]+)\b/
         )
-    )
+    ),
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
 
 export default function configureStore(initialState) {

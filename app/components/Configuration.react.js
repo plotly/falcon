@@ -6,12 +6,12 @@ import {baseUrl} from '../utils/utils';
 import {Link} from './Link.react';
 import {contains} from 'ramda';
 
-import * as styles from './styles/Configuration.css';
-
 const LINKS = {
     PLANS: 'http://plot.ly/plans/',
     DOCS: 'http://help.plot.ly/database-connectors/',
-    TYPEFORM: 'https://plotly.typeform.com/to/KUiCSl'
+    TYPEFORM: 'https://plotly.typeform.com/to/KUiCSl',
+    GITHUB: 'https://github.com/plotly/plotly-database-connector',
+    ABOUT: 'https://plot.ly/database-connectors/'
 };
 const ONPREM = contains('external-data-connector', window.location.href);
 
@@ -22,7 +22,7 @@ export default class Configuration extends Component {
             isMenuOpen: false
         }
         this.toggle = this.toggle.bind(this);
-        this.close = this.close.bind(this);        
+        this.close = this.close.bind(this);
     }
 
     toggle() {
@@ -32,7 +32,7 @@ export default class Configuration extends Component {
     close() {
         this.setState({ isMenuOpen: false });
     }
-    
+
     render() {
         const menuOptions = {
             isOpen: this.state.isMenuOpen,
@@ -43,27 +43,16 @@ export default class Configuration extends Component {
         };
 
         return (
-            <div className={styles.fullApp}>
-                <div className={styles.header}>
-                    <span className={styles.logoAndTitle}>
-                        <h5 className={styles.applicationTitle}>
-                            Plotly SQL Query Tool
-                        </h5>
-                    </span>
+            <div className="fullApp">
+                <div className="header">
 
-                    <span className={styles.supportLinksContainer}>
-                        <div className={styles.externalLinkContainer}>
+                    <span className="supportLinksContainer">
+                        <div className="externalLinkContainer">
                             <DropdownMenu {...menuOptions}>
-                                {
-                                    ONPREM ?
-                                    null : <li><Link className={styles.supportLinks} href={LINKS.PLANS}>Plans and Pricing</Link></li>
-                                }
-                                {
-                                    ONPREM ?
-                                    null : <li><Link className={styles.supportLinks} href={'https://plot.ly/create'}>Chart & SQL Editor</Link></li>
-                                }
-                                <li><Link className={styles.supportLinks} href={LINKS.DOCS}>Documentation</Link></li>
-                                <li><Link className={styles.supportLinks} href={LINKS.TYPEFORM}>Request a Connector</Link></li>
+                                <li><Link className="supportLinks" href={LINKS.ABOUT}>About this App</Link></li>                            
+                                <li><Link className="supportLinks" href={LINKS.DOCS}>Documentation</Link></li>
+                                <li><Link className="supportLinks" href={LINKS.TYPEFORM}>Request a Connector</Link></li>
+                                <li><Link className="supportLinks" href={LINKS.GITHUB}>Code on GitHub</Link></li>
                             </DropdownMenu>
                         </div>
                     </span>

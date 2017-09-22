@@ -1,11 +1,12 @@
 version: 0.4.{build}
 
 environment:
-  POSTGRES_PATH: C:\Program Files\PostgreSQL\9.6
+  matrix:
+    - nodejs_version: 6.11.1
+      POSTGRES_PATH: C:\Program Files\PostgreSQL\9.6
 
 platform:
   - x64
-  - x86
 
 services:
   - postgresql96
@@ -19,7 +20,7 @@ init:
 
 
 install:
-  - ps: Install-Product node 6.11.1
+  - ps: Install-Product node $env:nodejs_version $env:platform
   - yarn install --force
   - yarn run rebuild:modules:electron
 

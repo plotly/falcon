@@ -12,7 +12,7 @@ th, td {
 }
 
 .previewContainer {
-    margin: 25px;
+    margin: 0 25px;
     overflow: auto;
     border-radius: 3px;
 }

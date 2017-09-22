@@ -16,21 +16,25 @@ export default {
 
     plugins: [
         new webpack.optimize.UglifyJsPlugin({
+            sourceMap: false,
             compressor: {
                 warnings: false
             }
         }),
         new webpack.BannerPlugin(
-            'require("source-map-support").install();',
-            { raw: true, entryOnly: false }
+            {banner: 'require("source-map-support").install();',
+             raw: true, entryOnly: false }
         ),
         new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify('production')
-            }
+            __DEV__: false,
+            'process.env.NODE_ENV': JSON.stringify('production')
         }),
         // https://github.com/felixge/node-formidable/issues/337
-        new webpack.DefinePlugin({ 'global.GENTLY': false })
+        new webpack.DefinePlugin({ 'global.GENTLY': false }),
+
+        new webpack.LoaderOptionsPlugin({
+            minimize: true
+        })
     ],
 
     target: 'electron-main',

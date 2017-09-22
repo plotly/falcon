@@ -1,0 +1,9 @@
+.public_fixedDataTable_main, .fixedDataTableLayout_main public_fixedDataTable_main {
+    font-size: 12px !important;    
+    border-color: #c8d4e3;
+}
+
+.public_fixedDataTable_header, .public_fixedDataTable_header .public_fixedDataTableCell_main {
+    background-image: none;
+    background: #f3f6fa;
+}

@@ -424,6 +424,16 @@ export default class Servers {
             });
         });
 
+        server.post('/connections/:connectionId/sql-schemas', function schemasHandler(req, res, next) {
+            Datastores.schemas(
+                getConnectionById(req.params.connectionId)
+            ).then(schemas => {
+                res.json(200, schemas);
+            }).catch(error => {
+                res.json(500, {error: {message: error.message}});
+            });
+        });
+
         server.post('/connections/:connectionId/s3-keys', function s3KeysHandler(req, res, next) {
             Datastores.files(
                 getConnectionById(req.params.connectionId)

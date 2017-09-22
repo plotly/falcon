@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import {assoc, assocPath, contains, merge, dissoc} from 'ramda';
+import {assoc, assocPath, contains, dissoc, merge, omit, propOr} from 'ramda';
 
 
 /*
@@ -151,7 +151,8 @@ export const elasticsearchMappingsRequests = createApiReducer('elasticsearchMapp
 export const previewTableRequests = createApiReducer('previewTableRequest');
 export const s3KeysRequests = createApiReducer('s3KeysRequests');
 export const tablesRequests = createApiReducer('tablesRequests');
-
+export const schemaRequests = createApiReducer('schemaRequests');
+export const queryRequests = createApiReducer('queryRequests');
 
 
 function tabMap(state = {}, action) {
@@ -222,6 +223,27 @@ function connections(state = {}, action) {
     }
 }
 
+function previews(state = {}, action) {
+    if (action.type === 'UPDATE_PREVIEW') {
+        /*
+         * deep-merge the new payload with the existing state, indexed
+         * by connectionId
+         */
+        const {connectionId} = action.payload;
+        return merge(
+            state,
+            {
+                [connectionId]: merge(
+                propOr({}, connectionId, state),
+                omit('connectionId', action.payload)
+                )
+            }
+        );
+    } else {
+        return state;
+    }
+}
+
 const rootReducer = combineReducers({
     tabMap,
     connections,
@@ -241,7 +263,10 @@ const rootReducer = combineReducers({
     previewTableRequests,
     s3KeysRequests,
     apacheDrillStorageRequests,
-    apacheDrillS3KeysRequests
+    apacheDrillS3KeysRequests,
+    schemaRequests,
+    queryRequests,
+    previews
 });
 
 export default rootReducer;

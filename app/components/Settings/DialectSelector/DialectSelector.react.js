@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import {values} from 'ramda';
-import * as styles from './DialectSelector.css';
 import {
     DIALECTS, LOGOS
 } from '../../../constants/constants';
@@ -13,8 +12,8 @@ export default function DialectSelector(props) {
         <div
             key={DIALECT}
             className={classnames(
-                styles.logo, {
-                      [styles.logoSelected]:
+                'logo', {
+                      ['logoSelected']:
                       connectionObject.dialect === DIALECT
                  }
             )}
@@ -26,11 +25,11 @@ export default function DialectSelector(props) {
             id={`test-logo-${DIALECT}`}
         >
             <img
-                className={styles.logoImage}
+                className={'logoImage'}
                 src={LOGOS[DIALECT]}
             />
         </div>
     ));
 
-    return <div className={styles.logoContainer}>{logos}</div>;
+    return <div className={'logoContainer'}>{logos}</div>;
 }
