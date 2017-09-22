@@ -4941,9 +4941,9 @@ hyphenate-style-name@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/hyphenate-style-name/-/hyphenate-style-name-1.0.2.tgz#31160a36930adaf1fc04c6074f7eb41465d4ec4b"
 
-ibm_db@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/ibm_db/-/ibm_db-2.0.0.tgz#8eb1e14112c2e823b0155f2bec443e466fc369e2"
+"ibm_db@git+https://git@github.com/n-riesco/node-ibm_db.git":
+  version "2.2.0"
+  resolved "git+https://git@github.com/n-riesco/node-ibm_db.git#201ef8967906aade8c191f852ee0c7c804b51d9c"
   dependencies:
     bindings "~1.2.1"
     fstream "~1.0.10"
