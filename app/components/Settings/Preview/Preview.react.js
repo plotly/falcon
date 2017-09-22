@@ -13,6 +13,7 @@ import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../../Link.react';
 import * as Actions from '../../../actions/sessions';
 import {DIALECTS, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
+import getPlotJsonFromState from './components/getPlotJsonFromState.js'
 
 class Preview extends Component {
 
@@ -64,7 +65,7 @@ class Preview extends Component {
 
     runQuery() {
         this.props.runSqlQuery().then(content => {
-            /* 
+            /*
             * Cache the last successful query
             * lastSuccessfulQuery is the result of the last successful query
             * and should have the form {rows:[[]], columnnames:[]}
@@ -96,14 +97,27 @@ class Preview extends Component {
 
     render() {
 
-        const {selectedTable, elasticsearchMappingsRequest, tablesRequest, schemaRequest, connectionObject, 
-            setTable, setIndex, selectedIndex, updatePreview, preview, previewTableRequest, queryRequest} = this.props;
+        const {
+            connectionObject,
+            elasticsearchMappingsRequest,
+            preview,
+            previewTableRequest,
+            queryRequest,
+            schemaRequest,
+            selectedIndex,
+            selectedTable,
+            setIndex,
+            setTable,
+            tablesRequest,
+            updatePreview,
+        } = this.props;
 
-        const lastSuccessfulQuery = preview.lastSuccessfulQuery;        
+        const lastSuccessfulQuery = preview.lastSuccessfulQuery;
         const dialect = connectionObject.dialect;
         const showEditor = propOr(true, 'showEditor')(preview);
         const code = propOr('', 'code')(preview);
         const error = propOr('', 'error')(preview);
+        const chartEditorProps = propOr({}, 'ChartEditor', preview);
 
         let rows = [];
         let columnnames = [];
@@ -111,17 +125,17 @@ class Preview extends Component {
         let errorMsg = '';
         let successMsg = '';
 
-        if (isEmpty(previewTableRequest) || previewTableRequest.status === 'loading') {            
+        if (isEmpty(previewTableRequest) || previewTableRequest.status === 'loading') {
             isLoading = true;
-        } 
+        }
         else if (previewTableRequest.status !== 200) {
             errorMsg = JSON.stringify(previewTableRequest);
-        } 
+        }
         else if (isEmpty(queryRequest)) {
             rows = previewTableRequest.content.rows;
             columnnames = previewTableRequest.content.columnnames;
             successMsg = `${rows.length} rows retrieved`;
-        } 
+        }
         else if (queryRequest.status === 'loading') {
 
             if (has('lastSuccessfulQuery', preview)) {
@@ -139,7 +153,7 @@ class Preview extends Component {
                 // user's query failed but they have made a succesful query in the past
                 rows = lastSuccessfulQuery.rows;
                 columnnames = lastSuccessfulQuery.columnnames;
-            } 
+            }
             else {
                 // User has never made a succesful query on their own
                 rows = previewTableRequest.content.rows;
@@ -147,7 +161,7 @@ class Preview extends Component {
                 successMsg = `${rows.length} rows retrieved`;
             }
             errorMsg = JSON.stringify(queryRequest);
-        } 
+        }
         else {
             // User's query worked
             rows = queryRequest.content.rows;
@@ -226,7 +240,19 @@ class Preview extends Component {
                                 <ChartEditor
                                     rows={rows}
                                     columnNames={columnnames}
-                                    updatePlotJson={this.updatePlotJson}
+                                    plotJSON={
+                                        getPlotJsonFromState({
+                                            columnNames: columnnames,
+                                            rows: rows,
+                                            xAxisColumnName: chartEditorProps.xAxisColumnName,
+                                            yAxisColumnName: chartEditorProps.yAxisColumnName,
+                                            columnTraceTypes: chartEditorProps.columnTraceTypes
+                                        })
+                                    }
+                                    updateProps={newProps => this.updatePreview({
+                                        'ChartEditor': newProps
+                                    })}
+                                    {...chartEditorProps}
                                 />
                             </TabPanel>
 
@@ -236,30 +262,37 @@ class Preview extends Component {
                                 <SQLTable
                                     rows={rows}
                                     columnNames={columnnames}
+                                    plotJSON = {getPlotJsonFromState(this.state)}
                                 />
-                            </TabPanel>                            
+                            </TabPanel>
 
                             <TabPanel>
                                 <div className='export-options-container'>
                                     <div>
-                                        <button 
-                                            className='btn btn-outline' 
+                                        <button
+                                            className='btn btn-outline'
                                             onClick={() => this.ƒcache(csvString, 'grid')}
                                         >
                                             Send CSV to plot.ly
                                         </button>
-                                        <button 
-                                            className='btn btn-outline' 
+                                        <button
+                                            className='btn btn-outline'
                                             onClick={() => this.downloadCSV(columnnames, rows)}
                                         >
                                             Download CSV
                                         </button>
-                                        <button 
-                                            className='btn btn-outline' 
-                                            onClick={() => this.fetchDatacache(JSON.stringify(this.preview.plotJSON || {}), 'plot')}
+                                        <button
+                                            className='btn btn-outline'
+                                            onClick={() => this.fetchDatacache(JSON.stringify(getPlotJsonFromState({
+                                                columnNames: columnnames,
+                                                rows: rows,
+                                                xAxisColumnName: chartEditorProps.xAxisColumnName,
+                                                yAxisColumnName: chartEditorProps.yAxisColumnName,
+                                                columnTraceTypes: chartEditorProps.columnTraceTypes
+                                            }) || {}), 'plot')}
                                         >
                                             Send chart to plot.ly
-                                        </button>                                        
+                                        </button>
                                     </div>
                                     <div style={{width:650, height:200, border:'1px solid #dfe8f3',
                                         fontFamily: `'Ubuntu Mono', courier, monospace`, paddingTop: 10,
@@ -283,11 +316,11 @@ class Preview extends Component {
                                                         <div style={{color:'#D36046'}}>{`[ERROR] ${link.message}`}</div>
                                                     </div>
                                                 }
-                                            </div>                                                                                  
+                                            </div>
                                         ))}
                                     </div>
                                 </div>
-                            </TabPanel>                            
+                            </TabPanel>
                         </Tabs>
                     </div>
                 }
