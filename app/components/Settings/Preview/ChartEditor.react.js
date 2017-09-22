@@ -84,6 +84,7 @@ export default class ChartEditor extends PureComponent {
             'Select a chart type';
 
         const plotJSON = getPlotJsonFromState(this.state);
+        this.props.updatePlotJson(plotJSON);
 
         return (
             <div style={{fontFamily:'Open Sans, Sans-Serif'}}>

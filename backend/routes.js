@@ -485,9 +485,9 @@ export default class Servers {
         server.post('/datacache', function getDatacacheHandler(req, res, next) {
 
             const {payload, type} = req.params;
-            const gridResp = newDatacache(payload, type);
+            const datacacheResp = newDatacache(payload, type);
 
-            gridResp.then(function(resJSON){
+            datacacheResp.then(function(resJSON){
                 console.log('>>>>>>>>>>>>>>>>>>>>>>', resJSON);
                 if (resJSON) {
                     res.json(200, resJSON);

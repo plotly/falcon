@@ -26,22 +26,15 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
     });
 }
 
-export function newDatacache(gridJSON, type) {
-
-    let body = JSON.stringify({payload: JSON.stringify({data: JSON.parse(gridJSON)}), type: type});
-    const grid_data = 'a,b,c\n1,2,3\n4,5,6'
+export function newDatacache(payloadJSON, type) {    
     let form = new FormData();
-    form.append('type', 'grid')
-    form.append('payload', grid_data);
-    body = form;
+    form.append('type', type)
+    form.append('payload', payloadJSON);
+    const body = form;
 
     console.log('-----------------------', body);
 
     return fetch("https://plot.ly/datacache", {
-        // headers: {
-        //     'Accept': 'application/json',
-        //     'Content-Type': 'application/json'
-        // },
         method: 'POST',
         body: body
     }).then(res => res.json());

@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
-import {has, isEmpty, propOr, transpose} from 'ramda';
+import {has, isEmpty, propOr} from 'ramda';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 
 import SQLTable from './SQLTable.react.js';
@@ -10,9 +10,9 @@ import ApacheDrillPreview from './ApacheDrillPreview.js'
 import S3Preview from './S3Preview.js'
 
 import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
+import {Link} from '../../Link.react';
 import * as Actions from '../../../actions/sessions';
 import {DIALECTS, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
-import {submitStyle} from './components/editorConstants.js';
 
 class Preview extends Component {
 
@@ -22,12 +22,18 @@ class Preview extends Component {
         this.updateCode = this.updateCode.bind(this);
         this.toggleEditor = this.toggleEditor.bind(this);
         this.runQuery = this.runQuery.bind(this);
-        this.downloadCSV = this.downloadCSV.bind(this);
+        this.fetchDatacache = this.fetchDatacache.bind(this);
+        this.updatePlotJson = this.updatePlotJson.bind(this);
+
+        this.state = {
+            plotlyLinks: [],
+            plotJSON: {}
+        };
     }
 
-    fetchDatacache(gridObj) {
+    fetchDatacache(payload, type) {
 
-        const gridJSON = JSON.stringify({payload: gridObj, type: 'grid'});
+        const payloadJSON = JSON.stringify({payload: payload, type: type});
 
         fetch("/datacache", {
             headers: {
@@ -36,11 +42,19 @@ class Preview extends Component {
             },
             method: 'POST',
             credentials: 'include',
-            body: gridJSON
-        }).then(function(resp) {
-            return resp;
-        }).then(function(data) {
+            body: payloadJSON
+        }).then( resp => {
+            return resp.json();
+        }).then( data => {
             console.warn('***', data);
+            let plotlyLinks = this.state.plotlyLinks;
+            if ( !('error' in data) ) {
+                plotlyLinks.unshift({type: type, url: data.url});
+            }
+            else{
+                plotlyLinks.unshift({type: 'error', message: data.error.message});
+            }
+            this.setState({ plotlyLinks: plotlyLinks });
         });
     }
 
@@ -64,6 +78,12 @@ class Preview extends Component {
     updateCode(newCode) {
         this.props.updatePreview({
             code: newCode
+        });
+    }
+
+    updatePlotJson(newPlotJson) {
+        this.props.updatePreview({
+            plotJSON: newPlotJson
         });
     }
 
@@ -135,12 +155,10 @@ class Preview extends Component {
             successMsg = `${rows.length} rows retrieved`;
         }
 
-
-        let dataGrid = {cols: {}};
-        const columnData = transpose(rows);
-        columnnames.map((yColName, i) => {
-            dataGrid.cols[yColName] = {data: columnData[i], order: i}
-        })
+        let csvString = columnnames.join(', ') + '\n';
+        rows.map( row => {
+            csvString = csvString + row.join(', ') + '\n';
+        });
 
         return (
             <div className={'previewContainer'}>
@@ -199,10 +217,18 @@ class Preview extends Component {
                     <div>
                         <Tabs forceRenderTabPanel={true}>
                             <TabList>
-                                <Tab>Table</Tab>
                                 <Tab>Chart</Tab>
+                                <Tab>Table</Tab>
                                 <Tab>Export</Tab>
                             </TabList>
+
+                            <TabPanel>
+                                <ChartEditor
+                                    rows={rows}
+                                    columnNames={columnnames}
+                                    updatePlotJson={this.updatePlotJson}
+                                />
+                            </TabPanel>
 
                             <TabPanel
                                 style={{fontFamily: `'Ubuntu Mono', courier, monospace`}}
@@ -211,50 +237,54 @@ class Preview extends Component {
                                     rows={rows}
                                     columnNames={columnnames}
                                 />
-                            </TabPanel>
-
-                            <TabPanel>
-                                <ChartEditor
-                                    rows={rows}
-                                    columnNames={columnnames}
-                                />
-                            </TabPanel>
+                            </TabPanel>                            
 
                             <TabPanel>
                                 <div className='export-options-container'>
                                     <div>
-                                        {/*<form
-                                            action='https://plot.ly/datagrid'
-                                            method='post'
-                                            target='_blank'
-                                            name='data'
-                                        >
-                                            <input type='hidden' name='data' value={JSON.stringify(dataGrid)} />
-                                            <input 
-                                                type="submit" 
-                                                style={Object.assign({}, submitStyle, {
-                                                    width: '230px', 
-                                                    float: 'none', 
-                                                    marginBottom: '20px'})}
-                                                value={`Export ${rows.length} rows to plot.ly`}
-                                            />
-                                        </form>*/}
                                         <button 
                                             className='btn btn-outline' 
-                                            style={{margin: 0}}
-                                            onClick={() => this.fetchDatacache(JSON.stringify(dataGrid))}
+                                            onClick={() => this.ƒcache(csvString, 'grid')}
                                         >
-                                            Export CSV to plot.ly
+                                            Send CSV to plot.ly
                                         </button>
-                                    </div>
-                                    <div>
                                         <button 
                                             className='btn btn-outline' 
-                                            style={{margin: 0}}
                                             onClick={() => this.downloadCSV(columnnames, rows)}
                                         >
                                             Download CSV
                                         </button>
+                                        <button 
+                                            className='btn btn-outline' 
+                                            onClick={() => this.fetchDatacache(JSON.stringify(this.preview.plotJSON || {}), 'plot')}
+                                        >
+                                            Send chart to plot.ly
+                                        </button>                                        
+                                    </div>
+                                    <div style={{width:650, height:200, border:'1px solid #dfe8f3',
+                                        fontFamily: `'Ubuntu Mono', courier, monospace`, paddingTop: 10,
+                                        padding:20, marginTop:10, overflow:'hidden', overflowY:'scroll'}}>
+                                        {this.state.plotlyLinks.map(link => (
+                                            <div style={{borderTop:'1px solid #dfe8f3', marginTop:20}}>
+                                                {link.type == 'grid' &&
+                                                    <div>
+                                                        <div style={{color:'#00cc96'}}>🎉  Link to your CSV on Plot.ly ⬇️</div>
+                                                        <Link href={link.url} target="_blank">{link.url}</Link>
+                                                    </div>
+                                                }
+                                                {link.type == 'plot' &&
+                                                    <div>
+                                                        <div style={{color:'#00cc96'}}>🎉  Link to your CSV on Plot.ly ⬇️</div>
+                                                        <Link href={link.url} target="_blank">{link.url}</Link>
+                                                    </div>
+                                                }
+                                                {link.type == 'error' &&
+                                                    <div>
+                                                        <div style={{color:'#D36046'}}>{`[ERROR] ${link.message}`}</div>
+                                                    </div>
+                                                }
+                                            </div>                                                                                  
+                                        ))}
                                     </div>
                                 </div>
                             </TabPanel>                            
