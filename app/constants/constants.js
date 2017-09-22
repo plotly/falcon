@@ -159,47 +159,48 @@ export const INITIAL_CONNECTIONS = {
 export const FAQ = [
     {
         q: 'How does this app work?',
-        a: 'This app listens for query requests from the plot.ly online chart editor. This application \
-            queries the databases to which you have connected, then returns the results to plot.ly where \
-            you can compose charts and dashbords with the data.'
+        a: 'This app is a SQL client. Connect to your database in the Connection tab, run SQL queries in the \
+            Query tab, then export your results as a CSV or share them online through plot.ly. Optionally, \
+            you can run this app as a middleman between plot.ly and your database. As long as this app stays open, it will \
+            send the latest data to plot.ly to update your charts and dashboards.'
     }, {
-        q: 'Do I need this application open while making database queries?',
-        a: 'Yes, keep this application open while making queries from within plot.ly.'
+        q: 'I want to connect my dashboard to my database. How do I do that?',
+        a: 'Open the link in the "PLOT.LY" tab. From there, you can run and save a query that you want to be \
+            scheduled. Make a chart from the resulting data and embed it in your dashboard. As long as this app \
+            stays open, it will send the latest data to plot.ly to update your charts and dashboards.'
     }, {
-        q: 'Do I need to expose my database to plot.ly?',
-        a: 'No. Since this app sits between plot.ly and your database, you just need to make sure that you \
-            can connect to your database from the computer or server this app is running on.'
+        q: 'Am I exposing my database credentials to plot.ly?',
+        a: 'No. All of your credentials are only saved locally on this computer. We do not recommend uploading \
+            your database credentials to any cloud service.'
     }, {
         q: 'Where do I make SQL queries?',
-        a: 'The online plot.ly chart editor includes an SQL editor that you can use to import data from \
-            your databases into Plotly. You can access the chart editor at plot.ly/create?upload=sql'
-    }, {
-        q: 'Are these database credentials shared on the Plotly server?',
-        a: 'Your database credentials are only stored on your computer (they are not saved on any Plotly \
-            servers). We do not recommmend giving your database credentials to any online service.'
+        a: 'For one-shot queries, make them in this app (see the "QUERY" tab). For queries that you want to \
+            schedule, make them in the plot.ly workspace (see the "PLOT.LY" tab).'
     }, {
         q: 'Is this app open-source?',
         a: 'Yep! You can view and contribute to the code on GitHub: \
             https://github.com/plotly/plotly-database-connector.'
     }, {
-        q: '[Advanced] Can I schedule queries?',
-        a: 'You can set queries to runon a scheduler (ie daily or hourly) from the plot.ly online chart editor. ' +
-            'Scheduled queries are saved and managed by this application, so keep this app open ' +
-            'if you want your queries to run and your datasets to update. When you restart this ' +
-            'application, all of the scheduled queries will run automatically and their scheduling ' +
-            'timer will reset.'
+        q: '[Advanced] How do scheduled queries work?',
+        a: 'You can run queries on a scheduler (ie daily or hourly) through the plot.ly workspace. \
+            Scheduled queries are saved and run by this app, so keep this app open as long as you want \
+            your charts and dashboards to update. When you restart this app, all of the scheduled \
+            queries will run automatically and their scheduling timer will reset. We recommend setting up \
+            this app on an office computer or server if you want it to update a chart or dashboard 24/7. \
+            If you have Plotly On-Premises, you\'re in luck - this app is already running in your Plotly \
+            On-Premises container.'
     }, {
-        q: '[Advanced] What\'s an SSL certificate (and why do I need it?)',
-        a: 'An SSL certificate is used to encrypt the requests between your web browser and this ' +
-            'connector. Unencrypted requests are blocked by default in modern web browsers. ' +
-            'We generate these certificates for you automatically through Let\'s Encrypt. ' +
-            'This certificate takes a several minutes to generate.'
+        q: '[Advanced] What\'s an SSL certificate (and why do I need one?)',
+        a: 'An SSL certificate is used to encrypt the requests between your web browser and this \
+            connector. Unencrypted requests are blocked by default in modern web browsers. \
+            We generate these certificates for you automatically through Let\'s Encrypt. This \
+            certificate takes a several minutes to generate.'
     }, {
         q: '[Advanced] How do you generate certificates for a localhost web server?',
-        a: 'This application runs a server on localhost: it is not exposed to the network. SSL ' +
-            'certificates cannot be issued for localhost servers, so we create a unique URL for you  ' +
-            'and a global DNS entry that points that URL to localhost. We use Let\'s Encrypt ' +
-            'to generate certificates on that unique URL.'
+        a: 'This application runs a server locally on localhost: it is not exposed to the network. SSL \
+            certificates cannot be issued for localhost servers, so we create a unique URL for you \
+            and a global DNS entry that points that URL to localhost. We use Let\'s Encrypt \
+            to generate certificates on that unique URL.'
     }
 ];
 

@@ -241,7 +241,7 @@ class Preview extends Component {
 
                             <TabPanel>
                                 <div className='export-options-container'>
-                                    <div>
+                                    <div style={{margin: '20px 0'}}>
                                         <button 
                                             className='btn btn-outline' 
                                             onClick={() => this.ƒcache(csvString, 'grid')}

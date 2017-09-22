@@ -1,10 +1,12 @@
 .react-tabs__tab-list {
-    margin: 0 0 10px;
-    padding: 0;
+    padding: 5px 0;
+    margin: 0;
     text-transform: uppercase;
     font-family: 'Dosis';
     color: #506784;
     font-size: 18px;
+    border-bottom: 1px solid #c8dfe3;
+    background: #fff;
 }
 
 .react-tabs__tab {
@@ -49,17 +51,8 @@
     background: #fff;
 }
 
-.tab-panel-connection {
-    padding-bottom: 5px;
-    border-radius: 6px;
-    border: 1px solid #c8dfe3;
-    background: rgb(251, 252, 253);
-
-}
-
-.tab-panel-query {
-    border: 1px solid #c8dfe3;
-    border-radius: 0 0 4px 4px;    
+.big-whitespace-tab {
+    padding: 50px 200px;
 }
 
 .react-tabs__tab-list {
