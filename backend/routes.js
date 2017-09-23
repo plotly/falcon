@@ -487,15 +487,14 @@ export default class Servers {
             const {payload, type} = req.params;
             const datacacheResp = newDatacache(payload, type);
 
-            datacacheResp.then(function(resJSON){
+            datacacheResp.then(plotlyRes => plotlyRes.json().then(resJSON => {
                 console.log('>>>>>>>>>>>>>>>>>>>>>>', resJSON);
-                if (resJSON) {
-                    res.json(200, resJSON);
-                } else {
-                    res.json(404, {});
-                }
-            });            
-        });        
+                return res.json(plotlyRes.status, resJSON);
+            })).catch(err => {
+                console.error(err);
+                throw new Error(err);
+            });
+        });
 
         /* Persistent Datastores */
 
