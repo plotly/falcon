@@ -26,7 +26,7 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
     });
 }
 
-export function newDatacache(payloadJSON, type) {    
+export function newDatacache(payloadJSON, type) {
     let form = new FormData();
     form.append('type', type)
     form.append('payload', payloadJSON);
@@ -37,7 +37,12 @@ export function newDatacache(payloadJSON, type) {
     return fetch("https://plot.ly/datacache", {
         method: 'POST',
         body: body
-    }).then(res => res.json());
+    }).then(res => {
+        return res;
+    }).catch(err => {
+        console.error(err);
+        throw new Error(err);
+    });
 }
 
 export function updateGrid(rows, fid, uids, requestor) {

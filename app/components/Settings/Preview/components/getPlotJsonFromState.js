@@ -110,6 +110,10 @@ export default function getPlotJsonFromState(state) {
                 };
             }
 
+            if ((traceType === 'scatter' || traceType === 'line') && xColumnData.length > 20000) {
+                dataObj.type = 'scattergl';
+            }
+
             data.push(Object.assign(dataObj, dataTemplate));
         });
 

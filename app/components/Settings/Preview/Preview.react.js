@@ -25,7 +25,6 @@ class Preview extends Component {
         this.runQuery = this.runQuery.bind(this);
         this.fetchDatacache = this.fetchDatacache.bind(this);
         this.propsToState = this.propsToState.bind(this);
-        this.downloadCSV = this.downloadCSV.bind(this);
 
         this.state = {
             plotlyLinks: [],
@@ -163,15 +162,6 @@ class Preview extends Component {
             rows,
             successMsg,
         });
-
-=======
-    downloadCSV(csvString) {
-        var encodedUri = encodeURI(csvString);
-        var link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "data_export.csv");
-        link.click();
->>>>>>> ce105c72f20b2b25ff39c8c41fa0e146b6cb4fff
     }
 
     fetchDatacache(payload, type) {
@@ -368,7 +358,7 @@ class Preview extends Component {
                                         </button>
                                         <button
                                             className='btn btn-outline'
-                                            onClick={() => this.downloadCSV(csvString)}
+                                            onClick={() => this.fetchDatacache(csvString, 'csv')}
                                         >
                                             Download CSV
                                         </button>
@@ -393,9 +383,15 @@ class Preview extends Component {
                                                         <Link href={link.url} target="_blank">{link.url}</Link>
                                                     </div>
                                                 }
+                                                {link.type == 'csv' &&
+                                                    <div>
+                                                        <div style={{color:'#00cc96'}}>💾  Your CSV has been saved ⬇️</div>
+                                                        <Link href={link.url} target="_blank">{link.url}</Link>
+                                                    </div>
+                                                }                                                
                                                 {link.type == 'plot' &&
                                                     <div>
-                                                        <div style={{color:'#00cc96'}}>🎉  Link to your CSV on Plot.ly ⬇️</div>
+                                                        <div style={{color:'#00cc96'}}>📈  Link to your chart on Plot.ly ⬇️</div>
                                                         <Link href={link.url} target="_blank">{link.url}</Link>
                                                     </div>
                                                 }

@@ -407,7 +407,7 @@ class Settings extends Component {
                                                 href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}
                                                 target="_blank"
                                             >
-                                                Query {dialect} from plot.ly workspace
+                                                Query {dialect} from plot.ly
                                             </Link>                                            
                                             <div>
                                                 <code>PDC has auto-generated a local URL and SSL certificate for itself: </code>
