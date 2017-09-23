@@ -14,11 +14,9 @@
 }
 
 .openTab {
-    background: white;
-    border-width: 0px 1px 1px 1px;
-    border-color: #E7E8E9;
-    border-style: solid;
-    padding-bottom: 100px;
+    border-radius: 0 0 6px 6px;
+    border: 1px solid #c8dfe3;
+    background: rgb(251, 252, 253)
 }
 
 .configurationContainer {

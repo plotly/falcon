@@ -25,6 +25,7 @@ class Preview extends Component {
         this.runQuery = this.runQuery.bind(this);
         this.fetchDatacache = this.fetchDatacache.bind(this);
         this.propsToState = this.propsToState.bind(this);
+        this.downloadCSV = this.downloadCSV.bind(this);
 
         this.state = {
             plotlyLinks: [],
@@ -163,6 +164,14 @@ class Preview extends Component {
             successMsg,
         });
 
+=======
+    downloadCSV(csvString) {
+        var encodedUri = encodeURI(csvString);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "data_export.csv");
+        link.click();
+>>>>>>> ce105c72f20b2b25ff39c8c41fa0e146b6cb4fff
     }
 
     fetchDatacache(payload, type) {
@@ -340,7 +349,7 @@ class Preview extends Component {
                             </TabPanel>
 
                             <TabPanel
-                                style={{fontFamily: `'Ubuntu Mono', courier, monospace`}}
+                                style={{fontFamily: `'Ubuntu Mono', courier, monospace`, marginTop: '20px'}}
                             >
                                 <SQLTable
                                     rows={rows}
@@ -350,16 +359,16 @@ class Preview extends Component {
 
                             <TabPanel>
                                 <div className='export-options-container'>
-                                    <div>
+                                    <div style={{margin: '20px 0'}}>
                                         <button
                                             className='btn btn-outline'
-                                            onClick={() => this.datacache(csvString, 'grid')}
+                                            onClick={() => this.fetchDatacache(csvString, 'grid')}
                                         >
                                             Send CSV to plot.ly
                                         </button>
                                         <button
                                             className='btn btn-outline'
-                                            onClick={() => this.downloadCSV(columnNames, rows)}
+                                            onClick={() => this.downloadCSV(csvString)}
                                         >
                                             Download CSV
                                         </button>
