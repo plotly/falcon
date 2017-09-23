@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import update from 'react/lib/update';
 import createPlotlyComponent from 'react-plotlyjs';
 import Plotly from 'plotly.js/dist/plotly.min.js';
 import R from 'ramda';
@@ -23,83 +22,31 @@ export default class ChartEditor extends PureComponent {
         this.handleRemove = this.handleRemove.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleSelect = this.handleSelect.bind(this);
-
-        let columnTraceTypes = [];
-        this.props.columnNames.map(colName => (columnTraceTypes[colName] = 'scatter'));
-
-        this.state = {};
-    }
-
-    propsToState(newProps, oldProps) {
-        let newState = {};
-
-        const defaultState = {
-            xAxisColumnName: columnNames => columns[0],
-            yAxisColumnNames: columnNames => [columns[1]],
-            boxes: columnNames => columnNames.map(colName => ({name: colName, type: 'column'})),
-            droppedBoxNames: () => [],
-            selectedColumn: () => '',
-            selectedChartType: () => 'scatter'
-        }
-
-        if (nextProps.columnNames !== oldProps) {
-            // Reset props to defaults based off of columnNames
-            R.keys(defaultState).forEach(k => {
-                newState[k] = defaultState[k](nextProps.columnNames)
-            });
-            this.setState(newState);
-        } else if (nextProps.columnNames.length === 0) {
-            ['droppedBoxNames', 'selectedColumn', 'selectedChartType'].forEach(
-                k => newState[k] = defaultState[k]()
-            );
-            this.setState(newState);
-        } else {
-            R.keys(defaultState).forEach(k => {
-                newState[k] = newProps[k];
-            });
-            this.setState(newState);
-        }
-
-    }
-
-    componentWillMount() {
-        this.propsToState(this.props, {});
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this.propsToState(nextProps, this.props);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        // if( JSON.stringify(this.state) === JSON.stringify(nextState) ) {
-        //     return false;
-        // }
-
-        return true;
+        return (JSON.stringify(nextProps) !== this.props)
     }
 
     isDropped(boxName) {
-        return this.state.droppedBoxNames.indexOf(boxName) > -1;
+        return this.props.droppedBoxNames.indexOf(boxName) > -1;
     }
 
     render() {
-
         const PlotlyComponent = createPlotlyComponent(Plotly);
+
         const {
+            boxes,
+            columnNames,
+            droppedBoxNames,
+            plotJSON,
+            rows,
+            selectedChartType,
+            selectedColumn,
+            updatePlotJson,
+            updateProps,
             xAxisColumnName,
             yAxisColumnNames,
-            boxes,
-            droppedBoxNames,
-            selectedColumn,
-            selectedChartType
-        } = this.state;
-
-        const {
-            columnNames,
-            rows,
-            updateProps,
-            updatePlotJson,
-            plotJSON
         } = this.props;
 
         const columnLabel = selectedColumn ?
@@ -167,11 +114,10 @@ export default class ChartEditor extends PureComponent {
     }
 
     handleRemove(colName, axisType) {
-        let {selectedColumn} = this.state;
-        const {yAxisColumnNames} = this.state;
-        const {updateProps} = this.props;
+        let {selectedColumn} = this.props;
+        const {updateProps, yAxisColumnNames} = this.props;
 
-        if (colName === selectedColumn) {
+        if (colName === selectedColumn || yAxisColumnNames.length === 1) {
             selectedColumn = '';
         }
 
@@ -191,9 +137,8 @@ export default class ChartEditor extends PureComponent {
 
     handleSelect(event) {
         const traceType = event.target.value;
-        const selectedColumn = this.state.selectedColumn;
-        let columnTraceTypes = this.state.columnTraceTypes;
-        const {columnNames, updateProps} = this.props;
+        let columnTraceTypes = this.props.columnTraceTypes;
+        const {columnNames, selectedColumn, updateProps} = this.props;
 
         if (selectedColumn) {
             columnTraceTypes[selectedColumn] = traceType;
@@ -211,9 +156,8 @@ export default class ChartEditor extends PureComponent {
     }
 
     handleClick(colName) {
-        const {updateProps} = this.props;
-        const {columnTraceTypes} = this.state;
-        if (colName === this.state.selectedColumn) {
+        const {columnTraceTypes, selectedColumn, updateProps} = this.props;
+        if (colName === selectedColumn) {
             updateProps({selectedColumn: ''});
         }
         else{
@@ -226,30 +170,28 @@ export default class ChartEditor extends PureComponent {
 
     handleDrop(item, axisType) {
         const {name} = item;
-        const {updateProps} = this.props;
+        const {
+            updateProps,
+            droppedBoxNames,
+            xAxisColumnName,
+            yAxisColumnNames
+        } = this.props;
 
         if (axisType === 'xaxis') {
-            updateProps(update(this.state, {
-                droppedBoxNames: name ? {
-                    $push: [name],
-                } : {},
-                xAxisColumnName: {
-                    $set: name,
-                },
-            }));
+            updateProps({
+                droppedBoxNames: R.concat(droppedBoxNames, [name]),
+                xAxisColumnName: name
+            });
         }
         else if (axisType === 'yaxis') {
-            updateProps(update(this.state, {
-                droppedBoxNames: name ? {
-                    $push: [name],
-                } : {},
-                yAxisColumnNames: name ? {
-                    $push: [name],
-                } : {},
-                selectedColumn: {
-                    $set: name
-                }
-            }));
+            updateProps({
+                droppedBoxNames: R.concat(droppedBoxNames, [name]),
+                yAxisColumnNames: R.concat(
+                    yAxisColumnNames,
+                    [name]
+                ),
+                selectedColumn: name
+            });
         }
     }
 }
