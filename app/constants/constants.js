@@ -161,7 +161,7 @@ export const FAQ = [
         q: 'I ran into an issue - where can I get help?',
         a: 'Head over to the Plotly Forum for help from other Plotly users: \
             https://community.plot.ly/c/database-connector. For guaranteed prompt support by a Plotly engineer, \
-            consider purchasing a plot.ly Pro plan or Plotly On-Premises: https://plot.ly/plans'
+            consider purchasing a plot.ly Pro plan or Plotly On-Premises: https://plot.ly/plans.'
     }, {
         q: 'How does this app work?',
         a: 'This app is a SQL client. Connect to your database in the Connection tab, run SQL queries in the \
