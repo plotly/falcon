@@ -25,11 +25,20 @@ class Preview extends Component {
         this.runQuery = this.runQuery.bind(this);
         this.fetchDatacache = this.fetchDatacache.bind(this);
         this.updatePlotJson = this.updatePlotJson.bind(this);
+        this.downloadCSV = this.downloadCSV.bind(this);
 
         this.state = {
             plotlyLinks: [],
             plotJSON: {}
         };
+    }
+
+    downloadCSV(csvString) {
+        var encodedUri = encodeURI(csvString);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "data_export.csv");
+        link.click();        
     }
 
     fetchDatacache(payload, type) {
@@ -244,9 +253,9 @@ class Preview extends Component {
                                         getPlotJsonFromState({
                                             columnNames: columnnames,
                                             rows: rows,
-                                            xAxisColumnName: chartEditorProps.xAxisColumnName,
-                                            yAxisColumnName: chartEditorProps.yAxisColumnName,
-                                            columnTraceTypes: chartEditorProps.columnTraceTypes
+                                            xAxisColumnNames: chartEditorProps.xAxisColumnName || [],
+                                            yAxisColumnNames: chartEditorProps.yAxisColumnName || [],
+                                            columnTraceTypes: chartEditorProps.columnTraceTypes || {}
                                         })
                                     }
                                     updateProps={newProps => this.updatePreview({
@@ -257,12 +266,11 @@ class Preview extends Component {
                             </TabPanel>
 
                             <TabPanel
-                                style={{fontFamily: `'Ubuntu Mono', courier, monospace`}}
+                                style={{fontFamily: `'Ubuntu Mono', courier, monospace`, marginTop: '20px'}}
                             >
                                 <SQLTable
                                     rows={rows}
                                     columnNames={columnnames}
-                                    plotJSON = {getPlotJsonFromState(this.state)}
                                 />
                             </TabPanel>
 
@@ -271,13 +279,13 @@ class Preview extends Component {
                                     <div style={{margin: '20px 0'}}>
                                         <button
                                             className='btn btn-outline'
-                                            onClick={() => this.ƒcache(csvString, 'grid')}
+                                            onClick={() => this.fetchDatacache(csvString, 'grid')}
                                         >
                                             Send CSV to plot.ly
                                         </button>
                                         <button
                                             className='btn btn-outline'
-                                            onClick={() => this.downloadCSV(columnnames, rows)}
+                                            onClick={() => this.downloadCSV(csvString)}
                                         >
                                             Download CSV
                                         </button>
@@ -286,9 +294,9 @@ class Preview extends Component {
                                             onClick={() => this.fetchDatacache(JSON.stringify(getPlotJsonFromState({
                                                 columnNames: columnnames,
                                                 rows: rows,
-                                                xAxisColumnName: chartEditorProps.xAxisColumnName,
-                                                yAxisColumnName: chartEditorProps.yAxisColumnName,
-                                                columnTraceTypes: chartEditorProps.columnTraceTypes
+                                                xAxisColumnNames: chartEditorProps.xAxisColumnName || [],
+                                                yAxisColumnNames: chartEditorProps.yAxisColumnName || [],
+                                                columnTraceTypes: chartEditorProps.columnTraceTypes || {}
                                             }) || {}), 'plot')}
                                         >
                                             Send chart to plot.ly

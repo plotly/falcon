@@ -425,13 +425,14 @@ class Settings extends Component {
                                             <p>
                                                 {`Plotly is automatically initializing a
                                                   unique SSL certificate and URL for you.
-                                                  This can take up to 10 minutes. It has 
-                                                  been ${timeElapsed} Once this is complete, 
-                                                  you'll be able to query your databases from `}
+                                                  This can take up to 10 minutes. Once this 
+                                                  is complete, you'll be able to query your 
+                                                  databases from `}
                                                 <Link href={`${plotlyUrl}/create?upload=sql`}>
                                                         Plotly
                                                 </Link>
-                                                {'.'}
+                                                {`. It has been ${timeElapsed}. Check out the
+                                                FAQ while you wait! 📰`}
                                             </p>
                                         </div>
                                     )

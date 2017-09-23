@@ -158,27 +158,32 @@ export const INITIAL_CONNECTIONS = {
 
 export const FAQ = [
     {
+        q: 'I ran into an issue - where can I get help?',
+        a: 'Head over to the Plotly Forum for help from other Plotly users: \
+            https://community.plot.ly/c/database-connector. For guaranteed prompt support by a Plotly engineer, \
+            consider purchasing a plot.ly Pro plan or Plotly On-Premises: https://plot.ly/plans'
+    }, {
         q: 'How does this app work?',
         a: 'This app is a SQL client. Connect to your database in the Connection tab, run SQL queries in the \
             Query tab, then export your results as a CSV or share them online through plot.ly. Optionally, \
-            you can run this app as a middleman between plot.ly and your database. As long as this app stays open, it will \
-            send the latest data to plot.ly to update your charts and dashboards.'
+            you can run this app as a middleman between plot.ly and your database (see the next question).'
     }, {
-        q: 'I want to connect my dashboard to my database. How do I do that?',
-        a: 'Open the link in the "PLOT.LY" tab. From there, you can run and save a query that you want to be \
-            scheduled. Make a chart from the resulting data and embed it in your dashboard. As long as this app \
-            stays open, it will send the latest data to plot.ly to update your charts and dashboards.'
+        q: 'I want a persistent connection between my database and a chart hosted on plot.ly. How do I do that?',
+        a: 'Click the link in the "PLOT.LY" tab. This will open the plot.ly workspace with a connection to this app. \
+            From there, you can run, save, and schedule queries that will update your charts on plot.ly when your \
+            database updates. As long as this app stays open, it will send the latest data to plot.ly to update your \
+            chart. Here is a tutorial on scheduling queries: https://help.plot.ly/database-connectors/schedule-query/'
     }, {
         q: 'Am I exposing my database credentials to plot.ly?',
-        a: 'No. All of your credentials are only saved locally on this computer. We do not recommend uploading \
-            your database credentials to any cloud service.'
+        a: 'No. All of your credentials are only saved locally on this computer (the computer where the app is run). \
+            We do not recommend uploading your database credentials to any cloud service.'
     }, {
         q: 'Where do I make SQL queries?',
-        a: 'For one-shot queries, make them in this app (see the "QUERY" tab). For queries that you want to \
-            schedule, make them in the plot.ly workspace (see the "PLOT.LY" tab).'
+        a: 'For one-shot queries, make them in this app (see the "QUERY" tab). If you want a persistent connection \
+            between your charts and your database, make them in the plot.ly workspace (see the "PLOT.LY" tab).'
     }, {
         q: 'Is this app open-source?',
-        a: 'Yep! You can view and contribute to the code on GitHub: \
+        a: 'Yep! You can view and contribute to the source code on GitHub: \
             https://github.com/plotly/plotly-database-connector.'
     }, {
         q: '[Advanced] How do scheduled queries work?',
@@ -188,19 +193,19 @@ export const FAQ = [
             queries will run automatically and their scheduling timer will reset. We recommend setting up \
             this app on an office computer or server if you want it to update a chart or dashboard 24/7. \
             If you have Plotly On-Premises, you\'re in luck - this app is already running in your Plotly \
-            On-Premises container.'
+            On-Premises container. Contact your On-Prem admin to learn how to access it.'
     }, {
         q: '[Advanced] What\'s an SSL certificate (and why do I need one?)',
         a: 'An SSL certificate is used to encrypt the requests between your web browser and this \
             connector. Unencrypted requests are blocked by default in modern web browsers. \
             We generate these certificates for you automatically through Let\'s Encrypt. This \
-            certificate takes a several minutes to generate.'
+            certificate takes several minutes to generate.'
     }, {
         q: '[Advanced] How do you generate certificates for a localhost web server?',
-        a: 'This application runs a server locally on localhost: it is not exposed to the network. SSL \
-            certificates cannot be issued for localhost servers, so we create a unique URL for you \
+        a: 'This application runs a server locally on localhost: It is not exposed to the network. SSL \
+            certificates cannot be issued for localhost servers, so we create a unique, loxL URL for you \
             and a global DNS entry that points that URL to localhost. We use Let\'s Encrypt \
-            to generate certificates on that unique URL.'
+            to generate certificates for that unique, local URL.'
     }
 ];
 

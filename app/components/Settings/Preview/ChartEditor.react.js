@@ -30,7 +30,7 @@ export default class ChartEditor extends PureComponent {
         this.state = {};
     }
 
-    propsToState(newProps, oldProps) {
+    propsToState(nextProps, oldProps) {
         let newState = {};
 
         const defaultState = {
@@ -55,7 +55,7 @@ export default class ChartEditor extends PureComponent {
             this.setState(newState);
         } else {
             R.keys(defaultState).forEach(k => {
-                newState[k] = newProps[k];
+                newState[k] = nextProps[k];
             });
             this.setState(newState);
         }
