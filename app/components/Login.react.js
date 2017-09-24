@@ -1,11 +1,12 @@
 import fetch from 'isomorphic-fetch';
 import React, {Component} from 'react';
 import {render} from 'react-dom';
+import { connect } from 'react-redux';
 import {
     baseUrl,
     dynamicRequireElectron
 } from '../utils/utils';
-import {Link} from '../components/Link.react';
+import {Link} from './Link.react';
 import {productName, version} from '../../package.json';
 import {contains} from 'ramda';
 
@@ -348,4 +349,4 @@ class Login extends Component {
     }
 }
 
-render(<Login/>, document.getElementById('root'));
+export default connect()(Login);
