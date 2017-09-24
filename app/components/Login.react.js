@@ -1,7 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import React, {Component} from 'react';
-import {render} from 'react-dom';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import {
     baseUrl,
     dynamicRequireElectron
