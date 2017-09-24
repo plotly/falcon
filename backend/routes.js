@@ -273,7 +273,7 @@ export default class Servers {
         // Keeping the base route to have backwards compatibility.
         server.get('/', restify.serveStatic({
             directory: `${__dirname}/../static`,
-            file: 'login.html'
+            file: 'index.html'
         }));
 
         server.post('/logout', function logoutHandler(req, res, next) {
