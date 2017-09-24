@@ -8,6 +8,7 @@ import {productName, version} from '../package.json';
 
 import Login from './components/Login.react'
 import Configuration from './components/Configuration.react'
+import Status from './components/Oauth.react'
 
 const store = configureStore();
 
@@ -18,6 +19,7 @@ render(
       <Router history={browserHistory}>
         <Route exact path='/' component={Login} />
         <Route path='/database-connector' component={Configuration} />
+        <Route path='/oauth2/callback' component={Status} />
       </Router>
     </Provider>,
     document.getElementById('root')
