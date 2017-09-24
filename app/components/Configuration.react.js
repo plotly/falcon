@@ -1,10 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 import DropdownMenu from 'react-dd-menu';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import Settings from './Settings/Settings.react';
 import {baseUrl} from '../utils/utils';
 import {Link} from './Link.react';
 import {contains} from 'ramda';
+import * as SessionsActions from '../actions/sessions';
 
 const LINKS = {
     PLANS: 'http://plot.ly/plans/',
@@ -15,7 +18,7 @@ const LINKS = {
 };
 const ONPREM = contains('external-data-connector', window.location.href);
 
-export default class Configuration extends Component {
+class Configuration extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -54,3 +57,14 @@ export default class Configuration extends Component {
 Configuration.propTypes = {
     sessionsActions: PropTypes.object
 };
+
+function mapStateToProps(state) {
+    return {sessions: state.sessions};
+}
+
+function mapDispatchToProps(dispatch) {
+    const sessionsActions = bindActionCreators(SessionsActions, dispatch);
+    return {sessionsActions};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Configuration);
