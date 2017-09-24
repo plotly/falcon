@@ -1,7 +1,7 @@
 import queryString from 'query-string';
 import fetch from 'isomorphic-fetch';
 import React, {Component} from 'react';
-import {render} from 'react-dom';
+import {connect} from 'react-redux';
 
 class Status extends Component {
     constructor(props) {
@@ -102,4 +102,4 @@ class Status extends Component {
 
 }
 
-render(<Status/>, document.getElementById('root'));
+export default connect()(Status);
