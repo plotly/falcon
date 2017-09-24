@@ -10,7 +10,6 @@ const config = {
 
     entry: {
         'web': './app/index',
-        'oauth': './app/oauth/index'
     },
 
     output: {
