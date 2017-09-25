@@ -387,7 +387,7 @@ class Settings extends Component {
                                     {httpsServerIsOK ? (
                                         <div id="test-ssl-initialized" style={{textAlign: 'center'}}>
                                             <img 
-                                                src="../../../images/architecture.png" 
+                                                src="/static/images/architecture.png" 
                                                 style={{border: '1px solid #ebf0f8'}}
                                             >
                                             </img>

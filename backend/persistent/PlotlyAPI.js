@@ -32,8 +32,6 @@ export function newDatacache(payloadJSON, type) {
     form.append('payload', payloadJSON);
     const body = form;
 
-    console.log('-----------------------', body);
-
     return fetch("https://plot.ly/datacache", {
         method: 'POST',
         body: body

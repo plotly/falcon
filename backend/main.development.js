@@ -55,33 +55,6 @@ app.on('ready', () => {
         mainWindow = null;
     });
 
-    /*mainWindow.webContents.on("submit", function(event){
-        console.log('yo gaba gaba');
-        event.preventDefault();
-        shell.openExternal(this.action);
-    });*/
-
-    /*mainWindow.webContents.on('new-window', function(event){
-        console.log('-------');
-        event.preventDefault();
-        //shell.openExternal(this.action);
-        mainWindow.loadURL('https://plot.ly/datagrid', {
-          postData: [{
-            type: 'rawData',
-            bytes: Buffer.from(JSON.stringify({ "data": {"cols": {"first": {"data": [1,2,3], "order": 0}}}}))
-          }],
-          extraHeaders: 'Content-Type: application/x-www-form-urlencoded'
-        });     
-    });*/
-
-    /*mainWindow.webContents.on('will-navigate', function(event, url){
-        console.log('-------', url);
-        if (url.indexOf('datagrid') >= 0) {
-            event.preventDefault();
-            shell.openExternal(url);
-        }
-    });*/
-
     setupMenus(app, mainWindow);
 
 });

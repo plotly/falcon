@@ -203,7 +203,7 @@ export const FAQ = [
     }, {
         q: '[Advanced] How do you generate certificates for a localhost web server?',
         a: 'This application runs a server locally on localhost: It is not exposed to the network. SSL \
-            certificates cannot be issued for localhost servers, so we create a unique, loxL URL for you \
+            certificates cannot be issued for localhost servers, so we create a unique, local URL for you \
             and a global DNS entry that points that URL to localhost. We use Let\'s Encrypt \
             to generate certificates for that unique, local URL.'
     }

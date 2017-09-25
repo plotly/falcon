@@ -2,6 +2,7 @@ var restify = require('restify');
 import * as Datastores from './persistent/datastores/Datastores.js';
 import * as fs from 'fs';
 import os from 'os';
+import path from 'path';
 import webContents from 'electron';
 
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
@@ -492,21 +493,18 @@ export default class Servers {
                 datacacheResp.then(plotlyRes => plotlyRes.json().then(resJSON => {
                     return res.json(plotlyRes.status, resJSON);
                 })).catch(err => {
-                    console.error(err);
                     throw new Error(err);
                 });                
             }
             else {
                 const rand = Math.round(Math.random()*1000).toString();
-                const path = os.homedir().concat('/data_export_', rand, '.csv');
-                console.log('CSV: ', path);
-                fs.writeFile(path, payload, (err) => {
+                const downloadPath = path.join(getSetting('STORAGE_PATH'), `data_export_${rand}.csv`);
+                fs.writeFile(downloadPath, payload, (err) => {
                     if (err){
-                        console.error(err);
                         return res.json({type: 'error', message: err});                        
                     }
                     return res.json({
-                        type: 'csv', url: 'file:///'.concat(path)
+                        type: 'csv', url: 'file:///'.concat(downloadPath)
                     });
                 });
             }

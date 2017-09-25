@@ -1475,18 +1475,6 @@ describe('Routes - ', () => {
         })).catch(done);
     });
 
-    it.only('datacache - works', function(done) {
-        this.timeout(20 * 1000);
-        POST('datacache', {payload: {data: {cols: {data: [1,2,3]}}}, type: 'grid'})
-        .then(res => res.json().then(json => {
-            assert.deepEqual(
-                json,
-                {error: {message: 'syntax error at or near "SELECZ"'}}
-            );
-            assert.equal(res.status, 400);            
-        })).catch(done);
-    })
-
     it('uncaught-exceptions - uncaught exceptions get thrown OK ', function(done) {
         this.timeout(3 * 1000);
         POST('_throw')
