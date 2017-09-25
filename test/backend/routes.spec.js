@@ -254,7 +254,7 @@ describe('Routes - ', () => {
 
     // OAuth
     it('oauth - returns 200 on loading the oauth page', function(done) {
-        GET('oauth2/callback')
+        GET('oauth2')
         .then(res => {
             assert.equal(res.status, 200);
             done();
@@ -271,7 +271,7 @@ describe('Routes - ', () => {
             []
         );
 
-        POST('oauth2/token', {
+        POST('oauth2', {
             access_token: accessToken
         })
         .then(res => res.json().then(json => {
@@ -283,7 +283,7 @@ describe('Routes - ', () => {
             );
 
             // We can save it again and we'll get a 200 instead of a 201
-            POST('oauth2/token', {access_token: accessToken})
+            POST('oauth2', {access_token: accessToken})
             .then(res => res.json().then(json => {
                 assert.deepEqual(json, {});
                 assert.equal(res.status, 200);
@@ -296,7 +296,7 @@ describe('Routes - ', () => {
     xit('oauth - saving an access token that is not associated with a user account will fail with a 500 level error', function(done) {
         saveSetting('USERS', []);
         const access_token = 'lah lah lemons';
-        POST('oauth2/token', {access_token})
+        POST('oauth2', {access_token})
         .then(res => res.json().then(json => {
             assert.deepEqual(json, {
                 error: {
