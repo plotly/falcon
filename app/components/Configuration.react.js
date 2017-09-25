@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import DropdownMenu from 'react-dd-menu';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import Settings from './Settings/Settings.react';
 import {baseUrl} from '../utils/utils';
 import {Link} from './Link.react';
