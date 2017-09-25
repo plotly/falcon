@@ -186,7 +186,7 @@ export default class Servers {
             directory: `${__dirname}/../app/`
         }));
 
-        server.get(/\/oauth2\/callback\/?$/, restify.serveStatic({
+        server.get(/\/oauth2\/?$/, restify.serveStatic({
             directory: `${__dirname}/../static`,
             file: 'index.html'
         }));
@@ -232,7 +232,7 @@ export default class Servers {
             res.json(200, {http: HTTP_URL, https: HTTPS_URL});
         });
 
-        server.post(/\/oauth2\/token\/?$/, function saveOauth(req, res, next) {
+        server.post(/\/token\/?$/, function saveOauth(req, res, next) {
             const {access_token} = req.params;
             Logger.log(`Checking token ${access_token} against ${getSetting('PLOTLY_API_URL')}/v2/users/current`);
             fetch(`${getSetting('PLOTLY_API_URL')}/v2/users/current`, {
@@ -281,7 +281,7 @@ export default class Servers {
             res.redirect('/', next);
         });
 
-        server.get('/database-connector', restify.serveStatic({
+        server.get('/login', restify.serveStatic({
             directory: `${__dirname}/../static`,
             file: 'index.html'
         }));
@@ -487,21 +487,21 @@ export default class Servers {
         server.post('/datacache', function getDatacacheHandler(req, res, next) {
 
             const {payload, type} = req.params;
-            
+
             if (type !== 'csv') {
                 const datacacheResp = newDatacache(payload, type);
                 datacacheResp.then(plotlyRes => plotlyRes.json().then(resJSON => {
                     return res.json(plotlyRes.status, resJSON);
                 })).catch(err => {
                     throw new Error(err);
-                });                
+                });
             }
             else {
                 const rand = Math.round(Math.random()*1000).toString();
                 const downloadPath = path.join(getSetting('STORAGE_PATH'), `data_export_${rand}.csv`);
                 fs.writeFile(downloadPath, payload, (err) => {
                     if (err){
-                        return res.json({type: 'error', message: err});                        
+                        return res.json({type: 'error', message: err});
                     }
                     return res.json({
                         type: 'csv', url: 'file:///'.concat(downloadPath)

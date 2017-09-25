@@ -17,9 +17,9 @@ window.document.title = `${productName} v${version}`;
 render(
     <Provider store={store}>
       <Router history={browserHistory}>
-        <Route exact path='/' component={Login} />
-        <Route path='/database-connector' component={Configuration} />
-        <Route path='/oauth2/callback' component={Status} />
+        <Route exact path='/' component={Configuration} />
+        <Route path='/login' component={Login} />
+        <Route path='/oauth2' component={Status} />
       </Router>
     </Provider>,
     document.getElementById('root')
