@@ -1,18 +1,18 @@
 import fetch from 'isomorphic-fetch';
 import React, {Component} from 'react';
-import {render} from 'react-dom';
+import {connect} from 'react-redux';
 import {
     baseUrl,
     dynamicRequireElectron
 } from '../utils/utils';
-import {Link} from '../components/Link.react';
+import {Link} from './Link.react';
 import {productName, version} from '../../package.json';
 import {contains} from 'ramda';
 
 
 const currentEndpoint = '/login';
 const baseUrlWrapped = baseUrl().replace(currentEndpoint, '');
-const connectorUrl = '/database-connector';
+const connectorUrl = '/';
 
 const CLOUD = 'cloud';
 const ONPREM = 'onprem';
@@ -79,7 +79,7 @@ class Login extends Component {
         return (
             `${plotlyDomain}/o/authorize/?response_type=token&` +
             `client_id=${oauthClientId}&` +
-            `redirect_uri=${redirect_uri}/oauth2/callback`
+            `redirect_uri=${redirect_uri}/oauth2`
         );
     }
 
@@ -348,4 +348,4 @@ class Login extends Component {
     }
 }
 
-render(<Login/>, document.getElementById('root'));
+export default connect()(Login);
