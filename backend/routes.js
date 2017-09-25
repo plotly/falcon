@@ -232,7 +232,7 @@ export default class Servers {
             res.json(200, {http: HTTP_URL, https: HTTPS_URL});
         });
 
-        server.post(/\/token\/?$/, function saveOauth(req, res, next) {
+        server.post(/\/oauth2\/?$/, function saveOauth(req, res, next) {
             const {access_token} = req.params;
             Logger.log(`Checking token ${access_token} against ${getSetting('PLOTLY_API_URL')}/v2/users/current`);
             fetch(`${getSetting('PLOTLY_API_URL')}/v2/users/current`, {

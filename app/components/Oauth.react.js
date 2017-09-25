@@ -25,7 +25,7 @@ class Status extends Component {
         window.queryString = queryString;
 
         this.setState({status: 'loading'});
-        fetch('./token', {
+        fetch('./oauth2', {
             credentials: 'include',
             method: 'POST',
             headers: {
