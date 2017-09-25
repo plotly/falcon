@@ -44,22 +44,7 @@ export default class Configuration extends Component {
 
         return (
             <div className="fullApp">
-                <div className="header">
-
-                    <span className="supportLinksContainer">
-                        <div className="externalLinkContainer">
-                            <DropdownMenu {...menuOptions}>
-                                <li><Link className="supportLinks" href={LINKS.ABOUT}>About this App</Link></li>                            
-                                <li><Link className="supportLinks" href={LINKS.DOCS}>Documentation</Link></li>
-                                <li><Link className="supportLinks" href={LINKS.TYPEFORM}>Request a Connector</Link></li>
-                                <li><Link className="supportLinks" href={LINKS.GITHUB}>Code on GitHub</Link></li>
-                            </DropdownMenu>
-                        </div>
-                    </span>
-                </div>
-
                 <Settings/>
-
             </div>
 
         );

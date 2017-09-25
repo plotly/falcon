@@ -2,7 +2,7 @@
 import {transpose} from 'ramda';
 import {DEFAULT_DATA, DEFAULT_LAYOUT, DEFAULT_COLORS} from './editorConstants';
 
-export default function getPlotJsonFromState(state) {        
+export default function getPlotJsonFromState(state) {
     let data = DEFAULT_DATA;
     let layout = DEFAULT_LAYOUT;
 
@@ -11,23 +11,23 @@ export default function getPlotJsonFromState(state) {
     const rowData = state.rows;
 
     // Get chart configuration
-    const {xAxisColumnName, yAxisColumnNames, columnTraceTypes}  = state;
+    const {xAxisColumnName, yAxisColumnNames, columnTraceTypes} = state;
 
     const colsWithTraceTypes = Object.keys(columnTraceTypes);
 
-    if (typeof allColumnNames !== undefined && typeof rowData !== undefined) {            
+    if (typeof allColumnNames !== undefined && typeof rowData !== undefined) {
         data = [];
-        const columnData = transpose(rowData);            
+        const columnData = transpose(rowData);
         let yColName = '';
-        let xColumnData;            
+        let xColumnData;
         let yColumnData;
         let traceColor;
-        let traceType;            
+        let traceType;
         let dataObj;
 
         // eslint-disable-next-line
         yAxisColumnNames.map((yColName, i) => {
-            
+
             const numColors = DEFAULT_COLORS.length;
             const colorWheelIndex = parseInt(numColors * (i/numColors), 10);
             traceColor = DEFAULT_COLORS[colorWheelIndex];
@@ -43,11 +43,11 @@ export default function getPlotJsonFromState(state) {
             const dataTemplate = {
                 name: yColName,
                 mode: traceType === 'line' || traceType === 'area' ? 'lines' : 'markers',
-                fill: traceType === 'area' ? 'tozeroy' : null,                                       
+                fill: traceType === 'area' ? 'tozeroy' : null,
             };
 
             dataObj = {
-                x: xColumnData, 
+                x: xColumnData,
                 y: yColumnData,
                 type: traceType,
                 marker: {
@@ -61,7 +61,7 @@ export default function getPlotJsonFromState(state) {
 
             if (traceType === 'scattergeo-usa' || traceType === 'scattergeo-world') {
                 dataObj = {
-                    lat: xColumnData, 
+                    lat: xColumnData,
                     lon: yColumnData,
                     type: 'scattergeo',
                     marker: {
@@ -75,26 +75,26 @@ export default function getPlotJsonFromState(state) {
             }
             else if (traceType === 'choropleth-usa') {
                 dataObj = {
-                    locations: xColumnData, 
+                    locations: xColumnData,
                     z: yColumnData,
                     type: 'choropleth',
-                    locationmode: 'USA-states',                    
+                    locationmode: 'USA-states',
                     colorscale: [[0, 'rgb(242,240,247)'], [0.2, 'rgb(218,218,235)'],
                         [0.4, 'rgb(188,189,220)'], [0.6, 'rgb(158,154,200)'],
                         [0.8, 'rgb(117,107,177)'], [1, 'rgb(84,39,143)']]
-                };   
+                };
             }
             else if (traceType === 'choropleth-world') { ;
                 dataObj = {
-                    locations: xColumnData, 
+                    locations: xColumnData,
                     z: yColumnData,
                     type: 'choropleth',
                     locationmode: 'country names',
                     colorscale: [[0,'rgb(5, 10, 172)'],[0.35,'rgb(40, 60, 190)'],
                         [0.5,'rgb(70, 100, 245)'], [0.6,'rgb(90, 120, 245)'],
                         [0.7,'rgb(106, 137, 247)'],[1,'rgb(220, 220, 220)']]
-                };   
-            }                       
+                };
+            }
             else if (traceType === 'pie') {
                 delete dataObj.x;
                 delete dataObj.y;
@@ -102,12 +102,16 @@ export default function getPlotJsonFromState(state) {
                 let pieColors = [];
                 Array(100).fill().map(i => pieColors = pieColors.concat(DEFAULT_COLORS));
                 dataObj = {
-                    values: xColumnData, 
+                    values: xColumnData,
                     labels: yColumnData,
                     marker: {colors: pieColors},
                     hole: 0.2,
                     pull: 0.05
                 };
+            }
+
+            if ((traceType === 'scatter' || traceType === 'line') && xColumnData.length > 20000) {
+                dataObj.type = 'scattergl';
             }
 
             data.push(Object.assign(dataObj, dataTemplate));
@@ -123,7 +127,7 @@ export default function getPlotJsonFromState(state) {
         layout['barmode'] = 'stack';
         layout['yaxis']['title'] = ' ';
         layout['yaxis']['gridcolor'] = '#dfe8f3';
-        layout['font'] = {color: '#506784', size: '12px'};  
+        layout['font'] = {color: '#506784', size: '12px'};
         if (allColumnNames.length === 2) {
             layout['yaxis'] = {};
             layout['yaxis']['title'] = yColName;
@@ -168,7 +172,7 @@ export default function getPlotJsonFromState(state) {
                 gridwidth: 0.5,
                 range: [ 20.0, 60.0 ],
                 dtick: 5
-            };            
+            };
         }
     }
 

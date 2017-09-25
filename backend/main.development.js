@@ -1,4 +1,4 @@
-import {app, BrowserWindow} from 'electron';
+import {app, BrowserWindow, shell} from 'electron';
 import {contains, join, isEmpty} from 'ramda';
 import Logger from './logger';
 import {setupMenus} from './menus';
@@ -21,6 +21,7 @@ Logger.log('Loading persistent queries', 2);
 Logger.log('Electron version: ' + process.versions.electron, 2);
 Logger.log('Chrome version: ' + process.versions.chrome, 2);
 server.queryScheduler.loadQueries();
+
 
 app.on('ready', () => {
 

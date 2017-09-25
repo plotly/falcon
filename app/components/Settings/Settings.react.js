@@ -308,7 +308,7 @@ class Settings extends Component {
                     deleteTab={deleteTab}
                 />
 
-                <div className={'openTab'} style={{padding: 30}}>
+                <div className={'openTab'}>
 
                     <Tabs defaultIndex={0}>
 
@@ -319,11 +319,10 @@ class Settings extends Component {
                             ) : (
                                 <Tab disabled={true}>Loading...</Tab>
                             )}
-                            <Tab>SSL Certificate</Tab>
                             <Tab
                                 className="test-ssl-tab react-tabs__tab"
                             >
-                                External Apps
+                                Plot.ly
                             </Tab>
                             <Tab>FAQ</Tab>
                         </TabList>
@@ -337,7 +336,7 @@ class Settings extends Component {
                             {this.props.connectRequest.status === 200 ? (
                                 <SplitPane
                                     split="vertical"
-                                    minSize={100}
+                                    minSize={10}
                                     defaultSize={200}
                                     maxSize={800}
                                     style={{position:'relative !important'}}
@@ -354,7 +353,7 @@ class Settings extends Component {
                                             />
                                         }
                                     </div>
-                                    <div style={{width: '800px'}}>
+                                    <div>
                                         <Preview
                                             connectionObject={connections[selectedTab]}
                                             previewTableRequest={previewTableRequest || {}}
@@ -376,73 +375,43 @@ class Settings extends Component {
                                     </div>
                                 </SplitPane>
                             ) : (
-                                <p>You must connect to a data store first.</p>
-                            )}
-                        </TabPanel>
-
-                        <TabPanel>
-                            {this.props.connectRequest.status === 200 ? (
-                                <div>
-                                    {httpsServerIsOK ? (
-                                        <div>
-                                            <div>
-                                                <p>
-                                                    {'No action required. Plotly has already generated a unique SSL certificate for this app.'}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div>
-                                            <p>
-                                                {`Plotly is automatically initializing a
-                                                  unique SSL certificate and URL for you.
-                                                  This can take up to 10 minutes.`}
-                                            </p>
-                                            <p>
-                                                {`It has been ${timeElapsed}`}.
-                                            </p>
-                                            <p>
-                                                {`Once this is complete, you'll be able to
-                                                  query your databases from `}
-                                                <Link href={`${plotlyUrl}/create?upload=sql`}>
-                                                        Plotly
-                                                </Link>
-                                                {'.'}
-                                            </p>
-                                        </div>
-                                    )}
+                                <div className="big-whitespace-tab">
+                                    <p>Please connect to a data store in the Connection tab first.</p>
                                 </div>
-                            ) : (
-                                <p>You must connect to a data store first.</p>
                             )}
                         </TabPanel>
 
                         <TabPanel>
                             {this.props.connectRequest.status === 200 ? (
-                                <div>
+                                <div className="big-whitespace-tab">
                                     {httpsServerIsOK ? (
-                                        <div id="test-ssl-initialized">
+                                        <div id="test-ssl-initialized" style={{textAlign: 'center'}}>
+                                            <img 
+                                                src="/static/images/architecture.png" 
+                                                style={{border: '1px solid #ebf0f8'}}
+                                            >
+                                            </img>
                                             <p>
-                                                {`This App is a secure middleman between your database and external apps`}
+                                                {`The Plotly Database Connector (PDC) can be a middle man between 
+                                                    your database and Plot.ly, so that when your database updates, 
+                                                    your charts and dashboards update as well. Run PDC on a server 
+                                                    for 24/7 dashboard updates, or just keep this app open on an 
+                                                    office computer. If you have Plotly On-Premises, this app is 
+                                                    already running in your container. Contact your On-Prem admin
+                                                    to learn how to connect.`}
                                             </p>
-                                            <p>                                            
-                                                {`Click "Open Plotly" below to query directly from within Plotly's chart workspace.`}
-                                            </p>
+
                                             <Link
                                                 className='btn-primary'
-                                                style={{maxWidth: '100px'}}
+                                                style={{maxWidth: '50%', marginTop: '40px', marginBottom: '30px'}}
                                                 href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}
                                                 target="_blank"
                                             >
-                                                Open Plotly
+                                                Query {dialect} from plot.ly
                                             </Link>                                            
-                                            <p>
-                                                {`As long as this App stays open, Plotly charts will update 
-                                                automatically with the latest data. Run this app on a 
-                                                server to update charts 24/7. See FAQ for more info.`}
-                                            </p>
-                                            <div style={{textAlign: 'center'}}>
-                                                <small>This App's autogenerated URL: </small>
+                                            <div>
+                                                <code>PDC has auto-generated a local URL and SSL certificate for itself: </code>
+                                                <br />
                                                 <Link
                                                     href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}
                                                     target="_blank"
@@ -453,24 +422,36 @@ class Settings extends Component {
                                         </div>
                                     ) : (
                                         <div>
-                                            <p>{`Before you can query, wait until Plotly has
-                                              finished Step 3 for you.`}</p>
+                                            <p>
+                                                {`Plotly is automatically initializing a
+                                                  unique SSL certificate and URL for you.
+                                                  This can take up to 10 minutes. Once this 
+                                                  is complete, you'll be able to query your 
+                                                  databases from `}
+                                                <Link href={`${plotlyUrl}/create?upload=sql`}>
+                                                        Plotly
+                                                </Link>
+                                                {`. It has been ${timeElapsed}. Check out the
+                                                FAQ while you wait! 📰`}
+                                            </p>
                                         </div>
                                     )
                                     }
                                 </div>
                             ) : (
-                                <p>You must connect to a data store first.</p>
+                                <div className="big-whitespace-tab">
+                                    <p>Please connect to a data store in the Connection tab first.</p>
+                                </div>
                             )}
                         </TabPanel>
 
                         <TabPanel>
-                            <div>
+                            <div className="big-whitespace-tab">
                                 <ul>
                                     {FAQ.map(function(obj, i){
                                         return (
                                             <li key={i}>
-                                                <strong>{obj.q}</strong>
+                                                {obj.q}
                                                 <p>{obj.a}</p>
                                             </li>
                                         );

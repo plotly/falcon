@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import {getSetting} from '../settings.js';
 import Logger from '../logger';
+import FormData from 'form-data';
 
 export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessToken, method}) {
     let authorization;
@@ -25,6 +26,22 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
     });
 }
 
+export function newDatacache(payloadJSON, type) {
+    let form = new FormData();
+    form.append('type', type)
+    form.append('payload', payloadJSON);
+    const body = form;
+
+    return fetch("https://plot.ly/datacache", {
+        method: 'POST',
+        body: body
+    }).then(res => {
+        return res;
+    }).catch(err => {
+        console.error(err);
+        throw new Error(err);
+    });
+}
 
 export function updateGrid(rows, fid, uids, requestor) {
     const username = requestor;

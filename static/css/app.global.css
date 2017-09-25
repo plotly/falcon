@@ -133,6 +133,18 @@ button:active, .btn-primary:active {
     border: 1px solid #0d76bf;
 }
 
+button.btn-outline {
+    background: #fff;
+    color: #119DFF;
+    display: inline-block;
+    margin-right: 20px;
+    text-shadow: none;
+    padding: 9px 18px;
+    font-weight: 300;
+    border-radius: 4px;
+    font-size: 12px;    
+}
+
 .dd-menu > button {
     color: #506784;
     background: transparent;

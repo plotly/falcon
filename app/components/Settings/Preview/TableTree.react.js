@@ -19,7 +19,7 @@ class TableTree extends Component {
         }
         else if (isEmpty(schemaRequest)) {
             getSqlSchema();
-        } 
+        }
         else if (schemaRequest.status === 200 && !has('treeSchema', this.props.preview)) {
             let treeSchema = {};
             schemaRequest.content.rows.forEach(function(row) {
