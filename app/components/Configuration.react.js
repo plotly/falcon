@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import DropdownMenu from 'react-dd-menu';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
