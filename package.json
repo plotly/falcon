@@ -203,7 +203,6 @@
     "ramda": "^0.21.0",
     "react": "^15.5.1",
     "react-ace": "^3.4.1",
-    "react-dd-menu": "^2.0.2",
     "react-dnd": "^2.5.1",
     "react-dnd-html5-backend": "^2.5.1",
     "react-dom": "^15.5.1",
