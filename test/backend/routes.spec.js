@@ -89,7 +89,7 @@ function DELETE(path) {
 function setCookies() {
 
   // Sets cookies using `oauth` route, so that other requests can be authenticated:
-  return POST('oauth2/token', {access_token: accessToken})
+  return POST('oauth2', {access_token: accessToken})
   .then(res => res.json().then(json => {
       assert.deepEqual(json, {});
       assert.equal(res.status, 200);
@@ -121,9 +121,11 @@ describe('Servers - ', () => {
 
     it('Https server is up and running after an http server was started and certs were created.', (done) => {
         servers = new Servers({createCerts: false, startHttps: true});
+
         servers.httpServer.start();
         saveSetting('USERS', [{username, accessToken}]);
         saveSetting('CONNECTOR_HTTPS_DOMAIN', `${fakeCerts.subdomain}.${testCA}`);
+        saveSetting('AUTH_ENABLED', false);
         assert.isNull(servers.httpsServer.certs, 'Has no certs in the beginning.');
         assert.isNull(servers.httpsServer.server, 'Https server does not exists initially');
         fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
@@ -214,14 +216,20 @@ describe('Authentication - ', () => {
         .catch(done);
     });
 
-    it('works for home-page without logging in', function(done) {
-        GET('/')
+    it('allows access to login page without logging in', function(done) {
+        GET('login')
         .then(() => done())
         .catch(done);
     });
 
-    it('gives error for connections page when not logged in', function(done) {
-        GET('/')
+    it('allows access to connections page without logging in', function(done) {
+        GET('')
+        .then(() => done())
+        .catch(done);
+    });
+
+    it('does not allow access to settings when not logged in', function(done) {
+        GET('settings')
         .then(res => res.json().then(json => {
             assert.equal(res.status, 401);
             assert.deepEqual(json, {
@@ -232,22 +240,11 @@ describe('Authentication - ', () => {
         })).catch(done);
     });
 
-    it('does not allow access to settings when not logged in', function(done) {
-        GET('/settings')
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 401);
-            assert.deepEqual(json, {'code': 'Forbidden', 'message': ''});
-            done();
-        })).catch(done);
-    });
+    it('allows access to settings when logged in', function(done) {
 
-    it('works for connections page when logged in', function(done) {
-
-        // POST to 'oauth2/token' so that cookies are saved, and then
-        // proceed to connections page:
         setCookies().then(res => {
 
-            GET('/')
+            GET('settings')
             .then(res => {
                 assert.equal(res.status, 200);
                 done();
@@ -255,9 +252,8 @@ describe('Authentication - ', () => {
         });
 
     });
-
-
 });
+
 
 describe('Routes - ', () => {
     beforeEach(() => {
@@ -307,51 +303,6 @@ describe('Routes - ', () => {
             done();
         })
         .catch(done);
-    });
-
-    // Settings
-    it('settings/urls - returns 200 and the urls', function(done) {
-        GET('settings/urls')
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 200);
-            assert.equal(json.http, 'http://localhost:9494');
-            assert.equal(json.https, '');
-            done();
-        }))
-        .catch(done);
-    });
-
-    it('GET /settings returns some of the settings', function(done) {
-        saveSetting(
-            'USERS',
-            [{'username': 'chris', 'accessToken': 'lahlahlemons'}]
-        );
-        GET('settings')
-        .then(res => res.json().then(json => {
-            assert.deepEqual(json, {
-                'PLOTLY_URL': 'https://plot.ly',
-                'USERS': ['chris']
-            });
-            done();
-        })).catch(done);
-    });
-
-    it('PATCH /settings sets some settings', function(done) {
-        const newSettings = {
-            'PLOTLY_API_DOMAIN': 'acme.plot.ly',
-            'PLOTLY_API_SSL_ENABLED': false
-        };
-        PATCH('settings', newSettings).then(res => res.json().then(json => {
-            assert.equal(
-                getSetting('PLOTLY_API_SSL_ENABLED'),
-                newSettings.PLOTLY_API_SSL_ENABLED
-            );
-            assert.equal(
-                getSetting('PLOTLY_API_DOMAIN'),
-                newSettings.PLOTLY_API_DOMAIN
-            );
-            done();
-        })).catch(done);
     });
 
     // OAuth
@@ -412,6 +363,51 @@ describe('Routes - ', () => {
             assert.deepEqual(
                 getSetting('USERS'),
                 []
+            );
+            done();
+        })).catch(done);
+    });
+
+    // Settings
+    it('settings/urls - returns 200 and the urls', function(done) {
+        GET('settings/urls')
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 200);
+            assert.equal(json.http, 'http://localhost:9494');
+            assert.equal(json.https, '');
+            done();
+        }))
+        .catch(done);
+    });
+
+    it('GET /settings returns some of the settings', function(done) {
+        saveSetting(
+            'USERS',
+            [{'username': 'chris', 'accessToken': 'lahlahlemons'}]
+        );
+        GET('settings')
+        .then(res => res.json().then(json => {
+            assert.deepEqual(json, {
+                'PLOTLY_URL': 'https://plot.ly',
+                'USERS': ['chris']
+            });
+            done();
+        })).catch(done);
+    });
+
+    it('PATCH /settings sets some settings', function(done) {
+        const newSettings = {
+            'PLOTLY_API_DOMAIN': 'acme.plot.ly',
+            'PLOTLY_API_SSL_ENABLED': false
+        };
+        PATCH('settings', newSettings).then(res => res.json().then(json => {
+            assert.equal(
+                getSetting('PLOTLY_API_SSL_ENABLED'),
+                newSettings.PLOTLY_API_SSL_ENABLED
+            );
+            assert.equal(
+                getSetting('PLOTLY_API_DOMAIN'),
+                newSettings.PLOTLY_API_DOMAIN
             );
             done();
         })).catch(done);
