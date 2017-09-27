@@ -29,6 +29,9 @@ class Configuration extends Component {
         this.close = this.close.bind(this);
         this.logOut = this.logOut.bind(this);
 
+        window.require('electron').ipcRenderer.on('username', (event, message) => {
+            this.setState({username: message});
+        });
     }
 
     toggle() {
@@ -67,7 +70,7 @@ class Configuration extends Component {
                             </div>
                             :
                             <div>
-                                Please <Link to="/login" >Log In</Link> to continue.
+                                <Link to="/login" >Log In</Link>
                             </div>
 
         return (
