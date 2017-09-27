@@ -30,7 +30,7 @@ class Configuration extends Component {
         this.logOut = this.logOut.bind(this);
 
         if(window.require) {
-            window.require('electron').ipcRenderer.on('username',
+            window.require('electron').ipcRenderer.once('username',
                 (event, message) => {
                     this.setState({username: message});
                 });
