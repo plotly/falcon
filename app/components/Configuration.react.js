@@ -29,9 +29,12 @@ class Configuration extends Component {
         this.close = this.close.bind(this);
         this.logOut = this.logOut.bind(this);
 
-        window.require('electron').ipcRenderer.on('username', (event, message) => {
-            this.setState({username: message});
-        });
+        if(window.require) {
+            window.require('electron').ipcRenderer.on('username',
+                (event, message) => {
+                    this.setState({username: message});
+                });
+        }
     }
 
     toggle() {
