@@ -15,8 +15,10 @@ function accessTokenIsValid(access_token) {
     return getSetting('ACCESS_TOKEN') === access_token;
 }
 
+let win = '';
+
 export function PlotlyOAuth(electronWindow) {
-    const window = electronWindow;
+    win = electronWindow;
 
     function isAuthorized(req, res, next) {
         let path = req.href();
@@ -30,7 +32,7 @@ export function PlotlyOAuth(electronWindow) {
         }
 
         // No Auth for electron apps:
-        if (window) {
+        if (win) {
           return (next());
         }
         if (!accessTokenIsValid(req.cookies['db-connector-auth-token'])) {

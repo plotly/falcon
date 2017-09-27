@@ -273,6 +273,15 @@ export default class Servers {
                     const db_connector_access_token = generateAndSaveAccessToken();
                     res.setCookie('db-connector-auth-token', db_connector_access_token, {'maxAge': 300, 'path': '/'});
                     res.setCookie('db-connector-user', username, {'path': '/'});
+
+                    if (that.electronWindow) {
+
+                        that.electronWindow.loadURL(`${protocol}://${domain}:${port}/`);
+                        that.electronWindow.webContents.on('did-finish-load', () => {
+                            that.electronWindow.webContents.send('username', username);
+                        });
+
+                    }
                     res.json(status, {});
                 } else {
                     Logger.log(userMeta, 0);
