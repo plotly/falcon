@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one or more
+contributor license agreements. See the NOTICE file distributed with
+this work for additional information regarding copyright ownership.
+The ASF licenses this file to You under the Apache License, Version 2.0
+(the "License"); you may not use this file except in compliance with
+the License. You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configuration>
+    <!-- this property is useful when you want to change the default beeline port, which is 10000 -->
+    <property>
+      <name>hive.server2.thrift.port</name>
+      <value>10000</value>
+    </property>
+    <!-- one we created to enable/disable thrift serialization in the SerDe itself. this is for backward comptability -->
+    <property>
+     <name>hive.server2.thrift.resultset.serialize.in.tasks</name>
+     <value>true</value>
+    </property>
+    <!-- this is not the same fetch size as jdbc. this says what fetch size to use when filling the buffer in the serde. -->
+    <property>
+     <name>hive.server2.thrift.resultset.max.fetch.size</name>
+     <value>1000</value>
+    </property>
+    <property>
+     <name>hive.server2.logging.operation.enabled</name>
+     <value>true</value>
+    </property>
+    <!-- PLEASE set this when you want to debug hive code on eclipse. if it is not set to false, it will spawn a new jvm process and then your debug pointers will not be hit -->
+    <property>
+     <name>hive.exec.submit.local.task.via.child</name>
+     <value>false</value>
+    </property>
+    <property>
+     <name>hive.exec.submitviachild</name>
+     <value>false</value>
+    </property>
+    <property>
+     <name>mapreduce.framework.name</name>
+     <value>local</value>
+    </property>
+    <!-- this is a metastore property. this needs to be set to true or metastore will not start on a fresh hive install -->
+    <property>
+      <name>datanucleus.autoCreateTables</name>
+      <value>true</value>
+    </property>
+    <property>
+    <name>hive.server2.enable.doAs</name>
+    <value>false</value>
+  </property>
+  <property>
+    <name>fs.default.name</name>
+    <value>file:///</value>
+  </property>
+  <property>
+    <name>javax.jdo.option.ConnectionUserName</name>
+    <value>hive</value>
+  </property>
+  <property>
+   <name>javax.jdo.option.ConnectionPassword</name>
+   <value>hive</value>
+   <description>Enter your MySQL credentials. </description>
+  </property>
+    <property>
+    <name>hive.security.authorization.enabled</name>
+    <value>false</value>
+  </property>
+    <property>
+    <name>fs.file.impl.disable.cache</name>
+    <value>true</value>
+  </property>
+    <property>
+    <name>hive.optimize.bucketmapjoin.sortedmerge</name>
+    <value>true</value>
+  </property>
+    <property>
+    <name>hive.vectorized.execution.enabled</name>
+    <value>false</value>
+  </property>
+    <property>
+    <name>hive.mapred.reduce.tasks.speculative.execution</name>
+    <value>false</value>
+  </property>
+    <property>
+    <name>javax.jdo.option.ConnectionURL</name>
+    <value>jdbc:mysql://localhost:3306/hive?createDatabaseIfNotExist=true</value>
+  </property>
+    <property>
+    <name>hive.auto.convert.join.noconditionaltask</name>
+    <value>true</value>
+  </property>
+    <property>
+    <name>hive.metastore.uris</name>
+    <value> </value>
+  </property>
+    <property>
+    <name>hive.metastore.execute.setugi</name>
+    <value>true</value>
+  </property>
+    <property>
+    <name>hive.metastore.client.socket.timeout</name>
+    <value>60</value>
+  </property>
+    <!--property>
+    <name>hive.metastore.local</name>
+    <value>false</value>
+  </property-->
+    <property>
+    <name>hive.metastore.warehouse.dir</name>
+    <value>/apps/hive/warehouse</value>
+  </property>
+    <property>
+    <name>hive.auto.convert.sortmerge.join.noconditionaltask</name>
+    <value>true</value>
+  </property>
+    <property>
+    <name>hive.auto.convert.sortmerge.join</name>
+    <value>true</value>
+  </property>
+    <property>
+    <name>hive.metastore.cache.pinobjtypes</name>
+    <value>Table,Database,Type,FieldSchema,Order</value>
+  </property>
+    <property>
+    <name>javax.jdo.option.ConnectionDriverName</name>
+    <value>com.mysql.jdbc.Driver</value>
+  </property>
+    <property>
+    <name>hive.security.authorization.manager</name>
+    <value>org.apache.hadoop.hive.ql.security.authorization.DefaultHiveAuthorizationProvider</value>
+  </property>
+  <property>
+      <name>hive.metastore.schema.verification</name>
+      <value>false</value>
+  </property>
+</configuration>
