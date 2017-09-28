@@ -54,6 +54,11 @@ class Configuration extends Component {
       cookie.remove('plotly-auth-token');
       cookie.remove('db-connector-auth-token');
       this.setState({ username: ''});
+
+      // reload page when running in browser:
+      if (window) {
+          window.location.reload()
+      }
     }
 
     render() {
