@@ -1,3 +1,4 @@
+import {contains} from 'ramda';
 import {getSetting} from '../settings.js';
 import {generateAndSaveAccessToken} from '../utils/authUtils';
 import fetch from 'node-fetch';
@@ -49,9 +50,20 @@ export function PlotlyOAuth(electronWindow) {
                 return;
               }
               else {
-                  const dbConnectorAccessToken = generateAndSaveAccessToken();
-                  res.setCookie('db-connector-auth-token', dbConnectorAccessToken, {'maxAge': 300, 'path': '/'});
-                  return (next());
+                  if (!contains(userRes.username, getSetting('ALLOWED_USERS'))) {
+
+                      // Remove any existing credentials and return error
+                      res.clearCookie('db-connector-auth-token');
+                      res.clearCookie('plotly-auth-token');
+                      res.json(403, {error: {message: `User ${userMeta.username} is not allowed to view this app`}})
+                      return;
+
+                  } else {
+
+                      const dbConnectorAccessToken = generateAndSaveAccessToken();
+                      res.setCookie('db-connector-auth-token', dbConnectorAccessToken, {'maxAge': 300, 'path': '/'});
+                      return (next());
+                  }
               }
 
             }));

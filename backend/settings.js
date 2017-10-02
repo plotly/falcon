@@ -24,6 +24,7 @@ const DEFAULT_SETTINGS = {
     USERS: [],
 
     ACCESS_TOKEN: '',
+    ALLOWED_USERS: [],
     /*
      * The actual CORS origins is a "derived" setting
      * that is composed of ADDITIONAL_CORS_ALLOWED_ORIGINS,

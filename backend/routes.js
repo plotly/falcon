@@ -268,21 +268,27 @@ export default class Servers {
                     }
                     saveSetting('USERS', existingUsers);
 
-                    res.setCookie('plotly-auth-token', access_token, {'path': '/'});
+                    if (contains(username, getSetting('ALLOWED_USERS'))) {
+                        res.setCookie('plotly-auth-token', access_token, {'path': '/'});
 
-                    const db_connector_access_token = generateAndSaveAccessToken();
-                    res.setCookie('db-connector-auth-token', db_connector_access_token, {'maxAge': 300, 'path': '/'});
-                    res.setCookie('db-connector-user', username, {'path': '/'});
+                        const db_connector_access_token = generateAndSaveAccessToken();
+                        res.setCookie('db-connector-auth-token', db_connector_access_token, {'maxAge': 300, 'path': '/'});
+                        res.setCookie('db-connector-user', username, {'path': '/'});
 
-                    if (that.electronWindow) {
+                        if (that.electronWindow) {
 
-                        that.electronWindow.loadURL(`${protocol}://${domain}:${port}/`);
-                        that.electronWindow.webContents.on('did-finish-load', () => {
-                            that.electronWindow.webContents.send('username', username);
-                        });
+                            that.electronWindow.loadURL(`${protocol}://${domain}:${port}/`);
+                            that.electronWindow.webContents.on('did-finish-load', () => {
+                                that.electronWindow.webContents.send('username', username);
+                            });
 
+                        }
+                        res.json(status, {});
+                    } else {
+
+                      res.json(403, {error: {message: `User ${username} is not allowed to view this app`}});
+                      return;
                     }
-                    res.json(status, {});
                 } else {
                     Logger.log(userMeta, 0);
                     res.json(500, {error: {message: `Error ${userRes.status} fetching user`}});
