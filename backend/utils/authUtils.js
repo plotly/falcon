@@ -1,4 +1,4 @@
-const uuidv4 = require('uuid/v4');
+import {uuidv4} from 'uuid/v4';
 import {saveSetting} from '../settings.js';
 
 export function generateAndSaveAccessToken(){

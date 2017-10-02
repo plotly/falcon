@@ -29,6 +29,12 @@ class Configuration extends Component {
         this.close = this.close.bind(this);
         this.logOut = this.logOut.bind(this);
 
+        /*
+         * If this is an electron app, then we don't have access to cookies and
+         * we don't require authentication in the API.
+         * In the browser, the username is set with a cookie but in electron
+         * this is set using electron's ipcRenderer.
+         */
         if(window.require) {
             window.require('electron').ipcRenderer.once('username',
                 (event, message) => {
@@ -47,9 +53,11 @@ class Configuration extends Component {
 
     logOut() {
 
-      // Delete all the cookies and reset user state. This does not kill
-      // any running connections, but user will not be able to access them
-      // without logging in again.
+      /*
+       * Delete all the cookies and reset user state. This does not kill
+       * any running connections, but user will not be able to access them
+       * without logging in again.
+       */
       cookie.remove('db-connector-user');
       cookie.remove('plotly-auth-token');
       cookie.remove('db-connector-auth-token');
@@ -70,16 +78,16 @@ class Configuration extends Component {
             animate: false
         };
         const loginMessage = this.state.username ?
-                            <div className="supportLinksContainer">
-                                Logged in as "{this.state.username}" &nbsp;
-                                <Link onClick={this.logOut} >
-                                    Log Out
-                                </Link>
-                            </div>
-                            :
-                            <div>
-                                <Link to="/login" >Log In</Link>
-                            </div>
+                             <div className="supportLinksContainer">
+                                 Logged in as "{this.state.username}" &nbsp;
+                                 <Link onClick={this.logOut} >
+                                     Log Out
+                                 </Link>
+                             </div>
+                             :
+                             <div>
+                                 <Link to="/login" >Log In</Link>
+                             </div>
 
         return (
             <div className="fullApp">

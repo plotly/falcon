@@ -58,22 +58,21 @@ class Login extends Component {
 
     componentDidMount() {
         const {serverType} = this.state;
-        const that = this;
         const interval = setInterval(() => {
               usernameLogged = cookie.load('db-connector-user');
               if (usernameLogged) {
                   if (serverType === ONPREM) {
-                      that.setState({
+                      this.setState({
                           status: 'authorized',
                           statusMessage: 'Saving user information...'
                       });
-                      that.saveDomainToSettings().then(res => {
-                          if ( res.status === 200 ) {
+                      this.saveDomainToSettings().then(res => {
+                          if (res.status === 200) {
                               window.location.assign(connectorUrl);
                           } else {
-                              that.setState(
+                              this.setState(
                                   status: 'failure',
-                                  statusMessage: 'An error occured. Please try again.'
+                                  statusMessage: res.text()
                               )
                           }
                       });
