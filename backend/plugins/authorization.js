@@ -1,4 +1,3 @@
-import errors from 'restify-errors';
 import {getSetting} from '../settings.js';
 import {generateAndSaveAccessToken} from '../utils/authUtils';
 import fetch from 'node-fetch';
@@ -34,7 +33,8 @@ export function PlotlyOAuth(electronWindow) {
         if (!accessTokenIsValid(req.cookies['db-connector-auth-token'])) {
 
             if (!req.cookies['plotly-auth-token']) {
-              return (next(new errors.InvalidCredentialsError('Please login to access this page.')));
+              res.json(401, {error: {message: 'Please login to access this page.'}});
+              return;
             }
 
             const plotlyAuthToken = req.cookies['plotly-auth-token'];
@@ -45,7 +45,8 @@ export function PlotlyOAuth(electronWindow) {
             .then(userRes => userRes.json().then(userMeta => {
 
               if (userRes.status !== 200) {
-                return (next(new errors.InvalidCredentialsError('Please login to access this page.')));
+                res.json(401, {error: {message: 'Please login to access this page.'}});
+                return;
               }
               else {
                   const dbConnectorAccessToken = generateAndSaveAccessToken();

@@ -227,7 +227,6 @@
     "redux-thunk": "^2.0.1",
     "restify": "^4.0.4",
     "restify-cookies": "^0.2.2",
-    "restify-errors": "^5.0.0",
     "sequelize": "^3.23.0",
     "sinon": "^1.17.3",
     "source-map-support": "^0.4.18",
