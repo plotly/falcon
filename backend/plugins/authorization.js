@@ -1,6 +1,6 @@
 import {contains} from 'ramda';
 import {getSetting} from '../settings.js';
-import {generateAndSaveAccessToken} from '../utils/authUtils';
+import {generateAndSaveAccessToken, isElectron} from '../utils/authUtils';
 import fetch from 'node-fetch';
 
 const ESCAPED_ROUTES = [
@@ -14,7 +14,7 @@ function accessTokenIsValid(access_token) {
     return getSetting('ACCESS_TOKEN') === access_token;
 }
 
-export function PlotlyOAuth(electronWindow) {
+export function PlotlyOAuth() {
 
     function isAuthorized(req, res, next) {
         const path = req.href();
@@ -28,7 +28,7 @@ export function PlotlyOAuth(electronWindow) {
         }
 
         // No Auth for electron apps:
-        if (electronWindow) {
+        if (isElectron()) {
           return (next());
         }
         if (!accessTokenIsValid(req.cookies['db-connector-auth-token'])) {

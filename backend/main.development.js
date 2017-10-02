@@ -33,6 +33,10 @@ app.on('ready', () => {
 
     const {httpServer, httpsServer} = server;
 
+    /*
+     * This allows us to send pass information to electron renderer from
+     * inside the server.
+     */
     httpServer.electronWindow = mainWindow;
     httpsServer.electronWindow = mainWindow;
 

@@ -39,3 +39,7 @@ export function plotlyUrl() {
     }
     return 'https://plot.ly';
 }
+
+export function isElectron() {
+  return window.process && window.process.type === 'renderer'
+}

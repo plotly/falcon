@@ -21,7 +21,7 @@ import {
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
-import {generateAndSaveAccessToken} from './utils/authUtils';
+import {generateAndSaveAccessToken, isElectron} from './utils/authUtils';
 import {checkWritePermissions, newDatacache} from './persistent/PlotlyAPI.js';
 import {contains, has, keys, isEmpty, merge, pluck} from 'ramda';
 import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
@@ -131,7 +131,7 @@ export default class Servers {
         that.electronWindow = that.httpsServer.electronWindow || that.httpServer.electronWindow;
 
         server.use(CookieParser.parse);
-        server.use(PlotlyOAuth(that.electronWindow));
+        server.use(PlotlyOAuth());
 
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
@@ -275,8 +275,13 @@ export default class Servers {
                         res.setCookie('db-connector-auth-token', db_connector_access_token, {'maxAge': 300, 'path': '/'});
                         res.setCookie('db-connector-user', username, {'path': '/'});
 
-                        if (that.electronWindow) {
+                        if (isElectron()) {
 
+                            /*
+                             * This part is handled separately for electron-app
+                             * because electron apps does not support cookies
+                             * like browsers do.
+                             */
                             that.electronWindow.loadURL(`${protocol}://${domain}:${port}/`);
                             that.electronWindow.webContents.on('did-finish-load', () => {
                                 that.electronWindow.webContents.send('username', username);

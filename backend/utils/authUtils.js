@@ -6,3 +6,13 @@ export function generateAndSaveAccessToken(){
     saveSetting('ACCESS_TOKEN', access_token);
     return access_token;
 }
+
+
+export function isElectron() {
+
+    if (process.versions && !!process.versions.electron) {
+        return true;
+    } else {
+        return false;
+    }
+}
