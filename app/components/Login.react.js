@@ -70,10 +70,10 @@ class Login extends Component {
                           if (res.status === 200) {
                               window.location.assign(connectorUrl);
                           } else {
-                              this.setState(
+                              this.setState({
                                   status: 'failure',
                                   statusMessage: res.text()
-                              )
+                              });
                           }
                       });
                   }
