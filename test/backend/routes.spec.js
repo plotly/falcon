@@ -2,6 +2,7 @@ var fetch = require('fetch-cookie')(require('node-fetch'))
 
 import {assert} from 'chai';
 import {assoc, concat, contains, dissoc, isEmpty, keys, merge, sort, without} from 'ramda';
+import sinon from 'sinon';
 import Servers from '../../backend/routes.js';
 import {
     getConnections,
@@ -10,6 +11,8 @@ import {
 } from '../../backend/persistent/Connections.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
 import {setCertificatesSettings} from '../../backend/certificates';
+import * as utils from '../../backend/utils/authUtils';
+
 import fs from 'fs';
 import {
     accessToken,
@@ -88,12 +91,11 @@ function DELETE(path) {
 
 function setCookies() {
 
-  // Sets cookies using `oauth` route, so that other requests can be authenticated:
-  return POST('oauth2', {access_token: accessToken})
-  .then(res => res.json().then(json => {
-      assert.deepEqual(json, {});
-      assert.equal(res.status, 200);
-  }));
+    // Sets cookies using `oauth` route, so that other requests can be authenticated:
+    return POST('oauth2', {access_token: accessToken})
+    .then(res => res.json().then(json => {
+        assert.deepEqual(json, {});
+    }));
 
 }
 
@@ -101,6 +103,8 @@ let queryObject;
 let servers;
 let connectionId;
 
+let isElectronStub = sinon.stub(utils, 'isElectron');
+isElectronStub.returns(false);
 
 describe('Servers - ', () => {
     beforeEach(() => {
@@ -233,14 +237,29 @@ describe('Authentication - ', () => {
         .then(res => res.json().then(json => {
             assert.equal(res.status, 401);
             assert.deepEqual(json, {
-                'code': 'InvalidCredentials',
-                'message': 'Please login to access this page.'
+                "error": {"message": "Please login to access this page."}
             });
             done();
         })).catch(done);
     });
 
-    it('allows access to settings when logged in', function(done) {
+    it('Oauth fails when user not present in ALLOWED_USERS', function(done) {
+
+        // empty allowed_users list
+        saveSetting('ALLOWED_USERS', []);
+
+        POST('oauth2', {access_token: accessToken})
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 403);
+            assert.deepEqual(json,
+              {error: {message: `User ${username} is not allowed to view this app`}}
+            );
+            done();
+        })).catch(done);
+    });
+
+    it('allows access to settings when logged in and present in ALLOWED_USERS', function(done) {
+        saveSetting('ALLOWED_USERS', [username]);
 
         setCookies().then(res => {
 
@@ -252,8 +271,8 @@ describe('Authentication - ', () => {
         });
 
     });
-});
 
+});
 
 describe('Routes - ', () => {
     beforeEach(() => {
@@ -272,6 +291,10 @@ describe('Routes - ', () => {
         saveSetting('USERS', [{
             username, apiKey
         }]);
+
+        // Login the user:
+        saveSetting('ALLOWED_USERS', [username]);
+        setCookies();
 
         connectionId = saveConnection(sqlConnections);
         queryObject = {
@@ -315,9 +338,6 @@ describe('Routes - ', () => {
         .catch(done);
     });
 
-    // This tests sets the cookies required for user authentication, so
-    // all the tests requiring user authentication should be put placed
-    // after this one.
     it('oauth - saves oauth access token with a username if valid', function(done) {
         this.timeout(10 * 1000);
         saveSetting('USERS', []);
@@ -332,13 +352,13 @@ describe('Routes - ', () => {
         })
         .then(res => res.json().then(json => {
             assert.deepEqual(json, {});
-            assert.equal(res.status, 201);
+            assert.equal(res.status, 200);
             assert.deepEqual(
                 getSetting('USERS'),
                 [{username, accessToken}]
             );
 
-            // We can save it again and we'll get a 200 instead of a 201
+            // We can save it again and we'll still get a 200 instead of a 201
             POST('oauth2', {access_token: accessToken})
             .then(res => res.json().then(json => {
                 assert.deepEqual(json, {});
@@ -381,15 +401,11 @@ describe('Routes - ', () => {
     });
 
     it('GET /settings returns some of the settings', function(done) {
-        saveSetting(
-            'USERS',
-            [{'username': 'chris', 'accessToken': 'lahlahlemons'}]
-        );
         GET('settings')
         .then(res => res.json().then(json => {
             assert.deepEqual(json, {
                 'PLOTLY_URL': 'https://plot.ly',
-                'USERS': ['chris']
+                'USERS': ['plotly-database-connector']
             });
             done();
         })).catch(done);
@@ -1521,6 +1537,7 @@ describe('Routes - ', () => {
         assert.deepEqual(getSetting('USERS'), creds);
         POST('queries', queryObject)
         .then(res => res.json().then(json => {
+            assert.equal(res.status, 400);
             assert.deepEqual(
                 json,
                 {error: {
@@ -1529,7 +1546,7 @@ describe('Routes - ', () => {
                     )
                 }}
             );
-            assert.equal(res.status, 400);
+
             done();
         })).catch(done);
     });
@@ -1542,6 +1559,7 @@ describe('Routes - ', () => {
         assert.deepEqual(getSetting('PLOTLY_API_URL'), `https://${nonExistantServer}`);
         POST('queries', queryObject)
         .then(res => res.json().then(json => {
+            assert.equal(res.status, 400);
             assert.deepEqual(
                 json,
                 {
@@ -1554,7 +1572,7 @@ describe('Routes - ', () => {
                     }
                 }
             );
-            assert.equal(res.status, 400);
+
             done();
         })).catch(done);
     });
