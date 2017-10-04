@@ -278,12 +278,16 @@ describe('Authentication - ', () => {
     it('does not make request to plotly if accessToken is valid', function(done) {
         saveSetting('ALLOWED_USERS', [username]);
 
-
         POST('oauth2', {access_token: accessToken})
         .then(res => {
 
-            // This ensures that any requests to plotly fail so that we can catch them
-            saveSetting('PLOTLY_API_DOMAIN', 'http://bad-domain.plot.ly');
+            /*
+             * This ensures that any requests to plotly fail so that we
+             * can catch them. Since the requests to plotly are not made
+             * when accessToken is valid, test-request should return 200
+             * irrespective of bad plotly-domain.
+             */
+            saveSetting('PLOTLY_API_DOMAIN', 'bad-domain.plot.ly');
 
             GET('settings')
             .then(res => {
@@ -293,30 +297,61 @@ describe('Authentication - ', () => {
         });
     });
 
-    it('does not make request to plotly if accessToken not expired', function(done) {
+    it('makes request to plotly if accessToken expired', function(done) {
         saveSetting('ALLOWED_USERS', [username]);
 
 
-        // set fake access-token expiry of 1 sec:
+        // set access-token expiry of 1 sec:
+        accessTokenExpiryStub.returns(1);
 
         POST('oauth2', {access_token: accessToken})
         .then(res => {
 
             // This ensures that any requests to plotly fail so that we can catch them
-            saveSetting('PLOTLY_API_DOMAIN', 'http://bad-domain.plot.ly');
+            saveSetting('PLOTLY_API_DOMAIN', 'bad-domain.plot.ly');
 
             setTimeout(() => {
                 GET('settings')
-                .then(res => {
-                    assert.equal(res.status, 200);
+                .then(res => res.json().then(json => {
+                    assert.equal(res.status, 500);
+                    assert.equal(json.error.message,
+                                 ('request to ' +
+                                 'https://bad-domain.plot.ly/v2/users/current failed, ' +
+                                 'reason: getaddrinfo ENOTFOUND ' +
+                                 'bad-domain.plot.ly bad-domain.plot.ly:443'));
                     done();
-                }).catch(done);
+                })).catch(done);
             }, 2000);
         });
-
-
     });
 
+    it('prevents user from accessing urls when revoked from ALLOWED_USERS', function(done) {
+        saveSetting('ALLOWED_USERS', [username]);
+
+
+        // set access-token expiry of 3 sec:
+        accessTokenExpiryStub.returns(3);
+
+        POST('oauth2', {access_token: accessToken})
+        .then(res => {
+            // request should be allowed:
+            GET('settings').then(res => {
+              console.log('status1:' + res.status);
+              assert.equal(res.status, 200);
+            });
+        })
+        .then(saveSetting('ALLOWED_USERS', []))
+        .then(() => {
+
+            // Any requests should fail after revoking user access
+            GET('settings').then(res => {
+                console.log('status2:' + res.status);
+                assert.equal(res.status, 403);
+                done();
+            });
+
+        }).catch(done);
+    });
 
 });
 
