@@ -21,7 +21,7 @@ import {
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
-import {generateAndSaveAccessToken, isElectron} from './utils/authUtils';
+import {generateAndSaveAccessToken, getAccessTokenExpiry, isElectron} from './utils/authUtils';
 import {checkWritePermissions, newDatacache} from './persistent/PlotlyAPI.js';
 import {contains, has, keys, isEmpty, merge, pluck} from 'ramda';
 import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
@@ -272,7 +272,11 @@ export default class Servers {
                         res.setCookie('plotly-auth-token', access_token, {'path': '/'});
 
                         const db_connector_access_token = generateAndSaveAccessToken();
-                        res.setCookie('db-connector-auth-token', db_connector_access_token, {'maxAge': 300, 'path': '/'});
+                        res.setCookie('db-connector-auth-token',
+                                      db_connector_access_token, {
+                                          'maxAge': getAccessTokenExpiry(),
+                                          'path': '/'
+                                      });
                         res.setCookie('db-connector-user', username, {'path': '/'});
 
                         if (isElectron()) {

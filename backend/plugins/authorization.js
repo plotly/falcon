@@ -1,6 +1,7 @@
 import {contains} from 'ramda';
 import {getSetting} from '../settings.js';
 import {generateAndSaveAccessToken, isElectron, getAccessTokenExpiry} from '../utils/authUtils';
+import Logger from '../logger';
 import fetch from 'node-fetch';
 
 const ESCAPED_ROUTES = [
@@ -63,14 +64,19 @@ export function PlotlyOAuth() {
                       const dbConnectorAccessToken = generateAndSaveAccessToken();
                       res.setCookie('db-connector-auth-token',
                                     dbConnectorAccessToken, {
-                                        'maxAge': getAccessTokenExpiry(), 
+                                        'maxAge': getAccessTokenExpiry(),
                                         'path': '/'
                                     });
                       return (next());
                   }
               }
 
-            }));
+            }))
+            .catch(err => {
+                Logger.log(err, 0);
+                res.json(500, {error: {message: err.message}})
+                return;
+            });
 
         } else {
           return (next());
