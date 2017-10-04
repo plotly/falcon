@@ -89,12 +89,13 @@ function DELETE(path) {
     });
 }
 
-function setCookies() {
+function setCookies(done) {
 
     // Sets cookies using `oauth` route, so that other requests can be authenticated:
     return POST('oauth2', {access_token: accessToken})
     .then(res => res.json().then(json => {
         assert.deepEqual(json, {});
+        done();
     }));
 
 }
@@ -261,8 +262,8 @@ describe('Authentication - ', () => {
     it('allows access to settings when logged in and present in ALLOWED_USERS', function(done) {
         saveSetting('ALLOWED_USERS', [username]);
 
-        setCookies().then(res => {
-
+        POST('oauth2', {access_token: accessToken})
+        .then(res => {
             GET('settings')
             .then(res => {
                 assert.equal(res.status, 200);
@@ -275,7 +276,7 @@ describe('Authentication - ', () => {
 });
 
 describe('Routes - ', () => {
-    beforeEach(() => {
+    beforeEach((done) => {
         servers = new Servers({createCerts: false, startHttps: false});
         servers.httpServer.start();
 
@@ -294,7 +295,7 @@ describe('Routes - ', () => {
 
         // Login the user:
         saveSetting('ALLOWED_USERS', [username]);
-        setCookies();
+        setCookies(done);
 
         connectionId = saveConnection(sqlConnections);
         queryObject = {
@@ -352,7 +353,7 @@ describe('Routes - ', () => {
         })
         .then(res => res.json().then(json => {
             assert.deepEqual(json, {});
-            assert.equal(res.status, 200);
+            assert.equal(res.status, 201);
             assert.deepEqual(
                 getSetting('USERS'),
                 [{username, accessToken}]
@@ -393,8 +394,10 @@ describe('Routes - ', () => {
         GET('settings/urls')
         .then(res => res.json().then(json => {
             assert.equal(res.status, 200);
-            assert.equal(json.http, 'http://localhost:9494');
-            assert.equal(json.https, '');
+            assert.deepEqual(json, {
+                http: 'http://localhost:9494',
+                https: '',
+            });
             done();
         }))
         .catch(done);
