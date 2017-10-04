@@ -107,6 +107,8 @@ let connectionId;
 let isElectronStub = sinon.stub(utils, 'isElectron');
 isElectronStub.returns(false);
 
+let accessTokenExpiryStub = sinon.stub(utils, 'getAccessTokenExpiry');
+
 describe('Servers - ', () => {
     beforeEach(() => {
         ['KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH'].forEach(fileName => {
@@ -272,6 +274,49 @@ describe('Authentication - ', () => {
         });
 
     });
+
+    it('does not make request to plotly if accessToken is valid', function(done) {
+        saveSetting('ALLOWED_USERS', [username]);
+
+
+        POST('oauth2', {access_token: accessToken})
+        .then(res => {
+
+            // This ensures that any requests to plotly fail so that we can catch them
+            saveSetting('PLOTLY_API_DOMAIN', 'http://bad-domain.plot.ly');
+
+            GET('settings')
+            .then(res => {
+                assert.equal(res.status, 200);
+                done();
+            }).catch(done);
+        });
+    });
+
+    it('does not make request to plotly if accessToken not expired', function(done) {
+        saveSetting('ALLOWED_USERS', [username]);
+
+
+        // set fake access-token expiry of 1 sec:
+
+        POST('oauth2', {access_token: accessToken})
+        .then(res => {
+
+            // This ensures that any requests to plotly fail so that we can catch them
+            saveSetting('PLOTLY_API_DOMAIN', 'http://bad-domain.plot.ly');
+
+            setTimeout(() => {
+                GET('settings')
+                .then(res => {
+                    assert.equal(res.status, 200);
+                    done();
+                }).catch(done);
+            }, 2000);
+        });
+
+
+    });
+
 
 });
 
