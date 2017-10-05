@@ -185,7 +185,7 @@
     "form-data": "^2.3.1",
     "fs": "^0.0.1-security",
     "fs-extra": "https://registry.npmjs.org/fs-extra/-/fs-extra-0.26.7.tgz",
-    "ibm_db": "git+https://git@github.com/n-riesco/node-ibm_db.git",
+    "ibm_db": "^2.2.1",
     "immutable": "^3.8.1",
     "is-electron": "^2.1.0",
     "jsdom": "^8.4.0",

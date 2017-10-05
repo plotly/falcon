@@ -4989,16 +4989,16 @@ hyphenate-style-name@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/hyphenate-style-name/-/hyphenate-style-name-1.0.2.tgz#31160a36930adaf1fc04c6074f7eb41465d4ec4b"
 
-"ibm_db@git+https://git@github.com/n-riesco/node-ibm_db.git":
-  version "2.2.0"
-  resolved "git+https://git@github.com/n-riesco/node-ibm_db.git#201ef8967906aade8c191f852ee0c7c804b51d9c"
+ibm_db@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/ibm_db/-/ibm_db-2.2.1.tgz#6dfdc2bae70fa6350b0db3ebab7040dea2fc13d8"
   dependencies:
     bindings "~1.2.1"
     fstream "~1.0.10"
     nan "~2.3.5"
-    q "^1.4.1"
-    request "^2.75.0"
-    targz "^1.0.1"
+    q "~1.4.1"
+    request "~2.81.0"
+    targz "~1.0.1"
     unzipper "~0.7.2"
 
 iconv-lite@^0.4.11, iconv-lite@^0.4.13, iconv-lite@^0.4.19, iconv-lite@^0.4.5, iconv-lite@~0.4.13:
@@ -7540,7 +7540,7 @@ pure-color@^1.2.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/pure-color/-/pure-color-1.3.0.tgz#1fe064fb0ac851f0de61320a8bf796836422f33e"
 
-q@^1.1.2, q@^1.4.1:
+q@^1.1.2:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.0.tgz#dd01bac9d06d30e6f219aecb8253ee9ebdc308f1"
 
@@ -8216,7 +8216,7 @@ replace-ext@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/replace-ext/-/replace-ext-0.0.1.tgz#29bbd92078a739f0bcce2b4ee41e837953522924"
 
-request@2, request@^2.39.0, request@^2.45.0, request@^2.55.0, request@^2.75.0, request@^2.79.0, request@^2.81.0:
+request@2, request@^2.39.0, request@^2.45.0, request@^2.55.0, request@^2.79.0, request@^2.81.0:
   version "2.82.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.82.0.tgz#2ba8a92cd7ac45660ea2b10a53ae67cd247516ea"
   dependencies:
@@ -9313,7 +9313,7 @@ tar@^2.0.0, tar@^2.2.1:
     fstream "^1.0.2"
     inherits "2"
 
-targz@^1.0.1:
+targz@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/targz/-/targz-1.0.1.tgz#8f76a523694cdedfbb5d60a4076ff6eeecc5398f"
   dependencies:
@@ -9485,6 +9485,12 @@ touch@0.0.3:
     nopt "~1.0.10"
 
 tough-cookie@^2.2.0, tough-cookie@^2.3.1, tough-cookie@~2.3.0, tough-cookie@~2.3.2:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-2.3.3.tgz#0b618a5565b6dea90bf3425d04d55edc475a7561"
+  dependencies:
+    punycode "^1.4.1"
+
+tough-cookie@~2.3.0:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-2.3.3.tgz#0b618a5565b6dea90bf3425d04d55edc475a7561"
   dependencies:
