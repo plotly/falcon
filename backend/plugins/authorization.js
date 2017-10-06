@@ -66,7 +66,8 @@ export function PlotlyOAuth() {
                       res.setCookie('db-connector-auth-token',
                                     dbConnectorAccessToken, {
                                         'maxAge': getAccessTokenExpiry(),
-                                        'path': '/'
+                                        'path': getSetting('DB_CONNECTOR_URL'),
+                                        'secure': getSetting('PLOTLY_API_SSL_ENABLED')
                                     });
                       return (next());
                   }

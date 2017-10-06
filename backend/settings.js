@@ -19,6 +19,7 @@ const DEFAULT_SETTINGS = {
 
     CERTIFICATE_LAST_UPDATED: '',
     CONNECTOR_HTTPS_DOMAIN: 'default',
+    DB_CONNECTOR_URL: '/',
 
     // TODO - This should just be an object keyed by username
     USERS: [],

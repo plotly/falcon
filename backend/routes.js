@@ -268,13 +268,14 @@ export default class Servers {
                     }
 
                     if (contains(username, getSetting('ALLOWED_USERS'))) {
-                        res.setCookie('plotly-auth-token', access_token, {'path': '/'});
+                        res.setCookie('plotly-auth-token', access_token, {'path': getSetting('DB_CONNECTOR_URL')});
 
                         const db_connector_access_token = generateAndSaveAccessToken();
                         res.setCookie('db-connector-auth-token',
                                       db_connector_access_token, {
                                           'maxAge': getAccessTokenExpiry(),
-                                          'path': '/'
+                                          'path': getSetting('DB_CONNECTOR_URL'),
+                                          'secure': getSetting('PLOTLY_API_SSL_ENABLED')
                                       });
                         res.setCookie('db-connector-user', username, {'path': '/'});
 
