@@ -58,6 +58,12 @@ class Login extends Component {
 
     componentDidMount() {
         const {serverType} = this.state;
+        /*
+         * This repeatedly checks whether the the auth related cookies have been
+         * set for the user. Only meant for headless-server, since electron
+         * does not support cookies. For electron we initiate an eventListener
+         * to check for authentication.
+         */
         const interval = setInterval(() => {
               usernameLogged = cookie.load('db-connector-user');
               if (usernameLogged) {
@@ -66,15 +72,20 @@ class Login extends Component {
                           status: 'authorized',
                           statusMessage: 'Saving user information...'
                       });
-                      this.saveDomainToSettings().then(res => {
+                      this.saveDomainToSettings().then(res => res.text().then(text => {
                           if (res.status === 200) {
                               window.location.assign(connectorUrl);
                           } else {
                               this.setState({
                                   status: 'failure',
-                                  statusMessage: res.text()
+                                  statusMessage: text
                               });
                           }
+                      })).catch(err => {
+                          this.setState({
+                              status: 'failure',
+                              statusMessage: err.message
+                          })
                       });
                   }
                   else {

@@ -266,7 +266,6 @@ export default class Servers {
                         existingUsers.push({username, accessToken: access_token});
                         status = 201;
                     }
-                    saveSetting('USERS', existingUsers);
 
                     if (contains(username, getSetting('ALLOWED_USERS'))) {
                         res.setCookie('plotly-auth-token', access_token, {'path': '/'});
@@ -278,6 +277,8 @@ export default class Servers {
                                           'path': '/'
                                       });
                         res.setCookie('db-connector-user', username, {'path': '/'});
+
+                        saveSetting('USERS', existingUsers);
 
                         if (isElectron()) {
 

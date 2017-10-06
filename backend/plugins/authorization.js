@@ -56,6 +56,7 @@ export function PlotlyOAuth() {
                       // Remove any existing credentials and return error
                       res.clearCookie('db-connector-auth-token');
                       res.clearCookie('plotly-auth-token');
+                      res.clearCookie('db-connector-user');
                       res.json(403, {error: {message: `User ${userMeta.username} is not allowed to view this app`}})
                       return;
 

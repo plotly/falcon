@@ -104,10 +104,10 @@ let queryObject;
 let servers;
 let connectionId;
 
-let isElectronStub = sinon.stub(utils, 'isElectron');
+const isElectronStub = sinon.stub(utils, 'isElectron');
 isElectronStub.returns(false);
 
-let accessTokenExpiryStub = sinon.stub(utils, 'getAccessTokenExpiry');
+const accessTokenExpiryStub = sinon.stub(utils, 'getAccessTokenExpiry');
 
 describe('Servers - ', () => {
     beforeEach(() => {
@@ -193,7 +193,7 @@ describe('Authentication - ', () => {
         });
 
         // enable authentication:
-        saveSetting('AUTH_ENABLED', 'true');
+        saveSetting('AUTH_ENABLED', true);
 
         // Save some connections to the user's disk
         saveSetting('USERS', [{
@@ -231,8 +231,10 @@ describe('Authentication - ', () => {
 
     it('allows access to connections page without logging in', function(done) {
         GET('')
-        .then(() => done())
-        .catch(done);
+        .then(res => {
+            assert.equal(res.status, 200);
+            done();
+        }).catch(done);
     });
 
     it('does not allow access to settings when not logged in', function(done) {
@@ -269,9 +271,10 @@ describe('Authentication - ', () => {
             GET('settings')
             .then(res => {
                 assert.equal(res.status, 200);
-                done();
-            }).catch(done);
-        });
+                return;
+            });
+            done();
+        }).catch(done);
 
     });
 
@@ -292,9 +295,10 @@ describe('Authentication - ', () => {
             GET('settings')
             .then(res => {
                 assert.equal(res.status, 200);
-                done();
-            }).catch(done);
-        });
+                return;
+            });
+            done();
+        }).catch(done);
     });
 
     it('makes request to plotly if accessToken expired', function(done) {
@@ -319,10 +323,11 @@ describe('Authentication - ', () => {
                                  'https://bad-domain.plot.ly/v2/users/current failed, ' +
                                  'reason: getaddrinfo ENOTFOUND ' +
                                  'bad-domain.plot.ly bad-domain.plot.ly:443'));
-                    done();
-                })).catch(done);
+                    return;
+                }));
             }, 2000);
-        });
+            done();
+        }).catch(done);
     });
 
     it('prevents user from accessing urls when revoked from ALLOWED_USERS', function(done) {
@@ -336,20 +341,20 @@ describe('Authentication - ', () => {
         .then(res => {
             // request should be allowed:
             GET('settings').then(res => {
-              console.log('status1:' + res.status);
-              assert.equal(res.status, 200);
+                assert.equal(res.status, 200);
+                return;
             });
+            return;
         })
-        .then(saveSetting('ALLOWED_USERS', []))
         .then(() => {
+            saveSetting('ALLOWED_USERS', [])
 
             // Any requests should fail after revoking user access
             GET('settings').then(res => {
-                console.log('status2:' + res.status);
                 assert.equal(res.status, 403);
-                done();
+                return;
             });
-
+            done();
         }).catch(done);
     });
 
@@ -373,10 +378,6 @@ describe('Routes - ', () => {
             username, apiKey
         }]);
 
-        // Login the user:
-        saveSetting('ALLOWED_USERS', [username]);
-        setCookies(done);
-
         connectionId = saveConnection(sqlConnections);
         queryObject = {
             fid: validFid,
@@ -387,6 +388,9 @@ describe('Routes - ', () => {
             requestor: validFid.split(':')[0]
         };
 
+        // Login the user:
+        saveSetting('ALLOWED_USERS', [username]);
+        setCookies(done);
     });
 
     afterEach(() => {
