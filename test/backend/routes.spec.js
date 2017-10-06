@@ -330,6 +330,32 @@ describe('Authentication - ', () => {
         }).catch(done);
     });
 
+    it('renews access-token if expired', function(done) {
+        saveSetting('ALLOWED_USERS', [username]);
+
+
+        // set access-token expiry of 3 sec:
+        accessTokenExpiryStub.returns(3);
+
+        POST('oauth2', {access_token: accessToken})
+        .then(res => {
+            GET('settings').then(res => res.json().then(json => {
+                assert.equal(res.status, 200);
+                return;
+            }))
+        })
+        .then(res => {
+            setTimeout(() => {
+                GET('settings')
+                .then(res => res.json().then(json => {
+                    assert.equal(res.status, 200);
+                    return;
+                }));
+            }, 3000);
+            done();
+        }).catch(done);
+    });
+
     it('prevents user from accessing urls when revoked from ALLOWED_USERS', function(done) {
         saveSetting('ALLOWED_USERS', [username]);
 
