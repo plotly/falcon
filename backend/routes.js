@@ -21,7 +21,7 @@ import {
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
-import {generateAndSaveAccessToken, getAccessTokenExpiry, isElectron} from './utils/authUtils';
+import {generateAndSaveAccessToken, getAccessTokenExpiry} from './utils/authUtils';
 import {checkWritePermissions, newDatacache} from './persistent/PlotlyAPI.js';
 import {contains, has, keys, isEmpty, merge, pluck} from 'ramda';
 import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
@@ -131,7 +131,7 @@ export default class Servers {
         that.electronWindow = that.httpsServer.electronWindow || that.httpServer.electronWindow;
 
         server.use(CookieParser.parse);
-        server.use(PlotlyOAuth());
+        server.use(PlotlyOAuth(Boolean(that.isElectron)));
 
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
@@ -281,7 +281,7 @@ export default class Servers {
 
                         saveSetting('USERS', existingUsers);
 
-                        if (isElectron()) {
+                        if (that.isElectron) {
 
                             /*
                              * This part is handled separately for electron-app
