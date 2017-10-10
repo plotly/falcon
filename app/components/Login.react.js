@@ -1,3 +1,4 @@
+import cookie from 'react-cookies'
 import fetch from 'isomorphic-fetch';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
@@ -22,6 +23,7 @@ const SERVER_TYPES = {
 };
 
 window.document.title = `${productName} v${version}`;
+let usernameLogged = '';
 
 // http://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen
 const PopupCenter = (url, title, w, h) => {
@@ -52,25 +54,72 @@ class Login extends Component {
         this.buildOauthUrl = this.buildOauthUrl.bind(this);
         this.oauthPopUp = this.oauthPopUp.bind(this);
         this.logIn = this.logIn.bind(this);
-        this.checkAnyUserAccountIsSaved = this.checkAnyUserAccountIsSaved.bind(this);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this.checkAnyUserAccountIsSaved().then(isSaved => {
-            if (isSaved) {
-                window.location.assign(connectorUrl);
-            }
-        });
     }
 
     componentDidMount() {
-        this.checkAnyUserAccountIsSaved().then(isSaved => {
-            if (isSaved) {
-                window.location.assign(connectorUrl);
-            }
-        });
+        const {serverType} = this.state;
+        /*
+         * This repeatedly checks whether the the auth related cookies have been
+         * set for the user. Only meant for headless-server, since electron
+         * does not support cookies. For electron we initiate an eventListener
+         * to check for authentication.
+         */
+        const interval = setInterval(() => {
+              usernameLogged = cookie.load('db-connector-user');
+              if (usernameLogged) {
+                  if (serverType === ONPREM) {
+                      this.setState({
+                          status: 'authorized',
+                          statusMessage: 'Saving user information...'
+                      });
+                      this.saveDomainToSettings().then(res => res.text().then(text => {
+                          if (res.status === 200) {
+                              window.location.assign(connectorUrl);
+                          } else {
+                              this.setState({
+                                  status: 'failure',
+                                  statusMessage: text
+                              });
+                          }
+                      })).catch(err => {
+                          this.setState({
+                              status: 'failure',
+                              statusMessage: err.message
+                          })
+                      });
+                  }
+                  else {
+                      window.location.assign(connectorUrl);
+                  }
+              }
+        }, 1000);
+
     }
 
+    saveDomainToSettings() {
+
+        const {domain} = this.state;
+        let PLOTLY_API_SSL_ENABLED = true;
+        let PLOTLY_API_DOMAIN = '';
+        if (domain.startsWith('https://')) {
+            PLOTLY_API_SSL_ENABLED = true;
+            PLOTLY_API_DOMAIN = domain.replace('https://', '');
+        } else {
+            PLOTLY_API_SSL_ENABLED = false;
+            PLOTLY_API_DOMAIN = domain.replace('http://', '');
+        }
+        return fetch(`${baseUrlWrapped}/settings`, {
+            method: 'PATCH',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                PLOTLY_API_DOMAIN, PLOTLY_API_SSL_ENABLED
+            })
+        });
+
+    }
     buildOauthUrl() {
         const oauthClientId = 'isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt';
         const isOnPrem = this.state.serverType === ONPREM;
@@ -98,32 +147,6 @@ class Login extends Component {
                 popupWindow.focus();
             }
         }
-    }
-
-    checkAnyUserAccountIsSaved() {
-        return fetch(`${baseUrlWrapped}/settings`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        }).then((res) => res.json().then((json) => {
-            if (res.status !== 200) {
-                this.setState({
-                    status: 'failure',
-                    statusMessage: json.error.message
-                });
-                this.setState({loggedIn: false});
-                return false;
-            }
-            const userAccountIsSaved = json.USERS.length > 0;
-            console.warn('userAccountIsSaved: ', userAccountIsSaved);
-            this.setState({loggedIn: userAccountIsSaved});
-            return userAccountIsSaved;
-        })).catch((e) => {
-            this.setState({loggedIn: false});
-            return false;
-        });
     }
 
     logIn () {
@@ -193,65 +216,7 @@ class Login extends Component {
             )
         });
 
-        const repeatedlyCheckIfLoggedIn = () => {
-            const checkAuth = setInterval(() => {
-                this.checkAnyUserAccountIsSaved().then(isLoggedIn => {
-                    if (isLoggedIn) {
-                        clearInterval(checkAuth);
-                        window.location.assign(connectorUrl);
-                    }
-                });
-            }, 1000);
-        }
-
-        /*
-         * If the user is on-prem, then set the domain as a setting,
-         * and after that's done send them through the oauth redirect.
-         */
-        this.checkAnyUserAccountIsSaved().then(isLoggedIn => {
-            if (!isLoggedIn) {
-                if (this.state.serverType === ONPREM) {
-                    let PLOTLY_API_SSL_ENABLED;
-                    let PLOTLY_API_DOMAIN;
-                    if (domain.startsWith('https://')) {
-                        PLOTLY_API_SSL_ENABLED = true;
-                        PLOTLY_API_DOMAIN = domain.replace('https://', '');
-                    } else {
-                        PLOTLY_API_SSL_ENABLED = false;
-                        PLOTLY_API_DOMAIN = domain.replace('http://', '');
-                    }
-                    return fetch(`${baseUrlWrapped}/settings`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            PLOTLY_API_DOMAIN, PLOTLY_API_SSL_ENABLED
-                        })
-                    }).then(res => {
-                        if (res.status === 200) {
-                            this.oauthPopUp();
-                            repeatedlyCheckIfLoggedIn();
-                        } else {
-                            this.setState({
-                                status: 'failure',
-                                statusMessage: (
-                                    'There was an error while trying to log in. '+
-                                    'Try restarting the app and trying again.'
-                                )
-                            });
-                        }
-                    }).catch(console.error);
-                } else {
-                    this.oauthPopUp();
-                    repeatedlyCheckIfLoggedIn();
-                }
-            } else {
-                window.location.assign(connectorUrl);
-            }
-        }).catch(console.error);
-
+        this.oauthPopUp();
     }
 
 

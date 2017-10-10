@@ -16,7 +16,9 @@ const isTestRun = contains('--test-type=webdriver', process.argv.slice(2));
 
 const server = new Servers();
 Logger.log('Starting server', 2);
+server.isElectron = true;
 server.start();
+
 Logger.log('Loading persistent queries', 2);
 Logger.log('Electron version: ' + process.versions.electron, 2);
 Logger.log('Chrome version: ' + process.versions.chrome, 2);
@@ -32,6 +34,14 @@ app.on('ready', () => {
     });
 
     const {httpServer, httpsServer} = server;
+
+    /*
+     * This allows us to send pass information to electron renderer from
+     * inside the server.
+     */
+    httpServer.electronWindow = mainWindow;
+    httpsServer.electronWindow = mainWindow;
+
     const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;
     const HTTPS_URL = `${httpsServer.protocol}://${httpsServer.domain}:${httpsServer.port}`;
 

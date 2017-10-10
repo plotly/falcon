@@ -1,4 +1,5 @@
-import fetch from 'node-fetch';
+var fetch = require('fetch-cookie')(require('node-fetch'))
+
 import {assert} from 'chai';
 import {assoc, concat, contains, dissoc, isEmpty, keys, merge, sort, without} from 'ramda';
 import Servers from '../../backend/routes.js';
@@ -9,6 +10,8 @@ import {
 } from '../../backend/persistent/Connections.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
 import {setCertificatesSettings} from '../../backend/certificates';
+import * as utils from '../../backend/utils/authUtils';
+
 import fs from 'fs';
 import {
     accessToken,
@@ -85,6 +88,17 @@ function DELETE(path) {
     });
 }
 
+function setCookies(done) {
+
+    // Sets cookies using `oauth` route, so that other requests can be authenticated:
+    return POST('oauth2', {access_token: accessToken})
+    .then(res => res.json().then(json => {
+        assert.deepEqual(json, {});
+        done();
+    }));
+
+}
+
 let queryObject;
 let servers;
 let connectionId;
@@ -108,9 +122,11 @@ describe('Servers - ', () => {
 
     it('Https server is up and running after an http server was started and certs were created.', (done) => {
         servers = new Servers({createCerts: false, startHttps: true});
+
         servers.httpServer.start();
         saveSetting('USERS', [{username, accessToken}]);
         saveSetting('CONNECTOR_HTTPS_DOMAIN', `${fakeCerts.subdomain}.${testCA}`);
+        saveSetting('AUTH_ENABLED', false);
         assert.isNull(servers.httpsServer.certs, 'Has no certs in the beginning.');
         assert.isNull(servers.httpsServer.server, 'Https server does not exists initially');
         fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
@@ -157,9 +173,219 @@ describe('Servers - ', () => {
 
 });
 
-describe('Routes - ', () => {
+describe('Authentication - ', () => {
     beforeEach(() => {
         servers = new Servers({createCerts: false, startHttps: false});
+        servers.isElectron = false;
+        servers.httpServer.start();
+
+        // cleanup
+        ['CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH'].forEach(file => {
+            try {
+                fs.unlinkSync(getSetting(file));
+            } catch (e) {
+            }
+        });
+
+        // enable authentication:
+        saveSetting('AUTH_ENABLED', true);
+
+        // Save some connections to the user's disk
+        saveSetting('USERS', [{
+            username, apiKey
+        }]);
+        saveSetting('SSL_ENABLED', false);
+
+        connectionId = saveConnection(sqlConnections);
+        queryObject = {
+            fid: validFid,
+            uids: validUids.slice(0, 2), // since this particular query only has 2 columns
+            refreshInterval: 60, // every minute
+            query: 'SELECT * FROM ebola_2014 LIMIT 1',
+            connectionId: connectionId,
+            requestor: validFid.split(':')[0]
+        };
+
+    });
+
+    afterEach(() => {
+        servers.httpServer.close();
+        servers.queryScheduler.clearQueries();
+    });
+
+    it('ping - responds', function(done) {
+        GET('ping')
+        .then(() => done())
+        .catch(done);
+    });
+
+    it('allows access to login page without logging in', function(done) {
+        GET('login')
+        .then(() => done())
+        .catch(done);
+    });
+
+    it('allows access to connections page without logging in', function(done) {
+        GET('')
+        .then(res => {
+            assert.equal(res.status, 200);
+            done();
+        }).catch(done);
+    });
+
+    it('does not allow access to settings when not logged in', function(done) {
+        GET('settings')
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 401);
+            assert.deepEqual(json, {
+                "error": {"message": "Please login to access this page."}
+            });
+            done();
+        })).catch(done);
+    });
+
+    it('Oauth fails when user not present in ALLOWED_USERS', function(done) {
+
+        // empty allowed_users list
+        saveSetting('ALLOWED_USERS', []);
+
+        POST('oauth2', {access_token: accessToken})
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 403);
+            assert.deepEqual(json,
+              {error: {message: `User ${username} is not allowed to view this app`}}
+            );
+            done();
+        })).catch(done);
+    });
+
+    it('allows access to settings when logged in and present in ALLOWED_USERS', function(done) {
+        saveSetting('ALLOWED_USERS', [username]);
+
+        POST('oauth2', {access_token: accessToken})
+        .then(res => {
+            return GET('settings')
+            .then(res => {
+                assert.equal(res.status, 200);
+                done();
+            });
+        }).catch(done);
+
+    });
+
+    it('does not make request to plotly if accessToken is valid', function(done) {
+        saveSetting('ALLOWED_USERS', [username]);
+
+        POST('oauth2', {access_token: accessToken})
+        .then(res => {
+
+            /*
+             * This ensures that any requests to plotly fail so that we
+             * can catch them. Since the requests to plotly are not made
+             * when accessToken is valid, test-request should return 200
+             * irrespective of bad plotly-domain.
+             */
+            saveSetting('PLOTLY_API_DOMAIN', 'bad-domain.plot.ly');
+
+            return GET('settings')
+            .then(res => {
+                assert.equal(res.status, 200);
+                done();
+            });
+        }).catch(done);
+    });
+
+    it('makes request to plotly if accessToken expired', function(done) {
+        saveSetting('ALLOWED_USERS', [username]);
+
+        // set access-token expiry of 1 sec:
+        saveSetting('ACCESS_TOKEN_AGE', 1);
+
+        POST('oauth2', {access_token: accessToken})
+        .then(res => {
+
+            // This ensures that any requests to plotly fail so that we can catch them
+            saveSetting('PLOTLY_API_DOMAIN', 'bad-domain.plot.ly');
+
+            setTimeout(() => {
+                GET('settings')
+                .then(res => res.json().then(json => {
+                    assert.equal(res.status, 500);
+                    assert.equal(json.error.message,
+                                 ('request to ' +
+                                 'https://bad-domain.plot.ly/v2/users/current failed, ' +
+                                 'reason: getaddrinfo ENOTFOUND ' +
+                                 'bad-domain.plot.ly bad-domain.plot.ly:443'));
+
+                    done();
+                })).catch(done);
+            }, 2000);
+        }).catch(done);
+    });
+
+    it('renews access-token if expired', function(done) {
+        saveSetting('ALLOWED_USERS', [username]);
+
+
+        // set access-token expiry of 3 sec:
+        saveSetting('ACCESS_TOKEN_AGE', 3);
+
+        POST('oauth2', {access_token: accessToken})
+        .then(res => {
+            return GET('settings').then(res => res.json().then(json => {
+                assert.equal(res.status, 200);
+            }));
+        })
+        .then(res => {
+            setTimeout(() => {
+                GET('settings')
+                .then(res => res.json().then(json => {
+                    assert.equal(res.status, 200);
+                    done();
+                })).catch(done);
+            }, 3000);
+        }).catch(done);
+    });
+
+    it('prevents user from accessing urls when revoked from ALLOWED_USERS', function(done) {
+        saveSetting('ALLOWED_USERS', [username]);
+
+
+        // set access-token expiry of 1 sec:
+        saveSetting('ACCESS_TOKEN_AGE', 1);
+
+        POST('oauth2', {access_token: accessToken})
+        .then(res => {
+            // request should be allowed:
+            return GET('settings').then(res => {
+                assert.equal(res.status, 200);
+            });
+        })
+        .then(() => {
+
+            saveSetting('ALLOWED_USERS', []);
+
+            setTimeout(() => {
+                GET('settings')
+                .then(res => res.json().then(json => {
+                    assert.equal(res.status, 403);
+                    assert.deepEqual(json, {
+                        "error": {
+                            "message": `User ${username} is not allowed to view this app`
+                        }
+                    })
+                    done();
+                })).catch(done);
+            }, 3000);
+        }).catch(done);
+    });
+
+});
+
+describe('Routes - ', () => {
+    beforeEach((done) => {
+        servers = new Servers({createCerts: false, startHttps: false});
+        servers.isElectron = false;
         servers.httpServer.start();
 
         // cleanup
@@ -185,6 +411,10 @@ describe('Routes - ', () => {
             requestor: validFid.split(':')[0]
         };
 
+        // Login the user:
+        saveSetting('ALLOWED_USERS', [username]);
+        saveSetting('SSL_ENABLED', false);
+        setCookies(done);
     });
 
     afterEach(() => {
@@ -205,51 +435,6 @@ describe('Routes - ', () => {
             done();
         })
         .catch(done);
-    });
-
-    // Settings
-    it('settings/urls - returns 200 and the urls', function(done) {
-        GET('settings/urls')
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 200);
-            assert.equal(json.http, 'http://localhost:9494');
-            assert.equal(json.https, '');
-            done();
-        }))
-        .catch(done);
-    });
-
-    it('GET /settings returns some of the settings', function(done) {
-        saveSetting(
-            'USERS',
-            [{'username': 'chris', 'accessToken': 'lahlahlemons'}]
-        );
-        GET('settings')
-        .then(res => res.json().then(json => {
-            assert.deepEqual(json, {
-                'PLOTLY_URL': 'https://plot.ly',
-                'USERS': ['chris']
-            });
-            done();
-        })).catch(done);
-    });
-
-    it('PATCH /settings sets some settings', function(done) {
-        const newSettings = {
-            'PLOTLY_API_DOMAIN': 'acme.plot.ly',
-            'PLOTLY_API_SSL_ENABLED': false
-        };
-        PATCH('settings', newSettings).then(res => res.json().then(json => {
-            assert.equal(
-                getSetting('PLOTLY_API_SSL_ENABLED'),
-                newSettings.PLOTLY_API_SSL_ENABLED
-            );
-            assert.equal(
-                getSetting('PLOTLY_API_DOMAIN'),
-                newSettings.PLOTLY_API_DOMAIN
-            );
-            done();
-        })).catch(done);
     });
 
     // OAuth
@@ -282,7 +467,7 @@ describe('Routes - ', () => {
                 [{username, accessToken}]
             );
 
-            // We can save it again and we'll get a 200 instead of a 201
+            // We can save it again and we'll still get a 200 instead of a 201
             POST('oauth2', {access_token: accessToken})
             .then(res => res.json().then(json => {
                 assert.deepEqual(json, {});
@@ -307,6 +492,49 @@ describe('Routes - ', () => {
             assert.deepEqual(
                 getSetting('USERS'),
                 []
+            );
+            done();
+        })).catch(done);
+    });
+
+    // Settings
+    it('settings/urls - returns 200 and the urls', function(done) {
+        GET('settings/urls')
+        .then(res => res.json().then(json => {
+            assert.equal(res.status, 200);
+            assert.deepEqual(json, {
+                http: 'http://localhost:9494',
+                https: '',
+            });
+            done();
+        }))
+        .catch(done);
+    });
+
+    it('GET /settings returns some of the settings', function(done) {
+        GET('settings')
+        .then(res => res.json().then(json => {
+            assert.deepEqual(json, {
+                'PLOTLY_URL': 'https://plot.ly',
+                'USERS': ['plotly-database-connector']
+            });
+            done();
+        })).catch(done);
+    });
+
+    it('PATCH /settings sets some settings', function(done) {
+        const newSettings = {
+            'PLOTLY_API_DOMAIN': 'acme.plot.ly',
+            'PLOTLY_API_SSL_ENABLED': false
+        };
+        PATCH('settings', newSettings).then(res => res.json().then(json => {
+            assert.equal(
+                getSetting('PLOTLY_API_SSL_ENABLED'),
+                newSettings.PLOTLY_API_SSL_ENABLED
+            );
+            assert.equal(
+                getSetting('PLOTLY_API_DOMAIN'),
+                newSettings.PLOTLY_API_DOMAIN
             );
             done();
         })).catch(done);
@@ -1420,6 +1648,7 @@ describe('Routes - ', () => {
         assert.deepEqual(getSetting('USERS'), creds);
         POST('queries', queryObject)
         .then(res => res.json().then(json => {
+            assert.equal(res.status, 400);
             assert.deepEqual(
                 json,
                 {error: {
@@ -1428,7 +1657,7 @@ describe('Routes - ', () => {
                     )
                 }}
             );
-            assert.equal(res.status, 400);
+
             done();
         })).catch(done);
     });
@@ -1441,6 +1670,7 @@ describe('Routes - ', () => {
         assert.deepEqual(getSetting('PLOTLY_API_URL'), `https://${nonExistantServer}`);
         POST('queries', queryObject)
         .then(res => res.json().then(json => {
+            assert.equal(res.status, 400);
             assert.deepEqual(
                 json,
                 {
@@ -1453,7 +1683,7 @@ describe('Routes - ', () => {
                     }
                 }
             );
-            assert.equal(res.status, 400);
+
             done();
         })).catch(done);
     });

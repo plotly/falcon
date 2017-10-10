@@ -51,4 +51,26 @@ describe('Settings', function() {
         expect(getSetting('PLOTLY_API_URL'), 'http://plotly.acme.com');
     });
 
+    it('Parses default number settings as numbers', ()  => {
+        // check default
+        const numberSetting = getSetting('ACCESS_TOKEN_AGE');
+        expect(typeof numberSetting, 'number');
+        expect(numberSetting, 300);
+    });
+
+    it('Parses saved number settings as numbers', ()  => {
+        const now = Date.now();
+        saveSetting('ACCESS_TOKEN_EXPIRY', now);
+        const nowSetting = getSetting('ACCESS_TOKEN_EXPIRY');
+        expect(typeof nowSetting, 'number');
+        expect(nowSetting, now);
+    });
+
+    it('Parses environment number settings as numbers', ()  => {
+        const now = Date.now();
+        process.env.PLOTLY_CONNECTOR_ACCESS_TOKEN_EXPIRY = String(now);
+        const nowSetting = getSetting('ACCESS_TOKEN_EXPIRY');
+        expect(typeof nowSetting, 'number');
+        expect(nowSetting, now);
+    });
 });

@@ -31,7 +31,7 @@ export default {
         new webpack.DefinePlugin({ 'global.GENTLY': false })
     ],
 
-    target: 'node',
+    target: 'electron',
 
     node: {
         // https://github.com/automation-stack/electron-sudo#usage-with-webpack

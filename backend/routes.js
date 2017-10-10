@@ -1,10 +1,12 @@
 var restify = require('restify');
+var CookieParser = require('restify-cookies');
 import * as Datastores from './persistent/datastores/Datastores.js';
 import * as fs from 'fs';
 import os from 'os';
 import path from 'path';
 import webContents from 'electron';
 
+import {PlotlyOAuth} from './plugins/authorization.js'
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
 import {
     deleteConnectionById,
@@ -19,6 +21,8 @@ import {
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
+import {generateAndSaveAccessToken} from './utils/authUtils';
+import {getAccessTokenCookieOptions, getCookieOptions} from './constants';
 import {checkWritePermissions, newDatacache} from './persistent/PlotlyAPI.js';
 import {contains, has, keys, isEmpty, merge, pluck} from 'ramda';
 import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
@@ -124,6 +128,12 @@ export default class Servers {
         const that = this;
         const restifyServer = type === 'https' ? that.httpsServer : that.httpServer;
         const {server} = restifyServer;
+
+        that.electronWindow = that.httpsServer.electronWindow || that.httpServer.electronWindow;
+
+        server.use(CookieParser.parse);
+        server.use(PlotlyOAuth(Boolean(that.isElectron)));
+
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
         server.pre(function (request, response, next) {
@@ -257,8 +267,37 @@ export default class Servers {
                         existingUsers.push({username, accessToken: access_token});
                         status = 201;
                     }
-                    saveSetting('USERS', existingUsers);
-                    res.json(status, {});
+
+                    if (contains(username, getSetting('ALLOWED_USERS'))) {
+                        res.setCookie('plotly-auth-token', access_token, getCookieOptions());
+
+                        const db_connector_access_token = generateAndSaveAccessToken();
+                        res.setCookie('db-connector-auth-token',
+                                      db_connector_access_token,
+                                      getAccessTokenCookieOptions());
+                        res.setCookie('db-connector-user', username, getCookieOptions());
+
+                        saveSetting('USERS', existingUsers);
+
+                        if (that.isElectron) {
+
+                            /*
+                             * This part is handled separately for electron-app
+                             * because electron apps does not support cookies
+                             * like browsers do.
+                             */
+                            that.electronWindow.loadURL(`${protocol}://${domain}:${port}/`);
+                            that.electronWindow.webContents.on('did-finish-load', () => {
+                                that.electronWindow.webContents.send('username', username);
+                            });
+
+                        }
+                        res.json(status, {});
+                    } else {
+
+                      res.json(403, {error: {message: `User ${username} is not allowed to view this app`}});
+                      return;
+                    }
                 } else {
                     Logger.log(userMeta, 0);
                     res.json(500, {error: {message: `Error ${userRes.status} fetching user`}});
