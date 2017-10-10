@@ -2,7 +2,6 @@ var fetch = require('fetch-cookie')(require('node-fetch'))
 
 import {assert} from 'chai';
 import {assoc, concat, contains, dissoc, isEmpty, keys, merge, sort, without} from 'ramda';
-import sinon from 'sinon';
 import Servers from '../../backend/routes.js';
 import {
     getConnections,
@@ -103,8 +102,6 @@ function setCookies(done) {
 let queryObject;
 let servers;
 let connectionId;
-
-const accessTokenExpiryStub = sinon.stub(utils, 'getAccessTokenExpiry');
 
 describe('Servers - ', () => {
     beforeEach(() => {
@@ -301,9 +298,8 @@ describe('Authentication - ', () => {
     it('makes request to plotly if accessToken expired', function(done) {
         saveSetting('ALLOWED_USERS', [username]);
 
-
         // set access-token expiry of 1 sec:
-        accessTokenExpiryStub.returns(1);
+        saveSetting('ACCESS_TOKEN_AGE', 1);
 
         POST('oauth2', {access_token: accessToken})
         .then(res => {
@@ -332,7 +328,7 @@ describe('Authentication - ', () => {
 
 
         // set access-token expiry of 3 sec:
-        accessTokenExpiryStub.returns(3);
+        saveSetting('ACCESS_TOKEN_AGE', 3);
 
         POST('oauth2', {access_token: accessToken})
         .then(res => {
@@ -356,7 +352,7 @@ describe('Authentication - ', () => {
 
 
         // set access-token expiry of 1 sec:
-        accessTokenExpiryStub.returns(1);
+        saveSetting('ACCESS_TOKEN_AGE', 1);
 
         POST('oauth2', {access_token: accessToken})
         .then(res => {

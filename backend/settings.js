@@ -27,6 +27,7 @@ const DEFAULT_SETTINGS = {
 
     ACCESS_TOKEN: '',
     ACCESS_TOKEN_EXPIRY: 0,
+    ACCESS_TOKEN_AGE: 300,
     ALLOWED_USERS: [],
     /*
      * The actual CORS origins is a "derived" setting
