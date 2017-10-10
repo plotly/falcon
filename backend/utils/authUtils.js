@@ -5,7 +5,7 @@ import {ACCESS_TOKEN_EXPIRY} from '../constants';
 export function generateAndSaveAccessToken(){
     const currentTime = Date.now();
 
-    if (getSetting('ACCESS_TOKEN_EXPIRY') > currentTime) {
+    if (getSetting('ACCESS_TOKEN_EXPIRY') < currentTime) {
         const accessToken = uuidv4();
         saveSetting('ACCESS_TOKEN', accessToken);
         saveSetting('ACCESS_TOKEN_EXPIRY', currentTime + getAccessTokenExpiry());

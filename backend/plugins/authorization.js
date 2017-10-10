@@ -13,7 +13,9 @@ const ESCAPED_ROUTES = [
 ]
 
 function accessTokenIsValid(access_token) {
-    return getSetting('ACCESS_TOKEN') === access_token;
+    const currentTime = Date.now();
+    return (getSetting('ACCESS_TOKEN') === access_token &&
+            getSetting('ACCESS_TOKEN_EXPIRY') > currentTime);
 }
 
 export function PlotlyOAuth(electron) {
