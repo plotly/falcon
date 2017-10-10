@@ -1,6 +1,7 @@
 import {contains} from 'ramda';
 import {getSetting} from '../settings.js';
-import {generateAndSaveAccessToken, getAccessTokenExpiry} from '../utils/authUtils';
+import {ACCESS_TOKEN_COOKIE_OPTIONS, COOKIE_OPTIONS} from '../constants.js';
+import {generateAndSaveAccessToken} from '../utils/authUtils';
 import Logger from '../logger';
 import fetch from 'node-fetch';
 
@@ -64,11 +65,7 @@ export function PlotlyOAuth(electron) {
 
                       const dbConnectorAccessToken = generateAndSaveAccessToken();
                       res.setCookie('db-connector-auth-token',
-                                    dbConnectorAccessToken, {
-                                        'maxAge': getAccessTokenExpiry(),
-                                        'path': getSetting('DB_CONNECTOR_URL'),
-                                        'secure': getSetting('PLOTLY_API_SSL_ENABLED')
-                                    });
+                                    dbConnectorAccessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
                       return (next());
                   }
               }

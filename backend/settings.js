@@ -14,17 +14,19 @@ const DEFAULT_SETTINGS = {
         'connector'
     ),
     AUTH_ENABLED: true,
+    SSL_ENABLED: true,
+    WEB_BASE_PATHNAME: '/',
     PLOTLY_API_SSL_ENABLED: true,
     PLOTLY_API_DOMAIN: 'api.plot.ly',
 
     CERTIFICATE_LAST_UPDATED: '',
     CONNECTOR_HTTPS_DOMAIN: 'default',
-    DB_CONNECTOR_URL: '/',
 
     // TODO - This should just be an object keyed by username
     USERS: [],
 
     ACCESS_TOKEN: '',
+    ACCESS_TOKEN_EXPIRY: 0,
     ALLOWED_USERS: [],
     /*
      * The actual CORS origins is a "derived" setting

@@ -21,7 +21,8 @@ import {
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
-import {generateAndSaveAccessToken, getAccessTokenExpiry} from './utils/authUtils';
+import {generateAndSaveAccessToken} from './utils/authUtils';
+import {ACCESS_TOKEN_COOKIE_OPTIONS, COOKIE_OPTIONS} from './constants';
 import {checkWritePermissions, newDatacache} from './persistent/PlotlyAPI.js';
 import {contains, has, keys, isEmpty, merge, pluck} from 'ramda';
 import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
@@ -268,16 +269,13 @@ export default class Servers {
                     }
 
                     if (contains(username, getSetting('ALLOWED_USERS'))) {
-                        res.setCookie('plotly-auth-token', access_token, {'path': getSetting('DB_CONNECTOR_URL')});
+                        res.setCookie('plotly-auth-token', access_token, COOKIE_OPTIONS);
 
                         const db_connector_access_token = generateAndSaveAccessToken();
                         res.setCookie('db-connector-auth-token',
-                                      db_connector_access_token, {
-                                          'maxAge': getAccessTokenExpiry(),
-                                          'path': getSetting('DB_CONNECTOR_URL'),
-                                          'secure': getSetting('PLOTLY_API_SSL_ENABLED')
-                                      });
-                        res.setCookie('db-connector-user', username, {'path': '/'});
+                                      db_connector_access_token,
+                                      ACCESS_TOKEN_COOKIE_OPTIONS);
+                        res.setCookie('db-connector-user', username, COOKIE_OPTIONS);
 
                         saveSetting('USERS', existingUsers);
 

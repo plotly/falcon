@@ -1,25 +1,21 @@
 import uuidv4 from 'uuid/v4';
-import {saveSetting} from '../settings.js';
-
-const ACCESS_TOKEN_EXPIRY = 300;
+import {getSetting, saveSetting} from '../settings';
+import {ACCESS_TOKEN_EXPIRY} from '../constants';
 
 export function generateAndSaveAccessToken(){
-    const access_token = uuidv4();
-    saveSetting('ACCESS_TOKEN', access_token);
-    return access_token;
-}
+    const currentTime = Date.now();
 
-
-export function isElectron() {
-
-    if (process.versions && !!process.versions.electron) {
-        return true;
+    if (getSetting('ACCESS_TOKEN_EXPIRY') > currentTime) {
+        const accessToken = uuidv4();
+        saveSetting('ACCESS_TOKEN', accessToken);
+        saveSetting('ACCESS_TOKEN_EXPIRY', currentTime + getAccessTokenExpiry());
+        return accessToken;
     } else {
-        return false;
+        return getSetting('ACCESS_TOKEN');
     }
+
+
 }
-
-
 
 // Needed for mocking during tests.
 export function getAccessTokenExpiry() {
