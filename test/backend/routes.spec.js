@@ -104,9 +104,6 @@ let queryObject;
 let servers;
 let connectionId;
 
-const isElectronStub = sinon.stub(utils, 'isElectron');
-isElectronStub.returns(false);
-
 const accessTokenExpiryStub = sinon.stub(utils, 'getAccessTokenExpiry');
 
 describe('Servers - ', () => {
@@ -182,6 +179,7 @@ describe('Servers - ', () => {
 describe('Authentication - ', () => {
     beforeEach(() => {
         servers = new Servers({createCerts: false, startHttps: false});
+        servers.isElectron = false;
         servers.httpServer.start();
 
         // cleanup
@@ -199,6 +197,7 @@ describe('Authentication - ', () => {
         saveSetting('USERS', [{
             username, apiKey
         }]);
+        saveSetting('SSL_ENABLED', false);
 
         connectionId = saveConnection(sqlConnections);
         queryObject = {
@@ -268,12 +267,11 @@ describe('Authentication - ', () => {
 
         POST('oauth2', {access_token: accessToken})
         .then(res => {
-            GET('settings')
+            return GET('settings')
             .then(res => {
                 assert.equal(res.status, 200);
-                return;
+                done();
             });
-            done();
         }).catch(done);
 
     });
@@ -292,12 +290,11 @@ describe('Authentication - ', () => {
              */
             saveSetting('PLOTLY_API_DOMAIN', 'bad-domain.plot.ly');
 
-            GET('settings')
+            return GET('settings')
             .then(res => {
                 assert.equal(res.status, 200);
-                return;
+                done();
             });
-            done();
         }).catch(done);
     });
 
@@ -323,10 +320,10 @@ describe('Authentication - ', () => {
                                  'https://bad-domain.plot.ly/v2/users/current failed, ' +
                                  'reason: getaddrinfo ENOTFOUND ' +
                                  'bad-domain.plot.ly bad-domain.plot.ly:443'));
-                    return;
-                }));
+
+                    done();
+                })).catch(done);
             }, 2000);
-            done();
         }).catch(done);
     });
 
@@ -339,20 +336,18 @@ describe('Authentication - ', () => {
 
         POST('oauth2', {access_token: accessToken})
         .then(res => {
-            GET('settings').then(res => res.json().then(json => {
+            return GET('settings').then(res => res.json().then(json => {
                 assert.equal(res.status, 200);
-                return;
-            }))
+            }));
         })
         .then(res => {
             setTimeout(() => {
                 GET('settings')
                 .then(res => res.json().then(json => {
                     assert.equal(res.status, 200);
-                    return;
-                }));
+                    done();
+                })).catch(done);
             }, 3000);
-            done();
         }).catch(done);
     });
 
@@ -360,27 +355,32 @@ describe('Authentication - ', () => {
         saveSetting('ALLOWED_USERS', [username]);
 
 
-        // set access-token expiry of 3 sec:
-        accessTokenExpiryStub.returns(3);
+        // set access-token expiry of 1 sec:
+        accessTokenExpiryStub.returns(1);
 
         POST('oauth2', {access_token: accessToken})
         .then(res => {
             // request should be allowed:
-            GET('settings').then(res => {
+            return GET('settings').then(res => {
                 assert.equal(res.status, 200);
-                return;
             });
-            return;
         })
         .then(() => {
-            saveSetting('ALLOWED_USERS', [])
 
-            // Any requests should fail after revoking user access
-            GET('settings').then(res => {
-                assert.equal(res.status, 403);
-                return;
-            });
-            done();
+            saveSetting('ALLOWED_USERS', []);
+
+            setTimeout(() => {
+                GET('settings')
+                .then(res => res.json().then(json => {
+                    assert.equal(res.status, 403);
+                    assert.deepEqual(json, {
+                        "error": {
+                            "message": `User ${username} is not allowed to view this app`
+                        }
+                    })
+                    done();
+                })).catch(done);
+            }, 3000);
         }).catch(done);
     });
 
@@ -389,6 +389,7 @@ describe('Authentication - ', () => {
 describe('Routes - ', () => {
     beforeEach((done) => {
         servers = new Servers({createCerts: false, startHttps: false});
+        servers.isElectron = false;
         servers.httpServer.start();
 
         // cleanup
@@ -416,6 +417,7 @@ describe('Routes - ', () => {
 
         // Login the user:
         saveSetting('ALLOWED_USERS', [username]);
+        saveSetting('SSL_ENABLED', false);
         setCookies(done);
     });
 
