@@ -20,5 +20,6 @@ export function generateAndSaveAccessToken(){
 // Needed for mocking during tests.
 export function getAccessTokenExpiry() {
 
-    return ACCESS_TOKEN_EXPIRY;
+    // ACCESS_TOKEN_EXPIRY is expressed in seconds.
+    return ACCESS_TOKEN_EXPIRY * 1000;
 }
