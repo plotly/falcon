@@ -2,20 +2,20 @@
 
 Note that this section targets contributors and those who wish to set up and run the server themselves.
 
-If you're interested in using the distributed App, [download the latest release.](https://github.com/plotly/plotly-database-connector/releases)
+If you're interested in using the distributed App, [download the latest release.](https://github.com/plotly/falcon-sql-client/releases)
 
 ## Install
 
 Start by cloning the repo via git:
 
 ```bash
-git clone https://github.com/plotly/plotly-database-connector plotly-database-connector
+git clone https://github.com/plotly/falcon-sql-client falcon-sql-client
 ```
 
 And then install dependencies with **yarn**.
 
 ```bash
-$ cd plotly-database-connector
+$ cd falcon-sql-client
 $ yarn install
 $ yarn run rebuild:modules:electron
 ```
@@ -53,7 +53,7 @@ The database connector runs as a server by default as part of [Plotly On-Premise
 
 ## Run as a docker image
 
-See the [Dockerfile](https://github.com/plotly/plotly-database-connector/blob/master/Dockerfile) for more information.
+See the [Dockerfile](https://github.com/plotly/falcon-sql-client/blob/master/Dockerfile) for more information.
 
 ## Developing
 
@@ -108,4 +108,4 @@ $ yarn run test-e2e
 - Windows 32bit and 64bit builds are created in AppVeyor tests (under Artifacts)
 - Mac builds are created on any available Mac laptop - run `yarn run package` and zip the resulting build
 
-Releases are uploaded to https://github.com/plotly/plotly-database-connector/releases
+Releases are uploaded to https://github.com/plotly/falcon-sql-client/releases

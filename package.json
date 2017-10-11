@@ -1,6 +1,6 @@
 {
-  "name": "plotly-database-connector",
-  "productName": "Plotly Database Connector",
+  "name": "falcon-sql-client",
+  "productName": "Falcon SQL Client",
   "version": "2.3.0",
   "description": "Plotly Database Connector for https://plot.ly/create. Connect your database and query your data to use in your charts.",
   "main": "./backend/main.js",
@@ -96,7 +96,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/plotly/plotly-database-connector"
+    "url": "git+https://github.com/plotly/falcon-sql-client"
   },
   "author": {
     "name": "Plotly",
@@ -105,7 +105,7 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/plotly/plotly-database-connector/issues"
+    "url": "https://github.com/plotly/falcon-sql-client/issues"
   },
   "keywords": [
     "electron",
@@ -119,7 +119,7 @@
     "persistent",
     "connector"
   ],
-  "homepage": "https://github.com/plotly/plotly-database-connector",
+  "homepage": "https://github.com/plotly/falcon-sql-client",
   "optionalDependencies": {
     "fsevents": "*"
   },
