@@ -184,7 +184,7 @@ export const FAQ = [
     }, {
         q: 'Is this app open-source?',
         a: 'Yep! You can view and contribute to the source code on GitHub: \
-            https://github.com/plotly/plotly-database-connector.'
+            https://github.com/plotly/falcon-sql-client'
     }, {
         q: '[Advanced] How do scheduled queries work?',
         a: 'You can run queries on a scheduler (ie daily or hourly) through the plot.ly workspace. \
