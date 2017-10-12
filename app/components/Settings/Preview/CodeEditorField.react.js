@@ -26,7 +26,7 @@ class CodeEditorField extends Component {
 
             let lastTableName = '';
             let tableName;
-            let tables = {};
+            const tables = {};
             let newColumnArray = [];
             let DB_HAS_ONLY_ONE_TABLE;
             const TABLE_NAME = 0;
@@ -35,7 +35,7 @@ class CodeEditorField extends Component {
             const schema = schemaRequest.content;
             schema.rows.map(function(row, i) {
                 tableName = row[TABLE_NAME];
-                DB_HAS_ONLY_ONE_TABLE = (Object.keys(tables).length === 0 && i === schema.rows.length-1);
+                DB_HAS_ONLY_ONE_TABLE = (Object.keys(tables).length === 0 && i === schema.rows.length - 1);
                 if (tableName !== lastTableName || DB_HAS_ONLY_ONE_TABLE) {
                     if (newColumnArray.length !== 0) {
                         tables[tableName] = newColumnArray;
@@ -62,7 +62,7 @@ class CodeEditorField extends Component {
 
     autoComplete(cm) {
 
-        const codeMirror = this.refs['CodeMirror'].getCodeMirrorInstance();
+        const codeMirror = this.refs.CodeMirror.getCodeMirrorInstance();
 
         // hint options for specific plugin & general show-hint
         // 'tables' is sql-hint specific
@@ -86,22 +86,22 @@ class CodeEditorField extends Component {
         this.props.onChange(newCode);
 
         // Don't show autocomplete after a space
-        let char = newCode.slice(-1);
+        const char = newCode.slice(-1);
         if (char !== ' ' && char !== ';') {
-            let cm = this.refs['CodeMirror'].getCodeMirror();
+            const cm = this.refs.CodeMirror.getCodeMirror();
             this.autoComplete(cm);
         }
     }
 
     render() {
-        let mode = {
+        const mode = {
             [DIALECTS.APACHE_SPARK]: 'text/x-sparksql',
             [DIALECTS.MYSQL]: 'text/x-mysql',
             [DIALECTS.SQLITE]: 'text/x-sqlite',
             [DIALECTS.MARIADB]: 'text/x-mariadb',
             [DIALECTS.POSTGRES]: 'text/x-pgsql',
             [DIALECTS.REDSHIFT]: 'text/x-pgsql',
-            [DIALECTS.MSSQL]: 'text/x-mssql',
+            [DIALECTS.MSSQL]: 'text/x-mssql'
         }[this.props.connectionObject.dialect] || 'text/x-sql';
 
         const options = {

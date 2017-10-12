@@ -55,9 +55,8 @@ export function files(connection) {
             if (err) {
                 reject(err);
                 return;
-            } else {
-                resolve(data.Contents);
             }
+            resolve(data.Contents);
         });
     });
 }

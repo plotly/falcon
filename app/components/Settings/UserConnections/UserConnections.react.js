@@ -71,7 +71,7 @@ export default class UserConnections extends Component {
             width: '100%',
             maxWidth: 200,
             overflowWrap: 'break-word',
-            display: this.state.showSampleCredentials ? 'inline-block': 'none'
+            display: this.state.showSampleCredentials ? 'inline-block' : 'none'
         };
 
         const inputs = CONNECTION_CONFIG[connectionObject.dialect]
@@ -159,10 +159,10 @@ export default class UserConnections extends Component {
 		return (
             <div>
                 {inputs}
-                <small className='sampleCredentials'>
+                <small className="sampleCredentials">
                     <a onClick={this.toggleSampleCredentials}>
-                        {this.state.showSampleCredentials && `Hide Sample Credentials`}
-                        {!this.state.showSampleCredentials && `Show Sample Credentials`}
+                        {this.state.showSampleCredentials && 'Hide Sample Credentials'}
+                        {!this.state.showSampleCredentials && 'Show Sample Credentials'}
                     </a>
                 </small>
             </div>

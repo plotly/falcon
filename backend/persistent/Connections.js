@@ -20,18 +20,16 @@ export function sanitize(connection) {
 export function getConnections() {
     if (fs.existsSync(getSetting('CONNECTIONS_PATH'))) {
         return YAML.load(getSetting('CONNECTIONS_PATH').toString());
-    } else {
-        return [];
     }
+    return [];
 }
 
 export function getSanitizedConnectionById(id) {
     const connection = getConnections().find(c => c.id === id);
     if (connection) {
         return sanitize(connection);
-    } else {
-        return null;
     }
+    return null;
 }
 
 export function getConnectionById(id) {

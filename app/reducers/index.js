@@ -166,9 +166,8 @@ function tabMap(state = {}, action) {
 function selectedTab(state = '', action) {
     if (action.type === 'SET_TAB') {
         return action.payload;
-    } else {
-        return state;
     }
+    return state;
 }
 
 function selectedTables(state = {}, action) {
@@ -176,9 +175,8 @@ function selectedTables(state = {}, action) {
         return merge(state, action.payload);
     } else if (action.type === 'RESET') {
         return merge(state, assoc(action.payload.id, '', state));
-    } else {
-        return state;
     }
+    return state;
 }
 
 // object for each tab that tells us if the credentials have been modified since last save to disk
@@ -189,9 +187,8 @@ function connectionsNeedToBeSaved(state = {}, action) {
             action.payload.content,
             state
         );
-    } else {
-        return state;
     }
+    return state;
 }
 
 function selectedIndecies(state = {}, action) {
@@ -199,9 +196,8 @@ function selectedIndecies(state = {}, action) {
         return merge(state, action.payload);
     } else if (action.type === 'RESET') {
         return merge(state, assoc(action.payload.id, '', state));
-    } else {
-        return state;
     }
+    return state;
 }
 
 function connections(state = {}, action) {
@@ -218,9 +214,8 @@ function connections(state = {}, action) {
         );
     } else if (action.type === 'DELETE_CREDENTIAL') {
         return dissoc(action.payload, state);
-    } else {
-        return state;
     }
+    return state;
 }
 
 function previews(state = {}, action) {
@@ -239,9 +234,8 @@ function previews(state = {}, action) {
                 )
             }
         );
-    } else {
-        return state;
     }
+    return state;
 }
 
 const rootReducer = combineReducers({

@@ -17,7 +17,7 @@ export function connect(connection) {
 export function tables(connection) {
     const code = (connection.database) ?
         `val r = plotlyContext.sql("show tables in ${connection.database}").collect\n%json r` :
-        `val r = plotlyContext.sql("show tables").collect\n%json r`;
+        'val r = plotlyContext.sql("show tables").collect\n%json r';
     return sendRequest(connection, code)
         .then(json => {
             if (json instanceof Error) {
@@ -71,8 +71,8 @@ export function schemas(connection) {
                 return {columnnames: [], rows: []};
             }
 
-            let columnnames = json[0].schema.map(s => s.name.toUpperCase());
-            let rows = json.map(d => d.values);
+            const columnnames = json[0].schema.map(s => s.name.toUpperCase());
+            const rows = json.map(d => d.values);
             return {columnnames, rows};
         });
 }
@@ -95,8 +95,8 @@ export function query(query, connection) {
                 return {columnnames: [], rows: []};
             }
 
-            let columnnames = json[0].schema.map(s => s.name.toUpperCase());
-            let rows = json.map(d => d.values);
+            const columnnames = json[0].schema.map(s => s.name.toUpperCase());
+            const rows = json.map(d => d.values);
             return {columnnames, rows};
         });
 }
@@ -205,8 +205,8 @@ function wait(milliseconds) {
 function getClient(connection, attempts) {
     const timeout = connection.timeout || 180;
 
-    attempts = attempts || 1
-    if (attempts++ > connection.timeout) new Error("livy: connect: timeout");
+    attempts = attempts || 1;
+    if (attempts++ > connection.timeout) new Error('livy: connect: timeout');
 
     return getState(connection).then(state => {
         return (state === 'idle') ?
@@ -258,7 +258,7 @@ function getResponse(connection, statementId) {
                 json = statement.output.data['application/json'];
             } catch (err) {
                 json = makeError(statement);
-            };
+            }
             return json;
         });
 }
@@ -269,7 +269,7 @@ function makeError(json) {
     }
 
     let errorMessage = `${json.output.ename}: ${json.output.evalue}`;
-    if(Array.isArray(json.output.traceback)) {
+    if (Array.isArray(json.output.traceback)) {
         errorMessage += `\n${json.output.traceback.join('')}`;
     }
 

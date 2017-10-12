@@ -41,5 +41,5 @@ export function plotlyUrl() {
 }
 
 export function isElectron() {
-  return window.process && window.process.type === 'renderer'
+    return window.process && window.process.type === 'renderer';
 }

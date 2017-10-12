@@ -34,7 +34,7 @@ const SHOW_TABLES_QUERY = {
         'information_schema.tables ' +
         'WHERE table_type != \'VIEW\' and ' +
         'table_schema != \'pg_catalog\' and ' +
-        'table_schema != \'information_schema\''    
+        'table_schema != \'information_schema\''
     )
 };
 
@@ -82,22 +82,21 @@ export function connect(connection) {
     );
     if (connection.dialect !== 'sqlite') {
         return createClient(connection).authenticate();
-    } else {
-        /*
-         * sqlite's createClient will create a sqlite file even if it
-         * doesn't exist. that means that bad storage parameters won't
-         * reject. Instead of trying `authenticate`, just check if
-         * the file exists.
-         */
-        return new Promise(function(resolve, reject) {
-            if (fs.existsSync(connection.storage)) {
-                resolve();
-            } else {
-                reject(new Error(`SQLite file at path "${connection.storage}" does not exist.`));
-            }
-        })
     }
 
+    /*
+     * sqlite's createClient will create a sqlite file even if it
+     * doesn't exist. that means that bad storage parameters won't
+     * reject. Instead of trying `authenticate`, just check if
+     * the file exists.
+     */
+    return new Promise(function(resolve, reject) {
+        if (fs.existsSync(connection.storage)) {
+            resolve();
+        } else {
+            reject(new Error(`SQLite file at path "${connection.storage}" does not exist.`));
+        }
+    });
 }
 
 export function query(queryString, connection) {
@@ -114,16 +113,16 @@ export function tables(connection) {
     ).then(tableList => {
 
         let tableNames;
-        
-        if (connection.dialect === 'redshift') {            
+
+        if (connection.dialect === 'redshift') {
             tableNames = tableList.map(data => {
                 return data['?column?'];
             });
-        } else if(connection.dialect === 'postgres') {
+        } else if (connection.dialect === 'postgres') {
             tableNames = tableList.map(data => {
                 return data[0];
             });
-        } else if(connection.dialect === 'sqlite'){
+        } else if (connection.dialect === 'sqlite') {
             tableNames = tableList;
         } else {
             tableNames = tableList.map(object => values(object)[0]);

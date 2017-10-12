@@ -143,7 +143,7 @@ class QueryScheduler {
             }
 
             Logger.log(`Querying "${queryString}" with connection ${connectionId} to update grid ${fid}`, 2);
-            return Connections.query(queryString, requestedDBConnections)
+            return Connections.query(queryString, requestedDBConnections);
 
         }).then(rowsAndColumns => {
 
@@ -193,7 +193,6 @@ class QueryScheduler {
                     `grids/${fid}`,
                     {username, apiKey, accessToken, method: 'GET'}
                 ).then(res => {
-
                     if (res.status === 404) {
                         Logger.log(('' +
                             `Grid ID ${fid} doesn't exist on Plotly anymore, ` +
@@ -202,40 +201,37 @@ class QueryScheduler {
                         );
                         this.clearQuery(fid);
                         return deleteQuery(fid);
-                    } else {
-                        return res.text()
-                        .then(text => {
-                            let filemeta;
-                            try {
-                                filemeta = JSON.parse(text);
-                            } catch (e) {
-                                // Well, that's annoying.
-                                Logger.log(`Failed to parse the JSON of request ${fid}`, 0);
-                                Logger.log(e)
-                                Logger.log('Text response: ' + text, 0);
-                                throw new Error(e);
-                            }
-                            if (filemeta.deleted) {
-                                Logger.log(`
-                                    Grid ID ${fid} was deleted,
-                                    removing persistent query.`,
-                                    2
-                                );
-                                this.clearQuery(fid);
-                                return deleteQuery(fid);
-                            }
-                        });
                     }
-                });
 
-            } else {
-
-                return res.json().then(json => {
-                    Logger.log(`Grid ${fid} has been updated.`, 2);
+                    return res.text()
+                    .then(text => {
+                        let filemeta;
+                        try {
+                            filemeta = JSON.parse(text);
+                        } catch (e) {
+                            // Well, that's annoying.
+                            Logger.log(`Failed to parse the JSON of request ${fid}`, 0);
+                            Logger.log(e);
+                            Logger.log('Text response: ' + text, 0);
+                            throw new Error(e);
+                        }
+                        if (filemeta.deleted) {
+                            Logger.log(`
+                                Grid ID ${fid} was deleted,
+                                removing persistent query.`,
+                                2
+                            );
+                            this.clearQuery(fid);
+                            return deleteQuery(fid);
+                        }
+                    });
                 });
 
             }
 
+            return res.json().then(json => {
+                Logger.log(`Grid ${fid} has been updated.`, 2);
+            });
         });
 
     }

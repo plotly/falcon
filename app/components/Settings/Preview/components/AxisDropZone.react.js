@@ -21,7 +21,7 @@ const axisZoneTarget = {
 @DropTarget(props => props.accepts, axisZoneTarget, (connect, monitor) => ({
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver(),
-    canDrop: monitor.canDrop(),
+    canDrop: monitor.canDrop()
 }))
 export default class AxisDropZone extends Component {
 
@@ -35,7 +35,7 @@ export default class AxisDropZone extends Component {
         isOver: PropTypes.bool.isRequired,
         canDrop: PropTypes.bool.isRequired,
         accepts: PropTypes.arrayOf(PropTypes.string).isRequired,
-        onDrop: PropTypes.func.isRequired,
+        onDrop: PropTypes.func.isRequired
     };
 
     clickRemoveHandler (colName, dropType) {
@@ -57,10 +57,10 @@ export default class AxisDropZone extends Component {
         return connectDropTarget(
             <div style={{ ...style, backgroundColor }}>
 
-                {droppedItems.map((colName,i) => 
+                {droppedItems.map((colName, i) => 
                     <Box
                         name={colName}
-                        type='column'
+                        type="column"
                         isDropped={true}
                         removeDroppedItem={this.props.removeDroppedItem}
                         handleClick={this.props.handleClick}

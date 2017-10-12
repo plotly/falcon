@@ -6,14 +6,14 @@ import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import SQLTable from './SQLTable.react.js';
 import CodeEditorField from './CodeEditorField.react.js';
 import ChartEditor from './ChartEditor.react.js';
-import ApacheDrillPreview from './ApacheDrillPreview.js'
-import S3Preview from './S3Preview.js'
+import ApacheDrillPreview from './ApacheDrillPreview.js';
+import S3Preview from './S3Preview.js';
 
 import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../../Link.react';
 import * as Actions from '../../../actions/sessions';
 import {DIALECTS, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
-import getPlotJsonFromState from './components/getPlotJsonFromState.js'
+import getPlotJsonFromState from './components/getPlotJsonFromState.js';
 
 class Preview extends Component {
 
@@ -51,7 +51,7 @@ class Preview extends Component {
             setIndex,
             setTable,
             tablesRequest,
-            updatePreview,
+            updatePreview
         } = nextProps;
         const {chartEditor, lastSuccessfulQuery} = preview;
 
@@ -117,17 +117,17 @@ class Preview extends Component {
             boxes: columnNames => columnNames.map(
                 colName => ({name: colName, type: 'column'})),
             columnTraceTypes: columnNames => (
-                R.reduce((r, k)=>R.set(R.lensProp(k), 'scatter', r), {}, columnNames)
+                R.reduce((r, k) => R.set(R.lensProp(k), 'scatter', r), {}, columnNames)
             ),
             droppedBoxNames: () => [],
             selectedColumn: () => '',
             selectedChartType: () => 'scatter'
-        }
+        };
 
         if (columnNames !== this.state.columnNames) {
             // Reset props to defaults based off of columnNames
             R.keys(defaultChartEditorState).forEach(k => {
-                chartEditorState[k] = defaultChartEditorState[k](columnNames)
+                chartEditorState[k] = defaultChartEditorState[k](columnNames);
             });
         } else if (columnNames.length === 0) {
             ['droppedBoxNames', 'selectedColumn', 'selectedChartType'].forEach(
@@ -160,7 +160,7 @@ class Preview extends Component {
             isLoading,
             plotJSON,
             rows,
-            successMsg,
+            successMsg
         });
     }
 
@@ -168,7 +168,7 @@ class Preview extends Component {
 
         const payloadJSON = JSON.stringify({payload: payload, type: type});
 
-        fetch("/datacache", {
+        fetch('/datacache', {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -179,11 +179,10 @@ class Preview extends Component {
         }).then( resp => {
             return resp.json();
         }).then( data => {
-            let plotlyLinks = this.state.plotlyLinks;
+            const plotlyLinks = this.state.plotlyLinks;
             if ( !('error' in data) ) {
                 plotlyLinks.unshift({type: type, url: data.url});
-            }
-            else{
+            } else {
                 plotlyLinks.unshift({type: 'error', message: data.error.message});
             }
             this.setState({ plotlyLinks: plotlyLinks });
@@ -201,7 +200,7 @@ class Preview extends Component {
             * lastSuccessfulQuery is the result of the last successful query
             * and should have the form {rows:[[]], columnnames:[]}
             */
-            if( !has('error', content) && has('rows', content) && has('columnnames', content) ){
+            if ( !has('error', content) && has('rows', content) && has('columnnames', content) ) {
                 this.props.updatePreview({lastSuccessfulQuery: content});
             }
         });
@@ -242,7 +241,7 @@ class Preview extends Component {
             setIndex,
             setTable,
             tablesRequest,
-            updatePreview,
+            updatePreview
         } = this.props;
 
         const {
@@ -253,7 +252,7 @@ class Preview extends Component {
             isLoading,
             plotJSON,
             rows,
-            successMsg,
+            successMsg
         } = this.state;
 
         const dialect = connectionObject.dialect;
@@ -274,7 +273,7 @@ class Preview extends Component {
                                 </small>
                             </code>
 
-                            <div style={{display: showEditor ? 'block' : 'none', position:'relative'}}>
+                            <div style={{display: showEditor ? 'block' : 'none', position: 'relative'}}>
                                 <CodeEditorField
                                     value={code}
                                     onChange={this.updateCode}
@@ -285,7 +284,7 @@ class Preview extends Component {
                                     updatePreview={updatePreview}
                                 />
                                 <a
-                                    className='btn btn-primary runButton'
+                                    className="btn btn-primary runButton"
                                     onClick={this.runQuery}
                                     disabled={!isLoading}
                                 >
@@ -314,7 +313,7 @@ class Preview extends Component {
                     </div>
                 }
 
-                {dialect !== DIALECTS['S3'] && dialect !== DIALECTS['APACHE_DRILL'] &&
+                {dialect !== DIALECTS.S3 && dialect !== DIALECTS.APACHE_DRILL &&
                     <div>
                         <Tabs forceRenderTabPanel={true}>
                             <TabList>
@@ -348,22 +347,22 @@ class Preview extends Component {
                             </TabPanel>
 
                             <TabPanel>
-                                <div className='export-options-container'>
+                                <div className="export-options-container">
                                     <div style={{margin: '20px 0'}}>
                                         <button
-                                            className='btn btn-outline'
+                                            className="btn btn-outline"
                                             onClick={() => this.fetchDatacache(csvString, 'grid')}
                                         >
                                             Send CSV to plot.ly
                                         </button>
                                         <button
-                                            className='btn btn-outline'
+                                            className="btn btn-outline"
                                             onClick={() => this.fetchDatacache(csvString, 'csv')}
                                         >
                                             Download CSV
                                         </button>
                                         <button
-                                            className='btn btn-outline'
+                                            className="btn btn-outline"
                                             onClick={() => this.fetchDatacache(
                                                 JSON.stringify(plotJSON),
                                                 'plot'
@@ -372,32 +371,33 @@ class Preview extends Component {
                                             Send chart to plot.ly
                                         </button>
                                     </div>
-                                    <div style={{width:650, height:200, border:'1px solid #dfe8f3',
-                                        fontFamily: `'Ubuntu Mono', courier, monospace`, paddingTop: 10,
-                                        padding:20, marginTop:10, overflow:'hidden', overflowY:'scroll'}}>
+                                    <div style={{width: 650, height: 200, border: '1px solid #dfe8f3',
+                                        fontFamily: '\'Ubuntu Mono\', courier, monospace', paddingTop: 10,
+                                        padding: 20, marginTop: 10, overflow: 'hidden', overflowY: 'scroll'}}
+                                    >
                                         {this.state.plotlyLinks.map(link => (
-                                            <div style={{borderTop:'1px solid #dfe8f3', marginTop:20}}>
+                                            <div style={{borderTop: '1px solid #dfe8f3', marginTop: 20}}>
                                                 {link.type == 'grid' &&
                                                     <div>
-                                                        <div style={{color:'#00cc96'}}>🎉  Link to your CSV on Plot.ly ⬇️</div>
+                                                        <div style={{color: '#00cc96'}}>🎉  Link to your CSV on Plot.ly ⬇️</div>
                                                         <Link href={link.url} target="_blank">{link.url}</Link>
                                                     </div>
                                                 }
                                                 {link.type == 'csv' &&
                                                     <div>
-                                                        <div style={{color:'#00cc96'}}>💾  Your CSV has been saved ⬇️</div>
+                                                        <div style={{color: '#00cc96'}}>💾  Your CSV has been saved ⬇️</div>
                                                         <Link href={link.url} target="_blank">{link.url}</Link>
                                                     </div>
-                                                }                                                
+                                                }
                                                 {link.type == 'plot' &&
                                                     <div>
-                                                        <div style={{color:'#00cc96'}}>📈  Link to your chart on Plot.ly ⬇️</div>
+                                                        <div style={{color: '#00cc96'}}>📈  Link to your chart on Plot.ly ⬇️</div>
                                                         <Link href={link.url} target="_blank">{link.url}</Link>
                                                     </div>
                                                 }
                                                 {link.type == 'error' &&
                                                     <div>
-                                                        <div style={{color:'#D36046'}}>{`[ERROR] ${link.message}`}</div>
+                                                        <div style={{color: '#D36046'}}>{`[ERROR] ${link.message}`}</div>
                                                     </div>
                                                 }
                                             </div>
@@ -420,6 +420,6 @@ class Preview extends Component {
             </div>
         );
     }
-};
+}
 
 export default connect()(Preview);

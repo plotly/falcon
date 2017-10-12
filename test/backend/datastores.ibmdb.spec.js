@@ -32,7 +32,7 @@ describe('IBM DB2:', function () {
                 ['Moldova', 16.8],
                 ['Lithuania', 15.4],
                 ['Russia', 15.1],
-                ['Romania', 14.4],
+                ['Romania', 14.4]
             ]);
             assert.deepEqual(results.columnnames, ['LOCATION', 'ALCOHOL']);
         }).then(done);

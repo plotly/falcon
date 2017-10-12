@@ -6,7 +6,7 @@ import os from 'os';
 import path from 'path';
 import webContents from 'electron';
 
-import {PlotlyOAuth} from './plugins/authorization.js'
+import {PlotlyOAuth} from './plugins/authorization.js';
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
 import {
     deleteConnectionById,
@@ -220,7 +220,7 @@ export default class Servers {
                 PLOTLY_URL: getSetting('PLOTLY_URL')
             };
 
-            return res.json(200, filteredSettings)
+            return res.json(200, filteredSettings);
         });
 
         // Patch on /settings does a merge
@@ -536,10 +536,10 @@ export default class Servers {
                 });
             }
             else {
-                const rand = Math.round(Math.random()*1000).toString();
+                const rand = Math.round(Math.random() * 1000).toString();
                 const downloadPath = path.join(getSetting('STORAGE_PATH'), `data_export_${rand}.csv`);
                 fs.writeFile(downloadPath, payload, (err) => {
-                    if (err){
+                    if (err) {
                         return res.json({type: 'error', message: err});
                     }
                     return res.json({

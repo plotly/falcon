@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import TreeView from 'react-treeview';
 import {isEmpty, has, propOr} from 'ramda';
-import * as Actions from '../../../actions/sessions'
+import * as Actions from '../../../actions/sessions';
 
 class TableTree extends Component {
 
@@ -21,7 +21,7 @@ class TableTree extends Component {
             getSqlSchema();
         }
         else if (schemaRequest.status === 200 && !has('treeSchema', this.props.preview)) {
-            let treeSchema = {};
+            const treeSchema = {};
             schemaRequest.content.rows.forEach(function(row) {
                 const [tableName, columnName, dataType] = row;
 
@@ -29,7 +29,7 @@ class TableTree extends Component {
                     treeSchema[tableName][columnName] = dataType;
                 } else {
                     treeSchema[tableName] = {
-                        [columnName]: dataType,
+                        [columnName]: dataType
                     };
                 }
             });
@@ -51,7 +51,7 @@ class TableTree extends Component {
         const status = schemaRequest.status;
 
         if (typeof status === 'undefined' || status === 'loading') {
-            return (<div className='loading'>{'Loading'}</div>);
+            return (<div className="loading">{'Loading'}</div>);
         }
 
         if (status !== 200) {
@@ -66,7 +66,7 @@ class TableTree extends Component {
         const treeSchema = preview.treeSchema;
 
         if (!treeSchema) {
-            return (<div className='loading'>{'Updating'}</div>);
+            return (<div className="loading">{'Updating'}</div>);
         }
 
         const database = this.props.connectionObject.database;
@@ -92,6 +92,6 @@ class TableTree extends Component {
             </div>
         );
     }
-};
+}
 
 export default TableTree;

@@ -12,7 +12,7 @@ function request(relativeUrl, connection, {body, method, queryStringParams = ''}
         'Content-Type': 'application/json'
     };
     if (username && password) {
-        headers['Authorization'] = 'Basic ' + new Buffer(
+        headers.Authorization = 'Basic ' + new Buffer(
             username + ':' + password
         ).toString('base64');
     }
@@ -54,9 +54,8 @@ export function query(query, connection) {
         .then(res => res.json().then(results => {
             if (res.status === 200) {
                 return parseElasticsearch(body, results, mapping);
-            } else {
-                throw new Error(JSON.stringify(results));
             }
+            throw new Error(JSON.stringify(results));
         }));
     });
 }

@@ -10,8 +10,9 @@ export default function SQLTable(props) {
 	        width={800}
 	        height={200}
 	        headerHeight={40}
-	        {...this.props}>
-	        {columnNames.map(function(colName, colIndex){
+	        {...this.props}
+	    >
+	        {columnNames.map(function(colName, colIndex) {
 	            return <Column
 	                columnKey={colName}
 	                key={colIndex}

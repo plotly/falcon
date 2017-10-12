@@ -27,12 +27,12 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
 }
 
 export function newDatacache(payloadJSON, type) {
-    let form = new FormData();
-    form.append('type', type)
+    const form = new FormData();
+    form.append('type', type);
     form.append('payload', payloadJSON);
     const body = form;
 
-    return fetch("https://plot.ly/datacache", {
+    return fetch('https://plot.ly/datacache', {
         method: 'POST',
         body: body
     }).then(res => {
@@ -112,7 +112,7 @@ export function checkWritePermissions(fid, requestor) {
         apiKey,
         accessToken,
         method: 'GET'
-    }).then(function(res){
+    }).then(function(res) {
         if (res.status === 404) {
             throw new Error('Not found');
         } else if (res.status === 401) {
@@ -129,11 +129,10 @@ export function checkWritePermissions(fid, requestor) {
             filemeta.collaborators.results &&
             Boolean(filemeta.collaborators.results.find(collab => requestor === collab.username))
         ) {
-            return new Promise(function(resolve){resolve()});
+            return new Promise(function(resolve) {resolve();});
         } else if (owner === requestor) {
-            return new Promise(function(resolve){resolve()});
-        } else {
-            throw new Error('Permission denied');
+            return new Promise(function(resolve) {resolve();});
         }
-    })
+        throw new Error('Permission denied');
+    });
 }

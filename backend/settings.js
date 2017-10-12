@@ -79,11 +79,10 @@ function getDerivedSetting(settingName) {
     switch (settingName) {
         case 'PLOTLY_URL': {
             if (getSetting('PLOTLY_API_DOMAIN') ===
-                DEFAULT_SETTINGS['PLOTLY_API_DOMAIN']) {
-                return 'https://plot.ly'
-            } else {
-                return getSetting('PLOTLY_API_URL');
+                DEFAULT_SETTINGS.PLOTLY_API_DOMAIN) {
+                return 'https://plot.ly';
             }
+            return getSetting('PLOTLY_API_URL');
         }
 
         case 'PLOTLY_API_URL':
@@ -139,7 +138,7 @@ function getDerivedSetting(settingName) {
              * on-prem
              */
             if (getSetting('PLOTLY_API_DOMAIN') !==
-                    DEFAULT_SETTINGS['PLOTLY_API_DOMAIN']) {
+                    DEFAULT_SETTINGS.PLOTLY_API_DOMAIN) {
 
                 corsOrigins.push(getSetting('PLOTLY_URL'));
 
@@ -161,7 +160,7 @@ export function getSetting(settingName) {
     if (contains(settingName, derivedSettingsNames)) {
         return getDerivedSetting(settingName);
     } else if (has(`PLOTLY_CONNECTOR_${settingName}`, process.env)) {
-        let envObject = process.env[`PLOTLY_CONNECTOR_${settingName}`];
+        const envObject = process.env[`PLOTLY_CONNECTOR_${settingName}`];
         try {
             return JSON.parse(envObject);
         } catch (e) {
@@ -180,18 +179,16 @@ export function getSetting(settingName) {
         }
         if (has(settingName, DEFAULT_SETTINGS)) {
             return DEFAULT_SETTINGS[settingName];
-        } else {
-            throw new Error(`Setting ${settingName} does not exist`);
         }
+        throw new Error(`Setting ${settingName} does not exist`);
     }
 }
 
 function loadSettings() {
     if (fs.existsSync(getSetting('SETTINGS_PATH'))) {
         return YAML.load(getSetting('SETTINGS_PATH'));
-    } else {
-        return {};
     }
+    return {};
 }
 
 // Save settings to a file - primarily used for setting up tests

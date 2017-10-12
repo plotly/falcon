@@ -29,11 +29,11 @@ const TEST_CASES = [
     }
 ];
 
-describe('parseCSV', function(){
+describe('parseCSV', function() {
     TEST_CASES.forEach(function(testCase) {
         const {name, input, output} = testCase;
         it(`Parses a simple CSV string for test case ${name}`, function(done) {
-            parseCSV(input).then(function(rowsAndColumns){
+            parseCSV(input).then(function(rowsAndColumns) {
                 assert.deepEqual(
                     output[0], rowsAndColumns.columnnames
                 );

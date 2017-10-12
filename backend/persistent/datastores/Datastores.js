@@ -36,9 +36,8 @@ function getDatastoreClient(connection) {
         return ApacheLivy;
     } else if (dialect === 'ibm db2') {
         return IbmDb2;
-    } else {
-        return Sql;
     }
+    return Sql;
 }
 
 /*

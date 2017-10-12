@@ -10,7 +10,7 @@ const ESCAPED_ROUTES = [
   new RegExp('^/login$'),
   new RegExp('^/static/'),
   new RegExp('^/oauth2$')
-]
+];
 
 function accessTokenIsValid(access_token) {
     const currentTime = Date.now();
@@ -52,15 +52,14 @@ export function PlotlyOAuth(electron) {
               if (userRes.status !== 200) {
                 res.json(401, {error: {message: 'Please login to access this page.'}});
                 return;
-              }
-              else {
+              } else {
                   if (!contains(userMeta.username, getSetting('ALLOWED_USERS'))) {
 
                       // Remove any existing credentials and return error
                       res.clearCookie('db-connector-auth-token');
                       res.clearCookie('plotly-auth-token');
                       res.clearCookie('db-connector-user');
-                      res.json(403, {error: {message: `User ${userMeta.username} is not allowed to view this app`}})
+                      res.json(403, {error: {message: `User ${userMeta.username} is not allowed to view this app`}});
                       return;
 
                   } else {
@@ -75,7 +74,7 @@ export function PlotlyOAuth(electron) {
             }))
             .catch(err => {
                 Logger.log(err, 0);
-                res.json(500, {error: {message: err.message}})
+                res.json(500, {error: {message: err.message}});
                 return;
             });
 

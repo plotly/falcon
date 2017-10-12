@@ -8,7 +8,7 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import AxisDropZone from './components/AxisDropZone.react.js';
 import Box from './components/Box.react.js';
 
-import getPlotJsonFromState from './components/getPlotJsonFromState.js'
+import getPlotJsonFromState from './components/getPlotJsonFromState.js';
 import {PLOT_TYPES, controlPanelStyle, columnSelectLabelStyle,
         dropdownContainerStyle, selectDropdownStyle, submitStyle} from './components/editorConstants';
 
@@ -25,7 +25,7 @@ export default class ChartEditor extends PureComponent {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return (JSON.stringify(nextProps) !== this.props)
+        return (JSON.stringify(nextProps) !== this.props);
     }
 
     isDropped(boxName) {
@@ -46,7 +46,7 @@ export default class ChartEditor extends PureComponent {
             updatePlotJson,
             updateProps,
             xAxisColumnName,
-            yAxisColumnNames,
+            yAxisColumnNames
         } = this.props;
 
         const columnLabel = selectedColumn ?
@@ -54,7 +54,7 @@ export default class ChartEditor extends PureComponent {
             'Select a chart type';
 
         return (
-            <div style={{fontFamily:'Open Sans, Sans-Serif'}}>
+            <div style={{fontFamily: 'Open Sans, Sans-Serif'}}>
                 <div style={controlPanelStyle}>
                     <div style={dropdownContainerStyle}>
                         <div style={columnSelectLabelStyle}>{columnLabel}</div>
@@ -80,19 +80,19 @@ export default class ChartEditor extends PureComponent {
                     </div>
                 </div>
                 <div>
-                    <div style={{float:'left', height:'400px'}}>
+                    <div style={{float: 'left', height: '400px'}}>
                         <AxisDropZone
                             accepts={['column']}
                             onDrop={item => this.handleDrop(item, 'yaxis')}
                             removeDroppedItem={this.handleRemove}
                             handleClick={this.handleClick}
                             key={1}
-                            dropType='yaxis'
+                            dropType="yaxis"
                             droppedItems={yAxisColumnNames}
                             selectedColumn={selectedColumn}
                         />
                     </div>
-                    <div style={{marginLeft:'100px', position:'relative'}}>
+                    <div style={{marginLeft: '100px', position: 'relative'}}>
                         <PlotlyComponent
                             data={plotJSON.data}
                             layout={plotJSON.layout}
@@ -102,10 +102,10 @@ export default class ChartEditor extends PureComponent {
                 </div>
                 <AxisDropZone
                     accepts={['column']}
-                    onDrop={item => this.handleDrop(item ,'xaxis')}
+                    onDrop={item => this.handleDrop(item, 'xaxis')}
                     removeDroppedItem={this.handleRemove}
                     key={0}
-                    dropType='xaxis'
+                    dropType="xaxis"
                     droppedItems={[xAxisColumnName]}
                     selectedColumn={selectedColumn}
                 />
@@ -137,7 +137,7 @@ export default class ChartEditor extends PureComponent {
 
     handleSelect(event) {
         const traceType = event.target.value;
-        let columnTraceTypes = this.props.columnTraceTypes;
+        const columnTraceTypes = this.props.columnTraceTypes;
         const {columnNames, selectedColumn, updateProps} = this.props;
 
         if (selectedColumn) {
@@ -159,8 +159,7 @@ export default class ChartEditor extends PureComponent {
         const {columnTraceTypes, selectedColumn, updateProps} = this.props;
         if (colName === selectedColumn) {
             updateProps({selectedColumn: ''});
-        }
-        else{
+        } else {
             updateProps({
                 selectedColumn: colName,
                 selectedChartType: columnTraceTypes[colName]
