@@ -79,7 +79,7 @@
       "target": [
         "dmg"
       ],
-      "icon": "app/app.icns"
+      "icon": "app/app.ico"
     },
     "linux": {
       "target": [
