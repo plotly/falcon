@@ -13,7 +13,7 @@ const LINKS = {
     PLANS: 'http://plot.ly/plans/',
     DOCS: 'http://help.plot.ly/database-connectors/',
     TYPEFORM: 'https://plotly.typeform.com/to/KUiCSl',
-    GITHUB: 'https://github.com/plotly/plotly-database-connector',
+    GITHUB: 'https://github.com/plotly/falcon-sql-client',
     ABOUT: 'https://plot.ly/database-connectors/'
 };
 const ONPREM = contains('external-data-connector', window.location.href);

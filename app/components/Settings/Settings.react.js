@@ -386,17 +386,17 @@ class Settings extends Component {
                                 <div className="big-whitespace-tab">
                                     {httpsServerIsOK ? (
                                         <div id="test-ssl-initialized" style={{textAlign: 'center'}}>
-                                            <img 
-                                                src="/static/images/architecture.png" 
+                                            <img
+                                                src="/static/images/ms-icon-150x150.png"
                                                 style={{border: '1px solid #ebf0f8'}}
                                             >
                                             </img>
                                             <p>
-                                                {`The Plotly Database Connector (PDC) can be a middle man between 
-                                                    your database and Plot.ly, so that when your database updates, 
-                                                    your charts and dashboards update as well. Run PDC on a server 
-                                                    for 24/7 dashboard updates, or just keep this app open on an 
-                                                    office computer. If you have Plotly On-Premises, this app is 
+                                                {`The Falcon SQL Client can be a middle man between
+                                                    your database and Plot.ly, so that when your database updates,
+                                                    your charts and dashboards update as well. Run Falcon on a server
+                                                    for 24/7 dashboard updates, or just keep this app open on an
+                                                    office computer. If you have Plotly On-Premises, this app is
                                                     already running in your container. Contact your On-Prem admin
                                                     to learn how to connect.`}
                                             </p>
@@ -408,9 +408,9 @@ class Settings extends Component {
                                                 target="_blank"
                                             >
                                                 Query {dialect} from plot.ly
-                                            </Link>                                            
+                                            </Link>
                                             <div>
-                                                <code>PDC has auto-generated a local URL and SSL certificate for itself: </code>
+                                                <code>Falcon has auto-generated a local URL and SSL certificate for itself: </code>
                                                 <br />
                                                 <Link
                                                     href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}
@@ -425,8 +425,8 @@ class Settings extends Component {
                                             <p>
                                                 {`Plotly is automatically initializing a
                                                   unique SSL certificate and URL for you.
-                                                  This can take up to 10 minutes. Once this 
-                                                  is complete, you'll be able to query your 
+                                                  This can take up to 10 minutes. Once this
+                                                  is complete, you'll be able to query your
                                                   databases from `}
                                                 <Link href={`${plotlyUrl}/create?upload=sql`}>
                                                         Plotly

@@ -44,7 +44,7 @@ describe('plotly database connector', function() {
                 return delay(3 * 1000);
             })
             // ensure the electron app has loaded
-            .then(() => this.driver.wait(webdriver.until.titleContains('Plotly Database Connector')))
+            .then(() => this.driver.wait(webdriver.until.titleContains('Falcon')))
     );
 
     after(() =>
