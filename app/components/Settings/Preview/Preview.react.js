@@ -106,7 +106,7 @@ class Preview extends Component {
         }
 
         let csvString = columnNames.join(', ') + '\n';
-        rows.map( row => {
+        rows.map(row => {
             csvString = csvString + row.join(', ') + '\n';
         });
 
@@ -176,11 +176,11 @@ class Preview extends Component {
             method: 'POST',
             credentials: 'include',
             body: payloadJSON
-        }).then( resp => {
+        }).then(resp => {
             return resp.json();
-        }).then( data => {
+        }).then(data => {
             const plotlyLinks = this.state.plotlyLinks;
-            if ( !('error' in data) ) {
+            if (!('error' in data)) {
                 plotlyLinks.unshift({type: type, url: data.url});
             } else {
                 plotlyLinks.unshift({type: 'error', message: data.error.message});
@@ -200,7 +200,7 @@ class Preview extends Component {
             * lastSuccessfulQuery is the result of the last successful query
             * and should have the form {rows:[[]], columnnames:[]}
             */
-            if ( !has('error', content) && has('rows', content) && has('columnnames', content) ) {
+            if (!has('error', content) && has('rows', content) && has('columnnames', content)) {
                 this.props.updatePreview({lastSuccessfulQuery: content});
             }
         });

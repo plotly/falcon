@@ -181,7 +181,7 @@ class Settings extends Component {
             selectedIndex,
             tablesRequest
         } = this.props;
-        if (connectionsRequest && !connectionsRequest.status ) {
+        if (connectionsRequest && !connectionsRequest.status) {
             initialize();
         }
         // keeps the credentials form open until connected

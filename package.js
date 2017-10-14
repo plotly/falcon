@@ -64,7 +64,7 @@ function startPack() {
      * Workaround for: https://github.com/ibmdb/node-ibm_db/issues/329
      * This can be removed once the issue is resolved.
      */
-    if(os.platform == 'darwin') {
+    if (os.platform == 'darwin') {
         exec('install_name_tool -change `pwd`/node_modules/ibm_db/installer/clidriver/lib/libdb2.dylib @loader_path/../../installer/clidriver/lib/libdb2.dylib node_modules/ibm_db/build/Release/odbc_bindings.node');
     }
     build(electronCfg)

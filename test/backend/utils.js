@@ -212,10 +212,10 @@ export class MockedServerCA {
             headers: headers
         }));
         headers.forEach(header => restify.CORS.ALLOW_HEADERS.push(header));
-        server.opts( /.*/, function (req, res) {
+        server.opts(/.*/, function (req, res) {
             res.header(
                 'Access-Control-Allow-Headers',
-                restify.CORS.ALLOW_HEADERS.join( ', ' )
+                restify.CORS.ALLOW_HEADERS.join(', ')
             );
             res.header(
                 'Access-Control-Allow-Methods',

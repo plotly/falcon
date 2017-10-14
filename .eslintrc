@@ -120,7 +120,8 @@
             "block": {
                 exceptions: ["*"]
             }
-        }]
+        }],
+        "space-in-parens": [2, "never"]
     },
     "globals": {
         "jest": true

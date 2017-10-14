@@ -172,10 +172,10 @@ export default class Servers {
         Logger.log('CORS_ALLOWED_ORIGINS: ' + JSON.stringify(
             getSetting('CORS_ALLOWED_ORIGINS')
         ), 2);
-        server.opts( /.*/, function (req, res) {
+        server.opts(/.*/, function (req, res) {
             res.header(
                 'Access-Control-Allow-Headers',
-                restify.CORS.ALLOW_HEADERS.join( ', ' )
+                restify.CORS.ALLOW_HEADERS.join(', ')
             );
             res.header(
                 'Access-Control-Allow-Methods',
