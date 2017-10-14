@@ -94,7 +94,8 @@ class Status extends Component {
                 marginLeft: 'auto',
                 marginRight: 'auto',
                 width: '400px'
-            }}>
+            }}
+            >
                 {content}
             </div>
         );

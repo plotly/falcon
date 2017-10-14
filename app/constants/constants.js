@@ -289,4 +289,4 @@ export const SAMPLE_DBS = {
         dialect: 'sqlite',
         storage: `${__dirname}/plotly_datasets.db`
     }
-}
+};

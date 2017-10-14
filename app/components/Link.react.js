@@ -18,7 +18,6 @@ export function Link(props) {
                 {...R.omit(['className'], props)}
             />
         );
-    } else {
-        return <a href={href} target="_blank" {...props}/>
     }
+    return <a href={href} target="_blank" {...props}/>;
 }

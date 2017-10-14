@@ -14,12 +14,12 @@ export const names = [
     'country', 'month', 'year', 'lat', 'lon', 'value'
 ];
 export const columns = [
-    ['a', 'b', 'c'],    // 'country'
-    [1, 2, 3],          // 'month'
-    [4, 5, 6],          // 'year'
-    [7, 8, 9],           // 'lat'
-    [10, 11, 12],       // 'lon'
-    [13, 14, 15]        // 'value'
+    ['a', 'b', 'c'], // 'country'
+    [1, 2, 3], // 'month'
+    [4, 5, 6], // 'year'
+    [7, 8, 9], // 'lat'
+    [10, 11, 12], // 'lon'
+    [13, 14, 15] // 'value'
 ];
 
 // test account on prod
@@ -180,7 +180,7 @@ export class MockedServerCA {
     }
 
     start(returnStatus, returnContent) {
-        let that = this;
+        const that = this;
         const server = this.server;
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));

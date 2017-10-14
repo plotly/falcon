@@ -34,7 +34,7 @@ describe('plotly database connector', function() {
                     .withCapabilities({
                         chromeOptions: {
                             binary: electronPath,
-                            args: [`app=${path.resolve()}`],
+                            args: [`app=${path.resolve()}`]
                         }
                     })
                     .forBrowser('electron')

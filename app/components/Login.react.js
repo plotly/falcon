@@ -1,4 +1,4 @@
-import cookie from 'react-cookies'
+import cookie from 'react-cookies';
 import fetch from 'isomorphic-fetch';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
@@ -85,7 +85,7 @@ class Login extends Component {
                           this.setState({
                               status: 'failure',
                               statusMessage: err.message
-                          })
+                          });
                       });
                   }
                   else {
@@ -202,14 +202,15 @@ class Login extends Component {
                         'border': 'thin lightgrey solid',
                         'borderLeft': 'none',
                         'borderRight': 'none'
-                    }}>
-                        {`(If a login or authorization window does not pop up, visit `}
+                    }}
+                    >
+                        {'(If a login or authorization window does not pop up, visit '}
                         <div>
                             <Link href={this.buildOauthUrl()}>
                                 {this.buildOauthUrl()}
                             </Link>
                         </div>
-                        {` in your web browser.)`}
+                        {' in your web browser.)'}
                     </div>
 
                 </div>
@@ -232,7 +233,8 @@ class Login extends Component {
                 'marginLeft': 'auto',
                 'marginRight': 'auto',
                 'minWidth': '800px'
-            }}>
+            }}
+            >
                 <h2>
                     {'Plotly Database Connector'}
                 </h2>
@@ -246,7 +248,7 @@ class Login extends Component {
                         <input
                             type="radio"
                             checked={this.state.serverType !== ONPREM}
-                            onChange={() => {this.setState({serverType: CLOUD})}}
+                            onChange={() => {this.setState({serverType: CLOUD});}}
                         />
                     </div>
 
@@ -255,7 +257,7 @@ class Login extends Component {
                         <input
                             type="radio"
                             checked={this.state.serverType === ONPREM}
-                            onChange={() => {this.setState({serverType: ONPREM})}}
+                            onChange={() => {this.setState({serverType: ONPREM});}}
                         />
                     </div>
 

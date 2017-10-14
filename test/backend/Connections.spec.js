@@ -7,7 +7,7 @@ import {getSetting} from '../../backend/settings.js';
 
 describe('Connections', function () {
 
-    beforeEach(function(){
+    beforeEach(function() {
         const connectionsPath = getSetting('CONNECTIONS_PATH');
         try {
             fs.unlinkSync(connectionsPath);
@@ -30,4 +30,4 @@ describe('Connections', function () {
             'connection was saved'
         );
     });
-})
+});

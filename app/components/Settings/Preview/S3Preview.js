@@ -18,7 +18,7 @@ export default function S3Preview(props) {
                 </div>
             </div>
         );
-    } else {
-        return null;
     }
-};
+
+    return null;
+}

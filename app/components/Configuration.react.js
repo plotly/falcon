@@ -1,11 +1,11 @@
-import cookie from 'react-cookies'
+import cookie from 'react-cookies';
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import Settings from './Settings/Settings.react';
 import {baseUrl, isElectron} from '../utils/utils';
-import {Link} from 'react-router'
+import {Link} from 'react-router';
 import {contains} from 'ramda';
 import * as SessionsActions from '../actions/sessions';
 
@@ -24,7 +24,7 @@ class Configuration extends Component {
         this.state = {
             isMenuOpen: false,
             username: cookie.load('db-connector-user')
-        }
+        };
         this.toggle = this.toggle.bind(this);
         this.close = this.close.bind(this);
         this.logOut = this.logOut.bind(this);
@@ -35,7 +35,7 @@ class Configuration extends Component {
          * In the browser, the username is set with a cookie but in electron
          * this is set using electron's ipcRenderer.
          */
-        if(isElectron()) {
+        if (isElectron()) {
             window.require('electron').ipcRenderer.once('username',
                 (event, message) => {
                     this.setState({username: message});
@@ -65,7 +65,7 @@ class Configuration extends Component {
 
       // reload page when running in browser:
       if (!isElectron()) {
-          window.location.reload()
+          window.location.reload();
       }
     }
 
@@ -87,7 +87,7 @@ class Configuration extends Component {
                              :
                              <div>
                                  <Link to="/login" >Log In</Link>
-                             </div>
+                             </div>;
 
         return (
             <div className="fullApp">

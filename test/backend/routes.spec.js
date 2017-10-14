@@ -1,4 +1,4 @@
-var fetch = require('fetch-cookie')(require('node-fetch'))
+var fetch = require('fetch-cookie')(require('node-fetch'));
 
 import {assert} from 'chai';
 import {assoc, concat, contains, dissoc, isEmpty, keys, merge, sort, without} from 'ramda';
@@ -238,7 +238,7 @@ describe('Authentication - ', () => {
         .then(res => res.json().then(json => {
             assert.equal(res.status, 401);
             assert.deepEqual(json, {
-                "error": {"message": "Please login to access this page."}
+                'error': {'message': 'Please login to access this page.'}
             });
             done();
         })).catch(done);
@@ -370,10 +370,10 @@ describe('Authentication - ', () => {
                 .then(res => res.json().then(json => {
                     assert.equal(res.status, 403);
                     assert.deepEqual(json, {
-                        "error": {
-                            "message": `User ${username} is not allowed to view this app`
+                        'error': {
+                            'message': `User ${username} is not allowed to view this app`
                         }
-                    })
+                    });
                     done();
                 })).catch(done);
             }, 3000);
@@ -504,7 +504,7 @@ describe('Routes - ', () => {
             assert.equal(res.status, 200);
             assert.deepEqual(json, {
                 http: 'http://localhost:9494',
-                https: '',
+                https: ''
             });
             done();
         }))
@@ -815,7 +815,7 @@ describe('Routes - ', () => {
                             [ 'weather_data_seattle_2016', 'date', 'character varying' ],
                             [ 'world_gdp_with_codes_2014', 'code', 'character varying' ],
                             [ 'world_gdp_with_codes_2014', 'gdp (billions)', 'numeric' ],
-                            [ 'world_gdp_with_codes_2014', 'country', 'character varying' ],
+                            [ 'world_gdp_with_codes_2014', 'country', 'character varying' ]
                         ];
                     } else if (connection.dialect === 'mssql') {
                         rows = [
@@ -899,7 +899,7 @@ describe('Routes - ', () => {
                             [ 'weather_data_seattle_2016', 'Mean_TemperatureC', 'varchar', 8000, '0/0' ],
                             [ 'weather_data_seattle_2016', 'Min_TemperatureC', 'varchar', 8000, '0/0' ],
                             [ 'apple_stock_2014', 'AAPL_x', 'datetime', 8, '23/3' ],
-                            [ 'apple_stock_2014', 'AAPL_y', 'decimal', 17, '38/38' ],
+                            [ 'apple_stock_2014', 'AAPL_y', 'decimal', 17, '38/38' ]
                         ];
                     } else {
                         rows = [
@@ -981,7 +981,7 @@ describe('Routes - ', () => {
                             [ 'weather_data_seattle_2016', 'Date', 'varchar' ],
                             [ 'world_gdp_with_codes_2014', 'COUNTRY', 'varchar' ],
                             [ 'world_gdp_with_codes_2014', 'GDP (BILLIONS)', 'decimal' ],
-                            [ 'world_gdp_with_codes_2014', 'CODE', 'varchar' ],
+                            [ 'world_gdp_with_codes_2014', 'CODE', 'varchar' ]
                         ];
                     }
                     assert.deepEqual(json.rows, rows);

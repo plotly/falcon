@@ -40,7 +40,7 @@ class Settings extends Component {
             timeElapsedInterval: null,
             checkHTTPSEndpointInterval: null,
             getConnectorUrlsInterval: null
-        }
+        };
     }
 
     componentDidMount() {
@@ -83,7 +83,7 @@ class Settings extends Component {
             <div className={'editButtonContainer'}>
                 {show ? (
                     <button
-                        className = 'btn-secondary'
+                        className = "btn-secondary"
                         onClick={() => {
                             this.setState({showConnections: true, editMode: true});
                             this.props.setConnectionNeedToBeSaved(true);
@@ -142,7 +142,7 @@ class Settings extends Component {
             if (this.state.editMode) {
                 this.setState({editMode: false});
             }
-            if (this.props.connectionNeedToBeSaved){
+            if (this.props.connectionNeedToBeSaved) {
                 this.props.setConnectionNeedToBeSaved(false);
             }
         }
@@ -327,21 +327,21 @@ class Settings extends Component {
                             <Tab>FAQ</Tab>
                         </TabList>
 
-                        <TabPanel className={['tab-panel-connection','react-tabs__tab-panel']}>
+                        <TabPanel className={['tab-panel-connection', 'react-tabs__tab-panel']}>
                             {this.renderSettingsForm()}
                             {this.renderEditButton(!this.state.editMode)}
                         </TabPanel>
 
-                        <TabPanel className={['tab-panel-query','react-tabs__tab-panel']}>
+                        <TabPanel className={['tab-panel-query', 'react-tabs__tab-panel']}>
                             {this.props.connectRequest.status === 200 ? (
                                 <SplitPane
                                     split="vertical"
                                     minSize={10}
                                     defaultSize={200}
                                     maxSize={800}
-                                    style={{position:'relative !important'}}
+                                    style={{position: 'relative !important'}}
                                 >
-                                    <div className='tree-view-container'>
+                                    <div className="tree-view-container">
                                         {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
                                             <TableTree
                                                 connectionObject={connections[selectedTab]}
@@ -402,7 +402,7 @@ class Settings extends Component {
                                             </p>
 
                                             <Link
-                                                className='btn-primary'
+                                                className="btn-primary"
                                                 style={{maxWidth: '50%', marginTop: '40px', marginBottom: '30px'}}
                                                 href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}
                                                 target="_blank"
@@ -448,7 +448,7 @@ class Settings extends Component {
                         <TabPanel>
                             <div className="big-whitespace-tab">
                                 <ul>
-                                    {FAQ.map(function(obj, i){
+                                    {FAQ.map(function(obj, i) {
                                         return (
                                             <li key={i}>
                                                 {obj.q}
@@ -623,7 +623,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         return dispatch(Actions.runSqlQuery(
             selectedConnectionId,
             propOr('', 'code', preview)
-        ))
+        ));
     }
 
     /*

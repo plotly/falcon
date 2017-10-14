@@ -10,14 +10,14 @@ import {disconnect, getActiveSessions} from '../../backend/persistent/datastores
 
 const connection = {
     dialect: DIALECTS.APACHE_SPARK,
-    host: '104.154.141.189',  // default: '127.0.0.1'
+    host: '104.154.141.189', // default: '127.0.0.1'
     port: 8998,
 
-    database: 'plotly',  // default: ''
+    database: 'plotly', // default: ''
 
-    useSqlContext: false,  // create a HiveContext (default)
-    //useSqlContext: 1,      // use predefined sqlContext (Spark v1)
-    //useSqlContext: 2,      // create a SQLContext (Spark v2)
+    useSqlContext: false, // create a HiveContext (default)
+    // useSqlContext: 1,      // use predefined sqlContext (Spark v1)
+    // useSqlContext: 2,      // create a SQLContext (Spark v2)
 
     timeout: 120
 };
@@ -71,7 +71,7 @@ df.registerTempTable("ALCOHOL_CONSUMPTION_BY_COUNTRY_2010")
     });
 
     it('query returns rows and column names', function() {
-        let tableName = (connection.database) ?
+        const tableName = (connection.database) ?
             `${connection.database}.ALCOHOL_CONSUMPTION_BY_COUNTRY_2010`.toUpperCase() :
             'ALCOHOL_CONSUMPTION_BY_COUNTRY_2010';
 
@@ -82,7 +82,7 @@ df.registerTempTable("ALCOHOL_CONSUMPTION_BY_COUNTRY_2010")
                 ['Moldova', 16.8],
                 ['Lithuania', 15.4],
                 ['Russia', 15.1],
-                ['Romania', 14.4],
+                ['Romania', 14.4]
             ]);
             assert.deepEqual(results.columnnames, ['LOCATION', 'ALCOHOL']);
         });

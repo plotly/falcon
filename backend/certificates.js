@@ -16,7 +16,7 @@ export const LOCAL_SETTINGS = {
     DAYS_CERT_IS_GOOD: 24,
     MAX_TRIES_COUNT: 5,
     ONGOING_COUNT: 0,
-    TIMEOUT_BETWEEN_TRIES: 1,  // seconds
+    TIMEOUT_BETWEEN_TRIES: 1, // seconds
     USE_MOCK_CERTS: false,
     CERT_DOMAIN: 'plotly-connector.com'
 };
