@@ -159,12 +159,14 @@ export default class UserConnections extends Component {
 		return (
             <div>
                 {inputs}
-                <small className="sampleCredentials">
-                    <a onClick={this.toggleSampleCredentials}>
-                        {this.state.showSampleCredentials && 'Hide Sample Credentials'}
-                        {!this.state.showSampleCredentials && 'Show Sample Credentials'}
-                    </a>
-                </small>
+                {connectionObject.dialect !== 'sqlite' &&
+                    <small className="sampleCredentials">
+                        <a onClick={this.toggleSampleCredentials}>
+                            {this.state.showSampleCredentials && 'Hide Sample Credentials'}
+                            {!this.state.showSampleCredentials && 'Show Sample Credentials'}
+                        </a>
+                    </small>
+                }
             </div>
 
 		);
