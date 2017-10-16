@@ -143,6 +143,18 @@ export const LOGOS = {
     [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png'
 };
 
+export function defaultQueries(dialect, selectedTable) {
+
+    if(dialect === DIALECTS.IBM_DB2) {
+        return `SELECT * FROM ${selectedTable} FETCH FIRST 10 ROWS ONLY`;
+    } else if(dialect === DIALECTS.APACHE_SPARK) {
+        return `SELECT * FROM ${selectedTable} LIMIT 10`;
+    } else if(dialect === DIALECTS.MSSQL) {
+        return `SELECT TOP 10 * \nFROM ${selectedTable};`;
+    } else {
+      return `SELECT * FROM ${selectedTable} LIMIT 10;`
+    }
+}
 
 export const INITIAL_CONNECTIONS = {
     username: '',
