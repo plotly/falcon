@@ -3,6 +3,9 @@ npm-debug.log
 # Vim
 *.sw?
 
+# IntelliJ Idea
+.idea
+
 # Runtime data
 pids
 *.pid
