@@ -9,8 +9,8 @@ import fs from 'fs';
 const REDSHIFT_OPTIONS = {
     dialect: 'postgres',
     pool: false,
-    keepDefaultTimezone: true,  // avoid SET TIMEZONE
-    databaseVersion: '8.0.2',   // avoid SHOW SERVER_VERSION
+    keepDefaultTimezone: true, // avoid SET TIMEZONE
+    databaseVersion: '8.0.2', // avoid SHOW SERVER_VERSION
     dialectOptions: {
         ssl: true
     }

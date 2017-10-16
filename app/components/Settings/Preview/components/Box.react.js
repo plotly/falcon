@@ -45,7 +45,7 @@ export default class Box extends Component {
     handleRemove() {
         const { name, dropType } = this.props;
 
-        if ( typeof this.props.removeDroppedItem === 'function' ) {
+        if (typeof this.props.removeDroppedItem === 'function') {
             this.props.removeDroppedItem(name, dropType);
         }
     }
@@ -53,7 +53,7 @@ export default class Box extends Component {
     handleClick() {
         const { name } = this.props;
 
-        if ( typeof this.props.handleClick === 'function' ) {
+        if (typeof this.props.handleClick === 'function') {
             this.props.handleClick(name);
         }
     }    
