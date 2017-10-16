@@ -206,7 +206,7 @@ class Login extends Component {
                     >
                         {'(If a login or authorization window does not pop up, visit '}
                         <div>
-                            <Link href={this.buildOauthUrl()}>
+                            <Link href={this.buildOauthUrl()} className="externalLink">
                                 {this.buildOauthUrl()}
                             </Link>
                         </div>
@@ -222,7 +222,7 @@ class Login extends Component {
 
 
     render() {
-
+      const plotlyDomain = this.state.domain || 'https://plot.ly';
         return (
             <div style={{
                 'width': '80%',
@@ -253,7 +253,7 @@ class Login extends Component {
                     </div>
 
                     <div style={{'height': 60}}>
-                        <label>Connect to <Link href="https://plot.ly/products/on-premise/">Plotly On-Premise</Link></label>
+                        <label>Connect to <Link href="https://plot.ly/products/on-premise/" className="externalLink">Plotly On-Premise</Link></label>
                         <input
                             type="radio"
                             checked={this.state.serverType === ONPREM}
@@ -301,12 +301,12 @@ class Login extends Component {
 
                 <div style={{'marginTop': '30px'}}>
                     <span>
-                        {`The Falcon SQL Client requires a Plotly login to use.
+                        {`To schedule queries and update data, the Falcon SQL Client requires a Plotly login.
                           Don't have an account yet?`}
                     </span>
                 </div>
 
-                <Link href={`${this.state.plotlyDomain}/accounts/login/?action=signup`}>
+                <Link href={`${plotlyDomain}/accounts/login/?action=signup`} className="externalLink">
                     {'Create an account '}
                 </Link>
 
