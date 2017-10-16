@@ -53,6 +53,8 @@ export function schemas(connection) {
     const describeTable = (connection.database) ?
         `"describe ${connection.database}."` :
         `"describe "`;
+    // Supressed ESLint cause comlex expression is easier to maintain this way
+    // eslint-disable-next-line max-len
     const expression = `plotlyContext.sql(${showTables}).select("tableName").collect().map(tn => plotlyContext.sql(${describeTable} + tn(0)).withColumn("tableName", lit(tn(0).toString)).select("tableName", "col_name", "data_type")).reduce((l,r)=>l.union(r))`;
     const code = `val r = ${expression}.collect\n%json r`;
     return sendRequest(connection, code)

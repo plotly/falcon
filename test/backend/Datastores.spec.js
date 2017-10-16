@@ -68,8 +68,10 @@ describe('SQL - ', function () {
                     '{"type":"Polygon","coordinates":[[[0,0],[3,0],[3,3],[0,3],[0,0]]]}',
                     '{"type":"MultiPoint","coordinates":[[0,1],[0,1]]}',
                     '{"type":"MultiLineString","coordinates":[[[3,8],[4,5],[9,5]],[[8,6],[4,8],[0,3]]]}',
-                    '{"type":"MultiPolygon","coordinates":[[[[0,0],[7,0],[7,7],[0,7],[0,0]]],[[[0,0],[7,0],[7,7],[0,7],[0,0]]]]}',
-                    '{"type":"GeometryCollection","geometries":[{"type":"Point","coordinates":[9,8]},{"type":"Polygon","coordinates":[[[0,0],[7,0],[7,7],[0,7],[0,0]]]}]}'
+                    '{"type":"MultiPolygon","coordinates":[[[[0,0],[7,0],[7,7],'
+                    + '[0,7],[0,0]]],[[[0,0],[7,0],[7,7],[0,7],[0,0]]]]}',
+                    '{"type":"GeometryCollection","geometries":[{"type":"Point",'
+                    + '"coordinates":[9,8]},{"type":"Polygon","coordinates":[[[0,0],[7,0],[7,7],[0,7],[0,0]]]}]}'
                 ]]
             );
             done();

@@ -14,7 +14,16 @@ export const DIALECTS = {
     APACHE_DRILL: 'apache drill'
 };
 
-export const SQL_DIALECTS_USING_EDITOR = ['mysql', 'mariadb', 'postgres', 'redshift', 'mssql', 'sqlite', 'ibm db2', 'apache spark'];
+export const SQL_DIALECTS_USING_EDITOR = [
+    'mysql',
+    'mariadb',
+    'postgres',
+    'redshift',
+    'mssql',
+    'sqlite',
+    'ibm db2',
+    'apache spark'
+];
 
 const commonSqlOptions = [
     {'label': 'Username', 'value': 'username', 'type': 'text'},
@@ -44,12 +53,17 @@ export const CONNECTION_CONFIG = {
         {'label': 'Host', 'value': 'host', 'type': 'text' },
         {'label': 'Port', 'value': 'port', 'type': 'number'},
         {'label': 'Database', 'value': 'database', 'type': 'text'},
-        {'label': 'Timeout', 'value': 'timeout', 'type': 'number', 'description': 'Number of seconds for a request to timeout.'}
+        {
+            'label': 'Timeout',
+            'value': 'timeout',
+            'type': 'number',
+            'description': 'Number of seconds for a request to timeout.'
+        }
     ],
     [DIALECTS.IBM_DB2]: commonSqlOptions,
     [DIALECTS.MYSQL]: commonSqlOptions,
     [DIALECTS.MARIADB]: commonSqlOptions,
-	[DIALECTS.MSSQL]: concat(
+    [DIALECTS.MSSQL]: concat(
         commonSqlOptions, [
             {
                 'label': 'Connection Timeout',
