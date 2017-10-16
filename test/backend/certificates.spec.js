@@ -133,15 +133,16 @@ describe('Certificates', function() {
         assert.equal(noDaysLeft, 0, 'If last update was 24 days ago, 0 days left.');
     });
 
-    it('Mocks CA server properly. Changed CA url, can take a status, object and return it when endpoint is hit.', (done) => {
+    it('Mocks CA server properly. Changed CA url, can take a status, ' +
+        'object and return it when endpoint is hit.', (done) => {
         ServerCA.start(201, {});
         setTimeout(() => {
             return fetch(mockedCaServerURL, {method: 'POST'})
-            .then(res => res.json().then(json => {
-                assert.deepEqual(json, {});
-                assert.equal(res.status, 201);
-                done();
-            })).catch(done);
+                .then(res => res.json().then(json => {
+                    assert.deepEqual(json, {});
+                    assert.equal(res.status, 201);
+                    done();
+                })).catch(done);
         }, 500);
     });
 
@@ -208,7 +209,8 @@ describe('Certificates', function() {
         setTimeout(() => {
             assert.deepEqual(getCerts(), {cert, key});
             assert.equal(ServerCA.count, 1, 'Took one hit to get certificates.');
-            assert.equal(getSetting('CONNECTOR_HTTPS_DOMAIN'), 'plotly--33ffba0f-fc02-4f41-a338-d5f5ff.plotly-connector.com');
+            assert.equal(getSetting('CONNECTOR_HTTPS_DOMAIN'),
+                'plotly--33ffba0f-fc02-4f41-a338-d5f5ff.plotly-connector.com');
             assert.isTrue(
                 (new Date().getTime() - Date.parse(getSetting('CERTIFICATE_LAST_UPDATED'))) / 1000 < 2,
                 'Certificate\'s last update is recent.'

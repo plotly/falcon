@@ -410,7 +410,8 @@ class Settings extends Component {
                                                 Query {dialect} from plot.ly
                                             </Link>
                                             <div>
-                                                <code>Falcon has auto-generated a local URL and SSL certificate for itself: </code>
+                                                <code>Falcon has auto-generated a local URL
+                                                    and SSL certificate for itself: </code>
                                                 <br />
                                                 <Link
                                                     href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}

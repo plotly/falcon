@@ -190,7 +190,8 @@ describe('QueryScheduler', function() {
              PlotlyAPIRequest(`grids/${fid}`, {username, apiKey, method: 'DELETE'}).then(res => {
                  if (res.status !== 204) {
                      res.json().then(json => {
-                         assert.equal(res.status, 204, 'Grid was successfully deleted: ' + JSON.stringify(json, null, 2));
+                         assert.equal(res.status, 204,
+                             'Grid was successfully deleted: ' + JSON.stringify(json, null, 2));
                      });
                  }
 

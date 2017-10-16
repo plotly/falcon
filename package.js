@@ -65,6 +65,8 @@ function startPack() {
      * This can be removed once the issue is resolved.
      */
     if (os.platform == 'darwin') {
+        // Surpressed ESLint cause this is a complex command and concatenation would make it harder to maintain
+        // eslint-disable-next-line max-len
         exec('install_name_tool -change `pwd`/node_modules/ibm_db/installer/clidriver/lib/libdb2.dylib @loader_path/../../installer/clidriver/lib/libdb2.dylib node_modules/ibm_db/build/Release/odbc_bindings.node');
     }
     build(electronCfg)
@@ -121,6 +123,7 @@ function pack(plat, arch, cb) {
 function log(plat, arch) {
     return (err, filepath) => {
         if (err) return console.error(err);
-        console.log(`${plat}-${arch} finished! see release/${userFriendlyAppNames.plat[plat]}-${userFriendlyAppNames.arch[arch]}`);
+        console.log(`${plat}-${arch} finished! see release/` +
+            `${userFriendlyAppNames.plat[plat]}-${userFriendlyAppNames.arch[arch]}`);
     };
 }

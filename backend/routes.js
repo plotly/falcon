@@ -491,35 +491,38 @@ export default class Servers {
             });
         });
 
-        server.post('/connections/:connectionId/apache-drill-storage', function apacheDrillStorageHandler(req, res, next) {
-            Datastores.storage(
-                getConnectionById(req.params.connectionId)
-            ).then(files => {
-                res.json(200, files);
-            }).catch(error => {
-                res.json(500, {error: {message: error.message}});
+        server.post('/connections/:connectionId/apache-drill-storage',
+            function apacheDrillStorageHandler(req, res, next) {
+                Datastores.storage(
+                    getConnectionById(req.params.connectionId)
+                ).then(files => {
+                    res.json(200, files);
+                }).catch(error => {
+                    res.json(500, {error: {message: error.message}});
+                });
             });
-        });
 
-        server.post('/connections/:connectionId/apache-drill-s3-keys', function apacheDrills3KeysHandler(req, res, next) {
-            Datastores.listS3Files(
-                getConnectionById(req.params.connectionId)
-            ).then(files => {
-                res.json(200, files);
-            }).catch(error => {
-                res.json(500, {error: {message: error.message}});
+        server.post('/connections/:connectionId/apache-drill-s3-keys',
+            function apacheDrills3KeysHandler(req, res, next) {
+                Datastores.listS3Files(
+                    getConnectionById(req.params.connectionId)
+                ).then(files => {
+                    res.json(200, files);
+                }).catch(error => {
+                    res.json(500, {error: {message: error.message}});
+                });
             });
-        });
 
-        server.post('/connections/:connectionId/elasticsearch-mappings', function elasticsearchMappingsHandler(req, res, next) {
-            Datastores.elasticsearchMappings(
-                getConnectionById(req.params.connectionId)
-            ).then(mappings => {
-                res.json(200, mappings);
-            }).catch(error => {
-                res.json(500, {error: {message: error.message}});
+        server.post('/connections/:connectionId/elasticsearch-mappings',
+            function elasticsearchMappingsHandler(req, res, next) {
+                Datastores.elasticsearchMappings(
+                    getConnectionById(req.params.connectionId)
+                ).then(mappings => {
+                    res.json(200, mappings);
+                }).catch(error => {
+                    res.json(500, {error: {message: error.message}});
+                });
             });
-        });
 
         /* Plotly v2 API requests */
 

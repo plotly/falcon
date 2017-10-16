@@ -478,24 +478,25 @@ describe('Routes - ', () => {
         .catch(done);
     });
 
-    xit('oauth - saving an access token that is not associated with a user account will fail with a 500 level error', function(done) {
-        saveSetting('USERS', []);
-        const access_token = 'lah lah lemons';
-        POST('oauth2', {access_token})
-        .then(res => res.json().then(json => {
-            assert.deepEqual(json, {
-                error: {
-                    message: 'User was not found at https://api.plot.ly'
-                }
-            });
-            assert.equal(res.status, 500);
-            assert.deepEqual(
-                getSetting('USERS'),
-                []
-            );
-            done();
-        })).catch(done);
-    });
+    xit('oauth - saving an access token that is not associated with a user account will fail with a 500 level error',
+        function(done) {
+            saveSetting('USERS', []);
+            const access_token = 'lah lah lemons';
+            POST('oauth2', {access_token})
+                .then(res => res.json().then(json => {
+                    assert.deepEqual(json, {
+                        error: {
+                            message: 'User was not found at https://api.plot.ly'
+                        }
+                    });
+                    assert.equal(res.status, 500);
+                    assert.deepEqual(
+                        getSetting('USERS'),
+                        []
+                    );
+                    done();
+                })).catch(done);
+        });
 
     // Settings
     it('settings/urls - returns 200 and the urls', function(done) {
@@ -607,8 +608,12 @@ describe('Routes - ', () => {
                         ({
                             postgres: 'syntax error at or near "SELECZ"',
                             redshift: 'syntax error at or near "SELECZ"',
-                            mysql: 'ER_PARSE_ERROR: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'SELECZ\' at line 1',
-                            mariadb: "ER_PARSE_ERROR: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SELECZ' at line 1",
+                            mysql: 'ER_PARSE_ERROR: You have an error in your SQL syntax; check the manual that ' +
+                                'corresponds to your MySQL server version for the right syntax to use near ' +
+                                '\'SELECZ\' at line 1',
+                            mariadb: 'ER_PARSE_ERROR: You have an error in your SQL syntax; check the manual that ' +
+                                'corresponds to your MariaDB server version for the right syntax to use near ' +
+                                '\'SELECZ\' at line 1',
                             mssql: "Could not find stored procedure 'SELECZ'.",
                             sqlite: 'SQLITE_ERROR: near "SELECZ": syntax error'
                         })[connection.dialect]
@@ -1158,7 +1163,8 @@ describe('Routes - ', () => {
             return;
         }
 
-        it(`connections - ${connection.dialect} - saves connections to a file if they are valid and if they do not exist`, function(done) {
+        it(`connections - ${connection.dialect} - saves connections to a file if they are valid and ` +
+            `if they do not exist`, function(done) {
             this.timeout(5 * 1000);
             try {
                 fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
@@ -1218,9 +1224,12 @@ describe('Routes - ', () => {
                                 postgres: 'password authentication failed for user "typo"',
                                 redshift: 'password authentication failed for user "typo"',
                                 mssql: "Login failed for user 'typo'.",
-                                s3: 'The request signature we calculated does not match the signature you provided. Check your key and signing method.',
-                                elasticsearch: 'request to https://lahlahlemons.com:9243/_cat/indices/?format=json failed, reason: getaddrinfo ENOTFOUND lahlahlemons.com lahlahlemons.com:9243',
-                                ['apache drill']: 'request to https://lahlahlemons.com:8047/query.json failed, reason: getaddrinfo ENOTFOUND lahlahlemons.com lahlahlemons.com:8047',
+                                s3: 'The request signature we calculated does not match the signature you provided. ' +
+                                    'Check your key and signing method.',
+                                elasticsearch: 'request to https://lahlahlemons.com:9243/_cat/indices/?format=json ' +
+                                    'failed, reason: getaddrinfo ENOTFOUND lahlahlemons.com lahlahlemons.com:9243',
+                                ['apache drill']: 'request to https://lahlahlemons.com:8047/query.json failed, ' +
+                                    'reason: getaddrinfo ENOTFOUND lahlahlemons.com lahlahlemons.com:8047',
                                 sqlite: 'SQLite file at path "typo" does not exist.'
                             })[connection.dialect]
                         }
@@ -1678,7 +1687,8 @@ describe('Routes - ', () => {
                         message: (
                             'request to ' +
                             'https://plotly.lah-lah-lemons.com/v2/grids/plotly-database-connector:197 ' +
-                            'failed, reason: getaddrinfo ENOTFOUND plotly.lah-lah-lemons.com plotly.lah-lah-lemons.com:443'
+                            'failed, reason: getaddrinfo ENOTFOUND plotly.lah-lah-lemons.com ' +
+                            'plotly.lah-lah-lemons.com:443'
                         )
                     }
                 }

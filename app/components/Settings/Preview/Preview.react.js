@@ -260,6 +260,8 @@ class Preview extends Component {
         const code = propOr('', 'code')(preview);
         const error = propOr('', 'error')(preview);
 
+        // Surpressing ESLint cause restricting line length would harm JSX readability
+        /* eslint-disable max-len */
         return (
             <div className={'previewContainer'}>
                 <div>
@@ -419,6 +421,7 @@ class Preview extends Component {
                {ApacheDrillPreview(this.props)}
             </div>
         );
+        /* eslint-enable max-len */
     }
 }
 

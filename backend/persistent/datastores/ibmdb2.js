@@ -27,7 +27,8 @@ function getClient(connection) {
 }
 
 function getConnectionString(connection) {
-    return `DATABASE=${connection.database};UID=${connection.username};PWD=${connection.password};HOSTNAME=${connection.host};PORT=${connection.port};PROTOCOL=TCPIP`;
+    return `DATABASE=${connection.database};UID=${connection.username};PWD=${connection.password};` +
+        `HOSTNAME=${connection.host};PORT=${connection.port};PROTOCOL=TCPIP`;
 }
 
 export function connect(connection) {
