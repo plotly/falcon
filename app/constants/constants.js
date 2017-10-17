@@ -78,7 +78,7 @@ export const CONNECTION_CONFIG = {
                     and UDP port 1444 on the database server must be reachable.
                 `,
                 'type': 'text'
-            }
+            },
             /*
              * TODO - This option might replace the `ssl` option above.
              * See https://github.com/sequelize/sequelize/issues/8497
