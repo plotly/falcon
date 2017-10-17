@@ -157,6 +157,18 @@ export const LOGOS = {
     [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png'
 };
 
+export function defaultQueries(dialect, selectedTable) {
+
+    if(dialect === DIALECTS.IBM_DB2) {
+        return `SELECT * FROM ${selectedTable} FETCH FIRST 10 ROWS ONLY`;
+    } else if(dialect === DIALECTS.APACHE_SPARK) {
+        return `SELECT * FROM ${selectedTable} LIMIT 10`;
+    } else if(dialect === DIALECTS.MSSQL) {
+        return `SELECT TOP 10 * \nFROM ${selectedTable};`;
+    } else {
+      return `SELECT * FROM ${selectedTable} LIMIT 10;`
+    }
+}
 
 export const INITIAL_CONNECTIONS = {
     username: '',
@@ -183,7 +195,7 @@ export const FAQ = [
             you can run this app as a middleman between plot.ly and your database (see the next question).'
     }, {
         q: 'I want a persistent connection between my database and a chart hosted on plot.ly. How do I do that?',
-        a: 'Click the link in the "PLOT.LY" tab. This will open the plot.ly workspace with a connection to this app. \
+        a: 'Click the link in the "PLOT.LY" tab. This will open the plot.ly chart studio with a connection to this app. \
             From there, you can run, save, and schedule queries that will update your charts on plot.ly when your \
             database updates. As long as this app stays open, it will send the latest data to plot.ly to update your \
             chart. Here is a tutorial on scheduling queries: https://help.plot.ly/database-connectors/schedule-query/'
@@ -194,14 +206,14 @@ export const FAQ = [
     }, {
         q: 'Where do I make SQL queries?',
         a: 'For one-shot queries, make them in this app (see the "QUERY" tab). If you want a persistent connection \
-            between your charts and your database, make them in the plot.ly workspace (see the "PLOT.LY" tab).'
+            between your charts and your database, make them in the plot.ly chart studio (see the "PLOT.LY" tab).'
     }, {
         q: 'Is this app open-source?',
         a: 'Yep! You can view and contribute to the source code on GitHub: \
             https://github.com/plotly/falcon-sql-client'
     }, {
         q: '[Advanced] How do scheduled queries work?',
-        a: 'You can run queries on a scheduler (ie daily or hourly) through the plot.ly workspace. \
+        a: 'You can run queries on a scheduler (ie daily or hourly) through the plot.ly chart studio. \
             Scheduled queries are saved and run by this app, so keep this app open as long as you want \
             your charts and dashboards to update. When you restart this app, all of the scheduled \
             queries will run automatically and their scheduling timer will reset. We recommend setting up \

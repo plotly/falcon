@@ -15,7 +15,9 @@
 
 .openTab {
     border-radius: 0 0 6px 6px;
-    border: 1px solid #c8dfe3;
+    border-left: 1px solid #c8dfe3;
+		border-right: 1px solid #c8dfe3;
+		border-bottom: 1px solid #c8dfe3;
     background: rgb(251, 252, 253)
 }
 

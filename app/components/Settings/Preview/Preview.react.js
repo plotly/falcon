@@ -12,7 +12,7 @@ import S3Preview from './S3Preview.js';
 import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../../Link.react';
 import * as Actions from '../../../actions/sessions';
-import {DIALECTS, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
+import {defaultQueries, DIALECTS, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
 import getPlotJsonFromState from './components/getPlotJsonFromState.js';
 
 class Preview extends Component {
@@ -257,7 +257,7 @@ class Preview extends Component {
 
         const dialect = connectionObject.dialect;
         const showEditor = propOr(true, 'showEditor')(preview);
-        const code = propOr('', 'code')(preview);
+        const code = propOr(defaultQueries(dialect, selectedTable), 'code')(preview);
         const error = propOr('', 'error')(preview);
 
         // Surpressing ESLint cause restricting line length would harm JSX readability
@@ -382,19 +382,19 @@ class Preview extends Component {
                                                 {link.type == 'grid' &&
                                                     <div>
                                                         <div style={{color: '#00cc96'}}>🎉  Link to your CSV on Plot.ly ⬇️</div>
-                                                        <Link href={link.url} target="_blank">{link.url}</Link>
+                                                        <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
                                                     </div>
                                                 }
                                                 {link.type == 'csv' &&
                                                     <div>
                                                         <div style={{color: '#00cc96'}}>💾  Your CSV has been saved ⬇️</div>
-                                                        <Link href={link.url} target="_blank">{link.url}</Link>
+                                                        <Link href={link.url} target="_blank" style="externalLink">{link.url}</Link>
                                                     </div>
                                                 }
                                                 {link.type == 'plot' &&
                                                     <div>
                                                         <div style={{color: '#00cc96'}}>📈  Link to your chart on Plot.ly ⬇️</div>
-                                                        <Link href={link.url} target="_blank">{link.url}</Link>
+                                                        <Link href={link.url} target="_blank" style="externalLink">{link.url}</Link>
                                                     </div>
                                                 }
                                                 {link.type == 'error' &&

@@ -317,7 +317,7 @@ class Settings extends Component {
                             {this.props.connectRequest.status === 200 ? (
                                 <Tab>Query</Tab>
                             ) : (
-                                <Tab disabled={true}>Loading...</Tab>
+                                <Tab disabled={true}>Query</Tab>
                             )}
                             <Tab
                                 className="test-ssl-tab react-tabs__tab"

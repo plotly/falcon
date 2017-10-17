@@ -34,6 +34,9 @@
 }
 
 .externalLink {
+    color: #119DFF;
+    cursor: pointer;
+    text-decoration: underline;
     cursor: pointer;
     padding: 10px;
 }

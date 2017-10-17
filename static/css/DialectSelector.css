@@ -1,14 +1,14 @@
 .logoContainer {
     margin: 20px;
-    width: 600px;
+    width: 800px;
     text-align: center;
 }
 
 .logo {
     display: inline-block;
-    width: 60px;
-    height: 40px;
-    padding: 5px;
+    width: 100px;
+    height: 70px;
+    padding: 2px;
     margin: 5px;
     border-color: #BEC8D9;
     border-width: 2px;
