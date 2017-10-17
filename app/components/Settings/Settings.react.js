@@ -29,6 +29,7 @@ class Settings extends Component {
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
         this.state = {
             editMode: true,
+            selectedPanel: {},
             urls: {
                 https: null,
                 http: null
@@ -310,7 +311,10 @@ class Settings extends Component {
 
                 <div className={'openTab'}>
 
-                    <Tabs defaultIndex={0}>
+                    <Tabs
+                        selectedIndex={this.state.selectedPanel[selectedTab] || 0}
+                        onSelect={panelIndex => this.setState({selectedPanel: {[selectedTab]: panelIndex}})}
+                    >
 
                         <TabList>
                             <Tab>Connection</Tab>
