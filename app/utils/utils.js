@@ -1,4 +1,4 @@
-import {contains, has, head, replace} from 'ramda';
+import {contains} from 'ramda';
 
 export function dynamicRequireElectron() {
     return window.require('electron');
