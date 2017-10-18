@@ -4,6 +4,7 @@ import * as S3 from './S3';
 import * as ApacheDrill from './ApacheDrill';
 import * as IbmDb2 from './ibmdb2';
 import * as ApacheLivy from './livy';
+import * as ApacheImpala from './impala';
 
 /*
  * Switchboard to all of the different types of connections
@@ -34,6 +35,8 @@ function getDatastoreClient(connection) {
         return ApacheDrill;
     } else if (dialect === 'apache spark') {
         return ApacheLivy;
+    } else if (dialect === 'apache impala') {
+        return ApacheImpala;
     } else if (dialect === 'ibm db2') {
         return IbmDb2;
     }
