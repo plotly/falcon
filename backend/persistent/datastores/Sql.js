@@ -8,6 +8,7 @@ import {
     has,
     merge,
     mergeAll,
+    omit,
     sort,
     trim,
     uniq,
