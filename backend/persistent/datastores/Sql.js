@@ -71,8 +71,8 @@ function createClient(connection) {
          * See all options here:
          * http://tediousjs.github.io/tedious/api-connection.html
          */
-        options.dialectOptions.encrypt = connection.encrypt;
-        const trimmedInstanceName = trim(connection.instanceName);
+        options.dialectOptions.encrypt = Boolean(connection.encrypt);
+        const trimmedInstanceName = trim(connection.instanceName || '');
         if (trimmedInstanceName) {
             /*
              * port is mutually exclusive with instance name
