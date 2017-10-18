@@ -11,6 +11,7 @@ export const DIALECTS = {
     S3: 's3',
     IBM_DB2: 'ibm db2',
     APACHE_SPARK: 'apache spark',
+    APACHE_IMPALA: 'apache impala',
     APACHE_DRILL: 'apache drill'
 };
 
@@ -22,7 +23,8 @@ export const SQL_DIALECTS_USING_EDITOR = [
     'mssql',
     'sqlite',
     'ibm db2',
-    'apache spark'
+    'apache spark',
+    'apache impala'
 ];
 
 const commonSqlOptions = [
@@ -48,18 +50,21 @@ const commonSqlOptions = [
     }
 ];
 
+const hadoopQLOptions = [
+    {'label': 'Host', 'value': 'host', 'type': 'text' },
+    {'label': 'Port', 'value': 'port', 'type': 'number'},
+    {'label': 'Database', 'value': 'database', 'type': 'text'},
+    {
+        'label': 'Timeout',
+        'value': 'timeout',
+        'type': 'number',
+        'description': 'Number of seconds for a request to timeout.'
+    }
+]
+
 export const CONNECTION_CONFIG = {
-    [DIALECTS.APACHE_SPARK]: [
-        {'label': 'Host', 'value': 'host', 'type': 'text' },
-        {'label': 'Port', 'value': 'port', 'type': 'number'},
-        {'label': 'Database', 'value': 'database', 'type': 'text'},
-        {
-            'label': 'Timeout',
-            'value': 'timeout',
-            'type': 'number',
-            'description': 'Number of seconds for a request to timeout.'
-        }
-    ],
+    [DIALECTS.APACHE_IMPALA]: hadoopQLOptions,
+    [DIALECTS.APACHE_SPARK]: hadoopQLOptions,
     [DIALECTS.IBM_DB2]: commonSqlOptions,
     [DIALECTS.MYSQL]: commonSqlOptions,
     [DIALECTS.MARIADB]: commonSqlOptions,
@@ -172,6 +177,7 @@ export const CONNECTION_CONFIG = {
 
 export const LOGOS = {
     [DIALECTS.APACHE_SPARK]: 'images/spark-logo.png',
+    [DIALECTS.APACHE_IMPALA]: 'images/impala-logo.png',
     [DIALECTS.IBM_DB2]: 'images/ibmdb2-logo.png',
     [DIALECTS.REDSHIFT]: 'images/redshift-logo.png',
     [DIALECTS.POSTGRES]: 'images/postgres-logo.png',
@@ -188,7 +194,7 @@ export function defaultQueries(dialect, selectedTable) {
 
     if(dialect === DIALECTS.IBM_DB2) {
         return `SELECT * FROM ${selectedTable} FETCH FIRST 10 ROWS ONLY`;
-    } else if(dialect === DIALECTS.APACHE_SPARK) {
+    } else if(dialect === DIALECTS.APACHE_SPARK || dialect === DIALECTS.APACHE_IMPALA) {
         return `SELECT * FROM ${selectedTable} LIMIT 10`;
     } else if(dialect === DIALECTS.MSSQL) {
         return `SELECT TOP 10 * \nFROM ${selectedTable};`;
@@ -264,6 +270,13 @@ export const FAQ = [
 ];
 
 export const SAMPLE_DBS = {
+    [DIALECTS.APACHE_IMPALA]: {
+        timeout: 180,
+        database: 'plotly',
+        port: 21000,
+        host: '127.0.0.1',
+        dialect: DIALECTS.APACHE_IMPALA
+    },
     [DIALECTS.APACHE_SPARK]: {
         timeout: 180,
         database: 'plotly',

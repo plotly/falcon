@@ -200,6 +200,7 @@ class Settings extends Component {
 
         const connectionObject = connections[selectedTab] || {};
         if (contains(connectionObject.dialect, [
+                    DIALECTS.APACHE_IMPALA,
                     DIALECTS.APACHE_SPARK,
                     DIALECTS.IBM_DB2,
                     DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
