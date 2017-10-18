@@ -206,7 +206,8 @@ export const INITIAL_CONNECTIONS = {
     dialect: DIALECTS.MYSQL,
     port: '',
     host: '',
-    ssl: false
+    ssl: false,
+    encrypt: false
 };
 
 export const FAQ = [
