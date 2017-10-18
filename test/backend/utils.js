@@ -95,6 +95,8 @@ export const mssqlConnection = {
     username: 'masteruser',
     password: 'connecttoplotly',
     host: 'test-mssql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
+    instanceName: '',
+    encrypt: true,
     port: 1433,
     database: 'plotly_datasets'
 };

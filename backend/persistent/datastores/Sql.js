@@ -1,6 +1,18 @@
 import Sequelize from 'sequelize';
 import {parseSQL} from '../../parse';
-import {contains, dissoc, flatten, gt, has, merge, mergeAll, sort, uniq, values} from 'ramda';
+import {
+     contains,
+     dissoc,
+     flatten,
+     gt,
+     has,
+     merge,
+     mergeAll,
+     sort,
+     trim,
+     uniq,
+     values
+} from 'ramda';
 import {DIALECTS} from '../../../app/constants/constants';
 import Logger from '../../logger';
 import fs from 'fs';
@@ -57,6 +69,16 @@ function createClient(connection) {
          * See all options here:
          * http://tediousjs.github.io/tedious/api-connection.html
          */
+         options.dialectOptions.encrypt = connection.encrypt;
+         const trimmedInstanceName = trim(connection.instanceName);
+         if (trimmedInstanceName) {
+              /*
+               * port is mutually exclusive with instance name
+               * see https://github.com/sequelize/sequelize/issues/3097
+               */
+              options = omit(['port'], options);
+              options.dialectOptions.instanceName = trimmedInstanceName;
+        }
         options.dialectOptions.encrypt = true;
         ['connectTimeout', 'requestTimeout'].forEach(timeoutSetting => {
             if (has(timeoutSetting, connection) &&

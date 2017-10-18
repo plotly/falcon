@@ -36,6 +36,34 @@ export const CONNECTION_CONFIG = {
     [DIALECTS.MARIADB]: commonSqlOptions,
 	[DIALECTS.MSSQL]: concat(
         commonSqlOptions, [
+          {
+            'label': 'Instance Name',
+             'value': 'instanceName',
+             'description': `
+                 If your SQL Server was configured using an instance name
+                 instead of a port, then set this option.
+                 Note that if this option is specified, then the port
+                 will be ignored.
+                 For this to work, the SQL Server Browser service
+                 must be running on the database server
+                 and UDP port 1444 on the database server must be reachable.
+             `,
+             'type': 'text'
+         },
+         /*
+          * TODO - This option might replace the `ssl` option above.
+          * See https://github.com/sequelize/sequelize/issues/8497
+          */
+         {
+             'label': 'Encrypt Connection',
+             'value': 'encrypt',
+             'description': `
+                 If selected, the connection will be encrypted.
+                 Select this option if you're on Windows Azure.
+             `,
+             'type': 'checkbox'
+         },
+         {
             {
                 'label': 'Connection Timeout',
                 'value': 'connectTimeout',
