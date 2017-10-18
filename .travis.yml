@@ -7,7 +7,7 @@ matrix:
     - os: osx
       osx_image: xcode9.0
       language: node_js
-      node_js: "6"
+      node_js: "6.11.1"
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
@@ -20,7 +20,7 @@ cache:
   yarn: true
 
 before_install:
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.2.1
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 0.27.5
   - export PATH=$HOME/.yarn/bin:$PATH
 
 install:
