@@ -1,11 +1,13 @@
 
 import React from 'react';
+import PropTypes from 'prop-types';
 
-export default function ApacheDrillPreview(props) {
+const ApacheDrillPreview = function(props) {
     const {
         apacheDrillStorageRequest,
         apacheDrillS3KeysRequest
     } = props;
+
     if (apacheDrillStorageRequest.status >= 400) {
         return (<div>{'Hm... An error while trying to load Apache Drill'}</div>);
     } else if (apacheDrillStorageRequest.status === 'loading') {
@@ -63,7 +65,14 @@ export default function ApacheDrillPreview(props) {
                 {availableFiles}
             </div>
         );
-    } else {
-        return null;
     }
+
+    return null;
 };
+
+ApacheDrillPreview.propTypes = {
+    apacheDrillStorageRequest: PropTypes.object,
+    apacheDrillS3KeysRequest: PropTypes.object
+};
+
+export default ApacheDrillPreview;
