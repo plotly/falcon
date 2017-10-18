@@ -30,7 +30,7 @@ install:
 script:
   - yarn run build
   - yarn run package
-  - zip -r release.zip release
+  - zip -r release.zip release -q
 
 
 before_cache:
