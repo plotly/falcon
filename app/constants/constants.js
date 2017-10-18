@@ -53,7 +53,12 @@ const commonSqlOptions = [
 const hadoopQLOptions = [
     {'label': 'Host', 'value': 'host', 'type': 'text' },
     {'label': 'Port', 'value': 'port', 'type': 'number'},
-    {'label': 'Database', 'value': 'database', 'type': 'text'},
+    {
+        'label': 'Database',
+        'value': 'database',
+        'type': 'text',
+        'description': 'Database Name (Optional). If database name is not specified, all tables are returned.'
+    },
     {
         'label': 'Timeout',
         'value': 'timeout',

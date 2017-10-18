@@ -88,7 +88,7 @@
     host: 104.154.141.189
 
 -
-    dialect: apache spark
+    dialect: apache impala
     id: apache impala-159e0b47-0428-4c9e-b4b9-8201b86f8ca2
     timeout: 180
     database: plotly

@@ -35,7 +35,10 @@ export function schemas(connection) {
     let columnnames = ['tablename', 'column_name', 'data_type'];
     return tables(connection)
     .then(tableNames => {
-
+        /*
+         * The last column in the output of describe statement is 'comment',
+         * so we remove it(using Ramda.init) before sending out the result.
+         */
         const promises = map(tableName => {
             return query(`describe ${tableName}`)
             .then(json => map(row => prepend(tableName, init(row)), json.rows));

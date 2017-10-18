@@ -15,7 +15,7 @@ const connection = {
     timeout: 60
 };
 
-describe('Apache Spark:', function () {
+describe('Apache Impala:', function () {
 
     it('connect succeeds', function() {
         this.timeout(180 * 1000);
