@@ -1,7 +1,3 @@
-addons:
-  artifacts:
-    s3_region: "us-west-2"
-
 matrix:
   include:
     - os: osx
@@ -39,3 +35,9 @@ before_cache:
 branches:
   except:
     - "/^v\\d+\\.\\d+\\.\\d+$/"
+
+addons:
+  artifacts:
+    s3_region: "us-west-2"
+    paths: release.zip
+    debug: true
