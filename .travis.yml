@@ -1,5 +1,5 @@
 addons:
-  artifacts: true
+  artifacts:
     s3_region: "us-west-2"
 
 matrix:
