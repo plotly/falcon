@@ -218,7 +218,7 @@
     "react-select": "^1.0.0-beta13",
     "react-split-pane": "^0.1.66",
     "react-tabs": "^1.1.0",
-    "react-tooltip": "^3.1.7",
+    "react-tooltip": "^3.4.0",
     "react-treeview": "^0.4.7",
     "redux": "^3.4.0",
     "redux-actions": "^0.9.1",
