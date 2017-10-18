@@ -38,6 +38,6 @@ branches:
 
 addons:
   artifacts:
-    s3_region: "us-west-2"
+    s3_region: us-east-1
     paths: release.zip
     debug: true
