@@ -21,8 +21,8 @@ docker build . -t falcon-impala
 
 ## Run
 
-Run the command below inside a terminal, to start an instance listening on port
-25000 and 21000 (bare minimum):
+Run the command below inside a terminal, to start an instance listening on ports
+25000 and 21000:
 
 ```sh
 docker run -ti -p 25000:25000 -p 21000:21000 falcon-impala
