@@ -39,7 +39,11 @@ export default class Box extends Component {
         isDragging: PropTypes.bool.isRequired,
         name: PropTypes.string.isRequired,
         type: PropTypes.string.isRequired,
-        isDropped: PropTypes.bool.isRequired
+        isDropped: PropTypes.bool.isRequired,
+        dropType: PropTypes.string,
+        removeDroppedItem: PropTypes.func,
+        handleClick: PropTypes.func,
+        selectedColumn: PropTypes.string
     };
 
     handleRemove() {
@@ -56,7 +60,7 @@ export default class Box extends Component {
         if (typeof this.props.handleClick === 'function') {
             this.props.handleClick(name);
         }
-    }    
+    }
 
     render() {
         const { name, isDropped, isDragging, connectDragSource } = this.props;
@@ -71,7 +75,7 @@ export default class Box extends Component {
             <div style={{ ...style, opacity, borderColor }}>
                 {isDropped && this.props.dropType ?
                     <div>
-                        <a 
+                        <a
                             onClick={this.handleRemove}
                             style={{cursor: 'pointer', marginRight: '5px', color: '#d36046', textDecoration: 'none'}}
                         >
@@ -82,7 +86,7 @@ export default class Box extends Component {
                             style={{cursor: 'pointer', color: '#2a3f5f', textDecoration: 'none'}}
                         >
                             {name}
-                        </a>                        
+                        </a>
                     </div> :
                     <div>
                         {name}
