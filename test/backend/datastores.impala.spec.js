@@ -48,4 +48,14 @@ describe('Apache Impala:', function () {
             assert.deepEqual(results.columnnames, ['loc', 'alcohol']);
         });
     });
+
+    it('connect for invalid credentials fails', function() {
+        connection.host = 'http://lah-lah.lemons.com';
+
+        return connect(connection).catch(err => {
+            assert.equal(err.code, 'ENOTFOUND');
+            assert.equal(err.hostname, 'http://lah-lah.lemons.com');
+            assert.equal(err.port, 21000);
+        });
+    });
 });
