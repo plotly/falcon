@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import createPlotlyComponent from 'react-plotlyjs';
 import Plotly from 'plotly.js/dist/plotly.min.js';
 import R from 'ramda';
@@ -8,9 +9,8 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import AxisDropZone from './components/AxisDropZone.react.js';
 import Box from './components/Box.react.js';
 
-import getPlotJsonFromState from './components/getPlotJsonFromState.js';
 import {PLOT_TYPES, controlPanelStyle, columnSelectLabelStyle,
-        dropdownContainerStyle, selectDropdownStyle, submitStyle} from './components/editorConstants';
+        dropdownContainerStyle, selectDropdownStyle} from './components/editorConstants';
 
 
 @DragDropContext(HTML5Backend)
@@ -24,7 +24,20 @@ export default class ChartEditor extends PureComponent {
         this.handleSelect = this.handleSelect.bind(this);
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
+    static propTypes = {
+        boxes: PropTypes.arrayOf(PropTypes.object),
+        plotJSON: PropTypes.object,
+        selectedChartType: PropTypes.string,
+        selectedColumn: PropTypes.string,
+        xAxisColumnName: PropTypes.string,
+        yAxisColumnNames: PropTypes.string,
+        droppedBoxNames: PropTypes.array,
+        updateProps: PropTypes.func,
+        columnTraceTypes: PropTypes.array,
+        columnNames: PropTypes.array
+    }
+
+    shouldComponentUpdate(nextProps) {
         return (JSON.stringify(nextProps) !== this.props);
     }
 
@@ -37,14 +50,9 @@ export default class ChartEditor extends PureComponent {
 
         const {
             boxes,
-            columnNames,
-            droppedBoxNames,
             plotJSON,
-            rows,
             selectedChartType,
             selectedColumn,
-            updatePlotJson,
-            updateProps,
             xAxisColumnName,
             yAxisColumnNames
         } = this.props;
@@ -58,6 +66,8 @@ export default class ChartEditor extends PureComponent {
                 <div style={controlPanelStyle}>
                     <div style={dropdownContainerStyle}>
                         <div style={columnSelectLabelStyle}>{columnLabel}</div>
+                        {/* TODO is this a bug?
+                        there's no value attribute on <select> (instead use option's selected attr) */}
                         <select
                             onChange={this.handleSelect}
                             style={selectDropdownStyle}
@@ -172,7 +182,6 @@ export default class ChartEditor extends PureComponent {
         const {
             updateProps,
             droppedBoxNames,
-            xAxisColumnName,
             yAxisColumnNames
         } = this.props;
 
