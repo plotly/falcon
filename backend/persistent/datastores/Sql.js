@@ -72,7 +72,7 @@ function createClient(connection) {
          * See all options here:
          * http://tediousjs.github.io/tedious/api-connection.html
          */
-        options.dialectOptions.encrypt = Boolean(connection.encrypt);
+        options.dialectOptions.encrypt = connection.encrypt;
         const trimmedInstanceName = trim(connection.instanceName || '');
         if (trimmedInstanceName) {
             /*
