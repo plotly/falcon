@@ -1,22 +1,12 @@
 import cookie from 'react-cookies';
 import React, { Component, PropTypes } from 'react';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import Settings from './Settings/Settings.react';
-import {baseUrl, isElectron} from '../utils/utils';
+import {isElectron} from '../utils/utils';
 import {Link} from 'react-router';
 import {contains} from 'ramda';
 import * as SessionsActions from '../actions/sessions';
-
-const LINKS = {
-    PLANS: 'http://plot.ly/plans/',
-    DOCS: 'http://help.plot.ly/database-connectors/',
-    TYPEFORM: 'https://plotly.typeform.com/to/KUiCSl',
-    GITHUB: 'https://github.com/plotly/falcon-sql-client',
-    ABOUT: 'https://plot.ly/database-connectors/'
-};
-const ONPREM = contains('external-data-connector', window.location.href);
 
 class Configuration extends Component {
     constructor(props) {
@@ -70,13 +60,6 @@ class Configuration extends Component {
     }
 
     render() {
-        const menuOptions = {
-            isOpen: this.state.isMenuOpen,
-            close: this.close,
-            toggle: <button type="button" onClick={this.toggle}>MENU</button>,
-            align: 'right',
-            animate: false
-        };
         const loginMessage = this.state.username ?
                              <div className="supportLinksContainer">
                                  Logged in as "{this.state.username}" &nbsp;

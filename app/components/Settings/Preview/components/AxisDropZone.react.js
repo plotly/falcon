@@ -35,7 +35,12 @@ export default class AxisDropZone extends Component {
         isOver: PropTypes.bool.isRequired,
         canDrop: PropTypes.bool.isRequired,
         accepts: PropTypes.arrayOf(PropTypes.string).isRequired,
-        onDrop: PropTypes.func.isRequired
+        onDrop: PropTypes.func.isRequired,
+        removeDroppedItem: PropTypes.func,
+        dropType: PropTypes.string,
+        droppedItems: PropTypes.array,
+        handleClick: PropTypes.func,
+        selectedColumn: PropTypes.string
     };
 
     clickRemoveHandler (colName, dropType) {
@@ -57,7 +62,7 @@ export default class AxisDropZone extends Component {
         return connectDropTarget(
             <div style={{ ...style, backgroundColor }}>
 
-                {droppedItems.map((colName, i) => 
+                {droppedItems.map((colName, i) =>
                     <Box
                         name={colName}
                         type="column"
