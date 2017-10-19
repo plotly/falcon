@@ -127,6 +127,7 @@ export default class UserConnections extends Component {
                             </label>
                             <div className={'wrapInput'}>
                                 <input
+                                    checked={connectionObject[setting.value]}
                                     type="checkbox"
                                     onChange={() => {
                                         updateConnection({
