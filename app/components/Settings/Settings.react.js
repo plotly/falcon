@@ -29,6 +29,8 @@ class Settings extends Component {
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
         this.state = {
             editMode: true,
+            isLoggedIn: false,
+            selectedPanel: {},
             urls: {
                 https: null,
                 http: null
@@ -41,6 +43,27 @@ class Settings extends Component {
             checkHTTPSEndpointInterval: null,
             getConnectorUrlsInterval: null
         };
+
+        const checkIfLoggedIn = () => {
+            return fetch(`/settings`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            }).then((res) => res.json().then((json) => {
+                return (res.status === 200 && json.USERS.length > 0);
+            })).catch((e) => {
+                return false;
+            }).then(isLoggedIn => {
+                this.setState({isLoggedIn});
+                if(!isLoggedIn) setTimeout(checkIfLoggedIn, 1000);
+            }).catch((e) => {
+                console.error(e);
+            });
+        };
+
+        checkIfLoggedIn();
     }
 
     componentDidMount() {
@@ -310,7 +333,10 @@ class Settings extends Component {
 
                 <div className={'openTab'}>
 
-                    <Tabs defaultIndex={0}>
+                    <Tabs
+                        selectedIndex={this.state.selectedPanel[selectedTab] || 0}
+                        onSelect={panelIndex => this.setState({selectedPanel: {[selectedTab]: panelIndex}})}
+                    >
 
                         <TabList>
                             <Tab>Connection</Tab>
@@ -421,7 +447,7 @@ class Settings extends Component {
                                                 </Link>
                                             </div>
                                         </div>
-                                    ) : (
+                                    ) : (this.state.isLoggedIn) ? (
                                         <div>
                                             <p>
                                                 {`Plotly is automatically initializing a
@@ -434,6 +460,12 @@ class Settings extends Component {
                                                 </Link>
                                                 {`. It has been ${timeElapsed}. Check out the
                                                 FAQ while you wait! 📰`}
+                                            </p>
+                                        </div>
+                                    ): (
+                                        <div>
+                                            <p>
+                                                <a onClick={() => window.location.assign('/login')}>Log into Plotly</a>
                                             </p>
                                         </div>
                                     )
