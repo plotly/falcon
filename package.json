@@ -1,7 +1,7 @@
 {
   "name": "falcon-sql-client",
   "productName": "Falcon SQL Client",
-  "version": "2.4.0-rc1",
+  "version": "2.3.1",
   "description": "Plotly Database Connector for https://plot.ly/create. Connect your database and query your data to use in your charts.",
   "main": "./backend/main.js",
   "scripts": {
