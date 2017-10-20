@@ -102,8 +102,10 @@ export const mssqlConnection = {
     username: 'masteruser',
     password: 'connecttoplotly',
     host: 'test-mssql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
+    instanceName: '',
     port: 1433,
-    database: 'plotly_datasets'
+    database: 'plotly_datasets',
+    encrypt: true
 };
 export const elasticsearchConnections = {
     dialect: 'elasticsearch',
