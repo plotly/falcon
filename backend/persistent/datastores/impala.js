@@ -1,24 +1,25 @@
 import fetch from 'node-fetch';
-import {createClient} from 'node-impala';
+import * as impala from 'node-impala';
 import {dissoc, keys, values, init, map, prepend, unnest} from 'ramda';
 
 import Logger from '../../logger';
 
-const client = createClient();
 
-export function connect(connection) {
-    return client.connect({
+export function createClient(connection) {
+    const client = impala.createClient();
+    client.connect({
         host: connection.host,
         port: connection.port,
         resultType: 'json-array'
     });
+    return client;
 }
 
 export function tables(connection) {
     const code = (connection.database) ?
         `show tables in ${connection.database}` :
         'show tables';
-    return client.query(code)
+    return createClient(connection).query(code)
     .then(json => {
         let tableNames = json.map(t => t.name);
         if (connection.database) tableNames = tableNames.map(tn => `${connection.database}.${tn}`);
@@ -33,14 +34,21 @@ export function tables(connection) {
 
 export function schemas(connection) {
     let columnnames = ['tablename', 'column_name', 'data_type'];
-    return tables(connection)
-    .then(tableNames => {
+    const showTables = (connection.database) ?
+        `show tables in ${connection.database}` :
+        'show tables';
+
+    return createClient(connection).query(showTables)
+    .then(json => {
+        let tableNames = json.map(t => t.name);
+        if (connection.database) tableNames = tableNames.map(tn => `${connection.database}.${tn}`);
+
         /*
          * The last column in the output of describe statement is 'comment',
          * so we remove it(using Ramda.init) before sending out the result.
          */
         const promises = map(tableName => {
-            return query(`describe ${tableName}`)
+            return query(`describe ${tableName}`, connection)
             .then(json => map(row => prepend(tableName, init(row)), json.rows));
         }, tableNames);
 
@@ -58,16 +66,16 @@ export function schemas(connection) {
 }
 
 export function query(query, connection) {
-    return client.query(query)
-    .then(json => {
-        let columnnames = [];
-        let rows = [];
 
-        if (json.length !== 0) {
-            columnnames = keys(json[0]);
-            rows = json.map(obj => values(obj));
-        }
-        return {columnnames, rows};
+    return createClient(connection).query(query)
+    .then(json => {
+      let columnnames = [];
+      let rows = [[]];
+      if (json.length !== 0) {
+          columnnames = keys(json[0]);
+          rows = json.map(obj => values(obj));
+      }
+      return {columnnames, rows};
     }).catch(err => {
         Logger.log(err);
         throw new Error(err)
