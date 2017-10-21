@@ -53,9 +53,9 @@ describe('Apache Impala:', function () {
         connection.host = 'http://lah-lah.lemons.com';
 
         return connect(connection).catch(err => {
-            assert.equal(err.code, 'ENOTFOUND');
-            assert.equal(err.hostname, 'http://lah-lah.lemons.com');
-            assert.equal(err.port, 21000);
+            assert.equal(err, ('Error: Error: getaddrinfo ENOTFOUND ' +
+                               'http://lah-lah.lemons.com ' +
+                               'http://lah-lah.lemons.com:21000'));
         });
     });
 });

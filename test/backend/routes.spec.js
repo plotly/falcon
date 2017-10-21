@@ -1219,9 +1219,7 @@ describe('Routes - ', () => {
                 connectionTypo = merge(connection, {username: 'typo'});
             } else if (connection.dialect === 's3') {
                 connectionTypo = merge(connection, {secretAccessKey: 'typo'});
-            } else if (connection.dialect === 'elasticsearch') {
-                connectionTypo = merge(connection, {host: 'https://lahlahlemons.com'});
-            } else if (connection.dialect === 'apache drill') {
+            } else if (contains(connection.dialect, ['elasticsearch', 'apache drill', 'apache impala'])) {
                 connectionTypo = merge(connection, {host: 'https://lahlahlemons.com'});
             } else if (connection.dialect === 'sqlite') {
                 connectionTypo = merge(connection, {storage: 'typo'});
@@ -1249,7 +1247,8 @@ describe('Routes - ', () => {
                                     'failed, reason: getaddrinfo ENOTFOUND lahlahlemons.com lahlahlemons.com:9243',
                                 ['apache drill']: 'request to https://lahlahlemons.com:8047/query.json failed, ' +
                                     'reason: getaddrinfo ENOTFOUND lahlahlemons.com lahlahlemons.com:8047',
-                                sqlite: 'SQLite file at path "typo" does not exist.'
+                                sqlite: 'SQLite file at path "typo" does not exist.',
+                                ['apache impala']: 'Error: getaddrinfo ENOTFOUND https://lahlahlemons.com https://lahlahlemons.com:21000'
                             })[connection.dialect]
                         }
                     });
