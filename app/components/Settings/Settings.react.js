@@ -29,7 +29,6 @@ class Settings extends Component {
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
         this.state = {
             editMode: true,
-            isLoggedIn: false,
             selectedPanel: {},
             urls: {
                 https: null,
@@ -43,27 +42,6 @@ class Settings extends Component {
             checkHTTPSEndpointInterval: null,
             getConnectorUrlsInterval: null
         };
-
-        const checkIfLoggedIn = () => {
-            return fetch(`/settings`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            }).then((res) => res.json().then((json) => {
-                return (res.status === 200 && json.USERS.length > 0);
-            })).catch((e) => {
-                return false;
-            }).then(isLoggedIn => {
-                this.setState({isLoggedIn});
-                if(!isLoggedIn) setTimeout(checkIfLoggedIn, 1000);
-            }).catch((e) => {
-                console.error(e);
-            });
-        };
-
-        checkIfLoggedIn();
     }
 
     componentDidMount() {
@@ -446,8 +424,13 @@ class Settings extends Component {
                                                     <strong><code>{connectorUrl}</code></strong>
                                                 </Link>
                                             </div>
+                                            <p>
+                                                {`Logged in as "${this.props.username}"`}
+                                                <br/>
+                                                <a onClick={this.props.logout}>Log Out</a>
+                                            </p>
                                         </div>
-                                    ) : (this.state.isLoggedIn) ? (
+                                    ) : (this.props.username) ? (
                                         <div>
                                             <p>
                                                 {`Plotly is automatically initializing a
@@ -461,11 +444,18 @@ class Settings extends Component {
                                                 {`. It has been ${timeElapsed}. Check out the
                                                 FAQ while you wait! 📰`}
                                             </p>
+                                            <p>
+                                                {`Logged in as "${this.props.username}"`}
+                                                <br/>
+                                                <a onClick={this.props.logout}>Log Out</a>
+                                            </p>
                                         </div>
                                     ): (
                                         <div>
                                             <p>
                                                 <a onClick={() => window.location.assign('/login')}>Log into Plotly</a>
+                                                <br/>
+                                                Please, login in order to connect your queries to your Plotly account.
                                             </p>
                                         </div>
                                     )
