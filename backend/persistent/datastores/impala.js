@@ -15,6 +15,12 @@ export function createClient(connection) {
     return client;
 }
 
+export function connect(connection) {
+
+    // Runs a blank query to check connection has been established:
+    return createClient(connection).query('SELECT ID FROM (SELECT 1 ID) DUAL WHERE ID=0');
+}
+
 export function tables(connection) {
     const code = (connection.database) ?
         `show tables in ${connection.database}` :
