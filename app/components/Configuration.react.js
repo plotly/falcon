@@ -7,6 +7,8 @@ import {isElectron} from '../utils/utils';
 import {Link} from 'react-router';
 import {contains} from 'ramda';
 import * as SessionsActions from '../actions/sessions';
+import Login from './Login.react'
+
 
 class Configuration extends Component {
     constructor(props) {
@@ -60,24 +62,22 @@ class Configuration extends Component {
     }
 
     render() {
-        const loginMessage = this.state.username ?
-                             <div className="supportLinksContainer">
-                                 Logged in as "{this.state.username}" &nbsp;
-                                 <Link onClick={this.logOut} >
-                                     Log Out
-                                 </Link>
-                             </div>
-                             :
-                             <div>
-                                 <Link to="/login" >Log In</Link>
-                             </div>;
+        const menuOptions = {
+            isOpen: this.state.isMenuOpen,
+            close: this.close,
+            toggle: <button type="button" onClick={this.toggle}>MENU</button>,
+            align: 'right',
+            animate: false
+        };
 
-        return (
+        return (isElectron() || this.state.username) ? (
             <div className="fullApp">
-                {loginMessage}
-                <Settings/>
+                <Settings username={this.state.username} logout={this.logOut}/>
             </div>
-
+        ): (
+            <div className="fullApp">
+                <Login/>
+            </div>
         );
     }
 }

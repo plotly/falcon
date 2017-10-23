@@ -39,6 +39,7 @@ app.on('ready', () => {
      * This allows us to send pass information to electron renderer from
      * inside the server.
      */
+    server.electronWindow = mainWindow;
     httpServer.electronWindow = mainWindow;
     httpsServer.electronWindow = mainWindow;
 
