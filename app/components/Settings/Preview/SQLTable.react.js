@@ -1,7 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Table, Column, Cell} from 'fixed-data-table';
 
-export default function SQLTable(props) {
+const SQLTable = function(props) {
     const {columnNames, rows} = props;
 
     return (
@@ -20,7 +21,7 @@ export default function SQLTable(props) {
                     flexgrow={1}
                     width={200}
                     header={<Cell>{colName}</Cell>}
-                    cell={({rowIndex, ...props}) => (
+                    cell={({rowIndex}) => (
                         <Cell
                             height={20}
                         >
@@ -31,4 +32,11 @@ export default function SQLTable(props) {
             })}
         </Table>
     );
-}
+};
+
+SQLTable.propTypes = {
+    columnNames: PropTypes.array,
+    rows: PropTypes.array
+};
+
+export default SQLTable;
