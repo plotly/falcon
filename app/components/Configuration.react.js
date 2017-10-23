@@ -5,7 +5,6 @@ import {connect} from 'react-redux';
 import Settings from './Settings/Settings.react';
 import {isElectron} from '../utils/utils';
 import {Link} from 'react-router';
-import {contains} from 'ramda';
 import * as SessionsActions from '../actions/sessions';
 
 class Configuration extends Component {
