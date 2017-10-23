@@ -7,6 +7,8 @@ import {isElectron} from '../utils/utils';
 import {Link} from 'react-router';
 import {contains} from 'ramda';
 import * as SessionsActions from '../actions/sessions';
+import Login from './Login.react'
+
 
 class Configuration extends Component {
     constructor(props) {
@@ -74,7 +76,7 @@ class Configuration extends Component {
             </div>
         ): (
             <div className="fullApp">
-                <Link to="/login" >Log In</Link>
+                <Login/>
             </div>
         );
     }
