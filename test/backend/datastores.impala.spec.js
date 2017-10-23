@@ -1,19 +1,10 @@
 import {assert} from 'chai';
 
 import {DIALECTS} from '../../app/constants/constants.js';
-
+import {apacheImpalaConnection as connection} from './utils.js';
 import {
     query, connect, tables
 } from '../../backend/persistent/datastores/Datastores.js';
-
-
-const connection = {
-    dialect: DIALECTS.APACHE_IMPALA,
-    host: '35.184.155.127', // default: '127.0.0.1'
-    port: 21000,
-    database: 'plotly', // default: ''
-    timeout: 60
-};
 
 describe('Apache Impala:', function () {
 
@@ -53,6 +44,9 @@ describe('Apache Impala:', function () {
         connection.host = 'http://lah-lah.lemons.com';
 
         return connect(connection).catch(err => {
+            // reset hostname
+            connection.host = '35.184.155.127';
+
             assert.equal(err, ('Error: Error: getaddrinfo ENOTFOUND ' +
                                'http://lah-lah.lemons.com ' +
                                'http://lah-lah.lemons.com:21000'));
