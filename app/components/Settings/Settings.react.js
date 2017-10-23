@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {contains, dissoc, eqProps, flip, hasIn, head, isEmpty, keys, merge, propOr, reduce} from 'ramda';
 import {connect} from 'react-redux';
+import ReactToolTip from 'react-tooltip';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
 import fetch from 'isomorphic-fetch';
@@ -116,6 +117,7 @@ class Settings extends Component {
                 )}
             >
                 <div className={'dialectSelector'}>
+                    <ReactToolTip place={'top'} type={'dark'} effect={'solid'} />
                     <DialectSelector
                         connectionObject={connectionObject}
                         updateConnection={updateConnection}
@@ -200,6 +202,7 @@ class Settings extends Component {
 
         const connectionObject = connections[selectedTab] || {};
         if (contains(connectionObject.dialect, [
+                    DIALECTS.APACHE_IMPALA,
                     DIALECTS.APACHE_SPARK,
                     DIALECTS.IBM_DB2,
                     DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,

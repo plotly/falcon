@@ -361,6 +361,7 @@ function PREVIEW_QUERY (dialect, table, database = '') {
     switch (dialect) {
         case DIALECTS.IBM_DB2:
             return `SELECT * FROM ${table} FETCH FIRST 1000 ROWS ONLY`;
+        case DIALECTS.APACHE_IMPALA:
         case DIALECTS.APACHE_SPARK:
         case DIALECTS.MYSQL:
         case DIALECTS.SQLITE:

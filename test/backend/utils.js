@@ -131,6 +131,12 @@ export const sqliteConnection = {
     dialect: 'sqlite',
     storage: `${__dirname}/plotly_datasets.db`
 };
+export const apacheImpalaConnection = {
+    dialect: 'apache impala',
+    host: '35.184.155.127',
+    port: 21000,
+    database: 'plotly'
+};
 
 // TODO - Add sqlite here
 // TODO - Add postgis in here
@@ -144,7 +150,8 @@ export const testConnections = [
     sqliteConnection,
     elasticsearchConnections,
     publicReadableS3Connections,
-    apacheDrillConnections
+    apacheDrillConnections,
+    apacheImpalaConnection
 ];
 
 export const testSqlConnections = [
@@ -152,7 +159,8 @@ export const testSqlConnections = [
     mysqlConnection,
     mariadbConnection,
     redshiftConnection,
-    mssqlConnection
+    mssqlConnection,
+    apacheImpalaConnection
 ];
 
 export const configuration = dissoc('password', sqlConnections);
