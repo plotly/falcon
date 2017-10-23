@@ -1,11 +1,8 @@
-import React, {Component, PropTypes} from 'react';
-import ImmutablePropTypes from 'react-immutable-proptypes';
-import {contains, head, flatten, keys, values} from 'ramda';
-import {
-    CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS, SAMPLE_DBS
-} from '../../../constants/constants';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {contains, head} from 'ramda';
+import {CONNECTION_CONFIG, SAMPLE_DBS} from '../../../constants/constants';
 import {dynamicRequireElectron} from '../../../utils/utils';
-import classnames from 'classnames';
 
 let dialog;
 try {
@@ -15,16 +12,16 @@ try {
 }
 
 /*
- *	Displays and alters user inputs for `configuration`
- *	username, password, and local port number.
+ *  Displays and alters user inputs for `configuration`
+ *  username, password, and local port number.
 */
 
 
 export default class UserConnections extends Component {
     constructor(props) {
         super(props);
-		this.getStorageOnClick = this.getStorageOnClick.bind(this);
-		this.testClass = this.testClass.bind(this);
+        this.getStorageOnClick = this.getStorageOnClick.bind(this);
+        this.testClass = this.testClass.bind(this);
         this.toggleSampleCredentials = this.toggleSampleCredentials.bind(this);
 
         this.state = {showSampleCredentials: false};
@@ -36,31 +33,34 @@ export default class UserConnections extends Component {
         this.setState({showSampleCredentials: !this.state.showSampleCredentials});
     }
 
-	testClass() {
-		/*
-			No internal tests for now.
-		*/
+    testClass() {
+        /*
+            No internal tests for now.
+        */
 
-		return 'test-input-created';
-	}
+        return 'test-input-created';
+    }
 
-	getStorageOnClick(setting) {
+    getStorageOnClick(setting) {
         // sqlite requires a path
-		return () => {
-			dialog.showOpenDialog({
-				properties: ['openFile', 'openDirectory'],
-				filters: [{name: 'databases', extensions: ['db']}]
-			}, (paths) => {
-				// result returned in an array
-				// TODO: add length of paths === 0 check
-				// TODO: add path non null check
-				const path = head(paths);
-				this.props.updateConnection({
-					[setting.value]: paths[0]
-				});
-			});
-		};
-	}
+        return () => {
+            dialog.showOpenDialog({
+                properties: ['openFile', 'openDirectory'],
+                filters: [{name: 'databases', extensions: ['db']}]
+            }, (paths) => {
+                // result returned in an array
+                // TODO: add length of paths === 0 check
+                // TODO: add path non null check
+
+                // Surpressed ESLint cause see comments above
+                // eslint-disable-next-line no-unused-vars
+                const path = head(paths);
+                this.props.updateConnection({
+                    [setting.value]: paths[0]
+                });
+            });
+        };
+    }
 
     render() {
 
@@ -75,7 +75,7 @@ export default class UserConnections extends Component {
         };
 
         const inputs = CONNECTION_CONFIG[connectionObject.dialect]
-			.map(setting => {
+            .map(setting => {
                 let input;
                 const dialect = connectionObject.dialect;
                 if (contains(setting.type, ['text', 'number', 'password'])) {
@@ -157,7 +157,7 @@ export default class UserConnections extends Component {
                 );
         });
 
-		return (
+        return (
             <div>
                 {inputs}
                 {connectionObject.dialect !== 'sqlite' &&
@@ -170,8 +170,8 @@ export default class UserConnections extends Component {
                 }
             </div>
 
-		);
-	}
+        );
+    }
 }
 
 UserConnections.propTypes = {
