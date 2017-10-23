@@ -15,6 +15,7 @@ export default function getPlotJsonFromState(state) {
 
     const colsWithTraceTypes = Object.keys(columnTraceTypes);
 
+    // eslint-disable-next-line no-undefined
     if (typeof allColumnNames !== undefined && typeof rowData !== undefined) {
         data = [];
         const columnData = transpose(rowData);
@@ -84,7 +85,7 @@ export default function getPlotJsonFromState(state) {
                         [0.8, 'rgb(117,107,177)'], [1, 'rgb(84,39,143)']]
                 };
             }
-            else if (traceType === 'choropleth-world') { 
+            else if (traceType === 'choropleth-world') {
                 dataObj = {
                     locations: xColumnData,
                     z: yColumnData,
@@ -100,7 +101,9 @@ export default function getPlotJsonFromState(state) {
                 delete dataObj.y;
                 delete dataObj.marker.color;
                 let pieColors = [];
-                Array(100).fill().map(i => pieColors = pieColors.concat(DEFAULT_COLORS));
+
+                // TODO A bug or works as intended? If as intended, transform to forEach
+                Array(100).fill().map(() => pieColors = pieColors.concat(DEFAULT_COLORS));
                 dataObj = {
                     values: xColumnData,
                     labels: yColumnData,
@@ -142,6 +145,8 @@ export default function getPlotJsonFromState(state) {
             }
         }
 
+        // TODO should an .includes(traceType) be added?
+        // eslint-disable-next-line no-constant-condition
         if (['scattergeo-world', 'choropleth-world', 'scattergeo-usa', 'choropleth-usa']) {
             layout.geo = {
                 showland: true,
