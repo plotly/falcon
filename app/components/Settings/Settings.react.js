@@ -15,7 +15,7 @@ import TableTree from './Preview/TableTree.react.js';
 import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../Link.react';
 import {DIALECTS, FAQ, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
-import {getAllBaseUrls} from '../../utils/utils';
+import {getAllBaseUrls, isElectron, isOnPrem} from '../../utils/utils';
 
 
 let checkconnectorUrls;
@@ -323,12 +323,12 @@ class Settings extends Component {
                             ) : (
                                 <Tab disabled={true}>Query</Tab>
                             )}
-                            <Tab
+                            {isOnPrem() || <Tab
                                 className="test-ssl-tab react-tabs__tab"
                             >
                                 Plot.ly
-                            </Tab>
-                            <Tab>FAQ</Tab>
+                            </Tab>}
+                            { isElectron() && <Tab>FAQ</Tab> }
                         </TabList>
 
                         <TabPanel className={['tab-panel-connection', 'react-tabs__tab-panel']}>
@@ -385,7 +385,7 @@ class Settings extends Component {
                             )}
                         </TabPanel>
 
-                        <TabPanel>
+                        {isOnPrem() ||<TabPanel>
                             {this.props.connectRequest.status === 200 ? (
                                 <div className="big-whitespace-tab">
                                     {httpsServerIsOK ? (
@@ -466,9 +466,9 @@ class Settings extends Component {
                                     <p>Please connect to a data store in the Connection tab first.</p>
                                 </div>
                             )}
-                        </TabPanel>
+                        </TabPanel> }
 
-                        <TabPanel>
+                        {isElectron() && <TabPanel>
                             <div className="big-whitespace-tab">
                                 <ul>
                                     {FAQ.map(function(obj, i) {
@@ -481,7 +481,7 @@ class Settings extends Component {
                                     })}
                                 </ul>
                             </div>
-                        </TabPanel>
+                        </TabPanel>}
                     </Tabs>
                 </div>
             </div>
