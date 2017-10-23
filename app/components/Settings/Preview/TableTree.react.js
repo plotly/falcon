@@ -1,14 +1,23 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import TreeView from 'react-treeview';
-import {isEmpty, has, propOr} from 'ramda';
-import * as Actions from '../../../actions/sessions';
+import {isEmpty, has} from 'ramda';
 
 class TableTree extends Component {
-
     constructor(props) {
         super(props);
 
         this.storeSchemaTree = this.storeSchemaTree.bind(this);
+    }
+
+    static propTypes = {
+        schemaRequest: PropTypes.object,
+        getSqlSchema: PropTypes.func,
+        updatePreview: PropTypes.func,
+        preview: PropTypes.object,
+        connectionObject: PropTypes.shape({
+            database: PropTypes.string
+        })
     }
 
     storeSchemaTree() {
@@ -42,7 +51,7 @@ class TableTree extends Component {
         this.storeSchemaTree();
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps() {
         this.storeSchemaTree();
     }
 
