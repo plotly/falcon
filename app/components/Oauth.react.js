@@ -47,7 +47,7 @@ class Status extends Component {
                 });
             }
         }))
-        .catch(err => {
+        .catch(() => {
             this.setState({status: 'failure'});
         });
     }
