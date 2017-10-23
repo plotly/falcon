@@ -1,6 +1,6 @@
-import React, {Component, PropTypes} from 'react';
-import classnames from 'classnames';
-import {flatten, keys, isEmpty} from 'ramda';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {flatten, keys} from 'ramda';
 import Select from 'react-select';
 
 export default class OptionsDropdown extends Component {
@@ -11,6 +11,16 @@ export default class OptionsDropdown extends Component {
         this.renderElasticsearchDocs = this.renderElasticsearchDocs.bind(this);
     }
 
+    static propTypes = {
+        // See type of react-select's Select `value` property
+        selectedTable: PropTypes.any,
+        selectedIndex: PropTypes.any,
+
+        tablesRequest: PropTypes.object,
+        setTable: PropTypes.func,
+        elasticsearchMappingsRequest: PropTypes.object,
+        setIndex: PropTypes.func
+    }
 
     renderSQLOptions() {
         const {selectedTable, tablesRequest, setTable} = this.props;
@@ -50,7 +60,9 @@ export default class OptionsDropdown extends Component {
 
     renderElasticsearchIndecies() {
         const {
-            elasticsearchMappingsRequest: EMR, setIndex, selectedIndex
+            elasticsearchMappingsRequest: EMR,
+            setIndex,
+            selectedIndex
         } = this.props;
         if (!EMR.status) {
             return null;
@@ -88,7 +100,10 @@ export default class OptionsDropdown extends Component {
 
     renderElasticsearchDocs() {
         const {
-            selectedTable, selectedIndex, elasticsearchMappingsRequest: EMR, setTable, connectionObject
+            selectedTable,
+            selectedIndex,
+            elasticsearchMappingsRequest: EMR,
+            setTable
         } = this.props;
 
         if (!selectedIndex) {
