@@ -264,6 +264,7 @@ class Settings extends Component {
             deleteTab,
             elasticsearchMappingsRequest,
             getSqlSchema,
+            logout,
             schemaRequest,
             newTab,
             preview,
@@ -283,7 +284,8 @@ class Settings extends Component {
             setTab,
             tablesRequest,
             updateConnection,
-            updatePreview
+            updatePreview,
+            username
         } = this.props;
 
         if (!selectedTab) {
@@ -425,12 +427,12 @@ class Settings extends Component {
                                                 </Link>
                                             </div>
                                             <p>
-                                                {`Logged in as "${this.props.username}"`}
+                                                {`Logged in as "${username}"`}
                                                 <br/>
-                                                <a onClick={this.props.logout}>Log Out</a>
+                                                <a onClick={logout}>Log Out</a>
                                             </p>
                                         </div>
-                                    ) : (this.props.username) ? (
+                                    ) : (username) ? (
                                         <div>
                                             <p>
                                                 {`Plotly is automatically initializing a
@@ -445,9 +447,9 @@ class Settings extends Component {
                                                 FAQ while you wait! 📰`}
                                             </p>
                                             <p>
-                                                {`Logged in as "${this.props.username}"`}
+                                                {`Logged in as "${username}"`}
                                                 <br/>
-                                                <a onClick={this.props.logout}>Log Out</a>
+                                                <a onClick={logout}>Log Out</a>
                                             </p>
                                         </div>
                                     ): (
@@ -455,7 +457,9 @@ class Settings extends Component {
                                             <p>
                                                 <a onClick={() => window.location.assign('/login')}>Log into Plotly</a>
                                                 <br/>
-                                                Please, login in order to connect your queries to your Plotly account.
+                                                Log in to Plotly in order to schedule queries and make queries
+                                                directly from the <a href={`https://${plotlyUrl}/create`}>
+                                                Plotly Chart Studio </a>
                                             </p>
                                         </div>
                                     )
