@@ -188,6 +188,16 @@ export default class Servers {
         Logger.log(`Listening at: ${protocol}://${domain}:${port}`);
         server.listen(port);
 
+        // Set AUTH_ENABLED into a cookie so that frontend can show login-modal accordingly:
+        server.use((req, res, next) => {
+            const authEnabled = getSetting('AUTH_ENABLED');
+            if (!authEnabled || that.isElectron) {
+                res.setCookie('db-connector-auth-disabled', true);
+            }
+
+            next();
+        });
+
         server.get(/\/static\/?.*/, restify.serveStatic({
             directory: `${__dirname}/../`
         }));

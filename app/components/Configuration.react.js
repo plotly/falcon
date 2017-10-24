@@ -14,7 +14,8 @@ class Configuration extends Component {
         super(props);
         this.state = {
             isMenuOpen: false,
-            username: cookie.load('db-connector-user')
+            username: cookie.load('db-connector-user'),
+            authDisabled: cookie.load('db-connector-auth-disabled')
         };
         this.toggle = this.toggle.bind(this);
         this.close = this.close.bind(this);
@@ -52,6 +53,7 @@ class Configuration extends Component {
       cookie.remove('db-connector-user');
       cookie.remove('plotly-auth-token');
       cookie.remove('db-connector-auth-token');
+      cookie.remove('db-connector-auth-disabled');
       this.setState({ username: ''});
 
       // reload page when running in browser:
@@ -69,7 +71,7 @@ class Configuration extends Component {
             animate: false
         };
 
-        return (isElectron() || this.state.username) ? (
+        return (isElectron() || this.state.authDisabled || this.state.username) ? (
             <div className="fullApp">
                 <Settings username={this.state.username} logout={this.logOut}/>
             </div>
