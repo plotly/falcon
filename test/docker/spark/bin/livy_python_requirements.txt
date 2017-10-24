@@ -1,0 +1,6 @@
+cloudpickle
+requests
+requests-kerberos
+flake8
+flaky
+pytest
