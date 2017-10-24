@@ -35,7 +35,7 @@ export default class Servers {
      * The httpServer is always open for oauth.
      * The httpsServer starts when certificates have been created.
      */
-    constructor(args = {createCerts: true, startHttps: true}) {
+    constructor(args = {createCerts: true, startHttps: true, isElectron: false}) {
         this.httpServer = {
             port: null,
             server: null,
@@ -49,6 +49,7 @@ export default class Servers {
             protocol: null,
             domain: null
         };
+        this.isElectron = args.isElectron;
 
         /*
          * `args` is of form {protocol: 'HTTP', createCerts: true}
@@ -64,7 +65,7 @@ export default class Servers {
         this.httpServer.protocol = 'http';
         this.httpServer.domain = 'localhost';
 
-        if (args.startHttps && !getSetting('IS_RUNNING_INSIDE_ON_PREM')) {
+        if (args.startHttps && !getSetting('IS_RUNNING_INSIDE_ON_PREM') && this.isElectron) {
             // Create certs if necessary when we have an approved user.
             if (args.createCerts && isEmpty(getCerts())) {
                 const createCertificates = setInterval(() => {
@@ -278,7 +279,7 @@ export default class Servers {
                         status = 201;
                     }
 
-                    if (contains(username, getSetting('ALLOWED_USERS')) || that.isElectron) {
+                    if (contains(username, getSetting('ALLOWED_USERS')) || that.isElectron || !getSetting('AUTH_ENABLED')) {
                         res.setCookie('plotly-auth-token', access_token, getCookieOptions());
 
                         const db_connector_access_token = generateAndSaveAccessToken();
