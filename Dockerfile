@@ -43,7 +43,6 @@ ENV PLOTLY_CONNECTOR_LOG_TO_STDOUT="true"
 COPY package.json /usr/src/app
 COPY yarn.lock /usr/src/app
 RUN yarn install
-RUN yarn run rebuild:modules:electron
 
 COPY . /usr/src/app
 RUN yarn run heroku-postbuild
