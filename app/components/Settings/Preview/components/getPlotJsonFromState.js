@@ -1,5 +1,5 @@
 
-import {transpose} from 'ramda';
+import {transpose, contains} from 'ramda';
 import {DEFAULT_DATA, DEFAULT_LAYOUT, DEFAULT_COLORS} from './editorConstants';
 
 export default function getPlotJsonFromState(state) {
@@ -103,7 +103,9 @@ export default function getPlotJsonFromState(state) {
                 let pieColors = [];
 
                 // TODO A bug or works as intended? If as intended, transform to forEach
-                Array(100).fill().map(() => pieColors = pieColors.concat(DEFAULT_COLORS));
+                Array(100).fill().forEach(() => {
+                    pieColors = pieColors.concat(DEFAULT_COLORS);
+                });
                 dataObj = {
                     values: xColumnData,
                     labels: yColumnData,
@@ -145,9 +147,7 @@ export default function getPlotJsonFromState(state) {
             }
         }
 
-        // TODO should an .includes(traceType) be added?
-        // eslint-disable-next-line no-constant-condition
-        if (['scattergeo-world', 'choropleth-world', 'scattergeo-usa', 'choropleth-usa']) {
+        if (contains(traceType, ['scattergeo-world', 'choropleth-world', 'scattergeo-usa', 'choropleth-usa'])) {
             layout.geo = {
                 showland: true,
                 landcolor: 'rgb(212,212,212)',
