@@ -559,6 +559,9 @@ describe('Routes - ', () => {
                     `${connection.database}.dbo.ebola_2014`
                 );
             }
+            if (connection.dialect === 'apache impala') {
+                sampleQuery = 'SELECT * FROM PLOTLY.ALCOHOL_CONSUMPTION_BY_COUNTRY_2010 LIMIT 1';
+            }
             POST(`connections/${connectionId}/query`, {
                 query: sampleQuery
             })
@@ -569,6 +572,8 @@ describe('Routes - ', () => {
                     expectedColumnNames = ['Country', 'Month', 'Year', 'Lat', 'Lon', 'Value'];
                 } else if (connection.dialect === 'sqlite') {
                     expectedColumnNames = ['index', 'Country', 'Month', 'Year', 'Lat', 'Lon', 'Value'];
+                } else if (connection.dialect === 'apache impala') {
+                    expectedColumnNames = ['loc', 'alcohol'];
                 } else {
                     expectedColumnNames = ['country', 'month', 'year', 'lat', 'lon', 'value'];
                 }
@@ -583,7 +588,8 @@ describe('Routes - ', () => {
                                 'mysql': ['Guinea', 3, 14, 10, -10, '122'],
                                 'mariadb': ['Guinea', 3, 14, 10, -10, '122'],
                                 'mssql': ['Guinea', 3, 14, 10, -10, '122'],
-                                'sqlite': [0, 'Guinea', 3, 14, 9.95, -9.7, 122]
+                                'sqlite': [0, 'Guinea', 3, 14, 9.95, -9.7, 122],
+                                'apache impala': ['Belarus', '17.5']
                             })[connection.dialect]
                         ],
                         columnnames: expectedColumnNames
@@ -615,7 +621,8 @@ describe('Routes - ', () => {
                                 'corresponds to your MariaDB server version for the right syntax to use near ' +
                                 '\'SELECZ\' at line 1',
                             mssql: "Could not find stored procedure 'SELECZ'.",
-                            sqlite: 'SQLITE_ERROR: near "SELECZ": syntax error'
+                            sqlite: 'SQLITE_ERROR: near "SELECZ": syntax error',
+                            'apache impala': 'BeeswaxException: AnalysisException: Syntax error in line 1:\nSELECZ\n^\nEncountered: IDENTIFIER\nExpected: ALTER, COMPUTE, CREATE, DESCRIBE, DROP, EXPLAIN, INSERT, INVALIDATE, LOAD, REFRESH, SELECT, SHOW, USE, VALUES, WITH\n\nCAUSED BY: Exception: Syntax error'
                         })[connection.dialect]
                     }}
                 );
@@ -634,6 +641,10 @@ describe('Routes - ', () => {
                     `${connection.database}.dbo.ebola_2014`
                 );
             }
+            if (connection.dialect === 'apache impala') {
+                query = 'SELECT * FROM PLOTLY.ALCOHOL_CONSUMPTION_BY_COUNTRY_2010 LIMIT 0';
+            }
+
             POST(`connections/${connectionId}/query`, {query})
             .then(res => res.json().then(json => {
                 assert.equal(res.status, 200);
@@ -678,6 +689,9 @@ describe('Routes - ', () => {
                         'raster_overviews',
                         'spatial_ref_sys'
                     ]).sort();
+                }
+                if (connection.dialect === 'apache impala') {
+                    tables = ['PLOTLY.ALCOHOL_CONSUMPTION_BY_COUNTRY_2010'];
                 }
                 assert.deepEqual(
                     json, tables
@@ -905,6 +919,11 @@ describe('Routes - ', () => {
                             [ 'weather_data_seattle_2016', 'Min_TemperatureC', 'varchar', 8000, '0/0' ],
                             [ 'apple_stock_2014', 'AAPL_x', 'datetime', 8, '23/3' ],
                             [ 'apple_stock_2014', 'AAPL_y', 'decimal', 17, '38/38' ]
+                        ];
+                    } else if (connection.dialect === 'apache impala') {
+                        rows = [
+                            [ 'plotly.alcohol_consumption_by_country_2010', 'loc', 'string' ],
+                            [ 'plotly.alcohol_consumption_by_country_2010', 'alcohol', 'double' ],
                         ];
                     } else {
                         rows = [
@@ -1200,9 +1219,7 @@ describe('Routes - ', () => {
                 connectionTypo = merge(connection, {username: 'typo'});
             } else if (connection.dialect === 's3') {
                 connectionTypo = merge(connection, {secretAccessKey: 'typo'});
-            } else if (connection.dialect === 'elasticsearch') {
-                connectionTypo = merge(connection, {host: 'https://lahlahlemons.com'});
-            } else if (connection.dialect === 'apache drill') {
+            } else if (contains(connection.dialect, ['elasticsearch', 'apache drill', 'apache impala'])) {
                 connectionTypo = merge(connection, {host: 'https://lahlahlemons.com'});
             } else if (connection.dialect === 'sqlite') {
                 connectionTypo = merge(connection, {storage: 'typo'});
@@ -1230,7 +1247,8 @@ describe('Routes - ', () => {
                                     'failed, reason: getaddrinfo ENOTFOUND lahlahlemons.com lahlahlemons.com:9243',
                                 ['apache drill']: 'request to https://lahlahlemons.com:8047/query.json failed, ' +
                                     'reason: getaddrinfo ENOTFOUND lahlahlemons.com lahlahlemons.com:8047',
-                                sqlite: 'SQLite file at path "typo" does not exist.'
+                                sqlite: 'SQLite file at path "typo" does not exist.',
+                                ['apache impala']: 'Error: getaddrinfo ENOTFOUND https://lahlahlemons.com https://lahlahlemons.com:21000'
                             })[connection.dialect]
                         }
                     });

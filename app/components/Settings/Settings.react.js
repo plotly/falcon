@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {contains, dissoc, eqProps, flip, hasIn, head, isEmpty, keys, merge, propOr, reduce} from 'ramda';
 import {connect} from 'react-redux';
+import ReactToolTip from 'react-tooltip';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
 import fetch from 'isomorphic-fetch';
@@ -15,7 +16,7 @@ import TableTree from './Preview/TableTree.react.js';
 import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../Link.react';
 import {DIALECTS, FAQ, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
-import {getAllBaseUrls} from '../../utils/utils';
+import {getAllBaseUrls, isElectron, isOnPrem} from '../../utils/utils';
 
 
 let checkconnectorUrls;
@@ -29,6 +30,7 @@ class Settings extends Component {
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
         this.state = {
             editMode: true,
+            selectedPanel: {},
             urls: {
                 https: null,
                 http: null
@@ -115,6 +117,7 @@ class Settings extends Component {
                 )}
             >
                 <div className={'dialectSelector'}>
+                    <ReactToolTip place={'top'} type={'dark'} effect={'solid'} />
                     <DialectSelector
                         connectionObject={connectionObject}
                         updateConnection={updateConnection}
@@ -199,6 +202,7 @@ class Settings extends Component {
 
         const connectionObject = connections[selectedTab] || {};
         if (contains(connectionObject.dialect, [
+                    DIALECTS.APACHE_IMPALA,
                     DIALECTS.APACHE_SPARK,
                     DIALECTS.IBM_DB2,
                     DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
@@ -263,6 +267,7 @@ class Settings extends Component {
             deleteTab,
             elasticsearchMappingsRequest,
             getSqlSchema,
+            logout,
             schemaRequest,
             newTab,
             preview,
@@ -282,7 +287,8 @@ class Settings extends Component {
             setTab,
             tablesRequest,
             updateConnection,
-            updatePreview
+            updatePreview,
+            username
         } = this.props;
 
         if (!selectedTab) {
@@ -310,7 +316,10 @@ class Settings extends Component {
 
                 <div className={'openTab'}>
 
-                    <Tabs defaultIndex={0}>
+                    <Tabs
+                        selectedIndex={this.state.selectedPanel[selectedTab] || 0}
+                        onSelect={panelIndex => this.setState({selectedPanel: {[selectedTab]: panelIndex}})}
+                    >
 
                         <TabList>
                             <Tab>Connection</Tab>
@@ -319,12 +328,12 @@ class Settings extends Component {
                             ) : (
                                 <Tab disabled={true}>Query</Tab>
                             )}
-                            <Tab
+                            {isOnPrem() || <Tab
                                 className="test-ssl-tab react-tabs__tab"
                             >
                                 Plot.ly
-                            </Tab>
-                            <Tab>FAQ</Tab>
+                            </Tab>}
+                            { isElectron() && <Tab>FAQ</Tab> }
                         </TabList>
 
                         <TabPanel className={['tab-panel-connection', 'react-tabs__tab-panel']}>
@@ -381,7 +390,7 @@ class Settings extends Component {
                             )}
                         </TabPanel>
 
-                        <TabPanel>
+                        {isOnPrem() ||<TabPanel>
                             {this.props.connectRequest.status === 200 ? (
                                 <div className="big-whitespace-tab">
                                     {httpsServerIsOK ? (
@@ -420,8 +429,13 @@ class Settings extends Component {
                                                     <strong><code>{connectorUrl}</code></strong>
                                                 </Link>
                                             </div>
+                                            <p>
+                                                {`Logged in as "${username}"`}
+                                                <br/>
+                                                <a onClick={logout}>Log Out</a>
+                                            </p>
                                         </div>
-                                    ) : (
+                                    ) : (username) ? (
                                         <div>
                                             <p>
                                                 {`Plotly is automatically initializing a
@@ -435,6 +449,21 @@ class Settings extends Component {
                                                 {`. It has been ${timeElapsed}. Check out the
                                                 FAQ while you wait! 📰`}
                                             </p>
+                                            <p>
+                                                {`Logged in as "${username}"`}
+                                                <br/>
+                                                <a onClick={logout}>Log Out</a>
+                                            </p>
+                                        </div>
+                                    ): (
+                                        <div>
+                                            <p>
+                                                <a onClick={() => window.location.assign('/login')}>Log into Plotly</a>
+                                                <br/>
+                                                Log in to Plotly in order to schedule queries and make queries
+                                                directly from the <a href={`https://${plotlyUrl}/create`}>
+                                                Plotly Chart Studio </a>
+                                            </p>
                                         </div>
                                     )
                                     }
@@ -444,9 +473,9 @@ class Settings extends Component {
                                     <p>Please connect to a data store in the Connection tab first.</p>
                                 </div>
                             )}
-                        </TabPanel>
+                        </TabPanel> }
 
-                        <TabPanel>
+                        {isElectron() && <TabPanel>
                             <div className="big-whitespace-tab">
                                 <ul>
                                     {FAQ.map(function(obj, i) {
@@ -459,7 +488,7 @@ class Settings extends Component {
                                     })}
                                 </ul>
                             </div>
-                        </TabPanel>
+                        </TabPanel>}
                     </Tabs>
                 </div>
             </div>

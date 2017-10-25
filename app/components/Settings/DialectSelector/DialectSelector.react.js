@@ -12,6 +12,7 @@ const DialectSelector = function DialectSelector(props) {
     const logos = values(DIALECTS).map(DIALECT => (
         <div
             key={DIALECT}
+            data-tip={DIALECT}
             className={classnames(
                 'logo', {
                     ['logoSelected']: connectionObject.dialect === DIALECT

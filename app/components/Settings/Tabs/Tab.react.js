@@ -27,6 +27,8 @@ export default class ConnectionTab extends Component {
             label = `S3 - (${connectionObject.bucket})`;
         } else if (dialect === DIALECTS.APACHE_DRILL) {
             label = `Apache Drill (${connectionObject.host})`;
+        } else if (dialect === DIALECTS.APACHE_IMPALA) {
+              label = `Apache Impala (${connectionObject.host}:${connectionObject.port})`;
         } else if (dialect === DIALECTS.APACHE_SPARK) {
             label = `Apache Spark (${connectionObject.host}:${connectionObject.port})`;
         } else if (connectionObject.dialect === DIALECTS.ELASTICSEARCH) {
