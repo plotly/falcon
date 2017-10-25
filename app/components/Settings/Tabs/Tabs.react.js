@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import {keys} from 'ramda';
 import Tab from './Tab.react';
@@ -6,6 +7,14 @@ import Tab from './Tab.react';
 export default class ConnectionTabs extends Component {
     constructor(props) {
         super(props);
+    }
+
+    static propTypes = {
+        connections: PropTypes.object,
+        selectedTab: PropTypes.string,
+        newTab: PropTypes.func,
+        setTab: PropTypes.func,
+        deleteTab: PropTypes.func
     }
 
     render() {

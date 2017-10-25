@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import R, {has, isEmpty, propOr} from 'ramda';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
@@ -11,7 +12,6 @@ import S3Preview from './S3Preview.js';
 
 import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../../Link.react';
-import * as Actions from '../../../actions/sessions';
 import {defaultQueries, DIALECTS, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
 import getPlotJsonFromState from './components/getPlotJsonFromState.js';
 
@@ -38,20 +38,25 @@ class Preview extends Component {
         };
     }
 
+    static propTypes = {
+        runSqlQuery: PropTypes.func,
+        updatePreview: PropTypes.func,
+        preview: PropTypes.obj,
+        connectionObject: PropTypes.object,
+        elasticsearchMappingsRequest: PropTypes.object,
+        schemaRequest: PropTypes.object,
+        selectedTable: PropTypes.any,
+        selectedIndex: PropTypes.any,
+        tablesRequest: PropTypes.object,
+        setTable: PropTypes.func,
+        setIndex: PropTypes.func
+    };
+
     propsToState(nextProps, props) {
         const {
-            connectionObject,
-            elasticsearchMappingsRequest,
             preview,
             previewTableRequest,
-            queryRequest,
-            schemaRequest,
-            selectedIndex,
-            selectedTable,
-            setIndex,
-            setTable,
-            tablesRequest,
-            updatePreview
+            queryRequest
         } = nextProps;
         const {chartEditor, lastSuccessfulQuery} = preview;
 
@@ -112,12 +117,12 @@ class Preview extends Component {
 
         const chartEditorState = this.state.chartEditorState;
         const defaultChartEditorState = {
-            xAxisColumnName: columnNames => columnNames[0],
-            yAxisColumnNames: columnNames => [columnNames[1]],
-            boxes: columnNames => columnNames.map(
+            xAxisColumnName: colNames => colNames[0],
+            yAxisColumnNames: colNames => [colNames[1]],
+            boxes: colNames => colNames.map(
                 colName => ({name: colName, type: 'column'})),
-            columnTraceTypes: columnNames => (
-                R.reduce((r, k) => R.set(R.lensProp(k), 'scatter', r), {}, columnNames)
+            columnTraceTypes: colNames => (
+                R.reduce((r, k) => R.set(R.lensProp(k), 'scatter', r), {}, colNames)
             ),
             droppedBoxNames: () => [],
             selectedColumn: () => '',
@@ -131,7 +136,12 @@ class Preview extends Component {
             });
         } else if (columnNames.length === 0) {
             ['droppedBoxNames', 'selectedColumn', 'selectedChartType'].forEach(
-                k => chartEditorState[k] = defaultChartEditorState[k]()
+                // Function body wrapped in block because without a wrapping block,
+                // JavaScript treats the assignment as the implicit return value,
+                // which in turn breaks ESLint `no-return-assign` rule
+                k => {
+                    chartEditorState[k] = defaultChartEditorState[k]();
+                }
             );
         } else {
             R.keys(defaultChartEditorState).forEach(k => {
@@ -233,8 +243,6 @@ class Preview extends Component {
             connectionObject,
             elasticsearchMappingsRequest,
             preview,
-            previewTableRequest,
-            queryRequest,
             schemaRequest,
             selectedIndex,
             selectedTable,
@@ -258,7 +266,7 @@ class Preview extends Component {
         const dialect = connectionObject.dialect;
         const showEditor = propOr(true, 'showEditor')(preview);
         const code = propOr(defaultQueries(dialect, selectedTable), 'code')(preview);
-        const error = propOr('', 'error')(preview);
+        propOr('', 'error')(preview);
 
         // Surpressing ESLint cause restricting line length would harm JSX readability
         /* eslint-disable max-len */
@@ -340,7 +348,7 @@ class Preview extends Component {
                             </TabPanel>
 
                             <TabPanel
-                                style={{fontFamily: `'Ubuntu Mono', courier, monospace`, marginTop: '20px'}}
+                                style={{fontFamily: "'Ubuntu Mono', courier, monospace", marginTop: '20px'}}
                             >
                                 <SQLTable
                                     rows={rows}
@@ -379,25 +387,25 @@ class Preview extends Component {
                                     >
                                         {this.state.plotlyLinks.map(link => (
                                             <div style={{borderTop: '1px solid #dfe8f3', marginTop: 20}}>
-                                                {link.type == 'grid' &&
+                                                {link.type === 'grid' &&
                                                     <div>
                                                         <div style={{color: '#00cc96'}}>🎉  Link to your CSV on Plot.ly ⬇️</div>
                                                         <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
                                                     </div>
                                                 }
-                                                {link.type == 'csv' &&
+                                                {link.type === 'csv' &&
                                                     <div>
                                                         <div style={{color: '#00cc96'}}>💾  Your CSV has been saved ⬇️</div>
                                                         <Link href={link.url} target="_blank" style="externalLink">{link.url}</Link>
                                                     </div>
                                                 }
-                                                {link.type == 'plot' &&
+                                                {link.type === 'plot' &&
                                                     <div>
                                                         <div style={{color: '#00cc96'}}>📈  Link to your chart on Plot.ly ⬇️</div>
                                                         <Link href={link.url} target="_blank" style="externalLink">{link.url}</Link>
                                                     </div>
                                                 }
-                                                {link.type == 'error' &&
+                                                {link.type === 'error' &&
                                                     <div>
                                                         <div style={{color: '#D36046'}}>{`[ERROR] ${link.message}`}</div>
                                                     </div>

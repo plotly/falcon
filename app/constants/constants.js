@@ -1,3 +1,5 @@
+// Reason for surpressing: would harm readability of a lot of long strings in this case
+/* eslint-disable no-multi-str */
 import {concat} from 'ramda';
 
 export const DIALECTS = {
@@ -196,16 +198,15 @@ export const LOGOS = {
 };
 
 export function defaultQueries(dialect, selectedTable) {
-
-    if(dialect === DIALECTS.IBM_DB2) {
+    if (dialect === DIALECTS.IBM_DB2) {
         return `SELECT * FROM ${selectedTable} FETCH FIRST 10 ROWS ONLY`;
     } else if(dialect === DIALECTS.APACHE_SPARK || dialect === DIALECTS.APACHE_IMPALA) {
         return `SELECT * FROM ${selectedTable} LIMIT 10`;
-    } else if(dialect === DIALECTS.MSSQL) {
+    } else if (dialect === DIALECTS.MSSQL) {
         return `SELECT TOP 10 * \nFROM ${selectedTable};`;
-    } else {
-      return `SELECT * FROM ${selectedTable} LIMIT 10;`
     }
+
+    return `SELECT * FROM ${selectedTable} LIMIT 10;`;
 }
 
 export const INITIAL_CONNECTIONS = {
@@ -234,8 +235,8 @@ export const FAQ = [
             you can run this app as a middleman between plot.ly and your database (see the next question).'
     }, {
         q: 'I want a persistent connection between my database and a chart hosted on plot.ly. How do I do that?',
-        a: 'Click the link in the "PLOT.LY" tab. This will open the plot.ly chart studio with a connection to this app. \
-            From there, you can run, save, and schedule queries that will update your charts on plot.ly when your \
+        a: 'Click the link in the "PLOT.LY" tab. This will open the plot.ly chart studio with a connection to this \
+            app. From there, you can run, save, and schedule queries that will update your charts on plot.ly when your \
             database updates. As long as this app stays open, it will send the latest data to plot.ly to update your \
             chart. Here is a tutorial on scheduling queries: https://help.plot.ly/database-connectors/schedule-query/'
     }, {

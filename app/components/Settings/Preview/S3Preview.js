@@ -1,7 +1,7 @@
-
 import React from 'react';
+import PropTypes from 'prop-types';
 
-export default function S3Preview(props) {
+const S3Preview = function(props) {
     const {s3KeysRequest} = props;
     if (s3KeysRequest.status >= 400) {
         return (<div>{'Hm... An error occurred while trying to load S3 keys'}</div>);
@@ -14,11 +14,17 @@ export default function S3Preview(props) {
                 <div style={{maxHeight: 500, overflowY: 'auto'}}>
                     {s3KeysRequest.content.filter(object => object.Key.endsWith('.csv'))
                         .map(object => <div>{object.Key}</div>
-                    )}
+                        )}
                 </div>
             </div>
         );
     }
 
     return null;
-}
+};
+
+S3Preview.propTypes = {
+    s3KeysRequest: PropTypes.object
+};
+
+export default S3Preview;

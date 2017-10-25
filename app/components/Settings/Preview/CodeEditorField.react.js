@@ -1,12 +1,12 @@
 'use es6';
 import React, {Component} from 'react';
-import {has, isEmpty, propOr} from 'ramda';
+import PropTypes from 'prop-types';
+import {has, propOr} from 'ramda';
 // https://github.com/JedWatson/react-codemirror/issues/106
 import CodeMirror from '@skidding/react-codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/sql-hint';
-import * as Actions from '../../../actions/sessions';
 import {DIALECTS} from '../../../constants/constants';
 
 class CodeEditorField extends Component {
@@ -16,6 +16,16 @@ class CodeEditorField extends Component {
         this.autoComplete = this.autoComplete.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.injectAutocomplete = this.injectAutocomplete.bind(this);
+    }
+
+    static propTypes = {
+        schemaRequest: PropTypes.object,
+        preview: PropTypes.object,
+        updatePreview: PropTypes.func,
+        onChange: PropTypes.func,
+        connectionObject: PropTypes.shape({dialect: PropTypes.string}),
+        runQuery: PropTypes.func,
+        value: PropTypes.string
     }
 
     injectAutocomplete() {
@@ -31,7 +41,6 @@ class CodeEditorField extends Component {
             let DB_HAS_ONLY_ONE_TABLE;
             const TABLE_NAME = 0;
             const COLUMN_NAME = 1;
-            const DATA_TYPE = 2;
             const schema = schemaRequest.content;
             schema.rows.map(function(row, i) {
                 tableName = row[TABLE_NAME];
@@ -48,7 +57,7 @@ class CodeEditorField extends Component {
 
             updatePreview({
                 codeSchema: tables
-            });            
+            });
         }
     }
 
@@ -56,7 +65,7 @@ class CodeEditorField extends Component {
         this.injectAutocomplete();
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps() {
         this.injectAutocomplete();
     }
 

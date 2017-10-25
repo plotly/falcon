@@ -1,13 +1,19 @@
-import React, {Component, PropTypes} from 'react';
-import {has, pathOr} from 'ramda';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {pathOr} from 'ramda';
 
 const isLoading = (status) => status === 'loading';
 
 export default class ConnectButton extends Component {
+    static propTypes = {
+        connect: PropTypes.func,
+        connectRequest: PropTypes.object,
+        saveConnectionsRequest: PropTypes.object,
+        editMode: PropTypes.bool
+    }
 
     render() {
         const {
-            connectionsHaveBeenSaved,
             connect,
             connectRequest,
             saveConnectionsRequest,

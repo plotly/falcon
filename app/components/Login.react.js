@@ -8,7 +8,6 @@ import {
 } from '../utils/utils';
 import {Link} from './Link.react';
 import {productName, version} from '../../package.json';
-import {contains} from 'ramda';
 
 
 const currentEndpoint = '/login';
@@ -17,10 +16,6 @@ const connectorUrl = '/';
 
 const CLOUD = 'cloud';
 const ONPREM = 'onprem';
-const SERVER_TYPES = {
-    [CLOUD]: 'Plotly Cloud',
-    [ONPREM]: 'Plotly On-Premise'
-};
 
 window.document.title = `${productName} v${version}`;
 let usernameLogged = '';
@@ -28,8 +23,8 @@ let usernameLogged = '';
 // http://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen
 const PopupCenter = (url, title, w, h) => {
     // Fixes dual-screen position
-    const dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
-    const dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
+    const dualScreenLeft = 'screenLeft' in window ? window.screenLeft : screen.left;
+    const dualScreenTop = 'screenTop' in window ? window.screenTop : screen.top;
 
     const width = window.innerWidth
         ? window.innerWidth
@@ -56,7 +51,6 @@ class Login extends Component {
             statusMessage: '',
             serverType: CLOUD,
             status: '',
-            statusMessage: '',
             username: ''
         };
         this.buildOauthUrl = this.buildOauthUrl.bind(this);
@@ -72,34 +66,34 @@ class Login extends Component {
          * does not support cookies. For electron we initiate an eventListener
          * to check for authentication.
          */
-        const interval = setInterval(() => {
-              usernameLogged = cookie.load('db-connector-user');
-              if (usernameLogged) {
-                  if (serverType === ONPREM) {
-                      this.setState({
-                          status: 'authorized',
-                          statusMessage: 'Saving user information...'
-                      });
-                      this.saveDomainToSettings().then(res => res.text().then(text => {
-                          if (res.status === 200) {
-                              window.location.assign(connectorUrl);
-                          } else {
-                              this.setState({
-                                  status: 'failure',
-                                  statusMessage: text
-                              });
-                          }
-                      })).catch(err => {
-                          this.setState({
-                              status: 'failure',
-                              statusMessage: err.message
-                          });
-                      });
-                  }
-                  else {
-                      window.location.assign(connectorUrl);
-                  }
-              }
+        setInterval(() => {
+            usernameLogged = cookie.load('db-connector-user');
+            if (usernameLogged) {
+                if (serverType === ONPREM) {
+                    this.setState({
+                        status: 'authorized',
+                        statusMessage: 'Saving user information...'
+                    });
+                    this.saveDomainToSettings().then(res => res.text().then(text => {
+                        if (res.status === 200) {
+                            window.location.assign(connectorUrl);
+                        } else {
+                            this.setState({
+                                status: 'failure',
+                                statusMessage: text
+                            });
+                        }
+                    })).catch(err => {
+                        this.setState({
+                            status: 'failure',
+                            statusMessage: err.message
+                        });
+                    });
+                }
+                else {
+                    window.location.assign(connectorUrl);
+                }
+            }
         }, 1000);
 
     }
@@ -146,7 +140,9 @@ class Login extends Component {
             const oauthUrl = this.buildOauthUrl();
             electron.shell.openExternal(oauthUrl);
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.log('Unable to openExternal, opening a popupWindow instead:');
+            // eslint-disable-next-line no-console
             console.log(e);
             const popupWindow = PopupCenter(
                 this.buildOauthUrl(), 'Authorization', '500', '500'
@@ -270,7 +266,7 @@ class Login extends Component {
                     </div>
 
                     {
-                        this.state.serverType == ONPREM ? (
+                        this.state.serverType === ONPREM ? (
                             <div style={{'height': 60}}>
                                 <label>Your Plotly On-Premise Domain</label>
                                 <input

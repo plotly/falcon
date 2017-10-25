@@ -1,11 +1,12 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import {values} from 'ramda';
 import {
     DIALECTS, LOGOS
 } from '../../../constants/constants';
 import classnames from 'classnames';
 
-export default function DialectSelector(props) {
+const DialectSelector = function DialectSelector(props) {
     const {connectionObject, updateConnection} = props;
 
     const logos = values(DIALECTS).map(DIALECT => (
@@ -14,9 +15,8 @@ export default function DialectSelector(props) {
             data-tip={DIALECT}
             className={classnames(
                 'logo', {
-                      ['logoSelected']:
-                      connectionObject.dialect === DIALECT
-                 }
+                    ['logoSelected']: connectionObject.dialect === DIALECT
+                }
             )}
             onClick={() => {
                 updateConnection(
@@ -33,4 +33,11 @@ export default function DialectSelector(props) {
     ));
 
     return <div className={'logoContainer'}>{logos}</div>;
-}
+};
+
+DialectSelector.propTypes = {
+    connectionObject: PropTypes.object,
+    updateConnection: PropTypes.func
+};
+
+export default DialectSelector;

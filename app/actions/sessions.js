@@ -89,7 +89,7 @@ function apiThunk(endpoint, method, store, id, body) {
             }
         ))
         .catch(err => {
-            console.error(err);
+            console.error(err); // eslint-disable-line no-console
             dispatch({
                 type: store,
                 payload: {
@@ -221,7 +221,7 @@ export function previewTable (connectionId, dialect, table, database) {
     );
 }
 
-export function getSqlSchema (connectionId, dialect, database) {
+export function getSqlSchema (connectionId) {
     return apiThunk(
         `connections/${connectionId}/sql-schemas`,
         'POST',
@@ -249,9 +249,8 @@ export function initializeTabs() {
         const state = getState();
         const {connectionsRequest} = state;
         if (connectionsRequest.status !== 200) {
-            console.error(
-                "Can't initialize tabs - credentials haven't been retreived yet."
-            );
+            // eslint-disable-next-line no-console
+            console.error("Can't initialize tabs - credentials haven't been retreived yet.");
             return;
         }
         const savedConnections = connectionsRequest.content;
@@ -276,7 +275,7 @@ export function initializeTabs() {
 }
 
 export function newTab() {
-    return function(dispatch, getState) {
+    return function(dispatch) {
         const newId = uuid.v4();
         dispatch(mergeConnections({
             [newId]: INITIAL_CONNECTIONS

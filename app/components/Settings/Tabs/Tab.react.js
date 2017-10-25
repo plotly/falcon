@@ -1,10 +1,20 @@
-import React, { Component, PropTypes } from 'react';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import {LOGOS, DIALECTS} from '../../../constants/constants';
 
 export default class ConnectionTab extends Component {
     constructor(props) {
         super(props);
+    }
+
+    static propTypes = {
+        tabId: PropTypes.string,
+        isSelected: PropTypes.bool,
+        connectionObject: PropTypes.object,
+        setTab: PropTypes.func,
+        deleteTab: PropTypes.func,
+        isDeletable: PropTypes.bool
     }
 
     render() {

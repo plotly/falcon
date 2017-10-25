@@ -1,7 +1,7 @@
 import React from 'react';
 import {render} from 'react-dom';
 import {Provider} from 'react-redux';
-import {Route, Router, hashHistory, browserHistory} from 'react-router';
+import {Route, Router, browserHistory} from 'react-router';
 
 import configureStore from './store/configureStore';
 import {productName, version} from '../package.json';
