@@ -28,9 +28,9 @@ install:
 script:
   - yarn run build
   - yarn run package
+  - electron-installer-dmg release/Mac-64bit/Falcon*/*.app falcon-sql-client
+  - mv falcon-sql-client.dmg release/
   - zip -r release.zip release -q
-  - travis_wait electron-installer-dmg release/Mac-64bit/Falcon*/*.app falcon-sql-client
-
 
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
@@ -42,5 +42,5 @@ branches:
 addons:
   artifacts:
     s3_region: us-east-1
-    paths: release.zip, falcon-sql-client.dmg
+    paths: release.zip
     debug: true
