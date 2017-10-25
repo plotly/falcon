@@ -24,6 +24,9 @@ FROM node:6.11.1
 # The App saves folders to the `os.homedir()` directory.
 ENV HOME=/home/
 
+# Upgrade yarn to '1.2.1'
+RUN npm install -g yarn@1.2.1
+
 # Create app directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
