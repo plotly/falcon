@@ -18,6 +18,7 @@ cache:
 before_install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.2.1
   - npm install -g npm@3.10.9
+  - npm install -g electron-installer-dmg
   - export PATH=$HOME/.yarn/bin:$PATH
 
 install:
@@ -28,6 +29,7 @@ script:
   - yarn run build
   - yarn run package
   - zip -r release.zip release -q
+  - travis_wait electron-installer-dmg release/Mac-64bit/Falcon*/*.app falcon-sql-client
 
 
 before_cache:
@@ -40,5 +42,5 @@ branches:
 addons:
   artifacts:
     s3_region: us-east-1
-    paths: release.zip
+    paths: release.zip, falcon-sql-client.dmg
     debug: true
