@@ -429,11 +429,6 @@ class Settings extends Component {
                                                     <strong><code>{connectorUrl}</code></strong>
                                                 </Link>
                                             </div>
-                                            <p>
-                                                {`Logged in as "${username}"`}
-                                                <br/>
-                                                <a onClick={logout}>Log Out</a>
-                                            </p>
                                         </div>
                                     ) : (username) ? (
                                         <div>
@@ -448,11 +443,6 @@ class Settings extends Component {
                                                 </Link>
                                                 {`. It has been ${timeElapsed}. Check out the
                                                 FAQ while you wait! 📰`}
-                                            </p>
-                                            <p>
-                                                {`Logged in as "${username}"`}
-                                                <br/>
-                                                <a onClick={logout}>Log Out</a>
                                             </p>
                                         </div>
                                     ): (
@@ -473,6 +463,11 @@ class Settings extends Component {
                                     <p>Please connect to a data store in the Connection tab first.</p>
                                 </div>
                             )}
+                            {username && <p style={{textAlign: 'right'}}>
+                                {`Logged in as "${username}"`}
+                                <br/>
+                                <a onClick={logout}>Log Out</a>
+                            </p>}
                         </TabPanel> }
 
                         {isElectron() && <TabPanel>
