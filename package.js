@@ -60,7 +60,7 @@ function build(cfg) {
 }
 
 function startPack() {
-    console.log('start pack...');
+    console.log('start pack: ' + os.platform);
     /*
      * Workaround for: https://github.com/ibmdb/node-ibm_db/issues/329
      * This can be removed once the issue is resolved.
