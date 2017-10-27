@@ -15,7 +15,7 @@ import Preview from './Preview/Preview.react';
 import TableTree from './Preview/TableTree.react.js';
 import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../Link.react';
-import {DIALECTS, FAQ, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
+import {defaultQueries, DIALECTS, FAQ, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
 import {getAllBaseUrls, isElectron, isOnPrem} from '../../utils/utils';
 
 
@@ -532,6 +532,11 @@ function mapStateToProps(state) {
     ) {
         previewTableRequest = previewTableRequests[selectedConnectionId][selectedTable];
     }
+    const preview = previews[selectedConnectionId];
+    const connection = connections[selectedTab];
+    if (preview && connection && !hasIn('code', preview) ) {
+        preview.code = defaultQueries(connection.dialect, selectedTable);
+    }
 
     return {
         connectionsRequest,
@@ -549,7 +554,7 @@ function mapStateToProps(state) {
         connectionNeedToBeSaved: connectionsNeedToBeSaved[selectedTab] || true,
         connectionsHaveBeenSaved,
         connectionObject: connections[selectedTab],
-        preview: previews[selectedConnectionId],
+        preview,
         schemaRequest: schemaRequests[selectedConnectionId],
         queryRequest: queryRequests[selectedConnectionId],
         selectedTable,
