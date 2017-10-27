@@ -60,12 +60,12 @@ function build(cfg) {
 }
 
 function startPack() {
-    console.log('start pack: ' + os.platform);
+    console.log('start pack: ' + os.platform());
     /*
      * Workaround for: https://github.com/ibmdb/node-ibm_db/issues/329
      * This can be removed once the issue is resolved.
      */
-    if (os.platform == 'darwin') {
+    if (os.platform() === 'darwin') {
         // Surpressed ESLint cause this is a complex command and concatenation would make it harder to maintain
         // eslint-disable-next-line max-len
         console.log('Running command:');
