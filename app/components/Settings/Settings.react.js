@@ -532,9 +532,9 @@ function mapStateToProps(state) {
     ) {
         previewTableRequest = previewTableRequests[selectedConnectionId][selectedTable];
     }
-    const preview = previews[selectedConnectionId];
+    const preview = previews[selectedConnectionId] || {};
     const connection = connections[selectedTab];
-    if (preview && connection && !hasIn('code', preview) ) {
+    if (connection && !hasIn('code', preview) ) {
         preview.code = defaultQueries(connection.dialect, selectedTable);
     }
 
