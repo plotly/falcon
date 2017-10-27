@@ -1,0 +1,43 @@
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode9.0
+      language: node_js
+      node_js: "6.11.1"
+      env:
+        - ELECTRON_CACHE=$HOME/.cache/electron
+        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+
+cache:
+  directories:
+  - node_modules
+  - $HOME/.cache/electron
+  - $HOME/.cache/electron-builder
+  yarn: true
+
+before_install:
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.2.1
+  - npm install -g npm@3.10.9
+  - export PATH=$HOME/.yarn/bin:$PATH
+
+install:
+  - yarn install
+  - yarn run rebuild:modules:electron
+
+script:
+  - yarn run build
+  - yarn run package
+  - zip -r release.zip release -q
+
+before_cache:
+  - rm -rf $HOME/.cache/electron-builder/wine
+
+branches:
+  except:
+    - "/^v\\d+\\.\\d+\\.\\d+$/"
+
+addons:
+  artifacts:
+    s3_region: us-east-1
+    paths: release.zip
+    debug: true
