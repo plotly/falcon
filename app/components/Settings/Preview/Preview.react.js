@@ -396,13 +396,13 @@ class Preview extends Component {
                                                 {link.type === 'csv' &&
                                                     <div>
                                                         <div style={{color: '#00cc96'}}>💾  Your CSV has been saved ⬇️</div>
-                                                        <Link href={link.url} target="_blank" style="externalLink">{link.url}</Link>
+                                                        <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
                                                     </div>
                                                 }
                                                 {link.type === 'plot' &&
                                                     <div>
                                                         <div style={{color: '#00cc96'}}>📈  Link to your chart on Plot.ly ⬇️</div>
-                                                        <Link href={link.url} target="_blank" style="externalLink">{link.url}</Link>
+                                                        <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
                                                     </div>
                                                 }
                                                 {link.type === 'error' &&
