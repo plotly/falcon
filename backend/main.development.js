@@ -14,9 +14,8 @@ if (process.env.NODE_ENV === 'development') {
 
 const isTestRun = contains('--test-type=webdriver', process.argv.slice(2));
 
-const server = new Servers();
+const server = new Servers({createCerts: true, startHttps: true, isElectron: true});
 Logger.log('Starting server', 2);
-server.isElectron = true;
 server.start();
 
 Logger.log('Loading persistent queries', 2);

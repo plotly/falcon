@@ -15,7 +15,7 @@ import Preview from './Preview/Preview.react';
 import TableTree from './Preview/TableTree.react.js';
 import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../Link.react';
-import {DIALECTS, FAQ, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
+import {defaultQueries, DIALECTS, FAQ, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
 import {getAllBaseUrls, isElectron, isOnPrem} from '../../utils/utils';
 
 
@@ -429,11 +429,6 @@ class Settings extends Component {
                                                     <strong><code>{connectorUrl}</code></strong>
                                                 </Link>
                                             </div>
-                                            <p>
-                                                {`Logged in as "${username}"`}
-                                                <br/>
-                                                <a onClick={logout}>Log Out</a>
-                                            </p>
                                         </div>
                                     ) : (username) ? (
                                         <div>
@@ -448,11 +443,6 @@ class Settings extends Component {
                                                 </Link>
                                                 {`. It has been ${timeElapsed}. Check out the
                                                 FAQ while you wait! 📰`}
-                                            </p>
-                                            <p>
-                                                {`Logged in as "${username}"`}
-                                                <br/>
-                                                <a onClick={logout}>Log Out</a>
                                             </p>
                                         </div>
                                     ): (
@@ -473,6 +463,11 @@ class Settings extends Component {
                                     <p>Please connect to a data store in the Connection tab first.</p>
                                 </div>
                             )}
+                            {username && <p style={{textAlign: 'right'}}>
+                                {`Logged in as "${username}"`}
+                                <br/>
+                                <a onClick={logout}>Log Out</a>
+                            </p>}
                         </TabPanel> }
 
                         {isElectron() && <TabPanel>
@@ -537,6 +532,11 @@ function mapStateToProps(state) {
     ) {
         previewTableRequest = previewTableRequests[selectedConnectionId][selectedTable];
     }
+    const preview = previews[selectedConnectionId] || {};
+    const connection = connections[selectedTab];
+    if (connection && !hasIn('code', preview) ) {
+        preview.code = defaultQueries(connection.dialect, selectedTable);
+    }
 
     return {
         connectionsRequest,
@@ -554,7 +554,7 @@ function mapStateToProps(state) {
         connectionNeedToBeSaved: connectionsNeedToBeSaved[selectedTab] || true,
         connectionsHaveBeenSaved,
         connectionObject: connections[selectedTab],
-        preview: previews[selectedConnectionId],
+        preview,
         schemaRequest: schemaRequests[selectedConnectionId],
         queryRequest: queryRequests[selectedConnectionId],
         selectedTable,

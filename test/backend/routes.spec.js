@@ -121,7 +121,7 @@ describe('Servers - ', () => {
     });
 
     it('Https server is up and running after an http server was started and certs were created.', (done) => {
-        servers = new Servers({createCerts: false, startHttps: true});
+        servers = new Servers({createCerts: false, startHttps: true, isElectron: true});
 
         servers.httpServer.start();
         saveSetting('USERS', [{username, accessToken}]);
@@ -175,7 +175,7 @@ describe('Servers - ', () => {
 
 describe('Authentication - ', () => {
     beforeEach(() => {
-        servers = new Servers({createCerts: false, startHttps: false});
+        servers = new Servers({createCerts: false, startHttps: false, isElectron: false});
         servers.isElectron = false;
         servers.httpServer.start();
 
@@ -384,7 +384,7 @@ describe('Authentication - ', () => {
 
 describe('Routes - ', () => {
     beforeEach((done) => {
-        servers = new Servers({createCerts: false, startHttps: false});
+        servers = new Servers({createCerts: false, startHttps: false, isElectron: false});
         servers.isElectron = false;
         servers.httpServer.start();
 

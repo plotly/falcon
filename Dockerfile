@@ -24,6 +24,9 @@ FROM node:6.11.1
 # The App saves folders to the `os.homedir()` directory.
 ENV HOME=/home/
 
+# Upgrade yarn to '1.2.1'
+RUN npm install -g yarn@1.2.1
+
 # Create app directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -43,7 +46,6 @@ ENV PLOTLY_CONNECTOR_LOG_TO_STDOUT="true"
 COPY package.json /usr/src/app
 COPY yarn.lock /usr/src/app
 RUN yarn install
-RUN yarn run rebuild:modules:electron
 
 COPY . /usr/src/app
 RUN yarn run heroku-postbuild
