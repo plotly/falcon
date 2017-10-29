@@ -30,11 +30,11 @@ describe('Apache Impala:', function () {
 
         return query(`SELECT * FROM ${tableName}\nLIMIT 5`, connection).then(results => {
             assert.deepEqual(results.rows, [
-                ['Belarus', "17.5"],
-                ['Moldova', "16.8"],
-                ['Lithuania', "15.4"],
-                ['Russia', "15.1"],
-                ['Romania', "14.4"]
+                ['Belarus', '17.5'],
+                ['Moldova', '16.8'],
+                ['Lithuania', '15.4'],
+                ['Russia', '15.1'],
+                ['Romania', '14.4']
             ]);
             assert.deepEqual(results.columnnames, ['loc', 'alcohol']);
         });

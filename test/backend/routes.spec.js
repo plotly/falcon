@@ -923,7 +923,7 @@ describe('Routes - ', () => {
                     } else if (connection.dialect === 'apache impala') {
                         rows = [
                             [ 'plotly.alcohol_consumption_by_country_2010', 'loc', 'string' ],
-                            [ 'plotly.alcohol_consumption_by_country_2010', 'alcohol', 'double' ],
+                            [ 'plotly.alcohol_consumption_by_country_2010', 'alcohol', 'double' ]
                         ];
                     } else {
                         rows = [
@@ -1183,7 +1183,7 @@ describe('Routes - ', () => {
         }
 
         it(`connections - ${connection.dialect} - saves connections to a file if they are valid and ` +
-            `if they do not exist`, function(done) {
+            'if they do not exist', function(done) {
             this.timeout(5 * 1000);
             try {
                 fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
