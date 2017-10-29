@@ -3,11 +3,11 @@ import spies from 'chai-spies';
 chai.use(spies);
 
 import fs from 'fs';
-import {merge, dissoc, has} from 'ramda';
+import {merge} from 'ramda';
 
 import QueryScheduler from '../../backend/persistent/QueryScheduler.js';
 import {saveConnection} from '../../backend/persistent/Connections.js';
-import {getQuery, getQueries} from '../../backend/persistent/Queries.js';
+import {getQueries} from '../../backend/persistent/Queries.js';
 import { PlotlyAPIRequest,
     updateGrid
 } from '../../backend/persistent/PlotlyAPI.js';
@@ -22,15 +22,16 @@ let savedUsers;
 describe('QueryScheduler', function() {
     beforeEach(function () {
         this.timeout(1000 * 5);
-        try {
-            fs.unlinkSync(getSetting('QUERIES_PATH'));
-        } catch (e) {}
-        try {
-            fs.unlinkSync(getSetting('SETTINGS_PATH'));
-        } catch (e) {}
-        try {
-            fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
-        } catch (e) {}
+
+        ['QUERIES_PATH', 'SETTINGS_PATH', 'CONNECTIONS_PATH'].forEach(fileName => {
+            const settingPath = getSetting(fileName);
+            try {
+                fs.unlinkSync(settingPath);
+            } catch (e) {
+                // empty intentionally
+            }
+        });
+
         queryScheduler = new QueryScheduler();
         queryScheduler.minimumRefreshInterval = 1;
         savedUsers = getSetting('USERS');
@@ -184,17 +185,17 @@ describe('QueryScheduler', function() {
                  requestor: fid.split(':')[0]
              };
              assert.deepEqual(getQueries(), [], 'No queries existed');
-             assert(!Boolean(queryScheduler.queryJobs[fid]), 'No queries were scheduled');
+             assert(!queryScheduler.queryJobs[fid], 'No queries were scheduled');
              queryScheduler.scheduleQuery(queryObject);
              assert.deepEqual(getQueries(), [queryObject], 'A query has been saved');
 
              assert(Boolean(queryScheduler.queryJobs[fid]), 'A query has been scheduled');
 
-             PlotlyAPIRequest(`grids/${fid}`, {username, apiKey, method: 'DELETE'}).then(res => {
-                 if (res.status !== 204) {
-                     res.json().then(json => {
-                         assert.equal(res.status, 204,
-                             'Grid was successfully deleted: ' + JSON.stringify(json, null, 2));
+             PlotlyAPIRequest(`grids/${fid}`, {username, apiKey, method: 'DELETE'}).then(plotlyRes => {
+                 if (plotlyRes.status !== 204) {
+                     plotlyRes.json().then(plotlyJson => {
+                         assert.equal(plotlyRes.status, 204,
+                             'Grid was successfully deleted: ' + JSON.stringify(plotlyJson, null, 2));
                      });
                  }
 
@@ -208,7 +209,7 @@ describe('QueryScheduler', function() {
                      * network delays that happen when updating a grid
                      * that are hard to account for precisely.
                      */
-                    assert(!Boolean(queryScheduler.queryJobs[fid]), 'Queries were removed');
+                    assert(!queryScheduler.queryJobs[fid], 'Queries were removed');
                     assert.deepEqual(getQueries(), [], 'Queries were deleted');
                     done();
                 }, refreshInterval * 10 * 1000);

@@ -1,4 +1,4 @@
-import chai, {expect, assert} from 'chai';
+import chai, {assert} from 'chai';
 import spies from 'chai-spies';
 chai.use(spies);
 

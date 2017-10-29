@@ -6,7 +6,7 @@ import {
     query, connect, tables
 } from '../../backend/persistent/datastores/Datastores.js';
 
-import {disconnect, getActiveSessions} from '../../backend/persistent/datastores/livy.js';
+import {disconnect} from '../../backend/persistent/datastores/livy.js';
 
 const connection = {
     dialect: DIALECTS.APACHE_SPARK,
@@ -21,21 +21,6 @@ const connection = {
 
     timeout: 120
 };
-
-function setSessionId(connection) {
-    return getActiveSessions(connection)
-        .then(sessions => {
-            const ids = sessions
-                .filter(s => s.kind === 'spark')
-                .map(s => s.id);
-
-            if (ids.length <= 0) throw new Error('livy: no active spark sessions');
-
-            connection.sessionId = ids[ids.length - 1];
-
-            return connection;
-        });
-}
 
 // Suppressing ESLint cause Mocha ensures `this` is bound in test functions
 /* eslint-disable no-invalid-this */

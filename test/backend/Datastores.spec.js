@@ -1,5 +1,5 @@
-import {expect, assert} from 'chai';
-import {head, merge, last, range} from 'ramda';
+import {assert} from 'chai';
+import {merge, range} from 'ramda';
 
 import {
     sqlConnections,
@@ -15,6 +15,7 @@ import {
     query, connect, files, storage, listS3Files, elasticsearchMappings
 } from '../../backend/persistent/datastores/Datastores.js';
 
+// eslint-disable-next-line no-shadow
 const transpose = m => m[0].map((x, i) => m.map(x => x[i]));
 
 // Suppressing ESLint cause Mocha ensures `this` is bound in test functions
@@ -641,7 +642,7 @@ describe('S3 - Connection', function () {
         this.timeout(4 * 1000);
         connect({dialect: 's3', accessKeyId: 'asdf', secretAccessKey: 'fdas'})
         .then(() => done('Error - should not have succeeded'))
-        .catch(err => done());
+        .catch(() => done());
     });
 
     it('query parses S3 CSV files', function(done) {
@@ -658,9 +659,9 @@ describe('S3 - Connection', function () {
     it('files lists s3 files', function(done) {
         this.timeout(5 * 1000);
         files(publicReadableS3Connections)
-        .then(files => {
+        .then(connFiles => {
             assert.deepEqual(
-                JSON.stringify(files[0]),
+                JSON.stringify(connFiles[0]),
                 JSON.stringify({
                     'Key': '311.parquet/._SUCCESS.crc',
                     'LastModified': '2016-10-26T03:27:31.000Z',
@@ -682,7 +683,7 @@ describe('S3 - Connection', function () {
 describe('Apache Drill - Connection', function () {
     it('connects', function(done) {
         connect(apacheDrillConnections)
-        .then(res => done())
+        .then(() => done())
         .catch(done);
     });
 
@@ -700,9 +701,9 @@ describe('Apache Drill - Connection', function () {
     it('s3-keys returns a list of files in the s3 bucket', function(done) {
         this.timeout(10 * 1000);
         listS3Files(apacheDrillConnections)
-        .then(files => {
+        .then(connFiles => {
             assert.deepEqual(
-                JSON.stringify(files[0]),
+                JSON.stringify(connFiles[0]),
                 JSON.stringify({
                     'Key': '311.parquet/._SUCCESS.crc',
                     'LastModified': '2016-10-26T03:27:31.000Z',

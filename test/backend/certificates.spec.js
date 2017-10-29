@@ -1,7 +1,7 @@
 import chai, {assert, expect} from 'chai';
 import spies from 'chai-spies';
 import fs from 'fs';
-import {contains, dissoc, merge, isEmpty} from 'ramda';
+import {isEmpty} from 'ramda';
 import fetch from 'node-fetch';
 import Servers from '../../backend/routes.js';
 
@@ -20,9 +20,12 @@ import {
 
 const cleanUp = () => {
     ['KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH'].forEach(fileName => {
+        const settingPath = getSetting(fileName);
         try {
-            fs.unlinkSync(getSetting(fileName));
-        } catch (e) {}
+            fs.unlinkSync(settingPath);
+        } catch (e) {
+            // empty intentionally
+        }
     });
 };
 
@@ -154,7 +157,6 @@ describe('Certificates', function() {
         assert.equal(certificateSettings.TIMEOUT_BETWEEN_TRIES, 1);
 
         timeoutFetchAndSaveCerts();
-        const {cert, key} = fakeCerts;
         setTimeout(() => {
             // Check that timout was increased
             assert.equal(certificateSettings.TIMEOUT_BETWEEN_TRIES, 60);

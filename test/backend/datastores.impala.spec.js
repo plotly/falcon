@@ -1,6 +1,5 @@
 import {assert} from 'chai';
 
-import {DIALECTS} from '../../app/constants/constants.js';
 import {apacheImpalaConnection as connection} from './utils.js';
 import {
     query, connect, tables
