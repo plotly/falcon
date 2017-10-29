@@ -103,6 +103,8 @@ let queryObject;
 let servers;
 let connectionId;
 
+// Suppressing ESLint cause Mocha ensures `this` is bound in test functions
+/* eslint-disable no-invalid-this */
 describe('Servers - ', () => {
     beforeEach(() => {
         ['KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH'].forEach(fileName => {
@@ -1744,3 +1746,4 @@ describe('Routes - ', () => {
     });
 
 });
+/* eslint-enable no-invalid-this */

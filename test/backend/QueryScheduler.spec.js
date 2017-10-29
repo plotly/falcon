@@ -16,6 +16,9 @@ import {createGrid, names, sqlConnections, username, apiKey} from './utils.js';
 
 let queryScheduler;
 let savedUsers;
+
+// Suppressing ESLint cause Mocha ensures `this` is bound in test functions
+/* eslint-disable no-invalid-this */
 describe('QueryScheduler', function() {
     beforeEach(function () {
         this.timeout(1000 * 5);
@@ -329,3 +332,4 @@ describe('QueryScheduler', function() {
     });
 
 });
+/* eslint-enable no-invalid-this */

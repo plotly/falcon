@@ -21,6 +21,8 @@ saveCredentials();
 chromedriver.start();
 process.on('exit', chromedriver.stop);
 
+// Suppressing ESLint cause Mocha ensures `this` is bound in test functions
+/* eslint-disable no-invalid-this */
 describe('plotly database connector', function() {
     this.timeout(10 * 60 * 1000);
 
@@ -99,3 +101,4 @@ function clearConnectorFolder() {
         console.warn(e);
     }
 }
+/* eslint-enable no-invalid-this */

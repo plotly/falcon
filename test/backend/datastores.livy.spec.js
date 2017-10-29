@@ -37,6 +37,8 @@ function setSessionId(connection) {
         });
 }
 
+// Suppressing ESLint cause Mocha ensures `this` is bound in test functions
+/* eslint-disable no-invalid-this */
 describe('Apache Livy:', function () {
     before(function() {
         connection.host = connection.host || '127.0.0.1';
@@ -88,3 +90,4 @@ df.registerTempTable("ALCOHOL_CONSUMPTION_BY_COUNTRY_2010")
         });
     });
 });
+/* eslint-enable no-invalid-this */

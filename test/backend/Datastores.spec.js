@@ -17,7 +17,8 @@ import {
 
 const transpose = m => m[0].map((x, i) => m.map(x => x[i]));
 
-
+// Suppressing ESLint cause Mocha ensures `this` is bound in test functions
+/* eslint-disable no-invalid-this */
 describe('SQL - ', function () {
     it('connect connects to a database', function(done) {
         this.timeout(4 * 1000);
@@ -778,3 +779,4 @@ describe('Apache Drill - Connection', function () {
         }).catch(done);
     });
 });
+/* eslint-enable no-invalid-this */
