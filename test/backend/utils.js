@@ -238,7 +238,7 @@ export class MockedServerCA {
 
         server.listen(this.port);
 
-        server.post('/certificate', function pingHandler(req, res, next) {
+        server.post('/certificate', function pingHandler(req, res) {
             that.countUp();
             res.json(returnStatus, returnContent);
         });
@@ -257,7 +257,7 @@ export const apacheDrillStorage = [
     'config': {
       'type': 'file',
       'enabled': false,
-      'connection': 'classpath:\/\/\/',
+      'connection': 'classpath:///',
       'config': null,
       'workspaces': null,
       'formats': {
@@ -303,16 +303,16 @@ export const apacheDrillStorage = [
     'config': {
       'type': 'file',
       'enabled': false,
-      'connection': 'file:\/\/\/',
+      'connection': 'file:///',
       'config': null,
       'workspaces': {
         'root': {
-          'location': '\/',
+          'location': '/',
           'writable': false,
           'defaultInputFormat': null
         },
         'tmp': {
-          'location': '\/tmp',
+          'location': '/tmp',
           'writable': true,
           'defaultInputFormat': null
         }
@@ -387,9 +387,9 @@ export const apacheDrillStorage = [
       'enabled': false,
       'configProps': {
         'hive.metastore.uris': '',
-        'javax.jdo.option.ConnectionURL': 'jdbc:derby:;databaseName=..\/sample-data\/drill_hive_db;create=true',
-        'hive.metastore.warehouse.dir': '\/tmp\/drill_hive_wh',
-        'fs.default.name': 'file:\/\/\/',
+        'javax.jdo.option.ConnectionURL': 'jdbc:derby:;databaseName=../sample-data/drill_hive_db;create=true',
+        'hive.metastore.warehouse.dir': '/tmp/drill_hive_wh',
+        'fs.default.name': 'file:///',
         'hive.metastore.sasl.enabled': 'false'
       }
     }
@@ -406,7 +406,7 @@ export const apacheDrillStorage = [
     'name': 'mongo',
     'config': {
       'type': 'mongo',
-      'connection': 'mongodb:\/\/localhost:27017\/',
+      'connection': 'mongodb://localhost:27017/',
       'enabled': false
     }
   },
@@ -415,14 +415,14 @@ export const apacheDrillStorage = [
     'config': {
       'type': 'file',
       'enabled': true,
-      'connection': 's3a:\/\/plotly-s3-connector-test',
+      'connection': 's3a://plotly-s3-connector-test',
       'config': {
           'fs.s3a.access.key': 'AKIAIMHMSHTGARJYSKMQ',
           'fs.s3a.secret.key': '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'
       },
       'workspaces': {
         'root': {
-          'location': '\/',
+          'location': '/',
           'writable': true,
           'defaultInputFormat': null
         }
