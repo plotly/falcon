@@ -331,6 +331,10 @@ describe('Authentication - ', () => {
         .then(() => {
             return GET('settings').then(res => res.json().then(() => {
                 assert.equal(res.status, 200);
+                assert.deepEqual(json, {
+                    "PLOTLY_URL": "https://plot.ly",
+                    "USERS": ["plotly-database-connector"]
+                });
             }));
         })
         .then(() => {
@@ -338,6 +342,10 @@ describe('Authentication - ', () => {
                 GET('settings')
                 .then(res => res.json().then(() => {
                     assert.equal(res.status, 200);
+                    assert.deepEqual(json, {
+                        "PLOTLY_URL": "https://plot.ly",
+                        "USERS": ["plotly-database-connector"]
+                    });
                     done();
                 })).catch(done);
             }, 3000);
