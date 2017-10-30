@@ -299,6 +299,14 @@ export default class Servers {
                         }
                         saveSetting('USERS', existingUsers);
 
+                        if (getSetting('IS_RUNNING_INSIDE_ON_PREM') &&
+                            !contains(username, getSetting('ALLOWED_USERS'))) {
+
+                            // Add user to ALLOWED_USERS:
+                            let allowedUsers = getSetting('ALLOWED_USERS');
+                            allowedUsers.push(username);
+                            saveSetting('ALLOWED_USERS', allowedUsers);
+                        }
                         if (that.isElectron) {
 
                             /*
