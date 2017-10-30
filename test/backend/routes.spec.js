@@ -402,9 +402,8 @@ describe('Authentication - ', () => {
             return GET('settings').then(res => {
                 assert.equal(res.status, 401);
                 done();
-            }).catch(done);
-        })
-
+            });
+        }).catch(done);
     });
 
     it('on-premise - logged-in user is allowed access', function(done) {
@@ -422,15 +421,15 @@ describe('Authentication - ', () => {
             return GET('settings').then(res => res.json().then(json => {
                 assert.equal(res.status, 200);
                 assert.deepEqual(json, {
-                    USERS: [ 'plotly-database-connector' ],
+                    USERS: ['plotly-database-connector'],
                     PLOTLY_URL: 'https://plot.ly'
                 });
 
                 // user should be added in ALLOWED_USERS:
                 assert.deepEqual(getSetting('ALLOWED_USERS'), [username]);
                 done();
-            })).catch(done);
-        });
+            }));
+        }).catch(done);
     });
 });
 
