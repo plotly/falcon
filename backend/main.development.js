@@ -1,8 +1,7 @@
-import {app, BrowserWindow, shell} from 'electron';
-import {contains, join, isEmpty} from 'ramda';
-import Logger from './logger';
+import {app, BrowserWindow} from 'electron';
+import {contains} from 'ramda';
+import * as Logger from './logger';
 import {setupMenus} from './menus';
-import {getSetting} from './settings';
 
 import Servers from './routes.js';
 
@@ -43,6 +42,7 @@ app.on('ready', () => {
     httpsServer.electronWindow = mainWindow;
 
     const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;
+    // TODO ESLint no-unused-vars: though not used, would it be better to use HTTPS?
     const HTTPS_URL = `${httpsServer.protocol}://${httpsServer.domain}:${httpsServer.port}`;
 
     mainWindow.loadURL(`${HTTP_URL}/`);

@@ -27,8 +27,8 @@ export function connect(connection) {
     return request('_cat/indices/', connection, {method: 'GET'});
 }
 
-export function query(query, connection) {
-    const queryObject = JSON.parse(query);
+export function query(queryStmt, connection) {
+    const queryObject = JSON.parse(queryStmt);
     const {body, index, type} = queryObject;
     /*
      * If size is not defined or smaller than 10K, keep scroll disabled and

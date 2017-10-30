@@ -2,7 +2,7 @@ import {contains} from 'ramda';
 import {getSetting} from '../settings.js';
 import {getAccessTokenCookieOptions} from '../constants.js';
 import {generateAndSaveAccessToken} from '../utils/authUtils';
-import Logger from '../logger';
+import * as Logger from '../logger';
 import fetch from 'node-fetch';
 
 const ESCAPED_ROUTES = [

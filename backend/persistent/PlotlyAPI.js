@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import {getSetting} from '../settings.js';
-import Logger from '../logger';
+import * as Logger from '../logger';
 import FormData from 'form-data';
 
 export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessToken, method}) {
@@ -38,7 +38,7 @@ export function newDatacache(payloadJSON, type) {
     }).then(res => {
         return res;
     }).catch(err => {
-        console.error(err);
+        console.error(err); // eslint-disable-line no-console
         throw new Error(err);
     });
 }

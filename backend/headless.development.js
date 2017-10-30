@@ -1,5 +1,5 @@
 // Entry point for running the app without electron
-import Logger from './logger';
+import * as Logger from './logger';
 import Servers from './routes.js';
 import {getSetting} from './settings.js';
 

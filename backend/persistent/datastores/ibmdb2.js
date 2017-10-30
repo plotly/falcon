@@ -2,7 +2,7 @@ const ibmdb = require('ibm_db');
 
 import {dissoc} from 'ramda';
 
-import Logger from '../../logger';
+import * as Logger from '../../logger';
 import {parseSQL} from '../../parse';
 
 
@@ -41,11 +41,11 @@ export function connect(connection) {
     return getClient(connection);
 }
 
-export function query(query, connection) {
+export function query(queryStmt, connection) {
     return getClient(connection)
         .then(function(client) {
             return new Promise(function(resolve, reject) {
-                client.query(query, function(err, rows) {
+                client.query(queryStmt, function(err, rows) {
                     if (err) reject(err);
                     else resolve(parseSQL(rows));
                 });

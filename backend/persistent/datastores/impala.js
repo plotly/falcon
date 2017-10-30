@@ -1,8 +1,7 @@
-import fetch from 'node-fetch';
 import * as impala from 'node-impala';
-import {dissoc, keys, values, init, map, prepend, unnest} from 'ramda';
+import {keys, values, init, map, prepend, unnest} from 'ramda';
 
-import Logger from '../../logger';
+import * as Logger from '../../logger';
 
 
 export function createClient(connection) {
@@ -21,7 +20,7 @@ export function connect(connection) {
     return createClient(connection).query('SELECT ID FROM (SELECT 1 ID) DUAL WHERE ID=0')
     .catch(err => {
       Logger.log(err);
-      throw new Error(err);        
+      throw new Error(err);
     });
 }
 
@@ -59,7 +58,7 @@ export function schemas(connection) {
          */
         const promises = map(tableName => {
             return query(`describe ${tableName}`, connection)
-            .then(json => map(row => prepend(tableName, init(row)), json.rows));
+            .then(descJson => map(row => prepend(tableName, init(row)), descJson.rows));
         }, tableNames);
 
         // Wait for all the describe-table promises to resolve before resolving:
@@ -75,9 +74,9 @@ export function schemas(connection) {
     });
 }
 
-export function query(query, connection) {
+export function query(queryStmt, connection) {
 
-    return createClient(connection).query(query)
+    return createClient(connection).query(queryStmt)
     .then(json => {
       let columnnames = [];
       let rows = [[]];

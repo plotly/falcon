@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 
 import {dissoc} from 'ramda';
 
-import Logger from '../../logger';
+import * as Logger from '../../logger';
 
 export function connect(connection) {
     Logger.log('' +
@@ -79,8 +79,8 @@ export function schemas(connection) {
         });
 }
 
-export function query(query, connection) {
-    const code = `val r = plotlyContext.sql("""${query}""").collect\n%json r`;
+export function query(queryStmt, connection) {
+    const code = `val r = plotlyContext.sql("""${queryStmt}""").collect\n%json r`;
     return sendRequest(connection, code)
         .then(json => {
             if (json instanceof Error) {
@@ -118,6 +118,8 @@ function getServerUrl(connection) {
     return `http://${connection.host}:${connection.port}/sessions`;
 }
 
+const clients = {};
+
 function getSessionUrl(connection) {
     return `http://${connection.host}:${connection.port}/sessions/${clients[connection.id]}`;
 }
@@ -125,8 +127,6 @@ function getSessionUrl(connection) {
 function getStatementUrl(connection) {
     return `http://${connection.host}:${connection.port}/sessions/${clients[connection.id]}/statements`;
 }
-
-const clients = {};
 
 export function newSession(connection) {
     return fetch(getServerUrl(connection), {
@@ -204,11 +204,12 @@ function wait(milliseconds) {
     });
 }
 
-function getClient(connection, attempts) {
+function getClient(connection, attempts = 1) {
     const timeout = connection.timeout || 180;
 
-    attempts = attempts || 1;
-    if (attempts++ > connection.timeout) new Error('livy: connect: timeout');
+    if (attempts + 1 > timeout) {
+        throw new Error('livy: connect: timeout');
+    }
 
     return getState(connection).then(state => {
         return (state === 'idle') ?

@@ -1,13 +1,10 @@
 import Sequelize from 'sequelize';
 import {parseSQL} from '../../parse';
 import {
-    contains,
     dissoc,
-    flatten,
     gt,
     has,
     merge,
-    mergeAll,
     omit,
     sort,
     trim,
@@ -15,7 +12,7 @@ import {
     values
 } from 'ramda';
 import {DIALECTS} from '../../../app/constants/constants';
-import Logger from '../../logger';
+import * as Logger from '../../logger';
 import fs from 'fs';
 
 // http://stackoverflow.com/questions/32037385/using-sequelize-with-redshift
