@@ -279,7 +279,8 @@ export default class Servers {
                         status = 201;
                     }
 
-                    if (contains(username, getSetting('ALLOWED_USERS')) || that.isElectron || !getSetting('AUTH_ENABLED')) {
+                    if (contains(username, getSetting('ALLOWED_USERS')) || that.isElectron ||
+                        !getSetting('AUTH_ENABLED') || getSetting('IS_RUNNING_INSIDE_ON_PREM')) {
                         res.setCookie('plotly-auth-token', access_token, getCookieOptions());
 
                         const db_connector_access_token = generateAndSaveAccessToken();
