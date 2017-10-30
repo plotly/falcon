@@ -49,10 +49,10 @@ export function tables(connection) {
 export function schemas(connection) {
     const showTables = (connection.database) ?
         `"show tables in ${connection.database}"` :
-        `"show tables"`;
+        '"show tables"';
     const describeTable = (connection.database) ?
         `"describe ${connection.database}."` :
-        `"describe "`;
+        '"describe "';
     // Supressed ESLint cause comlex expression is easier to maintain this way
     // eslint-disable-next-line max-len
     const expression = `plotlyContext.sql(${showTables}).select("tableName").collect().map(tn => plotlyContext.sql(${describeTable} + tn(0)).withColumn("tableName", lit(tn(0).toString)).select("tableName", "col_name", "data_type")).reduce((l,r)=>l.union(r))`;

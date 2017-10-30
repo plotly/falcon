@@ -370,26 +370,27 @@ export default class Servers {
             if (connectionsOnFile) {
                 res.send(409, {connectionId: connectionsOnFile.id});
                 return;
-            } else {
-
-                // Check that the connections are valid
-                const connectionObject = req.params;
-                validateConnection(req.params).then(validation => {
-                    if (isEmpty(validation)) {
-                        res.json(200, {connectionId: saveConnection(req.params)});
-                        return;
-                    } else {
-                        Logger.log(validation, 2);
-                        res.json(400, {error: {message: validation.message}
-                        });
-                        return;
-                    }
-                }).catch(err => {
-                    Logger.log(err, 2);
-                    res.json(400, {error: {message: err.message}
-                    });
-                });
             }
+
+            // Check that the connections are valid
+            const connectionObject = req.params;
+            validateConnection(req.params).then(validation => {
+                if (isEmpty(validation)) {
+                    res.json(200, {connectionId: saveConnection(req.params)});
+                    return;
+                }
+
+                Logger.log(validation, 2);
+                res.json(400, {
+                    error: {message: validation.message}
+                });
+                return;
+            }).catch(err => {
+                Logger.log(err, 2);
+                res.json(400, {
+                    error: {message: err.message}
+                });
+            });
         });
 
         // return sanitized connections

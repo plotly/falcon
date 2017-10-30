@@ -83,7 +83,7 @@
         "yoda": [2],
         "key-spacing": [1],
         "max-len": ["error", 120, 4, {
-            "ignoreUrls": true
+            ignoreUrls: true
         }],
         "new-cap": [0],
         "no-shadow": [1],
@@ -92,7 +92,9 @@
         "no-unused-vars": [1],
         "no-use-before-define": [2, "nofunc"],
         "semi": [2, "always"],
-        "quotes": [2, "single", "avoid-escape"],
+        "quotes": [2, "single", {
+            avoidEscape: true
+        }],
         "valid-jsdoc": [1],
         "react/jsx-closing-bracket-location": [1, "line-aligned"],
         "jsx-quotes": [2, "prefer-double"],

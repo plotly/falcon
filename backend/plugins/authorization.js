@@ -48,29 +48,25 @@ export function PlotlyOAuth(electron) {
                 headers: {'Authorization': `Bearer ${plotlyAuthToken}`}
             })
             .then(userRes => userRes.json().then(userMeta => {
-
               if (userRes.status !== 200) {
                 res.json(401, {error: {message: 'Please login to access this page.'}});
                 return;
-              } else {
-                  if (!contains(userMeta.username, getSetting('ALLOWED_USERS'))) {
-
-                      // Remove any existing credentials and return error
-                      res.clearCookie('db-connector-auth-token');
-                      res.clearCookie('plotly-auth-token');
-                      res.clearCookie('db-connector-user');
-                      res.json(403, {error: {message: `User ${userMeta.username} is not allowed to view this app`}});
-                      return;
-
-                  } else {
-
-                      const dbConnectorAccessToken = generateAndSaveAccessToken();
-                      res.setCookie('db-connector-auth-token',
-                                    dbConnectorAccessToken, getAccessTokenCookieOptions());
-                      return (next());
-                  }
               }
 
+              if (!contains(userMeta.username, getSetting('ALLOWED_USERS'))) {
+
+                  // Remove any existing credentials and return error
+                  res.clearCookie('db-connector-auth-token');
+                  res.clearCookie('plotly-auth-token');
+                  res.clearCookie('db-connector-user');
+                  res.json(403, {error: {message: `User ${userMeta.username} is not allowed to view this app`}});
+                  return;
+              }
+
+              const dbConnectorAccessToken = generateAndSaveAccessToken();
+              res.setCookie('db-connector-auth-token',
+                            dbConnectorAccessToken, getAccessTokenCookieOptions());
+              return (next());
             }))
             .catch(err => {
                 Logger.log(err, 0);

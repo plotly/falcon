@@ -43,7 +43,7 @@ export function tables(connection) {
 }
 
 export function schemas(connection) {
-    let columnnames = ['tablename', 'column_name', 'data_type'];
+    const columnnames = ['tablename', 'column_name', 'data_type'];
     const showTables = (connection.database) ?
         `show tables in ${connection.database}` :
         'show tables';
@@ -88,6 +88,6 @@ export function query(query, connection) {
       return {columnnames, rows};
     }).catch(err => {
         Logger.log(err);
-        throw new Error(err)
+        throw new Error(err);
     });
 }

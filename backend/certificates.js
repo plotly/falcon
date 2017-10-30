@@ -79,7 +79,7 @@ export function fetchCertsFromCA() {
         ));
     }).then((res) => {
         if (res.status !== 201) {
-            let errorMessage = `An error occured requesting certificates from the CA, ` +
+            let errorMessage = 'An error occured requesting certificates from the CA, ' +
                 `status ${res.status} was returned.`;
             res.json().then(json => {
                 errorMessage += `JSON response was: ${JSON.stringify(json)}`;
