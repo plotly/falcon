@@ -266,9 +266,6 @@ export default class Servers {
                         res.json(500, {error: {message: `User was not found at ${getSetting('PLOTLY_API_URL')}`}});
                         return;
                     }
-                    const existingUsers = getSetting('USERS');
-                    const existingUsernames = pluck('username', existingUsers);
-                    let status;
 
                     /*
                      * Allow users access to app if any one of the following conditions apply:
@@ -287,6 +284,9 @@ export default class Servers {
                                       getAccessTokenCookieOptions());
                         res.setCookie('db-connector-user', username, getCookieOptions());
 
+                        const existingUsers = getSetting('USERS');
+                        const existingUsernames = pluck('username', existingUsers);
+                        let status;
 
                         if (contains(username, existingUsernames)) {
                             existingUsers[
