@@ -6,7 +6,7 @@ machine:
 
 dependencies:
     pre:
-        - npm install yarn@1.2.1
+        - cd /opt/circleci/nodejs/v6.11.1/lib/ && nvm use v6.11.1 && npm install npm@3.10.9 && npm install yarn@1.2.1 
 
     override:
         - yarn install
