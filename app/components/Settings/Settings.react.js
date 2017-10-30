@@ -1,5 +1,6 @@
-import React, {Component, PropTypes} from 'react';
-import {contains, dissoc, eqProps, flip, hasIn, head, isEmpty, keys, merge, propOr, reduce} from 'ramda';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {contains, dissoc, flip, head, hasIn, isEmpty, keys, merge, propOr, reduce} from 'ramda';
 import {connect} from 'react-redux';
 import ReactToolTip from 'react-tooltip';
 import classnames from 'classnames';
@@ -13,14 +14,10 @@ import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import Preview from './Preview/Preview.react';
 import TableTree from './Preview/TableTree.react.js';
-import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../Link.react';
 import {defaultQueries, DIALECTS, FAQ, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
-import {getAllBaseUrls, isElectron, isOnPrem} from '../../utils/utils';
+import {isElectron, isOnPrem} from '../../utils/utils';
 
-
-let checkconnectorUrls;
-let checkDNS;
 
 class Settings extends Component {
     constructor(props) {
@@ -64,6 +61,7 @@ class Settings extends Component {
         }, 5 * 1000);
 
         this.intervals.checkHTTPSEndpointInterval = setInterval(() => {
+            // eslint-disable-next-line no-console
             console.warn(`Attempting a connection at ${this.state.urls.https}`);
             if (this.state.urls.https) {
                 fetch(this.state.urls.https).then(() => {
@@ -101,12 +99,14 @@ class Settings extends Component {
 
     renderSettingsForm() {
         const {
-            connect,
             connectionObject,
             connectRequest,
-            connectionsHaveBeenSaved,
             saveConnectionsRequest,
-            updateConnection
+            updateConnection,
+
+            // Assign to new variable name to avoid shadowing (ESLint no-shadow)
+            // function `connect` in outer scope
+            connect: doConnect
         } = this.props;
 
         return (
@@ -128,8 +128,7 @@ class Settings extends Component {
                     updateConnection={updateConnection}
                 />
                 <ConnectButton
-                    connectionsHaveBeenSaved={connectionsHaveBeenSaved}
-                    connect={connect}
+                    connect={doConnect}
                     connectRequest={connectRequest}
                     editMode={this.state.editMode}
                     saveConnectionsRequest={saveConnectionsRequest}
@@ -158,15 +157,12 @@ class Settings extends Component {
         const {
             apacheDrillStorageRequest,
             apacheDrillS3KeysRequest,
-            connect,
             connections,
             connectRequest,
             connectionsRequest,
-            connectionNeedToBeSaved,
             elasticsearchMappingsRequest,
             getApacheDrillStorage,
             getApacheDrillS3Keys,
-            getConnectorUrls,
             getElasticsearchMappings,
             getTables,
             getS3Keys,
@@ -176,7 +172,6 @@ class Settings extends Component {
             previewTableRequest,
             selectedTable,
             settingsRequest,
-            setConnectionNeedToBeSaved,
             setTable,
             setIndex,
             s3KeysRequest,
@@ -257,13 +252,7 @@ class Settings extends Component {
         const {
             apacheDrillStorageRequest,
             apacheDrillS3KeysRequest,
-            connect,
-            connectRequest,
             connections,
-            connectionsHaveBeenSaved,
-            connectorUrlsRequest,
-            createCerts,
-            deleteConnectionsRequest,
             deleteTab,
             elasticsearchMappingsRequest,
             getSqlSchema,
@@ -272,21 +261,17 @@ class Settings extends Component {
             newTab,
             preview,
             previewTableRequest,
-            redirectUrl,
-            redirectUrlRequest,
             runSqlQuery,
             queryRequest,
             s3KeysRequest,
             selectedTab,
             settingsRequest,
-            saveConnectionsRequest,
             setIndex,
             setTable,
             selectedTable,
             selectedIndex,
             setTab,
             tablesRequest,
-            updateConnection,
             updatePreview,
             username
         } = this.props;
@@ -390,7 +375,7 @@ class Settings extends Component {
                             )}
                         </TabPanel>
 
-                        {isOnPrem() ||<TabPanel>
+                        {isOnPrem() || <TabPanel>
                             {this.props.connectRequest.status === 200 ? (
                                 <div className="big-whitespace-tab">
                                     {httpsServerIsOK ? (
@@ -445,7 +430,7 @@ class Settings extends Component {
                                                 FAQ while you wait! 📰`}
                                             </p>
                                         </div>
-                                    ): (
+                                    ) : (
                                         <div>
                                             <p>
                                                 <a onClick={() => window.location.assign('/login')}>Log into Plotly</a>
@@ -534,7 +519,7 @@ function mapStateToProps(state) {
     }
     const preview = previews[selectedConnectionId] || {};
     const connection = connections[selectedTab];
-    if (connection && !hasIn('code', preview) ) {
+    if (connection && !hasIn('code', preview)) {
         preview.code = defaultQueries(connection.dialect, selectedTable);
     }
 
@@ -710,5 +695,53 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         }
     );
 }
+
+Settings.propTypes = {
+    connect: PropTypes.func,
+    connectionObject: PropTypes.object,
+    connectRequest: PropTypes.object,
+    saveConnectionsRequest: PropTypes.object,
+    updateConnection: PropTypes.func,
+    dispatch: PropTypes.func,
+    setConnectionNeedToBeSaved: PropTypes.func,
+    connectorUrlsRequest: PropTypes.shape({
+        status: PropTypes.number,
+        content: PropTypes.array
+    }),
+    connectionNeedToBeSaved: PropTypes.bool,
+    apacheDrillStorageRequest: PropTypes.object,
+    apacheDrillS3KeysRequest: PropTypes.object,
+    connections: PropTypes.object,
+    connectionsRequest: PropTypes.object,
+    elasticsearchMappingsRequest: PropTypes.object,
+    getApacheDrillStorage: PropTypes.func,
+    getApacheDrillS3Keys: PropTypes.func,
+    getElasticsearchMappings: PropTypes.func,
+    getTables: PropTypes.func,
+    getS3Keys: PropTypes.func,
+    getSettings: PropTypes.func,
+    initialize: PropTypes.func,
+    previewTables: PropTypes.func,
+    previewTableRequest: PropTypes.object,
+    selectedTable: PropTypes.any,
+    settingsRequest: PropTypes.object,
+    setTable: PropTypes.func,
+    setIndex: PropTypes.func,
+    s3KeysRequest: PropTypes.object,
+    selectedTab: PropTypes.string,
+    selectedIndex: PropTypes.any,
+    tablesRequest: PropTypes.object,
+    deleteTab: PropTypes.func,
+    getSqlSchema: PropTypes.func,
+    schemaRequest: PropTypes.object,
+    newTab: PropTypes.func,
+    preview: PropTypes.object,
+    runSqlQuery: PropTypes.func,
+    queryRequest: PropTypes.object,
+    setTab: PropTypes.func,
+    updatePreview: PropTypes.func,
+    logout: PropTypes.func,
+    username: PropTypes.string
+};
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(Settings);

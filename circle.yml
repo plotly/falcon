@@ -1,8 +1,13 @@
 machine:
     node:
         version: 6.11.1
+    environment:
+        PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
 
 dependencies:
+    pre:
+        - npm uninstall -g yarn && rm -rf $HOME/.yarn && npm install -g yarn@1.2.1
+
     override:
         - yarn install
 
