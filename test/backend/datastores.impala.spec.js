@@ -1,11 +1,12 @@
 import {assert} from 'chai';
 
-import {DIALECTS} from '../../app/constants/constants.js';
 import {apacheImpalaConnection as connection} from './utils.js';
 import {
     query, connect, tables
 } from '../../backend/persistent/datastores/Datastores.js';
 
+// Suppressing ESLint cause Mocha ensures `this` is bound in test functions
+/* eslint-disable no-invalid-this */
 describe('Apache Impala:', function () {
 
     it('connect succeeds', function() {
@@ -30,11 +31,11 @@ describe('Apache Impala:', function () {
 
         return query(`SELECT * FROM ${tableName}\nLIMIT 5`, connection).then(results => {
             assert.deepEqual(results.rows, [
-                ['Belarus', "17.5"],
-                ['Moldova', "16.8"],
-                ['Lithuania', "15.4"],
-                ['Russia', "15.1"],
-                ['Romania', "14.4"]
+                ['Belarus', '17.5'],
+                ['Moldova', '16.8'],
+                ['Lithuania', '15.4'],
+                ['Russia', '15.1'],
+                ['Romania', '14.4']
             ]);
             assert.deepEqual(results.columnnames, ['loc', 'alcohol']);
         });
@@ -53,3 +54,4 @@ describe('Apache Impala:', function () {
         });
     });
 });
+/* eslint-enable no-invalid-this */

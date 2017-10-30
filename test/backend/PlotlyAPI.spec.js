@@ -1,4 +1,4 @@
-import chai, {expect, assert} from 'chai';
+import chai, {assert} from 'chai';
 import spies from 'chai-spies';
 chai.use(spies);
 
@@ -9,6 +9,8 @@ import {
 import {wait, names, createGrid, username, apiKey} from './utils.js';
 import {saveSetting} from '../../backend/settings.js';
 
+// Suppressing ESLint cause Mocha ensures `this` is bound in test functions
+/* eslint-disable no-invalid-this */
 describe('Grid API Functions', function () {
     before(() => {
         saveSetting('USERS', [{username, apiKey}]);
@@ -76,3 +78,4 @@ describe('Grid API Functions', function () {
 
     });
 });
+/* eslint-enable no-invalid-this */

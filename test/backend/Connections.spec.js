@@ -11,7 +11,9 @@ describe('Connections', function () {
         const connectionsPath = getSetting('CONNECTIONS_PATH');
         try {
             fs.unlinkSync(connectionsPath);
-        } catch (e) {}
+        } catch (e) {
+            // empty intentionally
+        }
     });
 
     it('saveConnection saves a connection', function() {

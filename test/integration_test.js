@@ -2,8 +2,6 @@ import chromedriver from 'chromedriver';
 import webdriver from 'selenium-webdriver';
 import electronPath from 'electron';
 
-import {expect} from 'chai';
-
 import fs from 'fs';
 import fsExtra from 'fs-extra';
 import path from 'path';
@@ -21,6 +19,8 @@ saveCredentials();
 chromedriver.start();
 process.on('exit', chromedriver.stop);
 
+// Suppressing ESLint cause Mocha ensures `this` is bound in test functions
+/* eslint-disable no-invalid-this */
 describe('plotly database connector', function() {
     this.timeout(10 * 60 * 1000);
 
@@ -96,6 +96,7 @@ function clearConnectorFolder() {
     try {
         fsExtra.removeSync(settings.getSetting('STORAGE_PATH'));
     } catch (e) {
-        console.warn(e);
+        console.warn(e); // eslint-disable-line no-console
     }
 }
+/* eslint-enable no-invalid-this */

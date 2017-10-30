@@ -1,16 +1,14 @@
 var fetch = require('fetch-cookie')(require('node-fetch'));
 
 import {assert} from 'chai';
-import {assoc, concat, contains, dissoc, isEmpty, keys, merge, sort, without} from 'ramda';
+import {assoc, concat, contains, dissoc, isEmpty, keys, merge} from 'ramda';
 import Servers from '../../backend/routes.js';
 import {
     getConnections,
-    getSanitizedConnections,
     saveConnection
 } from '../../backend/persistent/Connections.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
 import {setCertificatesSettings} from '../../backend/certificates';
-import * as utils from '../../backend/utils/authUtils';
 
 import fs from 'fs';
 import {
@@ -18,9 +16,7 @@ import {
     apacheDrillConnections,
     apacheDrillStorage,
     apiKey,
-    configuration,
     createGrid,
-    elasticsearchConnections,
     fakeCerts,
     mysqlConnection,
     publicReadableS3Connections,
@@ -99,25 +95,30 @@ function setCookies(done) {
 
 }
 
+function cleanUpSettings(...settingKeys) {
+    settingKeys.forEach(key => {
+        const settingPath = getSetting(key);
+        try {
+            fs.unlinkSync(settingPath);
+        } catch (e) {
+            // empty intentionally
+        }
+    });
+}
+
 let queryObject;
 let servers;
 let connectionId;
 
+// Suppressing ESLint cause Mocha ensures `this` is bound in test functions
+/* eslint-disable no-invalid-this */
 describe('Servers - ', () => {
     beforeEach(() => {
-        ['KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH'].forEach(fileName => {
-            try {
-                fs.unlinkSync(getSetting(fileName));
-            } catch (e) {}
-        });
+        cleanUpSettings('KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH');
     });
 
     afterEach(() => {
-        ['KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH'].forEach(fileName => {
-            try {
-                fs.unlinkSync(getSetting(fileName));
-            } catch (e) {}
-        });
+        cleanUpSettings('KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH');
     });
 
     it('Https server is up and running after an http server was started and certs were created.', (done) => {
@@ -180,12 +181,7 @@ describe('Authentication - ', () => {
         servers.httpServer.start();
 
         // cleanup
-        ['CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH'].forEach(file => {
-            try {
-                fs.unlinkSync(getSetting(file));
-            } catch (e) {
-            }
-        });
+        cleanUpSettings('CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH');
 
         // enable authentication:
         saveSetting('AUTH_ENABLED', true);
@@ -263,7 +259,7 @@ describe('Authentication - ', () => {
         saveSetting('ALLOWED_USERS', [username]);
 
         POST('oauth2', {access_token: accessToken})
-        .then(res => {
+        .then(() => {
             return GET('settings')
             .then(res => {
                 assert.equal(res.status, 200);
@@ -277,7 +273,7 @@ describe('Authentication - ', () => {
         saveSetting('ALLOWED_USERS', [username]);
 
         POST('oauth2', {access_token: accessToken})
-        .then(res => {
+        .then(() => {
 
             /*
              * This ensures that any requests to plotly fail so that we
@@ -302,7 +298,7 @@ describe('Authentication - ', () => {
         saveSetting('ACCESS_TOKEN_AGE', 1);
 
         POST('oauth2', {access_token: accessToken})
-        .then(res => {
+        .then(() => {
 
             // This ensures that any requests to plotly fail so that we can catch them
             saveSetting('PLOTLY_API_DOMAIN', 'bad-domain.plot.ly');
@@ -330,16 +326,17 @@ describe('Authentication - ', () => {
         // set access-token expiry of 3 sec:
         saveSetting('ACCESS_TOKEN_AGE', 3);
 
+        // TODO Are `res.json()` calls below even necessary? Checked response status is available without anyways...
         POST('oauth2', {access_token: accessToken})
-        .then(res => {
-            return GET('settings').then(res => res.json().then(json => {
+        .then(() => {
+            return GET('settings').then(res => res.json().then(() => {
                 assert.equal(res.status, 200);
             }));
         })
-        .then(res => {
+        .then(() => {
             setTimeout(() => {
                 GET('settings')
-                .then(res => res.json().then(json => {
+                .then(res => res.json().then(() => {
                     assert.equal(res.status, 200);
                     done();
                 })).catch(done);
@@ -355,7 +352,7 @@ describe('Authentication - ', () => {
         saveSetting('ACCESS_TOKEN_AGE', 1);
 
         POST('oauth2', {access_token: accessToken})
-        .then(res => {
+        .then(() => {
             // request should be allowed:
             return GET('settings').then(res => {
                 assert.equal(res.status, 200);
@@ -389,12 +386,7 @@ describe('Routes - ', () => {
         servers.httpServer.start();
 
         // cleanup
-        ['CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH'].forEach(file => {
-            try {
-                fs.unlinkSync(getSetting(file));
-            } catch (e) {
-            }
-        });
+        cleanUpSettings('CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH');
 
         // Save some connections to the user's disk
         saveSetting('USERS', [{
@@ -469,9 +461,9 @@ describe('Routes - ', () => {
 
             // We can save it again and we'll still get a 200 instead of a 201
             POST('oauth2', {access_token: accessToken})
-            .then(res => res.json().then(json => {
-                assert.deepEqual(json, {});
-                assert.equal(res.status, 200);
+            .then(oauth2Res => oauth2Res.json().then(oauth2Json => {
+                assert.deepEqual(oauth2Json, {});
+                assert.equal(oauth2Res.status, 200);
                 done();
             })).catch(done);
         }))
@@ -528,7 +520,7 @@ describe('Routes - ', () => {
             'PLOTLY_API_DOMAIN': 'acme.plot.ly',
             'PLOTLY_API_SSL_ENABLED': false
         };
-        PATCH('settings', newSettings).then(res => res.json().then(json => {
+        PATCH('settings', newSettings).then(res => res.json().then(() => {
             assert.equal(
                 getSetting('PLOTLY_API_SSL_ENABLED'),
                 newSettings.PLOTLY_API_SSL_ENABLED
@@ -622,7 +614,10 @@ describe('Routes - ', () => {
                                 '\'SELECZ\' at line 1',
                             mssql: "Could not find stored procedure 'SELECZ'.",
                             sqlite: 'SQLITE_ERROR: near "SELECZ": syntax error',
-                            'apache impala': 'BeeswaxException: AnalysisException: Syntax error in line 1:\nSELECZ\n^\nEncountered: IDENTIFIER\nExpected: ALTER, COMPUTE, CREATE, DESCRIBE, DROP, EXPLAIN, INSERT, INVALIDATE, LOAD, REFRESH, SELECT, SHOW, USE, VALUES, WITH\n\nCAUSED BY: Exception: Syntax error'
+                            'apache impala': 'BeeswaxException: AnalysisException: Syntax error in line 1:\nSELECZ\n' +
+                                '^\nEncountered: IDENTIFIER\nExpected: ALTER, COMPUTE, CREATE, DESCRIBE, DROP, ' +
+                                'EXPLAIN, INSERT, INVALIDATE, LOAD, REFRESH, SELECT, SHOW, USE, VALUES, WITH\n\n' +
+                                'CAUSED BY: Exception: Syntax error'
                         })[connection.dialect]
                     }}
                 );
@@ -923,7 +918,7 @@ describe('Routes - ', () => {
                     } else if (connection.dialect === 'apache impala') {
                         rows = [
                             [ 'plotly.alcohol_consumption_by_country_2010', 'loc', 'string' ],
-                            [ 'plotly.alcohol_consumption_by_country_2010', 'alcohol', 'double' ],
+                            [ 'plotly.alcohol_consumption_by_country_2010', 'alcohol', 'double' ]
                         ];
                     } else {
                         rows = [
@@ -1062,7 +1057,7 @@ describe('Routes - ', () => {
         this.timeout(5000);
         POST(`connections/${s3CredId}/query`, {query: '5k-scatter.csv'})
         .then(res => res.json().then(json => {
-            assert.equal(res.status, 200),
+            assert.equal(res.status, 200);
             assert.deepEqual(
                 keys(json),
                 ['columnnames', 'rows']
@@ -1160,7 +1155,7 @@ describe('Routes - ', () => {
             POST(`connections/${drillCredId}/query`, {query})
             .then(res => res.json())
             .then(json => {
-                console.warn(json.error.message);
+                console.warn(json.error.message); // eslint-disable-line no-console
                 assert(
                     json.error.message.startsWith(testCase.error)
                 );
@@ -1183,11 +1178,9 @@ describe('Routes - ', () => {
         }
 
         it(`connections - ${connection.dialect} - saves connections to a file if they are valid and ` +
-            `if they do not exist`, function(done) {
+            'if they do not exist', function(done) {
             this.timeout(5 * 1000);
-            try {
-                fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
-            } catch (e) {}
+            cleanUpSettings('CONNECTIONS_PATH');
 
             assert.deepEqual(getConnections(), []);
             POST('connections', connection)
@@ -1208,9 +1201,7 @@ describe('Routes - ', () => {
         it(`connections - ${connection.dialect} - fails if the connections are not valid`, function(done) {
             this.timeout(5 * 1000);
 
-            try {
-                fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
-            } catch (e) {}
+            cleanUpSettings('CONNECTIONS_PATH');
 
             assert.deepEqual(getConnections(), [], 'connections are empty at start');
 
@@ -1299,15 +1290,14 @@ describe('Routes - ', () => {
     });
 
     it('connection/:id - returns sanitized connections', function(done) {
-        let connections;
         POST('connections', publicReadableS3Connections)
-        .then(res => res.json().then(json => {
+        .then(res => res.json().then(() => {
             assert.equal(res.status, 200);
             return GET('connections');
         }))
         .then(res => res.json().then(connections => {
             return GET(`connections/${connections[0].id}`)
-            .then(res => res.json().then(function(connection) {
+            .then(resFromGet => resFromGet.json().then(function(connection) {
 
                 assert.deepEqual(
                     dissoc('id', connection),
@@ -1340,7 +1330,7 @@ describe('Routes - ', () => {
         .then(json => {
             assert.deepEqual(
                 json,
-                {error: 'password authentication failed for user \"banana\"'}
+                {error: 'password authentication failed for user "banana"'}
             );
             assert.deepEqual(
                 getConnections(),
@@ -1400,9 +1390,7 @@ describe('Routes - ', () => {
     });
 
     it('connections - returns an empty array of connections', function(done) {
-        try {
-            fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
-        } catch (e) {}
+        cleanUpSettings('CONNECTIONS_PATH');
 
         GET('connections')
         .then(res => {
@@ -1595,7 +1583,7 @@ describe('Routes - ', () => {
     it('queries - gets individual queries', function(done) {
         this.timeout(10 * 1000);
         GET(`queries/${queryObject.fid}`)
-        .then(res => res.json().then(json => {
+        .then(res => res.json().then(() => {
             assert.equal(res.status, 404);
             return POST('queries', queryObject);
         }))
@@ -1744,3 +1732,4 @@ describe('Routes - ', () => {
     });
 
 });
+/* eslint-enable no-invalid-this */

@@ -1,14 +1,17 @@
 import {assert, expect} from 'chai';
 import fs from 'fs';
-import {contains, dissoc, merge} from 'ramda';
+import {contains} from 'ramda';
 
 import {getSetting, saveSetting} from '../../backend/settings.js';
 
 describe('Settings', function() {
     beforeEach(() => {
+        const settingsPath = getSetting('SETTINGS_PATH');
         try {
-            fs.unlinkSync(getSetting('SETTINGS_PATH'));
-        } catch (e) {}
+            fs.unlinkSync(settingsPath);
+        } catch (e) {
+            // empty intentionally
+        }
 
         delete process.env.PLOTLY_CONNECTOR_STORAGE_PATH;
 
