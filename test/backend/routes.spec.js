@@ -394,7 +394,7 @@ describe('Authentication - ', () => {
             return GET('settings').then(res => {
                 assert.equal(res.status, 401);
                 done();
-            });
+            }).catch(done);
         })
 
     });
@@ -421,7 +421,7 @@ describe('Authentication - ', () => {
                 // user should be added in ALLOWED_USERS:
                 assert.deepEqual(getSetting('ALLOWED_USERS'), [username]);
                 done();
-            }));
+            })).catch(done);
         });
     });
 });
