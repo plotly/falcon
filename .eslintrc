@@ -8,18 +8,6 @@
         "jest": true,
         "node": true
     },
-    "ecmaFeatures": {
-        "arrowFunctions": true,
-        "blockBindings": true,
-        "classes": true,
-        "defaultParams": true,
-        "destructuring": true,
-        "forOf": true,
-        "generators": true,
-        "modules": true,
-        "templateStrings": true,
-        "jsx": true
-    },
     "rules": {
         "accessor-pairs": [1],
         "arrow-spacing": 2,
