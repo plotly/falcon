@@ -269,16 +269,14 @@ export default class Servers {
                     const existingUsers = getSetting('USERS');
                     const existingUsernames = pluck('username', existingUsers);
                     let status;
-                    if (contains(username, existingUsernames)) {
-                        existingUsers[
-                            existingUsernames.indexOf(username)
-                        ].accessToken = access_token;
-                        status = 200;
-                    } else {
-                        existingUsers.push({username, accessToken: access_token});
-                        status = 201;
-                    }
 
+                    /*
+                     * Allow users access to app if any one of the following conditions apply:
+                     * 1. username is present in `ALLOWED_USERS` setting.
+                     * 2. The app is running locally (as electron-app).
+                     * 3. Authentication is disabled.
+                     * 4. The app is running on-premise.
+                     */
                     if (contains(username, getSetting('ALLOWED_USERS')) || that.isElectron ||
                         !getSetting('AUTH_ENABLED') || getSetting('IS_RUNNING_INSIDE_ON_PREM')) {
                         res.setCookie('plotly-auth-token', access_token, getCookieOptions());
@@ -289,6 +287,16 @@ export default class Servers {
                                       getAccessTokenCookieOptions());
                         res.setCookie('db-connector-user', username, getCookieOptions());
 
+
+                        if (contains(username, existingUsernames)) {
+                            existingUsers[
+                                existingUsernames.indexOf(username)
+                            ].accessToken = access_token;
+                            status = 200;
+                        } else {
+                            existingUsers.push({username, accessToken: access_token});
+                            status = 201;
+                        }
                         saveSetting('USERS', existingUsers);
 
                         if (that.isElectron) {
