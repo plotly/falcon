@@ -329,15 +329,23 @@ describe('Authentication - ', () => {
         // TODO Are `res.json()` calls below even necessary? Checked response status is available without anyways...
         POST('oauth2', {access_token: accessToken})
         .then(() => {
-            return GET('settings').then(res => res.json().then(() => {
+            return GET('settings').then(res => res.json().then(json => {
                 assert.equal(res.status, 200);
+                assert.deepEqual(json, {
+                    "PLOTLY_URL": "https://plot.ly",
+                    "USERS": ["plotly-database-connector"]
+                });
             }));
         })
         .then(() => {
             setTimeout(() => {
                 GET('settings')
-                .then(res => res.json().then(() => {
+                .then(res => res.json().then(json => {
                     assert.equal(res.status, 200);
+                    assert.deepEqual(json, {
+                        "PLOTLY_URL": "https://plot.ly",
+                        "USERS": ["plotly-database-connector"]
+                    });
                     done();
                 })).catch(done);
             }, 3000);
@@ -377,6 +385,52 @@ describe('Authentication - ', () => {
         }).catch(done);
     });
 
+    it('on-premise - unauthorized user is not allowed access', function() {
+        saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
+
+        return GET('settings').then(res => {
+            assert.equal(res.status, 401);
+        });
+    });
+
+    it('on-premise - not allowed acccess if login failed', function(done) {
+        saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
+
+        POST('oauth2', {access_token: 'invalid access token'})
+        .then(res => {
+            assert.equal(res.status, 500);
+            return GET('settings').then(res => {
+                assert.equal(res.status, 401);
+                done();
+            });
+        }).catch(done);
+    });
+
+    it('on-premise - logged-in user is allowed access', function(done) {
+        saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
+
+        // Set Allowed users to empty:
+        saveSetting('USERS', []);
+        saveSetting('ALLOWED_USERS', []);
+
+        POST('oauth2', {access_token: accessToken})
+        .then(res => {
+            assert.equal(res.status, 201);
+
+            // request should be allowed:
+            return GET('settings').then(res => res.json().then(json => {
+                assert.equal(res.status, 200);
+                assert.deepEqual(json, {
+                    USERS: ['plotly-database-connector'],
+                    PLOTLY_URL: 'https://plot.ly'
+                });
+
+                // user should be added in ALLOWED_USERS:
+                assert.deepEqual(getSetting('ALLOWED_USERS'), [username]);
+                done();
+            }));
+        }).catch(done);
+    });
 });
 
 describe('Routes - ', () => {
