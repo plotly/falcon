@@ -329,7 +329,7 @@ describe('Authentication - ', () => {
         // TODO Are `res.json()` calls below even necessary? Checked response status is available without anyways...
         POST('oauth2', {access_token: accessToken})
         .then(() => {
-            return GET('settings').then(res => res.json().then(() => {
+            return GET('settings').then(res => res.json().then(json => {
                 assert.equal(res.status, 200);
                 assert.deepEqual(json, {
                     "PLOTLY_URL": "https://plot.ly",
@@ -340,7 +340,7 @@ describe('Authentication - ', () => {
         .then(() => {
             setTimeout(() => {
                 GET('settings')
-                .then(res => res.json().then(() => {
+                .then(res => res.json().then(json => {
                     assert.equal(res.status, 200);
                     assert.deepEqual(json, {
                         "PLOTLY_URL": "https://plot.ly",
