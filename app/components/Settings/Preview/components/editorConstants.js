@@ -31,7 +31,7 @@ export const selectDropdownStyle = {
 };
 
 export const submitStyle = {
-    background: '#fff', 
+    background: '#fff',
     padding: '10px',
     cursor: 'pointer',
     border: '1px solid #c8d4e3',
@@ -48,12 +48,12 @@ export const PLOT_TYPES = [
     {label: 'Area', value: 'area'},
     {label: 'Histogram', value: 'histogram'},
     {label: 'Box Plot', value: 'box'},
-    {label: 'Candlestick Plot', value: 'candlestick'},    
-    {label: 'OHLC Plot', value: 'ohlc'},        
+    {label: 'Candlestick Plot', value: 'candlestick'},
+    {label: 'OHLC Plot', value: 'ohlc'},
     {label: 'US [x=lat, y=lon]', value: 'scattergeo-usa'},
-    {label: 'World [x=lat, y=lon]', value: 'scattergeo-world'},    
+    {label: 'World [x=lat, y=lon]', value: 'scattergeo-world'},
     {label: 'US [x=state, y=value]', value: 'choropleth-usa'},
-    {label: 'World [x=country, y=value]', value: 'choropleth-world'}            
+    {label: 'World [x=country, y=value]', value: 'choropleth-world'}
 ];
 
 export const DEFAULT_DATA = [{x: [1, 2, 3, 4], y: [1, 4, 9, 16]}];
@@ -65,7 +65,7 @@ export const xAxisDropStyle = {
     color: '#2a3f5f',
     padding: '0.5rem',
     borderRadius: '6px',
-    border: '1px solid #dfe8f3'    
+    border: '1px solid #dfe8f3'
 };
 
 export const yAxisDropStyle = {
