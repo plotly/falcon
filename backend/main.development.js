@@ -42,8 +42,6 @@ app.on('ready', () => {
     httpsServer.electronWindow = mainWindow;
 
     const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;
-    // TODO ESLint no-unused-vars: though not used, would it be better to use HTTPS?
-    const HTTPS_URL = `${httpsServer.protocol}://${httpsServer.domain}:${httpsServer.port}`;
 
     mainWindow.loadURL(`${HTTP_URL}/`);
     // startup main window
