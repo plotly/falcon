@@ -4,9 +4,8 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import Settings from './Settings/Settings.react';
 import {isElectron} from '../utils/utils';
-import {Link} from 'react-router';
 import * as SessionsActions from '../actions/sessions';
-import Login from './Login.react'
+import Login from './Login.react';
 
 
 class Configuration extends Component {
@@ -63,19 +62,11 @@ class Configuration extends Component {
     }
 
     render() {
-        const menuOptions = {
-            isOpen: this.state.isMenuOpen,
-            close: this.close,
-            toggle: <button type="button" onClick={this.toggle}>MENU</button>,
-            align: 'right',
-            animate: false
-        };
-
         return (isElectron() || this.state.authDisabled || this.state.username) ? (
             <div className="fullApp">
                 <Settings username={this.state.username} logout={this.logOut}/>
             </div>
-        ): (
+        ) : (
             <div className="fullApp">
                 <Login/>
             </div>
