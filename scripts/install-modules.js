@@ -3,7 +3,7 @@ const path = require('path');
 const electronEnv = (process.argv[2] === '--electron');
 
 function execSync(command) {
-    console.log('>>', command);
+    console.log('>>', command); // eslint-disable-line no-console
     return require('child_process').execSync(command, {stdio: 'inherit'});
 }
 

@@ -48,7 +48,7 @@ class Status extends Component {
             }
         }))
         .catch(err => {
-            console.error(err);
+            console.error(err); // eslint-disable-line no-console
             this.setState({status: 'failure'});
         });
     }

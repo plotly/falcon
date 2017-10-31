@@ -67,7 +67,7 @@ const hadoopQLOptions = [
         'type': 'number',
         'description': 'Number of seconds for a request to timeout.'
     }
-]
+];
 
 export const CONNECTION_CONFIG = {
     [DIALECTS.APACHE_IMPALA]: hadoopQLOptions,
@@ -200,7 +200,7 @@ export const LOGOS = {
 export function defaultQueries(dialect, selectedTable) {
     if (dialect === DIALECTS.IBM_DB2) {
         return `SELECT * FROM ${selectedTable} FETCH FIRST 10 ROWS ONLY`;
-    } else if(dialect === DIALECTS.APACHE_SPARK || dialect === DIALECTS.APACHE_IMPALA) {
+    } else if (dialect === DIALECTS.APACHE_SPARK || dialect === DIALECTS.APACHE_IMPALA) {
         return `SELECT * FROM ${selectedTable} LIMIT 10`;
     } else if (dialect === DIALECTS.MSSQL) {
         return `SELECT TOP 10 * \nFROM ${selectedTable};`;

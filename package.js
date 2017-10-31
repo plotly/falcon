@@ -72,7 +72,7 @@ function startPack() {
         execSync('echo install_name_tool -change ' +
                  '`pwd`/node_modules/ibm_db/installer/clidriver/lib/libdb2.dylib ' +
                  '@loader_path/../../installer/clidriver/lib/libdb2.dylib ' +
-                 'node_modules/ibm_db/build/Release/odbc_bindings.node', {stdio:[0,1,2]});
+                 'node_modules/ibm_db/build/Release/odbc_bindings.node', {stdio: [0, 1, 2]});
         execSync('install_name_tool -change ' +
                  '`pwd`/node_modules/ibm_db/installer/clidriver/lib/libdb2.dylib ' +
                  '@loader_path/../../installer/clidriver/lib/libdb2.dylib ' +
