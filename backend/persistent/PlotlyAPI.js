@@ -38,7 +38,7 @@ export function newDatacache(payloadJSON, type) {
     }).then(res => {
         return res;
     }).catch(err => {
-        console.error(err); // eslint-disable-line no-console
+        Logger.log(err, 0);
         throw new Error(err);
     });
 }
