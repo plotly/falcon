@@ -43,3 +43,12 @@ export function plotlyUrl() {
 export function isElectron() {
     return window.process && window.process.type === 'renderer';
 }
+
+export function homeUrl() {
+    if (isOnPrem()) {
+        return '/external-data-connector';
+    }
+    else {
+        return '';
+    }
+}
