@@ -4,7 +4,8 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {
     baseUrl,
-    dynamicRequireElectron
+    dynamicRequireElectron,
+    homeUrl
 } from '../utils/utils';
 import {Link} from './Link.react';
 import {productName, version} from '../../package.json';
@@ -12,7 +13,7 @@ import {productName, version} from '../../package.json';
 
 const currentEndpoint = '/login';
 const baseUrlWrapped = baseUrl().replace(currentEndpoint, '');
-const connectorUrl = '/';
+const connectorUrl = homeUrl() + '/';
 
 const CLOUD = 'cloud';
 const ONPREM = 'onprem';
