@@ -301,7 +301,7 @@ export default class Servers {
                             !contains(username, getSetting('ALLOWED_USERS'))) {
 
                             // Add user to ALLOWED_USERS:
-                            let allowedUsers = getSetting('ALLOWED_USERS');
+                            const allowedUsers = getSetting('ALLOWED_USERS');
                             allowedUsers.push(username);
                             saveSetting('ALLOWED_USERS', allowedUsers);
                         }

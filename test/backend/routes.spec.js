@@ -332,8 +332,8 @@ describe('Authentication - ', () => {
             return GET('settings').then(res => res.json().then(json => {
                 assert.equal(res.status, 200);
                 assert.deepEqual(json, {
-                    "PLOTLY_URL": "https://plot.ly",
-                    "USERS": ["plotly-database-connector"]
+                    'PLOTLY_URL': 'https://plot.ly',
+                    'USERS': ['plotly-database-connector']
                 });
             }));
         })
@@ -343,8 +343,8 @@ describe('Authentication - ', () => {
                 .then(res => res.json().then(json => {
                     assert.equal(res.status, 200);
                     assert.deepEqual(json, {
-                        "PLOTLY_URL": "https://plot.ly",
-                        "USERS": ["plotly-database-connector"]
+                        'PLOTLY_URL': 'https://plot.ly',
+                        'USERS': ['plotly-database-connector']
                     });
                     done();
                 })).catch(done);
@@ -399,8 +399,8 @@ describe('Authentication - ', () => {
         POST('oauth2', {access_token: 'invalid access token'})
         .then(res => {
             assert.equal(res.status, 500);
-            return GET('settings').then(res => {
-                assert.equal(res.status, 401);
+            return GET('settings').then(resFromGET => {
+                assert.equal(resFromGET.status, 401);
                 done();
             });
         }).catch(done);
@@ -418,8 +418,8 @@ describe('Authentication - ', () => {
             assert.equal(res.status, 201);
 
             // request should be allowed:
-            return GET('settings').then(res => res.json().then(json => {
-                assert.equal(res.status, 200);
+            return GET('settings').then(resFromGET => resFromGET.json().then(json => {
+                assert.equal(resFromGET.status, 200);
                 assert.deepEqual(json, {
                     USERS: ['plotly-database-connector'],
                     PLOTLY_URL: 'https://plot.ly'
