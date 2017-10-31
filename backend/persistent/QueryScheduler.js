@@ -1,11 +1,10 @@
 import * as Connections from './datastores/Datastores';
-import {updateGrid} from './PlotlyAPI';
 import {getConnectionById} from './Connections';
 import {getQuery, getQueries, saveQuery, deleteQuery} from './Queries';
 import {getSetting} from '../settings';
 import Logger from '../logger';
-import {PlotlyAPIRequest} from './PlotlyAPI';
-import {has, merge} from 'ramda';
+import {PlotlyAPIRequest, updateGrid} from './PlotlyAPI';
+import {has} from 'ramda';
 
 class QueryScheduler {
     constructor() {
@@ -192,8 +191,8 @@ class QueryScheduler {
                 return PlotlyAPIRequest(
                     `grids/${fid}`,
                     {username, apiKey, accessToken, method: 'GET'}
-                ).then(res => {
-                    if (res.status === 404) {
+                ).then(resFromGET => {
+                    if (resFromGET.status === 404) {
                         Logger.log(('' +
                             `Grid ID ${fid} doesn't exist on Plotly anymore, ` +
                             'removing persistent query.'),
@@ -203,7 +202,7 @@ class QueryScheduler {
                         return deleteQuery(fid);
                     }
 
-                    return res.text()
+                    return resFromGET.text()
                     .then(text => {
                         let filemeta;
                         try {
@@ -229,7 +228,7 @@ class QueryScheduler {
 
             }
 
-            return res.json().then(json => {
+            return res.json().then(() => {
                 Logger.log(`Grid ${fid} has been updated.`, 2);
             });
         });

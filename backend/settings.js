@@ -1,5 +1,5 @@
 import fs from 'fs';
-import {concat, contains, has, keys} from 'ramda';
+import {concat, contains, has} from 'ramda';
 import YAML from 'yamljs';
 import {createStoragePath} from './utils/homeFiles';
 import path from 'path';

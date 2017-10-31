@@ -1,8 +1,7 @@
-import {app, BrowserWindow, shell} from 'electron';
-import {contains, join, isEmpty} from 'ramda';
+import {app, BrowserWindow} from 'electron';
+import {contains} from 'ramda';
 import Logger from './logger';
 import {setupMenus} from './menus';
-import {getSetting} from './settings';
 
 import Servers from './routes.js';
 
@@ -43,7 +42,6 @@ app.on('ready', () => {
     httpsServer.electronWindow = mainWindow;
 
     const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;
-    const HTTPS_URL = `${httpsServer.protocol}://${httpsServer.domain}:${httpsServer.port}`;
 
     mainWindow.loadURL(`${HTTP_URL}/`);
     // startup main window

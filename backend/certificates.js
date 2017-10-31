@@ -79,13 +79,13 @@ export function fetchCertsFromCA() {
         ));
     }).then((res) => {
         if (res.status !== 201) {
-            let errorMessage = `An error occured requesting certificates from the CA, ` +
+            let errorMessage = 'An error occured requesting certificates from the CA, ' +
                 `status ${res.status} was returned.`;
             res.json().then(json => {
                 errorMessage += `JSON response was: ${JSON.stringify(json)}`;
                 Logger.log(errorMessage, 0);
                 return errorMessage;
-            }).catch(e => {
+            }).catch(() => {
                 throw errorMessage;
             }).then(() => {
                 throw errorMessage;
@@ -103,7 +103,7 @@ export function fetchCertsFromCA() {
 }
 
 export function mockFetchCertsFromCA() {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
         resolve(fakeCerts);
     });
 }
@@ -125,7 +125,7 @@ export function fetchAndSaveCerts() {
     }
     return fetchCerts().then(response => {
         if (!response.key || !response.cert || !response.subdomain) {
-            throw 'CA did not return one or more of [key, cert, subdomain].';
+            throw new Error('CA did not return one or more of [key, cert, subdomain].');
         }
         Logger.log('Received a successful response from the CA.');
         return saveCertsLocally(response);
@@ -148,7 +148,7 @@ export function timeoutFetchAndSaveCerts(callback = () => {}) {
                 `Failed to restart the https server. Please restart manually. ${e}.
             `);
         }
-    }).catch((e) => {
+    }).catch(() => {
         // Retry calling CA if less than max count of tries.
         const {ONGOING_COUNT, MAX_TRIES_COUNT, TIMEOUT_BETWEEN_TRIES} = LOCAL_SETTINGS;
         if (ONGOING_COUNT < MAX_TRIES_COUNT) {

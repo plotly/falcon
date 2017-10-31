@@ -41,11 +41,11 @@ export function connect(connection) {
     return getClient(connection);
 }
 
-export function query(query, connection) {
+export function query(queryStmt, connection) {
     return getClient(connection)
         .then(function(client) {
             return new Promise(function(resolve, reject) {
-                client.query(query, function(err, rows) {
+                client.query(queryStmt, function(err, rows) {
                     if (err) reject(err);
                     else resolve(parseSQL(rows));
                 });
@@ -71,7 +71,7 @@ export function tables(connection) {
 
 export function schemas(connection) {
     return query(
-        `SELECT TABNAME, COLNAME, TYPENAME FROM syscat.columns WHERE SUBSTR(TABSCHEMA,1,3) != 'SYS'`,
+        "SELECT TABNAME, COLNAME, TYPENAME FROM syscat.columns WHERE SUBSTR(TABSCHEMA,1,3) != 'SYS'",
         connection
     );
 }

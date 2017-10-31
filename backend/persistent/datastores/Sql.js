@@ -1,13 +1,10 @@
 import Sequelize from 'sequelize';
 import {parseSQL} from '../../parse';
 import {
-    contains,
     dissoc,
-    flatten,
     gt,
     has,
     merge,
-    mergeAll,
     omit,
     sort,
     trim,
@@ -158,6 +155,9 @@ export function tables(connection) {
 export function schemas(connection) {
     const {database, dialect} = connection;
 
+    // Suppressing ESLint cause single quote strings beside template strings
+    // would be inconvenient when changed queries
+    /* eslint-disable quotes */
     let queryString;
     switch (dialect) {
         case DIALECTS.MYSQL:
@@ -171,7 +171,7 @@ export function schemas(connection) {
                 `WHERE table_catalog = '${database}' AND table_schema = 'public' ORDER BY table_name`;
             break;
         case DIALECTS.REDSHIFT:
-            queryString = `SELECT tablename, "column", "type" FROM pg_table_def WHERE schemaname = 'public';`
+            queryString = `SELECT tablename, "column", "type" FROM pg_table_def WHERE schemaname = 'public';`;
             break;
         case DIALECTS.MSSQL:
             queryString =
@@ -181,11 +181,12 @@ export function schemas(connection) {
                 `FROM sys.objects AS T ` +
                 `   JOIN sys.columns AS C ON T.object_id = C.object_id ` +
                 `   JOIN sys.types AS P ON C.system_type_id = P.system_type_id ` +
-                `WHERE T.type_desc = 'USER_TABLE';`
+                `WHERE T.type_desc = 'USER_TABLE';`;
             break;
         default:
             throw new Error(`Dialect ${dialect} is not one of the SQL DIALECTS`);
     }
+    /* eslint-enable quotes */
 
     return query(queryString, connection);
 }

@@ -1,10 +1,9 @@
 // Save and load connection objects that contain the DB credentials, host, and more
 
 import fs from 'fs';
-import {assoc, assocPath, dissoc, findIndex, merge} from 'ramda';
+import {assoc, dissoc, findIndex} from 'ramda';
 import uuid from 'uuid';
 import YAML from 'yamljs';
-import Logger from '../logger';
 import * as Datastores from './datastores/Datastores.js';
 
 import {getSetting} from '../settings';

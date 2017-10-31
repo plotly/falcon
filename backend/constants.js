@@ -1,5 +1,3 @@
-import {assoc} from 'ramda';
-
 import {getSetting} from './settings';
 
 export function getCookieOptions() {
