@@ -264,23 +264,16 @@ export default class Servers {
                         res.json(500, {error: {message: `User was not found at ${getSetting('PLOTLY_API_URL')}`}});
                         return;
                     }
-                    const existingUsers = getSetting('USERS');
-                    const existingUsernames = pluck('username', existingUsers);
-                    let status;
-                    if (contains(username, existingUsernames)) {
-                        existingUsers[
-                            existingUsernames.indexOf(username)
-                        ].accessToken = access_token;
-                        status = 200;
-                    } else {
-                        existingUsers.push({username, accessToken: access_token});
-                        status = 201;
-                    }
 
-                    if (contains(username, getSetting('ALLOWED_USERS'))
-                        || that.isElectron
-                        || !getSetting('AUTH_ENABLED'))
-                    {
+                    /*
+                     * Allow users access to app if any one of the following conditions apply:
+                     * 1. username is present in `ALLOWED_USERS` setting.
+                     * 2. The app is running locally (as electron-app).
+                     * 3. Authentication is disabled.
+                     * 4. The app is running on-premise.
+                     */
+                    if (contains(username, getSetting('ALLOWED_USERS')) || that.isElectron ||
+                        !getSetting('AUTH_ENABLED') || getSetting('IS_RUNNING_INSIDE_ON_PREM')) {
                         res.setCookie('plotly-auth-token', access_token, getCookieOptions());
 
                         const db_connector_access_token = generateAndSaveAccessToken();
@@ -289,8 +282,29 @@ export default class Servers {
                                       getAccessTokenCookieOptions());
                         res.setCookie('db-connector-user', username, getCookieOptions());
 
+                        const existingUsers = getSetting('USERS');
+                        const existingUsernames = pluck('username', existingUsers);
+                        let status;
+
+                        if (contains(username, existingUsernames)) {
+                            existingUsers[
+                                existingUsernames.indexOf(username)
+                            ].accessToken = access_token;
+                            status = 200;
+                        } else {
+                            existingUsers.push({username, accessToken: access_token});
+                            status = 201;
+                        }
                         saveSetting('USERS', existingUsers);
 
+                        if (getSetting('IS_RUNNING_INSIDE_ON_PREM') &&
+                            !contains(username, getSetting('ALLOWED_USERS'))) {
+
+                            // Add user to ALLOWED_USERS:
+                            let allowedUsers = getSetting('ALLOWED_USERS');
+                            allowedUsers.push(username);
+                            saveSetting('ALLOWED_USERS', allowedUsers);
+                        }
                         if (that.isElectron) {
 
                             /*
