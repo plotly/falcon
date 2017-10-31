@@ -1,6 +1,6 @@
 import {app, BrowserWindow} from 'electron';
 import {contains} from 'ramda';
-import * as Logger from './logger';
+import Logger from './logger';
 import {setupMenus} from './menus';
 
 import Servers from './routes.js';

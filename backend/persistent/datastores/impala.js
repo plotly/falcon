@@ -1,7 +1,7 @@
 import * as impala from 'node-impala';
 import {keys, values, init, map, prepend, unnest} from 'ramda';
 
-import * as Logger from '../../logger';
+import Logger from '../../logger';
 
 
 export function createClient(connection) {

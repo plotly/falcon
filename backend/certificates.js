@@ -1,7 +1,7 @@
 import {getSetting, saveSetting} from './settings.js';
 import * as fs from 'fs';
 import fetch from 'node-fetch';
-import * as Logger from './logger';
+import Logger from './logger';
 
 import {fakeCerts} from '../test/backend/utils';
 

@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 
 import {dissoc} from 'ramda';
 
-import * as Logger from '../../logger';
+import Logger from '../../logger';
 
 export function connect(connection) {
     Logger.log('' +

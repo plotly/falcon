@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import {getSetting} from '../settings.js';
-import * as Logger from '../logger';
+import Logger from '../logger';
 import FormData from 'form-data';
 
 export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessToken, method}) {

@@ -2,7 +2,7 @@ import * as Connections from './datastores/Datastores';
 import {getConnectionById} from './Connections';
 import {getQuery, getQueries, saveQuery, deleteQuery} from './Queries';
 import {getSetting} from '../settings';
-import * as Logger from '../logger';
+import Logger from '../logger';
 import {PlotlyAPIRequest, updateGrid} from './PlotlyAPI';
 import {has} from 'ramda';
 

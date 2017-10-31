@@ -2,7 +2,7 @@ const ibmdb = require('ibm_db');
 
 import {dissoc} from 'ramda';
 
-import * as Logger from '../../logger';
+import Logger from '../../logger';
 import {parseSQL} from '../../parse';
 
 

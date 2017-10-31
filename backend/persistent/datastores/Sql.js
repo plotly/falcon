@@ -12,7 +12,7 @@ import {
     values
 } from 'ramda';
 import {DIALECTS} from '../../../app/constants/constants';
-import * as Logger from '../../logger';
+import Logger from '../../logger';
 import fs from 'fs';
 
 // http://stackoverflow.com/questions/32037385/using-sequelize-with-redshift
