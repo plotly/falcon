@@ -104,8 +104,8 @@ $ yarn run test-e2e
 ## Builds and Releases
 
 - Update package.json with the new semver version
-- Linux builds are created at the end of CircleCI tests (under Artifacts)
-- Windows 32bit and 64bit builds are created in AppVeyor tests (under Artifacts)
-- Mac builds are created on any available Mac laptop - run `yarn run package` and zip the resulting build
+- Linux builds are created in [CircleCI tests](https://circleci.com/gh/plotly/falcon-sql-client/tree/master) under the latest master build -> Artifacts -> release.zip
+- Windows 64bit builds are created in [AppVeyor tests](https://ci.appveyor.com/project/AppVeyorDashAdmin/falcon-sql-client)  under Latest Build -> Artifacts -> release.zip
+- Mac builds are created in TravisCI tests and automatically hosted on [amazon](https://s3.console.aws.amazon.com/s3/buckets/falcon-travis-artifacts/plotly/falcon-sql-client/?region=us-east-1&tab=overview). Select the latest build (largest number *note:* the folders are not necessarily sequential) -> release.zip
 
-Releases are uploaded to https://github.com/plotly/falcon-sql-client/releases
+Builds are uploaded to https://github.com/plotly/falcon-sql-client/releases.
