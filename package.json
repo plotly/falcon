@@ -16,7 +16,7 @@
     "rebuild:modules:electron": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/install-modules.js --electron",
     "rebuild:modules:node": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/install-modules.js",
     "lint": "eslint app test backend scripts *.js",
-    "test": "yarn run test-unit-all && yarn run test-e2e",
+    "test": "yarn run lint && yarn run test-unit-all && yarn run test-e2e",
     "test-e2e": "cross-env NODE_ENV=test mocha --compilers js:babel-register --require babel-polyfill ./test/integration_test.js",
     "test-e2e-local": "source test/set_creds.sh && yarn run test-e2e",
     "test-unit": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --timeout 20000 --compilers js:babel-register ",
