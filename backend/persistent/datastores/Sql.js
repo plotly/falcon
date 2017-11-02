@@ -171,7 +171,13 @@ export function schemas(connection) {
                 `WHERE table_catalog = '${database}' AND table_schema = 'public' ORDER BY table_name`;
             break;
         case DIALECTS.REDSHIFT:
-            queryString = `SELECT tablename, "column", "type" FROM pg_table_def WHERE schemaname = 'public';`;
+            queryString = `
+                SELECT table_name, column_name, data_type
+                FROM information_schema.columns
+                WHERE table_catalog = '${database}'
+                    AND table_schema != 'pg_catalog'
+                    AND table_schema != 'information_schema'
+            `;
             break;
         case DIALECTS.MSSQL:
             queryString =

@@ -45,10 +45,7 @@ export function isElectron() {
 }
 
 export function homeUrl() {
-    if (isOnPrem()) {
-        return '/external-data-connector';
-    }
-    else {
-        return '';
-    }
+    return (isOnPrem()) ?
+        '/external-data-connector' :
+        '';
 }
