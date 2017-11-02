@@ -61,8 +61,6 @@ class Settings extends Component {
         }, 5 * 1000);
 
         this.intervals.checkHTTPSEndpointInterval = setInterval(() => {
-            // eslint-disable-next-line no-console
-            console.warn(`Attempting a connection at ${this.state.urls.https}`);
             if (this.state.urls.https) {
                 fetch(this.state.urls.https).then(() => {
                     this.setState({httpsServerIsOK: true});
