@@ -96,8 +96,17 @@ export default class Servers {
         this.httpsServer.start = this.startHttpsServer.bind(this);
         this.httpsServer.restart = this.restartHttpsServer.bind(this);
 
-        this.httpServer.close = this.close.bind(this);
-        this.httpsServer.close = this.closeHttpsServer.bind(this);
+        this.httpServer.close = function() {
+            Logger.log('Closing the http server.');
+            const server = this.httpServer.server;
+            server.close.apply(server, arguments);
+        }.bind(this);
+
+        this.httpsServer.close = function() {
+            Logger.log('Closing the https server.');
+            const server = this.httpsServer.server;
+            server.close.apply(server, arguments);
+        }.bind(this);
     }
 
     startHttpsServer() {
@@ -664,18 +673,5 @@ export default class Servers {
                 error: {message: err.message}
             });
         });
-    }
-
-    closeHttpsServer() {
-        const that = this;
-        that.close('https');
-    }
-
-    close(type = 'http') {
-        Logger.log(`Closing the ${type} server.`);
-        const that = this;
-        const restifyServer = type === 'https' ? that.httpsServer : that.httpServer;
-        const {server} = restifyServer;
-        server.close();
     }
 }
