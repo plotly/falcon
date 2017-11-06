@@ -205,9 +205,9 @@ export default class Servers {
             directory: `${__dirname}/../app/`
         }));
 
-        server.get(/\/oauth2\/?$/, restify.serveStatic({
+        server.get(/\/oauth2\/callback\/?$/, restify.serveStatic({
             directory: `${__dirname}/../static`,
-            file: 'index.html'
+            file: 'oauth.html'
         }));
 
         /*
