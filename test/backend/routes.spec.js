@@ -26,7 +26,8 @@ import {
     testSqlConnections,
     username,
     validFid,
-    validUids
+    validUids,
+    wait
 } from './utils.js';
 
 
@@ -84,17 +85,6 @@ function DELETE(path) {
     });
 }
 
-function setCookies(done) {
-
-    // Sets cookies using `oauth` route, so that other requests can be authenticated:
-    return POST('oauth2', {access_token: accessToken})
-    .then(res => res.json().then(json => {
-        assert.deepEqual(json, {});
-        done();
-    }));
-
-}
-
 function cleanUpSettings(...settingKeys) {
     settingKeys.forEach(key => {
         const settingPath = getSetting(key);
@@ -110,71 +100,93 @@ let queryObject;
 let servers;
 let connectionId;
 
+function waitForHttpsServer() {
+    return new Promise(function(resolve) {
+        const resolveIfStarted = function() {
+            if (servers.httpsServer.server) resolve();
+            else setTimeout(resolveIfStarted, 1000);
+        };
+        setTimeout(resolveIfStarted);
+    });
+}
+
+function closeServers() {
+    return new Promise(function(resolve) {
+        if (!servers) {
+            resolve();
+            return;
+        }
+
+        servers.httpServer.close(function() {
+            if (servers.httpsServer.server) servers.httpsServer.close(resolve);
+            else resolve();
+        });
+    });
+}
+
 // Suppressing ESLint cause Mocha ensures `this` is bound in test functions
 /* eslint-disable no-invalid-this */
-describe('Servers - ', () => {
+describe('Servers:', () => {
     beforeEach(() => {
         cleanUpSettings('KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH');
     });
 
-    afterEach(() => {
+    after(() => {
         cleanUpSettings('KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH');
     });
 
-    it('Https server is up and running after an http server was started and certs were created.', (done) => {
+    it('Https server is up and running after an http server was started and certs were created', () => {
         servers = new Servers({createCerts: false, startHttps: true, isElectron: true});
 
         servers.httpServer.start();
+
         saveSetting('USERS', [{username, accessToken}]);
         saveSetting('CONNECTOR_HTTPS_DOMAIN', `${fakeCerts.subdomain}.${testCA}`);
         saveSetting('AUTH_ENABLED', false);
-        assert.isNull(servers.httpsServer.certs, 'Has no certs in the beginning.');
-        assert.isNull(servers.httpsServer.server, 'Https server does not exists initially');
+
+        assert.isNull(servers.httpsServer.certs, 'httpsServer should have no certs initially');
+        assert.isNull(servers.httpsServer.server, 'httpsServer should not exist initially');
+
         fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
         fs.writeFileSync(getSetting('KEY_FILE'), fakeCerts.key);
 
-        setTimeout(() => {
-            assert.isFalse(isEmpty(servers.httpsServer.certs), 'Has certs.');
-            assert.equal(servers.httpsServer.protocol, 'https', 'Correct protocol.');
-            assert.equal(servers.httpsServer.domain, `${fakeCerts.subdomain}.${testCA}`, 'Correct domain');
-            assert.isNotNull(servers.httpsServer.server, 'Https server is non null');
+        return waitForHttpsServer().then(function() {
+            assert.isFalse(isEmpty(servers.httpsServer.certs), 'httpsServer should have certs.');
+            assert.equal(servers.httpsServer.protocol, 'https', 'httpsServer has wrong protocol');
+            assert.equal(servers.httpsServer.domain, `${fakeCerts.subdomain}.${testCA}`,
+                'httpsServer has wrong domain');
+
             // Can't fetch directly for now the https server because mocked certs
             // were generated from staging LE server - not real certs.
-
-            GET('settings/urls')
-            .then(res => res.json().then(json => {
+            return GET('settings/urls').then(res => res.json().then(json => {
                 assert.equal(json.http, 'http://localhost:9494');
                 assert.isNotNull(json.https, `${fakeCerts.subdomain}.${testCA}`);
-                servers.httpServer.close();
-                servers.httpsServer.close();
-                done();
-            }))
-            .catch(done);
-        }, 5000);
-    }).timeout(10000);
 
-    it('No certs are created after an http server was started in onprem.', (done) => {
+                return closeServers();
+            }));
+        });
+    });
+
+    it('No certs are created if the http server was started in onprem', () => {
         setCertificatesSettings('USE_MOCK_CERTS', true);
         saveSetting('USERS', [{username, accessToken}]);
         saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
 
-        setTimeout(() => {
-            servers = new Servers({createCerts: true, startHttps: true});
-            assert.isNull(servers.httpsServer.certs, 'Has no certs in the beginning.');
-            assert.isNull(servers.httpsServer.server, 'Https server does not exists initially');
-        }, 100);
+        servers = new Servers({createCerts: true, startHttps: true});
+        assert.isNull(servers.httpsServer.certs, 'httpsServer should have no certs if onprem');
+        assert.isNull(servers.httpsServer.server, 'httpsServer should not exist if onprem');
 
-        setTimeout(() => {
-            assert.isNull(servers.httpsServer.certs, 'Still has no certs.');
-            assert.isNull(servers.httpsServer.server, 'Https server does not exists either.');
-            servers.httpServer.close();
-            done();
-        }, 2000);
-    }).timeout(10000);
+        return wait(2000).then(function() {
+            assert.isNull(servers.httpsServer.certs, 'httpsServer should have no certs if onprem');
+            assert.isNull(servers.httpsServer.server, 'httpsServer should not exist if onprem');
+
+            return closeServers();
+        });
+    });
 
 });
 
-describe('Authentication - ', () => {
+describe('Authentication:', () => {
     beforeEach(() => {
         servers = new Servers({createCerts: false, startHttps: false, isElectron: false});
         servers.isElectron = false;
@@ -205,76 +217,59 @@ describe('Authentication - ', () => {
     });
 
     afterEach(() => {
-        servers.httpServer.close();
-        servers.queryScheduler.clearQueries();
+        return closeServers().then(() => {
+            servers.queryScheduler.clearQueries();
+        });
     });
 
-    it('ping - responds', function(done) {
-        GET('ping')
-        .then(() => done())
-        .catch(done);
+    it('backend responds to ping', function() {
+        return GET('ping');
     });
 
-    it('allows access to login page without logging in', function(done) {
-        GET('login')
-        .then(() => done())
-        .catch(done);
+    it('backend allows access to login page without logging in', function() {
+        return GET('login');
     });
 
-    it('allows access to connections page without logging in', function(done) {
-        GET('')
-        .then(res => {
+    it('backend allows access to connections page without logging in', function() {
+        return GET('').then(res => {
             assert.equal(res.status, 200);
-            done();
-        }).catch(done);
+        });
     });
 
-    it('does not allow access to settings when not logged in', function(done) {
-        GET('settings')
-        .then(res => res.json().then(json => {
+    it('backend does not allow access to settings when not logged in', function() {
+        return GET('settings').then(res => res.json().then(json => {
             assert.equal(res.status, 401);
             assert.deepEqual(json, {
-                'error': {'message': 'Please login to access this page.'}
+                error: {message: 'Please login to access this page.'}
             });
-            done();
-        })).catch(done);
+        }));
     });
 
-    it('Oauth fails when user not present in ALLOWED_USERS', function(done) {
-
-        // empty allowed_users list
+    it('oauth fails when user not present in ALLOWED_USERS', function() {
         saveSetting('ALLOWED_USERS', []);
 
-        POST('oauth2', {access_token: accessToken})
-        .then(res => res.json().then(json => {
+        return POST('oauth2', {access_token: accessToken}).then(res => res.json().then(json => {
             assert.equal(res.status, 403);
-            assert.deepEqual(json,
-              {error: {message: `User ${username} is not allowed to view this app`}}
-            );
-            done();
-        })).catch(done);
-    });
-
-    it('allows access to settings when logged in and present in ALLOWED_USERS', function(done) {
-        saveSetting('ALLOWED_USERS', [username]);
-
-        POST('oauth2', {access_token: accessToken})
-        .then(() => {
-            return GET('settings')
-            .then(res => {
-                assert.equal(res.status, 200);
-                done();
+            assert.deepEqual(json, {
+                error: {message: `User ${username} is not allowed to view this app`}
             });
-        }).catch(done);
-
+        }));
     });
 
-    it('does not make request to plotly if accessToken is valid', function(done) {
+    it('backend allows access to settings when logged in and present in ALLOWED_USERS', function() {
         saveSetting('ALLOWED_USERS', [username]);
 
-        POST('oauth2', {access_token: accessToken})
-        .then(() => {
+        return POST('oauth2', {access_token: accessToken}).then(() => {
+            return GET('settings').then(res => {
+                assert.equal(res.status, 200);
+            });
+        });
+    });
 
+    it('backend does not make request to plotly if accessToken is valid', function() {
+        saveSetting('ALLOWED_USERS', [username]);
+
+        return POST('oauth2', {access_token: accessToken}).then(() => {
             /*
              * This ensures that any requests to plotly fail so that we
              * can catch them. Since the requests to plotly are not made
@@ -283,52 +278,40 @@ describe('Authentication - ', () => {
              */
             saveSetting('PLOTLY_API_DOMAIN', 'bad-domain.plot.ly');
 
-            return GET('settings')
-            .then(res => {
+            return GET('settings').then(res => {
                 assert.equal(res.status, 200);
-                done();
             });
-        }).catch(done);
+        });
     });
 
-    it('makes request to plotly if accessToken expired', function(done) {
+    it('backend makes request to plotly if accessToken expired', function() {
         saveSetting('ALLOWED_USERS', [username]);
 
         // set access-token expiry of 1 sec:
         saveSetting('ACCESS_TOKEN_AGE', 1);
 
-        POST('oauth2', {access_token: accessToken})
-        .then(() => {
-
+        return POST('oauth2', {access_token: accessToken}).then(() => {
             // This ensures that any requests to plotly fail so that we can catch them
             saveSetting('PLOTLY_API_DOMAIN', 'bad-domain.plot.ly');
 
-            setTimeout(() => {
-                GET('settings')
-                .then(res => res.json().then(json => {
-                    assert.equal(res.status, 500);
-                    assert.equal(json.error.message,
-                                 ('request to ' +
-                                 'https://bad-domain.plot.ly/v2/users/current failed, ' +
-                                 'reason: getaddrinfo ENOTFOUND ' +
-                                 'bad-domain.plot.ly bad-domain.plot.ly:443'));
-
-                    done();
-                })).catch(done);
-            }, 2000);
-        }).catch(done);
+            return GET('settings').then(res => res.json().then(json => {
+                assert.equal(res.status, 500);
+                assert.equal(json.error.message,
+                             ('request to ' +
+                             'https://bad-domain.plot.ly/v2/users/current failed, ' +
+                             'reason: getaddrinfo ENOTFOUND ' +
+                             'bad-domain.plot.ly bad-domain.plot.ly:443'));
+            }));
+        });
     });
 
-    it('renews access-token if expired', function(done) {
+    it('backend renews access-token if expired', function() {
         saveSetting('ALLOWED_USERS', [username]);
-
 
         // set access-token expiry of 3 sec:
         saveSetting('ACCESS_TOKEN_AGE', 3);
 
-        // TODO Are `res.json()` calls below even necessary? Checked response status is available without anyways...
-        POST('oauth2', {access_token: accessToken})
-        .then(() => {
+        function assertAccessToken() {
             return GET('settings').then(res => res.json().then(json => {
                 assert.equal(res.status, 200);
                 assert.deepEqual(json, {
@@ -336,105 +319,94 @@ describe('Authentication - ', () => {
                     'USERS': ['plotly-database-connector']
                 });
             }));
+        }
+
+        return POST('oauth2', {access_token: accessToken}).then(() => {
+            return assertAccessToken();
         })
         .then(() => {
-            setTimeout(() => {
-                GET('settings')
-                .then(res => res.json().then(json => {
-                    assert.equal(res.status, 200);
-                    assert.deepEqual(json, {
-                        'PLOTLY_URL': 'https://plot.ly',
-                        'USERS': ['plotly-database-connector']
-                    });
-                    done();
-                })).catch(done);
-            }, 3000);
-        }).catch(done);
+            return wait(3000);
+        })
+        .then(() => {
+            return assertAccessToken();
+        });
     });
 
-    it('prevents user from accessing urls when revoked from ALLOWED_USERS', function(done) {
+    it('backend prevents user from accessing urls when revoked from ALLOWED_USERS', function() {
         saveSetting('ALLOWED_USERS', [username]);
-
 
         // set access-token expiry of 1 sec:
         saveSetting('ACCESS_TOKEN_AGE', 1);
 
-        POST('oauth2', {access_token: accessToken})
-        .then(() => {
-            // request should be allowed:
+        return POST('oauth2', {access_token: accessToken}).then(() => {
             return GET('settings').then(res => {
                 assert.equal(res.status, 200);
             });
         })
         .then(() => {
-
             saveSetting('ALLOWED_USERS', []);
-
-            setTimeout(() => {
-                GET('settings')
-                .then(res => res.json().then(json => {
-                    assert.equal(res.status, 403);
-                    assert.deepEqual(json, {
-                        'error': {
-                            'message': `User ${username} is not allowed to view this app`
-                        }
-                    });
-                    done();
-                })).catch(done);
-            }, 3000);
-        }).catch(done);
-    });
-
-    it('on-premise - unauthorized user is not allowed access', function() {
-        saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
-
-        return GET('settings').then(res => {
-            assert.equal(res.status, 401);
+            return wait(3000);
+        })
+        .then(() => {
+            return GET('settings').then(res => res.json().then(json => {
+                assert.equal(res.status, 403);
+                assert.deepEqual(json, {
+                    'error': {
+                        'message': `User ${username} is not allowed to view this app`
+                    }
+                });
+            }));
         });
     });
 
-    it('on-premise - not allowed acccess if login failed', function(done) {
-        saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
+    describe('onprem:', function() {
+        it('unauthorized user is not allowed access', function() {
+            saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
 
-        POST('oauth2', {access_token: 'invalid access token'})
-        .then(res => {
-            assert.equal(res.status, 500);
-            return GET('settings').then(resFromGET => {
-                assert.equal(resFromGET.status, 401);
-                done();
+            return GET('settings').then(res => {
+                assert.equal(res.status, 401);
             });
-        }).catch(done);
-    });
+        });
 
-    it('on-premise - logged-in user is allowed access', function(done) {
-        saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
+        it('user after faled login is not allowed acccess', function() {
+            saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
 
-        // Set Allowed users to empty:
-        saveSetting('USERS', []);
-        saveSetting('ALLOWED_USERS', []);
-
-        POST('oauth2', {access_token: accessToken})
-        .then(res => {
-            assert.equal(res.status, 201);
-
-            // request should be allowed:
-            return GET('settings').then(resFromGET => resFromGET.json().then(json => {
-                assert.equal(resFromGET.status, 200);
-                assert.deepEqual(json, {
-                    USERS: ['plotly-database-connector'],
-                    PLOTLY_URL: 'https://plot.ly'
+            return POST('oauth2', {access_token: 'invalid access token'}).then(res => {
+                assert.equal(res.status, 500);
+            }).then(() => {
+                return GET('settings').then(res => {
+                    assert.equal(res.status, 401);
                 });
+            });
+        });
 
-                // user should be added in ALLOWED_USERS:
-                assert.deepEqual(getSetting('ALLOWED_USERS'), [username]);
-                done();
-            }));
-        }).catch(done);
+        it('logged-in user is allowed access', function() {
+            saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
+
+            // Set Allowed users to empty:
+            saveSetting('USERS', []);
+            saveSetting('ALLOWED_USERS', []);
+
+            return POST('oauth2', {access_token: accessToken}).then(res => {
+                assert.equal(res.status, 201);
+            }).then(() => {
+                return GET('settings').then(res => res.json().then(json => {
+                    assert.equal(res.status, 200);
+                    assert.deepEqual(json, {
+                        USERS: ['plotly-database-connector'],
+                        PLOTLY_URL: 'https://plot.ly'
+                    });
+
+                    // user should be added in ALLOWED_USERS:
+                    assert.deepEqual(getSetting('ALLOWED_USERS'), [username]);
+                }));
+            });
+        });
     });
 });
 
-describe('Routes - ', () => {
-    beforeEach((done) => {
+describe('Routes:', () => {
+    beforeEach(() => {
         servers = new Servers({createCerts: false, startHttps: false, isElectron: false});
         servers.isElectron = false;
         servers.httpServer.start();
@@ -460,199 +432,169 @@ describe('Routes - ', () => {
         // Login the user:
         saveSetting('ALLOWED_USERS', [username]);
         saveSetting('SSL_ENABLED', false);
-        setCookies(done);
+
+        // Sets cookies using `oauth` route, so that following requests will be authenticated
+        return POST('oauth2', {access_token: accessToken}).then(res => res.json().then(json => {
+            assert.deepEqual(json, {});
+        }));
     });
 
     afterEach(() => {
-        servers.httpServer.close();
-        servers.queryScheduler.clearQueries();
+        return closeServers().then(() => {
+            servers.queryScheduler.clearQueries();
+        });
     });
 
-    it('ping - responds', function(done) {
-        GET('ping')
-        .then(() => done())
-        .catch(done);
-    });
-
-    it('index page - returns 200', function(done) {
-        GET('')
-        .then(res => {
-            assert.equal(res.status, 200);
-            done();
-        })
-        .catch(done);
-    });
-
-    // OAuth
-    it('oauth - returns 200 on loading the oauth page', function(done) {
-        GET('oauth2')
-        .then(res => {
-            assert.equal(res.status, 200);
-            done();
-        })
-        .catch(done);
-    });
-
-    it('oauth - saves oauth access token with a username if valid', function(done) {
-        this.timeout(10 * 1000);
-        saveSetting('USERS', []);
-
-        assert.deepEqual(
-            getSetting('USERS'),
-            []
-        );
-
-        POST('oauth2', {
-            access_token: accessToken
-        })
-        .then(res => res.json().then(json => {
-            assert.deepEqual(json, {});
-            assert.equal(res.status, 201);
-            assert.deepEqual(
-                getSetting('USERS'),
-                [{username, accessToken}]
-            );
-
-            // We can save it again and we'll still get a 200 instead of a 201
-            POST('oauth2', {access_token: accessToken})
-            .then(oauth2Res => oauth2Res.json().then(oauth2Json => {
-                assert.deepEqual(oauth2Json, {});
-                assert.equal(oauth2Res.status, 200);
-                done();
-            })).catch(done);
-        }))
-        .catch(done);
-    });
-
-    xit('oauth - saving an access token that is not associated with a user account will fail with a 500 level error',
-        function(done) {
-            saveSetting('USERS', []);
-            const access_token = 'lah lah lemons';
-            POST('oauth2', {access_token})
-                .then(res => res.json().then(json => {
-                    assert.deepEqual(json, {
-                        error: {
-                            message: 'User was not found at https://api.plot.ly'
-                        }
-                    });
-                    assert.equal(res.status, 500);
-                    assert.deepEqual(
-                        getSetting('USERS'),
-                        []
-                    );
-                    done();
-                })).catch(done);
+    describe('backend:', function() {
+        it('responds to ping', function() {
+            return GET('ping');
         });
 
-    // Settings
-    it('settings/urls - returns 200 and the urls', function(done) {
-        GET('settings/urls')
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 200);
-            assert.deepEqual(json, {
-                http: 'http://localhost:9494',
-                https: ''
+        it('allows access to connections page', function() {
+            return GET('').then(res => {
+                assert.equal(res.status, 200);
             });
-            done();
-        }))
-        .catch(done);
+        });
+
+        it('reports uncaught exceptions', function() {
+            return POST('_throw').then(res => res.json().then(json => {
+                assert.equal(res.status, 500);
+                assert.deepEqual(json, {error: {message: 'Yikes - uncaught error'}});
+            }));
+        });
+
     });
 
-    it('GET /settings returns some of the settings', function(done) {
-        GET('settings')
-        .then(res => res.json().then(json => {
-            assert.deepEqual(json, {
-                'PLOTLY_URL': 'https://plot.ly',
-                'USERS': ['plotly-database-connector']
+    describe('oauth:', function() {
+        it('returns 200 on loading the oauth page', function() {
+            return GET('oauth2').then(res => {
+                assert.equal(res.status, 200);
             });
-            done();
-        })).catch(done);
+        });
+
+        it('saves oauth access token with a username if valid', function() {
+            saveSetting('USERS', []);
+
+            assert.deepEqual(getSetting('USERS'), []);
+
+            return POST('oauth2', {access_token: accessToken}).then(res => res.json().then(json => {
+                assert.deepEqual(json, {});
+                assert.equal(res.status, 201);
+                assert.deepEqual(getSetting('USERS'), [{username, accessToken}]);
+            })).then(() => {
+                // We can save it again and we'll get a 200 instead of a 201
+                return POST('oauth2', {access_token: accessToken}).then(res => res.json().then(json => {
+                    assert.deepEqual(json, {});
+                    assert.equal(res.status, 200);
+                }));
+            });
+        });
+
+        it('saving an access token that is not associated with a user account will return status 500', function() {
+            saveSetting('USERS', []);
+            const access_token = 'lah lah lemons';
+
+            return POST('oauth2', {access_token}).then(res => res.json().then(json => {
+                assert.deepEqual(json, {
+                    error: {
+                        message: 'User was not found at https://api.plot.ly'
+                    }
+                });
+                assert.equal(res.status, 500);
+                assert.deepEqual(getSetting('USERS'), []);
+            }));
+        });
     });
 
-    it('PATCH /settings sets some settings', function(done) {
-        const newSettings = {
-            'PLOTLY_API_DOMAIN': 'acme.plot.ly',
-            'PLOTLY_API_SSL_ENABLED': false
-        };
-        PATCH('settings', newSettings).then(res => res.json().then(() => {
-            assert.equal(
-                getSetting('PLOTLY_API_SSL_ENABLED'),
-                newSettings.PLOTLY_API_SSL_ENABLED
-            );
-            assert.equal(
-                getSetting('PLOTLY_API_DOMAIN'),
-                newSettings.PLOTLY_API_DOMAIN
-            );
-            done();
-        })).catch(done);
+    describe('settings:', function() {
+        it('GET settings/urls returns 200 and the urls', function() {
+            return GET('settings/urls').then(res => res.json().then(json => {
+                assert.equal(res.status, 200);
+                assert.deepEqual(json, {
+                    http: 'http://localhost:9494',
+                    https: ''
+                });
+            }));
+        });
+
+        it('GET /settings returns some of the settings', function() {
+            return GET('settings').then(res => res.json().then(json => {
+                assert.deepEqual(json, {
+                    'PLOTLY_URL': 'https://plot.ly',
+                    'USERS': ['plotly-database-connector']
+                });
+            }));
+        });
+
+        it('PATCH /settings sets some settings', function() {
+            const newSettings = {
+                'PLOTLY_API_DOMAIN': 'acme.plot.ly',
+                'PLOTLY_API_SSL_ENABLED': false
+            };
+            return PATCH('settings', newSettings).then(res => res.json().then(() => {
+                assert.equal(
+                    getSetting('PLOTLY_API_SSL_ENABLED'),
+                    newSettings.PLOTLY_API_SSL_ENABLED
+                );
+                assert.equal(
+                    getSetting('PLOTLY_API_DOMAIN'),
+                    newSettings.PLOTLY_API_DOMAIN
+                );
+            }));
+        });
     });
 
-    // One Time SQL Queries
-    testSqlConnections.forEach(function createTest(connection) {
-
-        // TODO - Open up redshift to CI
-        if (connection.dialect === 'redshift') {
-            return;
-        }
-
-        it(`${connection.dialect} - query - runs a SQL query`, function(done) {
-            this.timeout(5000);
+    function createSqlQueryTest(connection) {
+        it('runs a SQL query', function() {
             connectionId = saveConnection(connection);
+
             let sampleQuery = 'SELECT * FROM ebola_2014 LIMIT 1';
             if (connection.dialect === 'mssql') {
                 sampleQuery = (
                     'SELECT TOP 1 * FROM ' +
                     `${connection.database}.dbo.ebola_2014`
                 );
-            }
-            if (connection.dialect === 'apache impala') {
+            } else if (connection.dialect === 'apache impala') {
                 sampleQuery = 'SELECT * FROM PLOTLY.ALCOHOL_CONSUMPTION_BY_COUNTRY_2010 LIMIT 1';
             }
-            POST(`connections/${connectionId}/query`, {
-                query: sampleQuery
-            })
-            .then(res => res.json())
-            .then(response => {
-                let expectedColumnNames;
-                if (contains(connection.dialect, ['mariadb', 'mysql', 'mssql'])) {
-                    expectedColumnNames = ['Country', 'Month', 'Year', 'Lat', 'Lon', 'Value'];
-                } else if (connection.dialect === 'sqlite') {
-                    expectedColumnNames = ['index', 'Country', 'Month', 'Year', 'Lat', 'Lon', 'Value'];
-                } else if (connection.dialect === 'apache impala') {
-                    expectedColumnNames = ['loc', 'alcohol'];
-                } else {
-                    expectedColumnNames = ['country', 'month', 'year', 'lat', 'lon', 'value'];
-                }
 
-                assert.deepEqual(
-                    response,
-                    {
-                        rows: [
-                            ({
-                                'postgres': ['Guinea', 3, 14, '9.95', '-9.7', '122'],
-                                'redshift': ['Guinea', 3, 14, '10', '-10', 122],
-                                'mysql': ['Guinea', 3, 14, 10, -10, '122'],
-                                'mariadb': ['Guinea', 3, 14, 10, -10, '122'],
-                                'mssql': ['Guinea', 3, 14, 10, -10, '122'],
-                                'sqlite': [0, 'Guinea', 3, 14, 9.95, -9.7, 122],
-                                'apache impala': ['Belarus', '17.5']
-                            })[connection.dialect]
-                        ],
-                        columnnames: expectedColumnNames
+            return POST(`connections/${connectionId}/query`, {query: sampleQuery})
+                .then(res => res.json())
+                .then(json => {
+                    let expectedColumnNames;
+                    if (contains(connection.dialect, ['mariadb', 'mysql', 'mssql'])) {
+                        expectedColumnNames = ['Country', 'Month', 'Year', 'Lat', 'Lon', 'Value'];
+                    } else if (connection.dialect === 'sqlite') {
+                        expectedColumnNames = ['index', 'Country', 'Month', 'Year', 'Lat', 'Lon', 'Value'];
+                    } else if (connection.dialect === 'apache impala') {
+                        expectedColumnNames = ['loc', 'alcohol'];
+                    } else {
+                        expectedColumnNames = ['country', 'month', 'year', 'lat', 'lon', 'value'];
                     }
-                );
 
-                done();
-            }).catch(done);
+                    assert.deepEqual(
+                        json,
+                        {
+                            rows: [
+                                ({
+                                    'postgres': ['Guinea', 3, 14, '9.95', '-9.7', '122'],
+                                    'redshift': ['Guinea', 3, 14, '10', '-10', 122],
+                                    'mysql': ['Guinea', 3, 14, 10, -10, '122'],
+                                    'mariadb': ['Guinea', 3, 14, 10, -10, '122'],
+                                    'mssql': ['Guinea', 3, 14, 10, -10, '122'],
+                                    'sqlite': [0, 'Guinea', 3, 14, 9.95, -9.7, 122],
+                                    'apache impala': ['Belarus', '17.5']
+                                })[connection.dialect]
+                            ],
+                            columnnames: expectedColumnNames
+                        }
+                    );
+                });
         });
 
-        it(`${connection.dialect} - query - fails when the SQL query contains a syntax error`, function(done) {
-            this.timeout(5 * 1000);
+        it('fails when the SQL query contains a syntax error', function() {
             connectionId = saveConnection(connection);
-            POST(`connections/${connectionId}/query`, {
-                query: 'SELECZ'
-            })
-            .then(res => res.json().then(json => {
+            return POST(`connections/${connectionId}/query`, {query: 'SELECZ'}).then(res => res.json().then(json => {
                 assert.equal(res.status, 400);
                 assert.deepEqual(
                     json,
@@ -675,27 +617,25 @@ describe('Routes - ', () => {
                         })[connection.dialect]
                     }}
                 );
-                done();
-            }))
-            .catch(done);
+            }));
         });
 
-        it(`${connection.dialect} - query - succeeds when SQL query returns no data`, function(done) {
+        it('succeeds when SQL query returns no data', function() {
             this.timeout(60 * 1000);
+
             connectionId = saveConnection(connection);
+
             let query = 'SELECT * FROM ebola_2014 LIMIT 0';
             if (connection.dialect === 'mssql') {
                 query = (
                     'SELECT TOP 0 * FROM ' +
                     `${connection.database}.dbo.ebola_2014`
                 );
-            }
-            if (connection.dialect === 'apache impala') {
+            } else if (connection.dialect === 'apache impala') {
                 query = 'SELECT * FROM PLOTLY.ALCOHOL_CONSUMPTION_BY_COUNTRY_2010 LIMIT 0';
             }
 
-            POST(`connections/${connectionId}/query`, {query})
-            .then(res => res.json().then(json => {
+            return POST(`connections/${connectionId}/query`, {query}).then(res => res.json().then(json => {
                 assert.equal(res.status, 200);
                 assert.deepEqual(
                     json,
@@ -704,18 +644,15 @@ describe('Routes - ', () => {
                         rows: [[]]
                     }
                 );
-                done();
-            }))
-            .catch(done);
+            }));
         });
+    }
 
-        // Meta info about the tables
-        it(`${connection.dialect} - tables - returns a list of tables`, function(done) {
-            this.timeout(5000);
+    function createSqlTablesTest(connection) {
+        it('returns a list of tables', function() {
             connectionId = saveConnection(connection);
-            POST(`connections/${connectionId}/sql-tables`)
-            .then(res => res.json())
-            .then(json => {
+
+            return POST(`connections/${connectionId}/sql-tables`).then(res => res.json()).then(json => {
                 let tables = [
                     'alcohol_consumption_by_country_2010',
                     'apple_stock_2014',
@@ -738,21 +675,16 @@ describe('Routes - ', () => {
                         'raster_overviews',
                         'spatial_ref_sys'
                     ]).sort();
-                }
-                if (connection.dialect === 'apache impala') {
+                } else if (connection.dialect === 'apache impala') {
                     tables = ['PLOTLY.ALCOHOL_CONSUMPTION_BY_COUNTRY_2010'];
                 }
-                assert.deepEqual(
-                    json, tables
-                );
-                done();
-            }).catch(done);
+                assert.deepEqual(json, tables);
+            });
         });
+    }
 
-        // Meta info about the schemas of all the tables
-        it(`${connection.dialect} - schemas - returns a list of table schemas`, function() {
-            this.timeout(5000);
-
+    function createSqlSchemasTest(connection) {
+        it('returns a list of table schemas', function() {
             connectionId = saveConnection(connection);
 
             return POST(`connections/${connectionId}/sql-schemas`)
@@ -1060,161 +992,159 @@ describe('Routes - ', () => {
                     assert.deepEqual(json.rows, rows);
                 });
         });
-    });
+    }
 
-    // S3
-    it('s3 - s3-keys returns a list of keys', function(done) {
-        this.timeout(10000);
-        const s3CredId = saveConnection(publicReadableS3Connections);
-        POST(`connections/${s3CredId}/s3-keys`)
-        .then(res => res.json())
-        .then(files => {
-            assert.deepEqual(
-                JSON.stringify(files[0]),
-                JSON.stringify({
-                    'Key': '311.parquet/._SUCCESS.crc',
-                    'LastModified': '2016-10-26T03:27:31.000Z',
-                    'ETag': '"9dfecc15c928c9274ad273719aa7a3c0"',
-                    'Size': 8,
-                    'StorageClass': 'STANDARD',
-                    'Owner': {
-                        'DisplayName': 'chris',
-                        'ID': '655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a'
-                    }
-                })
-            );
-            done();
-        }).catch(done);
-    });
-
-    it('s3 - s3-keys fails with the wrong connection credentials', function(done) {
-        this.timeout(10000);
-        const s3CredId = saveConnection({
-            dialect: 's3',
-            accessKeyId: 'asdf',
-            secretAccessKey: 'fdsa',
-            bucket: 'plotly-s3-connector-test'
-        });
-        POST(`connections/${s3CredId}/s3-keys`)
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 500);
-            assert.deepEqual(json, {
-                error: {message: 'The AWS Access Key Id you provided does not exist in our records.'}
-            });
-            done();
-        }))
-        .catch(done);
-    });
-
-    it('s3 - query returns data', function(done) {
-        const s3CredId = saveConnection(publicReadableS3Connections);
-        this.timeout(5000);
-        POST(`connections/${s3CredId}/query`, {query: '5k-scatter.csv'})
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 200);
-            assert.deepEqual(
-                keys(json),
-                ['columnnames', 'rows']
-            );
-            assert.deepEqual(
-                json.rows.slice(0, 2),
-                [
-                    ['-0.790276857291', '-1.32900495883'],
-                    ['0.931947948358', '0.266354435153']
-                ]
-            );
-            done();
-        })).catch(done);
-    });
-
-    // Apache Drill
-    it('apache-drill - apache-drill-storage returns a list of storage items', function(done) {
-        const s3CredId = saveConnection(apacheDrillConnections);
-
-        this.timeout(5000);
-        POST(`connections/${s3CredId}/apache-drill-storage`)
-        .then(res => res.json())
-        .then(storage => {
-            assert.deepEqual(
-                storage,
-                apacheDrillStorage
-            );
-            done();
-        }).catch(done);
-    });
-
-    it('apache-drill - apache-drill-s3-keys returns a list of s3 files', function(done) {
-        const s3CredId = saveConnection(apacheDrillConnections);
-        this.timeout(5000);
-        POST(`connections/${s3CredId}/apache-drill-s3-keys`)
-        .then(res => res.json())
-        .then(files => {
-            assert.deepEqual(
-                JSON.stringify(files[0]),
-                JSON.stringify({
-                    'Key': '311.parquet/._SUCCESS.crc',
-                    'LastModified': '2016-10-26T03:27:31.000Z',
-                    'ETag': '"9dfecc15c928c9274ad273719aa7a3c0"',
-                    'Size': 8,
-                    'StorageClass': 'STANDARD',
-                    'Owner': {
-                        'DisplayName': 'chris',
-                        'ID': '655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a'
-                    }
-                })
-            );
-            done();
-        }).catch(done);
-    });
-
-    [
-        {
-            name: 'non existant parquet file',
-            query: 'SELECT * FROM `s3`.root.`non-existant-file.parquet`',
-            error: (
-                'VALIDATION ERROR: From line 1, column 15 to line 1, ' +
-                'column 18: Table \'s3.root.non-existant-file.parquet\' ' +
-                'not found\n\nSQL Query null\n\n'
-            )
-        },
-        {
-            name: 'semi colon at the end',
-            query: 'SELECT * FROM `s3`.root.`311.parquet`;',
-            error: (
-                'PARSE ERROR: Encountered ";" at line 1, column 38.\n' +
-                'Was expecting one of:\n    <EOF> \n    "ORDER" ...\n'
-            )
-        },
-        {
-            name: 'unaccepted workspace',
-            query: 'SELECT * FROM `s3`.rootz.`311.parquet` LIMIT 10',
-            error: (
-                'VALIDATION ERROR: From line 1, column 15 to line 1, column 18: ' +
-                'Table \'s3.rootz.311.parquet\' not found\n\nSQL Query null\n\n'
-            )
-        },
-        {
-            name: 'unconfigured plugin',
-            query: 'SELECT * FROM `s3z`.root.`311.parquet` LIMIT 10',
-            error: (
-                'VALIDATION ERROR: From line 1, column 15 to line 1, column 19: ' +
-                'Table \'s3z.root.311.parquet\' not found\n\nSQL Query null\n\n'
-            )
+    testSqlConnections.forEach(function(connection) {
+        // TODO - Open up redshift to CI
+        if (connection.dialect === 'redshift') {
+            return;
         }
-    ].forEach(function(testCase) {
-        it(`apache-drill - error message validation - ${testCase.name}`, function(done) {
-            this.timeout(20 * 1000);
-            const drillCredId = saveConnection(apacheDrillConnections);
-            const query = testCase.query;
-            POST(`connections/${drillCredId}/query`, {query})
-            .then(res => res.json())
-            .then(json => {
-                console.warn(json.error.message); // eslint-disable-line no-console
-                assert(
-                    json.error.message.startsWith(testCase.error)
+
+        describe(`connections: sql: query: ${connection.dialect}:`, function() {
+            createSqlQueryTest(connection);
+        });
+
+        describe(`connections: sql: tables: ${connection.dialect}:`, function() {
+            createSqlTablesTest(connection);
+        });
+
+        describe(`connections: sql: schemas: ${connection.dialect}:`, function() {
+            createSqlSchemasTest(connection);
+        });
+    });
+
+    describe('connections: nosql: s3:', function() {
+        it('s3-keys returns a list of keys', function() {
+            const s3CredId = saveConnection(publicReadableS3Connections);
+            return POST(`connections/${s3CredId}/s3-keys`).then(res => res.json()).then(files => {
+                assert.deepEqual(
+                    JSON.stringify(files[0]),
+                    JSON.stringify({
+                        'Key': '311.parquet/._SUCCESS.crc',
+                        'LastModified': '2016-10-26T03:27:31.000Z',
+                        'ETag': '"9dfecc15c928c9274ad273719aa7a3c0"',
+                        'Size': 8,
+                        'StorageClass': 'STANDARD',
+                        'Owner': {
+                            'DisplayName': 'chris',
+                            'ID': '655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a'
+                        }
+                    })
                 );
-                done();
-            }).catch(done);
+            });
+        });
+
+        it('s3-keys fails with the wrong connection credentials', function() {
+            const s3CredId = saveConnection({
+                dialect: 's3',
+                accessKeyId: 'asdf',
+                secretAccessKey: 'fdsa',
+                bucket: 'plotly-s3-connector-test'
+            });
+            return POST(`connections/${s3CredId}/s3-keys`).then(res => res.json().then(json => {
+                assert.equal(res.status, 500);
+                assert.deepEqual(json, {
+                    error: {message: 'The AWS Access Key Id you provided does not exist in our records.'}
+                });
+            }));
+        });
+
+        it('query returns data', function() {
+            const s3CredId = saveConnection(publicReadableS3Connections);
+            return POST(`connections/${s3CredId}/query`, {query: '5k-scatter.csv'})
+                .then(res => res.json().then(json => {
+                    assert.equal(res.status, 200);
+                    assert.deepEqual(
+                        keys(json),
+                        ['columnnames', 'rows']
+                    );
+                    assert.deepEqual(
+                        json.rows.slice(0, 2),
+                        [
+                            ['-0.790276857291', '-1.32900495883'],
+                            ['0.931947948358', '0.266354435153']
+                        ]
+                    );
+                }));
+        });
+    });
+
+    describe('connections: nosql: apache-drill:', function() {
+        it('apache-drill-storage returns a list of storage items', function() {
+            const s3CredId = saveConnection(apacheDrillConnections);
+
+            return POST(`connections/${s3CredId}/apache-drill-storage`).then(res => res.json()).then(storage => {
+                assert.deepEqual(
+                    storage,
+                    apacheDrillStorage
+                );
+            });
+        });
+
+        it('apache-drill-s3-keys returns a list of s3 files', function() {
+            const s3CredId = saveConnection(apacheDrillConnections);
+
+            return POST(`connections/${s3CredId}/apache-drill-s3-keys`).then(res => res.json()).then(files => {
+                assert.deepEqual(
+                    JSON.stringify(files[0]),
+                    JSON.stringify({
+                        'Key': '311.parquet/._SUCCESS.crc',
+                        'LastModified': '2016-10-26T03:27:31.000Z',
+                        'ETag': '"9dfecc15c928c9274ad273719aa7a3c0"',
+                        'Size': 8,
+                        'StorageClass': 'STANDARD',
+                        'Owner': {
+                            'DisplayName': 'chris',
+                            'ID': '655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a'
+                        }
+                    })
+                );
+            });
+        });
+
+        [
+            {
+                name: 'non existant parquet file',
+                query: 'SELECT * FROM `s3`.root.`non-existant-file.parquet`',
+                error: (
+                    'VALIDATION ERROR: From line 1, column 15 to line 1, ' +
+                    'column 18: Table \'s3.root.non-existant-file.parquet\' ' +
+                    'not found\n\nSQL Query null\n\n'
+                )
+            },
+            {
+                name: 'semi colon at the end',
+                query: 'SELECT * FROM `s3`.root.`311.parquet`;',
+                error: (
+                    'PARSE ERROR: Encountered ";" at line 1, column 38.\n' +
+                    'Was expecting one of:\n    <EOF> \n    "ORDER" ...\n'
+                )
+            },
+            {
+                name: 'unaccepted workspace',
+                query: 'SELECT * FROM `s3`.rootz.`311.parquet` LIMIT 10',
+                error: (
+                    'VALIDATION ERROR: From line 1, column 15 to line 1, column 18: ' +
+                    'Table \'s3.rootz.311.parquet\' not found\n\nSQL Query null\n\n'
+                )
+            },
+            {
+                name: 'unconfigured plugin',
+                query: 'SELECT * FROM `s3z`.root.`311.parquet` LIMIT 10',
+                error: (
+                    'VALIDATION ERROR: From line 1, column 15 to line 1, column 19: ' +
+                    'Table \'s3z.root.311.parquet\' not found\n\nSQL Query null\n\n'
+                )
+            }
+        ].forEach(function(testCase) {
+            it(`error message validation - ${testCase.name}`, function() {
+                const drillCredId = saveConnection(apacheDrillConnections);
+                const query = testCase.query;
+
+                return POST(`connections/${drillCredId}/query`, {query}).then(res => res.json()).then(json => {
+                    assert(json.error.message.startsWith(testCase.error));
+                });
+            });
         });
     });
 
@@ -1224,21 +1154,13 @@ describe('Routes - ', () => {
      */
 
     // Connections
-    testConnections.forEach(function(connection) {
-
-        // TODO - Open up Redshift to CI
-        if (connection.dialect === 'redshift') {
-            return;
-        }
-
-        it(`connections - ${connection.dialect} - saves connections to a file if they are valid and ` +
-            'if they do not exist', function(done) {
-            this.timeout(5 * 1000);
+    function createConnectionTest(connection) {
+        it('saves connections to a file if they are valid and if they do not exist', function() {
             cleanUpSettings('CONNECTIONS_PATH');
 
             assert.deepEqual(getConnections(), []);
-            POST('connections', connection)
-            .then(res => res.json().then(json => {
+
+            return POST('connections', connection).then(res => res.json().then(json => {
                 assert.deepEqual(
                     json,
                     {connectionId: getConnections()[0].id}
@@ -1248,13 +1170,10 @@ describe('Routes - ', () => {
                     [connection],
                     getConnections().map(dissoc('id'))
                 );
-                done();
-            })).catch(done);
+            }));
         });
 
-        it(`connections - ${connection.dialect} - fails if the connections are not valid`, function(done) {
-            this.timeout(5 * 1000);
-
+        it('fails if the connections are not valid', function() {
             cleanUpSettings('CONNECTIONS_PATH');
 
             assert.deepEqual(getConnections(), [], 'connections are empty at start');
@@ -1272,8 +1191,7 @@ describe('Routes - ', () => {
                 throw new Error('Woops - missing an option in this test');
             }
 
-            POST('connections', connectionTypo)
-            .then(res => res.json().then(json => {
+            return POST('connections', connectionTypo).then(res => res.json().then(json => {
                 if (contains(connection.dialect, ['mysql', 'mariadb'])) {
                     assert.include(
                         json.error.message,
@@ -1304,211 +1222,190 @@ describe('Routes - ', () => {
                     getConnections(),
                     'connections weren\'t saved'
                 );
-                done();
-            })).catch(done);
+            }));
+        });
+    }
 
+    testConnections.forEach(function(connection) {
+        // TODO - Open up Redshift to CI
+        if (connection.dialect === 'redshift') {
+            return;
+        }
+
+        describe(`connections: all: ${connection.dialect}:`, function() {
+            createConnectionTest(connection);
         });
     });
 
-    it("connections - doesn't save connections if they already exist", function(done) {
-        POST('connections', sqlConnections)
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 409);
-            assert.deepEqual(json.connectionId, connectionId);
-            done();
-        })).catch(done);
-    });
-
-    it('connections - returns sanitized connections', function(done) {
-        POST('connections', publicReadableS3Connections)
-        .then(function(res) {
-            assert.equal(res.status, 200);
-            return GET('connections');
-        })
-        .then(res => {
-            assert.equal(res.status, 200);
-            return res.json();
-        })
-        .then(json => {
-            assert.deepEqual(
-                json.map(dissoc('id')),
-                [
-                    // The SQL connection we save in beforeEach
-                    dissoc('password', sqlConnections),
-                    // The S3 connection we save above
-                    dissoc('secretAccessKey', publicReadableS3Connections)
-                ]
-            );
-            done();
-        }).catch(done);
-    });
-
-    it('connection/:id - returns sanitized connections', function(done) {
-        POST('connections', publicReadableS3Connections)
-        .then(res => res.json().then(() => {
-            assert.equal(res.status, 200);
-            return GET('connections');
-        }))
-        .then(res => res.json().then(connections => {
-            return GET(`connections/${connections[0].id}`)
-            .then(resFromGet => resFromGet.json().then(function(connection) {
-
-                assert.deepEqual(
-                    dissoc('id', connection),
-                    dissoc('password', sqlConnections)
-                );
-
-                return GET(`connections/${connections[1].id}`);
-
+    describe('connections:', function() {
+        it("doesn't save connections if they already exist", function() {
+            return POST('connections', sqlConnections).then(res => res.json().then(json => {
+                assert.equal(res.status, 409);
+                assert.deepEqual(json.connectionId, connectionId);
             }));
+        });
 
-        }))
-        .then(res => res.json().then(function(connection) {
+        it('returns sanitized connections', function() {
+            return POST('connections', publicReadableS3Connections)
+                .then(function(res) {
+                    assert.equal(res.status, 200);
+                    return GET('connections');
+                })
+                .then(res => {
+                    assert.equal(res.status, 200);
+                    return res.json();
+                })
+                .then(json => {
+                    assert.deepEqual(
+                        json.map(dissoc('id')),
+                        [
+                            // The SQL connection we save in beforeEach
+                            dissoc('password', sqlConnections),
+                            // The S3 connection we save above
+                            dissoc('secretAccessKey', publicReadableS3Connections)
+                        ]
+                    );
+                });
+        });
 
-            assert.deepEqual(
-                dissoc('id', connection),
-                dissoc('secretAccessKey', publicReadableS3Connections)
-            );
+        it('connection/:id returns sanitized connections', function() {
+            return POST('connections', publicReadableS3Connections).then(res => {
+                    assert.equal(res.status, 200);
+                })
+                .then(() => {
+                    return GET('connections').then(res => res.json());
+                })
+                .then(connections => {
+                    return GET(`connections/${connections[0].id}`).then(res => res.json().then(function(connection) {
+                        assert.deepEqual(
+                            dissoc('id', connection),
+                            dissoc('password', sqlConnections)
+                        );
+                        return connections;
+                    }));
+                })
+                .then(connections => {
+                    return GET(`connections/${connections[1].id}`).then(res => res.json().then(function(connection) {
+                        assert.deepEqual(
+                            dissoc('id', connection),
+                            dissoc('secretAccessKey', publicReadableS3Connections)
+                        );
+                    }));
+                });
+        });
 
-            done();
+        it('does not update connection if bad connection object', function() {
+            return PUT(`connections/${connectionId}`, assoc('username', 'banana', sqlConnections))
+                .then(res => {
+                    assert.equal(res.status, 400);
+                    return res.json();
+                })
+                .then(json => {
+                    assert.deepEqual(
+                        json,
+                        {error: 'password authentication failed for user "banana"'}
+                    );
+                    assert.deepEqual(
+                        getConnections(),
+                        [merge(sqlConnections, {id: connectionId})]
+                    );
+                });
+        });
 
-        })).catch(done);
+        it('does not update connection if connectionId does not exist yet', function() {
+            return PUT('connections/wrong-connection-id-123', sqlConnections)
+                .then(res => {
+                    assert.equal(res.status, 404);
+                    return res.json();
+                })
+                .then(json => {
+                    assert.deepEqual(json, {});
+                    assert.deepEqual(
+                        getConnections(),
+                        [merge(sqlConnections, {id: connectionId})]
+                    );
+                });
+        });
+
+        it('updates connection if correct connection object', function() {
+            return PUT(`connections/${connectionId}`, mysqlConnection)
+                .then(res => {
+                    assert.equal(res.status, 200);
+                    return res.json();
+                })
+                .then(json => {
+                    assert.deepEqual(json, {});
+                    assert.deepEqual(
+                        getConnections(),
+                        [merge(mysqlConnection, {id: connectionId})]
+                    );
+                });
+        });
+
+        it('deletes connections', function() {
+            assert.deepEqual(getConnections().map(dissoc('id')), [sqlConnections]);
+
+            return DELETE(`connections/${connectionId}`).then(res => {
+                assert.equal(res.status, 200);
+                assert.deepEqual(getConnections(), []);
+            });
+        });
+
+        it('returns an empty array of connections', function() {
+            cleanUpSettings('CONNECTIONS_PATH');
+
+            return GET('connections')
+                .then(res => {
+                    assert.equal(res.status, 200);
+                    return res.json();
+                })
+                .then(json => {
+                    assert.deepEqual(json, []);
+                });
+        });
     });
 
-    it('connections - does not update connection if bad connection object', (done) => {
-        PUT(`connections/${connectionId}`, assoc('username', 'banana', sqlConnections))
-        .then(res => {
-            assert.equal(res.status, 400);
-            return res.json();
-        })
-        .then(json => {
-            assert.deepEqual(
-                json,
-                {error: 'password authentication failed for user "banana"'}
-            );
-            assert.deepEqual(
-                getConnections(),
-                [merge(sqlConnections, {id: connectionId})]
-            );
-            done();
-        }).catch(done);
-    });
+    describe('persistent queries:', function() {
+        beforeEach(function() {
+            // Verify that there are no queries saved
+            return GET('queries').then(res => res.json()).then(json => {
+                assert.deepEqual(json, []);
+            });
+        });
 
-    it('connections - does not update connection if connectionId does not exist yet', (done) => {
-        PUT('connections/wrong-connection-id-123', sqlConnections)
-        .then(res => {
-
-            assert.equal(res.status, 404);
-            return res.json();
-        })
-        .then(json => {
-            assert.deepEqual(
-                json,
-                {}
-            );
-            assert.deepEqual(
-                getConnections(),
-                [merge(sqlConnections, {id: connectionId})]
-            );
-            done();
-        }).catch(done);
-    });
-
-    it('connections - updates connection if correct connection object', (done) => {
-        PUT(`connections/${connectionId}`, mysqlConnection)
-        .then(res => {
-            assert.equal(res.status, 200);
-            return res.json();
-        })
-        .then(json => {
-            assert.deepEqual(
-                json,
-                {}
-            );
-            assert.deepEqual(
-                getConnections(),
-                [merge(mysqlConnection, {id: connectionId})]
-            );
-            done();
-        }).catch(done);
-    });
-
-    it('connections - deletes connections', function(done) {
-        assert.deepEqual(getConnections().map(dissoc('id')), [sqlConnections]);
-        DELETE(`connections/${connectionId}`)
-        .then(res => {
-            assert.equal(res.status, 200);
-            assert.deepEqual(getConnections(), []);
-            done();
-        }).catch(done);
-    });
-
-    it('connections - returns an empty array of connections', function(done) {
-        cleanUpSettings('CONNECTIONS_PATH');
-
-        GET('connections')
-        .then(res => {
-            assert.equal(res.status, 200);
-            return res.json();
-        })
-        .then(json => {
-            assert.deepEqual(json, []);
-            done();
-        }).catch(done);
-    });
-
-    // Persistent Queries
-    it('queries - registers a query and returns saved queries', function(done) {
-        this.timeout(10 * 1000);
-        // Verify that there are no queries saved
-        GET('queries')
-        .then(res => res.json())
-        .then(json => {
-            assert.deepEqual(json, []);
-
+        it('queries registers a query and returns saved queries', function() {
             // Save a grid that we can update
-            return createGrid('test interval');
+            return createGrid('test interval')
+                .then(res => {
+                    assert.equal(res.status, 201, 'Grid was created');
+                    return res.json();
+                })
+                .then(json => {
+                    const fid = json.file.fid;
+                    const uids = json.file.cols.map(col => col.uid);
 
-        })
-        .then(res => {
-            assert.equal(res.status, 201, 'Grid was created');
-            return res.json();
-        })
-        .then(json => {
-            const fid = json.file.fid;
-            const uids = json.file.cols.map(col => col.uid);
+                    queryObject = {
+                        fid,
+                        requestor: fid.split(':')[0],
+                        uids,
+                        refreshInterval: 60,
+                        connectionId,
+                        query: 'SELECT * from ebola_2014 LIMIT 2'
+                    };
+                    return POST('queries', queryObject);
+                })
+                .then(res => res.json().then(json => {
+                    assert.deepEqual(json, {});
+                    assert.equal(res.status, 201, 'Query was saved');
+                    return GET('queries');
+                }))
+                .then(res => res.json())
+                .then(json => {
+                    assert.deepEqual(json, [queryObject]);
+                });
+        });
 
-            queryObject = {
-                fid,
-                requestor: fid.split(':')[0],
-                uids,
-                refreshInterval: 60,
-                connectionId,
-                query: 'SELECT * from ebola_2014 LIMIT 2'
-            };
-            return POST('queries', queryObject);
-        })
-        .then(res => res.json().then(json => {
-            assert.deepEqual(json, {});
-            assert.equal(res.status, 201, 'Query was saved');
-            return GET('queries');
-        }))
-        .then(res => res.json())
-        .then(json => {
-            assert.deepEqual(json, [queryObject]);
-        })
-        .then(() => done())
-        .catch(done);
-    });
-
-    it('queries - can register queries if the user is a collaborator', function(done) {
-        this.timeout(20 * 1000);
-        // Verify that there are no queries saved
-        GET('queries')
-        .then(res => res.json())
-        .then(json => {
-            assert.deepEqual(json, []);
-
+        it('queries can register queries if the user is a collaborator', function() {
             /*
              * Plotly doesn't have a v2 endpoint for creating
              * collaborators, so we'll just use these hardcoded
@@ -1533,29 +1430,20 @@ describe('Routes - ', () => {
                 connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2'
             };
-            return POST('queries', queryObject);
-        })
-        .then(res => res.json().then(json => {
-            assert.deepEqual(json, {});
-            assert.equal(res.status, 201, 'Query was saved');
-            return GET('queries');
-        }))
-        .then(res => res.json())
-        .then(json => {
-            assert.deepEqual(json, [queryObject]);
-        })
-        .then(() => done())
-        .catch(done);
-    });
 
-    it("queries - can't register queries if the user can't view it", function(done) {
-        this.timeout(20 * 1000);
-        // Verify that there are no queries saved
-        GET('queries')
-        .then(res => res.json())
-        .then(json => {
-            assert.deepEqual(json, [], 'there are no queries saved');
+            return POST('queries', queryObject)
+                .then(res => res.json().then(json => {
+                    assert.deepEqual(json, {});
+                    assert.equal(res.status, 201, 'Query was saved');
+                    return GET('queries');
+                }))
+                .then(res => res.json())
+                .then(json => {
+                    assert.deepEqual(json, [queryObject]);
+                });
+        });
 
+        it("queries can't register queries if the user can't view it", function() {
             // The grid is not shared with this user
             const viewer = 'plotly-connector-viewer';
             saveSetting('USERS', [{
@@ -1573,29 +1461,20 @@ describe('Routes - ', () => {
                 connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2'
             };
-            return POST('queries', queryObject);
-        })
-        .then(res => res.json().then(json => {
-            assert.deepEqual(json, {error: {message: 'Not found'}});
-            assert.equal(res.status, 400);
-            return GET('queries');
-        }))
-        .then(res => res.json())
-        .then(json => {
-            assert.deepEqual(json, [], 'No queries were saved');
-        })
-        .then(() => done())
-        .catch(done);
-    });
 
-    it("queries - can't register queries if the user isn't a collaborator", function(done) {
-        this.timeout(20 * 1000);
-        // Verify that there are no queries saved
-        GET('queries')
-        .then(res => res.json())
-        .then(json => {
-            assert.deepEqual(json, [], 'no queries saved at start');
+            return POST('queries', queryObject)
+                .then(res => res.json().then(json => {
+                    assert.deepEqual(json, {error: {message: 'Not found'}});
+                    assert.equal(res.status, 400);
+                    return GET('queries');
+                }))
+                .then(res => res.json())
+                .then(json => {
+                    assert.deepEqual(json, [], 'No queries were saved');
+                });
+        });
 
+        it("queries can't register queries if the user isn't a collaborator", function() {
             // The grid is not shared with this user
             const viewer = 'plotly-connector-viewer';
             saveSetting('USERS', [{
@@ -1619,171 +1498,140 @@ describe('Routes - ', () => {
                 connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2'
             };
-            return POST('queries', queryObject);
-        })
-        .then(res => res.json().then(json => {
-            assert.deepEqual(json, {error: {message: 'Permission denied'}});
-            assert.equal(res.status, 400);
-            return GET('queries');
-        }))
-        .then(res => res.json())
-        .then(json => {
-            assert.deepEqual(json, [], 'still no queries saved');
-        })
-        .then(() => done())
-        .catch(done);
-    });
 
-    it('queries - gets individual queries', function(done) {
-        this.timeout(10 * 1000);
-        GET(`queries/${queryObject.fid}`)
-        .then(res => res.json().then(() => {
-            assert.equal(res.status, 404);
-            return POST('queries', queryObject);
-        }))
-        .then(res => res.json().then(json => {
-            assert.deepEqual(json, {});
-            assert.equal(res.status, 201);
-            return GET(`queries/${queryObject.fid}`);
-        }))
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 200);
-            assert.deepEqual(json, queryObject);
-            done();
-        })).catch(done);
-    });
+            return POST('queries', queryObject)
+                .then(res => res.json().then(json => {
+                    assert.deepEqual(json, {error: {message: 'Permission denied'}});
+                    assert.equal(res.status, 400);
+                    return GET('queries');
+                }))
+                .then(res => res.json())
+                .then(json => {
+                    assert.deepEqual(json, [], 'still no queries saved');
+                });
+        });
 
-    it('queries - deletes queries', function(done) {
-        this.timeout(10 * 1000);
-        POST('queries', queryObject)
-        .then(() => DELETE(`queries/${queryObject.fid}`))
-        .then(res => res.json().then(json => {
-            assert.deepEqual(json, {});
-            assert.equal(res.status, 200);
-            return GET(`queries/${queryObject.fid}`);
-        }))
-        .then(res => {
-            assert.equal(res.status, 404);
-            done();
-        }).catch(done);
-    });
+        it('queries gets individual queries', function() {
+            return GET(`queries/${queryObject.fid}`)
+                .then(res => res.json().then(() => {
+                    assert.equal(res.status, 404);
+                    return POST('queries', queryObject);
+                }))
+                .then(res => res.json().then(json => {
+                    assert.deepEqual(json, {});
+                    assert.equal(res.status, 201);
+                    return GET(`queries/${queryObject.fid}`);
+                }))
+                .then(res => res.json().then(json => {
+                    assert.equal(res.status, 200);
+                    assert.deepEqual(json, queryObject);
+                }));
+        });
 
-    it('queries - returns 404s when getting queries that don\'t exist', function(done) {
-        this.timeout(10 * 1000);
-        GET('queries/asdfasdf')
-        .then(res => {
-            assert.equal(res.status, 404);
-            done();
-        })
-        .catch(done);
-    });
+        it('queries deletes queries', function() {
+            return POST('queries', queryObject)
+                .then(() => DELETE(`queries/${queryObject.fid}`))
+                .then(res => res.json().then(json => {
+                    assert.deepEqual(json, {});
+                    assert.equal(res.status, 200);
+                    return GET(`queries/${queryObject.fid}`);
+                }))
+                .then(res => {
+                    assert.equal(res.status, 404);
+                });
+        });
 
-    it('queries - returns 404s when deleting queries that don\'t exist', function(done) {
-        DELETE('queries/asdfasdf')
-        .then(res => {
-            assert.equal(res.status, 404);
-            done();
-        })
-        .catch(done);
-    });
+        it('queries returns 404s when getting queries that don\'t exist', function() {
+            return GET('queries/asdfasdf').then(res => {
+                assert.equal(res.status, 404);
+            });
+        });
 
-    it("queries - POST /queries fails when the user's API keys or oauth creds aren't saved", function(done) {
-        this.timeout(10 * 1000);
-        saveSetting('USERS', []);
-        assert.deepEqual(getSetting('USERS'), []);
-        POST('queries', queryObject)
-        .then(res => res.json().then(json => {
-            assert.deepEqual(
-                json,
-                {error: {
-                    message: (
-                        'Unauthenticated: Attempting to update grid ' +
-                        'plotly-database-connector:197 ' +
-                        'but the authentication credentials ' +
-                        'for the user "plotly-database-connector" ' +
-                        'do not exist.'
-                    )
-                }}
-            );
-            assert.equal(res.status, 500);
-            done();
-        })).catch(done);
-    });
+        it('queries returns 404s when deleting queries that don\'t exist', function() {
+            return DELETE('queries/asdfasdf').then(res => {
+                assert.equal(res.status, 404);
+            });
+        });
 
-    it("queries - POST /queries fails when the user's API keys aren't correct", function(done) {
-        this.timeout(10 * 1000);
-        const creds = [{username: 'plotly-database-connector', apiKey: 'lah lah lemons'}];
-        saveSetting('USERS', creds);
-        assert.deepEqual(getSetting('USERS'), creds);
-        POST('queries', queryObject)
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 400);
-            assert.deepEqual(
-                json,
-                {error: {
-                    message: (
-                        'Unauthenticated'
-                    )
-                }}
-            );
+        it("queries POST /queries fails when the user's API keys or oauth creds aren't saved", function() {
+            saveSetting('USERS', []);
+            assert.deepEqual(getSetting('USERS'), []);
 
-            done();
-        })).catch(done);
-    });
-
-    // TODO - Getting intermittent FetchError: request to http://localhost:9494/queries failed, reason: socket hang up
-    it("queries - POST /queries fails when it can't connect to the plotly server", function(done) {
-        this.timeout(70 * 1000);
-        const nonExistantServer = 'plotly.lah-lah-lemons.com';
-        saveSetting('PLOTLY_API_DOMAIN', nonExistantServer);
-        assert.deepEqual(getSetting('PLOTLY_API_URL'), `https://${nonExistantServer}`);
-        POST('queries', queryObject)
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 400);
-            assert.deepEqual(
-                json,
-                {
-                    error: {
+            return POST('queries', queryObject).then(res => res.json().then(json => {
+                assert.deepEqual(
+                    json,
+                    {error: {
                         message: (
-                            'request to ' +
-                            'https://plotly.lah-lah-lemons.com/v2/grids/plotly-database-connector:197 ' +
-                            'failed, reason: getaddrinfo ENOTFOUND plotly.lah-lah-lemons.com ' +
-                            'plotly.lah-lah-lemons.com:443'
+                            'Unauthenticated: Attempting to update grid ' +
+                            'plotly-database-connector:197 ' +
+                            'but the authentication credentials ' +
+                            'for the user "plotly-database-connector" ' +
+                            'do not exist.'
                         )
+                    }}
+                );
+                assert.equal(res.status, 500);
+            }));
+        });
+
+        it("queries POST /queries fails when the user's API keys aren't correct", function() {
+            const creds = [{username: 'plotly-database-connector', apiKey: 'lah lah lemons'}];
+            saveSetting('USERS', creds);
+            assert.deepEqual(getSetting('USERS'), creds);
+
+            return POST('queries', queryObject).then(res => res.json().then(json => {
+                assert.equal(res.status, 400);
+                assert.deepEqual(
+                    json,
+                    {error: {
+                        message: (
+                            'Unauthenticated'
+                        )
+                    }}
+                );
+            }));
+        });
+
+        // TODO - Getting intermittent FetchError: request to http://localhost:9494/queries failed, reason: socket hang up
+        it("queries POST /queries fails when it can't connect to the plotly server", function() {
+            this.timeout(70 * 1000);
+
+            const nonExistantServer = 'plotly.lah-lah-lemons.com';
+            saveSetting('PLOTLY_API_DOMAIN', nonExistantServer);
+            assert.deepEqual(getSetting('PLOTLY_API_URL'), `https://${nonExistantServer}`);
+
+            return POST('queries', queryObject).then(res => res.json().then(json => {
+                assert.equal(res.status, 400);
+                assert.deepEqual(
+                    json,
+                    {
+                        error: {
+                            message: (
+                                'request to ' +
+                                'https://plotly.lah-lah-lemons.com/v2/grids/plotly-database-connector:197 ' +
+                                'failed, reason: getaddrinfo ENOTFOUND plotly.lah-lah-lemons.com ' +
+                                'plotly.lah-lah-lemons.com:443'
+                            )
+                        }
                     }
-                }
+                );
+            }));
+        });
+
+        it('queries POST /queries fails when there is a syntax error in the query', function() {
+            const invalidQueryObject = merge(
+                queryObject,
+                {query: 'SELECZ'}
             );
 
-            done();
-        })).catch(done);
+            return POST('queries', invalidQueryObject).then(res => res.json().then(json => {
+                assert.deepEqual(
+                    json,
+                    {error: {message: 'syntax error at or near "SELECZ"'}}
+                );
+                assert.equal(res.status, 400);
+            }));
+        });
     });
-
-    it('queries - POST /queries fails when there is a syntax error in the query', function(done) {
-        this.timeout(10 * 1000);
-        const invalidQueryObject = merge(
-            queryObject,
-            {query: 'SELECZ'}
-        );
-        POST('queries', invalidQueryObject)
-        .then(res => res.json().then(json => {
-            assert.deepEqual(
-                json,
-                {error: {message: 'syntax error at or near "SELECZ"'}}
-            );
-            assert.equal(res.status, 400);
-            done();
-        })).catch(done);
-    });
-
-    it('uncaught-exceptions - uncaught exceptions get thrown OK ', function(done) {
-        this.timeout(3 * 1000);
-        POST('_throw')
-        .then(res => res.json().then(json => {
-            assert.equal(res.status, 500);
-            assert.deepEqual(json, {error: {message: 'Yikes - uncaught error'}});
-            done();
-        })).catch(done);
-    });
-
 });
 /* eslint-enable no-invalid-this */
