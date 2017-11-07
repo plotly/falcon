@@ -9,7 +9,8 @@ const ESCAPED_ROUTES = [
   new RegExp('^/$'),
   new RegExp('^/login$'),
   new RegExp('^/static/'),
-  new RegExp('^/oauth2$')
+  new RegExp('^/oauth2$'),
+  new RegExp('^/oauth2/callback$')
 ];
 
 function accessTokenIsValid(access_token) {
