@@ -18,5 +18,5 @@ export function generateAndSaveAccessToken() {
 
 
 export function homeUrl() {
-    return getSetting('IS_RUNNING_INSIDE_ON_PREM') ? '/external-database-connector' : '';
+    return getSetting('IS_RUNNING_INSIDE_ON_PREM') ? '/external-data-connector' : '';
 }
