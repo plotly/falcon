@@ -485,7 +485,7 @@ describe('Routes - ', () => {
 
     // OAuth
     it('oauth - returns 200 on loading the oauth page', function(done) {
-        GET('oauth2')
+        GET('oauth2/callback')
         .then(res => {
             assert.equal(res.status, 200);
             done();
