@@ -1,16 +1,16 @@
-import {contains} from 'ramda';
+import {contains, map} from 'ramda';
 import {getSetting} from '../settings.js';
 import {getAccessTokenCookieOptions} from '../constants.js';
-import {generateAndSaveAccessToken} from '../utils/authUtils';
+import {generateAndSaveAccessToken, homeUrl} from '../utils/authUtils';
 import Logger from '../logger';
 import fetch from 'node-fetch';
 
 const ESCAPED_ROUTES = [
-  new RegExp('^/$'),
-  new RegExp('^/login$'),
-  new RegExp('^/static/'),
-  new RegExp('^/oauth2$'),
-  new RegExp('^/oauth2/callback$')
+  new RegExp(`^/$`),
+  new RegExp(`^/login$`),
+  new RegExp(`^/static/`),
+  new RegExp(`^/oauth2$`),
+  new RegExp(`^/oauth2/callback$`)
 ];
 
 function accessTokenIsValid(access_token) {
@@ -23,7 +23,10 @@ export function PlotlyOAuth(electron) {
 
     function isAuthorized(req, res, next) {
         const path = req.href();
-
+        Logger.log('debug:');
+        Logger.log('path:');
+        Logger.log(path);
+        Logger.log(ESCAPED_ROUTES);
         if (!getSetting('AUTH_ENABLED')) {
           return (next());
         }
@@ -37,8 +40,12 @@ export function PlotlyOAuth(electron) {
           return (next());
         }
         if (!accessTokenIsValid(req.cookies['db-connector-auth-token'])) {
+            Logger.log('access-token-check-failed');
+            Logger.log((req.cookies['db-connector-auth-token']));
+            Logger.log((req.header('Cookie')));
 
             if (!req.cookies['plotly-auth-token']) {
+              Logger.log('no-plotly-auth-token');
               res.json(401, {error: {message: 'Please login to access this page.'}});
               return;
             }
@@ -50,6 +57,9 @@ export function PlotlyOAuth(electron) {
             })
             .then(userRes => userRes.json().then(userMeta => {
               if (userRes.status !== 200) {
+                Logger.log('plotly-auth-token-incorrect, url:');
+                Logger.log(`${getSetting('PLOTLY_API_URL')}/v2/users/current`);
+                Logger.log(userRes.json());
                 res.json(401, {error: {message: 'Please login to access this page.'}});
                 return;
               }

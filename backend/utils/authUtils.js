@@ -15,3 +15,8 @@ export function generateAndSaveAccessToken() {
 
     return getSetting('ACCESS_TOKEN');
 }
+
+
+export function homeUrl() {
+    return getSetting('IS_RUNNING_INSIDE_ON_PREM') ? '/external-data-connector' : '';
+}
