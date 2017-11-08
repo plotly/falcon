@@ -2,7 +2,8 @@ import queryString from 'query-string';
 import fetch from 'isomorphic-fetch';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {homeUrl} from '../utils/utils'
+import {homeUrl} from '../utils/utils';
+
 class Status extends Component {
     constructor(props) {
         super(props);
