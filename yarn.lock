@@ -3573,10 +3573,6 @@ express@^4.14.0:
     utils-merge "1.0.0"
     vary "~1.1.1"
 
-extend@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/extend/-/extend-2.0.0.tgz#cc3c1e238521df4c28e3f30868b7324bb5898a5c"
-
 extend@~3.0.0, extend@~3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.1.tgz#a755ea7bc1adfcc5a31ce7e762dbaadc5e636444"
@@ -3598,15 +3594,6 @@ extglob@^0.3.1:
 extract-frustum-planes@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/extract-frustum-planes/-/extract-frustum-planes-1.0.0.tgz#97d5703ff0564c8c3c6838cac45f9e7bc52c9ef5"
-
-extract-text-webpack-plugin@2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/extract-text-webpack-plugin/-/extract-text-webpack-plugin-2.1.2.tgz#756ef4efa8155c3681833fbc34da53b941746d6c"
-  dependencies:
-    async "^2.1.2"
-    loader-utils "^1.0.2"
-    schema-utils "^0.3.0"
-    webpack-sources "^1.0.1"
 
 extract-zip@^1.0.3, extract-zip@^1.6.5:
   version "1.6.5"
@@ -6543,12 +6530,6 @@ node-pre-gyp@^0.6.36, node-pre-gyp@~0.6.38:
     semver "^5.3.0"
     tar "^2.2.1"
     tar-pack "^3.4.0"
-
-node-restify@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/node-restify/-/node-restify-0.2.1.tgz#97fea741c4cf9d53b2e57b3245ae3890de19add2"
-  dependencies:
-    extend "2.0.0"
 
 "nomnom@>= 1.5.x":
   version "1.8.1"
