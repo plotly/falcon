@@ -23,6 +23,11 @@ export class Loggr {
             }];
         }
 
+        streams = [{
+            level: 'info',
+            path: getSetting('LOG_PATH')
+        }];
+
         this.logToFile = bunyan.createLogger({
             name: 'plotly-database-connector-logger',
             streams

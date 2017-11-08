@@ -22,9 +22,13 @@ function accessTokenIsValid(access_token) {
 export function PlotlyOAuth(electron) {
 
     function isAuthorized(req, res, next) {
-        const path = req.href();
+        const href = req.href();
+        const path = req.path();
         Logger.log('debug:');
+        Logger.log('path:');
         Logger.log(path);
+        Logger.log('href:');
+        Logger.log(href);
         Logger.log(ESCAPED_ROUTES);
         if (!getSetting('AUTH_ENABLED')) {
           return (next());
