@@ -42,6 +42,7 @@ export function PlotlyOAuth(electron) {
         if (!accessTokenIsValid(req.cookies['db-connector-auth-token'])) {
             Logger.log('access-token-check-failed');
             Logger.log((req.cookies['db-connector-auth-token']));
+            Logger.log((req.cookies));
 
             if (!req.cookies['plotly-auth-token']) {
               Logger.log('no-plotly-auth-token');
