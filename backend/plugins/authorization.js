@@ -22,13 +22,10 @@ function accessTokenIsValid(access_token) {
 export function PlotlyOAuth(electron) {
 
     function isAuthorized(req, res, next) {
-        const href = req.href();
-        const path = req.path();
+        const path = req.href();
         Logger.log('debug:');
         Logger.log('path:');
         Logger.log(path);
-        Logger.log('href:');
-        Logger.log(href);
         Logger.log(ESCAPED_ROUTES);
         if (!getSetting('AUTH_ENABLED')) {
           return (next());
@@ -43,8 +40,11 @@ export function PlotlyOAuth(electron) {
           return (next());
         }
         if (!accessTokenIsValid(req.cookies['db-connector-auth-token'])) {
+            Logger.log('access-token-check-failed');
+            Logger.log((req.cookies['db-connector-auth-token']));
 
             if (!req.cookies['plotly-auth-token']) {
+              Logger.log('no-plotly-auth-token');
               res.json(401, {error: {message: 'Please login to access this page.'}});
               return;
             }
@@ -56,6 +56,9 @@ export function PlotlyOAuth(electron) {
             })
             .then(userRes => userRes.json().then(userMeta => {
               if (userRes.status !== 200) {
+                Logger.log('plotly-auth-token-incorrect, url:');
+                Logger.log(`${getSetting('PLOTLY_API_URL')}/v2/users/current`);
+                Logger.log(userRes.json());
                 res.json(401, {error: {message: 'Please login to access this page.'}});
                 return;
               }
