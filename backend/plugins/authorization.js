@@ -6,7 +6,7 @@ import Logger from '../logger';
 import fetch from 'node-fetch';
 
 const ESCAPED_ROUTES = [
-  new RegExp(`^${homeUrl()}/`),
+  new RegExp(`^${homeUrl()}/$`),
   new RegExp(`^${homeUrl()}/login$`),
   new RegExp(`^${homeUrl()}/static/`),
   new RegExp(`^${homeUrl()}/oauth2$`),
@@ -23,7 +23,9 @@ export function PlotlyOAuth(electron) {
 
     function isAuthorized(req, res, next) {
         const path = req.href();
-
+        Logger.log('debug:');
+        Logger.log(path);
+        Logger.log(ESCAPED_ROUTES);
         if (!getSetting('AUTH_ENABLED')) {
           return (next());
         }
