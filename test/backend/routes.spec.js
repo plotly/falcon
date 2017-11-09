@@ -1016,6 +1016,9 @@ describe('Routes:', () => {
         if (connection.dialect === 'redshift') {
             return;
         }
+        if (connection.dialect === 'apache impala') {
+            return;
+        }
 
         describe(`connections: sql connectors: ${connection.dialect}: query:`, function() {
             createSqlQueryTest(connection);
@@ -1246,6 +1249,9 @@ describe('Routes:', () => {
     testConnections.forEach(function(connection) {
         // TODO - Open up Redshift to CI
         if (connection.dialect === 'redshift') {
+            return;
+        }
+        if (connection.dialect === 'apache impala') {
             return;
         }
 
