@@ -96,8 +96,17 @@ export default class Servers {
         this.httpsServer.start = this.startHttpsServer.bind(this);
         this.httpsServer.restart = this.restartHttpsServer.bind(this);
 
-        this.httpServer.close = this.close.bind(this);
-        this.httpsServer.close = this.closeHttpsServer.bind(this);
+        this.httpServer.close = function() {
+            Logger.log('Closing the http server.');
+            const server = this.httpServer.server;
+            server.close.apply(server, arguments);
+        }.bind(this);
+
+        this.httpsServer.close = function() {
+            Logger.log('Closing the https server.');
+            const server = this.httpsServer.server;
+            server.close.apply(server, arguments);
+        }.bind(this);
     }
 
     startHttpsServer() {
@@ -137,6 +146,10 @@ export default class Servers {
         server.use(restify.bodyParser({mapParams: true}));
         server.pre(function (request, response, next) {
             Logger.log(`Request: ${request.href()}`, 2);
+            next();
+        });
+        server.use(function (request, response, next) {
+            Logger.log(`Response: ${request.href()}`, 2);
             next();
         });
 
@@ -216,7 +229,7 @@ export default class Servers {
          * Careful if you want to serve USERS - it contains oauth tokens which
          * shouldn't be served to the front-end.
          */
-        server.get('/settings', function serveSettings(req, res) {
+        server.get('/settings', function serveSettings(req, res, next) {
             const sanitizedUsers = pluck('username', getSetting('USERS'));
 
             /*
@@ -229,29 +242,32 @@ export default class Servers {
                 PLOTLY_URL: getSetting('PLOTLY_URL')
             };
 
-            return res.json(200, filteredSettings);
+            res.json(200, filteredSettings);
+            return next();
         });
 
         // Patch on /settings does a merge
-        server.patch('/settings', function mergeSettings(req, res) {
+        server.patch('/settings', function mergeSettings(req, res, next) {
             const partialSettings = req.params;
             keys(partialSettings).forEach(settingName =>
                 saveSetting(settingName, partialSettings[settingName])
             );
-            return res.json(200, {});
+            res.json(200, {});
+            return next();
         });
 
         // TODO - urls isn't actually a setting, it's more of a config
-        server.get('/settings/urls', function settings(req, res) {
+        server.get('/settings/urls', function settings(req, res, next) {
             const {httpServer, httpsServer} = that;
             const HTTP_URL = `${httpServer.protocol}://${httpServer.domain}:${httpServer.port}`;
             const HTTPS_URL = httpsServer.domain
                 ? `${httpsServer.protocol}://${httpsServer.domain}:${httpsServer.port}`
                 : '';
             res.json(200, {http: HTTP_URL, https: HTTPS_URL});
+            return next();
         });
 
-        server.post(/\/oauth2\/?$/, function saveOauth(req, res) {
+        server.post(/\/oauth2\/?$/, function saveOauth(req, res, next) {
             const {access_token} = req.params;
             Logger.log(`Checking token ${access_token} against ${getSetting('PLOTLY_API_URL')}/v2/users/current`);
             fetch(`${getSetting('PLOTLY_API_URL')}/v2/users/current`, {
@@ -262,7 +278,7 @@ export default class Servers {
                     const {username} = userMeta;
                     if (!username) {
                         res.json(500, {error: {message: `User was not found at ${getSetting('PLOTLY_API_URL')}`}});
-                        return;
+                        return next();
                     }
 
                     /*
@@ -306,7 +322,6 @@ export default class Servers {
                             saveSetting('ALLOWED_USERS', allowedUsers);
                         }
                         if (that.isElectron) {
-
                             /*
                              * This part is handled separately for electron-app
                              * because electron apps does not support cookies
@@ -316,22 +331,21 @@ export default class Servers {
                             that.electronWindow.webContents.on('did-finish-load', () => {
                                 that.electronWindow.webContents.send('username', username);
                             });
-
                         }
                         res.json(status, {});
-                    } else {
-
-                      res.json(403, {error: {message: `User ${username} is not allowed to view this app`}});
-                      return;
+                        return next();
                     }
-                } else {
-                    Logger.log(userMeta, 0);
-                    res.json(500, {error: {message: `Error ${userRes.status} fetching user`}});
+                    res.json(403, {error: {message: `User ${username} is not allowed to view this app`}});
+                    return next();
                 }
+                Logger.log(userMeta, 0);
+                res.json(500, {error: {message: `Error ${userRes.status} fetching user`}});
+                return next();
             }))
             .catch(err => {
                 Logger.log(err, 0);
                 res.json(500, {error: {message: err.message}});
+                return next();
             });
         });
 
@@ -351,12 +365,14 @@ export default class Servers {
             file: 'index.html'
         }));
 
-        server.get('/status', function statusHandler(req, res) {
+        server.get('/status', function statusHandler(req, res, next) {
             res.send('Connector status - running and available for requests.');
+            return next();
         });
 
-        server.get('/ping', function pingHandler(req, res) {
+        server.get('/ping', function pingHandler(req, res, next) {
             res.json(200, {message: 'pong'});
+            return next();
         });
 
         // Hidden URL to test uncaught exceptions
@@ -365,7 +381,7 @@ export default class Servers {
         });
 
         // Validate then save connections to a file
-        server.post('/connections', function postDatastoresHandler(req, res) {
+        server.post('/connections', function postDatastoresHandler(req, res, next) {
             /*
              * Check if the connection already exists
              * If it does, prevent overwriting so that IDs
@@ -383,84 +399,91 @@ export default class Servers {
                 sanitize(req.params)
             );
             if (connectionsOnFile) {
-                res.send(409, {connectionId: connectionsOnFile.id});
-                return;
+                res.json(409, {connectionId: connectionsOnFile.id});
+                return next();
             }
 
             // Check that the connections are valid
             validateConnection(req.params).then(validation => {
                 if (isEmpty(validation)) {
                     res.json(200, {connectionId: saveConnection(req.params)});
-                    return;
+                    return next();
                 }
 
                 Logger.log(validation, 2);
                 res.json(400, {
                     error: {message: validation.message}
                 });
-                return;
+                return next();
             }).catch(err => {
                 Logger.log(err, 2);
                 res.json(400, {
                     error: {message: err.message}
                 });
+                return next();
             });
         });
 
         // return sanitized connections
-        server.get('/connections', function getDatastoresHandler(req, res) {
+        server.get('/connections', function getDatastoresHandler(req, res, next) {
             res.json(200, getSanitizedConnections());
+            return next();
         });
 
         /*
          * return a single connection by id
          * ids are assigned by the server on connection save
          */
-        server.get('/connections/:id', function getDatastoresIdHandler(req, res) {
+        server.get('/connections/:id', function getDatastoresIdHandler(req, res, next) {
             const connection = getSanitizedConnectionById(req.params.id);
             if (connection) {
                 res.json(200, connection);
-            } else {
-                res.json(404, {});
+                return next();
             }
+            res.json(404, {});
+            return next();
         });
 
-        server.put('/connections/:id', (req, res) => {
+        server.put('/connections/:id', (req, res, next) => {
             const connectionExists = getSanitizedConnectionById(req.params.id);
             if (!connectionExists) {
                 res.json(404, {});
-                return;
+                return next();
             }
             // continue knowing that the id exists already
             validateConnection(req.params).then(validation => {
                 if (isEmpty(validation)) {
                     res.json(200, editConnectionById(req.params));
-                } else {
-                    Logger.log(validation, 2);
-                    res.json(400, {error: validation.message});
+                    return next();
                 }
+                Logger.log(validation, 2);
+                res.json(400, {error: validation.message});
+                return next();
             }).catch(err => {
                 Logger.log(err, 2);
                 res.json(400, {error: err.message});
+                return next();
             });
         });
 
         // delete connections
         // TODO - delete all associated queries?
-        server.del('/connections/:id', function delDatastoresHandler(req, res) {
+        server.del('/connections/:id', function delDatastoresHandler(req, res, next) {
             if (getSanitizedConnectionById(req.params.id)) {
                 deleteConnectionById(req.params.id);
                 res.json(200, {});
-            } else {
-                res.json(404, {});
+                return next();
             }
+            res.json(404, {});
+            return next();
         });
 
         /* Connect */
-        server.post('/connections/:connectionId/connect', function postConnectHandler(req, res) {
+        server.post('/connections/:connectionId/connect', function postConnectHandler(req, res, next) {
             Datastores.connect(getConnectionById(req.params.connectionId))
             .then(() => {
                 res.json(200, {});
+                return next();
             });
         });
 
@@ -473,9 +496,10 @@ export default class Servers {
                 getConnectionById(req.params.connectionId)
             ).then(rows => {
                 res.json(200, rows);
-                next();
+                return next();
             }).catch(error => {
                 res.json(400, {error: {message: error.message}});
+                return next();
             });
         });
 
@@ -487,80 +511,94 @@ export default class Servers {
          * Multiple words are separated by hyphens instead of camelCased or
          * underscored.
          */
-        server.post('/connections/:connectionId/sql-tables', function tablesHandler(req, res) {
+        server.post('/connections/:connectionId/sql-tables', function tablesHandler(req, res, next) {
             Datastores.tables(
                 getConnectionById(req.params.connectionId)
             ).then(tables => {
                 res.json(200, tables);
+                return next();
             }).catch(error => {
                 res.json(500, {error: {message: error.message}});
+                return next();
             });
         });
 
-        server.post('/connections/:connectionId/sql-schemas', function schemasHandler(req, res) {
+        server.post('/connections/:connectionId/sql-schemas', function schemasHandler(req, res, next) {
             Datastores.schemas(
                 getConnectionById(req.params.connectionId)
             ).then(schemas => {
                 res.json(200, schemas);
+                return next();
             }).catch(error => {
                 res.json(500, {error: {message: error.message}});
+                return next();
             });
         });
 
-        server.post('/connections/:connectionId/s3-keys', function s3KeysHandler(req, res) {
+        server.post('/connections/:connectionId/s3-keys', function s3KeysHandler(req, res, next) {
             Datastores.files(
                 getConnectionById(req.params.connectionId)
             ).then(files => {
                 res.json(200, files);
+                return next();
             }).catch(error => {
                 res.json(500, {error: {message: error.message}});
+                return next();
             });
         });
 
         server.post('/connections/:connectionId/apache-drill-storage',
-            function apacheDrillStorageHandler(req, res) {
+            function apacheDrillStorageHandler(req, res, next) {
                 Datastores.storage(
                     getConnectionById(req.params.connectionId)
                 ).then(files => {
                     res.json(200, files);
+                    return next();
                 }).catch(error => {
                     res.json(500, {error: {message: error.message}});
+                    return next();
                 });
             });
 
         server.post('/connections/:connectionId/apache-drill-s3-keys',
-            function apacheDrills3KeysHandler(req, res) {
+            function apacheDrills3KeysHandler(req, res, next) {
                 Datastores.listS3Files(
                     getConnectionById(req.params.connectionId)
                 ).then(files => {
                     res.json(200, files);
+                    return next();
                 }).catch(error => {
                     res.json(500, {error: {message: error.message}});
+                    return next();
                 });
             });
 
         server.post('/connections/:connectionId/elasticsearch-mappings',
-            function elasticsearchMappingsHandler(req, res) {
+            function elasticsearchMappingsHandler(req, res, next) {
                 Datastores.elasticsearchMappings(
                     getConnectionById(req.params.connectionId)
                 ).then(mappings => {
                     res.json(200, mappings);
+                    return next();
                 }).catch(error => {
                     res.json(500, {error: {message: error.message}});
+                    return next();
                 });
             });
 
         /* Plotly v2 API requests */
 
-        server.post('/datacache', function getDatacacheHandler(req, res) {
+        server.post('/datacache', function getDatacacheHandler(req, res, next) {
             const {payload, type: contentType} = req.params;
 
             if (contentType !== 'csv') {
                 const datacacheResp = newDatacache(payload, contentType);
                 datacacheResp.then(plotlyRes => plotlyRes.json().then(resJSON => {
-                    return res.json(plotlyRes.status, resJSON);
-                })).catch(err => {
-                    throw new Error(err);
+                    res.json(plotlyRes.status, resJSON);
+                    return next();
+                })).catch(error => {
+                    res.json(500, {error: {message: error.message}});
+                    return next();
                 });
             }
             else {
@@ -568,11 +606,11 @@ export default class Servers {
                 const downloadPath = path.join(getSetting('STORAGE_PATH'), `data_export_${rand}.csv`);
                 fs.writeFile(downloadPath, payload, (err) => {
                     if (err) {
-                        return res.json({type: 'error', message: err});
+                        res.json({type: 'error', message: err});
+                        return next();
                     }
-                    return res.json({
-                        type: 'csv', url: 'file:///'.concat(downloadPath)
-                    });
+                    res.json({type: 'csv', url: 'file:///'.concat(downloadPath)});
+                    return next();
                 });
             }
         });
@@ -580,17 +618,19 @@ export default class Servers {
         /* Persistent Datastores */
 
         // return the list of registered queries
-        server.get('/queries', function getQueriesHandler(req, res) {
+        server.get('/queries', function getQueriesHandler(req, res, next) {
             res.json(200, getQueries());
+            return next();
         });
 
-        server.get('/queries/:fid', function getQueriesFidHandler(req, res) {
+        server.get('/queries/:fid', function getQueriesFidHandler(req, res, next) {
             const query = getQuery(req.params.fid);
             if (query) {
                 res.json(200, query);
-            } else {
-                res.json(404, {});
+                return next();
             }
+            res.json(404, {});
+            return next();
         });
 
         // register or overwrite a query
@@ -598,7 +638,7 @@ export default class Servers {
          * TODO - Updating a query should be a PATCH or PUT under
          * the endpoint `/queries/:fid`
          */
-        server.post('/queries', function postQueriesHandler(req, res) {
+        server.post('/queries', function postQueriesHandler(req, res, next) {
             // Make the query and update the user's grid
             const {fid, uids, query, connectionId, requestor} = req.params;
 
@@ -621,16 +661,18 @@ export default class Servers {
                 }
                 that.queryScheduler.scheduleQuery(req.params);
                 res.json(status, {});
+                return next();
             })
             .catch(function returnError(error) {
                 Logger.log(error, 0);
                 res.json(400, {error: {message: error.message}});
+                return next();
             });
 
         });
 
         // delete a query
-        server.del('/queries/:fid', function delQueriesHandler(req, res) {
+        server.del('/queries/:fid', function delQueriesHandler(req, res, next) {
             const {fid} = req.params;
             if (getQuery(fid)) {
                 deleteQuery(fid);
@@ -641,9 +683,10 @@ export default class Servers {
                  * a little easier to write
                  */
                 res.json(200, {});
-            } else {
-                res.json(404, {});
+                return next();
             }
+            res.json(404, {});
+            return next();
         });
 
         // Transform restify's error messages into our standard error object
@@ -664,18 +707,5 @@ export default class Servers {
                 error: {message: err.message}
             });
         });
-    }
-
-    closeHttpsServer() {
-        const that = this;
-        that.close('https');
-    }
-
-    close(type = 'http') {
-        Logger.log(`Closing the ${type} server.`);
-        const that = this;
-        const restifyServer = type === 'https' ? that.httpsServer : that.httpServer;
-        const {server} = restifyServer;
-        server.close();
     }
 }
