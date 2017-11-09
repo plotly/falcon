@@ -20,7 +20,7 @@ render(
       <Router history={browserHistory}>
         <Route path={homeUrl() + '/'} component={Configuration} />
         <Route path={homeUrl() + '/login'} component={Login} />
-        <Route path={homeUrl() + '/oauth2'} component={Status} />
+        <Route path={homeUrl() + '/oauth2/callback'} component={Status} />
       </Router>
     </Provider>,
     document.getElementById('root')

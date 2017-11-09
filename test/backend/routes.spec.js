@@ -479,12 +479,11 @@ describe('Routes:', () => {
                 assert.deepEqual(json, {error: {message: 'Yikes - uncaught error'}});
             }));
         });
-
     });
 
     describe('oauth:', function() {
         it('returns 200 on loading the oauth page', function() {
-            return GET('oauth2').then(res => {
+            return GET('oauth2/callback').then(res => {
                 assert.equal(res.status, 200);
             });
         });

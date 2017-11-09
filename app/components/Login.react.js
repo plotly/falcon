@@ -131,7 +131,7 @@ class Login extends Component {
         return (
             `${plotlyDomain}/o/authorize/?response_type=token&` +
             `client_id=${oauthClientId}&` +
-            `redirect_uri=${redirect_uri}/oauth2`
+            `redirect_uri=${redirect_uri}/oauth2/callback`
         );
     }
 
