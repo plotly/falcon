@@ -1,4 +1,6 @@
-var fetch = require('fetch-cookie')(require('node-fetch'));
+const fetchCookie = require('fetch-cookie');
+const nodeFetch = require('node-fetch');
+let fetch = fetchCookie(nodeFetch);
 
 import {assert} from 'chai';
 import {assoc, concat, contains, dissoc, isEmpty, keys, merge} from 'ramda';
@@ -94,6 +96,10 @@ function cleanUpSettings(...settingKeys) {
             // empty intentionally
         }
     });
+}
+
+function clearCookies() {
+    fetch = fetchCookie(nodeFetch);
 }
 
 let queryObject;
@@ -214,6 +220,8 @@ describe('Authentication:', () => {
             requestor: validFid.split(':')[0]
         };
 
+        // ensure fetch starts with no cookies
+        clearCookies();
     });
 
     afterEach(() => {
@@ -223,11 +231,15 @@ describe('Authentication:', () => {
     });
 
     it('backend responds to ping', function() {
-        return GET('ping');
+        return GET('ping').then(res => res.json()).then(json => {
+            assert.equal(json.message, 'pong');
+        });
     });
 
     it('backend allows access to login page without logging in', function() {
-        return GET('login');
+        return GET('login').then(res => {
+            assert.equal(res.status, 200);
+        });
     });
 
     it('backend allows access to connections page without logging in', function() {
@@ -294,22 +306,22 @@ describe('Authentication:', () => {
             // This ensures that any requests to plotly fail so that we can catch them
             saveSetting('PLOTLY_API_DOMAIN', 'bad-domain.plot.ly');
 
-            return GET('settings').then(res => res.json().then(json => {
+            return wait(1000).then(() => GET('settings').then(res => res.json().then(json => {
                 assert.equal(res.status, 500);
                 assert.equal(json.error.message,
                              ('request to ' +
                              'https://bad-domain.plot.ly/v2/users/current failed, ' +
                              'reason: getaddrinfo ENOTFOUND ' +
                              'bad-domain.plot.ly bad-domain.plot.ly:443'));
-            }));
+            })));
         });
     });
 
     it('backend renews access-token if expired', function() {
         saveSetting('ALLOWED_USERS', [username]);
 
-        // set access-token expiry of 3 sec:
-        saveSetting('ACCESS_TOKEN_AGE', 3);
+        // set access-token expiry of 1 sec:
+        saveSetting('ACCESS_TOKEN_AGE', 1);
 
         function assertAccessToken() {
             return GET('settings').then(res => res.json().then(json => {
@@ -325,7 +337,7 @@ describe('Authentication:', () => {
             return assertAccessToken();
         })
         .then(() => {
-            return wait(3000);
+            return wait(1000);
         })
         .then(() => {
             return assertAccessToken();
@@ -368,7 +380,7 @@ describe('Authentication:', () => {
             });
         });
 
-        it('user after faled login is not allowed acccess', function() {
+        it('user after failed login is not allowed acccess', function() {
             saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
 
             return POST('oauth2', {access_token: 'invalid access token'}).then(res => {
@@ -433,6 +445,9 @@ describe('Routes:', () => {
         saveSetting('ALLOWED_USERS', [username]);
         saveSetting('SSL_ENABLED', false);
 
+        // ensure fetch starts with no cookies
+        clearCookies();
+
         // Sets cookies using `oauth` route, so that following requests will be authenticated
         return POST('oauth2', {access_token: accessToken}).then(res => res.json().then(json => {
             assert.deepEqual(json, {});
@@ -447,7 +462,9 @@ describe('Routes:', () => {
 
     describe('backend:', function() {
         it('responds to ping', function() {
-            return GET('ping');
+            return GET('ping').then(res => res.json()).then(json => {
+                assert.equal(json.message, 'pong');
+            });
         });
 
         it('allows access to connections page', function() {
@@ -1000,20 +1017,20 @@ describe('Routes:', () => {
             return;
         }
 
-        describe(`connections: sql: query: ${connection.dialect}:`, function() {
+        describe(`connections: sql connectors: ${connection.dialect}: query:`, function() {
             createSqlQueryTest(connection);
         });
 
-        describe(`connections: sql: tables: ${connection.dialect}:`, function() {
+        describe(`connections: sql connectors: ${connection.dialect}: tables:`, function() {
             createSqlTablesTest(connection);
         });
 
-        describe(`connections: sql: schemas: ${connection.dialect}:`, function() {
+        describe(`connections: sql connectors: ${connection.dialect}: schemas:`, function() {
             createSqlSchemasTest(connection);
         });
     });
 
-    describe('connections: nosql: s3:', function() {
+    describe('connections: nosql connectors: s3:', function() {
         it('s3-keys returns a list of keys', function() {
             const s3CredId = saveConnection(publicReadableS3Connections);
             return POST(`connections/${s3CredId}/s3-keys`).then(res => res.json()).then(files => {
@@ -1069,7 +1086,7 @@ describe('Routes:', () => {
         });
     });
 
-    describe('connections: nosql: apache-drill:', function() {
+    describe('connections: nosql connectors: apache-drill:', function() {
         it('apache-drill-storage returns a list of storage items', function() {
             const s3CredId = saveConnection(apacheDrillConnections);
 
@@ -1232,7 +1249,7 @@ describe('Routes:', () => {
             return;
         }
 
-        describe(`connections: all: ${connection.dialect}:`, function() {
+        describe(`connections: all connectors: ${connection.dialect}:`, function() {
             createConnectionTest(connection);
         });
     });
@@ -1368,12 +1385,14 @@ describe('Routes:', () => {
     describe('persistent queries:', function() {
         beforeEach(function() {
             // Verify that there are no queries saved
-            return GET('queries').then(res => res.json()).then(json => {
+            return GET('queries').then(res => res.json().then(json => {
                 assert.deepEqual(json, []);
-            });
+            }));
         });
 
         it('queries registers a query and returns saved queries', function() {
+            this.timeout(60 * 1000);
+
             // Save a grid that we can update
             return createGrid('test interval')
                 .then(res => {
