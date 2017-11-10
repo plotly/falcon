@@ -32,17 +32,14 @@ class QueryScheduler {
     }) {
         if (!refreshInterval) {
             throw new Error('Refresh interval was not supplied');
-        // TODO - bump up to 60 when done testing.
-    } else if (refreshInterval < this.minimumRefreshInterval) {
+        } else if (refreshInterval < this.minimumRefreshInterval) {
             throw new Error(
-                'Refresh interval must be at least ' +
-                `${this.minimumRefreshInterval} ` +
-                `(${this.minimumRefreshInterval} seconds). ` +
-                `${refreshInterval} was supplied.`
+                `Refresh interval must be at least ${this.minimumRefreshInterval} seconds (suppied ${refreshInterval})`
             );
         }
 
         Logger.log(`Scheduling "${query}" with connection ${connectionId} updating grid ${fid}`);
+
         // Delete query if it is already saved
         if (getQuery(fid)) {
             deleteQuery(fid);
@@ -77,7 +74,6 @@ class QueryScheduler {
             },
             refreshInterval * 1000
         );
-
     }
 
     // Load and schedule queries - To be run on app start.
