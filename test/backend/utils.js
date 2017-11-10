@@ -1,12 +1,28 @@
-import {
-    PlotlyAPIRequest
-} from '../../backend/persistent/PlotlyAPI.js';
-import {dissoc, merge} from 'ramda';
-var restify = require('restify');
+const fs = require('fs');
 
+const restify = require('restify');
+
+import {dissoc, merge} from 'ramda';
+
+import {PlotlyAPIRequest} from '../../backend/persistent/PlotlyAPI.js';
+import {getSetting} from '../../backend/settings.js';
+
+// Helper functions for testing
 export function wait(milliseconds) {
     return new Promise(function(resolve) {
         setTimeout(resolve, milliseconds);
+    });
+}
+
+// Helper functions for settings
+export function clearSettings(...settingKeys) {
+    settingKeys.forEach(key => {
+        const settingPath = getSetting(key);
+        try {
+            fs.unlinkSync(settingPath);
+        } catch (e) {
+            // empty intentionally
+        }
     });
 }
 

@@ -1,23 +1,22 @@
+const fs = require('fs');
 const fetchCookie = require('fetch-cookie');
+
 const nodeFetch = require('node-fetch');
 let fetch = fetchCookie(nodeFetch);
 
 import {assert} from 'chai';
 import {assoc, concat, contains, dissoc, isEmpty, keys, merge} from 'ramda';
+
 import Servers from '../../backend/routes.js';
-import {
-    getConnections,
-    saveConnection
-} from '../../backend/persistent/Connections.js';
+import {getConnections, saveConnection} from '../../backend/persistent/Connections.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
 import {setCertificatesSettings} from '../../backend/certificates';
-
-import fs from 'fs';
 import {
     accessToken,
     apacheDrillConnections,
     apacheDrillStorage,
     apiKey,
+    clearSettings,
     createGrid,
     fakeCerts,
     mysqlConnection,
@@ -33,7 +32,7 @@ import {
 } from './utils.js';
 
 
-// Shortcuts
+// Helper functions
 function GET(path) {
     return fetch(`http://localhost:9494/${path}`, {
         method: 'GET',
@@ -87,17 +86,6 @@ function DELETE(path) {
     });
 }
 
-function cleanUpSettings(...settingKeys) {
-    settingKeys.forEach(key => {
-        const settingPath = getSetting(key);
-        try {
-            fs.unlinkSync(settingPath);
-        } catch (e) {
-            // empty intentionally
-        }
-    });
-}
-
 function clearCookies() {
     fetch = fetchCookie(nodeFetch);
 }
@@ -134,11 +122,11 @@ function closeServers() {
 /* eslint-disable no-invalid-this */
 describe('Servers:', () => {
     beforeEach(() => {
-        cleanUpSettings('KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH');
+        clearSettings('KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH');
     });
 
     after(() => {
-        cleanUpSettings('KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH');
+        clearSettings('KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH');
     });
 
     it('Https server is up and running after an http server was started and certs were created', () => {
@@ -199,7 +187,7 @@ describe('Authentication:', () => {
         servers.httpServer.start();
 
         // cleanup
-        cleanUpSettings('CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH');
+        clearSettings('CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH');
 
         // enable authentication:
         saveSetting('AUTH_ENABLED', true);
@@ -424,7 +412,7 @@ describe('Routes:', () => {
         servers.httpServer.start();
 
         // cleanup
-        cleanUpSettings('CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH');
+        clearSettings('CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH');
 
         // Save some connections to the user's disk
         saveSetting('USERS', [{
@@ -1173,7 +1161,7 @@ describe('Routes:', () => {
     // Connections
     function createConnectionTest(connection) {
         it('saves connections to a file if they are valid and if they do not exist', function() {
-            cleanUpSettings('CONNECTIONS_PATH');
+            clearSettings('CONNECTIONS_PATH');
 
             assert.deepEqual(getConnections(), []);
 
@@ -1191,7 +1179,7 @@ describe('Routes:', () => {
         });
 
         it('fails if the connections are not valid', function() {
-            cleanUpSettings('CONNECTIONS_PATH');
+            clearSettings('CONNECTIONS_PATH');
 
             assert.deepEqual(getConnections(), [], 'connections are empty at start');
 
@@ -1372,7 +1360,7 @@ describe('Routes:', () => {
         });
 
         it('returns an empty array of connections', function() {
-            cleanUpSettings('CONNECTIONS_PATH');
+            clearSettings('CONNECTIONS_PATH');
 
             return GET('connections')
                 .then(res => {
