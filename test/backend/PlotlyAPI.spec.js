@@ -19,7 +19,6 @@ describe('Grid API Functions', function () {
     });
 
     it('updateGrid overwrites a grid with new data', function () {
-        this.timeout(15 * 1000);
         // First, create a new grid.
         // Note that the app never actually does this,
         // it works off of the assumption that a grid exists

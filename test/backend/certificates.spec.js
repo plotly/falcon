@@ -164,7 +164,7 @@ describe('Certificates', function() {
             expect(getCerts()).to.deep.equal({});
             done();
         }, 3000);
-    }).timeout(5000);
+    });
 
     it('timeoutFetchAndSaveCerts - Will create certs if returned status 201 with certificates.', (done) => {
         // Start server that returns the correct response.
@@ -199,7 +199,7 @@ describe('Certificates', function() {
             assert.equal(ServerCA.count, 2);
             done();
         }, 6000);
-    }).timeout(10000);
+    });
 
     it('setRenewalJob - renews certificate after a given time if receives 201 from CA', (done) => {
         ServerCA.start(201, fakeCerts);
@@ -231,7 +231,7 @@ describe('Certificates', function() {
             );
             done();
         }, 6000);
-    }).timeout(10000);
+    });
 
     it('setRenewalJob - tries again if received a 500 status from CA', (done) => {
         ServerCA.start(500, {error: 'An error occurred.'});
@@ -250,7 +250,7 @@ describe('Certificates', function() {
             assert.deepEqual(getCerts(), {});
             done();
         }, 7000);
-    }).timeout(10000);
+    });
 
     it('setRenewalJob - Restarts the https server.', (done) => { ServerCA.start(201, fakeCerts);
         const {cert, key} = fakeCerts;
@@ -276,6 +276,6 @@ describe('Certificates', function() {
             expect(restart).to.have.been.called();
             done();
         }, 5000);
-    }).timeout(10000);
+    });
 
 });
