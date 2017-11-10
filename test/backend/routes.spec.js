@@ -637,8 +637,6 @@ describe('Routes:', () => {
         });
 
         it('succeeds when SQL query returns no data', function() {
-            this.timeout(60 * 1000);
-
             connectionId = saveConnection(connection);
 
             let query = 'SELECT * FROM ebola_2014 LIMIT 0';
@@ -1396,8 +1394,6 @@ describe('Routes:', () => {
         });
 
         it('queries registers a query and returns saved queries', function() {
-            this.timeout(60 * 1000);
-
             // Save a grid that we can update
             return createGrid('test interval')
                 .then(res => {
@@ -1616,10 +1612,7 @@ describe('Routes:', () => {
             }));
         });
 
-        // TODO - Getting intermittent FetchError: request to http://localhost:9494/queries failed, reason: socket hang up
         it("queries POST /queries fails when it can't connect to the plotly server", function() {
-            this.timeout(70 * 1000);
-
             const nonExistantServer = 'plotly.lah-lah-lemons.com';
             saveSetting('PLOTLY_API_DOMAIN', nonExistantServer);
             assert.deepEqual(getSetting('PLOTLY_API_URL'), `https://${nonExistantServer}`);

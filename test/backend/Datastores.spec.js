@@ -22,12 +22,10 @@ const transpose = m => m[0].map((x, i) => m.map(x => x[i]));
 /* eslint-disable no-invalid-this */
 describe('SQL - ', function () {
     it('connect connects to a database', function(done) {
-        this.timeout(4 * 1000);
         connect(sqlConnections).then(done).catch(done);
     });
 
     it('query queries a database', function(done) {
-        this.timeout(4 * 1000);
         query(
             'SELECT * from ebola_2014 LIMIT 2',
             sqlConnections
@@ -50,7 +48,6 @@ describe('SQL - ', function () {
      * TODO - Create a static PostGIS table for testing
      */
     xit('query stringifies boolean, date, and geojson objects', function(done) {
-        this.timeout(5 * 1000);
 
         query(
             'SELECT * from test LIMIT 1',
@@ -85,7 +82,6 @@ describe('SQL - ', function () {
 
 describe('MSSQL - ', function () {
     it('times out after 15 seconds by default', function(done) {
-        this.timeout(20 * 1000);
         query(
             'WAITFOR DELAY \'00:00:16\'',
             mssqlConnection
@@ -101,7 +97,6 @@ describe('MSSQL - ', function () {
     });
 
     it('doesn\'t timeout if requestTimeout was set', function(done) {
-        this.timeout(20 * 1000);
         query(
             'WAITFOR DELAY \'00:00:16\'',
             merge(mssqlConnection, {requestTimeout: 18 * 1000})
@@ -113,7 +108,6 @@ describe('MSSQL - ', function () {
 
 describe('Elasticsearch - ', function () {
     it('connect connects to an index', function(done) {
-        this.timeout(4 * 1000);
         connect(elasticsearchConnections).then(res => res.json().then(json => {
             assert.deepEqual(
                 json[1],
@@ -341,7 +335,6 @@ describe('Elasticsearch - ', function () {
     });
 
     it('query queries an elasticsearch index', function(done) {
-        this.timeout(4 * 1000);
         query(JSON.stringify({
                 body: {
                     query: {
@@ -448,7 +441,6 @@ describe('Elasticsearch - ', function () {
     });
 
     it('query queries an elasticsearch index and limits the size', function(done) {
-        this.timeout(4 * 1000);
         query(JSON.stringify(
             {
                 body: {
@@ -505,7 +497,6 @@ describe('Elasticsearch - ', function () {
     });
 
     it('query returns more than 10K rows', function(done) {
-        this.timeout(60 * 1000);
         query(JSON.stringify(
             {
                 body: {
@@ -547,7 +538,6 @@ describe('Elasticsearch - ', function () {
     });
 
     it('query returns all the data when size is larger than the dataset', function(done) {
-        this.timeout(60 * 1000);
         query(JSON.stringify(
             {
                 body: {
@@ -583,7 +573,6 @@ describe('Elasticsearch - ', function () {
     });
 
     it('Returns valid aggregated data', function(done) {
-        this.timeout(4 * 1000);
         query(JSON.stringify(
             {
                 body: {
@@ -634,19 +623,16 @@ describe('Elasticsearch - ', function () {
 
 describe('S3 - Connection', function () {
     it('connect succeeds with the right connection', function(done) {
-        this.timeout(4 * 1000);
         connect(publicReadableS3Connections).then(done).catch(done);
     });
 
     it('connect fails with the wrong connection', function(done) {
-        this.timeout(4 * 1000);
         connect({dialect: 's3', accessKeyId: 'asdf', secretAccessKey: 'fdas'})
         .then(() => done('Error - should not have succeeded'))
         .catch(() => done());
     });
 
     it('query parses S3 CSV files', function(done) {
-        this.timeout(20 * 1000);
         query('5k-scatter.csv', publicReadableS3Connections)
         .then(grid => {
             assert.deepEqual(grid.rows[0], ['-0.790276857291', '-1.32900495883']);
@@ -657,7 +643,6 @@ describe('S3 - Connection', function () {
     });
 
     it('files lists s3 files', function(done) {
-        this.timeout(5 * 1000);
         files(publicReadableS3Connections)
         .then(connFiles => {
             assert.deepEqual(
@@ -688,7 +673,6 @@ describe('Apache Drill - Connection', function () {
     });
 
     it('storage returns valid apache drill storage items', function(done) {
-        this.timeout(10 * 1000);
         storage(apacheDrillConnections)
         .then(config => {
             assert.deepEqual(
@@ -699,7 +683,6 @@ describe('Apache Drill - Connection', function () {
     });
 
     it('s3-keys returns a list of files in the s3 bucket', function(done) {
-        this.timeout(10 * 1000);
         listS3Files(apacheDrillConnections)
         .then(connFiles => {
             assert.deepEqual(
@@ -721,7 +704,6 @@ describe('Apache Drill - Connection', function () {
     });
 
     it('query parses parquet files on S3', function(done) {
-        this.timeout(20 * 1000);
         query('SELECT * FROM s3.root.`sample-data.parquet` LIMIT 10', apacheDrillConnections)
         .then(grid => {
 
