@@ -6,12 +6,12 @@ import Logger from '../logger';
 import fetch from 'node-fetch';
 
 const ESCAPED_ROUTES = [
-  new RegExp(`^${homeUrl()}/$`),
-  new RegExp(`^${homeUrl()}/ping$`),
-  new RegExp(`^${homeUrl()}/login$`),
-  new RegExp(`^${homeUrl()}/static/`),
-  new RegExp(`^${homeUrl()}/oauth2$`),
-  new RegExp(`^${homeUrl()}/oauth2/callback$`)
+  new RegExp('^/$'),
+  new RegExp('^/ping$'),
+  new RegExp('^/login$'),
+  new RegExp('^/static/'),
+  new RegExp('^/oauth2$'),
+  new RegExp('^/oauth2/callback$')
 ];
 
 function accessTokenIsValid(access_token) {
