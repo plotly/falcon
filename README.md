@@ -1,21 +1,14 @@
-# Falcon SQL Client
-<p align="center">
-<img src="https://raw.githubusercontent.com/plotly/falcon-sql-client/master/app/app.ico">
-</p>
+![Falcon logo](https://github.com/plotly/falcon-sql-client/raw/master/static/images/falcon-logo-by-plotly-stripe.png)
 
-> Plotly Database Connector for https://plot.ly/create. Connect your database and query your data to use in your charts.
+Falcon in a free, open-source SQL editor with inline data visualization. It currently supports connecting to RedShift, MySQL, PostgreSQL, IBM DB2, Impala, MS SQL, and SQLite.
 
-The Falcon SQL Client is a cross-platform desktop application that connects the [Plotly 2.0 Visualization Platform](https://plot.ly/create) to your database.
+Visit plot.ly/free-sql-client-download to learn more or visit the [Plotly forum](https://community.plot.ly/c/falcon-sql-client).
 
-![Screencast of the falcon sql client](http://g.recordit.co/LqhQcEcwti.gif)
+Follow [@plotlygraphs](https://twitter.com/plotlygraphs) on Twitter for Falcon announcements.
 
-Plotly 2.0 makes HTTP requests from the local web browser directly to the Falcon app. This database connector runs as a server on localhost and forwards queries from the Plotly 2.0 web-application to the database that connect to. Requests are made client-side, so you don't need to open up the connector or your database to the world, you just need to be able to access it from the machine that is running this connector app.
+⬇ [Download Falcon](plot.ly/free-sql-client-download)
 
-[Learn more in our online documentation](http://help.plot.ly/database-connectors/) or just give it a try in [Plotly 2.0](https://plot.ly/create/?upload=sql).
-
-## Feature Requests
-
-[Contact us](https://plot.ly/products/consulting-and-oem/) for feature additions, support, training, consulting, and more.
+![Screencast of falcon sql client](https://github.com/plotly/falcon-sql-client/raw/master/static/images/falcon_hero.gif)
 
 ## Contribute
 
@@ -26,9 +19,9 @@ We want to encourage a warm, welcoming, and safe environment for contributing to
 
 ## Contact
 
-- Maintainer: Chris - chris@plot.ly
-- Feature requests and consulting: https://plot.ly/products/consulting-and-oem/
-- Security reports: https://help.plot.ly/security/
+- Lead maintainer: [@n-riesco](https://github.com/n-riesco)
+- [Feature requests and support](https://plot.ly/products/consulting-and-oem/)
+- [Security reports](https://help.plot.ly/security/)
 
 ## Credit
 
