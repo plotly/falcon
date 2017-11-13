@@ -1,16 +1,22 @@
 ![Falcon logo](https://github.com/plotly/falcon-sql-client/raw/master/static/images/falcon-logo-by-plotly-stripe.png)
 
-Falcon in a free, open-source SQL editor with inline data visualization. It currently supports connecting to RedShift, MySQL, PostgreSQL, IBM DB2, Impala, MS SQL, and SQLite.
+Falcon in a free, open-source SQL editor with inline data visualization. It currently supports connecting to **RedShift**, **MySQL**, **PostgreSQL**, **IBM DB2**, **Impala**, **MS SQL**, and **SQLite**.
 
-Visit plot.ly/free-sql-client-download to learn more or visit the [Plotly forum](https://community.plot.ly/c/falcon-sql-client).
+Visit [plot.ly](plot.ly/free-sql-client-download) to learn more or visit the [Plotly forum](https://community.plot.ly/c/falcon-sql-client).
 
 Follow [@plotlygraphs](https://twitter.com/plotlygraphs) on Twitter for Falcon announcements.
 
-⬇ [Download Falcon](plot.ly/free-sql-client-download)
+➡ [Download Falcon for Mac OS](plot.ly/free-sql-client-download)
+
+➡ [Download Falcon for Windows](plot.ly/free-sql-client-download)
 
 ![Screencast of falcon sql client](https://github.com/plotly/falcon-sql-client/raw/master/static/images/falcon_hero.gif)
 
-## Contribute
+## Documentation
+
+If you want to read more about connecting Falcon to your data warehouse, [help.plot.ly](https://help.plot.ly/database-connectors/) is free and available online. You can also [contribute](https://github.com/plotly/plotly.github.io/tree/master/_posts/connectors) to this documentation through GitHub.
+
+## Contributing
 
 See [CONTRIBUTING.md](https://github.com/plotly/falcon-sql-client/blob/master/CONTRIBUTING.md).
 You can also [contact us](https://plot.ly/products/consulting-and-oem/) if you would like a specific feature added.
