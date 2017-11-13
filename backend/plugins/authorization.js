@@ -1,7 +1,7 @@
 import {contains} from 'ramda';
 import {getSetting} from '../settings.js';
 import {getAccessTokenCookieOptions} from '../constants.js';
-import {generateAndSaveAccessToken} from '../utils/authUtils';
+import {generateAndSaveAccessToken, homeUrl} from '../utils/authUtils';
 import Logger from '../logger';
 import fetch from 'node-fetch';
 
