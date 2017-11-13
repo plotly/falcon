@@ -2,6 +2,7 @@ import queryString from 'query-string';
 import fetch from 'isomorphic-fetch';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {homeUrl} from '../utils/utils';
 
 class Status extends Component {
     constructor(props) {
@@ -25,7 +26,7 @@ class Status extends Component {
         window.queryString = queryString;
 
         this.setState({status: 'loading'});
-        fetch('./oauth2', {
+        fetch(homeUrl() + '/oauth2', {
             credentials: 'include',
             method: 'POST',
             headers: {
