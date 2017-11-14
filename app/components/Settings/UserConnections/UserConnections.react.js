@@ -47,7 +47,7 @@ export default class UserConnections extends Component {
             dialog.showOpenDialog({
                 properties: ['openFile', 'openDirectory'],
                 filters: [{
-                    name: 'databases', 
+                    name: 'databases',
                     // pulled from https://stackoverflow.com/a/47096815/4142536
                     extensions: [
                         'db',
