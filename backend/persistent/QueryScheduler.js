@@ -33,9 +33,10 @@ class QueryScheduler {
         if (!refreshInterval) {
             throw new Error('Refresh interval was not supplied');
         } else if (refreshInterval < this.minimumRefreshInterval) {
-            throw new Error(
-                `Refresh interval must be at least ${this.minimumRefreshInterval} seconds (suppied ${refreshInterval})`
-            );
+            throw new Error([
+                `Refresh interval must be at least ${this.minimumRefreshInterval} seconds`,
+                `(supplied ${refreshInterval})`
+            ].join(' '));
         }
 
         Logger.log(`Scheduling "${query}" with connection ${connectionId} updating grid ${fid}`);
