@@ -14,8 +14,26 @@ class QueryScheduler {
         this.clearQueries = this.clearQueries.bind(this);
         this.queryAndUpdateGrid = this.queryAndUpdateGrid.bind(this);
 
-        // Expose this.job so that tests can overwrite it
-        this.job = this.queryAndUpdateGrid;
+        // this.job wraps this.queryAndUpdateGrid to avoid concurrent runs of the same job
+        this.runningJobs = {};
+        this.job = (fid, uids, query, connectionId, requestor) => {
+            try {
+                if (this.runningJobs[fid]) {
+                    return;
+                }
+
+                this.runningJobs[fid] = true;
+
+                return this.queryAndUpdateGrid(fid, uids, query, connectionId, requestor)
+                    .catch(error => {
+                        Logger.log(error, 0);
+                    }).then(() => {
+                        delete this.runningJobs[fid];
+                    });
+            } catch (e) {
+                Logger.log(e, 0);
+            }
+        };
 
         // Expose this.minimumRefreshInterval so that tests can overwrite it
         this.minimumRefreshInterval = 60;
@@ -64,14 +82,7 @@ class QueryScheduler {
         // Schedule
         this.queryJobs[fid] = setInterval(
             () => {
-                try {
-                    this.job(fid, uids, query, connectionId, requestor)
-                    .catch(error => {
-                        Logger.log(error, 0);
-                    });
-                } catch (e) {
-                    Logger.log(e, 0);
-                }
+                this.job(fid, uids, query, connectionId, requestor);
             },
             refreshInterval * 1000
         );
