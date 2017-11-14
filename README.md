@@ -6,9 +6,9 @@ Visit [plot.ly](plot.ly/free-sql-client-download) to learn more or visit the [Pl
 
 Follow [@plotlygraphs](https://twitter.com/plotlygraphs) on Twitter for Falcon announcements.
 
-➡ [Download Falcon for Mac OS](plot.ly/free-sql-client-download)
+➡ [Download Falcon for Mac OS](https://plot.ly/free-sql-client-download/)
 
-➡ [Download Falcon for Windows](plot.ly/free-sql-client-download)
+➡ [Download Falcon for Windows](https://plot.ly/free-sql-client-download/)
 
 ![Screencast of falcon sql client](https://github.com/plotly/falcon-sql-client/raw/master/static/images/falcon_hero.gif)
 
