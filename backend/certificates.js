@@ -79,26 +79,36 @@ export function fetchCertsFromCA() {
         ));
     }).then((res) => {
         if (res.status !== 201) {
-            let errorMessage = 'An error occured requesting certificates from the CA, ' +
+            let errorMessage =
+                'An error occured requesting certificates from the CA, ' +
                 `status ${res.status} was returned.`;
-            res.json().then(json => {
+
+            return res.json().then(json => {
                 errorMessage += `JSON response was: ${JSON.stringify(json)}`;
-                Logger.log(errorMessage, 0);
-                return errorMessage;
-            }).catch(() => {
-                throw errorMessage;
-            }).then(() => {
-                throw errorMessage;
+            })
+            .catch(() => {
+                // ignore failure to parse response as json
+            })
+            .then(() => {
+                // report error to request certificates from the CA
+                throw new Error(errorMessage);
             });
         }
+
         return res.json();
     }).catch((e) => {
-        Logger.log(`CA Server fails to respond. ${JSON.stringify(e)}`, 0);
+        Logger.log(`CA Server fails to respond. ${e.message}`, 0);
+
         if (e.code === 'ECONNREFUSED') {
             Logger.log('Caught ECONNREFUSED from CA server.', 0);
+
             // If server is down, increase TIMEOUT to try a 1 minute later.
             setCertificatesSettings('TIMEOUT_BETWEEN_TRIES', 60);
+
+            return;
         }
+
+        throw e;
     });
 }
 
