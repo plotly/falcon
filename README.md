@@ -2,7 +2,7 @@
 
 Falcon in a free, open-source SQL editor with inline data visualization. It currently supports connecting to **RedShift**, **MySQL**, **PostgreSQL**, **IBM DB2**, **Impala**, **MS SQL**, and **SQLite**.
 
-Visit [plot.ly](plot.ly/free-sql-client-download) to learn more or visit the [Plotly forum](https://community.plot.ly/c/falcon-sql-client).
+Visit [plot.ly](https://plot.ly/free-sql-client-download) to learn more or visit the [Plotly forum](https://community.plot.ly/c/falcon-sql-client).
 
 Follow [@plotlygraphs](https://twitter.com/plotlygraphs) on Twitter for Falcon announcements.
 
