@@ -46,7 +46,23 @@ export default class UserConnections extends Component {
         return () => {
             dialog.showOpenDialog({
                 properties: ['openFile', 'openDirectory'],
-                filters: [{name: 'databases', extensions: ['db']}]
+                filters: [{
+                    name: 'databases',
+                    // pulled from https://stackoverflow.com/a/47096815/4142536
+                    extensions: [
+                        'db',
+                        'sdb',
+                        'sqlite',
+                        'db3',
+                        's3db',
+                        'sqlite3',
+                        'sl3',
+                        'db2',
+                        's2db',
+                        'sqlite2',
+                        'sl2'
+                    ]
+                }]
             }, (paths) => {
                 // result returned in an array
                 // TODO: add length of paths === 0 check
