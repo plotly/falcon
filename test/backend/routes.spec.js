@@ -819,6 +819,88 @@ describe('Routes:', () => {
                             [ 'world_gdp_with_codes_2014', 'gdp (billions)', 'numeric' ],
                             [ 'world_gdp_with_codes_2014', 'country', 'character varying' ]
                         ];
+                    } else if (connection.dialect === 'redshift') {
+                        rows = [
+                            [ 'walmart_store_openings_1962_2006', 'storenum', 'integer' ],
+                            [ 'walmart_store_openings_1962_2006', 'opendate', 'character varying' ],
+                            [ 'walmart_store_openings_1962_2006', 'date_super', 'character varying' ],
+                            [ 'walmart_store_openings_1962_2006', 'conversion', 'character varying' ],
+                            [ 'walmart_store_openings_1962_2006', 'st', 'integer' ],
+                            [ 'walmart_store_openings_1962_2006', 'county', 'integer' ],
+                            [ 'walmart_store_openings_1962_2006', 'streetaddr', 'character varying' ],
+                            [ 'walmart_store_openings_1962_2006', 'strcity', 'character varying' ],
+                            [ 'walmart_store_openings_1962_2006', 'strstate', 'character varying' ],
+                            [ 'walmart_store_openings_1962_2006', 'zipcode', 'integer' ],
+                            [ 'walmart_store_openings_1962_2006', 'type_store', 'character varying' ],
+                            [ 'walmart_store_openings_1962_2006', 'lat', 'numeric' ],
+                            [ 'walmart_store_openings_1962_2006', 'lon', 'numeric' ],
+                            [ 'walmart_store_openings_1962_2006', 'month', 'integer' ],
+                            [ 'walmart_store_openings_1962_2006', 'day', 'integer' ],
+                            [ 'walmart_store_openings_1962_2006', 'year', 'integer' ],
+                            [ 'alcohol_consumption_by_country_2010', 'location', 'character varying' ],
+                            [ 'alcohol_consumption_by_country_2010', 'alcohol', 'character varying' ],
+                            [ 'february_aa_flight_paths_2011', 'start_lat', 'numeric' ],
+                            [ 'february_aa_flight_paths_2011', 'start_lon', 'numeric' ],
+                            [ 'february_aa_flight_paths_2011', 'end_lat', 'numeric' ],
+                            [ 'february_aa_flight_paths_2011', 'end_lon', 'numeric' ],
+                            [ 'february_aa_flight_paths_2011', 'airline', 'character varying' ],
+                            [ 'february_aa_flight_paths_2011', 'airport1', 'character varying' ],
+                            [ 'february_aa_flight_paths_2011', 'airport2', 'character varying' ],
+                            [ 'february_aa_flight_paths_2011', 'cnt', 'integer' ],
+                            [ 'february_us_airport_traffic_2011', 'iata', 'character varying' ],
+                            [ 'february_us_airport_traffic_2011', 'airport', 'character varying' ],
+                            [ 'february_us_airport_traffic_2011', 'city', 'character varying' ],
+                            [ 'february_us_airport_traffic_2011', 'state', 'character varying' ],
+                            [ 'february_us_airport_traffic_2011', 'country', 'character varying' ],
+                            [ 'february_us_airport_traffic_2011', 'lat', 'numeric' ],
+                            [ 'february_us_airport_traffic_2011', 'long', 'numeric' ],
+                            [ 'february_us_airport_traffic_2011', 'cnt', 'integer' ],
+                            [ 'us_ag_exports_2011', 'code', 'character varying' ],
+                            [ 'us_ag_exports_2011', 'state', 'character varying' ],
+                            [ 'us_ag_exports_2011', 'category', 'character varying' ],
+                            [ 'us_ag_exports_2011', 'total exports', 'numeric' ],
+                            [ 'us_ag_exports_2011', 'beef', 'numeric' ],
+                            [ 'us_ag_exports_2011', 'pork', 'numeric' ],
+                            [ 'us_ag_exports_2011', 'poultry', 'numeric' ],
+                            [ 'us_ag_exports_2011', 'dairy', 'numeric' ],
+                            [ 'us_ag_exports_2011', 'fruits fresh', 'numeric' ],
+                            [ 'us_ag_exports_2011', 'fruits proc', 'numeric' ],
+                            [ 'us_ag_exports_2011', 'total fruits', 'numeric' ],
+                            [ 'us_ag_exports_2011', 'veggies fresh', 'numeric' ],
+                            [ 'us_ag_exports_2011', 'veggies proc', 'numeric' ],
+                            [ 'us_ag_exports_2011', 'total veggies', 'numeric' ],
+                            [ 'us_ag_exports_2011', 'corn', 'numeric' ],
+                            [ 'us_ag_exports_2011', 'wheat', 'numeric' ],
+                            [ 'us_ag_exports_2011', 'cotton', 'numeric' ],
+                            [ 'apple_stock_2014', 'aapl_x', 'date' ],
+                            [ 'apple_stock_2014', 'aapl_y', 'numeric' ],
+                            [ 'ebola_2014', 'country', 'character varying' ],
+                            [ 'ebola_2014', 'month', 'integer' ],
+                            [ 'ebola_2014', 'year', 'integer' ],
+                            [ 'ebola_2014', 'lat', 'numeric' ],
+                            [ 'ebola_2014', 'lon', 'numeric' ],
+                            [ 'ebola_2014', 'value', 'integer' ],
+                            [ 'us_cities_2014', 'name', 'character varying' ],
+                            [ 'us_cities_2014', 'pop', 'integer' ],
+                            [ 'us_cities_2014', 'lat', 'numeric' ],
+                            [ 'us_cities_2014', 'lon', 'numeric' ],
+                            [ 'usa_states_2014', 'rank', 'integer' ],
+                            [ 'usa_states_2014', 'state', 'character varying' ],
+                            [ 'usa_states_2014', 'postal', 'character varying' ],
+                            [ 'usa_states_2014', 'pop', 'numeric' ],
+                            [ 'world_gdp_with_codes_2014', 'country', 'character varying' ],
+                            [ 'world_gdp_with_codes_2014', 'gdp (billions)', 'numeric' ],
+                            [ 'world_gdp_with_codes_2014', 'code', 'character varying' ],
+                            [ 'precipitation_2015_06_30', 'hrapx', 'character varying' ],
+                            [ 'precipitation_2015_06_30', 'hrapy', 'character varying' ],
+                            [ 'precipitation_2015_06_30', 'lat', 'numeric' ],
+                            [ 'precipitation_2015_06_30', 'lon', 'numeric' ],
+                            [ 'precipitation_2015_06_30', 'globvalue', 'numeric' ],
+                            [ 'weather_data_seattle_2016', 'date', 'character varying' ],
+                            [ 'weather_data_seattle_2016', 'max_temperaturec', 'character varying' ],
+                            [ 'weather_data_seattle_2016', 'mean_temperaturec', 'character varying' ],
+                            [ 'weather_data_seattle_2016', 'min_temperaturec', 'character varying' ]
+                        ];
                     } else if (connection.dialect === 'mssql') {
                         rows = [
                             [ 'walmart_store_openings_1962_2006', 'storenum', 'int', 4, '10/0' ],
@@ -997,10 +1079,6 @@ describe('Routes:', () => {
     }
 
     testSqlConnections.forEach(function(connection) {
-        // TODO - Open up redshift to CI
-        if (connection.dialect === 'redshift') {
-            return;
-        }
         if (connection.dialect === 'apache impala') {
             return;
         }
@@ -1232,10 +1310,6 @@ describe('Routes:', () => {
     }
 
     testConnections.forEach(function(connection) {
-        // TODO - Open up Redshift to CI
-        if (connection.dialect === 'redshift') {
-            return;
-        }
         if (connection.dialect === 'apache impala') {
             return;
         }
