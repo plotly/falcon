@@ -5,6 +5,10 @@ import {generateAndSaveAccessToken} from '../utils/authUtils';
 import Logger from '../logger';
 import fetch from 'node-fetch';
 
+/*
+ * backend does not see `/external-data-connector` in on-prem (because it is proxied).
+ * So these ESCAPED_ROUTES should work for on-prem as well.
+ */
 const ESCAPED_ROUTES = [
   new RegExp('^/$'),
   new RegExp('^/ping$'),
