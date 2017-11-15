@@ -30,21 +30,25 @@ const SHOW_TABLES_QUERY = {
     [DIALECTS.MYSQL]: 'SHOW TABLES',
     [DIALECTS.MARIADB]: 'SHOW TABLES',
     [DIALECTS.SQLITE]: 'SELECT name FROM sqlite_master WHERE type="table"',
-    [DIALECTS.POSTGRES]: (
-        'SELECT table_name FROM ' +
-        'information_schema.tables WHERE ' +
-        'table_schema = \'public\''
-    ),
     [DIALECTS.MSSQL]: (
         'SELECT TABLE_NAME FROM ' +
         'information_schema.tables'
     ),
+    [DIALECTS.POSTGRES]: `
+        SELECT table_schema || '."'  || table_name || '"'
+        FROM information_schema.tables
+        WHERE table_type != 'VIEW'
+           AND table_schema != 'pg_catalog'
+           AND table_schema != 'information_schema'
+        ORDER BY table_schema, table_name
+    `,
     [DIALECTS.REDSHIFT]: `
         SELECT table_schema || '."'  || table_name || '"'
         FROM information_schema.tables
         WHERE table_type != 'VIEW'
            AND table_schema != 'pg_catalog'
            AND table_schema != 'information_schema'
+        ORDER BY table_schema, table_name
     `
 };
 
@@ -133,7 +137,7 @@ export function tables(connection) {
 
         let tableNames;
 
-        if (connection.dialect === 'redshift') {
+        if (connection.dialect === 'postgres' || connection.dialect === 'redshift') {
             tableNames = tableList.map(data => {
                 let tableName = String(data['?column?']);
 
@@ -149,10 +153,6 @@ export function tables(connection) {
                 }
 
                 return tableName;
-            });
-        } else if (connection.dialect === 'postgres') {
-            tableNames = tableList.map(data => {
-                return data[0];
             });
         } else if (connection.dialect === 'sqlite') {
             tableNames = tableList;
@@ -180,9 +180,6 @@ export function schemas(connection) {
                 `WHERE table_schema = '${database}' ORDER BY table_name`;
             break;
         case DIALECTS.POSTGRES:
-            queryString = `SELECT table_name, column_name, data_type FROM information_schema.columns ` +
-                `WHERE table_catalog = '${database}' AND table_schema = 'public' ORDER BY table_name`;
-            break;
         case DIALECTS.REDSHIFT:
             queryString = `
                 SELECT table_schema || '."'  || table_name || '"', column_name, data_type
