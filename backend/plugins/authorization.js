@@ -1,17 +1,21 @@
 import {contains} from 'ramda';
 import {getSetting} from '../settings.js';
 import {getAccessTokenCookieOptions} from '../constants.js';
-import {generateAndSaveAccessToken, homeUrl} from '../utils/authUtils';
+import {generateAndSaveAccessToken} from '../utils/authUtils';
 import Logger from '../logger';
 import fetch from 'node-fetch';
 
+/*
+ * backend does not see `/external-data-connector` in on-prem (because it is proxied).
+ * So these ESCAPED_ROUTES should work for on-prem as well.
+ */
 const ESCAPED_ROUTES = [
-  new RegExp(`^${homeUrl()}/$`),
-  new RegExp(`^${homeUrl()}/ping$`),
-  new RegExp(`^${homeUrl()}/login$`),
-  new RegExp(`^${homeUrl()}/static/`),
-  new RegExp(`^${homeUrl()}/oauth2$`),
-  new RegExp(`^${homeUrl()}/oauth2/callback$`)
+  new RegExp('^/$'),
+  new RegExp('^/ping$'),
+  new RegExp('^/login$'),
+  new RegExp('^/static/'),
+  new RegExp('^/oauth2$'),
+  new RegExp('^/oauth2/callback$')
 ];
 
 function accessTokenIsValid(access_token) {
