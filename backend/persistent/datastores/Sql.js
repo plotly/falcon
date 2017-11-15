@@ -135,7 +135,20 @@ export function tables(connection) {
 
         if (connection.dialect === 'redshift') {
             tableNames = tableList.map(data => {
-                return data['?column?'];
+                let tableName = String(data['?column?']);
+
+                // if schema is public, remove it from table name
+                if (tableName.startsWith('public.')) {
+                    tableName = tableName.substring(7);
+
+                    // if table name is lowercase, remove unnecessary quote marks
+                    const lowercase = tableName.toLowerCase();
+                    if (tableName === lowercase) {
+                        tableName = lowercase.substring(1, lowercase.length - 1);
+                    }
+                }
+
+                return tableName;
             });
         } else if (connection.dialect === 'postgres') {
             tableNames = tableList.map(data => {
