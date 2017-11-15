@@ -185,11 +185,12 @@ export function schemas(connection) {
             break;
         case DIALECTS.REDSHIFT:
             queryString = `
-                SELECT table_name, column_name, data_type
+                SELECT table_schema || '."'  || table_name || '"', column_name, data_type
                 FROM information_schema.columns
                 WHERE table_catalog = '${database}'
                     AND table_schema != 'pg_catalog'
                     AND table_schema != 'information_schema'
+                ORDER BY table_schema, table_name, column_name
             `;
             break;
         case DIALECTS.MSSQL:
