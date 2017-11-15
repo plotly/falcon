@@ -365,8 +365,8 @@ function PREVIEW_QUERY (dialect, table, database = '') {
         case DIALECTS.MYSQL:
         case DIALECTS.SQLITE:
         case DIALECTS.MARIADB:
-        case DIALECTS.REDSHIFT:
             return `SELECT * FROM ${table} LIMIT 1000`;
+        case DIALECTS.REDSHIFT:
         case DIALECTS.POSTGRES:
             return `SELECT * FROM "${table}" LIMIT 1000`;
         case DIALECTS.MSSQL:
