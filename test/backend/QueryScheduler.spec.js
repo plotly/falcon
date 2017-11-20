@@ -276,7 +276,7 @@ describe('QueryScheduler', function() {
             }));
         }
 
-        const refreshInterval = 30; // seconds
+        const refreshInterval = 60; // seconds
         this.timeout(10 * refreshInterval * 1000);
 
         /*
