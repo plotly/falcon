@@ -239,11 +239,11 @@
     "yamljs": "^0.2.8"
   },
   "engines": {
-    "node": "6.11.1",
-    "yarn": "1.2.1"
+    "node": "6",
+    "yarn": "1"
   },
   "devEngines": {
-    "node": "6.11.1",
-    "yarn": "1.2.1"
+    "node": "6",
+    "yarn": "1"
   }
 }
