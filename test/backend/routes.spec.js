@@ -437,9 +437,17 @@ describe('Routes:', () => {
         clearCookies();
 
         // Sets cookies using `oauth` route, so that following requests will be authenticated
-        return POST('oauth2', {access_token: accessToken}).then(res => res.json().then(json => {
+        return POST('oauth2', {access_token: accessToken}).then(res => {
+            if (res.status !== 200) {
+                return res.text().then(text => {
+                    let message = `Failed to set oauth cookies. Status: ${res.status}. Body: ${text}.`;
+                    throw new Error(message);
+                });
+            }
+            return res.json();
+        }).then(json => {
             assert.deepEqual(json, {});
-        }));
+        });
     });
 
     afterEach(() => {
