@@ -1,29 +1,36 @@
-machine:
-    node:
-        version: 6.11.1
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:6.11.1-browsers
     environment:
-        PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
-
-dependencies:
-    pre:
-        - npm uninstall -g yarn && rm -rf $HOME/.yarn && npm install -g yarn@1.2.1
-
-    override:
-        - yarn install
-
-    post:
-        - yarn run rebuild:modules:electron
-
-compile:
-    override:
-        - yarn run build
-
-test:
-    override:
-        - yarn run test
-
-    post:
-        - yarn run build
-        - yarn run package
-        - zip -r release.zip release
-        - mv release.zip $CIRCLE_ARTIFACTS
+      PATH: "/usr/local/opt/curl/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/home/circleci/project/node_modules/.bin"
+    steps:
+      - restore_cache:
+          key: v1-source-{{ .Branch }}-{{ .Revision }}
+          keys:
+            - v1-source-{{ .Branch }}-
+            - v1-source-
+      - checkout
+      - save_cache:
+          key: v1-source-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ".git"
+      - restore_cache:
+          key: v1-yarn-{{ checksum "package.json" }}
+          keys:
+            - v1-yarn-
+      - run: yarn install
+      - run: yarn run rebuild:modules:electron
+      - save_cache:
+          key: v1-yarn-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      - run: yarn run build
+      - run: yarn run test
+      - run: yarn run build
+      - run: yarn run package
+      - run: zip -r release.zip release
+      - run: mkdir artifacts && mv release.zip artifacts/
+      - store_artifacts:
+          path: artifacts
