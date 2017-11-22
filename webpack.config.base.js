@@ -32,7 +32,6 @@ export default {
             'sequelize': 'commonjs sequelize',
             'bunyan': 'commonjs bunyan',
             'tedious': 'tedious',
-            'electron-sudo': 'commonjs electron-sudo',
             'csv-parse': 'commonjs csv-parse'
         }
     ]

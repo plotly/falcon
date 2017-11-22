@@ -67,8 +67,6 @@
       "executableName": "falcon-sql-client",
       "maintainer": "enquiries@nicolasriesco.net",
       "target": [
-        "AppImage",
-        "deb",
         "tar.gz"
       ],
       "icon": "app/icons"
@@ -215,7 +213,6 @@
   "dependencies": {
     "bunyan": "^1.8.12",
     "csv-parse": "https://registry.npmjs.org/csv-parse/-/csv-parse-1.1.7.tgz",
-    "electron-sudo": "^3.0.13",
     "font-awesome": "^4.6.1",
     "ibm_db": "^2.2.1",
     "mysql": "^2.10.2",

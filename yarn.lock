@@ -3135,10 +3135,6 @@ electron-publish@19.46.4:
     fs-extra-p "^4.4.4"
     mime "^2.0.3"
 
-electron-sudo@^3.0.13:
-  version "3.0.13"
-  resolved "https://registry.yarnpkg.com/electron-sudo/-/electron-sudo-3.0.13.tgz#4c850cdc2f3bf0f3e543b8fd21cbd65646bd57ea"
-
 electron-to-chromium@^1.2.7:
   version "1.3.22"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.22.tgz#4322d52c151406e3eaef74ad02676883e8416418"
