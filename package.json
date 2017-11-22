@@ -176,6 +176,7 @@
     "del": "^2.2.0",
     "electron": "^1.7.8",
     "electron-debug": "^0.6.0",
+    "electron-installer-dmg": "^0.2.1",
     "electron-rebuild": "^1.1.3",
     "electron-sudo": "^3.0.13",
     "fbjs-scripts": "^0.6.0",
