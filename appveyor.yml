@@ -22,14 +22,13 @@ init:
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
   - yarn install --force
-  - yarn run rebuild:modules:electron
 
 build_script:
   - yarn run build
   - yarn run pack
 
 after_build:
-  - 7z a release.zip release
+  - 7z a release.zip release/latest.yml release/*.exe
 
 artifacts:
   - path: release.zip
