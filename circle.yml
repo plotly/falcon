@@ -1,13 +1,10 @@
 machine:
     node:
-        version: 6.11.1
+        version: 6
     environment:
         PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
 
 dependencies:
-    pre:
-        - npm uninstall -g yarn && rm -rf $HOME/.yarn && npm install -g yarn@1.2.1
-
     override:
         - yarn install
 
@@ -23,7 +20,5 @@ test:
         - yarn run test
 
     post:
-        - yarn run build
-        - yarn run package
-        - zip -r release.zip release
-        - mv release.zip $CIRCLE_ARTIFACTS
+        - yarn run pack
+        - mv release/latest-linux.yml release/falcon-sql-client* $CIRCLE_ARTIFACTS
