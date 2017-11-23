@@ -204,11 +204,11 @@
     "csv-parse": "^2.0.0",
     "font-awesome": "^4.6.1",
     "ibm_db": "git+https://git@github.com/n-riesco/node-ibm_db.git#patched-v2.2.1",
-    "mysql2": "^1.5.1",
+    "mysql": "^2.15.0",
     "pg": "^4.5.5",
     "pg-hstore": "^2.3.2",
     "restify": "^4.3.2",
-    "sequelize": "^4.22.15",
+    "sequelize": "^3.30.4",
     "source-map-support": "^0.5.0",
     "sqlite3": "^3.1.13",
     "tedious": "^2.1.4"
