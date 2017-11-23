@@ -1,24 +1,35 @@
-machine:
-    node:
-        version: 6
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:6.12.0-browsers
     environment:
-        PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
-
-dependencies:
-    override:
-        - yarn install
-
-    post:
-        - yarn run rebuild:modules:electron
-
-compile:
-    override:
-        - yarn run build
-
-test:
-    override:
-        - yarn run test
-
-    post:
-        - yarn run pack
-        - mv release/latest-linux.yml release/falcon-sql-client* $CIRCLE_ARTIFACTS
+      PATH: "/usr/local/opt/curl/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/home/circleci/project/node_modules/.bin"
+    steps:
+      - restore_cache:
+          key: v1-source-{{ .Branch }}-{{ .Revision }}
+          keys:
+            - v1-source-{{ .Branch }}-
+            - v1-source-
+      - checkout
+      - save_cache:
+          key: v1-source-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ".git"
+      - restore_cache:
+          key: v1-yarn-{{ checksum "package.json" }}
+          keys:
+            - v1-yarn-
+      - run: yarn install
+      - run: yarn run rebuild:modules:electron
+      - save_cache:
+          key: v1-yarn-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      - run: yarn run build
+      - run: yarn run test
+      - run: yarn run pack
+      - run: zip -r release.zip release
+      - run: mkdir artifacts && mv release/latest-linux.yml release/falcon-sql-client* artifacts
+      - store_artifacts:
+          path: artifacts
