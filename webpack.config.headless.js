@@ -36,13 +36,5 @@ export default {
     node: {
         __dirname: false,
         __filename: false
-    },
-
-    externals: [
-        merge(
-        ...baseConfig.externals,
-        {'font-awesome': 'font-awesome',
-        'source-map-support': 'source-map-support'}
-        )
-    ]
+    }
 };
