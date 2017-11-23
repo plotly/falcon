@@ -1,4 +1,3 @@
-const os = require('os');
 const path = require('path');
 
 const electronEnv = (process.argv[2] === '--electron');
@@ -14,14 +13,4 @@ if (electronEnv) {
     execSync(installAppDeps);
 } else {
     execSync('yarn install --force');
-}
-
-// Workaround for https://github.com/ibmdb/node-ibm_db/issues/329
-if (os.platform() === 'darwin') {
-    execSync([
-        'install_name_tool -change',
-        '`pwd`/node_modules/ibm_db/installer/clidriver/lib/libdb2.dylib',
-        '@loader_path/../../installer/clidriver/lib/libdb2.dylib',
-        'node_modules/ibm_db/build/Release/odbc_bindings.node'
-    ].join(' '));
 }
