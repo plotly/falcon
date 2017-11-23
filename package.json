@@ -198,7 +198,7 @@
     "restify-cookies": "^0.2.2",
     "selenium-webdriver": "^2.53.1",
     "style-loader": "^0.18.2",
-    "webpack": "2.7.0",
+    "webpack": "^3.8.1",
     "yamljs": "^0.3.0"
   },
   "dependencies": {
