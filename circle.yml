@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:6.11.1-browsers
+      - image: circleci/node:6-browsers
     environment:
       PATH: "/usr/local/opt/curl/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/home/circleci/project/node_modules/.bin"
     steps:
@@ -28,9 +28,9 @@ jobs:
             - node_modules
       - run: yarn run build
       - run: yarn run test
-      - run: yarn run build
-      - run: yarn run package
-      - run: zip -r release.zip release
-      - run: mkdir artifacts && mv release.zip artifacts/
+      - run: yarn run pack
+      - run: mkdir artifacts
+      - run: mv release/*.yml artifacts || true
+      - run: mv release/falcon-sql-client* artifacts
       - store_artifacts:
           path: artifacts

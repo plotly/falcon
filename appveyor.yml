@@ -2,7 +2,7 @@ version: 0.4.{build}
 
 environment:
   matrix:
-    - nodejs_version: 6.11.1
+    - nodejs_version: 6
       POSTGRES_PATH: C:\Program Files\PostgreSQL\9.6
 
 platform:
@@ -22,14 +22,13 @@ init:
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
   - yarn install --force
-  - yarn run rebuild:modules:electron
 
 build_script:
   - yarn run build
-  - yarn run package
+  - yarn run pack
 
 after_build:
-  - 7z a release.zip release
+  - 7z a release.zip release/latest.yml release/*.exe
 
 artifacts:
   - path: release.zip

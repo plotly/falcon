@@ -40,16 +40,7 @@ export default {
     target: 'electron-main',
 
     node: {
-        // https://github.com/automation-stack/electron-sudo#usage-with-webpack
         __dirname: false,
         __filename: false
-    },
-
-    externals: [
-        merge(
-        ...baseConfig.externals,
-        {'font-awesome': 'font-awesome',
-        'source-map-support': 'source-map-support'}
-        )
-    ]
+    }
 };

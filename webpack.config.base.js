@@ -22,18 +22,17 @@ export default {
     ],
     externals: [
         {
+            'csv-parse': 'commonjs csv-parse',
+            'font-awesome': 'font-awesome',
             'ibm_db': 'commonjs ibm_db',
             'mysql': 'mysql',
             'pg': 'pg',
-            'pg-native': 'pg-native',
             'pg-hstore': 'pg-hstore',
-            'sqlite3': 'sqlite3',
             'restify': 'commonjs restify',
             'sequelize': 'commonjs sequelize',
-            'bunyan': 'commonjs bunyan',
-            'tedious': 'tedious',
-            'electron-sudo': 'commonjs electron-sudo',
-            'csv-parse': 'commonjs csv-parse'
+            'source-map-support': 'source-map-support',
+            'sqlite3': 'sqlite3',
+            'tedious': 'tedious'
         }
     ]
 };

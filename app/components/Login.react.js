@@ -8,7 +8,7 @@ import {
     homeUrl
 } from '../utils/utils';
 import {Link} from './Link.react';
-import {productName, version} from '../../package.json';
+import {build, version} from '../../package.json';
 
 
 const currentEndpoint = '/login';
@@ -18,7 +18,7 @@ const connectorUrl = homeUrl() + '/';
 const CLOUD = 'cloud';
 const ONPREM = 'onprem';
 
-window.document.title = `${productName} v${version}`;
+window.document.title = `${build.productName} v${version}`;
 let usernameLogged = '';
 
 // http://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen
