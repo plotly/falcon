@@ -45,6 +45,7 @@
   },
   "build": {
     "appId": "org.plotly.connector",
+    "asar": false,
     "productName": "Falcon SQL Client",
     "files": [
       "app",
