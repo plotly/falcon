@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {contains, head} from 'ramda';
+import {contains} from 'ramda';
 import {CONNECTION_CONFIG, SAMPLE_DBS} from '../../../constants/constants';
 import {dynamicRequireElectron} from '../../../utils/utils';
 
@@ -45,7 +45,7 @@ export default class UserConnections extends Component {
         // sqlite requires a path
         return () => {
             dialog.showOpenDialog({
-                properties: ['openFile', 'openDirectory'],
+                properties: ['openFile'],
                 filters: [{
                     name: 'databases',
                     // pulled from https://stackoverflow.com/a/47096815/4142536
@@ -64,13 +64,7 @@ export default class UserConnections extends Component {
                     ]
                 }]
             }, (paths) => {
-                // result returned in an array
-                // TODO: add length of paths === 0 check
-                // TODO: add path non null check
-
-                // Surpressed ESLint cause see comments above
-                // eslint-disable-next-line no-unused-vars
-                const path = head(paths);
+                if (!paths || !paths.length) return;
                 this.props.updateConnection({
                     [setting.value]: paths[0]
                 });

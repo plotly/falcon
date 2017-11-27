@@ -15,18 +15,15 @@ export default function getPlotJsonFromState(state) {
 
     const colsWithTraceTypes = Object.keys(columnTraceTypes);
 
-    // eslint-disable-next-line no-undefined
-    if (typeof allColumnNames !== undefined && typeof rowData !== undefined) {
+    if (allColumnNames && rowData) {
         data = [];
         const columnData = transpose(rowData);
-        const yColName = '';
         let xColumnData;
         let yColumnData;
         let traceColor;
         let traceType;
         let dataObj;
 
-        // eslint-disable-next-line
         yAxisColumnNames.map((yColName, i) => {
 
             const numColors = DEFAULT_COLORS.length;
@@ -135,7 +132,7 @@ export default function getPlotJsonFromState(state) {
         layout.font = {color: '#506784', size: '12px'};
         if (allColumnNames.length === 2) {
             layout.yaxis = {};
-            layout.yaxis.title = yColName;
+            layout.yaxis.title = '';
         }
 
         if (data.length) {

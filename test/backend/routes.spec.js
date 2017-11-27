@@ -440,7 +440,7 @@ describe('Routes:', () => {
         return POST('oauth2', {access_token: accessToken}).then(res => {
             if (res.status !== 200) {
                 return res.text().then(text => {
-                    let message = `Failed to set oauth cookies. Status: ${res.status}. Body: ${text}.`;
+                    const message = `Failed to set oauth cookies. Status: ${res.status}. Body: ${text}.`;
                     throw new Error(message);
                 });
             }

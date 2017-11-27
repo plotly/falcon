@@ -126,7 +126,9 @@ export function query(queryString, connection) {
     return createClient(connection).query(
         queryString,
         {type: Sequelize.QueryTypes.SELECT}
-    ).then(results => parseSQL(results));
+    ).then(results => {
+        return parseSQL(results);
+    });
 }
 
 export function tables(connection) {
@@ -174,11 +176,12 @@ export function schemas(connection) {
     let queryString;
     switch (dialect) {
         case DIALECTS.MYSQL:
-        case DIALECTS.SQLITE:
         case DIALECTS.MARIADB:
             queryString = `SELECT table_name, column_name, data_type FROM information_schema.columns ` +
                 `WHERE table_schema = '${database}' ORDER BY table_name`;
             break;
+        case DIALECTS.SQLITE:
+            return sqlite_schemas(connection);
         case DIALECTS.POSTGRES:
         case DIALECTS.REDSHIFT:
             queryString = `
@@ -206,4 +209,36 @@ export function schemas(connection) {
     /* eslint-enable quotes */
 
     return query(queryString, connection);
+}
+
+function sqlite_schemas(connection) {
+    // Unfortunately, we need to make one query per table
+    return tables(connection).then(tableNames => {
+        const queries = tableNames.map(tableName => {
+            return createClient(connection).query(
+                `PRAGMA table_info(${tableName})`,
+                {type: Sequelize.QueryTypes.SELECT}
+            );
+        });
+
+        return Promise.all(queries).then(responses => {
+            const schemasResponse = {
+                columnnames: ['table_name', 'column_name', 'data_type'],
+                rows: []
+            };
+
+            responses.forEach((response, index) => {
+                const tableName = tableNames[index];
+                response.forEach(row => {
+                    schemasResponse.rows.push([
+                        tableName,
+                        row.name,
+                        row.type
+                    ]);
+                });
+            });
+
+            return schemasResponse;
+        });
+    });
 }
