@@ -1,6 +1,5 @@
 import webpack from 'webpack';
 import baseConfig from './webpack.config.base';
-import {merge} from 'ramda';
 
 export default {
     ...baseConfig,
