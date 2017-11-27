@@ -45,7 +45,7 @@ export default class UserConnections extends Component {
         // sqlite requires a path
         return () => {
             dialog.showOpenDialog({
-                properties: ['openFile', 'openDirectory'],
+                properties: ['openFile'],
                 filters: [{
                     name: 'databases',
                     // pulled from https://stackoverflow.com/a/47096815/4142536
