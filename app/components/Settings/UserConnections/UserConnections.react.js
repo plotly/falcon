@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {contains, head} from 'ramda';
+import {contains} from 'ramda';
 import {CONNECTION_CONFIG, SAMPLE_DBS} from '../../../constants/constants';
 import {dynamicRequireElectron} from '../../../utils/utils';
 
@@ -64,13 +64,7 @@ export default class UserConnections extends Component {
                     ]
                 }]
             }, (paths) => {
-                // result returned in an array
-                // TODO: add length of paths === 0 check
-                // TODO: add path non null check
-
-                // Surpressed ESLint cause see comments above
-                // eslint-disable-next-line no-unused-vars
-                const path = head(paths);
+                if (!paths || !paths.length) return;
                 this.props.updateConnection({
                     [setting.value]: paths[0]
                 });
