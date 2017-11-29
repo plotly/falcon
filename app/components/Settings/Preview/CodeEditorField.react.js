@@ -2,8 +2,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {has, propOr} from 'ramda';
-// https://github.com/JedWatson/react-codemirror/issues/106
-import CodeMirror from '@skidding/react-codemirror';
+import CodeMirror from 'react-codemirror';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/sql-hint';
@@ -34,30 +33,40 @@ class CodeEditorField extends Component {
         if (typeof schemaRequest !== 'undefined' && typeof preview !== 'undefined' &&
             schemaRequest.status === 200 && !has('codeSchema', preview)) {
 
-            let lastTableName = '';
-            let tableName;
-            const tables = {};
-            let newColumnArray = [];
-            let DB_HAS_ONLY_ONE_TABLE;
-            const TABLE_NAME = 0;
-            const COLUMN_NAME = 1;
-            const schema = schemaRequest.content;
-            schema.rows.map(function(row, i) {
-                tableName = row[TABLE_NAME];
-                DB_HAS_ONLY_ONE_TABLE = (Object.keys(tables).length === 0 && i === schema.rows.length - 1);
-                if (tableName !== lastTableName || DB_HAS_ONLY_ONE_TABLE) {
-                    if (newColumnArray.length !== 0) {
-                        tables[tableName] = newColumnArray;
+            const codeSchema = {};
+            const bareTableNames = {};
+            schemaRequest.content.rows.forEach(function(row) {
+                const [tableName, columnName, dataType] = row;
+
+                let bareTableName = bareTableNames[tableName];
+                if (!bareTableName) {
+                    bareTableName = tableName.split('.').slice(-1)[0];
+
+                    const first = bareTableName.charAt(0);
+                    if (first === '"' || first === '\'') {
+                        bareTableName = bareTableName.slice(1);
                     }
-                    newColumnArray = [];
-                    lastTableName = tableName;
+
+                    const last = bareTableName.charAt(bareTableName.length - 1);
+                    if (last === '"' || last === '\'') {
+                        bareTableName = bareTableName.slice(0, -1);
+                    }
+
+                    if (!bareTableName) return;
+
+                    bareTableNames[tableName] = bareTableName;
                 }
-                newColumnArray.push(row[COLUMN_NAME]);
+
+                if (codeSchema.hasOwnProperty(bareTableName)) {
+                    codeSchema[bareTableName][columnName] = dataType;
+                } else {
+                    codeSchema[bareTableName] = {
+                        [columnName]: dataType
+                    };
+                }
             });
 
-            updatePreview({
-                codeSchema: tables
-            });
+            updatePreview({codeSchema});
         }
     }
 
@@ -94,10 +103,10 @@ class CodeEditorField extends Component {
     handleChange(newCode) {
         this.props.onChange(newCode);
 
-        // Don't show autocomplete after a space
-        const char = newCode.slice(-1);
-        if (char !== ' ' && char !== ';') {
-            const cm = this.refs.CodeMirror.getCodeMirror();
+        // Don't show autocomplete after a space or semicolon
+        const cm = this.refs.CodeMirror.getCodeMirror();
+        const ch = cm.getTokenAt(cm.getCursor()).string.slice(-1);
+        if (ch && ch !== ' ' && ch !== ';') {
             this.autoComplete(cm);
         }
     }
