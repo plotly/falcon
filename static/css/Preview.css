@@ -11,10 +11,13 @@ th, td {
     text-align: left;
 }
 
+.Pane.vertical {
+    overflow-x: auto;
+}
+
 .previewContainer {
     margin: 0 25px 25px 25px;
     overflow: auto;
-    overflow-x: hidden;
     border-radius: 3px;
 }
 
@@ -27,9 +30,10 @@ th, td {
 
 .runButton {
     position: absolute;
-    right: 10px;
-    bottom: 10px;
+    right: 18px;
+    bottom: 18px;
     width: 70px;
+    z-index: 10;
 }
 
 .errorStatus p {
