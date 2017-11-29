@@ -7,7 +7,39 @@ import {dissoc, merge} from 'ramda';
 import {PlotlyAPIRequest} from '../../backend/persistent/PlotlyAPI.js';
 import {getSetting} from '../../backend/settings.js';
 
-// Helper functions for testing
+// Returns a function to be used in a Promise chain that asserts a response status
+export function assertResponseStatus(expectedStatus) {
+    // create error here to preserve caller stack trace
+    const statusError = new Error();
+
+    return function(response) {
+        if (response.status !== expectedStatus) {
+            return response.text().then(body => {
+                statusError.message = `Expected status: ${expectedStatus}. Status: ${response.status}. Body: ${body}.`;
+                throw statusError;
+            });
+        }
+
+        return response;
+    };
+}
+
+// Parse a fetch response as JSON; in case of failure include status and body in the error message
+export function getResponseJson(response) {
+    // create error here to preserve caller stack trace
+    const jsonError = new Error();
+
+    return response.text().then(text => {
+        try {
+            return JSON.parse(text);
+        } catch (err) {
+            jsonError.message = `${err.message}. Status: ${response.status}. Body: ${text}.`;
+            throw jsonError;
+        }
+    });
+}
+
+// Returns a Promise that resolves after a timeout
 export function wait(milliseconds) {
     return new Promise(function(resolve) {
         setTimeout(resolve, milliseconds);

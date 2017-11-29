@@ -11,8 +11,10 @@ import {PlotlyAPIRequest, updateGrid} from '../../backend/persistent/PlotlyAPI.j
 import {getSetting, saveSetting} from '../../backend/settings.js';
 import {
     apiKey,
+    assertResponseStatus,
     clearSettings,
     createGrid,
+    getResponseJson,
     names,
     sqlConnections,
     username,
@@ -172,9 +174,9 @@ describe('QueryScheduler', function() {
          * it only updates them
          */
         let fid, uids, queryObject;
-        return createGrid('test delete').then(res => res.json().then(json => {
-            assert.equal(res.status, 201);
-
+        return createGrid('test delete')
+        .then(assertResponseStatus(201))
+        .then(getResponseJson).then(json => {
             fid = json.file.fid;
             uids = json.file.cols.map(col => col.uid);
             queryObject = {
@@ -193,20 +195,10 @@ describe('QueryScheduler', function() {
 
             assert.deepEqual(getQueries(), [queryObject], 'Query has not been saved');
             assert(Boolean(queryScheduler.queryJobs[fid]), 'Query has not been scheduled');
-        }))
-        .then(() => {
-            return PlotlyAPIRequest(`grids/${fid}`, {username, apiKey, method: 'DELETE'}).then(res => {
-                if (res.status !== 204) {
-                    return res.json().then(json => {
-                        throw new Error([
-                            'Failed to delete the grid.',
-                            `Status: ${res.status}.`,
-                            `Response: ${JSON.stringify(json, null, 2)}`
-                        ].join(' '));
-                    });
-                }
-            });
+
+            return PlotlyAPIRequest(`grids/${fid}`, {username, apiKey, method: 'DELETE'});
         })
+        .then(assertResponseStatus(204))
         .then(() => {
             return waitAndAssertRemoval();
 
@@ -225,8 +217,8 @@ describe('QueryScheduler', function() {
     it('queries a database and updates a plotly grid on an interval', function() {
         function checkGridAgainstQuery(fid, name) {
             return PlotlyAPIRequest(`grids/${fid}/content`, {username, apiKey, method: 'GET'})
-            .then(res => res.json().then(json => {
-                assert.equal(res.status, 200);
+            .then(assertResponseStatus(200))
+            .then(getResponseJson).then(json => {
                 assert.deepEqual(
                     json.cols[names[0]].data,
                     ['Guinea', 'Guinea'],
@@ -257,23 +249,23 @@ describe('QueryScheduler', function() {
                     ['122', '224'],
                     name
                 );
-            }));
+            });
         }
 
         function resetAndVerifyGridContents(fid, uids) {
-            return updateGrid([[1, 2, 3, 4, 5, 6]], fid, uids, username, apiKey).then(res => {
-                assert.equal(res.status, 200, 'grid was updated');
+            return updateGrid([[1, 2, 3, 4, 5, 6]], fid, uids, username, apiKey)
+            .then(assertResponseStatus(200)).then(() => {
                 return PlotlyAPIRequest(`grids/${fid}/content`, {username, apiKey, method: 'GET'});
             })
-            .then(res => res.json().then(json => {
-                assert.equal(res.status, 200, 'data was retrieved');
+            .then(assertResponseStatus(200))
+            .then(getResponseJson).then(json => {
                 assert.deepEqual(json.cols[names[0]].data, [1]);
                 assert.deepEqual(json.cols[names[1]].data, [2]);
                 assert.deepEqual(json.cols[names[2]].data, [3]);
                 assert.deepEqual(json.cols[names[3]].data, [4]);
                 assert.deepEqual(json.cols[names[4]].data, [5]);
                 assert.deepEqual(json.cols[names[5]].data, [6]);
-            }));
+            });
         }
 
         const refreshInterval = 60; // seconds
@@ -291,9 +283,9 @@ describe('QueryScheduler', function() {
          * it only updates them
          */
         let fid, uids, queryObject;
-        return createGrid('test interval').then(res => res.json().then(json => {
-            assert.equal(res.status, 201);
-
+        return createGrid('test interval')
+        .then(assertResponseStatus(201))
+        .then(getResponseJson).then(json => {
             fid = json.file.fid;
             uids = json.file.cols.map(col => col.uid);
             queryObject = {
@@ -306,7 +298,7 @@ describe('QueryScheduler', function() {
             };
 
             queryScheduler.scheduleQuery(queryObject);
-        }))
+        })
         .then(() => wait(1.5 * refreshInterval * 1000))
         .then(() => checkGridAgainstQuery(fid, 'First check'))
         .then(() => resetAndVerifyGridContents(fid, uids))
