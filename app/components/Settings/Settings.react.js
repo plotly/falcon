@@ -330,7 +330,7 @@ class Settings extends Component {
                                     split="vertical"
                                     minSize={10}
                                     defaultSize={200}
-                                    maxSize={800}
+                                    maxSize={-400}
                                     style={{position: 'relative !important'}}
                                 >
                                     <div className="tree-view-container">

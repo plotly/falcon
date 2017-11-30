@@ -35,7 +35,7 @@
     "rebuild-and-e2e": "yarn run build && yarn run test-e2e",
     "start": "cross-env NODE_ENV=production electron ./",
     "start-headless": "cross-env NODE_ENV=production node ./dist/headless-bundle.js",
-    "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./backend/main.development",
+    "start-hot": "cross-env HOT=1 NODE_ENV=development electron --disable-http-cache -r babel-register ./backend/main.development",
     "watch-headless": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.headless.js --profile --colors --watch",
     "watch-web": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.web.js --profile --colors --watch",
     "watch-main": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.electron.js --profile --colors --watch",
@@ -123,7 +123,6 @@
     "fsevents": "*"
   },
   "devDependencies": {
-    "@skidding/react-codemirror": "^1.0.2",
     "aws-sdk": "^2.156.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.2",
@@ -172,6 +171,7 @@
     "query-string": "^5.0.1",
     "ramda": "^0.21.0",
     "react": "^15.5.1",
+    "react-codemirror": "^1.0.0",
     "react-cookies": "^0.1.0",
     "react-dnd": "^2.5.1",
     "react-dnd-html5-backend": "^2.5.1",
