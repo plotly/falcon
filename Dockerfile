@@ -13,7 +13,7 @@
 #
 # Adapted from https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
 
-FROM node:6.11.1
+FROM node:6
 
 # I'd like to install the latest version of npm with something like this:
 # RUN npm install --global npm@4.0.3
@@ -24,8 +24,8 @@ FROM node:6.11.1
 # The App saves folders to the `os.homedir()` directory.
 ENV HOME=/home/
 
-# Upgrade yarn to '1.2.1'
-RUN npm install -g yarn@1.2.1
+# Upgrade yarn to v1
+RUN npm install -g yarn@1
 
 # Create app directory
 RUN mkdir -p /usr/src/app
