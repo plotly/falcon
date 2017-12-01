@@ -12,6 +12,8 @@
     "build-web": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.web.js --profile --colors",
     "docker:db2:build": "docker build test/docker/ibmdb2/ -t pdc-db2 --build-arg LICENSE=accept --build-arg DB2INST1_PASSWORD=${DB2INST1_PASSWORD} --build-arg DB2USER1_PASSWORD=${DB2USER1_PASSWORD} --no-cache",
     "docker:db2:start": "docker run --rm -ti -p 50000:50000 pdc-db2",
+    "docker:falcon:build": "docker build -t falcon-sql-client:local .",
+    "docker:falcon:start": "docker run -ti --rm -p 9494:9494 -e PLOTLY_CONNECTOR_AUTH_ENABLED=$PLOTLY_CONNECTOR_AUTH_ENABLED -e PLOTLY_CONNECTOR_ALLOWED_USERS=$PLOTLY_CONNECTOR_ALLOWED_USERS falcon-sql-client:local",
     "rebuild:modules:electron": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/rebuild-modules.js --electron",
     "rebuild:modules:node": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/rebuild-modules.js",
     "fix:module:ibmdb": "node scripts/fix-module-ibmdb.js",
