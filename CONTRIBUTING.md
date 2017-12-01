@@ -53,6 +53,13 @@ The database connector runs as a server by default as part of [Plotly On-Premise
 
 ## Run as a docker image
 
+Build and run the docker image:
+```
+$ yarn run start-dockerfile
+```
+
+The web app will be accessible in your browser at `http://localhost:9494`.
+
 See the [Dockerfile](https://github.com/plotly/falcon-sql-client/blob/master/Dockerfile) for more information.
 
 ## Developing
