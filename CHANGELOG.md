@@ -43,15 +43,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Rebranded Plotly Database Connector to Falcon SQL Client
 * Do not create SSL certificates if user is not logged into Plotly
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 * DB2: build ibm_db driver against electron
 * oauth: login redirection
-
-### Security
 
 
 ## [2.3] - 2017-10-11
@@ -73,35 +67,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * CSV download of data to desktop.
 * PNG download of charts to desktop.
 
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
-
 
 ## [2.1.0] - 2017-08-24
-
-### Added
 
 ### Changed
 * Reorganized app with horizontal tabs to eliminate need for vertical scroll
 * Organized header links into an upper-right dropdown
 * Toggle sample database credentials
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 * Redshift: schema preview
 * Added missing font file
-
-### Security
 
 
 ## [2.0.2] - 2015-05-31
@@ -110,17 +86,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Automatic generation of a SSL certificate to import data into Plotly Chart
   Editor.
 
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
-
-
 
 ## [1.0.4] - 2017-02-20
 
@@ -128,31 +93,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Include credentials in the browser requests and accept credentials headers
   server-side.
 
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
-
 
 ## [1.0.3] - 2017-01-13
 
 ### Added
 * Windows and Mac installers
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 
 ## [1.0.2] - 2017-12-09
@@ -166,13 +111,3 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * A command-line version of the app
 * A web-app version of the app
 * Over 100 tests
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
