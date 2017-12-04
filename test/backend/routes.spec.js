@@ -1,110 +1,39 @@
-const fs = require('fs');
-const fetchCookie = require('fetch-cookie');
-
-const nodeFetch = require('node-fetch');
-let fetch = fetchCookie(nodeFetch);
-
 import {assert} from 'chai';
-import {assoc, contains, dissoc, isEmpty, keys, merge} from 'ramda';
+import {assoc, contains, dissoc, keys, merge} from 'ramda';
 
 import Servers from '../../backend/routes.js';
 import {getConnections, saveConnection} from '../../backend/persistent/Connections.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
-import {setCertificatesSettings} from '../../backend/certificates';
 import {
     accessToken,
     apacheDrillConnections,
     apacheDrillStorage,
     apiKey,
     assertResponseStatus,
+    clearCookies,
     clearSettings,
     createGrid,
-    fakeCerts,
+    DELETE,
+    GET,
     getResponseJson,
     mysqlConnection,
+    PATCH,
+    POST,
     publicReadableS3Connections,
+    PUT,
     sqlConnections,
-    testCA,
     testConnections,
     testSqlConnections,
     username,
     validFid,
-    validUids,
-    wait
+    validUids
 } from './utils.js';
 
 
-// Helper functions
-function GET(path) {
-    return fetch(`http://localhost:9494/${path}`, {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-    });
-}
-
-function PATCH(path, body = {}) {
-    return fetch(`http://localhost:9494/${path}`, {
-        method: 'PATCH',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: body ? JSON.stringify(body) : null
-    });
-}
-
-function POST(path, body = {}) {
-    return fetch(`http://localhost:9494/${path}`, {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: body ? JSON.stringify(body) : null
-    });
-}
-
-function PUT(path, body = {}) {
-    return fetch(`http://localhost:9494/${path}`, {
-        method: 'PUT',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: body ? JSON.stringify(body) : null
-    });
-}
-
-function DELETE(path) {
-    return fetch(`http://localhost:9494/${path}`, {
-        method: 'DELETE',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-    });
-}
-
-function clearCookies() {
-    fetch = fetchCookie(nodeFetch);
-}
 
 let queryObject;
 let servers;
 let connectionId;
-
-function waitForHttpsServer() {
-    return new Promise(function(resolve) {
-        const resolveIfStarted = function() {
-            if (servers.httpsServer.server) resolve();
-            else setTimeout(resolveIfStarted, 1000);
-        };
-        setTimeout(resolveIfStarted);
-    });
-}
 
 function closeServers() {
     return new Promise(function(resolve) {
@@ -122,292 +51,6 @@ function closeServers() {
 
 // Suppressing ESLint cause Mocha ensures `this` is bound in test functions
 /* eslint-disable no-invalid-this */
-describe('Servers:', () => {
-    beforeEach(() => {
-        clearSettings('KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH');
-    });
-
-    after(() => {
-        clearSettings('KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH');
-    });
-
-    it('Https server is up and running after an http server was started and certs were created', () => {
-        servers = new Servers({createCerts: false, startHttps: true, isElectron: true});
-
-        servers.httpServer.start();
-
-        saveSetting('USERS', [{username, accessToken}]);
-        saveSetting('CONNECTOR_HTTPS_DOMAIN', `${fakeCerts.subdomain}.${testCA}`);
-        saveSetting('AUTH_ENABLED', false);
-
-        assert.isNull(servers.httpsServer.certs, 'httpsServer should have no certs initially');
-        assert.isNull(servers.httpsServer.server, 'httpsServer should not exist initially');
-
-        fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
-        fs.writeFileSync(getSetting('KEY_FILE'), fakeCerts.key);
-
-        return waitForHttpsServer().then(function() {
-            assert.isFalse(isEmpty(servers.httpsServer.certs), 'httpsServer should have certs.');
-            assert.equal(servers.httpsServer.protocol, 'https', 'httpsServer has wrong protocol');
-            assert.equal(servers.httpsServer.domain, `${fakeCerts.subdomain}.${testCA}`,
-                'httpsServer has wrong domain');
-
-            // Can't fetch directly for now the https server because mocked certs
-            // were generated from staging LE server - not real certs.
-            return GET('settings/urls').then(getResponseJson).then(json => {
-                assert.equal(json.http, 'http://localhost:9494');
-                assert.isNotNull(json.https, `${fakeCerts.subdomain}.${testCA}`);
-
-                return closeServers();
-            });
-        });
-    });
-
-    it('No certs are created if the http server was started in onprem', () => {
-        setCertificatesSettings('USE_MOCK_CERTS', true);
-        saveSetting('USERS', [{username, accessToken}]);
-        saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
-
-        servers = new Servers({createCerts: true, startHttps: true});
-        assert.isNull(servers.httpsServer.certs, 'httpsServer should have no certs if onprem');
-        assert.isNull(servers.httpsServer.server, 'httpsServer should not exist if onprem');
-
-        return wait(2000).then(function() {
-            assert.isNull(servers.httpsServer.certs, 'httpsServer should have no certs if onprem');
-            assert.isNull(servers.httpsServer.server, 'httpsServer should not exist if onprem');
-
-            return closeServers();
-        });
-    });
-
-});
-
-describe('Authentication:', () => {
-    beforeEach(() => {
-        servers = new Servers({createCerts: false, startHttps: false, isElectron: false});
-        servers.isElectron = false;
-        servers.httpServer.start();
-
-        // cleanup
-        clearSettings('CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH');
-
-        // enable authentication:
-        saveSetting('AUTH_ENABLED', true);
-
-        // Save some connections to the user's disk
-        saveSetting('USERS', [{
-            username, apiKey
-        }]);
-        saveSetting('SSL_ENABLED', false);
-
-        connectionId = saveConnection(sqlConnections);
-        queryObject = {
-            fid: validFid,
-            uids: validUids.slice(0, 2), // since this particular query only has 2 columns
-            refreshInterval: 60, // every minute
-            query: 'SELECT * FROM ebola_2014 LIMIT 1',
-            connectionId: connectionId,
-            requestor: validFid.split(':')[0]
-        };
-
-        // ensure fetch starts with no cookies
-        clearCookies();
-    });
-
-    afterEach(() => {
-        return closeServers().then(() => {
-            servers.queryScheduler.clearQueries();
-        });
-    });
-
-    it('backend responds to ping', function() {
-        return GET('ping').then(getResponseJson).then(json => {
-            assert.equal(json.message, 'pong');
-        });
-    });
-
-    it('backend allows access to login page without logging in', function() {
-        return GET('login').then(assertResponseStatus(200));
-    });
-
-    it('backend allows access to connections page without logging in', function() {
-        return GET('').then(assertResponseStatus(200));
-    });
-
-    it('backend does not allow access to settings when not logged in', function() {
-        return GET('settings')
-        .then(assertResponseStatus(401))
-        .then(getResponseJson).then(json => {
-            assert.deepEqual(json, {
-                error: {message: 'Please login to access this page.'}
-            });
-        });
-    });
-
-    it('oauth fails when user not present in ALLOWED_USERS', function() {
-        saveSetting('ALLOWED_USERS', []);
-
-        return POST('oauth2', {access_token: accessToken})
-        .then(assertResponseStatus(403))
-        .then(getResponseJson).then(json => {
-            assert.deepEqual(json, {
-                error: {message: `User ${username} is not allowed to view this app`}
-            });
-        });
-    });
-
-    it('backend allows access to settings when logged in and present in ALLOWED_USERS', function() {
-        saveSetting('ALLOWED_USERS', [username]);
-
-        return POST('oauth2', {access_token: accessToken}).then(assertResponseStatus(200))
-        .then(() => {
-            return GET('settings').then(assertResponseStatus(200));
-        });
-    });
-
-    it('backend does not make request to plotly if accessToken is valid', function() {
-        saveSetting('ALLOWED_USERS', [username]);
-
-        return POST('oauth2', {access_token: accessToken})
-        .then(assertResponseStatus(200)).then(() => {
-            /*
-             * This ensures that any requests to plotly fail so that we
-             * can catch them. Since the requests to plotly are not made
-             * when accessToken is valid, test-request should return 200
-             * irrespective of bad plotly-domain.
-             */
-            saveSetting('PLOTLY_API_DOMAIN', 'bad-domain.plot.ly');
-
-            return GET('settings').then(assertResponseStatus(200));
-        });
-    });
-
-    it('backend makes request to plotly if accessToken expired', function() {
-        saveSetting('ALLOWED_USERS', [username]);
-
-        // set access-token expiry of 1 sec:
-        saveSetting('ACCESS_TOKEN_AGE', 1);
-
-        return POST('oauth2', {access_token: accessToken})
-        .then(assertResponseStatus(200))
-        .then(() => {
-            // This ensures that any requests to plotly fail so that we can catch them
-            saveSetting('PLOTLY_API_DOMAIN', 'bad-domain.plot.ly');
-
-            return wait(1000).then(() => {
-                return GET('settings')
-                .then(assertResponseStatus(500))
-                .then(getResponseJson).then(json => {
-                    assert.equal(json.error.message,
-                         'request to https://bad-domain.plot.ly/v2/users/current failed, ' +
-                         'reason: getaddrinfo ENOTFOUND bad-domain.plot.ly bad-domain.plot.ly:443'
-                    );
-                });
-            });
-        });
-    });
-
-    it('backend renews access-token if expired', function() {
-        saveSetting('ALLOWED_USERS', [username]);
-
-        // set access-token expiry of 1 sec:
-        saveSetting('ACCESS_TOKEN_AGE', 1);
-
-        function assertAccessToken() {
-            return GET('settings')
-            .then(assertResponseStatus(200))
-            .then(getResponseJson).then(json => {
-                assert.deepEqual(json, {
-                    'PLOTLY_URL': 'https://plot.ly',
-                    'USERS': ['plotly-database-connector']
-                });
-            });
-        }
-
-        return POST('oauth2', {access_token: accessToken}).then(() => {
-            return assertAccessToken();
-        })
-        .then(() => {
-            return wait(1000);
-        })
-        .then(() => {
-            return assertAccessToken();
-        });
-    });
-
-    it('backend prevents user from accessing urls when revoked from ALLOWED_USERS', function() {
-        saveSetting('ALLOWED_USERS', [username]);
-
-        // set access-token expiry of 1 sec:
-        saveSetting('ACCESS_TOKEN_AGE', 1);
-
-        return POST('oauth2', {access_token: accessToken})
-        .then(assertResponseStatus(200))
-        .then(() => {
-            return GET('settings')
-            .then(assertResponseStatus(200));
-        })
-        .then(() => {
-            saveSetting('ALLOWED_USERS', []);
-            return wait(3000);
-        })
-        .then(() => {
-            return GET('settings')
-            .then(assertResponseStatus(403))
-            .then(getResponseJson).then(json => {
-                assert.deepEqual(json, {
-                    'error': {
-                        'message': `User ${username} is not allowed to view this app`
-                    }
-                });
-            });
-        });
-    });
-
-    describe('onprem:', function() {
-        it('unauthorized user is not allowed access', function() {
-            saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
-
-            return GET('settings').then(assertResponseStatus(401));
-        });
-
-        it('user after failed login is not allowed acccess', function() {
-            saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
-
-            return POST('oauth2', {access_token: 'invalid access token'})
-            .then(assertResponseStatus(500))
-            .then(() => {
-                return GET('settings');
-            })
-            .then(assertResponseStatus(401));
-        });
-
-        it('logged-in user is allowed access', function() {
-            saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
-
-            // Set Allowed users to empty:
-            saveSetting('USERS', []);
-            saveSetting('ALLOWED_USERS', []);
-
-            return POST('oauth2', {access_token: accessToken})
-            .then(assertResponseStatus(201))
-            .then(() => {
-                return GET('settings')
-                .then(assertResponseStatus(200))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {
-                        USERS: ['plotly-database-connector'],
-                        PLOTLY_URL: 'https://plot.ly'
-                    });
-
-                    // user should be added in ALLOWED_USERS:
-                    assert.deepEqual(getSetting('ALLOWED_USERS'), [username]);
-                });
-            });
-        });
-    });
-});
-
 describe('Routes:', () => {
     beforeEach(() => {
         servers = new Servers({createCerts: false, startHttps: false, isElectron: false});
