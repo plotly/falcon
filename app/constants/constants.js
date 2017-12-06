@@ -14,7 +14,8 @@ export const DIALECTS = {
     IBM_DB2: 'ibm db2',
     APACHE_SPARK: 'apache spark',
     APACHE_IMPALA: 'apache impala',
-    APACHE_DRILL: 'apache drill'
+    APACHE_DRILL: 'apache drill',
+    DATA_WORLD: 'data.world'
 };
 
 export const SQL_DIALECTS_USING_EDITOR = [
@@ -194,7 +195,8 @@ export const LOGOS = {
     [DIALECTS.MSSQL]: 'images/mssql-logo.png',
     [DIALECTS.SQLITE]: 'images/sqlite-logo.png',
     [DIALECTS.S3]: 'images/s3-logo.png',
-    [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png'
+    [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png',
+    [DIALECTS.DATA_WORLD]: 'images/dataworld-logo.png'
 };
 
 export function PREVIEW_QUERY (dialect, table, database = '') {
