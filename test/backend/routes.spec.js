@@ -1,9 +1,12 @@
+const fs = require('fs');
+
 import {assert} from 'chai';
-import {assoc, contains, dissoc, keys, merge} from 'ramda';
+import {assoc, contains, dissoc, isEmpty, keys, merge} from 'ramda';
 
 import Servers from '../../backend/routes.js';
 import {getConnections, saveConnection} from '../../backend/persistent/Connections.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
+import {setCertificatesSettings} from '../../backend/certificates';
 import {
     accessToken,
     apacheDrillConnections,
@@ -14,6 +17,7 @@ import {
     clearSettings,
     createGrid,
     DELETE,
+    fakeCerts,
     GET,
     getResponseJson,
     mysqlConnection,
@@ -22,11 +26,13 @@ import {
     publicReadableS3Connections,
     PUT,
     sqlConnections,
+    testCA,
     testConnections,
     testSqlConnections,
     username,
     validFid,
-    validUids
+    validUids,
+    wait
 } from './utils.js';
 
 
@@ -34,6 +40,16 @@ import {
 let queryObject;
 let servers;
 let connectionId;
+
+function waitForHttpsServer() {
+    return new Promise(function(resolve) {
+        const resolveIfStarted = function() {
+            if (servers.httpsServer.server) resolve();
+            else setTimeout(resolveIfStarted, 1000);
+        };
+        setTimeout(resolveIfStarted);
+    });
+}
 
 function closeServers() {
     return new Promise(function(resolve) {
@@ -51,6 +67,66 @@ function closeServers() {
 
 // Suppressing ESLint cause Mocha ensures `this` is bound in test functions
 /* eslint-disable no-invalid-this */
+describe('Servers:', () => {
+    beforeEach(() => {
+        clearSettings('KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH');
+    });
+
+    after(() => {
+        clearSettings('KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH');
+    });
+
+    it('Https server is up and running after an http server was started and certs were created', () => {
+        servers = new Servers({createCerts: false, startHttps: true, isElectron: true});
+
+        servers.httpServer.start();
+
+        saveSetting('USERS', [{username, accessToken}]);
+        saveSetting('CONNECTOR_HTTPS_DOMAIN', `${fakeCerts.subdomain}.${testCA}`);
+        saveSetting('AUTH_ENABLED', false);
+
+        assert.isNull(servers.httpsServer.certs, 'httpsServer should have no certs initially');
+        assert.isNull(servers.httpsServer.server, 'httpsServer should not exist initially');
+
+        fs.writeFileSync(getSetting('CERT_FILE'), fakeCerts.cert);
+        fs.writeFileSync(getSetting('KEY_FILE'), fakeCerts.key);
+
+        return waitForHttpsServer().then(function() {
+            assert.isFalse(isEmpty(servers.httpsServer.certs), 'httpsServer should have certs.');
+            assert.equal(servers.httpsServer.protocol, 'https', 'httpsServer has wrong protocol');
+            assert.equal(servers.httpsServer.domain, `${fakeCerts.subdomain}.${testCA}`,
+                'httpsServer has wrong domain');
+
+            // Can't fetch directly for now the https server because mocked certs
+            // were generated from staging LE server - not real certs.
+            return GET('settings/urls').then(getResponseJson).then(json => {
+                assert.equal(json.http, 'http://localhost:9494');
+                assert.isNotNull(json.https, `${fakeCerts.subdomain}.${testCA}`);
+
+                return closeServers();
+            });
+        });
+    });
+
+    it('No certs are created if the http server was started in onprem', () => {
+        setCertificatesSettings('USE_MOCK_CERTS', true);
+        saveSetting('USERS', [{username, accessToken}]);
+        saveSetting('IS_RUNNING_INSIDE_ON_PREM', true);
+
+        servers = new Servers({createCerts: true, startHttps: true});
+        assert.isNull(servers.httpsServer.certs, 'httpsServer should have no certs if onprem');
+        assert.isNull(servers.httpsServer.server, 'httpsServer should not exist if onprem');
+
+        return wait(2000).then(function() {
+            assert.isNull(servers.httpsServer.certs, 'httpsServer should have no certs if onprem');
+            assert.isNull(servers.httpsServer.server, 'httpsServer should not exist if onprem');
+
+            return closeServers();
+        });
+    });
+
+});
+
 describe('Routes:', () => {
     beforeEach(() => {
         servers = new Servers({createCerts: false, startHttps: false, isElectron: false});
