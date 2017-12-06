@@ -1,13 +1,11 @@
 import {assert} from 'chai';
 
-import Servers from '../../backend/routes.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
 import {
     accessToken,
-    apiKey,
     assertResponseStatus,
-    clearCookies,
-    clearSettings,
+    closeTestServers,
+    createTestServers,
     GET,
     getResponseJson,
     POST,
@@ -16,51 +14,17 @@ import {
 } from './utils.js';
 
 
-
-let servers;
-
-function closeServers() {
-    return new Promise(function(resolve) {
-        if (!servers) {
-            resolve();
-            return;
-        }
-
-        servers.httpServer.close(function() {
-            if (servers.httpsServer.server) servers.httpsServer.close(resolve);
-            else resolve();
-        });
-    });
-}
-
 // Suppressing ESLint cause Mocha ensures `this` is bound in test functions
 /* eslint-disable no-invalid-this */
 describe('Authentication:', () => {
+    let servers;
+
     beforeEach(() => {
-        servers = new Servers({createCerts: false, startHttps: false, isElectron: false});
-        servers.isElectron = false;
-        servers.httpServer.start();
-
-        // cleanup
-        clearSettings('CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH');
-
-        // enable authentication:
-        saveSetting('AUTH_ENABLED', true);
-
-        // Save some connections to the user's disk
-        saveSetting('USERS', [{
-            username, apiKey
-        }]);
-        saveSetting('SSL_ENABLED', false);
-
-        // ensure fetch starts with no cookies
-        clearCookies();
+        servers = createTestServers();
     });
 
     afterEach(() => {
-        return closeServers().then(() => {
-            servers.queryScheduler.clearQueries();
-        });
+        return closeTestServers(servers);
     });
 
     it('backend responds to ping', function() {

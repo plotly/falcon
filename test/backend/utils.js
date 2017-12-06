@@ -10,7 +10,8 @@ const restify = require('restify');
 import {dissoc, merge} from 'ramda';
 
 import {PlotlyAPIRequest} from '../../backend/persistent/PlotlyAPI.js';
-import {getSetting} from '../../backend/settings.js';
+import Servers from '../../backend/routes.js';
+import {getSetting, saveSetting} from '../../backend/settings.js';
 
 // Helper functions
 export function clearCookies() {
@@ -157,6 +158,48 @@ export const validFid = 'plotly-database-connector:197';
 export const validUids = ['d5d91e', '89d77e', '45b645', 'a7011b', '7cf34b', '881702', '442fd5', 'f5993c', '6d6a67',
     'c3246c', 'eac785', '3c3ca8', '7ce7d7', 'f8cd7a', 'e52820', '0a91cc', 'c7dd62', 'b84d17', 'a6c128', 'ae9094'];
 
+// Helper functions for Servers
+export function createTestServers() {
+    const servers = new Servers({createCerts: false, startHttps: false, isElectron: false});
+    servers.httpServer.start();
+
+    // cleanup
+    clearSettings('CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH');
+
+    // enable authentication:
+    saveSetting('AUTH_ENABLED', true);
+    saveSetting('USERS', [{
+        username, apiKey
+    }]);
+    saveSetting('ALLOWED_USERS', [username]);
+    saveSetting('SSL_ENABLED', false);
+
+    // ensure fetch starts with no cookies
+    clearCookies();
+
+    return servers;
+}
+
+export function closeTestServers(servers) {
+    // await for HTTP and HTTPS to close
+    return new Promise(function(resolve) {
+        if (!servers) {
+            resolve();
+            return;
+        }
+
+        servers.httpServer.close(function() {
+            if (servers.httpsServer.server) servers.httpsServer.close(resolve);
+            else resolve();
+        });
+    })
+    // and clear all queries
+    .then(() => {
+        servers.queryScheduler.clearQueries();
+    });
+}
+
+// Helper functions for PlotlyAPIRequest
 export function createGrid(filename) {
     const cols = {};
     names.forEach((name, i) => {

@@ -11,11 +11,11 @@ import {
     accessToken,
     apacheDrillConnections,
     apacheDrillStorage,
-    apiKey,
     assertResponseStatus,
-    clearCookies,
     clearSettings,
+    closeTestServers,
     createGrid,
+    createTestServers,
     DELETE,
     fakeCerts,
     GET,
@@ -129,18 +129,9 @@ describe('Servers:', () => {
 
 describe('Routes:', () => {
     beforeEach(() => {
-        servers = new Servers({createCerts: false, startHttps: false, isElectron: false});
-        servers.isElectron = false;
-        servers.httpServer.start();
+        servers = createTestServers();
 
-        // cleanup
-        clearSettings('CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH');
-
-        // Save some connections to the user's disk
-        saveSetting('USERS', [{
-            username, apiKey
-        }]);
-
+        // Initialize query object
         connectionId = saveConnection(sqlConnections);
         queryObject = {
             fid: validFid,
@@ -151,13 +142,6 @@ describe('Routes:', () => {
             requestor: validFid.split(':')[0]
         };
 
-        // Login the user:
-        saveSetting('ALLOWED_USERS', [username]);
-        saveSetting('SSL_ENABLED', false);
-
-        // ensure fetch starts with no cookies
-        clearCookies();
-
         // Sets cookies using `oauth` route, so that following requests will be authenticated
         return POST('oauth2', {access_token: accessToken})
         .then(assertResponseStatus(200))
@@ -167,9 +151,7 @@ describe('Routes:', () => {
     });
 
     afterEach(() => {
-        return closeServers().then(() => {
-            servers.queryScheduler.clearQueries();
-        });
+        return closeTestServers(servers);
     });
 
     describe('backend:', function() {
