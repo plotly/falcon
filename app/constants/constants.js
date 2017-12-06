@@ -408,5 +408,9 @@ export const SAMPLE_DBS = {
     sqlite: {
         dialect: 'sqlite',
         storage: `${__dirname}/plotly_datasets.db`
+    },
+    [DIALECTS.DATA_WORLD]: {
+        owner: 'jonloyens',
+        id: 'an-intro-to-dataworld-dataset'
     }
 };
