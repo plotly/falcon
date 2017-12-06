@@ -179,7 +179,35 @@ export const CONNECTION_CONFIG = {
             'value': 'secretAccessKey',
             'type': 'password'
         }
-    ] // TODO - password options for apache drill
+    ], // TODO - password options for apache drill
+    [DIALECTS.DATA_WORLD]: [
+        {
+            'label': 'Owner',
+            'value': 'owner',
+            'type': 'text',
+            'description': `
+              User name and unique identifier of the creator of the dataset.
+              For example, in the URL: https://data.world/jonloyens/an-intro-to-dataworld-dataset,
+              jonloyens is the unique identifier of the dataset.
+            `
+        },
+        {
+            'label': 'Id',
+            'value': 'id',
+            'type': 'text',
+            'description': `
+              Dataset unique identifier.
+              For example, in the URL: https://data.world/jonloyens/an-intro-to-dataworld-dataset,
+              an-intro-to-dataworld-dataset is the unique identifier of the dataset.
+            `
+        },
+        {
+            'label': 'Token',
+            'value': 'token',
+            'type': 'text',
+            'description': 'Your data.world token'
+        }
+    ]
 };
 
 
