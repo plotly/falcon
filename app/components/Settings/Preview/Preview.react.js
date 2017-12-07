@@ -12,7 +12,7 @@ import S3Preview from './S3Preview.js';
 
 import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../../Link.react';
-import {defaultQueries, DIALECTS, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
+import {DIALECTS, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
 import getPlotJsonFromState from './components/getPlotJsonFromState.js';
 
 class Preview extends Component {
@@ -265,7 +265,7 @@ class Preview extends Component {
 
         const dialect = connectionObject.dialect;
         const showEditor = propOr(true, 'showEditor')(preview);
-        const code = propOr(defaultQueries(dialect, selectedTable), 'code')(preview);
+        const code = propOr(PREVIEW_QUERY(dialect, selectedTable), 'code')(preview);
         propOr('', 'error')(preview);
 
         // Surpressing ESLint cause restricting line length would harm JSX readability

@@ -197,16 +197,33 @@ export const LOGOS = {
     [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png'
 };
 
-export function defaultQueries(dialect, selectedTable) {
-    if (dialect === DIALECTS.IBM_DB2) {
-        return `SELECT * FROM ${selectedTable} FETCH FIRST 10 ROWS ONLY`;
-    } else if (dialect === DIALECTS.APACHE_SPARK || dialect === DIALECTS.APACHE_IMPALA) {
-        return `SELECT * FROM ${selectedTable} LIMIT 10`;
-    } else if (dialect === DIALECTS.MSSQL) {
-        return `SELECT TOP 10 * \nFROM ${selectedTable};`;
+export function PREVIEW_QUERY (dialect, table, database = '') {
+    switch (dialect) {
+        case DIALECTS.IBM_DB2:
+            return `SELECT * FROM ${table} FETCH FIRST 1000 ROWS ONLY`;
+        case DIALECTS.APACHE_IMPALA:
+        case DIALECTS.APACHE_SPARK:
+        case DIALECTS.MYSQL:
+        case DIALECTS.SQLITE:
+        case DIALECTS.MARIADB:
+        case DIALECTS.POSTGRES:
+        case DIALECTS.REDSHIFT:
+            return `SELECT * FROM ${table} LIMIT 1000`;
+        case DIALECTS.MSSQL:
+            return 'SELECT TOP 1000 * FROM ' +
+                `${database}.dbo.${table}`;
+        case DIALECTS.ELASTICSEARCH:
+            return JSON.stringify({
+                index: database || '_all',
+                type: table || '_all',
+                body: {
+                    query: { 'match_all': {} },
+                    size: 1000
+                }
+            });
+        default:
+            throw new Error(`Dialect ${dialect} is not one of the DIALECTS`);
     }
-
-    return `SELECT * FROM ${selectedTable} LIMIT 10;`;
 }
 
 export const INITIAL_CONNECTIONS = {
