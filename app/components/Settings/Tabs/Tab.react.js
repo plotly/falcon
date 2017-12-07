@@ -35,6 +35,8 @@ export default class ConnectionTab extends Component {
             label = `Elasticsearch (${connectionObject.host})`;
         } else if (connectionObject.dialect === DIALECTS.SQLITE) {
             label = connectionObject.storage;
+        } else if (connectionObject.dialect === DIALECTS.DATA_WORLD) {
+            label = `data.world (${connectionObject.owner}/${connectionObject.id})`;
         } else {
             label = `${connectionObject.database} (${connectionObject.username}@${connectionObject.host})`;
         }
