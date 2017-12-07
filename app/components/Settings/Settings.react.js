@@ -15,7 +15,7 @@ import ConnectButton from './ConnectButton/ConnectButton.react';
 import Preview from './Preview/Preview.react';
 import TableTree from './Preview/TableTree.react.js';
 import {Link} from '../Link.react';
-import {defaultQueries, DIALECTS, FAQ, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
+import {DIALECTS, FAQ, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
 import {isElectron, isOnPrem} from '../../utils/utils';
 
 
@@ -518,7 +518,7 @@ function mapStateToProps(state) {
     const preview = previews[selectedConnectionId] || {};
     const connection = connections[selectedTab];
     if (connection && !hasIn('code', preview)) {
-        preview.code = defaultQueries(connection.dialect, selectedTable);
+        preview.code = PREVIEW_QUERY(connection.dialect, selectedTable);
     }
 
     return {
