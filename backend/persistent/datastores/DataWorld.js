@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk';
 import {parseCSV} from '../../parse.js';
+import fetch from 'node-fetch';
 
 function createClient(connection) {
     AWS.config.update({
@@ -12,9 +13,21 @@ function createClient(connection) {
 
 export function connect(connection) {
     return new Promise((resolve, reject) => {
-      resolve({success: true});
+      fetch(`https://api.data.world/v0/datasets/${connection.owner}/${connection.id}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${connection.token}` }
+      })
+      .then(res => res.json())
+      .then(json => {
+        // json.code is defined only when there is an error
+        if (json.code) {
+          reject(json);
+        } else {
+          resolve();
+        }
+      });
     });
-}
+  }
 
 /*
  * Download a (csv) file from S3, parse it
