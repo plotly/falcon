@@ -5,7 +5,9 @@ import {connect} from 'react-redux';
 import {
     baseUrl,
     dynamicRequireElectron,
-    homeUrl
+    homeUrl,
+    isOnPrem,
+    plotlyUrl
 } from '../utils/utils';
 import {Link} from './Link.react';
 import {build, version} from '../../package.json';
@@ -48,11 +50,10 @@ class Login extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            domain: '',
+            domain: (isOnPrem() ? plotlyUrl() : 'https://plot.ly'),
             statusMessage: '',
             serverType: CLOUD,
-            status: '',
-            username: ''
+            status: ''
         };
         this.buildOauthUrl = this.buildOauthUrl.bind(this);
         this.oauthPopUp = this.oauthPopUp.bind(this);
@@ -124,12 +125,12 @@ class Login extends Component {
 
     }
     buildOauthUrl() {
+        const {domain} = this.state;
         const oauthClientId = 'isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt';
-        const isOnPrem = this.state.serverType === ONPREM;
-        const plotlyDomain = isOnPrem ? this.state.domain : 'https://plot.ly';
+
         const redirect_uri = baseUrlWrapped;
         return (
-            `${plotlyDomain}/o/authorize/?response_type=token&` +
+            `${domain}/o/authorize/?response_type=token&` +
             `client_id=${oauthClientId}&` +
             `redirect_uri=${redirect_uri}/oauth2/callback`
         );
@@ -155,17 +156,10 @@ class Login extends Component {
     }
 
     logIn () {
-        const {domain, serverType, username} = this.state;
+        const {domain, serverType} = this.state;
 
         this.setState({status: '', statusMessage: ''});
 
-        if (!username) {
-            this.setState({
-                status: 'failure',
-                statusMessage: 'Enter your Plotly username.'
-            });
-            return;
-        }
         if (serverType === ONPREM) {
             if (!domain) {
                 this.setState({
@@ -191,10 +185,10 @@ class Login extends Component {
             statusMessage: (
                 <div>
                     <div>
-                        {`Authorizing ${username}...`}
+                        {'Authorizing ...'}
                     </div>
                     <div>
-                        {`You may be redirected to ${domain ? domain : 'https://plot.ly'} and asked to log in.`}
+                        {`You may be redirected to ${domain} and asked to log in.`}
                     </div>
 
                     <div style={{
@@ -227,7 +221,7 @@ class Login extends Component {
 
 
     render() {
-      const plotlyDomain = this.state.domain || 'https://plot.ly';
+      const {domain} = this.state;
         return (
             <div style={{
                 'width': '80%',
@@ -241,12 +235,13 @@ class Login extends Component {
             }}
             >
                 <h2>
-                    {'Plotly Database Connector'}
+                    {'Falcon SQL Client'}
                 </h2>
                 <h4>
                     {'Log in to Plotly to continue'}
                 </h4>
 
+                {!isOnPrem() &&
                 <div>
                     <div style={{'height': 60}}>
                         <label>Connect to Plotly Cloud</label>
@@ -281,19 +276,7 @@ class Login extends Component {
                         ) : null
                     }
 
-                    <div style={{'height': 60}}>
-                        <label>Your Plotly Username</label>
-                        <input
-                            id="test-username"
-                            type="text"
-                            placeholder=""
-                            onChange={e => this.setState({
-                                username: e.target.value
-                            })}
-                        />
-                    </div>
-                </div>
-
+                </div>}
                 <div>
                     <button id="test-login-button" onClick={this.logIn}>
                         {'Log in'}
@@ -306,15 +289,19 @@ class Login extends Component {
 
                 <div style={{'marginTop': '30px'}}>
                     <span>
-                        {`To schedule queries and update data, the Falcon SQL Client requires a Plotly login.
-                          Don't have an account yet?`}
+                        {'To schedule queries and update data, the Falcon SQL Client requires a Plotly login.'}
                     </span>
                 </div>
 
-                <Link href={`${plotlyDomain}/accounts/login/?action=signup`} className="externalLink">
-                    {'Create an account '}
-                </Link>
-
+                {!isOnPrem() &&
+                <div>
+                    <span>
+                        {'Don\'t have an account yet?'}
+                    </span>
+                    <Link href={`${domain}/accounts/login/?action=signup`} className="externalLink">
+                        {'Create an account '}
+                    </Link>
+                </div>}
             </div>
         );
     }
