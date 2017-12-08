@@ -53,7 +53,7 @@ class Login extends Component {
             domain: '',
             statusMessage: '',
             serverType: CLOUD,
-            status: '',
+            status: ''
         };
         this.buildOauthUrl = this.buildOauthUrl.bind(this);
         this.oauthPopUp = this.oauthPopUp.bind(this);
@@ -63,7 +63,7 @@ class Login extends Component {
          * This prevents need to enter on-prem domain when running inside
          * On Prem server:
         */
-        if (isOnprem()) {
+        if (isOnPrem()) {
             this.setState({domain: plotlyUrl()});
         }
     }
@@ -192,7 +192,7 @@ class Login extends Component {
             statusMessage: (
                 <div>
                     <div>
-                        {`Authorizing ...`}
+                        {'Authorizing ...'}
                     </div>
                     <div>
                         {`You may be redirected to ${domain ? domain : 'https://plot.ly'} and asked to log in.`}
