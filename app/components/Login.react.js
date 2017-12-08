@@ -52,7 +52,6 @@ class Login extends Component {
             statusMessage: '',
             serverType: CLOUD,
             status: '',
-            username: ''
         };
         this.buildOauthUrl = this.buildOauthUrl.bind(this);
         this.oauthPopUp = this.oauthPopUp.bind(this);
@@ -155,17 +154,10 @@ class Login extends Component {
     }
 
     logIn () {
-        const {domain, serverType, username} = this.state;
+        const {domain, serverType} = this.state;
 
         this.setState({status: '', statusMessage: ''});
 
-        if (!username) {
-            this.setState({
-                status: 'failure',
-                statusMessage: 'Enter your Plotly username.'
-            });
-            return;
-        }
         if (serverType === ONPREM) {
             if (!domain) {
                 this.setState({
@@ -191,7 +183,7 @@ class Login extends Component {
             statusMessage: (
                 <div>
                     <div>
-                        {`Authorizing ${username}...`}
+                        {`Authorizing ...`}
                     </div>
                     <div>
                         {`You may be redirected to ${domain ? domain : 'https://plot.ly'} and asked to log in.`}
@@ -281,17 +273,6 @@ class Login extends Component {
                         ) : null
                     }
 
-                    <div style={{'height': 60}}>
-                        <label>Your Plotly Username</label>
-                        <input
-                            id="test-username"
-                            type="text"
-                            placeholder=""
-                            onChange={e => this.setState({
-                                username: e.target.value
-                            })}
-                        />
-                    </div>
                 </div>
 
                 <div>
