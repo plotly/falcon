@@ -50,7 +50,7 @@ class Login extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            domain: (isOnPrem() ? plotlyUrl(): 'https://plot.ly'),
+            domain: (isOnPrem() ? plotlyUrl() : 'https://plot.ly'),
             statusMessage: '',
             serverType: CLOUD,
             status: ''
