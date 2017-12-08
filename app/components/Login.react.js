@@ -5,7 +5,9 @@ import {connect} from 'react-redux';
 import {
     baseUrl,
     dynamicRequireElectron,
-    homeUrl
+    homeUrl,
+    isOnPrem,
+    plotlyUrl
 } from '../utils/utils';
 import {Link} from './Link.react';
 import {build, version} from '../../package.json';
@@ -56,6 +58,14 @@ class Login extends Component {
         this.buildOauthUrl = this.buildOauthUrl.bind(this);
         this.oauthPopUp = this.oauthPopUp.bind(this);
         this.logIn = this.logIn.bind(this);
+
+        /*
+         * This prevents need to enter on-prem domain when running inside
+         * On Prem server:
+        */
+        if (isOnprem()) {
+            this.setState({domain: plotlyUrl()});
+        }
     }
 
     componentDidMount() {
@@ -124,8 +134,7 @@ class Login extends Component {
     }
     buildOauthUrl() {
         const oauthClientId = 'isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt';
-        const isOnPrem = this.state.serverType === ONPREM;
-        const plotlyDomain = isOnPrem ? this.state.domain : 'https://plot.ly';
+        const plotlyDomain = isOnPrem() ? this.state.domain : 'https://plot.ly';
         const redirect_uri = baseUrlWrapped;
         return (
             `${plotlyDomain}/o/authorize/?response_type=token&` +
@@ -239,6 +248,7 @@ class Login extends Component {
                     {'Log in to Plotly to continue'}
                 </h4>
 
+                {!isOnPrem() &&
                 <div>
                     <div style={{'height': 60}}>
                         <label>Connect to Plotly Cloud</label>
@@ -273,8 +283,7 @@ class Login extends Component {
                         ) : null
                     }
 
-                </div>
-
+                </div>}
                 <div>
                     <button id="test-login-button" onClick={this.logIn}>
                         {'Log in'}
@@ -287,15 +296,18 @@ class Login extends Component {
 
                 <div style={{'marginTop': '30px'}}>
                     <span>
-                        {`To schedule queries and update data, the Falcon SQL Client requires a Plotly login.
-                          Don't have an account yet?`}
+                        {'To schedule queries and update data, the Falcon SQL Client requires a Plotly login.'}
                     </span>
                 </div>
 
-                <Link href={`${plotlyDomain}/accounts/login/?action=signup`} className="externalLink">
-                    {'Create an account '}
-                </Link>
-
+                {!isOnPrem() && <div>
+                   <span>
+                       {'Don\'t have an account yet?'}
+                    </span>
+                    <Link href={`${plotlyDomain}/accounts/login/?action=signup`} className="externalLink">
+                        {'Create an account '}
+                    </Link>
+                </div>}
             </div>
         );
     }
