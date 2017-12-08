@@ -242,7 +242,7 @@ class Login extends Component {
             }}
             >
                 <h2>
-                    {'Plotly Database Connector'}
+                    {'Falcon SQL Client'}
                 </h2>
                 <h4>
                     {'Log in to Plotly to continue'}
