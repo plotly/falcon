@@ -295,8 +295,8 @@ class Login extends Component {
 
                 {!isOnPrem() &&
                 <div>
-                   <span>
-                       {'Don\'t have an account yet?'}
+                    <span>
+                        {'Don\'t have an account yet?'}
                     </span>
                     <Link href={`${domain}/accounts/login/?action=signup`} className="externalLink">
                         {'Create an account '}
