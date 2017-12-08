@@ -293,7 +293,8 @@ class Login extends Component {
                     </span>
                 </div>
 
-                {!isOnPrem() && <div>
+                {!isOnPrem() &&
+                <div>
                    <span>
                        {'Don\'t have an account yet?'}
                     </span>
