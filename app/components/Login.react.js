@@ -50,7 +50,7 @@ class Login extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            domain: '',
+            domain: (isOnPrem() ? plotlyUrl(): 'https://plot.ly'),
             statusMessage: '',
             serverType: CLOUD,
             status: ''
@@ -58,14 +58,6 @@ class Login extends Component {
         this.buildOauthUrl = this.buildOauthUrl.bind(this);
         this.oauthPopUp = this.oauthPopUp.bind(this);
         this.logIn = this.logIn.bind(this);
-
-        /*
-         * This prevents need to enter on-prem domain when running inside
-         * On Prem server:
-        */
-        if (isOnPrem()) {
-            this.setState({domain: plotlyUrl()});
-        }
     }
 
     componentDidMount() {
@@ -133,11 +125,12 @@ class Login extends Component {
 
     }
     buildOauthUrl() {
+        const {domain} = this.state;
         const oauthClientId = 'isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt';
-        const plotlyDomain = isOnPrem() ? this.state.domain : 'https://plot.ly';
+
         const redirect_uri = baseUrlWrapped;
         return (
-            `${plotlyDomain}/o/authorize/?response_type=token&` +
+            `${domain}/o/authorize/?response_type=token&` +
             `client_id=${oauthClientId}&` +
             `redirect_uri=${redirect_uri}/oauth2/callback`
         );
@@ -195,7 +188,7 @@ class Login extends Component {
                         {'Authorizing ...'}
                     </div>
                     <div>
-                        {`You may be redirected to ${domain ? domain : 'https://plot.ly'} and asked to log in.`}
+                        {`You may be redirected to ${domain} and asked to log in.`}
                     </div>
 
                     <div style={{
@@ -228,7 +221,7 @@ class Login extends Component {
 
 
     render() {
-      const plotlyDomain = this.state.domain || 'https://plot.ly';
+      const {domain} = this.state;
         return (
             <div style={{
                 'width': '80%',
@@ -304,7 +297,7 @@ class Login extends Component {
                    <span>
                        {'Don\'t have an account yet?'}
                     </span>
-                    <Link href={`${plotlyDomain}/accounts/login/?action=signup`} className="externalLink">
+                    <Link href={`${domain}/accounts/login/?action=signup`} className="externalLink">
                         {'Create an account '}
                     </Link>
                 </div>}
