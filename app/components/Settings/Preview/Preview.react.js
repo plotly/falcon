@@ -14,6 +14,7 @@ import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../../Link.react';
 import {DIALECTS, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
 import getPlotJsonFromState from './components/getPlotJsonFromState.js';
+import {homeUrl} from '../../../utils/utils';
 
 class Preview extends Component {
 
@@ -178,7 +179,7 @@ class Preview extends Component {
 
         const payloadJSON = JSON.stringify({payload: payload, type: type});
 
-        fetch('/datacache', {
+        fetch(homeUrl() + '/datacache', {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
