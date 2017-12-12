@@ -42,7 +42,8 @@ Build (after it was already built for electron desktop) and run the app:
 ```bash
 $ yarn run rebuild:modules:node
 $ yarn run heroku-postbuild
-$ yarn run start-headless```
+$ yarn run start-headless
+```
 
 Visit the app in your web browser at `http://localhost:9494`.
 
