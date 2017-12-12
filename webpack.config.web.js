@@ -2,6 +2,9 @@ import webpack from 'webpack';
 import baseConfig from './webpack.config.base';
 import path from 'path';
 
+const AUTH_ENABLED = (process.env.PLOTLY_CONNECTOR_AUTH_ENABLED !== 'undefined' ?
+                      JSON.parse(process.env.PLOTLY_CONNECTOR_AUTH_ENABLED): true);
+
 const config = {
     ...baseConfig,
 
@@ -24,13 +27,11 @@ const config = {
             __DEV__: false,
             'process.env.NODE_ENV': JSON.stringify('production')
         }),
-        /*
-         * This is used to pass environment variables to frontend when docker
-         * container initializes
-         */
+
+        // This is used to pass environment variables to frontend
         new webpack.DefinePlugin({
             'PLOTLY_ENV': {
-                'AUTH_ENABLED': JSON.stringify(process.env.PLOTLY_CONNECTOR_AUTH_ENABLED)
+                'AUTH_ENABLED': AUTH_ENABLED
             }
         })
     ],
