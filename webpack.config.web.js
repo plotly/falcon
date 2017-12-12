@@ -24,6 +24,10 @@ const config = {
             __DEV__: false,
             'process.env.NODE_ENV': JSON.stringify('production')
         }),
+        /*
+         * This is used to pass environment variables to frontend when docker
+         * container initializes
+         */
         new webpack.DefinePlugin({
             'PLOTLY_ENV': {
                 'AUTH_ENABLED': JSON.stringify(process.env.PLOTLY_CONNECTOR_AUTH_ENABLED)

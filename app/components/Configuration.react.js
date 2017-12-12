@@ -14,7 +14,7 @@ class Configuration extends Component {
         this.state = {
             isMenuOpen: false,
             username: cookie.load('db-connector-user'),
-            // eslint-disable-next-line no-undef
+            /*global PLOTLY_ENV*/
             authDisabled: typeof PLOTLY_ENV !== 'undefined' ? !PLOTLY_ENV.AUTH_ENABLED : false
         };
         this.toggle = this.toggle.bind(this);
