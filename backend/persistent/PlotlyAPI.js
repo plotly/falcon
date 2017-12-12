@@ -32,7 +32,7 @@ export function newDatacache(payloadJSON, type) {
     form.append('payload', payloadJSON);
     const body = form;
 
-    return fetch('https://plot.ly/datacache', {
+    return fetch(`${getSetting('PLOTLY_API_URL')}/datacache`, {
         method: 'POST',
         body: body
     }).then(res => {
