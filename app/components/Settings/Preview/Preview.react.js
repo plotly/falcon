@@ -366,12 +366,13 @@ class Preview extends Component {
                                         >
                                             Send CSV to Chart Studio
                                         </button>
+                                        {!isOnPrem() &&
                                         <button
                                             className="btn btn-outline"
                                             onClick={() => this.fetchDatacache(csvString, 'csv')}
                                         >
                                             Download CSV
-                                        </button>
+                                        </button>}
                                         <button
                                             className="btn btn-outline"
                                             onClick={() => this.fetchDatacache(
