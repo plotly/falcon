@@ -14,7 +14,7 @@ import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../../Link.react';
 import {DIALECTS, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
 import getPlotJsonFromState from './components/getPlotJsonFromState.js';
-import {homeUrl} from '../../../utils/utils';
+import {homeUrl, isOnPrem} from '../../../utils/utils';
 
 class Preview extends Component {
 
@@ -364,7 +364,7 @@ class Preview extends Component {
                                             className="btn btn-outline"
                                             onClick={() => this.fetchDatacache(csvString, 'grid')}
                                         >
-                                            Send CSV to plot.ly
+                                            Send CSV to Chart Studio
                                         </button>
                                         <button
                                             className="btn btn-outline"
@@ -379,7 +379,7 @@ class Preview extends Component {
                                                 'plot'
                                             )}
                                         >
-                                            Send chart to plot.ly
+                                            Send chart to Chart Studio
                                         </button>
                                     </div>
                                     <div style={{width: 650, height: 200, border: '1px solid #dfe8f3',
@@ -390,7 +390,7 @@ class Preview extends Component {
                                             <div style={{borderTop: '1px solid #dfe8f3', marginTop: 20}}>
                                                 {link.type === 'grid' &&
                                                     <div>
-                                                        <div style={{color: '#00cc96'}}>🎉  Link to your CSV on Plot.ly ⬇️</div>
+                                                        <div style={{color: '#00cc96'}}>🎉  Link to your CSV on Chart Studio ⬇️</div>
                                                         <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
                                                     </div>
                                                 }
@@ -402,7 +402,7 @@ class Preview extends Component {
                                                 }
                                                 {link.type === 'plot' &&
                                                     <div>
-                                                        <div style={{color: '#00cc96'}}>📈  Link to your chart on Plot.ly ⬇️</div>
+                                                        <div style={{color: '#00cc96'}}>📈  Link to your chart on Chart Studio ⬇️</div>
                                                         <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
                                                     </div>
                                                 }
