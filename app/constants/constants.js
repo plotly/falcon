@@ -222,7 +222,7 @@ export function PREVIEW_QUERY (dialect, table, database = '') {
                 }
             });
         default:
-            throw new Error(`Dialect ${dialect} is not one of the DIALECTS`);
+            return '';
     }
 }
 
