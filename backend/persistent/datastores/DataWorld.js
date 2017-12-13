@@ -18,6 +18,20 @@ export function connect(connection) {
     });
   }
 
+function getSchema(fileName, connection) {
+  fetch(`https://api.data.world/v0/sql/${connection.owner}/${connection.id}`, {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${connection.token}` }
+    body: JSON.stringify({
+      query: `SELECT * FROM ${fileName} LIMIT 1`
+    })
+  })
+  .then(res => res.json())
+  .then(json => {
+    console.log(json)
+  });
+}
+
 function getTables(allFiles) {
   const csvFiles = allFiles.filter((file) => {
     return /.csv$/.test(file.name);
@@ -33,6 +47,9 @@ export function schemas(connection) {
       const tableNames = tables.map((table) => {
         const tableName = table.name;
         return tableName.substring(0, tableName.length - 4);
+      });
+      tableNames.map((name) => {
+        getSchema(name);
       });
       const rows = tableNames.map((tableName) => {
         return [tableName];
