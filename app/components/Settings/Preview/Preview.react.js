@@ -50,7 +50,8 @@ class Preview extends Component {
         selectedIndex: PropTypes.any,
         tablesRequest: PropTypes.object,
         setTable: PropTypes.func,
-        setIndex: PropTypes.func
+        setIndex: PropTypes.func,
+        username: PropTypes.string
     };
 
     propsToState(nextProps, props) {
@@ -206,7 +207,7 @@ class Preview extends Component {
                 }
 
             } else {
-                link = plotlyLinks.find((link) => link.type === 'error')
+                link = plotlyLinks.find((link) => link.type === 'error');
                 if (link) {
                     // if exists, overwrite it:
                     link.message = data.error.message;
