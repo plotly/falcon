@@ -1,15 +1,4 @@
-import AWS from 'aws-sdk';
-import {parseCSV} from '../../parse.js';
 import fetch from 'node-fetch';
-
-function createClient(connection) {
-    AWS.config.update({
-        accessKeyId: connection.accessKeyId,
-        secretAccessKey: connection.secretAccessKey
-    });
-    return new AWS.S3();
-}
-
 
 export function connect(connection) {
     return new Promise((resolve, reject) => {
@@ -23,45 +12,36 @@ export function connect(connection) {
         if (json.code) {
           reject(json);
         } else {
-          resolve();
+          resolve(json);
         }
       });
     });
   }
 
-/*
- * Download a (csv) file from S3, parse it
- * and return the results.
- */
-export function query(key, connection) {
-    const {bucket} = connection;
-    const client = createClient(connection);
-    return new Promise((resolve, reject) => {
-        client.getObject({Bucket: bucket, Key: key}, (err, response) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            const textData = response.Body.toString();
-            // TODO ^ handle binary files too
-            parseCSV(textData).then(resolve);
-        });
-    });
+function getTables(allFiles) {
+  const csvFiles = allFiles.filter((file) => {
+    return /.csv$/.test(file.name);
+  });
+  
+  return csvFiles;
 }
 
-/*
- * List all of the files in an S3 bucket
- */
-export function files(connection) {
-    const {bucket} = connection;
-    const client = createClient(connection);
-    return new Promise((resolve, reject) => {
-        client.listObjects({Bucket: bucket}, (err, data) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            resolve(data.Contents);
-        });
-    });
+export function schemas(connection) {
+  return connect(connection)
+    .then((json) => {
+      const tables = getTables(json.files);
+      const tableNames = tables.map((table) => {
+        const tableName = table.name;
+        return tableName.substring(0, tableName.length - 4);
+      });
+      const rows = tableNames.map((tableName) => {
+        return [tableName];
+      });
+    return {
+      columnnames: ['?column?', 'column_name', 'data_type'],
+      rows
+    };
+  }).catch(err => {
+    throw new Error(err);
+  });
 }
