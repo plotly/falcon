@@ -589,10 +589,10 @@ export default class Servers {
         /* Plotly v2 API requests */
 
         server.post('/datacache', function getDatacacheHandler(req, res, next) {
-            const {payload, type: contentType} = req.params;
+            const {payload, requestor, type: contentType} = req.params;
 
             if (contentType !== 'csv') {
-                const datacacheResp = newDatacache(payload, contentType);
+                const datacacheResp = newDatacache(payload, contentType, requestor);
                 datacacheResp.then(plotlyRes => plotlyRes.json().then(resJSON => {
                     res.json(plotlyRes.status, resJSON);
                     return next();
