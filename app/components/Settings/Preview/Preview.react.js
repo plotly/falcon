@@ -193,10 +193,27 @@ class Preview extends Component {
             return resp.json();
         }).then(data => {
             const plotlyLinks = this.state.plotlyLinks;
+            let link;
+
             if (!('error' in data)) {
-                plotlyLinks.unshift({type: type, url: data.url});
+                link = plotlyLinks.find((link) => link.type === type);
+                if (link) {
+                    // if exists, overwrite it:
+                    link.url = data.url;
+                }
+                else {
+                    plotlyLinks.unshift({type: type, url: data.url});
+                }
+
             } else {
-                plotlyLinks.unshift({type: 'error', message: data.error.message});
+                link = plotlyLinks.find((link) => link.type === 'error')
+                if (link) {
+                    // if exists, overwrite it:
+                    link.message = data.error.message;
+                }
+                else {
+                    plotlyLinks.unshift({type: 'error', message: data.error.message});
+                }
             }
             this.setState({ plotlyLinks: plotlyLinks });
         });
