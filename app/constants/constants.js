@@ -27,7 +27,8 @@ export const SQL_DIALECTS_USING_EDITOR = [
     'sqlite',
     'ibm db2',
     'apache spark',
-    'apache impala'
+    'apache impala',
+    'data.world'
 ];
 
 const commonSqlOptions = [
@@ -136,7 +137,7 @@ export const CONNECTION_CONFIG = {
 
     [DIALECTS.ELASTICSEARCH]: [
         {'label': 'Username', 'value': 'username', 'type': 'text',
-         'description': `
+            'description': `
             These credentials are used to authenticate Elasticsearch instances
             that are protected with HTTP Basic Auth.
             You can leave this blank if your instance does not have
