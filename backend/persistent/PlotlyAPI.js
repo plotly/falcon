@@ -26,15 +26,34 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
     });
 }
 
-export function newDatacache(payloadJSON, type) {
+export function newDatacache(payloadJSON, type, requestor) {
     const form = new FormData();
     form.append('type', type);
     form.append('payload', payloadJSON);
     const body = form;
 
-    return fetch('https://plot.ly/datacache', {
+    const users = getSetting('USERS');
+    const user = users.find(
+        u => u.username === requestor
+    );
+    const apiKey = user.apiKey;
+    const accessToken = user.accessToken;
+
+    let authorization = '';
+    if (apiKey) {
+        authorization = 'Basic ' + new Buffer(
+            requestor + ':' + apiKey
+        ).toString('base64');
+    } else if (accessToken) {
+        authorization = `Bearer ${accessToken}`;
+    }
+
+    return fetch(`${getSetting('PLOTLY_URL')}/datacache`, {
         method: 'POST',
-        body: body
+        body: body,
+        headers: {
+            'Authorization': authorization
+        }
     }).then(res => {
         return res;
     }).catch(err => {

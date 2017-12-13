@@ -363,6 +363,7 @@ class Settings extends Component {
                                             schemaRequest={schemaRequest}
                                             runSqlQuery={runSqlQuery}
                                             queryRequest={queryRequest || {}}
+                                            username={username}
                                         />
                                     </div>
                                 </SplitPane>

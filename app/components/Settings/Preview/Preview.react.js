@@ -14,6 +14,7 @@ import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../../Link.react';
 import {DIALECTS, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
 import getPlotJsonFromState from './components/getPlotJsonFromState.js';
+import {homeUrl, isOnPrem} from '../../../utils/utils';
 
 class Preview extends Component {
 
@@ -49,7 +50,8 @@ class Preview extends Component {
         selectedIndex: PropTypes.any,
         tablesRequest: PropTypes.object,
         setTable: PropTypes.func,
-        setIndex: PropTypes.func
+        setIndex: PropTypes.func,
+        username: PropTypes.string
     };
 
     propsToState(nextProps, props) {
@@ -176,9 +178,11 @@ class Preview extends Component {
 
     fetchDatacache(payload, type) {
 
-        const payloadJSON = JSON.stringify({payload: payload, type: type});
+        const {username} = this.props;
+        const payloadJSON = JSON.stringify({
+            payload: payload, type: type, requestor: username});
 
-        fetch('/datacache', {
+        fetch(homeUrl() + '/datacache', {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -190,10 +194,26 @@ class Preview extends Component {
             return resp.json();
         }).then(data => {
             const plotlyLinks = this.state.plotlyLinks;
+            let link;
+
             if (!('error' in data)) {
-                plotlyLinks.unshift({type: type, url: data.url});
+                link = plotlyLinks.find((link) => link.type === type);
+                if (link) {
+                    // if exists, overwrite it:
+                    link.url = data.url;
+                } else {
+                    plotlyLinks.unshift({type: type, url: data.url});
+                }
+
             } else {
-                plotlyLinks.unshift({type: 'error', message: data.error.message});
+                link = plotlyLinks.find((link) => link.type === 'error');
+                if (link) {
+                    // if exists, overwrite it:
+                    link.message = data.error.message;
+                }
+                else {
+                    plotlyLinks.unshift({type: 'error', message: data.error.message});
+                }
             }
             this.setState({ plotlyLinks: plotlyLinks });
         });
@@ -363,14 +383,15 @@ class Preview extends Component {
                                             className="btn btn-outline"
                                             onClick={() => this.fetchDatacache(csvString, 'grid')}
                                         >
-                                            Send CSV to plot.ly
+                                            Send CSV to Chart Studio
                                         </button>
+                                        {!isOnPrem() &&
                                         <button
                                             className="btn btn-outline"
                                             onClick={() => this.fetchDatacache(csvString, 'csv')}
                                         >
                                             Download CSV
-                                        </button>
+                                        </button>}
                                         <button
                                             className="btn btn-outline"
                                             onClick={() => this.fetchDatacache(
@@ -378,7 +399,7 @@ class Preview extends Component {
                                                 'plot'
                                             )}
                                         >
-                                            Send chart to plot.ly
+                                            Send chart to Chart Studio
                                         </button>
                                     </div>
                                     <div style={{width: 650, height: 200, border: '1px solid #dfe8f3',
@@ -389,7 +410,7 @@ class Preview extends Component {
                                             <div style={{borderTop: '1px solid #dfe8f3', marginTop: 20}}>
                                                 {link.type === 'grid' &&
                                                     <div>
-                                                        <div style={{color: '#00cc96'}}>🎉  Link to your CSV on Plot.ly ⬇️</div>
+                                                        <div style={{color: '#00cc96'}}>🎉  Link to your CSV on Chart Studio ⬇️</div>
                                                         <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
                                                     </div>
                                                 }
@@ -401,7 +422,7 @@ class Preview extends Component {
                                                 }
                                                 {link.type === 'plot' &&
                                                     <div>
-                                                        <div style={{color: '#00cc96'}}>📈  Link to your chart on Plot.ly ⬇️</div>
+                                                        <div style={{color: '#00cc96'}}>📈  Link to your chart on Chart Studio ⬇️</div>
                                                         <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
                                                     </div>
                                                 }
