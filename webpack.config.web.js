@@ -2,8 +2,12 @@ import webpack from 'webpack';
 import baseConfig from './webpack.config.base';
 import path from 'path';
 
-const AUTH_ENABLED = (process.env.PLOTLY_CONNECTOR_AUTH_ENABLED !== 'undefined' ?
-                      JSON.parse(process.env.PLOTLY_CONNECTOR_AUTH_ENABLED): true);
+const AUTH_ENABLED = process.env.PLOTLY_CONNECTOR_AUTH_ENABLED ?
+                     JSON.parse(process.env.PLOTLY_CONNECTOR_AUTH_ENABLED) : true;
+
+const OAUTH2_CLIENT_ID = process.env.PLOTLY_CONNECTOR_OAUTH2_CLIENT_ID ?
+                         JSON.stringify(process.env.PLOTLY_CONNECTOR_OAUTH2_CLIENT_ID) :
+                         JSON.stringify('isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt');
 
 const config = {
     ...baseConfig,
@@ -31,7 +35,8 @@ const config = {
         // This is used to pass environment variables to frontend
         new webpack.DefinePlugin({
             'PLOTLY_ENV': {
-                'AUTH_ENABLED': AUTH_ENABLED
+                'AUTH_ENABLED': AUTH_ENABLED,
+                'OAUTH2_CLIENT_ID': OAUTH2_CLIENT_ID
             }
         })
     ],
