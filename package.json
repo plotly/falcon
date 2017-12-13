@@ -1,6 +1,6 @@
 {
   "name": "falcon-sql-client",
-  "version": "2.3.3-beta1",
+  "version": "2.4.0",
   "description": "Free, open-source SQL client for Windows, Mac and Linux",
   "main": "./backend/main.js",
   "scripts": {
