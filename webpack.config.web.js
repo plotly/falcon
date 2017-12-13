@@ -6,8 +6,8 @@ const AUTH_ENABLED = process.env.PLOTLY_CONNECTOR_AUTH_ENABLED ?
                      JSON.parse(process.env.PLOTLY_CONNECTOR_AUTH_ENABLED) : true;
 
 const OAUTH2_CLIENT_ID = process.env.PLOTLY_CONNECTOR_OAUTH2_CLIENT_ID ?
-                         JSON.stringify(process.env.PLOTLY_CONNECTOR_OAUTH2_CLIENT_ID) :
-                         JSON.stringify('isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt');
+    JSON.stringify(process.env.PLOTLY_CONNECTOR_OAUTH2_CLIENT_ID) :
+    JSON.stringify('isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt');
 
 const config = {
     ...baseConfig,
