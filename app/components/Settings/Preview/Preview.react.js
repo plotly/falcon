@@ -201,8 +201,7 @@ class Preview extends Component {
                 if (link) {
                     // if exists, overwrite it:
                     link.url = data.url;
-                }
-                else {
+                } else {
                     plotlyLinks.unshift({type: type, url: data.url});
                 }
 
