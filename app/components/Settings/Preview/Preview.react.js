@@ -177,7 +177,9 @@ class Preview extends Component {
 
     fetchDatacache(payload, type) {
 
-        const payloadJSON = JSON.stringify({payload: payload, type: type});
+        const {username} = this.props;
+        const payloadJSON = JSON.stringify({
+            payload: payload, type: type, requestor: username});
 
         fetch(homeUrl() + '/datacache', {
             headers: {
