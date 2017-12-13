@@ -48,12 +48,12 @@ export function newDatacache(payloadJSON, type, requestor) {
         authorization = `Bearer ${accessToken}`;
     }
 
-    return fetch(`${getSetting('PLOTLY_API_URL')}/datacache`, {
+    return fetch(`${getSetting('PLOTLY_URL')}/datacache`, {
         method: 'POST',
-        body: body
+        body: body,
         headers: {
             'Authorization': authorization
-        },
+        }
     }).then(res => {
         return res;
     }).catch(err => {
