@@ -197,7 +197,7 @@ class Preview extends Component {
             let link;
 
             if (!('error' in data)) {
-                link = plotlyLinks.find((link) => link.type === type);
+                link = plotlyLinks.find((l) => l.type === type);
                 if (link) {
                     // if exists, overwrite it:
                     link.url = data.url;
@@ -206,7 +206,7 @@ class Preview extends Component {
                 }
 
             } else {
-                link = plotlyLinks.find((link) => link.type === 'error');
+                link = plotlyLinks.find((l) => l.type === 'error');
                 if (link) {
                     // if exists, overwrite it:
                     link.message = data.error.message;
