@@ -33,6 +33,8 @@ const config = {
         }),
 
         // This is used to pass environment variables to frontend
+        // detailed discussions on this ticket:
+        // https://github.com/plotly/streambed/issues/10436
         new webpack.DefinePlugin({
             'PLOTLY_ENV': {
                 'AUTH_ENABLED': AUTH_ENABLED,
