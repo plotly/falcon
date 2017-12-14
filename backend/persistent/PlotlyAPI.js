@@ -37,8 +37,12 @@ export function newDatacache(payloadJSON, type, requestor) {
         u => u.username === requestor
     );
 
+    /*
+     * Authentication is only required for on-premise private-mode for this
+     * endpoint, so even if the user is not logged in, we should still be able
+     * to proceed with blank `Authorization` header.
+     */
     let authorization = '';
-
     if (user) {
         const apiKey = user.apiKey;
         const accessToken = user.accessToken;
