@@ -1,8 +1,9 @@
 import fetch from 'node-fetch';
 
 export function connect(connection) {
+  console.log('This is the connection', connection);
     return new Promise((resolve, reject) => {
-      fetch(`https://api.data.world/v0/datasets/${connection.owner}/${connection.id}`, {
+      fetch(`https://api.data.world/v0/datasets/${connection.owner}/${connection.identifier}`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${connection.token}` }
       })
@@ -12,7 +13,7 @@ export function connect(connection) {
         if (json.code) {
           reject(json);
         } else {
-          resolve(json);
+          resolve();
         }
       });
     });
@@ -21,7 +22,7 @@ export function connect(connection) {
 function getSchema(fileName, connection) {
   fetch(`https://api.data.world/v0/sql/${connection.owner}/${connection.id}`, {
     method: 'POST',
-    headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${connection.token}` }
+    headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${connection.token}` },
     body: JSON.stringify({
       query: `SELECT * FROM ${fileName} LIMIT 1`
     })
