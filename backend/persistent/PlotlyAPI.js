@@ -36,16 +36,20 @@ export function newDatacache(payloadJSON, type, requestor) {
     const user = users.find(
         u => u.username === requestor
     );
-    const apiKey = user.apiKey;
-    const accessToken = user.accessToken;
 
     let authorization = '';
-    if (apiKey) {
-        authorization = 'Basic ' + new Buffer(
-            requestor + ':' + apiKey
-        ).toString('base64');
-    } else if (accessToken) {
-        authorization = `Bearer ${accessToken}`;
+
+    if (user) {
+        const apiKey = user.apiKey;
+        const accessToken = user.accessToken;
+
+        if (apiKey) {
+            authorization = 'Basic ' + new Buffer(
+                requestor + ':' + apiKey
+            ).toString('base64');
+        } else if (accessToken) {
+            authorization = `Bearer ${accessToken}`;
+        }
     }
 
     return fetch(`${getSetting('PLOTLY_URL')}/datacache`, {
