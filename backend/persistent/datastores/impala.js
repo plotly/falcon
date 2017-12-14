@@ -67,7 +67,6 @@ export function schemas(connection) {
 
       // The results are nested inside a list, so we need to un-nest first:
       const rows = unnest(res);
-      console.log('Imapala schema', {columnnames, rows});
       return {columnnames, rows};
     }).catch(err => {
         Logger.log(err);

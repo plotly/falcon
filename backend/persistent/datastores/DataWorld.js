@@ -97,3 +97,33 @@ export function schemas(connection) {
 
   });
 }
+
+export function query(queryStmt, connection) {
+  return new Promise((resolve, reject) => {
+    const params = encodeURIComponent('query') + '=' + encodeURIComponent(queryStmt);
+    fetch(`https://api.data.world/v0/sql/${connection.owner}/${connection.identifier}?includeTableSchema=true`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${connection.token}`,
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      },
+      body: params
+    })
+    .then(res => {
+      return res.json();
+    })
+    .then(json => {
+      const fields = json[0].fields;
+      const columnnames = fields.map((field) => {
+        return field.name;
+      });
+      const rows = json.slice(1).map((row) => {
+        return Object.values(row);
+      });
+      resolve({
+        columnnames,
+        rows
+      });
+    });
+  });
+}
