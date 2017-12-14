@@ -36,7 +36,7 @@ export default class ConnectionTab extends Component {
         } else if (connectionObject.dialect === DIALECTS.SQLITE) {
             label = connectionObject.storage;
         } else if (connectionObject.dialect === DIALECTS.DATA_WORLD) {
-            label = `data.world (${connectionObject.owner}/${connectionObject.id})`;
+            label = `data.world (${connectionObject.owner}/${connectionObject.identifier})`;
         } else {
             label = `${connectionObject.database} (${connectionObject.username}@${connectionObject.host})`;
         }
