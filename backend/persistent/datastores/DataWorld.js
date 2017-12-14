@@ -48,22 +48,23 @@ export function tables(connection) {
 }
 
 function getSchema(connection, table) {
-  console.log('The table', table);
-  const params = encodeURIComponent('query') + '=' + encodeURIComponent(`select * from ${table} limit 1`);
-  fetch(`https://api.data.world/v0/sql/${connection.owner}/${connection.identifier}?includeTableSchema=true`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${connection.token}`,
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-    },
-    body: params
-  })
+  return new Promise((resolve, reject) => {
+    const params = encodeURIComponent('query') + '=' + encodeURIComponent(`select * from ${table} limit 1`);
+    fetch(`https://api.data.world/v0/sql/${connection.owner}/${connection.identifier}?includeTableSchema=true`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${connection.token}`,
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      },
+      body: params
+    })
     .then(res => {
       return res.json();
     })
     .then(json => {
-      return json.fields;
+      resolve({table, fields: json[0].fields });
     });
+  });
 }
 
 export function schemas(connection) {
@@ -78,20 +79,21 @@ export function schemas(connection) {
       if (json.code) {
         reject(json);
       } else {
-        const tableSchemas = getTables(json.files).map(table => {
-          const rs = getSchema(connection, table);
-          return rs;
+        const promises = getTables(json.files).map(table => {
+          return getSchema(connection, table).then((schema) => {
+            return schema.fields.map((field) => {
+              return [schema.table, field.name, field.type];
+            });
+          });
         });
-
-        console.log(tableSchemas);
+        Promise.all(promises).then((tableSchemas) => {
+          resolve({
+            columnNames: [ 'tablename', 'column_name', 'data_type' ],
+            rows: [].concat.apply([], tableSchemas)
+          });
+        });
       }
     });
-    resolve({
-      columnNames: [ 'tablename', 'column_name', 'data_type' ],
-      rows: [
-        [ 'plotly.alcohol_consumption_by_country_2010', 'loc', 'string' ],
-        [ 'plotly.alcohol_consumption_by_country_2010', 'alcohol', 'double' ]
-      ]
-    });
+
   });
 }
