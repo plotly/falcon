@@ -18,7 +18,7 @@ export function connect(connection) {
   });
  }
 
-function getTables(allFiles) {
+function getCsvs(allFiles) {
   const csvFiles = allFiles.filter((file) => {
     return /.csv$/.test(file.name);
   });
@@ -41,14 +41,15 @@ export function tables(connection) {
       if (json.code) {
         reject(json);
       } else {
-        resolve(getTables(json.files));
+        resolve(getCsvs(json.files));
       }
     });
   });
 }
 
-function getSchema(connection, table) {
+function getSchema(connection, csvFile) {
   return new Promise((resolve, reject) => {
+    const table = csvFile.replace(/-/g, '_')
     const params = encodeURIComponent('query') + '=' + encodeURIComponent(`select * from ${table} limit 1`);
     fetch(`https://api.data.world/v0/sql/${connection.owner}/${connection.identifier}?includeTableSchema=true`, {
       method: 'POST',
@@ -79,8 +80,8 @@ export function schemas(connection) {
       if (json.code) {
         reject(json);
       } else {
-        const promises = getTables(json.files).map(table => {
-          return getSchema(connection, table).then((schema) => {
+        const promises = getCsvs(json.files).map(csvFile => {
+          return getSchema(connection, csvFile).then((schema) => {
             return schema.fields.map((field) => {
               return [schema.table, field.name, field.type];
             });
@@ -100,7 +101,8 @@ export function schemas(connection) {
 
 export function query(queryStmt, connection) {
   return new Promise((resolve, reject) => {
-    const params = encodeURIComponent('query') + '=' + encodeURIComponent(queryStmt);
+    const query = queryStmt.replace(/-/g, '_');
+    const params = encodeURIComponent('query') + '=' + encodeURIComponent(query);
     fetch(`https://api.data.world/v0/sql/${connection.owner}/${connection.identifier}?includeTableSchema=true`, {
       method: 'POST',
       headers: {
