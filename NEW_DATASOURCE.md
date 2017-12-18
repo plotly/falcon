@@ -13,3 +13,16 @@ app/components/Settings/Tabs/Tab.react.js
 app/components/Settings/Settings.react.js
 
 ## Datastore file should have the following functions
+
+function query(queryObject, connection); 
+
+function connect(connection);
+
+function schemas(connection);
+
+function tables(connection);
+
+//Question are these required?
+function files(connection);
+
+function storage(connection); 
