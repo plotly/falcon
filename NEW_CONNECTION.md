@@ -35,6 +35,9 @@ The following are the instructions for adding the Constants File:
 1. Add an entry in DIALECTS
 2. Add an entry in SQL_DIALECTS_USING_EDITOR
 3. Add an entry under CONNECTION_CONFIG
+4. Add the location of the logo in 
+5. Add the preview query in the PREVIEW_QUERY section
+6. Add an entry in the SAMPLE_DBS 
 
 
 ## Updating the Tab.react.js 
