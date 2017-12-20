@@ -42,3 +42,4 @@ The following are the instructions for adding the Constants File:
 
 ## Updating the Tab.react.js 
 The following are the instructions for adding the Tab React JS file
+1. Add an entry for the connection label
