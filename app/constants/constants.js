@@ -14,7 +14,8 @@ export const DIALECTS = {
     IBM_DB2: 'ibm db2',
     APACHE_SPARK: 'apache spark',
     APACHE_IMPALA: 'apache impala',
-    APACHE_DRILL: 'apache drill'
+    APACHE_DRILL: 'apache drill',
+    ATHENA: 'athena'
 };
 
 export const SQL_DIALECTS_USING_EDITOR = [
@@ -26,7 +27,8 @@ export const SQL_DIALECTS_USING_EDITOR = [
     'sqlite',
     'ibm db2',
     'apache spark',
-    'apache impala'
+    'apache impala',
+    'athena'
 ];
 
 const commonSqlOptions = [
@@ -178,7 +180,29 @@ export const CONNECTION_CONFIG = {
             'value': 'secretAccessKey',
             'type': 'password'
         }
-    ] // TODO - password options for apache drill
+    ], // TODO - password options for apache drill
+
+    /**
+     * accessKeyId: 'xxxx',
+    secretAccessKey: 'xxxx',
+    region: 'xxxx',
+     */
+    [DIALECTS.ATHENA]: [
+        {
+            'label': 'S3 Bucket',
+            'value': 'bucket',
+            'type': 'text',
+            'description': `
+                The S3 connection will import CSV files from any
+                directory in your S3 bucket.`
+        },
+        {'label': 'S3 Access Key ID', 'value': 'accessKeyId', 'type': 'text'},
+        {
+            'label': 'S3 Secret Access Key',
+            'value': 'secretAccessKey',
+            'type': 'password'
+        }
+    ]
 };
 
 

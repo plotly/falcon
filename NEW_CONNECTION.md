@@ -26,3 +26,16 @@ function tables(connection);
 function files(connection);
 
 function storage(connection); 
+
+## Images
+It is recommended to add the images as png and a good idea to include a regular and small icon
+
+## Updating the constants.js file
+The following are the instructions for adding the Constants File:
+1. Add an entry in DIALECTS
+2. Add an entry in SQL_DIALECTS_USING_EDITOR
+3. Add an entry under CONNECTION_CONFIG
+
+
+## Updating the Tab.react.js 
+The following are the instructions for adding the Tab React JS file
