@@ -7,7 +7,7 @@ import * as ApacheLivy from './livy';
 import * as ApacheImpala from './impala';
 import * as DataStoreMock from './DataStoreMock';
 
-import {getSetting} from '../../settings'
+import {getSetting} from '../../settings';
 /*
  * Switchboard to all of the different types of connections
  * that we support.

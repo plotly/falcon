@@ -22,15 +22,15 @@ export function query(queryString, connection) {
         } else {
             resolve({
                 'columnnames': ['COLUMN_A', 'COLUMN_B', 'COLUMN_C'],
-                'rows':[
-                    ['ROW_1','1.112', '12'],
-                    ['ROW_2','2.2', '98'],
-                    ['ROW_3','3.12', '62']
+                'rows': [
+                    ['ROW_1', '1.112', '12'],
+                    ['ROW_2', '2.2', '98'],
+                    ['ROW_3', '3.12', '62']
                 ]
             });
         }
 
-    })
+    });
 }
 
 export function files(connection) {
