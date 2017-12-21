@@ -54,7 +54,7 @@ const DEFAULT_SETTINGS = {
      * If TEST_MODE is true, Falcon oes not make requests to the
      * databases, but instead return hardcoded responses.
      */
-    TEST_MODE: false
+    TEST_MODE: false,
     /*
      * Whether or not this is running on the on-premise server.
      * Note that if the connector is running on a user's local machine
