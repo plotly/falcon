@@ -5,7 +5,7 @@ import * as ApacheDrill from './ApacheDrill';
 import * as IbmDb2 from './ibmdb2';
 import * as ApacheLivy from './livy';
 import * as ApacheImpala from './impala';
-import * as DataStoreMock from './DataStoreMock';
+import * as DatastoreMock from './datastoremock';
 
 import {getSetting} from '../../settings';
 /*
@@ -32,7 +32,7 @@ function getDatastoreClient(connection) {
 
     // handle test mode:
     if (getSetting('TEST_MODE')) {
-        return DataStoreMock;
+        return DatastoreMock;
     }
 
     if (dialect === 'elasticsearch') {
