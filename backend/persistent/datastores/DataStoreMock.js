@@ -18,7 +18,7 @@ export function query(queryString, connection) {
     return new Promise((resolve, reject) => {
 
         if (queryString === 'ERROR') {
-            reject('Syntax Error in Query');
+            reject(new Error('Syntax Error in Query'));
         } else {
             resolve({
                 'columnnames': ['COLUMN_A', 'COLUMN_B', 'COLUMN_C'],
@@ -35,7 +35,30 @@ export function query(queryString, connection) {
 
 export function files(connection) {
     return new Promise((resolve, reject) => {
-        resolve(['FILE_1', 'FILE_2', 'FILE_3']);
+        resolve([
+            {
+                "Key": "A.csv",
+                "LastModified": "2016-10-09T17:29:49.000Z",
+                "ETag": "\"635633cb59c369da25fdf7bd6cc8de62\"",
+                "Size": 151650,
+                "StorageClass": "STANDARD",
+                "Owner": {
+                    "DisplayName": "chris",
+                    "ID": "655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+                }
+             },
+             {
+                 "Key": "B.csv",
+                 "LastModified": "2016-10-09T17:29:49.000Z",
+                 "ETag": "\"635633cb59c369da25fdf7bd6cc8de62\"",
+                 "Size": 151650,
+                 "StorageClass": "STANDARD",
+                 "Owner": {
+                     "DisplayName": "chris",
+                     "ID": "655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+                 }
+             },
+        ]);
     });
 }
 
@@ -62,4 +85,63 @@ export function elasticsearchMappings(connection) {
               }
           });
     });
+}
+
+export function storage(connection) {
+
+    return new Promise((resolve, reject) => {
+        resolve([
+            {
+                "name": "s3",
+                "config": {
+                    "type": "file",
+                    "enabled": true,
+                    "connection": "s3a://plotly-s3-connector-test",
+                    "config": {
+                        "fs.s3a.access.key": "ABCD",
+                        "fs.s3a.secret.key": "MNOP"
+                    },
+                    "workspaces": {
+                        "root": {
+                            "location": "/",
+                            "writable": true,
+                            "defaultInputFormat": null
+                        }
+                    },
+                    "formats": {"parquet": {"type": "parquet"}}
+                }
+            }
+        ]);
+  });
+
+}
+
+// This is for Apache Drill:
+export function listS3Files(connection) {
+  return new Promise((resolve, reject) => {
+      resolve([
+          {
+              "Key": "A.parquet",
+              "LastModified": "2016-10-09T17:29:49.000Z",
+              "ETag": "\"635633cb59c369da25fdf7bd6cc8de62\"",
+              "Size": 151650,
+              "StorageClass": "STANDARD",
+              "Owner": {
+                  "DisplayName": "chris",
+                  "ID": "655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+              }
+           },
+           {
+               "Key": "B.parquet",
+               "LastModified": "2016-10-09T17:29:49.000Z",
+               "ETag": "\"635633cb59c369da25fdf7bd6cc8de62\"",
+               "Size": 151650,
+               "StorageClass": "STANDARD",
+               "Owner": {
+                   "DisplayName": "chris",
+                   "ID": "655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+               }
+           },
+      ]);
+  });
 }
