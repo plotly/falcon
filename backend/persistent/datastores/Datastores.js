@@ -7,7 +7,6 @@ import * as ApacheLivy from './livy';
 import * as ApacheImpala from './impala';
 import * as DatastoreMock from './datastoremock';
 
-import {getSetting} from '../../settings';
 /*
  * Switchboard to all of the different types of connections
  * that we support.
@@ -31,7 +30,7 @@ function getDatastoreClient(connection) {
     const {dialect} = connection;
 
     // handle test mode:
-    if (getSetting('TEST_MODE')) {
+    if (connection.mock) {
         return DatastoreMock;
     }
 
