@@ -6,14 +6,14 @@ export function connect() {
   return new Promise();
 }
 
-export function tables(connection) {
-    return new Promise((resolve, reject) => {
+export function tables() {
+    return new Promise((resolve) => {
         resolve(['TABLE_A', 'TABLE_B', 'TABLE_C', 'TABLE_D']);
     });
 
 }
 
-export function query(queryString, connection) {
+export function query(queryString) {
 
     return new Promise((resolve, reject) => {
 
@@ -33,37 +33,37 @@ export function query(queryString, connection) {
     });
 }
 
-export function files(connection) {
-    return new Promise((resolve, reject) => {
+export function files() {
+    return new Promise((resolve) => {
         resolve([
             {
-                "Key": "A.csv",
-                "LastModified": "2016-10-09T17:29:49.000Z",
-                "ETag": "\"635633cb59c369da25fdf7bd6cc8de62\"",
-                "Size": 151650,
-                "StorageClass": "STANDARD",
-                "Owner": {
-                    "DisplayName": "chris",
-                    "ID": "655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+                'Key': 'A.csv',
+                'LastModified': '2016-10-09T17:29:49.000Z',
+                'ETag': '\'635633cb59c369da25fdf7bd6cc8de62\'',
+                'Size': 151650,
+                'StorageClass': 'STANDARD',
+                'Owner': {
+                    'DisplayName': 'chris',
+                    'ID': '655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a'
                 }
              },
              {
-                 "Key": "B.csv",
-                 "LastModified": "2016-10-09T17:29:49.000Z",
-                 "ETag": "\"635633cb59c369da25fdf7bd6cc8de62\"",
-                 "Size": 151650,
-                 "StorageClass": "STANDARD",
-                 "Owner": {
-                     "DisplayName": "chris",
-                     "ID": "655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+                 'Key': 'B.csv',
+                 'LastModified': '2016-10-09T17:29:49.000Z',
+                 'ETag': '\'635633cb59c369da25fdf7bd6cc8de62\'',
+                 'Size': 151650,
+                 'StorageClass': 'STANDARD',
+                 'Owner': {
+                     'DisplayName': 'chris',
+                     'ID': '655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a'
                  }
-             },
+             }
         ]);
     });
 }
 
-export function elasticsearchMappings(connection) {
-    return new Promise((resolve, reject) => {
+export function elasticsearchMappings() {
+    return new Promise((resolve) => {
           resolve({
               'test-mappings': {
                   'mappings': {
@@ -87,28 +87,28 @@ export function elasticsearchMappings(connection) {
     });
 }
 
-export function storage(connection) {
+export function storage() {
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         resolve([
             {
-                "name": "s3",
-                "config": {
-                    "type": "file",
-                    "enabled": true,
-                    "connection": "s3a://plotly-s3-connector-test",
-                    "config": {
-                        "fs.s3a.access.key": "ABCD",
-                        "fs.s3a.secret.key": "MNOP"
+                'name': 's3',
+                'config': {
+                    'type': 'file',
+                    'enabled': true,
+                    'connection': 's3a://plotly-s3-connector-test',
+                    'config': {
+                        'fs.s3a.access.key': 'ABCD',
+                        'fs.s3a.secret.key': 'MNOP'
                     },
-                    "workspaces": {
-                        "root": {
-                            "location": "/",
-                            "writable": true,
-                            "defaultInputFormat": null
+                    'workspaces': {
+                        'root': {
+                            'location': '/',
+                            'writable': true,
+                            'defaultInputFormat': null
                         }
                     },
-                    "formats": {"parquet": {"type": "parquet"}}
+                    'formats': {'parquet': {'type': 'parquet'}}
                 }
             }
         ]);
@@ -117,31 +117,31 @@ export function storage(connection) {
 }
 
 // This is for Apache Drill:
-export function listS3Files(connection) {
-  return new Promise((resolve, reject) => {
+export function listS3Files() {
+  return new Promise((resolve) => {
       resolve([
           {
-              "Key": "A.parquet",
-              "LastModified": "2016-10-09T17:29:49.000Z",
-              "ETag": "\"635633cb59c369da25fdf7bd6cc8de62\"",
-              "Size": 151650,
-              "StorageClass": "STANDARD",
-              "Owner": {
-                  "DisplayName": "chris",
-                  "ID": "655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+              'Key': 'A.parquet',
+              'LastModified': '2016-10-09T17:29:49.000Z',
+              'ETag': '\'635633cb59c369da25fdf7bd6cc8de62\'',
+              'Size': 151650,
+              'StorageClass': 'STANDARD',
+              'Owner': {
+                  'DisplayName': 'chris',
+                  'ID': '655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a'
               }
            },
            {
-               "Key": "B.parquet",
-               "LastModified": "2016-10-09T17:29:49.000Z",
-               "ETag": "\"635633cb59c369da25fdf7bd6cc8de62\"",
-               "Size": 151650,
-               "StorageClass": "STANDARD",
-               "Owner": {
-                   "DisplayName": "chris",
-                   "ID": "655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a"
+               'Key': 'B.parquet',
+               'LastModified': '2016-10-09T17:29:49.000Z',
+               'ETag': '\'635633cb59c369da25fdf7bd6cc8de62\'',
+               'Size': 151650,
+               'StorageClass': 'STANDARD',
+               'Owner': {
+                   'DisplayName': 'chris',
+                   'ID': '655b5b49d59fe8784105e397058bf0f410579195145a701c03b55f10920bc67a'
                }
-           },
+           }
       ]);
   });
 }
