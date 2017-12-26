@@ -26,6 +26,7 @@ describe('Datastore Mock:', function () {
 
     afterEach(() => {
         return closeTestServers(servers);
+        sqlConnections.mock = false;
     });
 
     it('tables returns list of hardcoded tables', function() {
