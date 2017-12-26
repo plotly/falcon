@@ -1,42 +1,70 @@
 import {assert} from 'chai';
 
-import {sqlConnections as connection} from './utils.js';
-import {
-    query, tables, files, elasticsearchMappings, storage, listS3Files
-} from '../../backend/persistent/datastores/Datastores.js';
+import {saveConnection} from '../../backend/persistent/Connections.js';
 import {saveSetting} from '../../backend/settings.js';
 
+import {
+    assertResponseStatus,
+    closeTestServers,
+    createTestServers,
+    getResponseJson,
+    POST,
+    sqlConnections
+} from './utils.js';
+
+
+let servers;
+let connectionId;
+
 describe('Datastore Mock:', function () {
-    before(() => {
-        saveSetting('TEST_MODE', true);
+    beforeEach(() => {
+        servers = createTestServers();
+        saveSetting('AUTH_ENABLED', false);
+        sqlConnections.mock = true;
+        connectionId = saveConnection(sqlConnections);
+    });
+
+    afterEach(() => {
+        return closeTestServers(servers);
     });
 
     it('tables returns list of hardcoded tables', function() {
-        return tables(connection).then(result => {
-            assert.deepEqual(result, ['TABLE_A', 'TABLE_B', 'TABLE_C', 'TABLE_D']);
+        return POST(`connections/${connectionId}/sql-tables`)
+        .then(assertResponseStatus(200)).then(getResponseJson)
+        .then(json => {
+            assert.deepEqual(json, ['TABLE_A', 'TABLE_B', 'TABLE_C', 'TABLE_D']);
         });
+
     });
 
     it('query returns hardcoded results', function() {
-        return query('SELECT * FROM  TABLE_A LIMIT 5', connection).then(results => {
-            assert.deepEqual(results.rows, [
+        return POST(`connections/${connectionId}/query`, {query: ''})
+        .then(assertResponseStatus(200)).then(getResponseJson)
+        .then(json => {
+            assert.deepEqual(json.rows, [
                 ['ROW_1', '1.112', '12'],
                 ['ROW_2', '2.2', '98'],
                 ['ROW_3', '3.12', '62']
             ]);
-            assert.deepEqual(results.columnnames, ['COLUMN_A', 'COLUMN_B', 'COLUMN_C']);
+            assert.deepEqual(json.columnnames, ['COLUMN_A', 'COLUMN_B', 'COLUMN_C']);
         });
     });
 
     it('query returns error when required', function() {
-        return query('ERROR', connection).catch(err => {
-            assert.equal(err, 'Error: Syntax Error in Query');
+        return POST(`connections/${connectionId}/query`, {query: 'ERROR'})
+        .then(assertResponseStatus(400)).then(getResponseJson)
+        .then(err => {
+            assert.deepEqual(err, {
+              error: {message: 'Syntax Error in Query'}
+            });
         });
     });
 
     it('S3 files endpoint returns hardcoded filenames', function() {
-        return files(connection).then(result => {
-            assert.deepEqual(result, [
+        return POST(`connections/${connectionId}/s3-keys`)
+        .then(assertResponseStatus(200)).then(getResponseJson)
+        .then(json => {
+            assert.deepEqual(json, [
                 {
                     'Key': 'A.csv',
                     'LastModified': '2016-10-09T17:29:49.000Z',
@@ -64,8 +92,10 @@ describe('Datastore Mock:', function () {
     });
 
     it('Elasticsearch mock mappings are returned', function() {
-        return elasticsearchMappings(connection).then(result => {
-            assert.deepEqual(result, {
+        return POST(`connections/${connectionId}/elasticsearch-mappings`)
+        .then(assertResponseStatus(200)).then(getResponseJson)
+        .then(json => {
+            assert.deepEqual(json, {
                 'test-mappings': {
                     'mappings': {
                         'TABLE_A': {
@@ -89,8 +119,10 @@ describe('Datastore Mock:', function () {
     });
 
     it('Apache Drill mock config is returned', function() {
-        return storage(connection).then(result => {
-            assert.deepEqual(result, [
+        return POST(`connections/${connectionId}/apache-drill-storage`)
+        .then(assertResponseStatus(200)).then(getResponseJson)
+        .then(json => {
+            assert.deepEqual(json, [
                 {
                     'name': 's3',
                     'config': {
@@ -116,8 +148,10 @@ describe('Datastore Mock:', function () {
     });
 
     it('Apache Drill mock parquet files are returned', function() {
-        return listS3Files(connection).then(result => {
-            assert.deepEqual(result, [
+        return POST(`connections/${connectionId}/apache-drill-s3-keys`)
+        .then(assertResponseStatus(200)).then(getResponseJson)
+        .then(json => {
+            assert.deepEqual(json, [
                 {
                     'Key': 'A.parquet',
                     'LastModified': '2016-10-09T17:29:49.000Z',

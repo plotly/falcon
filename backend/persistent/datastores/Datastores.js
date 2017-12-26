@@ -27,13 +27,12 @@ import * as DatastoreMock from './datastoremock';
  */
 
 function getDatastoreClient(connection) {
-    const {dialect} = connection;
-
     // handle test mode:
     if (connection.mock) {
         return DatastoreMock;
     }
 
+    const {dialect} = connection;
     if (dialect === 'elasticsearch') {
         return Elasticsearch;
     } else if (dialect === 's3') {
