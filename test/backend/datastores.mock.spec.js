@@ -5,6 +5,7 @@ import {saveSetting} from '../../backend/settings.js';
 
 import {
     assertResponseStatus,
+    clearSettings,
     closeTestServers,
     createTestServers,
     getResponseJson,
@@ -26,7 +27,7 @@ describe('Datastore Mock:', function () {
 
     afterEach(() => {
         return closeTestServers(servers);
-        sqlConnections.mock = false;
+        clearSettings('SETTINGS_PATH');
     });
 
     it('tables returns list of hardcoded tables', function() {
