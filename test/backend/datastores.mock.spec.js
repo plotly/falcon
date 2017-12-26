@@ -26,8 +26,9 @@ describe('Datastore Mock:', function () {
     });
 
     afterEach(() => {
-        return closeTestServers(servers);
         clearSettings('SETTINGS_PATH');
+        return closeTestServers(servers);
+
     });
 
     it('tables returns list of hardcoded tables', function() {
