@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 
 import {saveConnection} from '../../backend/persistent/Connections.js';
-import {saveSetting} from '../../backend/settings.js';
+import {saveSetting, getSetting} from '../../backend/settings.js';
 
 import {
     assertResponseStatus,
@@ -26,9 +26,9 @@ describe('Datastore Mock:', function () {
     });
 
     afterEach(() => {
-        clearSettings('SETTINGS_PATH');
+        sqlConnections.mock = false;
+        connectionId = saveConnection(sqlConnections);
         return closeTestServers(servers);
-
     });
 
     it('tables returns list of hardcoded tables', function() {
@@ -37,7 +37,6 @@ describe('Datastore Mock:', function () {
         .then(json => {
             assert.deepEqual(json, ['TABLE_A', 'TABLE_B', 'TABLE_C', 'TABLE_D']);
         });
-
     });
 
     it('query returns hardcoded results', function() {
