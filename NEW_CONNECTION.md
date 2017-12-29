@@ -12,20 +12,6 @@ app/actions/sessions.js
 app/components/Settings/Tabs/Tab.react.js
 app/components/Settings/Settings.react.js
 
-## Datastore file should have the following functions
-
-function query(queryObject, connection); 
-
-function connect(connection);
-
-function schemas(connection);
-
-function tables(connection);
-
-//Question are these required?
-function files(connection);
-
-function storage(connection); 
 
 ## Images
 It is recommended to add the images as png and a good idea to include a regular and small icon
@@ -43,3 +29,22 @@ The following are the instructions for adding the Constants File:
 ## Updating the Tab.react.js 
 The following are the instructions for adding the Tab React JS file
 1. Add an entry for the connection label
+
+## Datastore file should have the following functions
+```javascript
+function query(queryObject, connection); 
+
+function connect(connection);
+
+/**
+ * The following method will return a list of schemas that are 
+ */
+function schemas(connection);
+
+function tables(connection);
+
+//Question are these required?
+function files(connection);
+
+function storage(connection); 
+```

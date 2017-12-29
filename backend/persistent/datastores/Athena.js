@@ -59,14 +59,27 @@ export function query(queryObject, connection){
 export function schemas(connection){
     console.log( 'Schemas', connection);
 
-    let columnnames = ['FirstName', 'LastName', 'Date'];
+    let columnnames = ['Table', 'column_name', 'data_type'];
     let rows = [];
 
     for( let i=0; i< 4; i++){
+
+        
         let r = [];
-        r.push( `John-${i}`);
-        r.push( `Smith-${i}`);
-        r.push( `0${i}/12/2017`);
+        r.push('Test');
+        r.push(`first_name_${i}`);
+        r.push(`varchar`);
+
+        rows.push(r);
+    }
+
+    for( let i=0; i< 2; i++){
+
+        
+        let r = [];
+        r.push('Sample');
+        r.push(`last_name_${i}`);
+        r.push(`varchar`);
 
         rows.push(r);
     }
@@ -83,9 +96,8 @@ export function schemas(connection){
  */
 export function tables(connection){
     console.log( 'Tables', connection);
-    return [];
-
+    
     return new Promise(function(resolve, reject) {
-        resolve( [] );
+        resolve( ['Sample', 'Test'] );
     });
 }

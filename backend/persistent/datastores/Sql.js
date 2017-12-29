@@ -127,6 +127,7 @@ export function query(queryString, connection) {
         queryString,
         {type: Sequelize.QueryTypes.SELECT}
     ).then(results => {
+        console.log( 'SQL Results', results);
         return parseSQL(results);
     });
 }
@@ -137,6 +138,7 @@ export function tables(connection) {
         {type: Sequelize.QueryTypes.SELECT}
     ).then(tableList => {
 
+        console.log( 'List of Tables', tableList);
         let tableNames;
 
         if (connection.dialect === 'postgres' || connection.dialect === 'redshift') {
