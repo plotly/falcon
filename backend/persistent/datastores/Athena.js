@@ -1,4 +1,4 @@
-
+import {parseSQL} from '../../parse';
 //TODO 
 //1. What is expected object for connection
 //2. What is expect results for the schems.  Is this a list of databases or 
@@ -44,10 +44,29 @@ export function query(queryObject, connection){
     console.log( 'Athena Query Conn', connection);
     console.log( 'Athena Query Obj', queryObject);
 
-    return [];
 
+    let results = [];
+
+    for( let i=0; i< 20; i++){
+
+        let r = {};
+        if( i % 2 === 0){
+            r.first_name_0  = 'John';
+            r.value = i;
+            results.push( r );
+        }else{
+            r.first_name_0  = 'Joan';
+            r.value = i;
+            results.push( r );
+        }
+    }
+
+    console.log( 'Returning results to query');
+    let columnnames = ['first_name_0', 'value'];
     return new Promise(function(resolve, reject) {
-        resolve( [] );
+
+        
+        resolve( parseSQL( results ) );
     });
 }
 
@@ -73,6 +92,14 @@ export function schemas(connection){
         rows.push(r);
     }
 
+    let rowData = [];
+    rowData.push('Test');
+    rowData.push( 'value');
+    rowData.push('integer');
+
+    rows.push( rowData );
+
+
     for( let i=0; i< 2; i++){
 
         
@@ -83,6 +110,14 @@ export function schemas(connection){
 
         rows.push(r);
     }
+
+    rowData = [];
+    rowData.push('Sample');
+    rowData.push( 'value');
+    rowData.push('integer');
+
+    rows.push( rowData );
+
 
 
     return new Promise(function(resolve, reject) {

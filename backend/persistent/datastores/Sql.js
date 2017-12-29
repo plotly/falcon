@@ -164,6 +164,7 @@ export function tables(connection) {
             tableNames = tableList.map(object => values(object)[0]);
         }
 
+        console.log( 'SQL Table names', tableNames);
         return uniq(sort((a, b) => gt(a, b) ? 1 : -1, tableNames));
 
     });
