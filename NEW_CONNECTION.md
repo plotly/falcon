@@ -86,6 +86,8 @@ The following are the instructions for updating the Datastores.js
 1. Import the new Data source file
 2. Update the function getDatastoreClient
 ``` javascript
+    //The dialect name must match what was specified under
+    //app/constants/constants.js for the Dialect name
     } else if (dialect === 'new dialect') {
         return MyNewDialect;
     }
