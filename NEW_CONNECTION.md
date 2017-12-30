@@ -2,19 +2,25 @@
 
 The following are the instructions for adding a new data source 
 
-## Add the following files for Creating a new Datasource
+## The following are the files that need to be updated
 
-backend/persistent/datastores/Datastores.js
-backend/persistent/datastores/NameOfDatastoreToConnect.js
-app/constants/constants.js
-app/images
-app/actions/sessions.js
-app/components/Settings/Tabs/Tab.react.js
-app/components/Settings/Settings.react.js
+1. app/constants/constants.js
+2. app/actions/sessions.js
+3. app/components/Settings/Tabs/Tab.react.js
+4. app/components/Settings/Settings.react.js
+5. backend/persistent/datastores/Datastores.js
 
+## The following are the new files that need to be added
+
+1. app/images
+2. backend/persistent/datastores/NameOfDatastoreToConnect.js
+
+# Detailed Implementation Instructions
 
 ## Images
 It is recommended to add the images as png and a good idea to include a regular and small icon
+You can add the new icon in the directory app/images.  It recommended to use png format
+and name the file in lower case with dashes (ex: mysql-logo.png )
 
 ## Updating the constants.js file
 The following are the instructions for adding the Constants File:
@@ -25,12 +31,14 @@ The following are the instructions for adding the Constants File:
 5. Add the preview query in the PREVIEW_QUERY section
 6. Add an entry in the SAMPLE_DBS 
 
-
 ## Updating the Tab.react.js 
 The following are the instructions for adding the Tab React JS file
 1. Add an entry for the connection label
 
-## Datastore file should have the following functions
+## New Datastore file
+This file should be added in the following location
+backend/persistent/datastores
+
 ```javascript
 
 /**
@@ -70,11 +78,17 @@ function tables(connection);
  */ 
 function query(queryObject, connection); 
 
-//Question are these required?
-function files(connection);
-
-function storage(connection); 
 ```
 
-## Steps to run application in development mode
+## Updating the Datastores.js 
+The following are the instructions for updating the Datastores.js
+
+1. Import the new Data source file
+2. Update the function getDatastoreClient
+``` javascript
+    } else if (dialect === 'new dialect') {
+        return MyNewDialect;
+    }
+```
+# Development and Debugging Setup
 TBD
