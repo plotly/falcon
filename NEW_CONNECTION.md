@@ -18,7 +18,7 @@ The following are the instructions for adding a new data source
 # Detailed Implementation Instructions
 
 ## Images
-It is recommended to add the images as png and a good idea to include a regular and small icon
+It is recommended to add the images as png and a good idea to include a regular and small icon.
 You can add the new icon in the directory app/images.  It recommended to use png format
 and name the file in lower case with dashes (ex: mysql-logo.png )
 
