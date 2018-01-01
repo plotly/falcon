@@ -1,0 +1,108 @@
+-
+    dialect: postgres
+    id: postgres-189ebfb4-e1b4-446c-9b83-b326875fa2d8
+    username: masteruser
+    password: connecttoplotly
+    host: readonly-test-postgres.cwwxgcilxwxw.us-west-2.rds.amazonaws.com
+    port: 5432
+    database: plotly_datasets
+    mock: true
+
+-
+    dialect: mysql
+    id: mysql-189ebfb4-e1b4-446c-9b83-b326875fa2d8
+    username: masteruser
+    password: connecttoplotly
+    host: readonly-test-mysql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com
+    port: 3306
+    database: plotly_datasets
+    mock: true
+
+-
+    dialect: mariadb
+    id: mariadb-189ebfb4-e1b4-446c-9b83-b326875fa2d8
+    username: masteruser
+    password: connecttoplotly
+    host: readonly-test-mariadb.cwwxgcilxwxw.us-west-2.rds.amazonaws.com
+    port: 3306
+    database: plotly_datasets
+    mock: true
+
+-
+    dialect: redshift
+    id: redshift-189ebfb4-e1b4-446c-9b83-b326875fa2d8
+    username: plotly
+    password: Qmbdf#3DU]pP8a=CKTK}
+    host: sql-connector-test.cfiaqtidutxu.us-east-1.redshift.amazonaws.com
+    port: 5439
+    database: plotly_datasets
+    mock: true
+
+-
+    dialect: mssql
+    id: mssql-189ebfb4-e1b4-446c-9b83-b326875fa2d8
+    username: masteruser
+    password: connecttoplotly
+    host: test-mssql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com
+    port: 1433
+    database: plotly_datasets
+    mock: true
+
+-
+    dialect: sqlite
+    id: sqlite-189ebfb4-e1b4-446c-9b83-b326875fa2d8
+    storage: /app/test/backend/plotly_datasets.db
+    mock: true
+
+-
+    dialect: elasticsearch
+    id: elasticsearch-189ebfb4-e1b4-446c-9b83-b326875fa2d8
+    host: https://67a7441549120daa2dbeef8ac4f5bb2e.us-east-1.aws.found.io
+    port: 9243
+    mock: true
+
+-
+    dialect: s3
+    id: s3-189ebfb4-e1b4-446c-9b83-b326875fa2d8
+    bucket: plotly-s3-connector-test
+    accessKeyId: AKIAIMHMSHTGARJYSKMQ
+    secretAccessKey: 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
+    mock: true
+
+-
+    dialect: apache drill
+    id: apache drill-189ebfb4-e1b4-446c-9b83-b326875fa2d8
+    host: http://ec2-35-164-71-216.us-west-2.compute.amazonaws.com
+    port: 8047
+    bucket: plotly-s3-connector-test
+    accessKeyId: AKIAIMHMSHTGARJYSKMQ
+    secretAccessKey: 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
+    mock: true
+
+-
+    dialect: ibm db2
+    id: ibm db2-f51f57b6-d00b-478a-b502-8e201ae70e74
+    username: db2user1
+    password: w8wfy99DvEmgkBsE
+    database: plotly
+    port: 50000
+    host: 35.184.35.183
+    mock: true
+
+-
+    dialect: apache spark
+    id: apache spark-7b7bfa1e-cdfa-4001-b326-e0e170667021
+    timeout: 180
+    database: plotly
+    port: 8998
+    host: 104.154.141.189
+    mock: true
+
+-
+    dialect: apache impala
+    id: apache impala-159e0b47-0428-4c9e-b4b9-8201b86f8ca2
+    timeout: 180
+    database: plotly
+    port: 21000
+    host: 35.184.155.127
+    mock: true
