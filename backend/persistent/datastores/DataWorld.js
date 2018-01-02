@@ -31,25 +31,19 @@ function getCsvs(allFiles) {
 
 export function tables(connection) {
   return new Promise((resolve, reject) => {
-    fetch(`https://api.data.world/v0/datasets/${connection.owner}/${connection.identifier}`, {
-      method: 'GET',
-      headers: { 'Authorization': `Bearer ${connection.token}` }
-    })
-    .then(res => res.json())
-    .then(json => {
-      // json.code is defined only when there is an error
-      if (json.code) {
-        reject(json);
-      } else {
-        resolve(getCsvs(json.files));
-      }
+    query('SELECT * FROM Tables', connection).then((res) => {
+      const allTables = res.rows.map((table) => {
+        return table[0];
+      });
+
+      resolve(allTables);
     });
   });
 }
 
-function getSchema(connection, csvFile) {
+function getSchema(connection, tableName) {
   return new Promise((resolve, reject) => {
-    const table = csvFile.replace(/-/g, '_')
+    const table = tableName.replace(/-/g, '_')
     const params = encodeURIComponent('query') + '=' + encodeURIComponent(`select * from ${table} limit 1`);
     fetch(`https://api.data.world/v0/sql/${connection.owner}/${connection.identifier}?includeTableSchema=true`, {
       method: 'POST',
@@ -70,9 +64,9 @@ function getSchema(connection, csvFile) {
 
 export function schemas(connection) {
   return new Promise((resolve, reject) => {
-    query('SELECT * FROM Tables', connection).then((res) => {
-      const promises = res.rows.map((table) => {
-        return getSchema(connection, table[0]).then((schema) => {
+    tables(connection).then((allTables) => {
+      const promises = allTables.map((table) => {
+        return getSchema(connection, table).then((schema) => {
           return schema.fields.map((field) => {
             return [schema.table, field.name, field.type];
           });
