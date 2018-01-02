@@ -36,7 +36,14 @@ export default class ConnectionTab extends Component {
         } else if (connectionObject.dialect === DIALECTS.SQLITE) {
             label = connectionObject.storage;
         } else if (connectionObject.dialect === DIALECTS.DATA_WORLD) {
-            label = `data.world (${connectionObject.owner}/${connectionObject.identifier})`;
+            const parser = document.createElement('a');
+            parser.href = connectionObject.url;
+            const pathNames = parser.pathname.split('/');
+            if (pathNames.length >= 3) {
+                label = `data.world (${pathNames[1]}/${pathNames[2]})`;
+            } else {
+                label = 'data.world (/)';
+            }
         } else {
             label = `${connectionObject.database} (${connectionObject.username}@${connectionObject.host})`;
         }

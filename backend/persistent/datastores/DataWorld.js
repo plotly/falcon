@@ -1,6 +1,8 @@
 import fetch from 'node-fetch';
 import url from 'url';
 
+import Logger from '../../logger';
+
 function parseUrl(datasetUrl) {
   const pathnameArray = url.parse(datasetUrl).pathname.split('/');
   return {
@@ -25,6 +27,10 @@ export function connect(connection) {
         resolve();
       }
     });
+  })
+  .catch(err => {
+    Logger.log(err);
+    throw new Error(err);
   });
  }
 
