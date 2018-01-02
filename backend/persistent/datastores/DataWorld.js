@@ -1,8 +1,18 @@
 import fetch from 'node-fetch';
+import url from 'url';
+
+function parseUrl(datasetUrl) {
+  const pathnameArray = url.parse(datasetUrl).pathname.split('/');
+  return {
+    owner: pathnameArray[1],
+    id: pathnameArray[2]
+  };
+}
 
 export function connect(connection) {
+  const { owner, id } = parseUrl(connection.url);
   return new Promise((resolve, reject) => {
-    fetch(`https://api.data.world/v0/datasets/${connection.owner}/${connection.identifier}`, {
+    fetch(`https://api.data.world/v0/datasets/${owner}/${id}`, {
       method: 'GET',
       headers: { 'Authorization': `Bearer ${connection.token}` }
     })
@@ -18,17 +28,6 @@ export function connect(connection) {
   });
  }
 
-function getCsvs(allFiles) {
-  const csvFiles = allFiles.filter((file) => {
-    return /.csv$/.test(file.name);
-  });
-  const tablesNames = csvFiles.map((table) => {
-    return table.name.substring(0, table.name.length - 4).toLowerCase();
-  });
-
-  return tablesNames;
-}
-
 export function tables(connection) {
   return new Promise((resolve, reject) => {
     query('SELECT * FROM Tables', connection).then((res) => {
@@ -42,10 +41,11 @@ export function tables(connection) {
 }
 
 function getSchema(connection, tableName) {
+  const { owner, id } = parseUrl(connection.url);
   return new Promise((resolve, reject) => {
-    const table = tableName.replace(/-/g, '_')
+    const table = tableName.replace(/-/g, '_');
     const params = encodeURIComponent('query') + '=' + encodeURIComponent(`select * from ${table} limit 1`);
-    fetch(`https://api.data.world/v0/sql/${connection.owner}/${connection.identifier}?includeTableSchema=true`, {
+    fetch(`https://api.data.world/v0/sql/${owner}/${id}?includeTableSchema=true`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${connection.token}`,

@@ -183,24 +183,10 @@ export const CONNECTION_CONFIG = {
     ], // TODO - password options for apache drill
     [DIALECTS.DATA_WORLD]: [
         {
-            'label': 'Owner',
-            'value': 'owner',
+            'label': 'Dataset URL',
+            'value': 'url',
             'type': 'text',
-            'description': `
-              User name and unique identifier of the creator of the dataset.
-              For example, in the URL: https://data.world/jonloyens/an-intro-to-dataworld-dataset,
-              jonloyens is the unique identifier of the dataset.
-            `
-        },
-        {
-            'label': 'Identifier',
-            'value': 'identifier',
-            'type': 'text',
-            'description': `
-              Dataset unique identifier.
-              For example, in the URL: https://data.world/jonloyens/an-intro-to-dataworld-dataset,
-              an-intro-to-dataworld-dataset is the unique identifier of the dataset.
-            `
+            'description': 'The dataset\'s URL on data.world'
         },
         {
             'label': 'Token',
@@ -411,7 +397,6 @@ export const SAMPLE_DBS = {
         storage: `${__dirname}/plotly_datasets.db`
     },
     [DIALECTS.DATA_WORLD]: {
-        owner: 'jonloyens',
-        identifier: 'an-intro-to-dataworld-dataset'
+        url: 'https://data.world/jonloyens/an-intro-to-dataworld-dataset'
     }
 };
