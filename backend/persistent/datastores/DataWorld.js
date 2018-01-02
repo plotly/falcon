@@ -89,11 +89,12 @@ export function schemas(connection) {
   });
 }
 
-export function query(queryStmt, connection) {
+export function query(query, connection) {
+  const { owner, id } = parseUrl(connection.url);
   return new Promise((resolve, reject) => {
-    const query = queryStmt.replace(/-/g, '_');
-    const params = encodeURIComponent('query') + '=' + encodeURIComponent(query);
-    fetch(`https://api.data.world/v0/sql/${connection.owner}/${connection.identifier}?includeTableSchema=true`, {
+    const queryStatement = `${query.replace(/-/g, '_')}`;
+    const params = encodeURIComponent('query') + '=' + encodeURIComponent(queryStatement);
+    fetch(`https://api.data.world/v0/sql/${owner}/${id}?includeTableSchema=true`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${connection.token}`,

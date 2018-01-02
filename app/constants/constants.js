@@ -397,6 +397,6 @@ export const SAMPLE_DBS = {
         storage: `${__dirname}/plotly_datasets.db`
     },
     [DIALECTS.DATA_WORLD]: {
-        url: 'https://data.world/jonloyens/an-intro-to-dataworld-dataset'
+        url: 'https://data.world/rflprr/reported-lyme-disease-cases-by-state'
     }
 };
