@@ -35,6 +35,12 @@ The following are the instructions for adding the Constants File:
 The following are the instructions for adding the Tab React JS file
 1. Add an entry for the connection label
 
+## Updating the Settings.react.js
+Update the fetchData function to make the calls to appropriate sessions.js backend.  
+Currently there is Dialect types for SQL, ElasticSearch, S3 and Apache Drill.  If 
+your new data source is an SQL Type you will need to add the new Dialect in the 
+fetchData section for SQL types.  
+
 ## New Datastore file
 This file should be added in the following location
 backend/persistent/datastores
