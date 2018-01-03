@@ -26,11 +26,11 @@ export function connect(connection) {
       } else {
         resolve();
       }
+    })
+    .catch(err => {
+      Logger.log(err);
+      throw new Error(err);
     });
-  })
-  .catch(err => {
-    Logger.log(err);
-    throw new Error(err);
   });
  }
 
@@ -42,6 +42,9 @@ export function tables(connection) {
       });
 
       resolve(allTables);
+    })
+    .catch(err => {
+      reject(err);
     });
   });
 }
@@ -50,7 +53,7 @@ function getSchema(connection, tableName) {
   const { owner, id } = parseUrl(connection.url);
   return new Promise((resolve, reject) => {
     const table = tableName.replace(/-/g, '_');
-    const params = encodeURIComponent('query') + '=' + encodeURIComponent(`select * from ${table} limit 1`);
+    const params = encodeURIComponent('query') + '=' + encodeURIComponent(`SELECT * FROM ${table} LIMIT 1`);
     fetch(`https://api.data.world/v0/sql/${owner}/${id}?includeTableSchema=true`, {
       method: 'POST',
       headers: {
@@ -64,12 +67,15 @@ function getSchema(connection, tableName) {
     })
     .then(json => {
       resolve({table, fields: json[0].fields });
+    })
+    .catch(err => {
+      reject(err);
     });
   });
 }
 
 export function schemas(connection) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     tables(connection).then((allTables) => {
       const promises = allTables.map((table) => {
         return getSchema(connection, table).then((schema) => {
@@ -84,15 +90,23 @@ export function schemas(connection) {
           columnNames: [ 'tablename', 'column_name', 'data_type' ],
           rows: [].concat.apply([], tableSchemas)
         });
+      })
+      .catch(err => {
+        Logger.log(err);
+        throw new Error(err);
       });
+    })
+    .catch(err => {
+      Logger.log(err);
+      throw new Error(err);
     });
   });
 }
 
-export function query(query, connection) {
+export function query(queryString, connection) {
   const { owner, id } = parseUrl(connection.url);
   return new Promise((resolve, reject) => {
-    const queryStatement = `${query.replace(/-/g, '_')}`;
+    const queryStatement = `${queryString.replace(/-/g, '_')}`;
     const params = encodeURIComponent('query') + '=' + encodeURIComponent(queryStatement);
     fetch(`https://api.data.world/v0/sql/${owner}/${id}?includeTableSchema=true`, {
       method: 'POST',
@@ -117,6 +131,10 @@ export function query(query, connection) {
         columnnames,
         rows
       });
+    })
+    .catch(err => {
+      Logger.log(err);
+      throw new Error(err);
     });
   });
 }
