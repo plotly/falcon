@@ -224,6 +224,7 @@ export function PREVIEW_QUERY (dialect, table, database = '') {
         case DIALECTS.SQLITE:
         case DIALECTS.MARIADB:
         case DIALECTS.POSTGRES:
+        case DIALECTS.DATA_WORLD:
         case DIALECTS.REDSHIFT:
             return `SELECT * FROM ${table} LIMIT 1000`;
         case DIALECTS.MSSQL:
