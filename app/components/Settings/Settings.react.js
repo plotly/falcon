@@ -199,7 +199,8 @@ class Settings extends Component {
                     DIALECTS.APACHE_SPARK,
                     DIALECTS.IBM_DB2,
                     DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
-                    DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE
+                    DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE,
+                    DIALECTS.ATHENA
         ])) {
             if (connectRequest.status === 200 && !tablesRequest.status) {
                 this.setState({editMode: false});
