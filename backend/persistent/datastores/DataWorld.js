@@ -16,7 +16,11 @@ export function connect(connection) {
   return new Promise((resolve, reject) => {
     fetch(`https://api.data.world/v0/datasets/${owner}/${id}`, {
       method: 'GET',
-      headers: { 'Authorization': `Bearer ${connection.token}` }
+      headers: {
+        'Authorization': `Bearer ${connection.token}`,
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        'User-Agent': `Falcon/Plotly - ${process.env.npm_package_version}`
+      }
     })
     .then(res => res.json())
     .then(json => {
@@ -57,7 +61,8 @@ export function schemas(connection) {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${connection.token}`,
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        'User-Agent': `Falcon/Plotly - ${process.env.npm_package_version}`
       },
       body: params
     }).then(res => {
@@ -94,7 +99,8 @@ export function query(queryString, connection) {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${connection.token}`,
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        'User-Agent': `Falcon/Plotly - ${process.env.npm_package_version}`
       },
       body: params
     })
