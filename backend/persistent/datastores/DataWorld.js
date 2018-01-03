@@ -54,30 +54,21 @@ export function tables(connection) {
 }
 
 export function schemas(connection) {
-  const { owner, id } = parseUrl(connection.url);
-  return new Promise((resolve, reject) => {
-    const params = `${encodeURIComponent('query')}=${encodeURIComponent('SELECT * FROM TableColumns')}`;
-    fetch(`https://api.data.world/v0/sql/${owner}/${id}?includeTableSchema=true`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${connection.token}`,
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-        'User-Agent': `Falcon/Plotly - ${process.env.npm_package_version}`
-      },
-      body: params
-    }).then(res => {
-      return res.json();
-    })
-    .then(json => {
-      const rows = json.splice(1).map(table => {
+  return new Promise((resolve) => {
+    query('SELECT * FROM TableColumns', connection).then((res) => {
+      const rows = res.rows.splice(1).map((table) => {
+        const tableName = table[0];
+        const columnName = table[3];
         // Extract the datatype from datatype url e.g. http://www.w3.org/2001/XMLSchema#integer
-        const dataType = /#(.*)/.exec(table.columnDatatype)[1];
+        const columnDataType = /#(.*)/.exec(table[6])[1];
+
         return [
-          table.tableId,
-          table.columnName,
-          dataType
+          tableName,
+          columnName,
+          columnDataType
         ];
       });
+
       resolve({
         columnNames: [ 'tablename', 'column_name', 'data_type' ],
         rows
@@ -121,8 +112,7 @@ export function query(queryString, connection) {
       });
     })
     .catch(err => {
-      Logger.log(err);
-      throw new Error(err);
+      reject(err);
     });
   });
 }
