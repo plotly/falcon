@@ -183,16 +183,16 @@ export const CONNECTION_CONFIG = {
     ], // TODO - password options for apache drill
     [DIALECTS.DATA_WORLD]: [
         {
-            'label': 'Dataset URL',
+            'label': 'Dataset/Project URL',
             'value': 'url',
             'type': 'text',
-            'description': 'The dataset\'s URL on data.world'
+            'description': 'The URL of the dataset or project on data.world'
         },
         {
             'label': 'Token',
             'value': 'token',
             'type': 'text',
-            'description': 'Your data.world token'
+            'description': 'Your data.world token. Can be obtained from https://data.world/settings/advanced'
         }
     ]
 };
