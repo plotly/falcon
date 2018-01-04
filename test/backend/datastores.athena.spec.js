@@ -57,6 +57,41 @@ describe('Athena Unit Tests:', function () {
         }
     });
 
+    it('connect fails missing password', function( done ) {
+        const conn = {
+            username: 'user',
+            database: 'database',
+        };
+        try{
+            connect( conn ).then( connection =>{
+                assert.isUnDefined( connection, 'Connection should not have been defined');
+                done('Should have not have occured do to missing password');
+            }).catch( err =>{
+                done();
+            })
+        }catch( error ){
+            done();
+        }
+    });
+
+    it('connect fails username is empty', function( done ) {
+        const conn = {
+            username: 'user',
+            password: '',
+            database: 'database',
+        };
+        try{
+            connect( conn ).then( connection =>{
+                assert.isUnDefined( connection, 'Connection should not have been defined');
+                done('Should have not have occured do to missing password');
+            }).catch( err =>{
+                done();
+            })
+        }catch( error ){
+            done();
+        }
+    });
+
 
 
 
