@@ -9,7 +9,9 @@ describe('Athena Unit Tests:', function () {
     
     it('connect succeeds', function( done ) {
         const conn = {
-            username: 'user'
+            username: 'user',
+            password: 'password',
+            database: 'database',
         };
         connect( conn ).then( connection =>{
             assert.isDefined( connection, 'Connection is defined');
@@ -22,6 +24,8 @@ describe('Athena Unit Tests:', function () {
 
     it('connect fails missing username', function( done ) {
         const conn = {
+            password: 'password',
+            database: 'database',
         };
         try{
             connect( conn ).then( connection =>{
@@ -37,7 +41,9 @@ describe('Athena Unit Tests:', function () {
 
     it('connect fails username is empty', function( done ) {
         const conn = {
-            username: ''
+            username: '',
+            password: 'password',
+            database: 'database',
         };
         try{
             connect( conn ).then( connection =>{

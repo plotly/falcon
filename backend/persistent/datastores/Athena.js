@@ -25,9 +25,16 @@ export function connect(connection) {
     } = connection;
 
     //Validate that the connection has a 
-
     if( !username ){
         throw new Error(`The username was not defined`);
+    }
+
+    if( !password ){
+        throw new Error(`The password was not defined`);
+    }
+
+    if( !database ){
+        throw new Error(`The database was not defined`);
     }
     let con = {
         username, 
