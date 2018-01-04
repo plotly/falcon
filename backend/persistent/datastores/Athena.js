@@ -11,6 +11,12 @@ import {parseSQL} from '../../parse';
 /*
  * The connection object will open a connection to the Athena database
  * @param {object} connection
+ * @param {string} connection.username - username for connection
+ * @param {string} connection.password - password for connection
+ * @param {string} connection.database - database for connection
+ * @param {string} connection.port - port for connection
+ * @param {string} connection.accessKey - AWS Access Key
+ * @param {string} connection.secretKey - AWS Secret Key
  */
 export function connect(connection) {
     console.log( 'Athena Connection', connection);
@@ -18,6 +24,11 @@ export function connect(connection) {
         username, password, database, port, dialect, accessKey, secretKey
     } = connection;
 
+    //Validate that the connection has a 
+
+    if( !username ){
+        throw new Error(`The username was not defined`);
+    }
     let con = {
         username, 
         password, 
