@@ -1,7 +1,6 @@
 import {assert} from 'chai';
 
-import {saveConnection} from '../../backend/persistent/Connections.js';
-import {saveSetting, getSetting} from '../../backend/settings.js';
+import {saveSetting} from '../../backend/settings.js';
 
 import {
     assertResponseStatus,
@@ -9,20 +8,20 @@ import {
     closeTestServers,
     createTestServers,
     getResponseJson,
-    POST,
-    sqlConnections
+    POST
 } from './utils.js';
 
 
 let servers;
-let connectionId = 'postgres-189ebfb4-e1b4-446c-9b83-b326875fa2d8';
 let storagePath;
+
+const connectionId = 'postgres-189ebfb4-e1b4-446c-9b83-b326875fa2d8';
 
 describe('Datastore Mock:', function () {
     beforeEach(() => {
         servers = createTestServers();
         storagePath = process.env.PLOTLY_CONNECTOR_STORAGE_PATH;
-        process.env.PLOTLY_CONNECTOR_STORAGE_PATH = 'mock-storage'
+        process.env.PLOTLY_CONNECTOR_STORAGE_PATH = 'mock-storage';
         saveSetting('AUTH_ENABLED', false);
     });
 
