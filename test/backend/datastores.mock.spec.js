@@ -4,7 +4,6 @@ import {saveSetting} from '../../backend/settings.js';
 
 import {
     assertResponseStatus,
-    clearSettings,
     closeTestServers,
     createTestServers,
     getResponseJson,
@@ -26,8 +25,9 @@ describe('Datastore Mock:', function () {
     });
 
     afterEach(() => {
-        process.env.PLOTLY_CONNECTOR_STORAGE_PATH = storagePath;
-        return closeTestServers(servers);
+        return closeTestServers(servers).then(() => {
+            process.env.PLOTLY_CONNECTOR_STORAGE_PATH = storagePath;
+        });
     });
 
     it('tables returns list of hardcoded tables', function() {
