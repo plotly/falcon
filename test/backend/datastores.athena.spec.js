@@ -92,7 +92,41 @@ describe('Athena Unit Tests:', function () {
         }
     });
 
+    it('connect fails missing database', function( done ) {
+        const conn = {
+            username: 'user',
+            password: '',
+            database: 'database',
+        };
+        try{
+            connect( conn ).then( connection =>{
+                assert.isUnDefined( connection, 'Connection should not have been defined');
+                done('Should have not have occured do to missing database');
+            }).catch( err =>{
+                done();
+            })
+        }catch( error ){
+            done();
+        }
+    });
 
+    it('connect fails database is empty', function( done ) {
+        const conn = {
+            username: 'user',
+            password: 'password',
+            database: '',
+        };
+        try{
+            connect( conn ).then( connection =>{
+                assert.isUnDefined( connection, 'Connection should not have been defined');
+                done('Should have not have occured do to missing database');
+            }).catch( err =>{
+                done();
+            })
+        }catch( error ){
+            done();
+        }
+    });
 
 
 });
