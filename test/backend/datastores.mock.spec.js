@@ -4,12 +4,14 @@ import {saveSetting} from '../../backend/settings.js';
 
 import {
     assertResponseStatus,
+    clearSettings,
     closeTestServers,
-    createTestServers,
     getResponseJson,
+    GET,
     POST
 } from './utils.js';
 
+import Servers from '../../backend/routes.js';
 
 let servers;
 let storagePath;
@@ -18,15 +20,27 @@ const connectionId = 'postgres-189ebfb4-e1b4-446c-9b83-b326875fa2d8';
 
 describe('Datastore Mock:', function () {
     beforeEach(() => {
-        servers = createTestServers();
         storagePath = process.env.PLOTLY_CONNECTOR_STORAGE_PATH;
         process.env.PLOTLY_CONNECTOR_STORAGE_PATH = 'mock-storage';
+
         saveSetting('AUTH_ENABLED', false);
+
+        servers = new Servers({createCerts: false, startHttps: false, isElectron: false});
+        servers.httpServer.start();
     });
 
     afterEach(() => {
         return closeTestServers(servers).then(() => {
+            clearSettings('SETTINGS_PATH');
             process.env.PLOTLY_CONNECTOR_STORAGE_PATH = storagePath;
+        });
+    });
+
+    it('all mock connections are loaded', function() {
+        return GET('connections')
+        .then(assertResponseStatus(200)).then(getResponseJson)
+        .then(json => {
+            assert.equal(Object.keys(json).length, 12, 'Missing mock connectors');
         });
     });
 
