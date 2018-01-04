@@ -18,6 +18,12 @@ import {parseSQL} from '../../parse';
  * @param {string} connection.accessKey - AWS Access Key
  * @param {string} connection.secretKey - AWS Secret Key
  */
+export function validateConnection( connection ){
+
+    //TODO Move validation of connection into common function
+}
+
+
 export function connect(connection) {
     console.log( 'Athena Connection', connection);
     const {

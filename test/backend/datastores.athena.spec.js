@@ -2,6 +2,18 @@ import {assert} from 'chai';
 
 import {connect} from '../../backend/persistent/datastores/Athena';
 
+//TODO
+//Query tests case.  
+//1. Validate connection and query object
+//2. Validate empty results with column names and rows empty
+//3. Validate one row and column
+//4. Validate multiple rows and columns
+
+//Schema
+//1. Validate connection object
+
+//Tables
+//1. Validate connection object
 
 // Suppressing ESLint cause Mocha ensures `this` is bound in test functions
 /* eslint-disable no-invalid-this */
