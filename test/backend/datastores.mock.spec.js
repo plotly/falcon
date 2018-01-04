@@ -15,19 +15,21 @@ import {
 
 
 let servers;
-let connectionId;
+let connectionId = 'postgres-189ebfb4-e1b4-446c-9b83-b326875fa2d8';
+let storagePath;
 
 describe('Datastore Mock:', function () {
     beforeEach(() => {
         servers = createTestServers();
+        storagePath = process.env.PLOTLY_CONNECTOR_STORAGE_PATH;
+        process.env.PLOTLY_CONNECTOR_STORAGE_PATH = 'mock-storage'
         saveSetting('AUTH_ENABLED', false);
-        sqlConnections.mock = true;
-        connectionId = saveConnection(sqlConnections);
     });
 
     afterEach(() => {
-        sqlConnections.mock = false;
-        connectionId = saveConnection(sqlConnections);
+        clearSettings('SETTINGS_PATH');
+        process.env.PLOTLY_CONNECTOR_STORAGE_PATH = storagePath;
+        saveSetting('AUTH_ENABLED', true);
         return closeTestServers(servers);
     });
 
