@@ -26,9 +26,7 @@ describe('Datastore Mock:', function () {
     });
 
     afterEach(() => {
-        clearSettings('SETTINGS_PATH');
         process.env.PLOTLY_CONNECTOR_STORAGE_PATH = storagePath;
-        saveSetting('AUTH_ENABLED', true);
         return closeTestServers(servers);
     });
 
