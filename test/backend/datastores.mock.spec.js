@@ -32,7 +32,9 @@ describe('Datastore Mock:', function () {
     afterEach(() => {
         return closeTestServers(servers).then(() => {
             clearSettings('SETTINGS_PATH');
-            process.env.PLOTLY_CONNECTOR_STORAGE_PATH = storagePath;
+            if (storagePath) {
+                process.env.PLOTLY_CONNECTOR_STORAGE_PATH = storagePath;
+            }
         });
     });
 
