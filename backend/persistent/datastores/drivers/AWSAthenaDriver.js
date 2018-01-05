@@ -48,7 +48,7 @@ export function startQuery( athenaClient, params ){
     let queryParams = {
         QueryString: params.sqlStatement,
         ResultConfiguration: { 
-          OutputLocation: s3Outputlocation, 
+          OutputLocation: params.s3Outputlocation, 
           EncryptionConfiguration: {
             EncryptionOption: 'SSE_S3'
           }
