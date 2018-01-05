@@ -34,6 +34,8 @@ describe('Datastore Mock:', function () {
             clearSettings('SETTINGS_PATH');
             if (storagePath) {
                 process.env.PLOTLY_CONNECTOR_STORAGE_PATH = storagePath;
+            } else {
+                delete process.env.PLOTLY_CONNECTOR_STORAGE_PATH;
             }
         });
     });
