@@ -135,11 +135,11 @@ export function stopQuery( athenaClient, queryExecutionId ){
 
     return new Promise(function(resolve, reject) {
 
-        client.stopQueryExecution( queryParams, (err, data) =>{
+        return client.stopQueryExecution( queryParams, (err, data) =>{
             if (err) {
-                reject( err );
+                return reject( err );
             }else{
-                resolve( data);
+                return resolve( data);
             }
         });
     });
@@ -158,8 +158,7 @@ export function getQueryResults( athenaClient, queryExecutionId ){
     };
 
     return new Promise(function(resolve, reject) {
-
-        client.getQueryResults(queryParams, (err, data) => {
+        return client.getQueryResults(queryParams, (err, data) => {
             if ( err ) {
                 return reject(err);
             } else {
@@ -201,8 +200,9 @@ export function executeQuery( queryParams ){
                 retryInterval = 1000;
             }
 
+            console.log( `The Interval ${retryInterval} The retry count ${retryCount}`);
             let checkQueryStatus = ()=>{
-                console.log( `Checking Query Status`);
+                console.log( `Checking Query Status ${retryCount}`);
                 retryCount++;
                 queryResultsCompleted( client, queryExecutionId).then( queryStatus =>{
                     console.log( `Checking Query Status: ${queryStatus}`);
@@ -214,7 +214,7 @@ export function executeQuery( queryParams ){
                         return getQueryResults( client, queryExecutionId );
                     }else{
                         //Loop again
-                            console.log( 'Starting time out');
+                        console.log( 'Starting time out');
                         return setTimeout( checkQueryStatus, retryInterval );
                     }
                 }).catch( err =>{
