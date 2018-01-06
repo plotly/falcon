@@ -1,11 +1,9 @@
 import {parseSQL} from '../../parse';
-//TODO 
-//1. What is expected object for connection
-//2. What is expect results for the schems.  Is this a list of databases or 
-// table definitions.  Must check against Postgres
-//3. What is the expected results from the list of tables?
-//4. What is the expected results for the query
-//5. Hard code the format of the data to test
+
+const SHOW_TABLES_QUERY = `SHOW TABLES`;
+const SHOW_SCHEMA_QUERY = `DESCRIBE ${tableName}`;
+
+
 
 
 /*
