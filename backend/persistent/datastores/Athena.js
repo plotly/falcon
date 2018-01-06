@@ -3,18 +3,23 @@ import {parseSQL} from '../../parse';
 const SHOW_TABLES_QUERY = `SHOW TABLES`;
 const SHOW_SCHEMA_QUERY = `DESCRIBE ${tableName}`;
 
-
+//TODO
+// 0. Get the connection parameters working and validation
+// 1. Get the list of tables
+// 2. Get the list of schemas
+// 3. Get the query working correctly 
 
 
 /*
  * The connection object will open a connection to the Athena database
  * @param {object} connection
- * @param {string} connection.username - username for connection
- * @param {string} connection.password - password for connection
- * @param {string} connection.database - database for connection
- * @param {string} connection.port - port for connection
  * @param {string} connection.accessKey - AWS Access Key
- * @param {string} connection.secretKey - AWS Secret Key
+ * @param {string} connection.secretAccessKey - AWS Secret Key
+ * @param {string} connection.region - AWS Region
+ * @param {string} connection.dbName - Database name to connect to 
+ * @param {string} connection.sqlStatement - SQL statement to execute
+ * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
+ * @param {number} params.queryTimeout  - The timeout interval when the query should stop
  */
 export function validateConnection( connection ){
 
@@ -25,32 +30,41 @@ export function validateConnection( connection ){
 export function connect(connection) {
     console.log( 'Athena Connection', connection);
     const {
-        username, password, database, port, dialect, accessKey, secretKey
+        region, accessKey, secretKey, dbName, sqlStatement, s3Outputlocation, queryTimeout
     } = connection;
 
     //Validate that the connection has a 
-    if( !username ){
-        throw new Error(`The username was not defined`);
+    if( !region ){
+        throw new Error(`The AWS Region was not defined`);
     }
 
-    if( !password ){
-        throw new Error(`The password was not defined`);
+    if( !accessKey ){
+        throw new Error(`The AWS access key was not defined`);
     }
 
-    if( !database ){
-        throw new Error(`The database was not defined`);
+    if( !secretKey ){
+        throw new Error(`The AWS secret key was not defined`);
+    }
+
+    if( !dbName ){
+        throw new Error(`The Database Name was not defined`);
+    }
+
+    if( !sqlStatement ){
+        throw new Error(`The SQL Statement was not defined`);
+    }
+
+    if( !s3Outputlocation ){
+        throw new Error(`The Athena S3 Results Output location was not defined`);
+    }
+
+    if( !queryTimeout ){
+        throw new Error(`The Athena S3 Results Output location was not defined`);
     }
     let con = {
-        username, 
-        password, 
-        database, 
-        port, 
-        dialect, 
-        accessKey, 
-        secretKey
+        region, accessKey, secretKey, dbName, sqlStatement, s3Outputlocation, queryTimeout
     };
 
-    console.log( 'Connection object', con);
     return new Promise(function(resolve, reject) {
         resolve( con );
     });
