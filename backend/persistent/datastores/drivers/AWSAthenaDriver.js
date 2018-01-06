@@ -57,13 +57,12 @@ export function startQuery( athenaClient, params ){
         }
     };
     return new Promise(function(resolve, reject) {
-
-        client.startQueryExecution( queryParams, (err, data) =>{
+        return client.startQueryExecution( queryParams, (err, data) =>{
             if (err) {
-                reject( err );
+                return reject( err );
             }else{
                 let queryId = data.QueryExecutionId;
-                resolve( queryId );
+                return resolve( queryId );
             }
           });
     });
@@ -85,13 +84,16 @@ export function queryResultsCompleted( athenaClient, queryExecutionId  ){
     };
 
     return new Promise(function(resolve, reject) {
-
-        client.getQueryExecution( queryParams, (err, data) =>{
+        console.log( 'Start checking query execution');
+        return client.getQueryExecution( queryParams, (err, data) =>{
+            console.log( 'Start returning checking query execution');
             if (err) {
-                reject( -1 );
+                console.log( `Error getting query execution ${err}`);
+                return reject( -1 );
             }else{
-
+                console.log( `Got Response ${data}`);
                 let state = data.QueryExecution.Status.State;
+                console.log( `The query Result state ${state}`);
                 let queryState = 0;
                 switch (state) {
                     case 'QUEUED':
@@ -113,7 +115,7 @@ export function queryResultsCompleted( athenaClient, queryExecutionId  ){
                         queryState = -1;
                         break;
                 }
-                resolve( queryState );
+                return resolve( queryState );
             }
         });
     });
@@ -177,56 +179,54 @@ export function getQueryResults( athenaClient, queryExecutionId ){
  * @param {string} params.dbName - Database name to connect to 
  * @param {string} params.sqlStatement - SQL statement to execute
  * @param {string} params.s3Outputlocation - Location will Athena will output resutls of query
- * @param {number} params.timeout  - The timeout interval when the query should stop
+ * @param {number} params.queryTimeout  - The timeout interval when the query should stop
  */
 export function executeQuery( queryParams ){
     let client = createAthenaClient( queryParams );
 
+    //let query = startQuery;
 
     return new Promise(function(resolve, reject) {
+        //console.log( 'Starting query', query);
+        return startQuery(client, queryParams).then( queryExecutionId => {
 
-        startQuery(client, queryParams, (err, data) => {
-            let queryExecutionId;
-            if ( err ) {
-                return reject(err);
-            } else {
-                
-                queryExecutionId = data;
-                //Define a function for interval 
-                //1. Set number of timeout before starting
-                let retryInterval = params.timeout/ NUMBER_OF_RETRIES;
+            console.log( `Got Query Id ${queryExecutionId}`);
+            //Define a function for interval 
+            //1. Set number of timeout before starting
+            let retryInterval = queryParams.queryTimeout/ NUMBER_OF_RETRIES;
 
-                let retryCount = 0;
-                //If retry interval is not defined or less 0 set retry to 1000
-                if( ( !retryInterval )  || (retryInterval < 1 ) ){
-                    retryInterval = 1000;
-                }
-
-                let checkQueryStatus = ()=>{
-                    console.log( `Checking Query Status`);
-                    retryCount++;
-                    queryResultsCompleted( client, queryParams).then( queryStatus =>{
-                        console.log( `Checking Query Status: ${queryStatus}`);
-
-                        if( queryStatus < 0 ){
-                            return reject( `There was an error completing the query`);
-                        }else if( queryStatus === 1){
-                            console.log( 'Have query results');
-                            return getQueryResults( client, queryExecutionId );
-                        }else{
-                            //Loop again
-                             console.log( 'Starting time out');
-                            return setTimeout( checkQueryStatus, retryInterval );
-                        }
-                    }).catch( err =>{
-                        console.log( `Unexpected error checking query results ${err}`);
-                        return reject( err );
-                    });
-                };
-
-                checkQueryStatus();
-               
+            let retryCount = 0;
+            //If retry interval is not defined or less 0 set retry to 1000
+            if( ( !retryInterval )  || (retryInterval < 1 ) ){
+                retryInterval = 1000;
             }
+
+            let checkQueryStatus = ()=>{
+                console.log( `Checking Query Status`);
+                retryCount++;
+                queryResultsCompleted( client, queryExecutionId).then( queryStatus =>{
+                    console.log( `Checking Query Status: ${queryStatus}`);
+
+                    if( queryStatus < 0 ){
+                        return reject( `There was an error completing the query`);
+                    }else if( queryStatus === 1){
+                        console.log( 'Have query results');
+                        return getQueryResults( client, queryExecutionId );
+                    }else{
+                        //Loop again
+                            console.log( 'Starting time out');
+                        return setTimeout( checkQueryStatus, retryInterval );
+                    }
+                }).catch( err =>{
+                    console.log( `Unexpected error checking query results ${err}`);
+                    return reject( err );
+                });
+            };
+
+            checkQueryStatus();
+               
+        }).catch( err =>{
+            return reject( err );
         });
     });
 }
