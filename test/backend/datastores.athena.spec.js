@@ -21,9 +21,13 @@ describe('Athena Unit Tests:', function () {
     
     it('connect succeeds', function( done ) {
         const conn = {
-            username: 'user',
-            password: 'password',
-            database: 'database',
+            region: 'us-east-1', 
+            accessKey: 'XXXXXXXX', 
+            secretKey: 'XXXXXAAAA', 
+            dbName: 'PLOT.LY-TEST', 
+            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
+            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
+            queryTimeout: 10000
         };
         connect( conn ).then( connection =>{
             assert.isDefined( connection, 'Connection is defined');
@@ -34,15 +38,19 @@ describe('Athena Unit Tests:', function () {
         })
     });
 
-    it('connect fails missing username', function( done ) {
+    it('connect fails missing region', function( done ) {
         const conn = {
-            password: 'password',
-            database: 'database',
+            accessKey: 'XXXXXXXX', 
+            secretKey: 'XXXXXAAAA', 
+            dbName: 'PLOT.LY-TEST', 
+            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
+            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
+            queryTimeout: 10000
         };
         try{
             connect( conn ).then( connection =>{
                 assert.isUnDefined( connection, 'Connection should not have been defined');
-                done('Should have not have occured do to missing username');
+                done('Should have not have occured do to missing region');
             }).catch( err =>{
                 done();
             })
@@ -53,14 +61,18 @@ describe('Athena Unit Tests:', function () {
 
     it('connect fails username is empty', function( done ) {
         const conn = {
-            username: '',
-            password: 'password',
-            database: 'database',
+            region: '', 
+            accessKey: 'XXXXXXXX', 
+            secretKey: 'XXXXXAAAA', 
+            dbName: 'PLOT.LY-TEST', 
+            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
+            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
+            queryTimeout: 10000
         };
         try{
             connect( conn ).then( connection =>{
                 assert.isUnDefined( connection, 'Connection should not have been defined');
-                done('Should have not have occured do to missing username');
+                done('Should have not have occured do to missing region');
             }).catch( err =>{
                 done();
             })
@@ -69,15 +81,19 @@ describe('Athena Unit Tests:', function () {
         }
     });
 
-    it('connect fails missing password', function( done ) {
+    it('connect fails missing AWS access key', function( done ) {
         const conn = {
-            username: 'user',
-            database: 'database',
+            region: 'us-east-1', 
+            secretKey: 'XXXXXAAAA', 
+            dbName: 'PLOT.LY-TEST', 
+            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
+            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
+            queryTimeout: 10000
         };
         try{
             connect( conn ).then( connection =>{
                 assert.isUnDefined( connection, 'Connection should not have been defined');
-                done('Should have not have occured do to missing password');
+                done('Should have not have occured do to missing AWS access key');
             }).catch( err =>{
                 done();
             })
@@ -86,16 +102,20 @@ describe('Athena Unit Tests:', function () {
         }
     });
 
-    it('connect fails username is empty', function( done ) {
+    it('connect fails AWS Access key is empty', function( done ) {
         const conn = {
-            username: 'user',
-            password: '',
-            database: 'database',
+            region: 'us-east-1', 
+            accessKey: '', 
+            secretKey: 'XXXXXAAAA', 
+            dbName: 'PLOT.LY-TEST', 
+            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
+            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
+            queryTimeout: 10000
         };
         try{
             connect( conn ).then( connection =>{
                 assert.isUnDefined( connection, 'Connection should not have been defined');
-                done('Should have not have occured do to missing password');
+                done('Should have not have occured do to missing aws access key');
             }).catch( err =>{
                 done();
             })
@@ -104,16 +124,19 @@ describe('Athena Unit Tests:', function () {
         }
     });
 
-    it('connect fails missing database', function( done ) {
+    it('connect fails missing secret key', function( done ) {
         const conn = {
-            username: 'user',
-            password: '',
-            database: 'database',
+            region: 'us-east-1', 
+            accessKey: 'XXXXXXXX',  
+            dbName: 'PLOT.LY-TEST', 
+            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
+            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
+            queryTimeout: 10000
         };
         try{
             connect( conn ).then( connection =>{
                 assert.isUnDefined( connection, 'Connection should not have been defined');
-                done('Should have not have occured do to missing database');
+                done('Should have not have occured do to missing secret key');
             }).catch( err =>{
                 done();
             })
@@ -122,16 +145,20 @@ describe('Athena Unit Tests:', function () {
         }
     });
 
-    it('connect fails database is empty', function( done ) {
+    it('connect fails secret key is empty', function( done ) {
         const conn = {
-            username: 'user',
-            password: 'password',
-            database: '',
+            region: 'us-east-1', 
+            accessKey: 'AAAAAAA', 
+            secretKey: '', 
+            dbName: 'PLOT.LY-TEST', 
+            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
+            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
+            queryTimeout: 10000
         };
         try{
             connect( conn ).then( connection =>{
                 assert.isUnDefined( connection, 'Connection should not have been defined');
-                done('Should have not have occured do to missing database');
+                done('Should have not have occured do to missing secret key');
             }).catch( err =>{
                 done();
             })
@@ -140,6 +167,178 @@ describe('Athena Unit Tests:', function () {
         }
     });
 
+    it('connect fails missing db name', function( done ) {
+        const conn = {
+            region: 'us-east-1', 
+            accessKey: 'XXXXXXXX', 
+            secretKey: 'XXXXXX',  
+            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
+            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
+            queryTimeout: 10000
+        };
+        try{
+            connect( conn ).then( connection =>{
+                assert.isUnDefined( connection, 'Connection should not have been defined');
+                done('Should have not have occured do to missing db name');
+            }).catch( err =>{
+                done();
+            })
+        }catch( error ){
+            done();
+        }
+    });
+
+    it('connect fails db name is empty', function( done ) {
+        const conn = {
+            region: 'us-east-1', 
+            accessKey: 'AAAAAAA', 
+            secretKey: 'XXXXXX', 
+            dbName: '', 
+            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
+            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
+            queryTimeout: 10000
+        };
+        try{
+            connect( conn ).then( connection =>{
+                assert.isUnDefined( connection, 'Connection should not have been defined');
+                done('Should have not have occured do to missing db name');
+            }).catch( err =>{
+                done();
+            })
+        }catch( error ){
+            done();
+        }
+    }); 
+
+    it('connect fails missing sql statement', function( done ) {
+        const conn = {
+            region: 'us-east-1', 
+            accessKey: 'XXXXXXXX', 
+            secretKey: 'XXXXXX',  
+            dbName: 'PLOT.LY-TEST', 
+            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
+            queryTimeout: 10000
+        };
+        try{
+            connect( conn ).then( connection =>{
+                assert.isUnDefined( connection, 'Connection should not have been defined');
+                done('Should have not have occured do to missing sql statement');
+            }).catch( err =>{
+                done();
+            })
+        }catch( error ){
+            done();
+        }
+    });
+
+    it('connect fails db name is empty', function( done ) {
+        const conn = {
+            region: 'us-east-1', 
+            accessKey: 'AAAAAAA', 
+            secretKey: 'XXXXXX', 
+            dbName: 'PLOT.LY-TEST', 
+            sqlStatement: '', 
+            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
+            queryTimeout: 10000
+        };
+        try{
+            connect( conn ).then( connection =>{
+                assert.isUnDefined( connection, 'Connection should not have been defined');
+                done('Should have not have occured do to missing sql statement');
+            }).catch( err =>{
+                done();
+            })
+        }catch( error ){
+            done();
+        }
+    }); 
+    
+
+    it('connect fails missing S3 Output locaiont', function( done ) {
+        const conn = {
+            region: 'us-east-1', 
+            accessKey: 'XXXXXXXX', 
+            secretKey: 'XXXXXX',  
+            dbName: 'PLOT.LY-TEST', 
+            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
+            queryTimeout: 10000
+        };
+        try{
+            connect( conn ).then( connection =>{
+                assert.isUnDefined( connection, 'Connection should not have been defined');
+                done('Should have not have occured do to missing S3 Location');
+            }).catch( err =>{
+                done();
+            })
+        }catch( error ){
+            done();
+        }
+    });
+
+    it('connect fails db name is empty', function( done ) {
+        const conn = {
+            region: 'us-east-1', 
+            accessKey: 'AAAAAAA', 
+            secretKey: 'XXXXXX', 
+            dbName: 'PLOT.LY-TEST', 
+            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
+            s3Outputlocation: '', 
+            queryTimeout: 10000
+        };
+        try{
+            connect( conn ).then( connection =>{
+                assert.isUnDefined( connection, 'Connection should not have been defined');
+                done('Should have not have occured do to missing S3 Location');
+            }).catch( err =>{
+                done();
+            })
+        }catch( error ){
+            done();
+        }
+    });
+
+    it('connect fails missing S3 Output locaiont', function( done ) {
+        const conn = {
+            region: 'us-east-1', 
+            accessKey: 'XXXXXXXX', 
+            secretKey: 'XXXXXX',  
+            dbName: 'PLOT.LY-TEST', 
+            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
+            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
+        };
+        try{
+            connect( conn ).then( connection =>{
+                assert.isUnDefined( connection, 'Connection should not have been defined');
+                done('Should have not have occured do to missing S3 Location');
+            }).catch( err =>{
+                done();
+            })
+        }catch( error ){
+            done();
+        }
+    });
+
+    it('connect fails db name is empty', function( done ) {
+        const conn = {
+            region: 'us-east-1', 
+            accessKey: 'AAAAAAA', 
+            secretKey: 'XXXXXX', 
+            dbName: 'PLOT.LY-TEST', 
+            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
+            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
+            queryTimeout: -1
+        };
+        try{
+            connect( conn ).then( connection =>{
+                assert.isUnDefined( connection, 'Connection should not have been defined');
+                done('Should have not have occured do to missing S3 Location');
+            }).catch( err =>{
+                done();
+            })
+        }catch( error ){
+            done();
+        }
+    });
 
 });
 /* eslint-enable no-invalid-this */

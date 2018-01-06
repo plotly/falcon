@@ -1,7 +1,7 @@
 import {parseSQL} from '../../parse';
 
 const SHOW_TABLES_QUERY = `SHOW TABLES`;
-const SHOW_SCHEMA_QUERY = `DESCRIBE ${tableName}`;
+const SHOW_SCHEMA_QUERY = `DESCRIBE `;
 
 //TODO
 // 0. Get the connection parameters working and validation
@@ -58,8 +58,8 @@ export function connect(connection) {
         throw new Error(`The Athena S3 Results Output location was not defined`);
     }
 
-    if( !queryTimeout ){
-        throw new Error(`The Athena S3 Results Output location was not defined`);
+    if( !queryTimeout && queryTimeout < 0){
+        throw new Error(`The Athena Query Timeout was not defined`);
     }
     let con = {
         region, accessKey, secretKey, dbName, sqlStatement, s3Outputlocation, queryTimeout
