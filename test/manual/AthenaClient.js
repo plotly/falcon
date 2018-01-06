@@ -5,11 +5,13 @@ import {createAthenaClient, startQuery, stopQuery, queryResultsCompleted, execut
 
 const client = createAthenaClient();
 
+const SQL_STATEMENT = `select * from clean_logs limit 1000`;
+//const SQL_STATEMENT = `SHOW TABLES`; 
 let params  = {
     dbName :'shopscreen_logs',
-    sqlStatement: 'select * from clean_logs limit 100000',
+    sqlStatement: SQL_STATEMENT,
     s3Outputlocation: 's3://aws-athena-query-results-575576301786-us-east-1/',
-    queryTimeout: 20000
+    queryTimeout: 5000
 };
 /*startQuery( client, params ).then( rst =>{
     console.log( 'Got the query id back', rst);
@@ -33,9 +35,25 @@ let params  = {
     console.log( 'err', err);
 });*/
 
+console.log( `Starting of executing query`);
 executeQuery( params ).then( queryResult =>{
     console.log( `Received response `);
-    console.log( queryResult );    
+    console.log( queryResult );   
+    console.log( 'Geting resposne');
+    for( let i=0; i< queryResult.length; i++ ){
+        console.log('Have row');
+        let row = queryResult[i].Data;
+        //console.log(row);
+        let rowData = '';
+        for( let j=0; j< row.length; j++ ){
+            rowData = `${rowData}, ${row[j]}`;
+            //console.log( row[j] );
+        }
+        console.log( rowData );
+    }
+    
 }).catch( err =>{
     console.log( `Unexpected error returning the query result ${err}`);
 });
+
+console.log( `Completing Executin of query`);

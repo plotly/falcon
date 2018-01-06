@@ -158,10 +158,11 @@ export function getQueryResults( athenaClient, queryExecutionId ){
     };
 
     return new Promise(function(resolve, reject) {
-        return client.getQueryResults(queryParams, (err, data) => {
+        client.getQueryResults(queryParams, (err, data) => {
             if ( err ) {
                 return reject(err);
             } else {
+                console.log( `Got response for query results`);
                 return resolve(data);
             }
         });
@@ -183,15 +184,10 @@ export function getQueryResults( athenaClient, queryExecutionId ){
 export function executeQuery( queryParams ){
     let client = createAthenaClient( queryParams );
 
-    //let query = startQuery;
-
     return new Promise(function(resolve, reject) {
-        //console.log( 'Starting query', query);
         return startQuery(client, queryParams).then( queryExecutionId => {
 
-            console.log( `Got Query Id ${queryExecutionId}`);
-            //Define a function for interval 
-            //1. Set number of timeout before starting
+            //Define the wait interval 
             let retryInterval = queryParams.queryTimeout/ NUMBER_OF_RETRIES;
 
             let retryCount = 0;
@@ -200,21 +196,22 @@ export function executeQuery( queryParams ){
                 retryInterval = 1000;
             }
 
-            console.log( `The Interval ${retryInterval} The retry count ${retryCount}`);
             let checkQueryStatus = ()=>{
-                console.log( `Checking Query Status ${retryCount}`);
                 retryCount++;
                 queryResultsCompleted( client, queryExecutionId).then( queryStatus =>{
-                    console.log( `Checking Query Status: ${queryStatus}`);
-
                     if( queryStatus < 0 ){
                         return reject( `There was an error completing the query`);
                     }else if( queryStatus === 1){
-                        console.log( 'Have query results');
-                        return getQueryResults( client, queryExecutionId );
+                        return getQueryResults( client, queryExecutionId ).then( rst =>{
+
+                            if( rst && rst.ResultSet && rst.ResultSet.Rows ){
+                                return resolve( rst.ResultSet.Rows );
+                            }else{
+                                return resolve( [] );
+                            }
+                        });
                     }else{
                         //Loop again
-                        console.log( 'Starting time out');
                         return setTimeout( checkQueryStatus, retryInterval );
                     }
                 }).catch( err =>{
