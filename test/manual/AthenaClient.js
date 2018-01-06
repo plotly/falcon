@@ -10,7 +10,7 @@ let params  = {
     sqlStatement: 'select * from clean_logs limit 1000',
     s3Outputlocation: 's3://aws-athena-query-results-575576301786-us-east-1/'
 };
-startQuery( client, params ).then( rst =>{
+/*startQuery( client, params ).then( rst =>{
     console.log( 'Got the query id back', rst);
 
     queryResultsCompleted( client, rst ).then( queryState =>{
@@ -30,4 +30,11 @@ startQuery( client, params ).then( rst =>{
     //})//
 }).catch( err =>{
     console.log( 'err', err);
+});*/
+
+executeQuery( queryParams ).then( queryResult =>{
+    console.log( `Received response `);
+    console.log( queryResult );    
+}).catch( err =>{
+    console.log( `Unexpected error returning the query result ${err}`);
 });

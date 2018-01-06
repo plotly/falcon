@@ -2,6 +2,7 @@
 
 const AWS = require( 'aws-sdk' );
 const credentials = require('../../../../aws.json');
+const NUMBER_OF_RETRIES = 5;
 
 /**
  * The following function will create an AWS Athena Client
@@ -142,6 +143,90 @@ export function stopQuery( athenaClient, queryExecutionId ){
     });
 }
 
-export function getQueryResults(){
+/**
+ * The following method will get the query results based on the query id
+ * @param {object} athenaClient  - Object created using create athena client
+ * @param {string} queryExecutionId 
+ */
+export function getQueryResults( athenaClient, queryExecutionId ){
+    let client = athenaClient;
 
+    let queryParams = {
+        QueryExecutionId: queryExecutionId
+    };
+
+    return new Promise(function(resolve, reject) {
+
+        client.getQueryResults(queryParams, (err, data) => {
+            if ( err ) {
+                return reject(err);
+            } else {
+                return resolve(data);
+            }
+        });
+    });
+}
+
+/**
+ * The following function will create an AWS Athena Client
+ * @param {object} queryParams 
+ * @param {string} queryParams.accessKey - AWS Access Key
+ * @param {string} queryParams.secretAccessKey - AWS Secret Key
+ * @param {string} queryParams.region - AWS Region
+ * @param {string} queryParams.region - AWS Region
+ * @param {string} params.dbName - Database name to connect to 
+ * @param {string} params.sqlStatement - SQL statement to execute
+ * @param {string} params.s3Outputlocation - Location will Athena will output resutls of query
+ * @param {number} params.timeout  - The timeout interval when the query should stop
+ */
+export function executeQuery( queryParams ){
+    let client = createAthenaClient( queryParams );
+
+
+    return new Promise(function(resolve, reject) {
+
+        startQuery(client, queryParams, (err, data) => {
+            let queryExecutionId;
+            if ( err ) {
+                return reject(err);
+            } else {
+                
+                queryExecutionId = data;
+                //Define a function for interval 
+                //1. Set number of timeout before starting
+                let retryInterval = params.timeout/ NUMBER_OF_RETRIES;
+
+                let retryCount = 0;
+                //If retry interval is not defined or less 0 set retry to 1000
+                if( ( !retryInterval )  || (retryInterval < 1 ) ){
+                    retryInterval = 1000;
+                }
+
+                let checkQueryStatus = ()=>{
+                    console.log( `Checking Query Status`);
+                    retryCount++;
+                    queryResultsCompleted( client, queryParams).then( queryStatus =>{
+                        console.log( `Checking Query Status: ${queryStatus}`);
+
+                        if( queryStatus < 0 ){
+                            return reject( `There was an error completing the query`);
+                        }else if( queryStatus === 1){
+                            console.log( 'Have query results');
+                            return getQueryResults( client, queryExecutionId );
+                        }else{
+                            //Loop again
+                             console.log( 'Starting time out');
+                            return setTimeout( checkQueryStatus, retryInterval );
+                        }
+                    }).catch( err =>{
+                        console.log( `Unexpected error checking query results ${err}`);
+                        return reject( err );
+                    });
+                };
+
+                checkQueryStatus();
+               
+            }
+        });
+    });
 }
