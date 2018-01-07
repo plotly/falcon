@@ -2,6 +2,8 @@
 
 import {createAthenaClient, startQuery, stopQuery, queryResultsCompleted, executeQuery} from '../../backend/persistent/datastores/drivers/AWSAthenaDriver';
 
+import {tables} from '../../backend/persistent/datastores/Athena';
+
 
 const client = createAthenaClient();
 
@@ -36,7 +38,7 @@ let params  = {
 });*/
 
 console.log( `Starting of executing query`);
-executeQuery( params ).then( queryResult =>{
+/*executeQuery( params ).then( queryResult =>{
     console.log( `Received response `);
     console.log( queryResult );   
     console.log( 'Geting resposne');
@@ -56,4 +58,10 @@ executeQuery( params ).then( queryResult =>{
     console.log( `Unexpected error returning the query result ${err}`);
 });
 
-console.log( `Completing Executin of query`);
+console.log( `Completing Executin of query`);*/
+
+tables( params ).then( queryResult =>{
+    console.log( 'Retrieved the results', queryResult);
+}).catch( err =>{
+    console.log( 'Error getting tables', err);
+});

@@ -1,4 +1,5 @@
 import {parseSQL} from '../../parse';
+import {executeQuery} from './drivers/AWSAthenaDriver';
 
 const SHOW_TABLES_QUERY = `SHOW TABLES`;
 const SHOW_SCHEMA_QUERY = `DESCRIBE `;
@@ -161,14 +162,42 @@ export function schemas(connection){
     });
 }
 
+
 /**
  * Should return a list of tables that are in the database
- * @param {*} connection 
+ * @param {object} connection 
+ * @param {string} connection.accessKey - AWS Access Key
+ * @param {string} connection.secretAccessKey - AWS Secret Key
+ * @param {string} connection.region - AWS Region
+ * @param {string} connection.region - AWS Region
+ * @param {string} connection.dbName - Database name to connect to 
+ * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
  */
 export function tables(connection){
     console.log( 'Tables', connection);
-    
+
+    connection.sqlStatement = SHOW_TABLES_QUERY;
+    connection.queryTimeout = 5000;
     return new Promise(function(resolve, reject) {
-        resolve( ['Sample', 'Test'] );
+        executeQuery( connection ).then( dataSet =>{
+
+            let rst = [];
+            console.log( 'data set', dataSet );
+            if( dataSet && dataSet.length > 0){
+                rst = dataSet.map( data =>{
+                    if( data && data.Data && data.Data.length > 0 ){
+                        return data.Data[0].VarCharValue;
+                    }
+                });
+            }
+            resolve( rst );
+        }).catch( err =>{
+            reject( err );
+        });
     });
+
+
+
+    
+
 }
