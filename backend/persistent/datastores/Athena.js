@@ -2,7 +2,7 @@ import {parseSQL} from '../../parse';
 import {executeQuery} from './drivers/AWSAthenaDriver';
 
 const SHOW_TABLES_QUERY = `SHOW TABLES`;
-const SHOW_SCHEMA_QUERY = `SELECT column_name, data_type FROM information_schema.columns WHERE table_schema =  `;
+const SHOW_SCHEMA_QUERY = `SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema `;
 const DEFAULT_QUERY_TIMEOUT = 5000;
 
 //TODO
@@ -106,13 +106,47 @@ export function query(queryObject, connection){
  * Should return a list of databases that are defined within the database.
  * @param {object} connection 
  */
+/**
+ * Should return a list of tables and their that are defined within the database.
+ * @param {object} connection 
+ * @param {string} connection.accessKey - AWS Access Key
+ * @param {string} connection.secretAccessKey - AWS Secret Key
+ * @param {string} connection.region - AWS Region
+ * @param {string} connection.region - AWS Region
+ * @param {string} connection.dbName - Database name to connect to 
+ * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
+ */
 export function schemas(connection){
-    console.log( 'Schemas', connection);
-
     let columnnames = ['Table', 'column_name', 'data_type'];
     let rows = [];
 
-    for( let i=0; i< 4; i++){
+    connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.dbName}'` ;
+    connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
+    return new Promise(function(resolve, reject) {
+        executeQuery( connection ).then( dataSet =>{
+
+            let rows = [];
+            if( dataSet && dataSet.length > 0){
+                for( let i=0; i< dataSet.length; i++){
+                    let data = dataSet[i];
+
+                    if( data && data.Data && data.Data.length > 0 ){
+                        if( i != 0){
+                            let row = [];
+                            row.push( data.Data[0].VarCharValue ); //Table Name
+                            row.push( data.Data[1].VarCharValue ); //Column Name
+                            row.push( data.Data[2].VarCharValue ); //DataType
+                            rows.push( row );
+                        }   
+                    }
+                }
+            }
+            resolve( {columnnames, rows} );
+        }).catch( err =>{
+            reject( err );
+        });
+    });
+    /*for( let i=0; i< 4; i++){
 
         
         let r = [];
@@ -153,7 +187,7 @@ export function schemas(connection){
 
     return new Promise(function(resolve, reject) {
         resolve( {columnnames, rows} );
-    });
+    });*/
 }
 
 
@@ -175,7 +209,7 @@ export function tables(connection){
         executeQuery( connection ).then( dataSet =>{
 
             let rst = [];
-            console.log( 'data set', dataSet );
+            //console.log( 'data set', dataSet );
             if( dataSet && dataSet.length > 0){
                 rst = dataSet.map( data =>{
                     if( data && data.Data && data.Data.length > 0 ){

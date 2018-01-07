@@ -84,16 +84,12 @@ export function queryResultsCompleted( athenaClient, queryExecutionId  ){
     };
 
     return new Promise(function(resolve, reject) {
-        console.log( 'Start checking query execution');
         return client.getQueryExecution( queryParams, (err, data) =>{
-            console.log( 'Start returning checking query execution');
             if (err) {
                 console.log( `Error getting query execution ${err}`);
                 return reject( -1 );
             }else{
-                console.log( `Got Response ${data}`);
                 let state = data.QueryExecution.Status.State;
-                console.log( `The query Result state ${state}`);
                 let queryState = 0;
                 switch (state) {
                     case 'QUEUED':
@@ -162,7 +158,6 @@ export function getQueryResults( athenaClient, queryExecutionId ){
             if ( err ) {
                 return reject(err);
             } else {
-                console.log( `Got response for query results`);
                 return resolve(data);
             }
         });

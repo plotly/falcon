@@ -2,7 +2,7 @@
 
 import {createAthenaClient, startQuery, stopQuery, queryResultsCompleted, executeQuery} from '../../backend/persistent/datastores/drivers/AWSAthenaDriver';
 
-import {tables} from '../../backend/persistent/datastores/Athena';
+import {tables, schemas} from '../../backend/persistent/datastores/Athena';
 
 
 const client = createAthenaClient();
@@ -60,7 +60,7 @@ console.log( `Starting of executing query`);
 
 console.log( `Completing Executin of query`);*/
 
-tables( params ).then( queryResult =>{
+schemas( params ).then( queryResult =>{
     console.log( 'Retrieved the results', queryResult);
 }).catch( err =>{
     console.log( 'Error getting tables', err);
