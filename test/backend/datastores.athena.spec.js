@@ -25,7 +25,6 @@ describe('Athena Unit Tests:', function () {
             accessKey: 'XXXXXXXX', 
             secretKey: 'XXXXXAAAA', 
             dbName: 'PLOT.LY-TEST', 
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
         };
@@ -43,7 +42,6 @@ describe('Athena Unit Tests:', function () {
             accessKey: 'XXXXXXXX', 
             secretKey: 'XXXXXAAAA', 
             dbName: 'PLOT.LY-TEST', 
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
         };
@@ -65,7 +63,6 @@ describe('Athena Unit Tests:', function () {
             accessKey: 'XXXXXXXX', 
             secretKey: 'XXXXXAAAA', 
             dbName: 'PLOT.LY-TEST', 
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
         };
@@ -86,7 +83,6 @@ describe('Athena Unit Tests:', function () {
             region: 'us-east-1', 
             secretKey: 'XXXXXAAAA', 
             dbName: 'PLOT.LY-TEST', 
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
         };
@@ -108,7 +104,6 @@ describe('Athena Unit Tests:', function () {
             accessKey: '', 
             secretKey: 'XXXXXAAAA', 
             dbName: 'PLOT.LY-TEST', 
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
         };
@@ -129,7 +124,6 @@ describe('Athena Unit Tests:', function () {
             region: 'us-east-1', 
             accessKey: 'XXXXXXXX',  
             dbName: 'PLOT.LY-TEST', 
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
         };
@@ -151,7 +145,6 @@ describe('Athena Unit Tests:', function () {
             accessKey: 'AAAAAAA', 
             secretKey: '', 
             dbName: 'PLOT.LY-TEST', 
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
         };
@@ -172,7 +165,6 @@ describe('Athena Unit Tests:', function () {
             region: 'us-east-1', 
             accessKey: 'XXXXXXXX', 
             secretKey: 'XXXXXX',  
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
         };
@@ -194,7 +186,6 @@ describe('Athena Unit Tests:', function () {
             accessKey: 'AAAAAAA', 
             secretKey: 'XXXXXX', 
             dbName: '', 
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
         };
@@ -210,57 +201,12 @@ describe('Athena Unit Tests:', function () {
         }
     }); 
 
-    it('connect fails missing sql statement', function( done ) {
-        const conn = {
-            region: 'us-east-1', 
-            accessKey: 'XXXXXXXX', 
-            secretKey: 'XXXXXX',  
-            dbName: 'PLOT.LY-TEST', 
-            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
-            queryTimeout: 10000
-        };
-        try{
-            connect( conn ).then( connection =>{
-                assert.isUnDefined( connection, 'Connection should not have been defined');
-                done('Should have not have occured do to missing sql statement');
-            }).catch( err =>{
-                done();
-            })
-        }catch( error ){
-            done();
-        }
-    });
-
-    it('connect fails db name is empty', function( done ) {
-        const conn = {
-            region: 'us-east-1', 
-            accessKey: 'AAAAAAA', 
-            secretKey: 'XXXXXX', 
-            dbName: 'PLOT.LY-TEST', 
-            sqlStatement: '', 
-            s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
-            queryTimeout: 10000
-        };
-        try{
-            connect( conn ).then( connection =>{
-                assert.isUnDefined( connection, 'Connection should not have been defined');
-                done('Should have not have occured do to missing sql statement');
-            }).catch( err =>{
-                done();
-            })
-        }catch( error ){
-            done();
-        }
-    }); 
-    
-
     it('connect fails missing S3 Output locaiont', function( done ) {
         const conn = {
             region: 'us-east-1', 
             accessKey: 'XXXXXXXX', 
             secretKey: 'XXXXXX',  
             dbName: 'PLOT.LY-TEST', 
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             queryTimeout: 10000
         };
         try{
@@ -275,13 +221,12 @@ describe('Athena Unit Tests:', function () {
         }
     });
 
-    it('connect fails db name is empty', function( done ) {
+    it('connect fails S3 Output location is empty', function( done ) {
         const conn = {
             region: 'us-east-1', 
             accessKey: 'AAAAAAA', 
             secretKey: 'XXXXXX', 
             dbName: 'PLOT.LY-TEST', 
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: '', 
             queryTimeout: 10000
         };
@@ -297,19 +242,18 @@ describe('Athena Unit Tests:', function () {
         }
     });
 
-    it('connect fails missing S3 Output locaiont', function( done ) {
+    it('connect fails missing Query Timeout', function( done ) {
         const conn = {
             region: 'us-east-1', 
             accessKey: 'XXXXXXXX', 
             secretKey: 'XXXXXX',  
             dbName: 'PLOT.LY-TEST', 
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
         };
         try{
             connect( conn ).then( connection =>{
                 assert.isUnDefined( connection, 'Connection should not have been defined');
-                done('Should have not have occured do to missing S3 Location');
+                done('Should have not have occured do to missing Query Timeout');
             }).catch( err =>{
                 done();
             })
@@ -318,20 +262,19 @@ describe('Athena Unit Tests:', function () {
         }
     });
 
-    it('connect fails db name is empty', function( done ) {
+    it('connect fails query timeout is less then zero', function( done ) {
         const conn = {
             region: 'us-east-1', 
             accessKey: 'AAAAAAA', 
             secretKey: 'XXXXXX', 
             dbName: 'PLOT.LY-TEST', 
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: -1
         };
         try{
             connect( conn ).then( connection =>{
                 assert.isUnDefined( connection, 'Connection should not have been defined');
-                done('Should have not have occured do to missing S3 Location');
+                done('Should have not have occured do to missing Query Timeout');
             }).catch( err =>{
                 done();
             })

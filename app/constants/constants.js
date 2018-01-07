@@ -198,11 +198,15 @@ export const CONNECTION_CONFIG = {
             'label': 'AWS Region','value': 'region','type': 'text'
         },
         {
-            'label': 'S3 Bucket',
-            'value': 'bucket',
-            'type': 'text',
-            'description': `
-                The Athena will put the output results of the query in this location.`
+            'label': 'Database','value': 'dbName','type': 'text'
+        },
+        {
+            'label': 'S3 Results Bucket','value': 'bucket','type': 'text',
+            'description': 
+                `Athena will put the results of the query to the following bucket.`
+        },
+        {
+            'label': 'Query Timeout','value': 'queryTimeout','type': 'number'
         },
         {
             'label': 'Database','value': 'database','type': 'text'
@@ -422,6 +426,9 @@ export const SAMPLE_DBS = {
         accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
         secretAccessKey: 'Urvus4R7MnJOAqT4U3eovlCBimQ4Zg2Y9sV5LWow',
         region:'us-west-2',
-        database:'default'
+        database:'ploytly',
+        sqlStatement: 'SHOW TABLES',
+        s3Outputlocation:'s3://plotly-athena-results-us-west-2/',
+        queryTimeout:5000
     },
 };

@@ -15,14 +15,13 @@ const DEFAULT_QUERY_TIMEOUT = 5000;
  * @param {string} connection.secretAccessKey - AWS Secret Key
  * @param {string} connection.region - AWS Region
  * @param {string} connection.dbName - Database name to connect to 
- * @param {string} connection.sqlStatement - SQL statement to execute
  * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
  * @param {number} params.queryTimeout  - The timeout interval when the query should stop
  */
 export function connect(connection) {
     console.log( 'Athena Connection', connection);
     const {
-        region, accessKey, secretKey, dbName, sqlStatement, s3Outputlocation, queryTimeout
+        region, accessKey, secretKey, dbName, s3Outputlocation, queryTimeout
     } = connection;
 
     //Validate that the connection has a 
@@ -42,10 +41,6 @@ export function connect(connection) {
         throw new Error(`The Database Name was not defined`);
     }
 
-    if( !sqlStatement ){
-        throw new Error(`The SQL Statement was not defined`);
-    }
-
     if( !s3Outputlocation ){
         throw new Error(`The Athena S3 Results Output location was not defined`);
     }
@@ -54,7 +49,7 @@ export function connect(connection) {
         throw new Error(`The Athena Query Timeout was not defined`);
     }
     let con = {
-        region, accessKey, secretKey, dbName, sqlStatement, s3Outputlocation, queryTimeout
+        region, accessKey, secretKey, dbName, s3Outputlocation, queryTimeout
     };
 
     return new Promise(function(resolve, reject) {
