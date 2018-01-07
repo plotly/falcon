@@ -2,13 +2,13 @@ import {parseSQL} from '../../parse';
 import {executeQuery} from './drivers/AWSAthenaDriver';
 
 const SHOW_TABLES_QUERY = `SHOW TABLES`;
-const SHOW_SCHEMA_QUERY = `DESCRIBE `;
+const SHOW_SCHEMA_QUERY = `SELECT column_name, data_type FROM information_schema.columns WHERE table_schema =  `;
+const DEFAULT_QUERY_TIMEOUT = 5000;
 
 //TODO
-// 0. Get the connection parameters working and validation
-// 1. Get the list of tables
 // 2. Get the list of schemas
 // 3. Get the query working correctly 
+
 
 
 /*
@@ -22,12 +22,6 @@ const SHOW_SCHEMA_QUERY = `DESCRIBE `;
  * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
  * @param {number} params.queryTimeout  - The timeout interval when the query should stop
  */
-export function validateConnection( connection ){
-
-    //TODO Move validation of connection into common function
-}
-
-
 export function connect(connection) {
     console.log( 'Athena Connection', connection);
     const {
@@ -174,10 +168,9 @@ export function schemas(connection){
  * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
  */
 export function tables(connection){
-    console.log( 'Tables', connection);
 
     connection.sqlStatement = SHOW_TABLES_QUERY;
-    connection.queryTimeout = 5000;
+    connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
     return new Promise(function(resolve, reject) {
         executeQuery( connection ).then( dataSet =>{
 
@@ -195,9 +188,4 @@ export function tables(connection){
             reject( err );
         });
     });
-
-
-
-    
-
 }
