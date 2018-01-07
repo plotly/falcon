@@ -61,3 +61,6 @@ backend/headlessBundle.js
 backend/headlessBundle.js.map
 
 npm-shrinkwrap.unsafe.json
+
+#AWS Credentials
+aws.json

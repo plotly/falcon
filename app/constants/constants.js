@@ -14,7 +14,8 @@ export const DIALECTS = {
     IBM_DB2: 'ibm db2',
     APACHE_SPARK: 'apache spark',
     APACHE_IMPALA: 'apache impala',
-    APACHE_DRILL: 'apache drill'
+    APACHE_DRILL: 'apache drill',
+    ATHENA: 'athena'
 };
 
 export const SQL_DIALECTS_USING_EDITOR = [
@@ -26,7 +27,8 @@ export const SQL_DIALECTS_USING_EDITOR = [
     'sqlite',
     'ibm db2',
     'apache spark',
-    'apache impala'
+    'apache impala',
+    'athena'
 ];
 
 const commonSqlOptions = [
@@ -178,7 +180,41 @@ export const CONNECTION_CONFIG = {
             'value': 'secretAccessKey',
             'type': 'password'
         }
-    ] // TODO - password options for apache drill
+    ], // TODO - password options for apache drill
+
+    /**
+     * accessKeyId: 'xxxx',
+    secretAccessKey: 'xxxx',
+    region: 'xxxx',
+     */
+    [DIALECTS.ATHENA]: [
+        {
+            'label': 'S3 Access Key','value': 'accessKey','type': 'password'
+        },
+        {
+            'label': 'S3 Secret Access Key','value': 'secretKey','type': 'password'
+        },
+        {
+            'label': 'AWS Region','value': 'region','type': 'text'
+        },
+        {
+            'label': 'S3 Bucket',
+            'value': 'bucket',
+            'type': 'text',
+            'description': `
+                The Athena will put the output results of the query in this location.`
+        },
+        {
+            'label': 'Database','value': 'database','type': 'text'
+        },
+        {
+            'label': 'Athena SQL Query',
+            'value': 'query',
+            'type': 'text',
+            'description': `
+                The SQL Query that will be executed against Athena.`
+        }
+    ]
 };
 
 
@@ -194,7 +230,8 @@ export const LOGOS = {
     [DIALECTS.MSSQL]: 'images/mssql-logo.png',
     [DIALECTS.SQLITE]: 'images/sqlite-logo.png',
     [DIALECTS.S3]: 'images/s3-logo.png',
-    [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png'
+    [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png',
+    [DIALECTS.ATHENA]: 'images/athena-logo.png'
 };
 
 export function PREVIEW_QUERY (dialect, table, database = '') {
@@ -208,6 +245,7 @@ export function PREVIEW_QUERY (dialect, table, database = '') {
         case DIALECTS.MARIADB:
         case DIALECTS.POSTGRES:
         case DIALECTS.REDSHIFT:
+        case DIALECTS.ATHENA:
             return `SELECT * FROM ${table} LIMIT 1000`;
         case DIALECTS.MSSQL:
             return 'SELECT TOP 1000 * FROM ' +
@@ -378,5 +416,12 @@ export const SAMPLE_DBS = {
     sqlite: {
         dialect: 'sqlite',
         storage: `${__dirname}/plotly_datasets.db`
-    }
+    },
+    [DIALECTS.ATHENA]: {
+        bucket: 'plotly-s3-connector-test',
+        accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
+        secretAccessKey: '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',
+        region:'us-west-2',
+        database:'default'
+    },
 };

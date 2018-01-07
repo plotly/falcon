@@ -33,6 +33,8 @@ export default class ConnectionTab extends Component {
             label = `Apache Spark (${connectionObject.host}:${connectionObject.port})`;
         } else if (connectionObject.dialect === DIALECTS.ELASTICSEARCH) {
             label = `Elasticsearch (${connectionObject.host})`;
+        } else if (connectionObject.dialect === DIALECTS.ATHENA) {
+            label = `Athena (${connectionObject.database})`;
         } else if (connectionObject.dialect === DIALECTS.SQLITE) {
             label = connectionObject.storage;
         } else {

@@ -5,6 +5,7 @@ import * as ApacheDrill from './ApacheDrill';
 import * as IbmDb2 from './ibmdb2';
 import * as ApacheLivy from './livy';
 import * as ApacheImpala from './impala';
+import * as Athena from './Athena';
 
 /*
  * Switchboard to all of the different types of connections
@@ -27,6 +28,8 @@ import * as ApacheImpala from './impala';
 
 function getDatastoreClient(connection) {
     const {dialect} = connection;
+
+    console.log( 'Selection dialect', dialect);
     if (dialect === 'elasticsearch') {
         return Elasticsearch;
     } else if (dialect === 's3') {
@@ -39,6 +42,8 @@ function getDatastoreClient(connection) {
         return ApacheImpala;
     } else if (dialect === 'ibm db2') {
         return IbmDb2;
+    }else if (dialect === 'athena') {
+        return Athena;
     }
     return Sql;
 }
