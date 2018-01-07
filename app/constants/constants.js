@@ -182,11 +182,6 @@ export const CONNECTION_CONFIG = {
         }
     ], // TODO - password options for apache drill
 
-    /**
-     * accessKeyId: 'xxxx',
-    secretAccessKey: 'xxxx',
-    region: 'xxxx',
-     */
     [DIALECTS.ATHENA]: [
         {
             'label': 'S3 Access Key','value': 'accessKey','type': 'password'
@@ -210,13 +205,6 @@ export const CONNECTION_CONFIG = {
         },
         {
             'label': 'Database','value': 'database','type': 'text'
-        },
-        {
-            'label': 'Athena SQL Query',
-            'value': 'query',
-            'type': 'text',
-            'description': `
-                The SQL Query that will be executed against Athena.`
         }
     ]
 };

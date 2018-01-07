@@ -109,6 +109,7 @@ export function query(queryObject, connection){
  * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
  */
 export function schemas(connection){
+    console.log( 'Getting Athena Schemas');
     let columnnames = ['Table', 'column_name', 'data_type'];
     let rows = [];
 

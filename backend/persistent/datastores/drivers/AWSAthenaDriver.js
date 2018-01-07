@@ -12,20 +12,20 @@ const NUMBER_OF_RETRIES = 5;
  * @param {string} connection.region - AWS Region
  */
 export function createAthenaClient( connection ){
-    /*let connectionParams = {
+    let connectionParams = {
         accessKeyId: connection.accessKey,
         secretAccessKey: connection.secretAccessKey,
         region: connection.region,
         maxRetries: 5
-    }*/
+    }
 
-    let connectionParams = {
+    /*let connectionParams = {
         apiVersion: '2017-05-18',
         accessKeyId: credentials.accessKey,
         secretAccessKey: credentials.secretAccessKey,
         region: credentials.region,
         maxRetries: 5
-    }
+    }*/
     let athenaClient = new AWS.Athena( connectionParams );
 
     return athenaClient;
