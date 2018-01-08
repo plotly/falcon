@@ -168,6 +168,7 @@
     "json-loader": "^0.5.4",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
+    "nock": "^9.1.5",
     "node-fetch": "^1.7.2",
     "node-impala": "^2.0.4",
     "plotly.js": "^1.31.2",

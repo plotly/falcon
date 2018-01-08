@@ -14,7 +14,7 @@ function parseUrl(datasetUrl) {
 export function connect(connection) {
   const { owner, id } = parseUrl(connection.url);
   return new Promise((resolve, reject) => {
-    fetch(`https://api.data.world/v0/datasets/${owner}/${id}`, {
+    fetch(`https://api.data.world/v0/datasets/${owner}/${id}/`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${connection.token}`,
@@ -56,7 +56,7 @@ export function tables(connection) {
 export function schemas(connection) {
   return new Promise((resolve) => {
     query('SELECT * FROM TableColumns', connection).then((res) => {
-      const rows = res.rows.splice(1).map((table) => {
+      const rows = res.rows.map((table) => {
         const tableName = table[0];
         const columnName = table[3];
         // Extract the datatype from datatype url e.g. http://www.w3.org/2001/XMLSchema#integer

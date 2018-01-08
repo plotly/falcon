@@ -192,7 +192,7 @@ export const CONNECTION_CONFIG = {
             'label': 'Token',
             'value': 'token',
             'type': 'text',
-            'description': 'Your data.world token. Can be obtained from https://data.world/settings/advanced'
+            'description': 'Your data.world token. It can be obtained from https://data.world/settings/advanced'
         }
     ]
 };
