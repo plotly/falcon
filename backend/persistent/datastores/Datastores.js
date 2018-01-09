@@ -5,7 +5,7 @@ import * as ApacheDrill from './ApacheDrill';
 import * as IbmDb2 from './ibmdb2';
 import * as ApacheLivy from './livy';
 import * as ApacheImpala from './impala';
-import * as DataWorld from './DataWorld';
+import * as DataWorld from './dataworld';
 import * as DatastoreMock from './datastoremock';
 
 /*
