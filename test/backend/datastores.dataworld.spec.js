@@ -67,10 +67,8 @@ nock('https://api.data.world', {
 
 describe('Data World:', function () {
 
-    it('connect succeeds', function(done) {
-        connect(connection).then(() => {
-            done();
-        }).catch(done);
+    it('connect succeeds', function() {
+        return connect(connection);
     });
 
     it('tables returns list of tables', function(done) {
