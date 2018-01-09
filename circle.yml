@@ -3,8 +3,12 @@ jobs:
   build:
     docker:
       - image: circleci/node:6-browsers
+      - image: quay.io/plotly/falcon-test-spark
+      - image: quay.io/plotly/falcon-test-db2
     environment:
       PATH: "/usr/local/opt/curl/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/home/circleci/project/node_modules/.bin"
+      PLOTLY_CONNECTOR_IS_RUNNING_ON_CIRCLE_CI: "true"
+    working_directory: /home/circleci/falcon
     steps:
       - restore_cache:
           key: v1-source-{{ .Branch }}-{{ .Revision }}
