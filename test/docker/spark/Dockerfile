@@ -1,8 +1,11 @@
 FROM sequenceiq/hadoop-ubuntu:2.6.0
 
+# We are using 'sync' to separate chmod and script execution. See:
+# https://github.com/moby/moby/issues/9547 for details
+
 # Get latest java:
 COPY bin/setup_java.sh /setup_java.sh
-RUN chmod +x /setup_java.sh ; /setup_java.sh
+RUN chmod +x /setup_java.sh; sync; /setup_java.sh;
 ENV JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre
 
 # Get hive:
@@ -20,7 +23,7 @@ COPY conf/my.cnf /etc/
 
 # Install mysql as hive metastore
 COPY setup_mysql.sh /setup_mysql.sh
-RUN chmod +x /setup_mysql.sh && /setup_mysql.sh;
+RUN chmod +x /setup_mysql.sh; sync; /setup_mysql.sh;
 # RUN /hive/bin/schematool -dbType mysql -initSchema -verbose;
 
 # Install spark
@@ -39,7 +42,7 @@ COPY conf/* $SPARK_HOME/conf/
 COPY bin/* /bin/
 
 # Setup Livy
-RUN chmod +x /bin/setup_livy.sh; /bin/setup_livy.sh;
+RUN chmod +x /bin/setup_livy.sh; sync; /bin/setup_livy.sh;
 COPY conf/livy.conf /livy/conf/
 
 # Workaround for mysql
@@ -47,4 +50,4 @@ RUN echo "skip-grant-tables" | tee -a /etc/my.cnf && service mysql restart; exit
 
 EXPOSE 8998
 
-ENTRYPOINT /etc/bootstrap.sh && service mysql start && chmod +x /bin/setup_database.sh && /bin/setup_database.sh && /livy/bin/livy-server;
+ENTRYPOINT /etc/bootstrap.sh && service mysql start && chmod +x /bin/setup_database.sh && sync && /bin/setup_database.sh && /livy/bin/livy-server;
