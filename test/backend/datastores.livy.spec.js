@@ -7,6 +7,8 @@ import {
 } from '../../backend/persistent/datastores/Datastores.js';
 
 import {disconnect} from '../../backend/persistent/datastores/livy.js';
+import {getSetting} from '../../backend/settings.js';
+
 
 const connection = {
     dialect: DIALECTS.APACHE_SPARK,
@@ -21,6 +23,11 @@ const connection = {
 
     timeout: 120
 };
+
+// Circle CI uses test databases running locally on machine:
+if (getSetting('IS_RUNNING_ON_CIRCLE_CI')) {
+    connection.host = 'localhost';
+}
 
 // Suppressing ESLint cause Mocha ensures `this` is bound in test functions
 /* eslint-disable no-invalid-this */

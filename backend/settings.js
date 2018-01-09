@@ -59,7 +59,10 @@ const DEFAULT_SETTINGS = {
      * Generally set through the ENV variable:
      * PLOTLY_CONNECTOR_IS_RUNNING_INSIDE_ON_PREM
      */
-    IS_RUNNING_INSIDE_ON_PREM: false
+    IS_RUNNING_INSIDE_ON_PREM: false,
+
+    // Whether it is running in Circle CI environment
+    IS_RUNNING_ON_CIRCLE_CI: false
 };
 
 // Settings that depend on other settings are described here
