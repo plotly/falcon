@@ -71,15 +71,14 @@ describe('Data World:', function () {
         return connect(connection);
     });
 
-    it('tables returns list of tables', function(done) {
-        tables(connection).then(result => {
+    it('tables returns list of tables', function() {
+        return tables(connection).then(result => {
             assert.deepEqual(result, ['sampletable']);
-            done();
-        }).catch(done);
+        });
     });
 
-    it('query returns rows and column names', function(done) {
-        query('SELECT * FROM sampletable LIMIT 5', connection).then(result => {
+    it('query returns rows and column names', function() {
+        return query('SELECT * FROM sampletable LIMIT 5', connection).then(result => {
             assert.deepEqual(
                 result.columnnames,
                 [ 'stringcolumn', 'datecolumn', 'decimalcolumn' ]
@@ -91,13 +90,11 @@ describe('Data World:', function () {
                 [ 'Fourth column', '2017-05-27', 4 ],
                 [ 'Fifth column', '2017-05-28', 5 ]
             ]);
-
-            done();
-        }).catch(done);
+        });
     });
 
-    it('schemas returns table schemas', function(done) {
-        schemas(connection).then(result => {
+    it('schemas returns table schemas', function() {
+        return schemas(connection).then(result => {
             assert.deepEqual(
                 result.columnNames,
                 [ 'tablename', 'column_name', 'data_type' ]
@@ -107,8 +104,6 @@ describe('Data World:', function () {
                 [ 'sampletable', 'datecolumn', 'date' ],
                 [ 'sampletable', 'decimalcolumn', 'decimal' ]
             ]);
-
-            done();
-        }).catch(done);
+        });
     });
 });
