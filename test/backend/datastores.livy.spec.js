@@ -10,7 +10,7 @@ import {disconnect} from '../../backend/persistent/datastores/livy.js';
 
 const connection = {
     dialect: DIALECTS.APACHE_SPARK,
-    host: '104.154.141.189', // default: '127.0.0.1'
+    host: 'spark.test.plotly.host', // default: '127.0.0.1'
     port: 8998,
 
     database: 'plotly', // default: ''
