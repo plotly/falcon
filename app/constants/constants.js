@@ -189,10 +189,10 @@ export const CONNECTION_CONFIG = {
             'description': 'The URL of the dataset or project on data.world'
         },
         {
-            'label': 'Token',
+            'label': 'Read/Write API Token',
             'value': 'token',
-            'type': 'text',
-            'description': 'Your data.world token. It can be obtained from https://data.world/settings/advanced'
+            'type': 'password',
+            'description': 'Your data.world read/write token. It can be obtained from https://data.world/settings/advanced'
         }
     ]
 };
