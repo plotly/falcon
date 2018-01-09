@@ -37,7 +37,7 @@ export function connect(connection) {
 export function tables(connection) {
   return query('SELECT * FROM Tables', connection).then((res) => {
     const allTables = res.rows.map((table) => {
-      return table[0];
+      return table[0].replace(/-/g, '_');
     });
 
     return allTables;
@@ -51,7 +51,7 @@ export function tables(connection) {
 export function schemas(connection) {
   return query('SELECT * FROM TableColumns', connection).then((res) => {
     const rows = res.rows.map((table) => {
-      const tableName = table[0];
+      const tableName = table[0].replace(/-/g, '_');
       const columnName = table[3];
       // Extract the datatype from datatype url e.g. http://www.w3.org/2001/XMLSchema#integer
       const columnDataType = /#(.*)/.exec(table[6])[1];
@@ -76,8 +76,7 @@ export function schemas(connection) {
 
 export function query(queryString, connection) {
   const { owner, id } = parseUrl(connection.url);
-  const queryStatement = `${queryString.replace(/-/g, '_')}`;
-  const params = `${encodeURIComponent('query')}=${encodeURIComponent(queryStatement)}`;
+  const params = `${encodeURIComponent('query')}=${encodeURIComponent(queryString)}`;
 
   return fetch(`https://api.data.world/v0/sql/${owner}/${id}?includeTableSchema=true`, {
     method: 'POST',
