@@ -7,7 +7,7 @@ import {
     dataWorldQueryResponse,
     dataWorldColumnsResponse
 } from './utils.js';
-import {connect, tables, query, schemas} from '../../backend/persistent/datastores/DataWorld';
+import {connect, tables, query, schemas} from '../../backend/persistent/datastores/dataworld';
 
 // Mock dataset GET request
 nock('https://api.data.world/v0/datasets/falcon/test-dataset', {
