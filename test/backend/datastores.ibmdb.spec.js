@@ -17,7 +17,7 @@ const connection = {
 };
 
 // Circle CI uses test databases running locally on machine:
-if (getSetting('IS_RUNNING_ON_CIRCLE_CI')) {
+if (process.env.CIRCLECI) {
     connection.host = 'localhost';
 }
 
