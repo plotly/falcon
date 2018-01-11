@@ -15,7 +15,7 @@ Commands
 To Create GKE Cluster:
 
 ```sh
-gcloud container clusters create falcon-test-dbs  --zone us-central1-b --machine-type n1-standard-2 --num-nodes 2 --enable-autoupgrade
+gcloud container clusters create falcon-test-dbs  --zone us-central1-b --machine-type n1-standard-2 --num-nodes 3 --enable-autoupgrade
 ```
 
 To create deployments for test databases:
