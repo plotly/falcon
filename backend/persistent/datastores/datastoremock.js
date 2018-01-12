@@ -1,7 +1,29 @@
 /*
  * Mock functions return the hardcoded values without hitting any DB
  */
+import {has} from 'ramda';
 
+// Custom mocks to check edge cases in Workspace2.0 sql_panel:
+const mockResults = {
+    'SELECT 1+1 AS A, 1+2 AS B': {
+        'columnnames': ['A', 'B'],
+        'rows': [['2', '3']]
+    },
+    ['{"index":"test-mappings","type":"TABLE_A",' +
+    '"body":{"query":{"query_string":{"query":"*"}},' +
+    '"aggs":{"agg1":{"terms":{"size":5,"field":"COLUMN_A"},' +
+    '"aggs":{"agg2":{"sum":{"field":"COLUMN_B"}}}}}}}']: {
+        'columnnames': ['ES_CASE1_COL_A', 'ES_CASE1_COL_B'],
+        'rows': [['ES_CASE1_ROW1', 'ES_CASE1_ROW2']]
+    },
+    ['{"index":"test-mappings","type":"TABLE_A","body":' +
+    '{"query":{"query_string":{"query":"*"}},"aggs":' +
+    '{"agg1":{"range":{"ranges":[{"from":0,"to":1}],' +
+    '"field":"COLUMN_B"},"aggs":{"agg2":{"max":{"field":"COLUMN_C"}}}}}}}']: {
+        'columnnames': ['ES_CASE2_COL_A', 'ES_CASE2_COL_B'],
+        'rows': [['ES_CASE2_ROW1', 'ES_CASE2_ROW2']]
+    }
+}
 export function connect() {
   return new Promise();
 }
@@ -14,6 +36,8 @@ export function query(queryString) {
     return new Promise((resolve, reject) => {
         if (queryString === 'ERROR') {
             reject(new Error('Syntax Error in Query'));
+        } else if (has(queryString, mockResults)) {
+            resolve(mockResults[queryString])
         } else {
             resolve({
                 'columnnames': ['COLUMN_A', 'COLUMN_B', 'COLUMN_C'],
