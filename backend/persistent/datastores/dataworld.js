@@ -64,7 +64,7 @@ export function schemas(connection) {
     });
 
     return ({
-      columnNames: [ 'tablename', 'column_name', 'data_type' ],
+      columnnames: [ 'tablename', 'column_name', 'data_type' ],
       rows
     });
   })

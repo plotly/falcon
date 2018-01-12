@@ -96,7 +96,7 @@ describe('Data World:', function () {
     it('schemas returns table schemas', function() {
         return schemas(connection).then(result => {
             assert.deepEqual(
-                result.columnNames,
+                result.columnnames,
                 [ 'tablename', 'column_name', 'data_type' ]
             );
             assert.deepEqual(result.rows, [
