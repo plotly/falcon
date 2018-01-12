@@ -86,13 +86,13 @@ describe('Datastore Mock:', function () {
 
         // Check each case iteratively:
         map(key => {
-          promise = POST(`connections/${connectionId}/query`, {query: key})
-          .then(assertResponseStatus(200)).then(getResponseJson)
-          .then(json => {
-              assert.deepEqual(json.rows, mockResults[key].rows);
-              assert.deepEqual(json.columnnames, mockResults[key].columnnames);
-          });
-          promises.push(promise);
+            promise = POST(`connections/${connectionId}/query`, {query: key})
+            .then(assertResponseStatus(200)).then(getResponseJson)
+            .then(json => {
+                assert.deepEqual(json.rows, mockResults[key].rows);
+                assert.deepEqual(json.columnnames, mockResults[key].columnnames);
+            });
+            promises.push(promise);
         }, keys(mockResults));
 
         // All promises must resolve:
