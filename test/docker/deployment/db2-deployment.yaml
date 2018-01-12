@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: db2-node
+  name: db2-node
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        name: db2-node
+    spec:
+      containers:
+      - image: gcr.io/plotly-testing/falcon/test-db2
+        name: db2-node
+        ports:
+        - containerPort: 50000

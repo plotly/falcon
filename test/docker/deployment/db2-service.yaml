@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: db2-service
+  name: db2-service
+spec:
+  ports:
+  - protocol: TCP
+    port: 50000
+    targetPort: 50000
+  selector:
+    name: db2-node
+  type: LoadBalancer

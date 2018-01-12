@@ -292,7 +292,7 @@ export const sqliteConnection = {
 };
 export const apacheImpalaConnection = {
     dialect: 'apache impala',
-    host: '35.184.155.127',
+    host: 'impala.test.plotly.host',
     port: 21000,
     database: 'plotly'
 };

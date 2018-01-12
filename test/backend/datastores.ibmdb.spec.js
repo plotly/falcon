@@ -5,15 +5,21 @@ import {DIALECTS} from '../../app/constants/constants.js';
 import {
     query, connect, tables
 } from '../../backend/persistent/datastores/Datastores.js';
+import {getSetting} from '../../backend/settings.js';
 
 const connection = {
     dialect: DIALECTS.IBM_DB2,
     username: 'db2user1',
     password: 'w8wfy99DvEmgkBsE',
-    host: '35.184.35.183',
+    host: 'db2.test.plotly.host',
     port: 50000,
     database: 'plotly'
 };
+
+// Circle CI uses test databases running locally on machine:
+if (process.env.CIRCLECI) {
+    connection.host = 'localhost';
+}
 
 describe('IBM DB2:', function () {
     it('connect succeeds', function(done) {

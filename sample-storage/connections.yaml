@@ -85,7 +85,7 @@
     password: w8wfy99DvEmgkBsE
     database: plotly
     port: 50000
-    host: 35.184.35.183
+    host: db2.test.plotly.host
 
 -
     dialect: apache spark
@@ -93,7 +93,7 @@
     timeout: 180
     database: plotly
     port: 8998
-    host: 104.154.141.189
+    host: spark.test.plotly.host
 
 -
     dialect: apache impala
@@ -101,4 +101,4 @@
     timeout: 180
     database: plotly
     port: 21000
-    host: 35.184.155.127
+    host: impala.test.plotly.host

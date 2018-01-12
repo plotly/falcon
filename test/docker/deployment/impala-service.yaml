@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: impala-service
+  name: impala-service
+spec:
+  ports:
+  - protocol: TCP
+    port: 21000
+    targetPort: 21000
+  selector:
+    name: impala-node
+  type: LoadBalancer
