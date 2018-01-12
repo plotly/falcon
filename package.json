@@ -32,6 +32,7 @@
     "test-unit-oauth2": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/routes.oauth2.spec.js",
     "test-unit-scheduler": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/QueryScheduler.spec.js",
     "test-unit-routes": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/routes.spec.js",
+    "test-unit-mock": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/datastores.mock.spec.js",
     "pack": "cross-env NODE_ENV=production electron-builder --publish=never",
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
     "package-all": "yarn run package -- --all",
