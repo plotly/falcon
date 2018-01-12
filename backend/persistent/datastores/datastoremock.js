@@ -23,7 +23,8 @@ export const mockResults = {
         'columnnames': ['ES_CASE2_COL_A', 'ES_CASE2_COL_B'],
         'rows': [['ES_CASE2_ROW1', 'ES_CASE2_ROW2']]
     }
-}
+};
+
 export function connect() {
   return new Promise();
 }
@@ -37,7 +38,7 @@ export function query(queryString) {
         if (queryString === 'ERROR') {
             reject(new Error('Syntax Error in Query'));
         } else if (has(queryString, mockResults)) {
-            resolve(mockResults[queryString])
+            resolve(mockResults[queryString]);
         } else {
             resolve({
                 'columnnames': ['COLUMN_A', 'COLUMN_B', 'COLUMN_C'],
