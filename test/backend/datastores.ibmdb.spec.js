@@ -5,7 +5,6 @@ import {DIALECTS} from '../../app/constants/constants.js';
 import {
     query, connect, tables
 } from '../../backend/persistent/datastores/Datastores.js';
-import {getSetting} from '../../backend/settings.js';
 
 const connection = {
     dialect: DIALECTS.IBM_DB2,

@@ -7,8 +7,6 @@ import {
 } from '../../backend/persistent/datastores/Datastores.js';
 
 import {disconnect} from '../../backend/persistent/datastores/livy.js';
-import {getSetting} from '../../backend/settings.js';
-
 
 const connection = {
     dialect: DIALECTS.APACHE_SPARK,

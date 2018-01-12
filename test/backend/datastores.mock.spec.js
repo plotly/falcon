@@ -1,6 +1,7 @@
 import {assert} from 'chai';
-
+import {keys, map} from 'ramda';
 import {saveSetting} from '../../backend/settings.js';
+import {mockResults} from '../../backend/persistent/datastores/datastoremock.js';
 
 import {
     assertResponseStatus,
@@ -77,6 +78,26 @@ describe('Datastore Mock:', function () {
               error: {message: 'Syntax Error in Query'}
             });
         });
+    });
+
+    it('custom queries return custom results', function() {
+        const promises = [];
+        let promise = null;
+
+        // Check each case iteratively:
+        map(key => {
+            promise = POST(`connections/${connectionId}/query`, {query: key})
+            .then(assertResponseStatus(200)).then(getResponseJson)
+            .then(json => {
+                assert.deepEqual(json.rows, mockResults[key].rows);
+                assert.deepEqual(json.columnnames, mockResults[key].columnnames);
+            });
+            promises.push(promise);
+        }, keys(mockResults));
+
+        // All promises must resolve:
+        return Promise.all(promises);
+
     });
 
     it('S3 files endpoint returns hardcoded filenames', function() {
