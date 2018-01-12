@@ -4,6 +4,7 @@ import TreeView from 'react-treeview';
 import {isEmpty, has} from 'ramda';
 
 import {DIALECTS} from '../../../constants/constants';
+import {getPathNames} from '../../../utils/utils';
 
 const BASENAME_RE = /[^\\/]+$/;
 
@@ -24,6 +25,17 @@ class TableTree extends Component {
             dialect: PropTypes.string,
             storage: PropTypes.string
         })
+    }
+
+    getLabel(connectionObject) {
+        switch (connectionObject.dialect) {
+            case DIALECTS.SQLITE:
+              return BASENAME_RE.exec(connectionObject.storage)[0] || connectionObject.storage;
+            case DIALECTS.DATA_WORLD:
+              return getPathNames(connectionObject.url)[2];
+            default:
+              return connectionObject.database;
+        }
     }
 
     storeSchemaTree() {
@@ -84,9 +96,7 @@ class TableTree extends Component {
             return (<div className="loading">{'Updating'}</div>);
         }
 
-        const label = (this.props.connectionObject.dialect === DIALECTS.SQLITE) ?
-            BASENAME_RE.exec(this.props.connectionObject.storage)[0] || this.props.connectionObject.storage :
-            this.props.connectionObject.database;
+        const label = this.getLabel(this.props.connectionObject);
         const labelNode = <span className="node">{label}</span>;
 
         return (

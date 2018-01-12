@@ -14,7 +14,8 @@ export const DIALECTS = {
     IBM_DB2: 'ibm db2',
     APACHE_SPARK: 'apache spark',
     APACHE_IMPALA: 'apache impala',
-    APACHE_DRILL: 'apache drill'
+    APACHE_DRILL: 'apache drill',
+    DATA_WORLD: 'data.world'
 };
 
 export const SQL_DIALECTS_USING_EDITOR = [
@@ -26,7 +27,8 @@ export const SQL_DIALECTS_USING_EDITOR = [
     'sqlite',
     'ibm db2',
     'apache spark',
-    'apache impala'
+    'apache impala',
+    'data.world'
 ];
 
 const commonSqlOptions = [
@@ -178,7 +180,21 @@ export const CONNECTION_CONFIG = {
             'value': 'secretAccessKey',
             'type': 'password'
         }
-    ] // TODO - password options for apache drill
+    ], // TODO - password options for apache drill
+    [DIALECTS.DATA_WORLD]: [
+        {
+            'label': 'Dataset/Project URL',
+            'value': 'url',
+            'type': 'text',
+            'description': 'The URL of the dataset or project on data.world'
+        },
+        {
+            'label': 'Read/Write API Token',
+            'value': 'token',
+            'type': 'password',
+            'description': 'Your data.world read/write token. It can be obtained from https://data.world/settings/advanced'
+        }
+    ]
 };
 
 
@@ -194,7 +210,8 @@ export const LOGOS = {
     [DIALECTS.MSSQL]: 'images/mssql-logo.png',
     [DIALECTS.SQLITE]: 'images/sqlite-logo.png',
     [DIALECTS.S3]: 'images/s3-logo.png',
-    [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png'
+    [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png',
+    [DIALECTS.DATA_WORLD]: 'images/dataworld-logo.png'
 };
 
 export function PREVIEW_QUERY (dialect, table, database = '') {
@@ -207,6 +224,7 @@ export function PREVIEW_QUERY (dialect, table, database = '') {
         case DIALECTS.SQLITE:
         case DIALECTS.MARIADB:
         case DIALECTS.POSTGRES:
+        case DIALECTS.DATA_WORLD:
         case DIALECTS.REDSHIFT:
             return `SELECT * FROM ${table} LIMIT 1000`;
         case DIALECTS.MSSQL:
@@ -378,5 +396,8 @@ export const SAMPLE_DBS = {
     sqlite: {
         dialect: 'sqlite',
         storage: `${__dirname}/plotly_datasets.db`
+    },
+    [DIALECTS.DATA_WORLD]: {
+        url: 'https://data.world/rflprr/reported-lyme-disease-cases-by-state'
     }
 };

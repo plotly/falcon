@@ -5,6 +5,7 @@ import * as ApacheDrill from './ApacheDrill';
 import * as IbmDb2 from './ibmdb2';
 import * as ApacheLivy from './livy';
 import * as ApacheImpala from './impala';
+import * as DataWorld from './dataworld';
 import * as DatastoreMock from './datastoremock';
 
 /*
@@ -45,6 +46,8 @@ function getDatastoreClient(connection) {
         return ApacheImpala;
     } else if (dialect === 'ibm db2') {
         return IbmDb2;
+    } else if (dialect === 'data.world') {
+        return DataWorld;
     }
     return Sql;
 }
