@@ -50,7 +50,6 @@
   },
   "build": {
     "appId": "org.plotly.connector",
-    "asar": false,
     "productName": "Falcon SQL Client",
     "files": [
       "app",
@@ -60,7 +59,6 @@
     ],
     "linux": {
       "category": "Database",
-      "compression": "store",
       "desktop": {
         "Comment": "Free, open-source SQL client for Windows, Mac and Linux",
         "Exec": "falcon-sql-client",
@@ -86,6 +84,7 @@
       "icon": "app/icons/app.icns"
     },
     "win": {
+      "asar": false,
       "target": [
         "nsis"
       ],
