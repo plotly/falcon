@@ -4,7 +4,7 @@
 import {has} from 'ramda';
 
 // Custom mocks to check edge cases in Workspace2.0 sql_panel:
-const mockResults = {
+export const mockResults = {
     'SELECT 1+1 AS A, 1+2 AS B': {
         'columnnames': ['A', 'B'],
         'rows': [['2', '3']]
