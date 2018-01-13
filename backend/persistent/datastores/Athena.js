@@ -28,6 +28,7 @@ export function connect(connection) {
         region, accessKey, secretKey, dbName, sqlStatement, s3Outputlocation, queryTimeout
     } = connection;
 
+    /*
     //Validate that the connection has a 
     if( !region ){
         throw new Error(`The AWS Region was not defined`);
@@ -58,7 +59,7 @@ export function connect(connection) {
     }
     let con = {
         region, accessKey, secretKey, dbName, sqlStatement, s3Outputlocation, queryTimeout
-    };
+    };*/
 
     return new Promise(function(resolve, reject) {
         resolve( con );
@@ -120,7 +121,7 @@ export function schemas(connection){
     let columnnames = ['Table', 'column_name', 'data_type'];
     let rows = [];
 
-    connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.dbName}'` ;
+    /*connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.dbName}'` ;
     connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
     return new Promise(function(resolve, reject) {
         executeQuery( connection ).then( dataSet =>{
@@ -145,8 +146,8 @@ export function schemas(connection){
         }).catch( err =>{
             reject( err );
         });
-    });
-    /*for( let i=0; i< 4; i++){
+    });*/
+    for( let i=0; i< 4; i++){
 
         
         let r = [];
@@ -187,7 +188,7 @@ export function schemas(connection){
 
     return new Promise(function(resolve, reject) {
         resolve( {columnnames, rows} );
-    });*/
+    });
 }
 
 
@@ -203,7 +204,7 @@ export function schemas(connection){
  */
 export function tables(connection){
 
-    connection.sqlStatement = SHOW_TABLES_QUERY;
+    /*connection.sqlStatement = SHOW_TABLES_QUERY;
     connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
     return new Promise(function(resolve, reject) {
         executeQuery( connection ).then( dataSet =>{
@@ -221,5 +222,12 @@ export function tables(connection){
         }).catch( err =>{
             reject( err );
         });
+    });*/
+
+    let columnnames = [];
+    let rows = [];
+    return new Promise(function(resolve, reject) {
+        resolve( {columnnames, rows} );
     });
+
 }
