@@ -20,13 +20,13 @@ jobs:
           paths:
             - ".git"
       - restore_cache:
-          key: v1-yarn-{{ checksum "package.json" }}
+          key: v2-yarn-{{ checksum "yarn.lock" }}
           keys:
-            - v1-yarn-
+            - v2-yarn-
       - run: yarn install
       - run: yarn run rebuild:modules:electron
       - save_cache:
-          key: v1-yarn-{{ checksum "package.json" }}
+          key: v2-yarn-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
       - run: yarn run build
