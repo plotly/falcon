@@ -23,6 +23,8 @@ jobs:
           key: v2-yarn-{{ checksum "yarn.lock" }}
           keys:
             - v2-yarn-
+      - run: node --version
+      - run: yarn --version
       - run: yarn install
       - run: yarn run rebuild:modules:electron
       - save_cache:
