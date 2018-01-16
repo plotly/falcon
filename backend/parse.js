@@ -53,8 +53,6 @@ export function parseSQL(data) {
 
     // plotly workspace requires keys (columnnames, ncols, nrows, rows)
     // and they should be in this format
-    console.log( 'Returning column names', columnnames);
-    console.log( 'Returning rowss', rows);
     return {columnnames, rows};
 }
 

@@ -4,6 +4,9 @@ Note that this section targets contributors and those who wish to set up and run
 
 If you're interested in using the distributed App, [download the latest release.](https://github.com/plotly/falcon-sql-client/releases)
 
+## Prerequisites
+It is recommended to use node v6.12 with the latest electron-builder
+
 ## Install
 
 Start by cloning the repo via git:
@@ -125,3 +128,14 @@ $ yarn run test-e2e
 - Mac builds are created in TravisCI tests and automatically hosted on [amazon](https://s3.console.aws.amazon.com/s3/buckets/falcon-travis-artifacts/plotly/falcon-sql-client/?region=us-east-1&tab=overview). Select the latest build (largest number *note:* the folders are not necessarily sequential) -> release.zip
 
 Builds are uploaded to https://github.com/plotly/falcon-sql-client/releases.
+
+## Troubleshooting
+The Falcon Configuration information is installed in the users home directory.
+For example Unix and Mac (~/.plotly/connector).  If you have tried the install
+process and the app is still not running, this may be related to some corrupted 
+configuration files.  You can try removing the existing configuration files and then 
+restarting the build process
+
+```bash
+rm -rf ~/.plotly/connector/
+```

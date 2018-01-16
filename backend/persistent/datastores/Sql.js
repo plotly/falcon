@@ -127,7 +127,6 @@ export function query(queryString, connection) {
         queryString,
         {type: Sequelize.QueryTypes.SELECT}
     ).then(results => {
-        console.log( 'SQL Results', results);
         return parseSQL(results);
     });
 }
@@ -138,7 +137,6 @@ export function tables(connection) {
         {type: Sequelize.QueryTypes.SELECT}
     ).then(tableList => {
 
-        console.log( 'List of Tables', tableList);
         let tableNames;
 
         if (connection.dialect === 'postgres' || connection.dialect === 'redshift') {
@@ -164,7 +162,6 @@ export function tables(connection) {
             tableNames = tableList.map(object => values(object)[0]);
         }
 
-        console.log( 'SQL Table names', tableNames);
         return uniq(sort((a, b) => gt(a, b) ? 1 : -1, tableNames));
 
     });
