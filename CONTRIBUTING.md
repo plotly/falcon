@@ -130,8 +130,8 @@ $ yarn run test-e2e
 Builds are uploaded to https://github.com/plotly/falcon-sql-client/releases.
 
 ## Troubleshooting
-The Falcon Configuration information is installed in the users home directory.
-For example Unix and Mac (~/.plotly/connector).  If you have tried the install
+The Falcon Configuration information is installed in the user's home directory.
+For example Unix and Mac (~/.plotly/connector) and for Windows (%userprofile%\.plotly\connector\).  If you have tried the install
 process and the app is still not running, this may be related to some corrupted 
 configuration files.  You can try removing the existing configuration files and then 
 restarting the build process

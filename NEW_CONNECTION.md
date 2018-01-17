@@ -1,7 +1,8 @@
 # Add New Data Source
 
 ## Images
-It is recommended to add the images as png and a good idea to include.  
+The connector must provide an icon to be displayed on the selection tab and
+it is recommended to add the images as png format.  
 Please verify that the icon looks good with the following CSS specs:
 ```css
  max-width: 100px;
