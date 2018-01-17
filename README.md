@@ -1,9 +1,5 @@
 ![Falcon logo](https://github.com/plotly/falcon-sql-client/raw/master/static/images/falcon-logo-by-plotly-stripe.png)
 
-> 📢 Announcement!
-> Registration is open for a 2 day, Falcon, SQL, and Dashboards master class in Montreal, February 17-18.
-> Register online here [https://plotcon.plot.ly](https://plotcon.plot.ly) :level_slider:📈 🇨🇦
-
 Falcon in a free, open-source SQL editor with inline data visualization. It currently supports connecting to **RedShift**, **MySQL**, **PostgreSQL**, **IBM DB2**, **Impala**, **MS SQL**, and **SQLite**.
 
 Visit [plot.ly](https://plot.ly/free-sql-client-download) to learn more or visit the [Plotly forum](https://community.plot.ly/c/falcon-sql-client).

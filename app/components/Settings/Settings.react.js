@@ -199,7 +199,8 @@ class Settings extends Component {
                     DIALECTS.APACHE_SPARK,
                     DIALECTS.IBM_DB2,
                     DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
-                    DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE
+                    DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE,
+                    DIALECTS.DATA_WORLD
         ])) {
             if (connectRequest.status === 200 && !tablesRequest.status) {
                 this.setState({editMode: false});
@@ -363,6 +364,7 @@ class Settings extends Component {
                                             schemaRequest={schemaRequest}
                                             runSqlQuery={runSqlQuery}
                                             queryRequest={queryRequest || {}}
+                                            username={username}
                                         />
                                     </div>
                                 </SplitPane>

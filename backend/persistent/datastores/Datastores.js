@@ -5,6 +5,8 @@ import * as ApacheDrill from './ApacheDrill';
 import * as IbmDb2 from './ibmdb2';
 import * as ApacheLivy from './livy';
 import * as ApacheImpala from './impala';
+import * as DataWorld from './dataworld';
+import * as DatastoreMock from './datastoremock';
 
 /*
  * Switchboard to all of the different types of connections
@@ -26,6 +28,11 @@ import * as ApacheImpala from './impala';
  */
 
 function getDatastoreClient(connection) {
+    // handle test mode:
+    if (connection.mock) {
+        return DatastoreMock;
+    }
+
     const {dialect} = connection;
     if (dialect === 'elasticsearch') {
         return Elasticsearch;
@@ -39,6 +46,8 @@ function getDatastoreClient(connection) {
         return ApacheImpala;
     } else if (dialect === 'ibm db2') {
         return IbmDb2;
+    } else if (dialect === 'data.world') {
+        return DataWorld;
     }
     return Sql;
 }

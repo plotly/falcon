@@ -126,7 +126,8 @@ class Login extends Component {
     }
     buildOauthUrl() {
         const {domain} = this.state;
-        const oauthClientId = 'isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt';
+        /* global PLOTLY_ENV */
+        const oauthClientId = PLOTLY_ENV.OAUTH2_CLIENT_ID;
 
         const redirect_uri = baseUrlWrapped;
         return (

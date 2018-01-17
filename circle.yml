@@ -3,8 +3,11 @@ jobs:
   build:
     docker:
       - image: circleci/node:6-browsers
+      - image: quay.io/plotly/falcon-test-spark
+      - image: quay.io/plotly/falcon-test-db2
     environment:
       PATH: "/usr/local/opt/curl/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/home/circleci/project/node_modules/.bin"
+    working_directory: /home/circleci/falcon
     steps:
       - restore_cache:
           key: v1-source-{{ .Branch }}-{{ .Revision }}
@@ -17,13 +20,15 @@ jobs:
           paths:
             - ".git"
       - restore_cache:
-          key: v1-yarn-{{ checksum "package.json" }}
+          key: v2-yarn-{{ checksum "yarn.lock" }}
           keys:
-            - v1-yarn-
+            - v2-yarn-
+      - run: node --version
+      - run: yarn --version
       - run: yarn install
       - run: yarn run rebuild:modules:electron
       - save_cache:
-          key: v1-yarn-{{ checksum "package.json" }}
+          key: v2-yarn-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
       - run: yarn run build

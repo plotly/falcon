@@ -292,9 +292,13 @@ export const sqliteConnection = {
 };
 export const apacheImpalaConnection = {
     dialect: 'apache impala',
-    host: '35.184.155.127',
+    host: 'impala.test.plotly.host',
     port: 21000,
     database: 'plotly'
+};
+export const dataWorldConnection = {
+    url: 'https://data.world/falcon/test-dataset',
+    token: 'token'
 };
 
 // TODO - Add sqlite here
@@ -601,4 +605,189 @@ export const apacheDrillStorage = [
       }
     }
   }
+];
+
+export const dataWorldTablesResponse = [
+    {
+        'fields': [
+            {
+                'name': 'tableId',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'tableName',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'tableTitle',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'tableDescription',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'owner',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'dataset',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            }
+        ]
+    },
+    {
+        'tableId': 'sampletable',
+        'tableName': 'sampletable',
+        'tableTitle': 'sampletable',
+        'tableDescription': null,
+        'owner': 'falcon',
+        'dataset': 'sample-dataset'
+    }
+];
+
+export const dataWorldQueryResponse = [
+    {
+        'fields': [
+            {
+                'name': 'stringcolumn',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'datecolumn',
+                'type': 'date',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#date'
+            },
+            {
+                'name': 'decimalcolumn',
+                'type': 'decimal',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#decimal'
+            }
+        ]
+    },
+    {
+        'stringcolumn': 'First column',
+        'datecolumn': '2017-05-24',
+        'decimalcolumn': 1
+    },
+    {
+        'stringcolumn': 'Second column',
+        'datecolumn': '2017-05-25',
+        'decimalcolumn': 2
+    },
+    {
+        'stringcolumn': 'Third column',
+        'datecolumn': '2017-05-26',
+        'decimalcolumn': 3
+    },
+    {
+        'stringcolumn': 'Fourth column',
+        'datecolumn': '2017-05-27',
+        'decimalcolumn': 4
+    },
+    {
+        'stringcolumn': 'Fifth column',
+        'datecolumn': '2017-05-28',
+        'decimalcolumn': 5
+    }
+];
+
+export const dataWorldColumnsResponse = [
+    {
+        'fields': [
+            {
+                'name': 'tableId',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'tableName',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'columnIndex',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'columnName',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'columnTitle',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'columnDescription',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'columnDatatype',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'columnNullable',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'owner',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            },
+            {
+                'name': 'dataset',
+                'type': 'string',
+                'rdfType': 'http://www.w3.org/2001/XMLSchema#string'
+            }
+        ]
+    },
+    {
+        'tableId': 'sampletable',
+        'tableName': 'sampletable',
+        'columnIndex': 1,
+        'columnName': 'stringcolumn',
+        'columnTitle': 'stringcolumn',
+        'columnDescription': null,
+        'columnDatatype': 'http://www.w3.org/2001/XMLSchema#string',
+        'columnNullable': false,
+        'owner': 'falcon',
+        'dataset': 'test-dataset'
+    },
+    {
+        'tableId': 'sampletable',
+        'tableName': 'sampletable',
+        'columnIndex': 2,
+        'columnName': 'datecolumn',
+        'columnTitle': 'datecolumn',
+        'columnDescription': null,
+        'columnDatatype': 'http://www.w3.org/2001/XMLSchema#date',
+        'columnNullable': false,
+        'owner': 'falcon',
+        'dataset': 'test-dataset'
+    },
+    {
+        'tableId': 'sampletable',
+        'tableName': 'sampletable',
+        'columnIndex': 3,
+        'columnName': 'decimalcolumn',
+        'columnTitle': 'decimalcolumn',
+        'columnDescription': null,
+        'columnDatatype': 'http://www.w3.org/2001/XMLSchema#decimal',
+        'columnNullable': false,
+        'owner': 'falcon',
+        'dataset': 'test-dataset'
+    }
 ];

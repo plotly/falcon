@@ -49,3 +49,11 @@ export function homeUrl() {
         '/external-data-connector' :
         '';
 }
+
+export function getPathNames(url) {
+    const parser = document.createElement('a');
+    parser.href = url;
+    const pathNames = parser.pathname.split('/');
+
+    return pathNames;
+}

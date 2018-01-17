@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: spark-node
+  name: spark-node
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        name: spark-node
+    spec:
+      containers:
+      - image: gcr.io/plotly-testing/falcon/test-spark
+        name: spark-node
+        ports:
+        - containerPort: 8998
