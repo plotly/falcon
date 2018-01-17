@@ -9,7 +9,7 @@ Please verify that the icon looks good with the following CSS specs:
 ```
 
 ## Updating the constants.js file
-The following are the instructions for adding the Constants File:
+The following are the instructions for updating the Constants File:
 1. Add an entry in DIALECTS
 2. Add an entry in SQL_DIALECTS_USING_EDITOR
 3. Add an entry under CONNECTION_CONFIG
@@ -18,7 +18,7 @@ The following are the instructions for adding the Constants File:
 6. Add sample credentials for your connector in the SAMPLE_DBS 
 
 ## Updating the Tab.react.js 
-The following are the instructions for adding the Tab React JS file
+The following are the instructions for updating the Tab React JS file
 1. Customise the label for your connector in the render function:
 
 ```javascript
@@ -34,7 +34,7 @@ The following are the instructions for adding the Tab React JS file
 
 ## Updating the Settings.react.js
 Update the fetchData function to make the calls to appropriate sessions.js backend.  
-Add your new connectino to the following list:
+Add your new connection to the following list:
 
 ```javascript
     if (contains(connectionObject.dialect, [
