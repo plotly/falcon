@@ -148,48 +148,6 @@ export function schemas(connection){
             reject( err );
         });
     });
-    /*for( let i=0; i< 4; i++){
-
-        
-        let r = [];
-        r.push('Test');
-        r.push(`first_name_${i}`);
-        r.push(`varchar`);
-
-        rows.push(r);
-    }
-
-    let rowData = [];
-    rowData.push('Test');
-    rowData.push( 'value');
-    rowData.push('integer');
-
-    rows.push( rowData );
-
-
-    for( let i=0; i< 2; i++){
-
-        
-        let r = [];
-        r.push('Sample');
-        r.push(`last_name_${i}`);
-        r.push(`varchar`);
-
-        rows.push(r);
-    }
-
-    rowData = [];
-    rowData.push('Sample');
-    rowData.push( 'value');
-    rowData.push('integer');
-
-    rows.push( rowData );
-
-
-
-    return new Promise(function(resolve, reject) {
-        resolve( {columnnames, rows} );
-    });*/
 }
 
 
