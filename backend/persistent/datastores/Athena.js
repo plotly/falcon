@@ -11,6 +11,8 @@ const DEFAULT_QUERY_TIMEOUT = 5000;
 
 
 
+
+
 /*
  * The connection object will open a connection to the Athena database
  * @param {object} connection

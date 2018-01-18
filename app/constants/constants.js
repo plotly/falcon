@@ -182,11 +182,6 @@ export const CONNECTION_CONFIG = {
         }
     ], // TODO - password options for apache drill
 
-    /**
-     * accessKeyId: 'xxxx',
-    secretAccessKey: 'xxxx',
-    region: 'xxxx',
-     */
     [DIALECTS.ATHENA]: [
         {
             'label': 'S3 Access Key','value': 'accessKey','type': 'password'
@@ -198,21 +193,18 @@ export const CONNECTION_CONFIG = {
             'label': 'AWS Region','value': 'region','type': 'text'
         },
         {
-            'label': 'S3 Bucket',
-            'value': 'bucket',
-            'type': 'text',
-            'description': `
-                The Athena will put the output results of the query in this location.`
+            'label': 'S3 Bucket','value': 's3Outputlocation','type': 'text',
+            'description': `The Athena will put the output results of the query in this location.`
         },
         {
-            'label': 'Database','value': 'database','type': 'text'
+            'label': 'Database','value': 'dbName','type': 'text'
         },
         {
-            'label': 'Athena SQL Query',
-            'value': 'query',
-            'type': 'text',
-            'description': `
-                The SQL Query that will be executed against Athena.`
+            'label': 'Query Timeout','value': 'queryTimeout','type': 'number'
+        },
+        {
+            'label': 'Athena SQL Query','value': 'sqlStatement','type': 'text',
+            'description': `The SQL Query that will be executed against Athena.`
         }
     ]
 };
