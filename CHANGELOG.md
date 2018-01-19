@@ -20,6 +20,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 
+## [2.5.0] - 2018-01-19
+
+### Added
+* Connector for https://data.world
+
+### Changed
+* test: implemented mock connectors
+* test: updated DB2, Impala and Spark sample servers
+* Enabled asar in the installers for Mac and Linux
+
+### Deprecated
+* test: DB2 and Spark sample servers will be turned off in the near future.
+  Please, instead, use the docker containers:
+  - quay.io/plotly/falcon-test-db2
+  - quay.io/plotly/falcon-test-spark
+
+
 ## [2.4.0] - 2017-12-15
 
 ### Added
