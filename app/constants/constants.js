@@ -315,14 +315,14 @@ export const SAMPLE_DBS = {
         timeout: 180,
         database: 'plotly',
         port: 21000,
-        host: '35.184.155.127',
+        host: 'impala.test.plotly.host',
         dialect: DIALECTS.APACHE_IMPALA
     },
     [DIALECTS.APACHE_SPARK]: {
         timeout: 180,
         database: 'plotly',
         port: 8998,
-        host: '104.154.141.189',
+        host: 'spark.test.plotly.host',
         dialect: DIALECTS.APACHE_SPARK
     },
     [DIALECTS.IBM_DB2]: {
@@ -330,10 +330,10 @@ export const SAMPLE_DBS = {
         password: 'w8wfy99DvEmgkBsE',
         database: 'plotly',
         port: 50000,
-        host: '35.184.35.183',
+        host: 'db2.test.plotly.host',
         dialect: DIALECTS.IBM_DB2
     },
-    postgres: {
+    [DIALECTS.POSTGRES]: {
         username: 'masteruser',
         password: 'connecttoplotly',
         database: 'plotly_datasets',
@@ -341,7 +341,7 @@ export const SAMPLE_DBS = {
         host: 'readonly-test-postgres.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
         dialect: 'postgres'
     },
-    mysql: {
+    [DIALECTS.MYSQL]: {
         dialect: 'mysql',
         username: 'masteruser',
         password: 'connecttoplotly',
@@ -349,7 +349,7 @@ export const SAMPLE_DBS = {
         port: 3306,
         database: 'plotly_datasets'
     },
-    mariadb: {
+    [DIALECTS.MARIADB]: {
         dialect: 'mariadb',
         username: 'masteruser',
         password: 'connecttoplotly',
@@ -357,7 +357,7 @@ export const SAMPLE_DBS = {
         port: 3306,
         database: 'plotly_datasets'
     },
-    redshift: {
+    [DIALECTS.REDSHIFT]: {
         dialect: 'redshift',
         username: 'plotly',
         password: 'Qmbdf#3DU]pP8a=CKTK}',
@@ -365,7 +365,7 @@ export const SAMPLE_DBS = {
         port: 5439,
         database: 'plotly_datasets'
     },
-    mssql: {
+    [DIALECTS.MSSQL]: {
         dialect: 'mssql',
         username: 'masteruser',
         password: 'connecttoplotly',
@@ -373,18 +373,18 @@ export const SAMPLE_DBS = {
         port: 1433,
         database: 'plotly_datasets'
     },
-    elasticsearch: {
+    [DIALECTS.ELASTICSEARCH]: {
         dialect: 'elasticsearch',
         host: 'https://67a7441549120daa2dbeef8ac4f5bb2e.us-east-1.aws.found.io',
         port: '9243'
     },
-    s3: {
+    [DIALECTS.S3]: {
         dialect: 's3',
         bucket: 'plotly-s3-connector-test',
         accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
         secretAccessKey: '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'
     },
-    'apache drill': {
+    [DIALECTS.APACHE_DRILL]: {
         dialect: 'apache drill',
         host: 'http://ec2-35-164-71-216.us-west-2.compute.amazonaws.com',
         port: 8047,
@@ -393,7 +393,7 @@ export const SAMPLE_DBS = {
         accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
         secretAccessKey: 'Urvus4R7MnJOAqT4U3eovlCBimQ4Zg2Y9sV5LWow'
     },
-    sqlite: {
+    [DIALECTS.SQLITE]: {
         dialect: 'sqlite',
         storage: `${__dirname}/plotly_datasets.db`
     },
