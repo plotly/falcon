@@ -80,29 +80,34 @@ export function query(queryObject, connection){
     return new Promise(function(resolve, reject) {
         executeQuery( connection ).then( dataSet =>{
 
-            console.log('sql',dataSet );
             let rows = [];
+            let numberOfColumns = 0;
             if( dataSet && dataSet.length > 0){
-                let cols = dataSet[0].Data
-                console.log( 'Columns?', dataSet[0].Data)
-                console.log( 'Columns?', dataSet[0].Data)
 
-                for (let j = 0; j< cols.length; j++ ){
+                //First column contains the column names
+                let cols = dataSet[0].Data
+                numberOfColumns = cols.length;
+                for (let j = 0; j< numberOfColumns; j++ ){
                     columnnames.push( cols[j].VarCharValue );
-                    console.log( 'Column Name', cols[j].VarCharValue);
                 }
 
+                //Loop through the remaining rows to extract data
                 for( let i=1; i< dataSet.length; i++){
-                    let data = dataSet[i];
+                    let row = dataSet[i];
+                    //Ensure Row is defined and has expected number of columns
+                    if( row && row.Data && row.Data.length === numberOfColumns ){
+                        let r = [];
 
-                    if( data && data.Data && data.Data.length > 0 ){
-                        if( i != 0){
-                            let row = [];
-                            row.push( data.Data[0].VarCharValue ); //Table Name
-                            row.push( data.Data[1].VarCharValue ); //Column Name
-                            row.push( data.Data[2].VarCharValue ); //DataType
-                            rows.push( row );
-                        }   
+                        //Extract each element from the row
+                        row.Data.map( element =>{
+                            if( element && element.VarCharValue ){
+                                r.push( element.VarCharValue);
+                            }else{
+                                //Put empty results if element has no value
+                                r.push( '' );
+                            }
+                        } )
+                        rows.push( r );
                     }
                 }
             }
