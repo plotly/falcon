@@ -47,10 +47,6 @@ export function connect(connection) {
         throw new Error(`The Database Name was not defined`);
     }
 
-    if( !sqlStatement ){
-        throw new Error(`The SQL Statement was not defined`);
-    }
-
     if( !s3Outputlocation ){
         throw new Error(`The Athena S3 Results Output location was not defined`);
     }
@@ -182,11 +178,4 @@ export function tables(connection){
             reject( err );
         });
     });
-
-    /*let columnnames = [];
-    let rows = [];
-    return new Promise(function(resolve, reject) {
-        resolve( {columnnames, rows} );
-    });*/
-
 }

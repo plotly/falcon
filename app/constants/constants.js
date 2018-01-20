@@ -200,9 +200,6 @@ export const CONNECTION_CONFIG = {
             'label': 'Database','value': 'dbName','type': 'text'
         },
         {
-            'label': 'Query Timeout','value': 'queryTimeout','type': 'number'
-        },
-        {
             'label': 'Athena SQL Query','value': 'sqlStatement','type': 'text',
             'description': `The SQL Query that will be executed against Athena.`
         }
