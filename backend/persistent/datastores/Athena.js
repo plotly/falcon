@@ -4,6 +4,8 @@ import {executeQuery} from './drivers/AWSAthenaDriver';
 const SHOW_TABLES_QUERY = `SHOW TABLES`;
 const SHOW_SCHEMA_QUERY = `SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema `;
 const DEFAULT_QUERY_TIMEOUT = 2000;
+const SHOW_DATABASE_QUERY = `SHOW DATABASES`;
+
 
 //TODO
 // 2. Get the list of schemas
@@ -70,20 +72,12 @@ export function connect(connection) {
  * @param {object} connection 
  */
 export function query(queryObject, connection){
-    //console.log( 'Athena Query Conn', connection);
-    //console.log( 'Athena Query Obj', queryObject);
-
-    let columnnames = [];
-    let rows = [];
+    let columnnames = [], rows = [], numberOfColumns = 0;
 
     connection.sqlStatement = queryObject;
     return new Promise(function(resolve, reject) {
         executeQuery( connection ).then( dataSet =>{
-
-            let rows = [];
-            let numberOfColumns = 0;
             if( dataSet && dataSet.length > 0){
-
                 //First column contains the column names
                 let cols = dataSet[0].Data
                 numberOfColumns = cols.length;
@@ -116,37 +110,43 @@ export function query(queryObject, connection){
             reject( err );
         });
     });
+}
 
-    /*let results = [];
+/**
+ * Should return a list of databases
+ * @param {object} connection 
+ * @param {string} connection.accessKey - AWS Access Key
+ * @param {string} connection.secretAccessKey - AWS Secret Key
+ * @param {string} connection.region - AWS Region
+ * @param {string} connection.region - AWS Region
+ * @param {string} connection.dbName - Database name to connect to 
+ * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
+ * @returns {Array} - returns an array of the database names in the system
+ */
+function getDatabases( connection ){
 
-    for( let i=0; i< 20; i++){
-
-        let r = {};
-        if( i % 2 === 0){
-            r.first_name_0  = 'John';
-            r.value = i;
-            results.push( r );
-        }else{
-            r.first_name_0  = 'Joan';
-            r.value = i;
-            results.push( r );
-        }
-    }
-
-    console.log( 'Returning results to query');
-    let columnnames = ['first_name_0', 'value'];
+    connection.sqlStatement = SHOW_DATABASE_QUERY;
+    connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
     return new Promise(function(resolve, reject) {
+        executeQuery( connection ).then( dataSet =>{
+            let rows = [];
+            if( dataSet && dataSet.length > 0){
+                for( let i=0; i< dataSet.length; i++){
+                    let data = dataSet[i];
 
-        
-        resolve( parseSQL( results ) );
-    });*/
+                    if( data && data.Data && data.Data.length > 0 ){
+                        rows.push( data.Data[0].VarCharValue ); //Database Name
+                    }
+                }
+            }
+            resolve( rows );
+        }).catch( err =>{
+            reject( err );
+        });
+    });
 }
 
 
-/**
- * Should return a list of databases that are defined within the database.
- * @param {object} connection 
- */
 /**
  * Should return a list of tables and their that are defined within the database.
  * @param {object} connection 
@@ -161,11 +161,18 @@ export function schemas(connection){
     let columnnames = ['Table', 'column_name', 'data_type'];
     let rows = [];
 
-    connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.dbName}'` ;
-    connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
-    return new Promise(function(resolve, reject) {
-        executeQuery( connection ).then( dataSet =>{
 
+    return new Promise(function(resolve, reject) {
+        console.log( 'Start getting databases');
+        return getDatabases( connection ).then( dbNames =>{
+            console.log( 'Calling Get Database Names', dbNames);
+            connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.dbName}'` ;
+            connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
+
+            //TODO Implement a Promise All where pass in DB name
+            return  executeQuery( connection )
+        }).then( dataSet =>{
+            console.log( 'Calling execute Query');
             let rows = [];
             if( dataSet && dataSet.length > 0){
                 for( let i=0; i< dataSet.length; i++){
@@ -184,6 +191,7 @@ export function schemas(connection){
             }
             resolve( {columnnames, rows} );
         }).catch( err =>{
+            console.log( 'Unexpected error', err);
             reject( err );
         });
     });
