@@ -3,7 +3,7 @@ import {executeQuery} from './drivers/AWSAthenaDriver';
 
 const SHOW_TABLES_QUERY = `SHOW TABLES`;
 const SHOW_SCHEMA_QUERY = `SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema `;
-const DEFAULT_QUERY_TIMEOUT = 5000;
+const DEFAULT_QUERY_TIMEOUT = 2000;
 
 //TODO
 // 2. Get the list of schemas
@@ -70,11 +70,49 @@ export function connect(connection) {
  * @param {object} connection 
  */
 export function query(queryObject, connection){
-    console.log( 'Athena Query Conn', connection);
-    console.log( 'Athena Query Obj', queryObject);
+    //console.log( 'Athena Query Conn', connection);
+    //console.log( 'Athena Query Obj', queryObject);
 
+    let columnnames = [];
+    let rows = [];
 
-    let results = [];
+    connection.sqlStatement = queryObject;
+    return new Promise(function(resolve, reject) {
+        executeQuery( connection ).then( dataSet =>{
+
+            console.log('sql',dataSet );
+            let rows = [];
+            if( dataSet && dataSet.length > 0){
+                let cols = dataSet[0].Data
+                console.log( 'Columns?', dataSet[0].Data)
+                console.log( 'Columns?', dataSet[0].Data)
+
+                for (let j = 0; j< cols.length; j++ ){
+                    columnnames.push( cols[j].VarCharValue );
+                    console.log( 'Column Name', cols[j].VarCharValue);
+                }
+
+                for( let i=1; i< dataSet.length; i++){
+                    let data = dataSet[i];
+
+                    if( data && data.Data && data.Data.length > 0 ){
+                        if( i != 0){
+                            let row = [];
+                            row.push( data.Data[0].VarCharValue ); //Table Name
+                            row.push( data.Data[1].VarCharValue ); //Column Name
+                            row.push( data.Data[2].VarCharValue ); //DataType
+                            rows.push( row );
+                        }   
+                    }
+                }
+            }
+            resolve( {columnnames, rows} );
+        }).catch( err =>{
+            reject( err );
+        });
+    });
+
+    /*let results = [];
 
     for( let i=0; i< 20; i++){
 
@@ -96,7 +134,7 @@ export function query(queryObject, connection){
 
         
         resolve( parseSQL( results ) );
-    });
+    });*/
 }
 
 

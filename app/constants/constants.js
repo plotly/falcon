@@ -200,8 +200,8 @@ export const CONNECTION_CONFIG = {
             'label': 'Database','value': 'dbName','type': 'text'
         },
         {
-            'label': 'Athena SQL Query','value': 'sqlStatement','type': 'text',
-            'description': `The SQL Query that will be executed against Athena.`
+            'label': 'S3 Bucket','value': 'queryTimeout','type': 'text',
+            'description': `The maximum duration (In Milliseconds) that an SQL query can execute for.`
         }
     ]
 };
@@ -407,10 +407,11 @@ export const SAMPLE_DBS = {
         storage: `${__dirname}/plotly_datasets.db`
     },
     [DIALECTS.ATHENA]: {
-        bucket: 'plotly-s3-connector-test',
-        accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
-        secretAccessKey: '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',
+        s3Outputlocation: 'plotly-s3-connector-test',
+        accessKey: 'AKIAIMHMSHTGARJYSKMQ',
+        secretKey: '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',
         region:'us-west-2',
-        database:'default'
+        dbName:'default',
+        queryTimeout: 5000
     },
 };
