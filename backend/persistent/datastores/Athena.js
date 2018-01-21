@@ -123,7 +123,7 @@ export function query(queryObject, connection){
  * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
  * @returns {Array} - returns an array of the database names in the system
  */
-function getDatabases( connection ){
+/*function getDatabases( connection ){
 
     connection.sqlStatement = SHOW_DATABASE_QUERY;
     connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
@@ -144,7 +144,7 @@ function getDatabases( connection ){
             reject( err );
         });
     });
-}
+}*/
 
 /**
  * Should return a list of databases
@@ -157,7 +157,7 @@ function getDatabases( connection ){
  * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
  * @returns {Array} - returns an array of the table names, columns and types
  */
-function getDatabaseSchema( connection, database ){
+/*function getDatabaseSchema( connection, database ){
     let columnnames = ['Table', 'column_name', 'data_type'];
     let rows = [];
 
@@ -189,7 +189,7 @@ function getDatabaseSchema( connection, database ){
             reject( err );
         });
     });
-}
+}*/
 
 
 /**
@@ -206,80 +206,29 @@ export function schemas(connection){
     let columnnames = ['Table', 'column_name', 'data_type'];
     let rows = [];
 
-
+    connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.database}'` ;
+    connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
     return new Promise(function(resolve, reject) {
+        executeQuery( connection ).then( dataSet =>{
 
-        let res = resolve;
-        console.log( 'Start getting databases');
-        return getDatabases( connection ).then( dbNames =>{
-            let r = res;
-            console.log( 'Calling Get Database Names', dbNames);
-            let queryPromises = [];
-            
-            for( let j = 0; j < dbNames.length; j++ ){
-                queryPromises.push( getDatabaseSchema( connection, dbNames[j]));
-            }
+            let rows = [];
+            if( dataSet && dataSet.length > 0){
+                for( let i=0; i< dataSet.length; i++){
+                    let data = dataSet[i];
 
-            return Promise.all( queryPromises ).then ( queryRst =>{
-                //console.log( 'Resolved all promies', queryRst);
-                let sch = [];
-
-                if( queryRst && queryRst.length > 0 ){
-                    //console.log( 'Looking through result');
-                    for( let i=0; i< queryRst.length; i++ ){
-                        //console.log( 'First table result', queryRst[i].rows);
-
-                        sch.push( ...queryRst[i].rows);
+                    if( data && data.Data && data.Data.length > 0 ){
+                        if( i != 0){
+                            let row = [];
+                            row.push( data.Data[0].VarCharValue ); //Table Name
+                            row.push( data.Data[1].VarCharValue ); //Column Name
+                            row.push( data.Data[2].VarCharValue ); //DataType
+                            rows.push( row );
+                        }   
                     }
                 }
-
-                console.log( 'Table names', sch);
-                console.log( '')
-
-                //let rows = [];
-
-                for( let i=0; i< 4; i++){
-
-                    
-                    let r = [];
-                    r.push('Test');
-                    r.push(`first_name_${i}`);
-                    r.push(`varchar`);
-
-                    rows.push(r);
-                }
-
-                let rowData = [];
-                rowData.push('Test');
-                rowData.push( 'value');
-                rowData.push('integer');
-
-                rows.push( rowData );
-
-
-                for( let i=0; i< 2; i++){
-
-                    
-                    let r = [];
-                    r.push('Sample');
-                    r.push(`last_name_${i}`);
-                    r.push(`varchar`);
-
-                    rows.push(r);
-                }
-
-                rowData = [];
-                rowData.push('Sample');
-                rowData.push( 'value');
-                rowData.push('integer');
-
-                rows.push( rowData );
-                //return r( {columnnames, sch} );
-                return resolve( {columnnames, rows});
-            });
-
+            }
+            resolve( {columnnames, rows} );
         }).catch( err =>{
-            console.log( 'Unexpected error', err);
             reject( err );
         });
     });

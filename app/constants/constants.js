@@ -200,7 +200,7 @@ export const CONNECTION_CONFIG = {
             'label': 'Database','value': 'database','type': 'text'
         },
         {
-            'label': 'Athena QueryTimeout','value': 'queryTimeout','type': 'text',
+            'label': 'Athena QueryTimeout','value': 'queryTimeout','type': 'number',
             'description': `The maximum duration (In Milliseconds) that an SQL query can execute for.`
         }
     ]
