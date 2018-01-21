@@ -53,7 +53,7 @@ export function startQuery( athenaClient, params ){
           }
         },
         QueryExecutionContext: {
-          Database: params.dbName
+          Database: params.database
         }
     };
     return new Promise(function(resolve, reject) {
@@ -205,8 +205,12 @@ export function executeQuery( queryParams ){
                                 return resolve( [] );
                             }
                         });
+                    }else if( retryCount > NUMBER_OF_RETRIES){
+                        console.log( `Timeout ${retryCount}`);
+                        return reject(`Timeout.  Athena did not respond before the query timeout.`);
                     }else{
                         //Loop again
+                        console.log( `Loop through another time ${retryCount}`);
                         return setTimeout( checkQueryStatus, retryInterval );
                     }
                 }).catch( err =>{

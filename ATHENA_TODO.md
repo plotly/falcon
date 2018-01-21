@@ -1,13 +1,11 @@
 1. Remove file before merging back into Master
-
-2a. Athena Preview Query is failing
-2. Put back Database name.  Makes it easier to workwith.
-3. Execute get the list of databases
-3a. Execute a query to get a list of all the tables and columns for that database
-3b. Reorganize the query to get a list of Athena
-4. Execute test to get tables
-4a. Verify when get tables is called
-5. Execute test to query results
-6. Implement Show databases.  This works on Athena
-7. Test AWS Credentials
+2. Clean up ES Lint
+3. Send in bad credentials
+4. Send in bad SQL Query
 8. Do we want test information
+9. Timeout issue.  
+10.  Make timeout in seconds.  * 1000 to be milliseconds
+
+Sample Query
+
+SELECT count(serialnumber) as count, company FROM clean_logs where serialnumber != '' group by company  LIMIT 1000
