@@ -184,24 +184,24 @@ export const CONNECTION_CONFIG = {
 
     [DIALECTS.ATHENA]: [
         {
-            'label': 'S3 Access Key','value': 'accessKey','type': 'password'
+            'label': 'S3 Access Key', 'value': 'accessKey', 'type': 'password'
         },
         {
-            'label': 'S3 Secret Access Key','value': 'secretKey','type': 'password'
+            'label': 'S3 Secret Access Key', 'value': 'secretKey', 'type': 'password'
         },
         {
-            'label': 'AWS Region','value': 'region','type': 'text'
+            'label': 'AWS Region', 'value': 'region', 'type': 'text'
         },
         {
-            'label': 'S3 Bucket','value': 's3Outputlocation','type': 'text',
-            'description': `The Athena will put the output results of the query in this location.`
+            'label': 'S3 Bucket', 'value': 's3Outputlocation', 'type': 'text',
+            'description': 'The Athena will put the output results of the query in this location.'
         },
         {
-            'label': 'Database','value': 'database','type': 'text'
+            'label': 'Database', 'value': 'database', 'type': 'text'
         },
         {
-            'label': 'Athena QueryTimeout','value': 'queryTimeout','type': 'number',
-            'description': `The maximum duration (In Milliseconds) that an SQL query can execute for.`
+            'label': 'Athena QueryTimeout', 'value': 'queryTimeout', 'type': 'number',
+            'description': 'The maximum duration (In Milliseconds) that an SQL query can execute for.'
         }
     ]
 };
@@ -410,8 +410,8 @@ export const SAMPLE_DBS = {
         s3Outputlocation: 'plotly-s3-connector-test',
         accessKey: 'AKIAIMHMSHTGARJYSKMQ',
         secretKey: 'Urvus4R7MnJOAqT4U3eovlCBimQ4Zg2Y9sV5LWow',
-        region:'us-west-2',
-        database:'default',
+        region: 'us-west-2',
+        database: 'default',
         queryTimeout: 5000
-    },
+    }
 };
