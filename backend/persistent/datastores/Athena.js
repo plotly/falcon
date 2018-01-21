@@ -174,7 +174,7 @@ function getDatabaseSchema( connection, dbName ){
                     if( data && data.Data && data.Data.length > 0 ){
                         if( i != 0){
                             let row = [];
-                            let tableName = `${dbName}.data.Data[0].VarCharValue`;
+                            let tableName = `${dbName}.${data.Data[0].VarCharValue}`;
                             row.push( tableName ); //Table Name
                             row.push( data.Data[1].VarCharValue ); //Column Name
                             row.push( data.Data[2].VarCharValue ); //DataType
@@ -211,16 +211,42 @@ export function schemas(connection){
         return getDatabases( connection ).then( dbNames =>{
             console.log( 'Calling Get Database Names', dbNames);
 
-            getDatabaseSchema( connection, dbNames[0]).then( rst =>{
-                console.log( 'Schema result', rst);
-                connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.dbName}'` ;
-                connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
-    
-                //TODO Implement a Promise All where pass in DB name
-                return  executeQuery( connection )
+            let queryPromises = dbNames.map( name =>{
+                return getDatabaseSchema( connection, name);
             });
 
-        }).then( dataSet =>{
+            return Promise.all( queryPromises ).then ( queryRst =>{
+                //console.log( 'Resolved all promies', queryRst);
+                let sch = [];
+
+                if( queryRst && queryRst.length > 0 ){
+                    //console.log( 'Looking through result');
+                    for( let i=0; i< queryRst.length; i++ ){
+                        //console.log( 'First table result', queryRst[i].rows);
+
+                        sch.push( ...queryRst[i].rows);
+                    }
+                }
+
+                console.log( 'Table names', sch);
+                return resolve( {columnnames, sch} );
+
+                /*getDatabaseSchema( connection, dbNames[0]).then( rst =>{
+                    console.log( 'Schema result', rst);
+                    connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.dbName}'` ;
+                    connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
+        
+                    //TODO Implement a Promise All where pass in DB name
+                    return  executeQuery( connection )
+                });*/
+
+            })
+
+        }).catch( err =>{
+            console.log( 'Unexpected error', err);
+            reject( err );
+        });
+        /*.then( dataSet =>{
             console.log( 'Calling execute Query');
             let rows = [];
             if( dataSet && dataSet.length > 0){
@@ -242,7 +268,7 @@ export function schemas(connection){
         }).catch( err =>{
             console.log( 'Unexpected error', err);
             reject( err );
-        });
+        });*/
     });
 }
 
