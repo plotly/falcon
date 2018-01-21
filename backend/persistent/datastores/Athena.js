@@ -206,14 +206,19 @@ export function schemas(connection){
     let columnnames = ['Table', 'column_name', 'data_type'];
     let rows = [];
 
+
     return new Promise(function(resolve, reject) {
+
+        let res = resolve;
         console.log( 'Start getting databases');
         return getDatabases( connection ).then( dbNames =>{
+            let r = res;
             console.log( 'Calling Get Database Names', dbNames);
-
-            let queryPromises = dbNames.map( name =>{
-                return getDatabaseSchema( connection, name);
-            });
+            let queryPromises = [];
+            
+            for( let j = 0; j < dbNames.length; j++ ){
+                queryPromises.push( getDatabaseSchema( connection, dbNames[j]));
+            }
 
             return Promise.all( queryPromises ).then ( queryRst =>{
                 //console.log( 'Resolved all promies', queryRst);
@@ -229,46 +234,54 @@ export function schemas(connection){
                 }
 
                 console.log( 'Table names', sch);
-                return resolve( {columnnames, sch} );
+                console.log( '')
 
-                /*getDatabaseSchema( connection, dbNames[0]).then( rst =>{
-                    console.log( 'Schema result', rst);
-                    connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.dbName}'` ;
-                    connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
-        
-                    //TODO Implement a Promise All where pass in DB name
-                    return  executeQuery( connection )
-                });*/
+                //let rows = [];
 
-            })
+                for( let i=0; i< 4; i++){
+
+                    
+                    let r = [];
+                    r.push('Test');
+                    r.push(`first_name_${i}`);
+                    r.push(`varchar`);
+
+                    rows.push(r);
+                }
+
+                let rowData = [];
+                rowData.push('Test');
+                rowData.push( 'value');
+                rowData.push('integer');
+
+                rows.push( rowData );
+
+
+                for( let i=0; i< 2; i++){
+
+                    
+                    let r = [];
+                    r.push('Sample');
+                    r.push(`last_name_${i}`);
+                    r.push(`varchar`);
+
+                    rows.push(r);
+                }
+
+                rowData = [];
+                rowData.push('Sample');
+                rowData.push( 'value');
+                rowData.push('integer');
+
+                rows.push( rowData );
+                //return r( {columnnames, sch} );
+                return resolve( {columnnames, rows});
+            });
 
         }).catch( err =>{
             console.log( 'Unexpected error', err);
             reject( err );
         });
-        /*.then( dataSet =>{
-            console.log( 'Calling execute Query');
-            let rows = [];
-            if( dataSet && dataSet.length > 0){
-                for( let i=0; i< dataSet.length; i++){
-                    let data = dataSet[i];
-
-                    if( data && data.Data && data.Data.length > 0 ){
-                        if( i != 0){
-                            let row = [];
-                            row.push( data.Data[0].VarCharValue ); //Table Name
-                            row.push( data.Data[1].VarCharValue ); //Column Name
-                            row.push( data.Data[2].VarCharValue ); //DataType
-                            rows.push( row );
-                        }   
-                    }
-                }
-            }
-            resolve( {columnnames, rows} );
-        }).catch( err =>{
-            console.log( 'Unexpected error', err);
-            reject( err );
-        });*/
     });
 }
 
