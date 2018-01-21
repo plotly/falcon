@@ -197,10 +197,10 @@ export const CONNECTION_CONFIG = {
             'description': `The Athena will put the output results of the query in this location.`
         },
         {
-            'label': 'Database','value': 'dbName','type': 'text'
+            'label': 'Database','value': 'database','type': 'text'
         },
         {
-            'label': 'S3 Bucket','value': 'queryTimeout','type': 'text',
+            'label': 'Athena QueryTimeout','value': 'queryTimeout','type': 'text',
             'description': `The maximum duration (In Milliseconds) that an SQL query can execute for.`
         }
     ]
@@ -411,7 +411,7 @@ export const SAMPLE_DBS = {
         accessKey: 'AKIAIMHMSHTGARJYSKMQ',
         secretKey: 'Urvus4R7MnJOAqT4U3eovlCBimQ4Zg2Y9sV5LWow',
         region:'us-west-2',
-        dbName:'default',
+        database:'default',
         queryTimeout: 5000
     },
 };

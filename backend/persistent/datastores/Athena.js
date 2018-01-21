@@ -21,7 +21,7 @@ const SHOW_DATABASE_QUERY = `SHOW DATABASES`;
  * @param {string} connection.accessKey - AWS Access Key
  * @param {string} connection.secretAccessKey - AWS Secret Key
  * @param {string} connection.region - AWS Region
- * @param {string} connection.dbName - Database name to connect to 
+ * @param {string} connection.database - Database name to connect to 
  * @param {string} connection.sqlStatement - SQL statement to execute
  * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
  * @param {number} params.queryTimeout  - The timeout interval when the query should stop
@@ -29,7 +29,7 @@ const SHOW_DATABASE_QUERY = `SHOW DATABASES`;
 export function connect(connection) {
     console.log( 'Athena Connection', connection);
     const {
-        region, accessKey, secretKey, dbName, sqlStatement, s3Outputlocation, queryTimeout
+        region, accessKey, secretKey, database, sqlStatement, s3Outputlocation, queryTimeout
     } = connection;
 
     //Validate that the connection has a 
@@ -45,7 +45,7 @@ export function connect(connection) {
         throw new Error(`The AWS secret key was not defined`);
     }
 
-    if( !dbName ){
+    if( !database ){
         throw new Error(`The Database Name was not defined`);
     }
 
@@ -57,7 +57,7 @@ export function connect(connection) {
         throw new Error(`The Athena Query Timeout was not defined`);
     }
     let con = {
-        region, accessKey, secretKey, dbName, sqlStatement, s3Outputlocation, queryTimeout
+        region, accessKey, secretKey, database, sqlStatement, s3Outputlocation, queryTimeout
     };
 
     return new Promise(function(resolve, reject) {
@@ -119,7 +119,7 @@ export function query(queryObject, connection){
  * @param {string} connection.secretAccessKey - AWS Secret Key
  * @param {string} connection.region - AWS Region
  * @param {string} connection.region - AWS Region
- * @param {string} connection.dbName - Database name to connect to 
+ * @param {string} connection.database - Database name to connect to 
  * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
  * @returns {Array} - returns an array of the database names in the system
  */
@@ -153,16 +153,16 @@ function getDatabases( connection ){
  * @param {string} connection.secretAccessKey - AWS Secret Key
  * @param {string} connection.region - AWS Region
  * @param {string} connection.region - AWS Region
- * @param {string} connection.dbName - Database name to connect to 
+ * @param {string} connection.database - Database name to connect to 
  * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
  * @returns {Array} - returns an array of the table names, columns and types
  */
-function getDatabaseSchema( connection, dbName ){
+function getDatabaseSchema( connection, database ){
     let columnnames = ['Table', 'column_name', 'data_type'];
     let rows = [];
 
     return new Promise(function(resolve, reject) {
-        connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${dbName}'` ;
+        connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${database}'` ;
         connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
         return  executeQuery( connection ).then( dataSet =>{
             console.log( 'Calling execute Query');
@@ -174,7 +174,7 @@ function getDatabaseSchema( connection, dbName ){
                     if( data && data.Data && data.Data.length > 0 ){
                         if( i != 0){
                             let row = [];
-                            let tableName = `${dbName}.${data.Data[0].VarCharValue}`;
+                            let tableName = `${database}.${data.Data[0].VarCharValue}`;
                             row.push( tableName ); //Table Name
                             row.push( data.Data[1].VarCharValue ); //Column Name
                             row.push( data.Data[2].VarCharValue ); //DataType
@@ -199,7 +199,7 @@ function getDatabaseSchema( connection, dbName ){
  * @param {string} connection.secretAccessKey - AWS Secret Key
  * @param {string} connection.region - AWS Region
  * @param {string} connection.region - AWS Region
- * @param {string} connection.dbName - Database name to connect to 
+ * @param {string} connection.database - Database name to connect to 
  * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
  */
 export function schemas(connection){
@@ -293,7 +293,7 @@ export function schemas(connection){
  * @param {string} connection.secretAccessKey - AWS Secret Key
  * @param {string} connection.region - AWS Region
  * @param {string} connection.region - AWS Region
- * @param {string} connection.dbName - Database name to connect to 
+ * @param {string} connection.database - Database name to connect to 
  * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
  */
 export function tables(connection){

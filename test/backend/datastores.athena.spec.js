@@ -24,7 +24,7 @@ describe('Athena Unit Tests:', function () {
             region: 'us-east-1', 
             accessKey: 'XXXXXXXX', 
             secretKey: 'XXXXXAAAA', 
-            dbName: 'PLOT.LY-TEST', 
+            database: 'PLOT.LY-TEST', 
             sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
@@ -42,7 +42,7 @@ describe('Athena Unit Tests:', function () {
         const conn = {
             accessKey: 'XXXXXXXX', 
             secretKey: 'XXXXXAAAA', 
-            dbName: 'PLOT.LY-TEST', 
+            database: 'PLOT.LY-TEST', 
             sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
@@ -64,7 +64,7 @@ describe('Athena Unit Tests:', function () {
             region: '', 
             accessKey: 'XXXXXXXX', 
             secretKey: 'XXXXXAAAA', 
-            dbName: 'PLOT.LY-TEST', 
+            database: 'PLOT.LY-TEST', 
             sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
@@ -85,7 +85,7 @@ describe('Athena Unit Tests:', function () {
         const conn = {
             region: 'us-east-1', 
             secretKey: 'XXXXXAAAA', 
-            dbName: 'PLOT.LY-TEST', 
+            database: 'PLOT.LY-TEST', 
             sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
@@ -107,7 +107,7 @@ describe('Athena Unit Tests:', function () {
             region: 'us-east-1', 
             accessKey: '', 
             secretKey: 'XXXXXAAAA', 
-            dbName: 'PLOT.LY-TEST', 
+            database: 'PLOT.LY-TEST', 
             sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
@@ -128,7 +128,7 @@ describe('Athena Unit Tests:', function () {
         const conn = {
             region: 'us-east-1', 
             accessKey: 'XXXXXXXX',  
-            dbName: 'PLOT.LY-TEST', 
+            database: 'PLOT.LY-TEST', 
             sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
@@ -150,7 +150,7 @@ describe('Athena Unit Tests:', function () {
             region: 'us-east-1', 
             accessKey: 'AAAAAAA', 
             secretKey: '', 
-            dbName: 'PLOT.LY-TEST', 
+            database: 'PLOT.LY-TEST', 
             sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
@@ -193,7 +193,7 @@ describe('Athena Unit Tests:', function () {
             region: 'us-east-1', 
             accessKey: 'AAAAAAA', 
             secretKey: 'XXXXXX', 
-            dbName: '', 
+            database: '', 
             sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
@@ -215,7 +215,7 @@ describe('Athena Unit Tests:', function () {
             region: 'us-east-1', 
             accessKey: 'XXXXXXXX', 
             secretKey: 'XXXXXX',  
-            dbName: 'PLOT.LY-TEST', 
+            database: 'PLOT.LY-TEST', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
         };
@@ -236,7 +236,7 @@ describe('Athena Unit Tests:', function () {
             region: 'us-east-1', 
             accessKey: 'AAAAAAA', 
             secretKey: 'XXXXXX', 
-            dbName: 'PLOT.LY-TEST', 
+            database: 'PLOT.LY-TEST', 
             sqlStatement: '', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
             queryTimeout: 10000
@@ -259,7 +259,7 @@ describe('Athena Unit Tests:', function () {
             region: 'us-east-1', 
             accessKey: 'XXXXXXXX', 
             secretKey: 'XXXXXX',  
-            dbName: 'PLOT.LY-TEST', 
+            database: 'PLOT.LY-TEST', 
             sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             queryTimeout: 10000
         };
@@ -280,7 +280,7 @@ describe('Athena Unit Tests:', function () {
             region: 'us-east-1', 
             accessKey: 'AAAAAAA', 
             secretKey: 'XXXXXX', 
-            dbName: 'PLOT.LY-TEST', 
+            database: 'PLOT.LY-TEST', 
             sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: '', 
             queryTimeout: 10000
@@ -302,7 +302,7 @@ describe('Athena Unit Tests:', function () {
             region: 'us-east-1', 
             accessKey: 'XXXXXXXX', 
             secretKey: 'XXXXXX',  
-            dbName: 'PLOT.LY-TEST', 
+            database: 'PLOT.LY-TEST', 
             sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100', 
             s3Outputlocation: 's3://aws-athena-query-results-11111111-us-east-1/', 
         };
