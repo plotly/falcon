@@ -1,5 +1,6 @@
 1. Remove file before merging back into Master
 
+2a. Athena Preview Query is failing
 2. Put back Database name.  Makes it easier to workwith.
 3. Execute get the list of databases
 3a. Execute a query to get a list of all the tables and columns for that database
