@@ -146,6 +146,51 @@ function getDatabases( connection ){
     });
 }
 
+/**
+ * Should return a list of databases
+ * @param {object} connection 
+ * @param {string} connection.accessKey - AWS Access Key
+ * @param {string} connection.secretAccessKey - AWS Secret Key
+ * @param {string} connection.region - AWS Region
+ * @param {string} connection.region - AWS Region
+ * @param {string} connection.dbName - Database name to connect to 
+ * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
+ * @returns {Array} - returns an array of the table names, columns and types
+ */
+function getDatabaseSchema( connection, dbName ){
+    let columnnames = ['Table', 'column_name', 'data_type'];
+    let rows = [];
+
+    return new Promise(function(resolve, reject) {
+        connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${dbName}'` ;
+        connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
+        return  executeQuery( connection ).then( dataSet =>{
+            console.log( 'Calling execute Query');
+            let rows = [];
+            if( dataSet && dataSet.length > 0){
+                for( let i=0; i< dataSet.length; i++){
+                    let data = dataSet[i];
+
+                    if( data && data.Data && data.Data.length > 0 ){
+                        if( i != 0){
+                            let row = [];
+                            let tableName = `${dbName}.data.Data[0].VarCharValue`;
+                            row.push( tableName ); //Table Name
+                            row.push( data.Data[1].VarCharValue ); //Column Name
+                            row.push( data.Data[2].VarCharValue ); //DataType
+                            rows.push( row );
+                        }   
+                    }
+                }
+            }
+            resolve( {columnnames, rows} );
+        }).catch( err =>{
+            console.log( 'Unexpected error', err);
+            reject( err );
+        });
+    });
+}
+
 
 /**
  * Should return a list of tables and their that are defined within the database.
@@ -161,16 +206,20 @@ export function schemas(connection){
     let columnnames = ['Table', 'column_name', 'data_type'];
     let rows = [];
 
-
     return new Promise(function(resolve, reject) {
         console.log( 'Start getting databases');
         return getDatabases( connection ).then( dbNames =>{
             console.log( 'Calling Get Database Names', dbNames);
-            connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.dbName}'` ;
-            connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
 
-            //TODO Implement a Promise All where pass in DB name
-            return  executeQuery( connection )
+            getDatabaseSchema( connection, dbNames[0]).then( rst =>{
+                console.log( 'Schema result', rst);
+                connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.dbName}'` ;
+                connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
+    
+                //TODO Implement a Promise All where pass in DB name
+                return  executeQuery( connection )
+            });
+
         }).then( dataSet =>{
             console.log( 'Calling execute Query');
             let rows = [];
