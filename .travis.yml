@@ -21,17 +21,13 @@ install:
 script:
   - yarn run build
   - yarn run pack
-  - zip release.zip release/Falcon* release/*.yml
+  - zip mac-release.zip release/Falcon* release/*.yml
 
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
 
-branches:
-  except:
-    - "/^v\\d+\\.\\d+\\.\\d+$/"
-
 addons:
   artifacts:
     s3_region: us-east-1
-    paths: release.zip
+    paths: mac-release.zip
     debug: true
