@@ -29,7 +29,6 @@ import * as Athena from './Athena';
 function getDatastoreClient(connection) {
     const {dialect} = connection;
 
-    console.log( 'Selection dialect', dialect);
     if (dialect === 'elasticsearch') {
         return Elasticsearch;
     } else if (dialect === 's3') {
@@ -42,7 +41,7 @@ function getDatastoreClient(connection) {
         return ApacheImpala;
     } else if (dialect === 'ibm db2') {
         return IbmDb2;
-    }else if (dialect === 'athena') {
+    } else if (dialect === 'athena') {
         return Athena;
     }
     return Sql;
