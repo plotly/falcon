@@ -28,7 +28,7 @@ export function createAthenaClient(connection) {
  * The following method will execute the sql statement to query the
  * athena database
  * @param {object} athenaClient  - Object created using create athena client
- * @param {object} params
+ * @param {object} params - Connection Parameters
  * @param {string} params.dbName - Database name to connect to
  * @param {string} params.sqlStatement - SQL statement to execute
  * @param {string} params.s3Outputlocation - Location will Athena will output resutls of query
@@ -56,7 +56,6 @@ export function startQuery(athenaClient, params) {
             }
                 const queryId = data.QueryExecutionId;
                 return resolve(queryId);
-
           });
     });
 }
@@ -66,7 +65,7 @@ export function startQuery(athenaClient, params) {
  * have completed.  It will return -1 if the query errored, 0
  * if it is still executing or 1 if it has completed
  * @param {object} athenaClient  - Object created using create athena client
- * @param {string} queryExecutionId
+ * @param {string} queryExecutionId - AWS Query Execution Id
  * @returns {int} -1 : Error, 0 : Still running, 1 : Completed
  */
 export function queryResultsCompleted(athenaClient, queryExecutionId) {
@@ -79,33 +78,31 @@ export function queryResultsCompleted(athenaClient, queryExecutionId) {
     return new Promise(function(resolve, reject) {
         return client.getQueryExecution(queryParams, (err, data) => {
             if (err) {
-                console.log(`Error getting query execution ${err}`);
                 return reject(-1);
             }
-                const state = data.QueryExecution.Status.State;
-                let queryState = 0;
-                switch (state) {
-                    case 'QUEUED':
-                        queryState = 0;
-                        break;
-                    case 'RUNNING':
-                        queryState = 0;
-                        break;
-                    case 'SUCCEEDED':
-                        queryState = 1;
-                        break;
-                    case 'FAILED':
-                        queryState = -1;
-                        break;
-                    case 'CANCELLED':
-                        queryState = -1;
-                        break;
-                    default:
-                        queryState = -1;
-                        break;
-                }
-                return resolve(queryState);
-
+            const state = data.QueryExecution.Status.State;
+            let queryState = 0;
+            switch (state) {
+                case 'QUEUED':
+                    queryState = 0;
+                    break;
+                case 'RUNNING':
+                    queryState = 0;
+                    break;
+                case 'SUCCEEDED':
+                    queryState = 1;
+                    break;
+                case 'FAILED':
+                    queryState = -1;
+                    break;
+                case 'CANCELLED':
+                    queryState = -1;
+                    break;
+                default:
+                    queryState = -1;
+                    break;
+            }
+            return resolve(queryState);
         });
     });
 }
@@ -113,7 +110,7 @@ export function queryResultsCompleted(athenaClient, queryExecutionId) {
 /**
  * The following method will stop the query execution based on the query id
  * @param {object} athenaClient  - Object created using create athena client
- * @param {string} queryExecutionId
+ * @param {string} queryExecutionId - AWS Athena Query Id
  * @returns {Promise} That resolves to AWS Stop Request
  */
 export function stopQuery(athenaClient, queryExecutionId) {
@@ -124,13 +121,11 @@ export function stopQuery(athenaClient, queryExecutionId) {
     };
 
     return new Promise(function(resolve, reject) {
-
         return client.stopQueryExecution(queryParams, (err, data) => {
             if (err) {
                 return reject(err);
             }
-                return resolve(data);
-
+            return resolve(data);
         });
     });
 }
@@ -138,7 +133,7 @@ export function stopQuery(athenaClient, queryExecutionId) {
 /**
  * The following method will get the query results based on the query id
  * @param {object} athenaClient  - Object created using create athena client
- * @param {string} queryExecutionId
+ * @param {string} queryExecutionId - AWS Athena Query Id
  * @returns {Promise} Resolves to AWS Query Response
  */
 export function getQueryResults(athenaClient, queryExecutionId) {
@@ -153,8 +148,7 @@ export function getQueryResults(athenaClient, queryExecutionId) {
             if (err) {
                 return reject(err);
             }
-                return resolve(data);
-
+            return resolve(data);
         });
     });
 }
