@@ -48,11 +48,11 @@ function getDatastoreClient(connection) {
         return ApacheImpala;
     } else if (dialect === 'ibm db2') {
         return IbmDb2;
-    }else if (dialect === 'data.world') {
+    } else if (dialect === 'data.world') {
         return DataWorld;
     } else if (dialect === 'athena') {
         return Athena;
-    } 
+    }
     return Sql;
 }
 
