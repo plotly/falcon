@@ -8,30 +8,62 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Added
-* Windows installer
-* Mac installer
 
 ### Changed
-* Reduced app size
-* Desktop app can run without logging into Plotly
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
-* CodeEditor: autocomplete
-* CodeEditor: `Run` becomes unclickable or hidden
-* DB2: unable to locate driver in mac
-* Postgres: table preview
-* Postgres: accept schema names and quoted identifiers
-* Redshift: table preview
-* Redshift: accept schema names and quoted identifiers
-* Sqlite: file selector
-* Sqlite: schemas overview
 
 ### Security
-* Document test databases
+
+
+## [2.5.0] - 2018-01-19
+
+### Added
+* Connector for https://data.world
+
+### Changed
+* test: implemented mock connectors
+* test: updated DB2, Impala and Spark sample servers
+* Enabled asar in the installers for Mac and Linux
+
+### Deprecated
+* test: DB2 and Spark sample servers will be turned off in the near future.
+  Please, instead, use the docker containers:
+  - quay.io/plotly/falcon-test-db2
+  - quay.io/plotly/falcon-test-spark
+
+
+## [2.4.0] - 2017-12-15
+
+### Added
+* CHANGELOG.md
+* Windows installer
+* Mac installer
+
+### Changed
+* Reduced app size
+* Desktop app can run without logging into Plotly
+* Do not download fonts
+
+### Removed
+* OnPrem: removed `Download CSV`
+
+### Fixed
+* CodeEditor: Restored functionality to autocomplete keywords and table names
+* CodeEditor: Fixed issue with the button `Run` becoming unclickable or hidden
+* DB2: Fixed error with Falcon being unable to locate the ibm_db driver in Mac
+* OnPrem: Fixed multiple OAuth issues
+* OnPrem: Fixed export link
+* Postgres: Fixed table preview to show tables in all the schemas
+* Postgres: Accept schema names and quoted identifiers
+* Redshift: Fixed table preview to show tables in all the schemas
+* Redshift: Accept schema names and quoted identifiers
+* Sqlite: Fixed the file selector in Windows and Linux
+* Sqlite: Fixed the schemas overview
 
 
 ## [2.3.2] - 2017-11-01

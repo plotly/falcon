@@ -26,15 +26,42 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
     });
 }
 
-export function newDatacache(payloadJSON, type) {
+export function newDatacache(payloadJSON, type, requestor) {
     const form = new FormData();
     form.append('type', type);
     form.append('payload', payloadJSON);
     const body = form;
 
-    return fetch('https://plot.ly/datacache', {
+    const users = getSetting('USERS');
+    const user = users.find(
+        u => u.username === requestor
+    );
+
+    /*
+     * Authentication is only required for on-premise private-mode for this
+     * endpoint, so even if the user is not logged in, we should still be able
+     * to proceed with blank `Authorization` header.
+     */
+    let authorization = '';
+    if (user) {
+        const apiKey = user.apiKey;
+        const accessToken = user.accessToken;
+
+        if (apiKey) {
+            authorization = 'Basic ' + new Buffer(
+                requestor + ':' + apiKey
+            ).toString('base64');
+        } else if (accessToken) {
+            authorization = `Bearer ${accessToken}`;
+        }
+    }
+
+    return fetch(`${getSetting('PLOTLY_URL')}/datacache`, {
         method: 'POST',
-        body: body
+        body: body,
+        headers: {
+            'Authorization': authorization
+        }
     }).then(res => {
         return res;
     }).catch(err => {

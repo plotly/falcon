@@ -200,16 +200,6 @@ export default class Servers {
         Logger.log(`Listening at: ${protocol}://${domain}:${port}`);
         server.listen(port);
 
-        // Set AUTH_ENABLED into a cookie so that frontend can show login-modal accordingly:
-        server.use((req, res, next) => {
-            const authEnabled = getSetting('AUTH_ENABLED');
-            if (!authEnabled || that.isElectron) {
-                res.setCookie('db-connector-auth-disabled', true);
-            }
-
-            next();
-        });
-
         server.get(/\/static\/?.*/, restify.serveStatic({
             directory: `${__dirname}/../`
         }));
@@ -589,10 +579,10 @@ export default class Servers {
         /* Plotly v2 API requests */
 
         server.post('/datacache', function getDatacacheHandler(req, res, next) {
-            const {payload, type: contentType} = req.params;
+            const {payload, requestor, type: contentType} = req.params;
 
             if (contentType !== 'csv') {
-                const datacacheResp = newDatacache(payload, contentType);
+                const datacacheResp = newDatacache(payload, contentType, requestor);
                 datacacheResp.then(plotlyRes => plotlyRes.json().then(resJSON => {
                     res.json(plotlyRes.status, resJSON);
                     return next();

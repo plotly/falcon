@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: spark-service
+  name: spark-service
+spec:
+  ports:
+  - protocol: TCP
+    port: 8998
+    targetPort: 8998
+  selector:
+    name: spark-node
+  type: LoadBalancer
