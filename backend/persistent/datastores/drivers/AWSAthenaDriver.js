@@ -1,6 +1,7 @@
 'use strict';
 
 const AWS = require('aws-sdk');
+import Logger from '../../../logger';
 const NUMBER_OF_RETRIES = 5;
 
 /**
@@ -52,6 +53,7 @@ export function startQuery(athenaClient, params) {
     return new Promise(function(resolve, reject) {
         return client.startQueryExecution(queryParams, (err, data) => {
             if (err) {
+                Logger.log(`Unexpected Error starting Athena Query ${err}`);
                 return reject(err);
             }
                 const queryId = data.QueryExecutionId;
@@ -78,6 +80,7 @@ export function queryResultsCompleted(athenaClient, queryExecutionId) {
     return new Promise(function(resolve, reject) {
         return client.getQueryExecution(queryParams, (err, data) => {
             if (err) {
+                Logger.log(`Unexpected Error getting Athena Query Execution Status ${err}`);
                 return reject(-1);
             }
             const state = data.QueryExecution.Status.State;
@@ -123,6 +126,7 @@ export function stopQuery(athenaClient, queryExecutionId) {
     return new Promise(function(resolve, reject) {
         return client.stopQueryExecution(queryParams, (err, data) => {
             if (err) {
+                Logger.log(`Unexpected Error stoping Athena Query Execution ${err}`);
                 return reject(err);
             }
             return resolve(data);

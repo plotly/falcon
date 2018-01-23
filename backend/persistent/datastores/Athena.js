@@ -1,6 +1,7 @@
 
 import {executeQuery} from './drivers/AWSAthenaDriver';
 
+import Logger from '../../logger';
 const SHOW_TABLES_QUERY = 'SHOW TABLES';
 const SHOW_SCHEMA_QUERY = 'SELECT table_name, column_name, data_type FROM '
     + 'information_schema.columns WHERE table_schema ';
@@ -24,34 +25,34 @@ export function connect(connection) {
         region, accessKey, secretKey, database, sqlStatement, s3Outputlocation, queryTimeout
     } = connection;
 
-    if (!region) {
-        throw new Error('The AWS Region was not defined');
-    }
+    return new Promise(function(resolve, reject) {
 
-    if (!accessKey) {
-        throw new Error('The AWS access key was not defined');
-    }
+        if (!region) {
+            return reject(new Error('The AWS Region was not defined'));
+        }
 
-    if (!secretKey) {
-        throw new Error('The AWS secret key was not defined');
-    }
+        if (!accessKey) {
+            return reject(new Error('The AWS access key was not defined'));
+        }
 
-    if (!database) {
-        throw new Error('The Database Name was not defined');
-    }
+        if (!secretKey) {
+            return reject(new Error('The AWS secret key was not defined'));
+        }
 
-    if (!s3Outputlocation) {
-        throw new Error('The Athena S3 Results Output location was not defined');
-    }
+        if (!database) {
+            return reject(new Error('The Database Name was not defined'));
+        }
 
-    if (!queryTimeout && queryTimeout < 0) {
-        throw new Error('The Athena Query Timeout was not defined');
-    }
-    const con = {
-        region, accessKey, secretKey, database, sqlStatement, s3Outputlocation, queryTimeout
-    };
+        if (!s3Outputlocation) {
+            return reject(new Error('The Athena S3 Results Output location was not defined'));
+        }
 
-    return new Promise(function(resolve) {
+        if (!queryTimeout && queryTimeout < 0) {
+            return reject(new Error('The Athena Query Timeout was not defined'));
+        }
+        const con = {
+            region, accessKey, secretKey, database, sqlStatement, s3Outputlocation, queryTimeout
+        };
         resolve(con);
     });
 }
@@ -66,8 +67,13 @@ export function query(queryObject, connection) {
     const columnnames = [], rows = [];
     let numberOfColumns = 0;
 
-    connection.sqlStatement = queryObject;
+
     return new Promise(function(resolve, reject) {
+
+        if (!queryObject) {
+            return reject(new Error('The SQL Statement was not defined'));
+        }
+        connection.sqlStatement = queryObject;
         executeQuery(connection).then(dataSet => {
             if (dataSet && dataSet.length > 0) {
                 // First column contains the column names
@@ -99,6 +105,7 @@ export function query(queryObject, connection) {
             }
             resolve({columnnames, rows});
         }).catch(err => {
+            Logger.log(`Unexpected Error executing the query ${err}`);
             reject(err);
         });
     });
@@ -140,6 +147,7 @@ export function schemas(connection) {
             }
             resolve({columnnames, rows});
         }).catch(err => {
+            Logger.log(`Unexpected Error getting the schemas ${err}`);
             reject(err);
         });
     });
@@ -174,6 +182,7 @@ export function tables(connection) {
             }
             resolve(rst);
         }).catch(err => {
+            Logger.log(`Unexpected Error getting the tables ${err}`);
             reject(err);
         });
     });
