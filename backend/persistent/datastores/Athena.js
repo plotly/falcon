@@ -105,7 +105,7 @@ export function query(queryObject, connection) {
 }
 
 /**
- * Should return a list of tables and their that are defined within the database.
+ * Should return a list of tables and their columns that are defined within the database.
  * @param {object} connection - Connection parameters
  * @param {string} connection.accessKey - AWS Access Key
  * @param {string} connection.secretAccessKey - AWS Secret Key

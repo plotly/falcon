@@ -154,7 +154,7 @@ export function getQueryResults(athenaClient, queryExecutionId) {
 }
 
 /**
- * The following function will create an AWS Athena Client.  It will first start
+ * The following function will execute a query against athena.  It will first start
  * by starting the query request.  It will then start a timer to periodically
  * check to see if the query results have completed. If the Query Timeout has
  * Exceeded it will reject the query.  If the it receives data before the query
