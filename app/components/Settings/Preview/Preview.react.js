@@ -239,7 +239,7 @@ class Preview extends Component {
                 const milliSeconds = new Date().getTime() - STARTED_AT.getTime();
                 // Keep 3 decimals
                 const seconds = parseFloat((milliSeconds / 1000).toFixed(3));
-	        this.setState({ timeQueryElapsedMsg: `in ${seconds} seconds` });
+                this.setState({ timeQueryElapsedMsg: `in ${seconds} seconds` });
             }
         });
     }
