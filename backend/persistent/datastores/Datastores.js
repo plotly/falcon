@@ -7,7 +7,7 @@ import * as ApacheLivy from './livy';
 import * as ApacheImpala from './impala';
 import * as DataWorld from './dataworld';
 import * as DatastoreMock from './datastoremock';
-import * as Athena from './Athena';
+import * as Athena from './athena';
 
 /*
  * Switchboard to all of the different types of connections

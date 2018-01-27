@@ -1,5 +1,4 @@
-
-import {executeQuery} from './drivers/AWSAthenaDriver';
+import {executeQuery} from './drivers/athena';
 
 import Logger from '../../logger';
 const SHOW_TABLES_QUERY = 'SHOW TABLES';
@@ -15,14 +14,14 @@ const DEFAULT_QUERY_TIMEOUT = 2000;
  * @param {string} connection.secretAccessKey - AWS Secret Key
  * @param {string} connection.region - AWS Region
  * @param {string} connection.database - Database name to connect to
- * @param {string} connection.sqlStatement - SQL statement to execute
- * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
- * @param {number} params.queryTimeout  - The timeout interval when the query should stop
+ * @param {string} connection.outputS3Bucket - Location will Athena will output resutls of query
+ * @param {number} connection.timeout  - The timeout interval when the query should stop
+ * @param {boolean} 
  * @returns {Promise} that resolves connection
  */
 export function connect(connection) {
-    const {
-        region, accessKey, secretKey, database, sqlStatement, s3Outputlocation, queryTimeout
+    let {
+        region, accessKey, secretKey, database, sqlStatement, outputS3Bucket, timeout, sslEnabled
     } = connection;
 
     return new Promise(function(resolve, reject) {
@@ -43,15 +42,16 @@ export function connect(connection) {
             return reject(new Error('The Database Name was not defined'));
         }
 
-        if (!s3Outputlocation) {
-            return reject(new Error('The Athena S3 Results Output location was not defined'));
+        if (!outputS3Bucket) {
+            return reject(new Error('The Athena S3 Results Output Bucket was not defined'));
         }
 
-        if (!queryTimeout && queryTimeout < 0) {
-            return reject(new Error('The Athena Query Timeout was not defined'));
+        if (!timeout && timeout < 0) {
+            timeout = EFAULT_QUERY_TIMEOUT;
         }
+
         const con = {
-            region, accessKey, secretKey, database, sqlStatement, s3Outputlocation, queryTimeout
+            region, accessKey, secretKey, database, sqlStatement, outputS3Bucket, timeout, sslEnabled
         };
         resolve(con);
     });
@@ -117,9 +117,8 @@ export function query(queryObject, connection) {
  * @param {string} connection.accessKey - AWS Access Key
  * @param {string} connection.secretAccessKey - AWS Secret Key
  * @param {string} connection.region - AWS Region
- * @param {string} connection.region - AWS Region
  * @param {string} connection.database - Database name to connect to
- * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
+ * @param {string} connection.outputS3Bucket - Location will Athena will output resutls of query
  * @returns {Promise} that resolves to { columnnames, rows }
  */
 export function schemas(connection) {
@@ -160,9 +159,8 @@ export function schemas(connection) {
  * @param {string} connection.accessKey - AWS Access Key
  * @param {string} connection.secretAccessKey - AWS Secret Key
  * @param {string} connection.region - AWS Region
- * @param {string} connection.region - AWS Region
  * @param {string} connection.database - Database name to connect to
- * @param {string} connection.s3Outputlocation - Location will Athena will output resutls of query
+ * @param {string} connection.outputS3Bucket - Location will Athena will output resutls of query
  * @returns {Promise} that resolves to { columnnames, rows }
  */
 export function tables(connection) {

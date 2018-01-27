@@ -18,6 +18,7 @@ export function createAthenaClient(connection) {
         accessKeyId: connection.accessKey,
         secretAccessKey: connection.secretAccessKey,
         region: connection.region,
+        sslEnabled : connection.sslEnabled, 
         maxRetries: 5
     };
     const athenaClient = new AWS.Athena(connectionParams);

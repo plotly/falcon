@@ -209,15 +209,21 @@ export const CONNECTION_CONFIG = {
             'label': 'AWS Region', 'value': 'region', 'type': 'text'
         },
         {
-            'label': 'S3 Bucket', 'value': 's3Outputlocation', 'type': 'text',
-            'description': 'The Athena will put the output results of the query in this location.'
+            'label': 'S3 Bucket', 'value': 'outputS3Bucket', 'type': 'text',
+            'description': 'The Athena connector will store query results in this location.'
         },
         {
             'label': 'Database', 'value': 'database', 'type': 'text'
         },
         {
-            'label': 'Athena QueryTimeout', 'value': 'queryTimeout', 'type': 'number',
-            'description': 'The maximum duration (In Milliseconds) that an SQL query can execute for.'
+            'label': 'Timeout', 'value': 'timeout', 'type': 'number',
+            'description': 'The maximum duration (In Milliseconds) that an SQL query can execute for. Default 2 seconds'
+        },
+        {
+            'label': 'SSL Enabled', 'value': 'sslEnabled', 'type': 'checkbox',
+            'description': 'Does your database require that you connect to it via SSL? \
+                            Note that this is just the connection between this app and your database; \
+                            connections to plot.ly or your plotly instance are always encrypted.'
         }
     ]
 };
