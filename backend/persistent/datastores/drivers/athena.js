@@ -13,14 +13,19 @@ const NUMBER_OF_RETRIES = 5;
  * @returns {object} AWS Athena Client
  */
 export function createAthenaClient(connection) {
+    console.log( 'Here are the settings', connection);
     const connectionParams = {
         apiVersion: '2017-05-18',
         accessKeyId: connection.accessKey,
         secretAccessKey: connection.secretAccessKey,
         region: connection.region,
-        sslEnabled : connection.sslEnabled, 
         maxRetries: 5
     };
+
+    if( connection.sslEnabled ){
+        console.log( 'Enabling SSL Connnections');
+        connectionParams.sslEnabled = connection.sslEnabled;
+    }
     const athenaClient = new AWS.Athena(connectionParams);
 
     return athenaClient;
@@ -31,9 +36,9 @@ export function createAthenaClient(connection) {
  * athena database
  * @param {object} athenaClient  - Object created using create athena client
  * @param {object} params - Connection Parameters
- * @param {string} params.dbName - Database name to connect to
+ * @param {string} params.database - Database name to connect to
  * @param {string} params.sqlStatement - SQL statement to execute
- * @param {string} params.s3Outputlocation - Location will Athena will output resutls of query
+ * @param {string} params.outputS3Bucket - Location will Athena will output resutls of query
  * @return {string} requestId
  */
 export function startQuery(athenaClient, params) {
@@ -42,7 +47,7 @@ export function startQuery(athenaClient, params) {
     const queryParams = {
         QueryString: params.sqlStatement,
         ResultConfiguration: {
-          OutputLocation: params.s3Outputlocation,
+          OutputLocation: params.outputS3Bucket,
           EncryptionConfiguration: {
             EncryptionOption: 'SSE_S3'
           }
@@ -55,6 +60,7 @@ export function startQuery(athenaClient, params) {
         return client.startQueryExecution(queryParams, (err, data) => {
             if (err) {
                 Logger.log(`Unexpected Error starting Athena Query ${err}`);
+                console.log( 'Unexpected Error Start Query', err);
                 return reject(err);
             }
                 const queryId = data.QueryExecutionId;
@@ -82,6 +88,7 @@ export function queryResultsCompleted(athenaClient, queryExecutionId) {
         return client.getQueryExecution(queryParams, (err, data) => {
             if (err) {
                 Logger.log(`Unexpected Error getting Athena Query Execution Status ${err}`);
+                console.log( 'Unexpected Error Query Execution', err);
                 return reject(-1);
             }
             const state = data.QueryExecution.Status.State;
@@ -128,6 +135,7 @@ export function stopQuery(athenaClient, queryExecutionId) {
         return client.stopQueryExecution(queryParams, (err, data) => {
             if (err) {
                 Logger.log(`Unexpected Error stoping Athena Query Execution ${err}`);
+                console.log( 'Unexpected Error Stop Query', err);
                 return reject(err);
             }
             return resolve(data);
@@ -151,6 +159,7 @@ export function getQueryResults(athenaClient, queryExecutionId) {
     return new Promise(function(resolve, reject) {
         client.getQueryResults(queryParams, (err, data) => {
             if (err) {
+                console.log( 'Unexpected Error Get Results Query', err);
                 return reject(err);
             }
             return resolve(data);

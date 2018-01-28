@@ -206,7 +206,8 @@ export const CONNECTION_CONFIG = {
             'label': 'S3 Secret Access Key', 'value': 'secretKey', 'type': 'password'
         },
         {
-            'label': 'AWS Region', 'value': 'region', 'type': 'text'
+            'label': 'AWS Region', 'value': 'region', 'type': 'text',
+            'description':'The AWS region (i.e. us-east-1) where the database resides'
         },
         {
             'label': 'S3 Bucket', 'value': 'outputS3Bucket', 'type': 'text',
