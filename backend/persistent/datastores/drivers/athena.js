@@ -13,7 +13,6 @@ const NUMBER_OF_RETRIES = 5;
  * @returns {object} AWS Athena Client
  */
 export function createAthenaClient(connection) {
-    console.log( 'Here are the settings', connection);
     const connectionParams = {
         apiVersion: '2017-05-18',
         accessKeyId: connection.accessKey,
@@ -88,32 +87,42 @@ export function queryResultsCompleted(athenaClient, queryExecutionId) {
         return client.getQueryExecution(queryParams, (err, data) => {
             if (err) {
                 Logger.log(`Unexpected Error getting Athena Query Execution Status ${err}`);
-                console.log( 'Unexpected Error Query Execution', err);
                 return reject(-1);
             }
             const state = data.QueryExecution.Status.State;
-            let queryState = 0;
+            let queryState = 0, queryStatus = '';
             switch (state) {
                 case 'QUEUED':
                     queryState = 0;
+                    queryStatus = 'Query is queued';
                     break;
                 case 'RUNNING':
                     queryState = 0;
+                    queryStatus = 'Query still executing';
                     break;
                 case 'SUCCEEDED':
                     queryState = 1;
+                    queryStatus = 'Query completed successfully';
                     break;
                 case 'FAILED':
                     queryState = -1;
+                    queryStatus = data.QueryExecution.Status.StateChangeReason;
                     break;
                 case 'CANCELLED':
                     queryState = -1;
+                    queryStatus = 'Query was cancelled';
                     break;
                 default:
                     queryState = -1;
+                    queryStatus = 'Unknown error executing the query';
                     break;
             }
-            return resolve(queryState);
+
+            let rst = {
+                queryState,
+                queryStatus
+            }
+            return resolve( rst );
         });
     });
 }
@@ -185,6 +194,7 @@ export function getQueryResults(athenaClient, queryExecutionId) {
  * @returns {Promise} resolve to AWS Query Response
  */
 export function executeQuery(queryParams) {
+    console.log( 'Start executing query');
     const client = createAthenaClient(queryParams);
 
     return new Promise(function(resolve, reject) {
@@ -201,22 +211,27 @@ export function executeQuery(queryParams) {
 
             const checkQueryStatus = () => {
                 retryCount++;
-                queryResultsCompleted(client, queryExecutionId).then(queryStatus => {
-                    if (queryStatus < 0) {
-                        return reject('There was an error completing the query');
-                    } else if (queryStatus === 1) {
+                queryResultsCompleted(client, queryExecutionId).then(queryResult => {
+                    console.log( 'Checking query results', queryResult);
+                    if (queryResult.queryState < 0) {
+                        return reject( new Error(queryResult.queryStatus) );
+                    } else if (queryResult.queryState === 1) {
                         return getQueryResults(client, queryExecutionId).then(rst => {
 
                             if (rst && rst.ResultSet && rst.ResultSet.Rows) {
                                 return resolve(rst.ResultSet.Rows);
-                            }
+                            }else{
                                 return resolve([]);
+                            }
                         });
                     } else if (retryCount > NUMBER_OF_RETRIES) {
-                        return reject('Timeout.  Athena did not respond before the query timeout.');
-                    }
+                        console.log( 'TIMEOUT ');
+                        return reject(new Error('Timeout.  Athena did not respond before the query timeout.'));
+                    }else{
                         // Loop again
+                        console.log( 'Loop Again', queryResult);
                         return setTimeout(checkQueryStatus, retryInterval);
+                    }
 
                 }).catch(err => {
                     return reject(err);

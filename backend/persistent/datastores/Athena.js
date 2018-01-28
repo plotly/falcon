@@ -14,7 +14,7 @@ const DEFAULT_QUERY_TIMEOUT = 2000;
  * @param {string} connection.secretAccessKey - AWS Secret Key
  * @param {string} connection.region - AWS Region
  * @param {string} connection.database - Database name to connect to
- * @param {string} connection.outputS3Bucket - Location will Athena will output resutls of query
+ * @param {string} connection.outputS3Bucket - Location where Athena will output resutls of query
  * @param {number} connection.timeout  - The timeout interval when the query should stop
  * @param {boolean} 
  * @returns {Promise} that resolves connection
@@ -47,13 +47,21 @@ export function connect(connection) {
         }
 
         if (!timeout && timeout < 0) {
-            timeout = EFAULT_QUERY_TIMEOUT;
+            timeout = DEFAULT_QUERY_TIMEOUT;
         }
 
         const con = {
             region, accessKey, secretKey, database, sqlStatement, outputS3Bucket, timeout, sslEnabled
         };
-        resolve(con);
+
+        //Test the connection to get a list of schemas
+        //This will validate that the connection properties work 
+        schemas( con ).then( rst =>{
+            resolve(con);
+        }).catch( err =>{
+            Logger.log( err );
+            reject( err );
+        });
     });
 }
 
@@ -64,9 +72,8 @@ export function connect(connection) {
  * @returns {Promise} that resolves to { columnnames, rows }
  */
 export function query(queryObject, connection) {
-    const columnnames = [], rows = [];
+    let columnnames = [], rows = [];
     let numberOfColumns = 0;
-
 
     return new Promise(function(resolve, reject) {
 
@@ -78,25 +85,18 @@ export function query(queryObject, connection) {
             if (dataSet && dataSet.length > 0) {
                 // First column contains the column names
                 const cols = dataSet[0].Data;
-                numberOfColumns = cols.length;
-                for (let j = 0; j < numberOfColumns; j++) {
-                    columnnames.push(cols[j].VarCharValue);
-                }
+                columnnames = cols.map( col => col.VarCharValue);
 
                 // Loop through the remaining rows to extract data
                 for (let i = 1; i < dataSet.length; i++) {
                     const row = dataSet[i];
                     // Ensure Row is defined and has expected number of columns
-                    if (row && row.Data && row.Data.length === numberOfColumns) {
-                        const r = [];
-
-                        // Extract each element from the row
-                        row.Data.map(element => {
+                    if (row && row.Data && row.Data.length === columnnames.length) {
+                        let r = row.Data.map(element => {
                             if (element && element.VarCharValue) {
-                                r.push(element.VarCharValue);
+                                return element.VarCharValue;
                             } else {
-                                // Put empty results if element has no value
-                                r.push('');
+                                return '';
                             }
                         });
                         rows.push(r);
@@ -105,8 +105,8 @@ export function query(queryObject, connection) {
             }
             resolve({columnnames, rows});
         }).catch(err => {
-            Logger.log(`Unexpected Error executing the query ${err}`);
-            reject(err);
+            Logger.log(err);
+            throw err;
         });
     });
 }
@@ -144,10 +144,10 @@ export function schemas(connection) {
                     }
                 }
             }
-            resolve({columnnames, rows});
+            return resolve({columnnames, rows});
         }).catch(err => {
-            Logger.log(`Unexpected Error getting the schemas ${err}`);
-            reject(err);
+            Logger.log(err);
+            throw err;
         });
     });
 }
@@ -178,10 +178,10 @@ export function tables(connection) {
                     }
                 });
             }
-            resolve(rst);
+            return resolve(rst);
         }).catch(err => {
-            Logger.log(`Unexpected Error getting the tables ${err}`);
-            reject(err);
+            Logger.log(err);
+            return reject(err);
         });
     });
 }
