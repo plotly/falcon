@@ -207,7 +207,7 @@ export const CONNECTION_CONFIG = {
         },
         {
             'label': 'AWS Region', 'value': 'region', 'type': 'text',
-            'description':'The AWS region (i.e. us-east-1) where the database resides'
+            'description': 'The AWS region (i.e. us-east-1) where the database resides'
         },
         {
             'label': 'S3 Bucket', 'value': 'outputS3Bucket', 'type': 'text',

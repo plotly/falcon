@@ -4,7 +4,7 @@ import {connect} from '../../backend/persistent/datastores/Athena';
 
 /* eslint-disable no-invalid-this */
 describe('Athena Unit Tests:', function () {
-    it('connect succeeds', function(done) {
+    it('Invalid connection strings because incorrect credentials', function(done) {
         const conn = {
             region: 'us-east-1',
             accessKey: 'XXXXXXXX',
@@ -15,10 +15,10 @@ describe('Athena Unit Tests:', function () {
             queryTimeout: 10000
         };
         connect(conn).then(connection => {
-            assert.isDefined(connection, 'Connection is defined');
-            done();
+           done(`Should NOT have obtained a valid connection ${connection}`);
         }).catch(err => {
-            done(`Should have obtained a valid connection ${err}`);
+            assert.isDefined(err, 'Connection failed due to incorrect connection string');
+            done();
         });
     });
 

@@ -18,11 +18,10 @@ export function createAthenaClient(connection) {
         accessKeyId: connection.accessKey,
         secretAccessKey: connection.secretAccessKey,
         region: connection.region,
-        maxRetries: 5
+        maxRetries: NUMBER_OF_RETRIES
     };
 
-    if( connection.sslEnabled ){
-        console.log( 'Enabling SSL Connnections');
+    if (connection.sslEnabled) {
         connectionParams.sslEnabled = connection.sslEnabled;
     }
     const athenaClient = new AWS.Athena(connectionParams);
@@ -59,7 +58,6 @@ export function startQuery(athenaClient, params) {
         return client.startQueryExecution(queryParams, (err, data) => {
             if (err) {
                 Logger.log(`Unexpected Error starting Athena Query ${err}`);
-                console.log( 'Unexpected Error Start Query', err);
                 return reject(err);
             }
                 const queryId = data.QueryExecutionId;
@@ -118,11 +116,11 @@ export function queryResultsCompleted(athenaClient, queryExecutionId) {
                     break;
             }
 
-            let rst = {
+            const rst = {
                 queryState,
                 queryStatus
-            }
-            return resolve( rst );
+            };
+            return resolve(rst);
         });
     });
 }
@@ -144,7 +142,6 @@ export function stopQuery(athenaClient, queryExecutionId) {
         return client.stopQueryExecution(queryParams, (err, data) => {
             if (err) {
                 Logger.log(`Unexpected Error stoping Athena Query Execution ${err}`);
-                console.log( 'Unexpected Error Stop Query', err);
                 return reject(err);
             }
             return resolve(data);
@@ -168,7 +165,6 @@ export function getQueryResults(athenaClient, queryExecutionId) {
     return new Promise(function(resolve, reject) {
         client.getQueryResults(queryParams, (err, data) => {
             if (err) {
-                console.log( 'Unexpected Error Get Results Query', err);
                 return reject(err);
             }
             return resolve(data);
@@ -194,7 +190,6 @@ export function getQueryResults(athenaClient, queryExecutionId) {
  * @returns {Promise} resolve to AWS Query Response
  */
 export function executeQuery(queryParams) {
-    console.log( 'Start executing query');
     const client = createAthenaClient(queryParams);
 
     return new Promise(function(resolve, reject) {
@@ -212,24 +207,21 @@ export function executeQuery(queryParams) {
             const checkQueryStatus = () => {
                 retryCount++;
                 queryResultsCompleted(client, queryExecutionId).then(queryResult => {
-                    console.log( 'Checking query results', queryResult);
                     if (queryResult.queryState < 0) {
-                        return reject( new Error(queryResult.queryStatus) );
+                        return reject(new Error(queryResult.queryStatus));
                     } else if (queryResult.queryState === 1) {
                         return getQueryResults(client, queryExecutionId).then(rst => {
 
                             if (rst && rst.ResultSet && rst.ResultSet.Rows) {
                                 return resolve(rst.ResultSet.Rows);
-                            }else{
-                                return resolve([]);
                             }
+                                return resolve([]);
+
                         });
                     } else if (retryCount > NUMBER_OF_RETRIES) {
-                        console.log( 'TIMEOUT ');
-                        return reject(new Error('Timeout.  Athena did not respond before the query timeout.'));
-                    }else{
+                        throw new Error('Timeout.  Athena did not respond before the query timeout.');
+                    } else {
                         // Loop again
-                        console.log( 'Loop Again', queryResult);
                         return setTimeout(checkQueryStatus, retryInterval);
                     }
 
