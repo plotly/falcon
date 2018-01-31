@@ -18,19 +18,15 @@ The following is the instructions for setting up an Athena Database and Table.
 7. Enter in Database Name, Tablet Name,  and the S3 Location where you uploaded the CSV file and then Next
 8. Choose CSV for the option and Click on Next
 9. Add the following 4 columns with the following information and then click on Next:
-i. Company - string
-ii. Log_Type - string,
-iii. Product - string,
-iv. timestamp - timestamp
+i. location - string
+ii. alcohol - double,
 10. Skip adding Partitions and click on Create Table
 11. It will generate Create External Skip (see sample below).  Click on Run Query (this will create table)
 
 ```sql
-CREATE EXTERNAL TABLE IF NOT EXISTS test (
-  `Company` string,
-  `Log_Type` string,
-  `Product` string,
-  `timestamp` timestamp 
+CREATE EXTERNAL TABLE IF NOT EXISTS alcohol_consumption_by_country_2010 (
+  `location` string,
+  `alcohol` double, 
 )
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
 WITH SERDEPROPERTIES (
@@ -39,4 +35,4 @@ WITH SERDEPROPERTIES (
 ) LOCATION 's3://plot.ly-athena/test-csv/'
 TBLPROPERTIES ('has_encrypted_data'='false');
 ```
-12. Run sample SQL to see the results ( select * from test ) and it should return sample data
+12. Run sample SQL to see the results ( select * from alcohol_consumption_by_country_2010 ) and it should return sample data
