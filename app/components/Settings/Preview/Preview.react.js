@@ -35,6 +35,7 @@ class Preview extends Component {
             isLoading: false,
             errorMsg: '',
             successMsg: '',
+            timeQueryElapsedMsg: '',
             chartEditorState: {}
         };
     }
@@ -224,14 +225,21 @@ class Preview extends Component {
     }
 
     runQuery() {
+        const STARTED_AT = new Date();
         this.props.runSqlQuery().then(content => {
             /*
             * Cache the last successful query
             * lastSuccessfulQuery is the result of the last successful query
             * and should have the form {rows:[[]], columnnames:[]}
+            * Update state.timeQueryElapsedMsg with the number of seconds took by
+            * the query.
             */
             if (!has('error', content) && has('rows', content) && has('columnnames', content)) {
                 this.props.updatePreview({lastSuccessfulQuery: content});
+                const milliSeconds = new Date().getTime() - STARTED_AT.getTime();
+                // Keep 3 decimals
+                const seconds = parseFloat((milliSeconds / 1000).toFixed(3));
+                this.setState({ timeQueryElapsedMsg: `in ${seconds} seconds` });
             }
         });
     }
@@ -280,7 +288,8 @@ class Preview extends Component {
             isLoading,
             plotJSON,
             rows,
-            successMsg
+            successMsg,
+            timeQueryElapsedMsg
         } = this.state;
 
         const dialect = connectionObject.dialect;
@@ -442,7 +451,7 @@ class Preview extends Component {
 
                 {successMsg &&
                     <div className="successMsg">
-                        <p>{successMsg}</p>
+                        <p>{successMsg} {timeQueryElapsedMsg}</p>
                     </div>
                 }
 
