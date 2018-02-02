@@ -2,7 +2,7 @@
 
 const AWS = require('aws-sdk');
 import Logger from '../../../logger';
-const NUMBER_OF_RETRIES = 5;
+const NUMBER_OF_RETRIES = 50;
 
 /**
  * The following function will create an AWS Athena Client
@@ -186,7 +186,7 @@ export function getQueryResults(athenaClient, queryExecutionId) {
  * @param {string} queryParams.dbName - Database name to connect to
  * @param {string} queryParams.sqlStatement - SQL statement to execute
  * @param {string} queryParams.s3Outputlocation - Location will Athena will output resutls of query
- * @param {number} queryParams.queryTimeout  - The timeout interval when the query should stop
+ * @param {number} queryParams.queryInterval  - The timeout interval when the query should stop
  * @returns {Promise} resolve to AWS Query Response
  */
 export function executeQuery(queryParams) {
@@ -196,7 +196,7 @@ export function executeQuery(queryParams) {
         return startQuery(client, queryParams).then(queryExecutionId => {
 
             // Define the wait interval
-            let retryInterval = queryParams.queryTimeout / NUMBER_OF_RETRIES;
+            let retryInterval = queryParams.queryInterval;
 
             let retryCount = 0;
             // If retry interval is not defined or less 0 set retry to 1000
@@ -214,12 +214,10 @@ export function executeQuery(queryParams) {
 
                             if (rst && rst.ResultSet && rst.ResultSet.Rows) {
                                 return resolve(rst.ResultSet.Rows);
-                            }
+                            }else{
                                 return resolve([]);
-
+                            }
                         });
-                    } else if (retryCount > NUMBER_OF_RETRIES) {
-                        throw new Error('Timeout.  Athena did not respond before the query timeout.');
                     } else {
                         // Loop again
                         return setTimeout(checkQueryStatus, retryInterval);

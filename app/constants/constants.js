@@ -217,8 +217,9 @@ export const CONNECTION_CONFIG = {
             'label': 'Database', 'value': 'database', 'type': 'text'
         },
         {
-            'label': 'Timeout', 'value': 'timeout', 'type': 'number',
-            'description': 'The maximum duration (In Milliseconds) that an SQL query can execute for. Default 2 seconds'
+            'label': 'Query Interval', 'value': 'queryInterval', 'type': 'number',
+            'description': 'The Interval (In Milliseconds) that Falcon will check to see \
+                             if the Athena Query is done. Default 2 seconds'
         },
         {
             'label': 'SSL Enabled', 'value': 'sslEnabled', 'type': 'checkbox',

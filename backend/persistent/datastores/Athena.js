@@ -4,7 +4,7 @@ import Logger from '../../logger';
 const SHOW_TABLES_QUERY = 'SHOW TABLES';
 const SHOW_SCHEMA_QUERY = 'SELECT table_name, column_name, data_type FROM '
     + 'information_schema.columns WHERE table_schema ';
-const DEFAULT_QUERY_TIMEOUT = 2000;
+const DEFAULT_QUERY_INTERVAL = 2000;
 
 /*
  * The connection function will validate the parameters and return the connection
@@ -47,12 +47,12 @@ export function connect(connection) {
             return reject(new Error('The Athena S3 Results Output Bucket was not defined'));
         }
 
-        if (!timeout && timeout < 0) {
-            timeout = DEFAULT_QUERY_TIMEOUT;
+        if (!queryInterval && queryInterval < 0) {
+            queryInterval = DEFAULT_QUERY_INTERVAL;
         }
 
         const con = {
-            region, accessKey, secretKey, database, sqlStatement, outputS3Bucket, timeout, sslEnabled
+            region, accessKey, secretKey, database, sqlStatement, outputS3Bucket, queryInterval, sslEnabled
         };
 
         // Test the connection to get a list of schemas
