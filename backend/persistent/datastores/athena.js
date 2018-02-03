@@ -5,7 +5,6 @@ const SHOW_TABLES_QUERY = 'SHOW TABLES';
 const SHOW_SCHEMA_QUERY = 'SELECT table_name, column_name, data_type FROM '
     + 'information_schema.columns WHERE table_schema ';
 const DEFAULT_QUERY_INTERVAL = 2000;
-
 /*
  * The connection function will validate the parameters and return the connection
  * parameters
