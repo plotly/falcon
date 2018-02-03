@@ -1,6 +1,6 @@
 import {assert} from 'chai';
 
-import {connect} from '../../backend/persistent/datastores/Athena';
+import {connect} from '../../backend/persistent/datastores/athena';
 
 /* eslint-disable no-invalid-this */
 describe('Athena Unit Tests:', function () {
