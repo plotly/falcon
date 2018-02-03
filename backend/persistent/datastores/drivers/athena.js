@@ -198,14 +198,12 @@ export function executeQuery(queryParams) {
             // Define the wait interval
             let retryInterval = queryParams.queryInterval;
 
-            let retryCount = 0;
             // If retry interval is not defined or less 0 set retry to 1000
             if ((!retryInterval) || (retryInterval < 1)) {
                 retryInterval = 1000;
             }
 
             const checkQueryStatus = () => {
-                retryCount++;
                 queryResultsCompleted(client, queryExecutionId).then(queryResult => {
                     if (queryResult.queryState < 0) {
                         return reject(new Error(queryResult.queryStatus));
@@ -214,15 +212,12 @@ export function executeQuery(queryParams) {
 
                             if (rst && rst.ResultSet && rst.ResultSet.Rows) {
                                 return resolve(rst.ResultSet.Rows);
-                            }else{
-                                return resolve([]);
                             }
+                            return resolve([]);
                         });
-                    } else {
-                        // Loop again
-                        return setTimeout(checkQueryStatus, retryInterval);
                     }
-
+                    // Loop again
+                    return setTimeout(checkQueryStatus, retryInterval);
                 }).catch(err => {
                     return reject(err);
                 });

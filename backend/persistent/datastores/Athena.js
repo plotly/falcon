@@ -23,7 +23,7 @@ export function connect(connection) {
     const {
         region, accessKey, secretKey, database, sqlStatement, outputS3Bucket, sslEnabled
     } = connection;
-    let timeout = connection.timeout;
+    let queryInterval = connection.timeout;
 
     return new Promise(function(resolve, reject) {
 
@@ -126,7 +126,7 @@ export function schemas(connection) {
     const rows = [];
 
     connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.database}'` ;
-    connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
+    connection.queryInterval = DEFAULT_QUERY_INTERVAL;
     return new Promise(function(resolve) {
         executeQuery(connection).then(dataSet => {
             if (dataSet && dataSet.length > 0) {
@@ -166,7 +166,7 @@ export function schemas(connection) {
 export function tables(connection) {
 
     connection.sqlStatement = SHOW_TABLES_QUERY;
-    connection.queryTimeout = DEFAULT_QUERY_TIMEOUT;
+    connection.queryInterval = DEFAULT_QUERY_INTERVAL;
     return new Promise(function(resolve, reject) {
         executeQuery(connection).then(dataSet => {
 

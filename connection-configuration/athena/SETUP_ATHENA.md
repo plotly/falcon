@@ -1,5 +1,14 @@
+# Additional Resources
+The following is a link to AWS Athena documentation on setting up an athena table and database
+
+[AWS Athean](https://docs.aws.amazon.com/athena/latest/ug/getting-started.html)
+
+In addition, there is a live tutorial built into the AWS Athena Console that provides
+step by step instructions with pictures on how to create a database and table (including 
+sample data)
+
 # Setup
-The following is the instructions for setting up an Athena Database and Table.
+The following is the high level instructions for setting up an Athena Database and Table.
 
 ## Requirements:
 1. A valid AWS Account and access to the AWS Console
