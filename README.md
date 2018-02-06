@@ -36,6 +36,7 @@ We want to encourage a warm, welcoming, and safe environment for contributing to
 |**Chris Parmer**| [@chriddyp](https://github.com/chriddyp) | |
 |**Nicolas Riesco**| [@n-riesco](https://github.com/n-riesco) | |
 |**Tarun Gaba**| [@tarzzz](https://github.com/tarzzz) | |
+|**Shannon Lal**| [@shannonlal](https://github.com/shannonlal) | |
 
 ## Credit
 
