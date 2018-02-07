@@ -68,7 +68,7 @@ export function PlotlyOAuth(electron) {
             }
 
             return userRes.json().then(userMeta => {
-                if (!contains(userMeta.username, getSetting('ALLOWED_USERS'))) {
+                if (!userMeta.username || !contains(userMeta.username, getSetting('ALLOWED_USERS'))) {
                     // Remove any existing credentials and return error
                     res.clearCookie('db-connector-auth-token');
                     res.clearCookie('plotly-auth-token');
