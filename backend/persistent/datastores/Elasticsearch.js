@@ -7,9 +7,9 @@ const MAX_RESULTS_SIZE = 10 * 1000;
 function request(relativeUrl, connection, {body, method, queryStringParams = ''}) {
     const {host, port, username, password} = connection;
     let url;
-    if( typeof port !== 'undefined' && port !== ''){
+    if (typeof port !== 'undefined' && port !== '') {
         url = `${host}:${port}/${relativeUrl}?format=json${queryStringParams}`;
-    }else{
+    } else {
         url = `${host}/${relativeUrl}?format=json${queryStringParams}`;
     }
     const headers = {
