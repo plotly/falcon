@@ -263,8 +263,17 @@ export default class Servers {
             fetch(`${getSetting('PLOTLY_API_URL')}/v2/users/current`, {
                 headers: {'Authorization': `Bearer ${access_token}`}
             })
-            .then(userRes => userRes.json().then(userMeta => {
-                if (userRes.status === 200) {
+            .then(userRes => {
+                if (userRes.status !== 200) {
+                    return userRes.text().then(body => {
+                        const errorMessage = `Error fetching user. Status: ${userRes.status}. Body: ${body}.`;
+                        Logger.log(errorMessage, 0);
+                        res.json(500, {error: {message: errorMessage}});
+                        return next();
+                    });
+                }
+
+                return userRes.json().then(userMeta => {
                     const {username} = userMeta;
                     if (!username) {
                         res.json(500, {error: {message: `User was not found at ${getSetting('PLOTLY_API_URL')}`}});
@@ -327,15 +336,12 @@ export default class Servers {
                     }
                     res.json(403, {error: {message: `User ${username} is not allowed to view this app`}});
                     return next();
-                }
-                Logger.log(userMeta, 0);
-                res.json(500, {error: {message: `Error ${userRes.status} fetching user`}});
-                return next();
-            }))
-            .catch(err => {
-                Logger.log(err, 0);
-                res.json(500, {error: {message: err.message}});
-                return next();
+                })
+                .catch(err => {
+                    Logger.log(err, 0);
+                    res.json(500, {error: {message: err.message}});
+                    return next();
+                });
             });
         });
 

@@ -29,6 +29,15 @@ We want to encourage a warm, welcoming, and safe environment for contributing to
 - [Feature requests and support](https://plot.ly/products/consulting-and-oem/)
 - [Security reports](https://help.plot.ly/security/)
 
+## Maintainers
+
+|   | Github | Twitter |
+|---|--------|---------|
+|**Chris Parmer**| [@chriddyp](https://github.com/chriddyp) | |
+|**Nicolas Riesco**| [@n-riesco](https://github.com/n-riesco) | |
+|**Tarun Gaba**| [@tarzzz](https://github.com/tarzzz) | |
+|**Shannon Lal**| [@shannonlal](https://github.com/shannonlal) | |
+
 ## Credit
 
 This app is built with Electron, React, Redux, and Sequelize.

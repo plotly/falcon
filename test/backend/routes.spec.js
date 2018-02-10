@@ -290,7 +290,7 @@ describe('Routes:', () => {
                             rows: [
                                 ({
                                     'postgres': ['Guinea', 3, 14, '9.95', '-9.7', '122'],
-                                    'redshift': ['Guinea', 3, 14, '10', '-10', 122],
+                                    'redshift': ['Guinea', 5, 14, '10', '-10', 291],
                                     'mysql': ['Guinea', 3, 14, 10, -10, '122'],
                                     'mariadb': ['Guinea', 3, 14, 10, -10, '122'],
                                     'mssql': ['Guinea', 3, 14, 10, -10, '122'],

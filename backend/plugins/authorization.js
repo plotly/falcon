@@ -57,26 +57,32 @@ export function PlotlyOAuth(electron) {
         fetch(`${getSetting('PLOTLY_API_URL')}/v2/users/current`, {
             headers: {'Authorization': `Bearer ${plotlyAuthToken}`}
         })
-        .then(userRes => userRes.json().then(userMeta => {
+        .then(userRes => {
             if (userRes.status !== 200) {
-                res.json(401, {error: {message: 'Please login to access this page.'}});
-                return next(false);
+                return userRes.text().then(body => {
+                    const errorMessage = `Error fetching user. Status: ${userRes.status}. Body: ${body}.`;
+                    Logger.log(errorMessage, 0);
+                    res.json(500, {error: {message: errorMessage}});
+                    return next();
+                });
             }
 
-            if (!contains(userMeta.username, getSetting('ALLOWED_USERS'))) {
-                // Remove any existing credentials and return error
-                res.clearCookie('db-connector-auth-token');
-                res.clearCookie('plotly-auth-token');
-                res.clearCookie('db-connector-user');
-                res.json(403, {error: {message: `User ${userMeta.username} is not allowed to view this app`}});
-                return next(false);
-            }
+            return userRes.json().then(userMeta => {
+                if (!userMeta.username || !contains(userMeta.username, getSetting('ALLOWED_USERS'))) {
+                    // Remove any existing credentials and return error
+                    res.clearCookie('db-connector-auth-token');
+                    res.clearCookie('plotly-auth-token');
+                    res.clearCookie('db-connector-user');
+                    res.json(403, {error: {message: `User ${userMeta.username} is not allowed to view this app`}});
+                    return next(false);
+                }
 
-            const dbConnectorAccessToken = generateAndSaveAccessToken();
-            res.setCookie('db-connector-auth-token', dbConnectorAccessToken, getAccessTokenCookieOptions());
+                const dbConnectorAccessToken = generateAndSaveAccessToken();
+                res.setCookie('db-connector-auth-token', dbConnectorAccessToken, getAccessTokenCookieOptions());
 
-            return next();
-        }))
+                return next();
+            });
+        })
         .catch(err => {
             Logger.log(err, 0);
             res.json(500, {error: {message: err.message}});
