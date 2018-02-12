@@ -208,9 +208,9 @@ export function getApacheDrillS3Keys(connectionId) {
     );
 }
 
-export function previewTable (connectionId, dialect, table, database) {
+export function previewTable(connectionId, connectionObject, table, elasticsearchIndex) {
     const body = {
-        query: PREVIEW_QUERY(dialect, table, database)
+        query: PREVIEW_QUERY(connectionObject, table, elasticsearchIndex)
     };
     return apiThunk(
         `connections/${connectionId}/query`,
