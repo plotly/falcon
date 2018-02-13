@@ -294,7 +294,7 @@ class Preview extends Component {
 
         const dialect = connectionObject.dialect;
         const showEditor = propOr(true, 'showEditor')(preview);
-        const code = propOr(PREVIEW_QUERY(dialect, selectedTable), 'code')(preview);
+        const code = propOr(PREVIEW_QUERY(connectionObject, selectedTable), 'code')(preview);
         propOr('', 'error')(preview);
 
         // Surpressing ESLint cause restricting line length would harm JSX readability
