@@ -36,6 +36,7 @@
     "test-unit-ibmdb": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/datastores.ibmdb.spec.js",
     "test-unit-impala": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/datastores.impala.spec.js",
     "test-unit-livy": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/datastores.livy.spec.js",
+    "test-unit-nock": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/datastores.dataworld.spec.js test/backend/datastores.elasticsearch*.spec.js",
     "test-unit-oauth2": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/routes.oauth2.spec.js",
     "test-unit-plotly": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/PlotlyAPI.spec.js",
     "test-unit-scheduler": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/QueryScheduler.spec.js",

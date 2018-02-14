@@ -88,26 +88,26 @@ describe('QueryScheduler', function() {
         assert(spy1.notCalled, 'job1 should not have been called yet');
 
         return wait(3.25 * refreshInterval * 1000)
-            .then(() => {
-                assert(spy1.calledThrice, 'job1 should have been called yet three times');
+        .then(() => {
+            assert(spy1.calledThrice, 'job1 should have been called three times');
 
-                queryScheduler.job = spy2;
-                queryScheduler.scheduleQuery(merge(query, {query: 'query-2'}));
-            })
-            .then(() => wait(3.25 * refreshInterval * 1000))
-            .then(() => {
-                assert(spy1.calledThrice, 'job1 should have been called yet three times');
-                assert(spy1.alwaysCalledWith(
-                    query.fid, query.uids, query.query,
-                    query.connectionId, query.requestor
-                ), `job1 was called with unexpected args: ${spy1.args}`);
+            queryScheduler.job = spy2;
+            queryScheduler.scheduleQuery(merge(query, {query: 'query-2'}));
+        })
+        .then(() => wait(3.25 * refreshInterval * 1000))
+        .then(() => {
+            assert(spy1.calledThrice, 'job1 should have been called three times');
+            assert(spy1.alwaysCalledWith(
+                query.fid, query.uids, query.query,
+                query.connectionId, query.requestor
+            ), `job1 was called with unexpected args: ${spy1.args}`);
 
-                assert(spy2.calledThrice, 'job2 should have been called yet three times');
-                assert(spy2.alwaysCalledWith(
-                    query.fid, query.uids, 'query-2',
-                    query.connectionId, query.requestor
-                ), `job1 was called with unexpected args: ${spy2.args}`);
-            });
+            assert(spy2.calledThrice, 'job2 should have been called three times');
+            assert(spy2.alwaysCalledWith(
+                query.fid, query.uids, 'query-2',
+                query.connectionId, query.requestor
+            ), `job2 was called with unexpected args: ${spy2.args}`);
+        });
     });
 
     it('saves queries to file', function() {
