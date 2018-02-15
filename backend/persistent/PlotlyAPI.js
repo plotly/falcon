@@ -3,6 +3,10 @@ import {getSetting} from '../settings.js';
 import Logger from '../logger';
 import FormData from 'form-data';
 
+// Module to access Plot.ly REST API
+//
+// See API documentation at https://api.plot.ly/v2/
+
 export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessToken, method}) {
     let authorization;
     if (apiKey) {

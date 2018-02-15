@@ -214,8 +214,8 @@ export const LOGOS = {
     [DIALECTS.DATA_WORLD]: 'images/dataworld-logo.png'
 };
 
-export function PREVIEW_QUERY (dialect, table, database = '') {
-    switch (dialect) {
+export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
+    switch (connection.dialect) {
         case DIALECTS.IBM_DB2:
             return `SELECT * FROM ${table} FETCH FIRST 1000 ROWS ONLY`;
         case DIALECTS.APACHE_IMPALA:
@@ -228,11 +228,10 @@ export function PREVIEW_QUERY (dialect, table, database = '') {
         case DIALECTS.REDSHIFT:
             return `SELECT * FROM ${table} LIMIT 1000`;
         case DIALECTS.MSSQL:
-            return 'SELECT TOP 1000 * FROM ' +
-                `${database}.dbo.${table}`;
+            return `SELECT TOP 1000 * FROM ${connection.database}.dbo.${table}`;
         case DIALECTS.ELASTICSEARCH:
             return JSON.stringify({
-                index: database || '_all',
+                index: elasticsearchIndex || '_all',
                 type: table || '_all',
                 body: {
                     query: { 'match_all': {} },
