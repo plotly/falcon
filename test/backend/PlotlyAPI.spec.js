@@ -6,8 +6,15 @@ import {
     PlotlyAPIRequest,
     updateGrid
 } from '../../backend/persistent/PlotlyAPI.js';
-import {wait, names, createGrid, username, apiKey} from './utils.js';
 import {saveSetting} from '../../backend/settings.js';
+import {
+    apiKey,
+    assertResponseStatus,
+    createGrid,
+    getResponseJson,
+    names,
+    username
+} from './utils.js';
 
 // Suppressing ESLint cause Mocha ensures `this` is bound in test functions
 /* eslint-disable no-invalid-this */
@@ -24,31 +31,29 @@ describe('Grid API Functions', function () {
         // it works off of the assumption that a grid exists
 
         let fid;
-        return createGrid('Test updateGrid').then(res => res.json().then(json => {
-            // Update the grid's data
+        return createGrid('Test updateGrid')
+        .then(assertResponseStatus(201))
+        .then(getResponseJson).then(json => {
             fid = json.file.fid;
             const uids = json.file.cols.map(col => col.uid);
-
-            return wait(1000).then(() => {
-                return updateGrid(
-                    [
-                        ['x', 10, 40, 70, 100, 130],
-                        ['y', 20, 50, 80, 110, 140],
-                        ['z', 30, 60, 90, 120, 150]
-                    ],
-                    fid,
-                    uids,
-                    username
-                );
-            });
-        })).then(() => {
-            // Retrieve the contents from the grid
-            return wait(1000).then(() => {
-                const url = `grids/${fid}/content`;
-                return PlotlyAPIRequest(url, {username, apiKey, method: 'GET'});
-            });
-        }).then(res => res.json().then(json => {
-            // Test that the update worked
+            return updateGrid(
+                [
+                    ['x', 10, 40, 70, 100, 130],
+                    ['y', 20, 50, 80, 110, 140],
+                    ['z', 30, 60, 90, 120, 150]
+                ],
+                fid,
+                uids,
+                username
+            );
+        })
+        .then(assertResponseStatus(200))
+        .then(() => {
+            const url = `grids/${fid}/content`;
+            return PlotlyAPIRequest(url, {username, apiKey, method: 'GET'});
+        })
+        .then(assertResponseStatus(200))
+        .then(getResponseJson).then(json => {
             assert.deepEqual(
                 json.cols[names[0]].data,
                 ['x', 'y', 'z']
@@ -73,8 +78,7 @@ describe('Grid API Functions', function () {
                 json.cols[names[5]].data,
                 [130, 140, 150]
             );
-        }));
-
+        });
     });
 });
 /* eslint-enable no-invalid-this */

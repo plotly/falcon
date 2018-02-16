@@ -521,7 +521,7 @@ function mapStateToProps(state) {
     const preview = previews[selectedConnectionId] || {};
     const connection = connections[selectedTab];
     if (connection && !hasIn('code', preview)) {
-        preview.code = PREVIEW_QUERY(connection.dialect, selectedTable);
+        preview.code = PREVIEW_QUERY(connection, selectedTable);
     }
 
     return {
@@ -605,9 +605,9 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     function boundPreviewTables() {
         return dispatch(Actions.previewTable(
             selectedConnectionId,
-            connectionObject.dialect,
+            connectionObject,
             selectedTable,
-            connectionObject.database || selectedIndex
+            selectedIndex
         ));
     }
     function boundUpdatePreview(previewUpdateObject) {
