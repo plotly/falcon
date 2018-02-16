@@ -1,27 +1,39 @@
+// do not use import, otherwise other test units won't be able to reactivate nock
+const nock = require('nock');
+
 import {assert} from 'chai';
 import {range} from 'ramda';
-
-import nock from 'nock';
-const disabledNock = {};
-// const nock = function() { return disabledNock; };
-disabledNock.reply = nock;
-disabledNock.get = nock;
-disabledNock.post = nock;
 
 import {
     assertResponseStatus,
     elasticsearchConnections,
     getResponseJson
 } from './utils.js';
-elasticsearchConnections.host = 'http://localhost';
-elasticsearchConnections.port = '9200';
-const url = `${elasticsearchConnections.host}:${elasticsearchConnections.port}`;
 
 import {
     query, connect, elasticsearchMappings
 } from '../../backend/persistent/datastores/Datastores.js';
 
-describe('Elasticsearch:', function () {
+describe('Elasticsearch v5:', function () {
+    let url;
+
+    before(function() {
+        url = `${elasticsearchConnections.host}:${elasticsearchConnections.port}`;
+
+        // Enable nock if it has been disabled by other specs
+        if (!nock.isActive()) nock.activate();
+
+        // Uncomment to test dockerized server:
+        //
+        // elasticsearchConnections.host = 'http://localhost';
+        // elasticsearchConnections.port = '9200';
+        // nock.restore();
+    });
+
+    after(function() {
+        nock.restore();
+    });
+
     const expectedMappingsResponse = {
         'test-types': {
             'mappings': {

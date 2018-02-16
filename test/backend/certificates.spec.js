@@ -1,5 +1,6 @@
-import chai, {assert, expect} from 'chai';
-import spies from 'chai-spies';
+import {assert, expect} from 'chai';
+import sinon from 'sinon';
+
 import fs from 'fs';
 import {isEmpty} from 'ramda';
 import fetch from 'node-fetch';
@@ -28,8 +29,6 @@ const cleanUp = () => {
         }
     });
 };
-
-chai.use(spies);
 
 const mockedCaServerURL = 'http://localhost:9494/certificate';
 
@@ -264,16 +263,16 @@ describe('Certificates', function() {
         ServerUnderTest = new Servers({startHTTPS: true, createCerts: false});
         // Set a spy on ServerUnderTest.httpsServer.restart
         saveSetting('USERS', [{username, accessToken}]);
-        ServerUnderTest.httpsServer.restart = chai.spy(() => {});
+        ServerUnderTest.httpsServer.restart = sinon.spy();
         // Make sure restart has not been called yet.
         const {restart} = ServerUnderTest.httpsServer;
         // Renew the certificates in 1s.
-        expect(restart).not.to.have.been.called();
+        assert(restart.notCalled, 'restart should not have been called yet');
         setRenewalJob({server: ServerUnderTest.httpsServer, timeout: 1000});
         setTimeout(() => {
             assert.equal(ServerCA.count, 1, 'Made a call to renew.');
             assert.deepEqual(getCerts(), {cert, key}, 'Real certificates appeared.');
-            expect(restart).to.have.been.called();
+            assert(restart.called, 'restart should have been called');
             done();
         }, 5000);
     });
