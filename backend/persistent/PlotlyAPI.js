@@ -149,8 +149,8 @@ export function checkWritePermissions(fid, requestor) {
         } else if (res.status === 401) {
             throw new Error('Unauthenticated');
         } else if (res.status !== 200) {
-            return res.json().then(json => {
-                throw new Error(`${res.status}: ${JSON.stringify(json, null, 2)}`);
+            return res.text().then(body => {
+                throw new Error(`Failed request 'grids/${fid}'. Status: ${res.status}. Body: ${body}`);
             });
         } else {
             return res.json();
