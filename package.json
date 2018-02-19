@@ -42,6 +42,7 @@
     "test-unit-scheduler": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/QueryScheduler.spec.js",
     "test-unit-routes": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/routes.spec.js",
     "test-unit-mock": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/datastores.mock.spec.js",
+    "test-jest":"./node_modules/.bin/jest ./test/app",
     "pack": "cross-env NODE_ENV=production electron-builder --publish=never",
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
     "package-all": "yarn run package -- --all",
@@ -212,7 +213,14 @@
     "sinon": "^4.3.0",
     "style-loader": "^0.19.0",
     "webpack": "^3.8.1",
-    "yamljs": "^0.3.0"
+    "yamljs": "^0.3.0",
+    "jest":"^22.3.0",
+    "babel-jest":"latest",
+    "react-test-renderer":"latest",
+    "react-addons-test-utils": "latest",
+    "enzyme":"latest",
+    "babel-preset-jest":"^22.2.0",
+    "enzyme-adapter-react-15":"^1.0.5"
   },
   "dependencies": {
     "csv-parse": "^2.0.0",
