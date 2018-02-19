@@ -5,18 +5,53 @@ import {type} from 'ramda';
 
 import {parseSQL} from '../../parse';
 
-// define type error thrown by this connector
+/**
+ * @typedef {object} PapaError Papaparse error
+ *
+ * @property {string} type    Error type
+ * @property {string} code    Error code
+ * @property {string} message Error description
+ * @property {number} row     Row index that triggered the error
+ */
+
+/**
+ *  Error thrown by CSV connector
+ *  @class
+ *  @param {string}      url    URL of the CSV file that triggered the error
+ *  @param {PapaError[]} errors List of errors returned by Papaparse
+ */
 export function CSVError(url, errors) {
+      /**
+       * Error class
+       * @type {string}
+       */
       this.name = 'CSVError';
+
+      /**
+       * Error description
+       * @type {string}
+       */
       this.message = 'Failed to parse CSV file ' + url;
 
       if (Error.captureStackTrace) {
           Error.captureStackTrace(this, CSVError);
       } else {
+          /**
+           * Error stack trace
+           */
           this.stack = new Error(this.message).stack;
       }
 
+      /**
+       * URL to CSV file
+       * @type {string}
+       */
       this.url = url;
+
+      /**
+       * List of errors returned by Papaparse
+       * @type {PapaError[]}
+       */
       this.errors = errors;
 
       if (errors && errors[0] && errors[0].message) {
@@ -26,7 +61,11 @@ export function CSVError(url, errors) {
 CSVError.prototype = Object.create(Error.prototype);
 CSVError.prototype.constructor = CSVError;
 
-// the data parsed from CSV files is stored here
+/**
+ * Store of CSV files parsed into JS objects and indexed by URL
+ *
+ * @const {Object.<string, object>}
+ */
 const connectionData = {};
 function getData(connection) {
     return connectionData[connection.database];
@@ -65,15 +104,21 @@ export function connect(connection) {
     });
 }
 
+/**
+ * Table name used in SQL queries to refer to the data imported from a CSV file,
+ * so that we can take advantage of alaSQL's parser.
+ * @const {string}
+ */
+const TABLENAME = '?';
+
 export function tables() {
-    // To take advantage of alaSQL's parser, the table is named '?'
-    return Promise.resolve(['?']);
+    return Promise.resolve([TABLENAME]);
 }
 
 export function schemas(connection) {
     const columnnames = ['TABNAME', 'COLNAME', 'TYPENAME'];
     const rows = connection.meta.fields.map(columnName => {
-        return ['?', columnName, getType(columnName)];
+        return [TABLENAME, columnName, getType(columnName)];
     });
 
     return Promise.resolve({columnnames, rows});
@@ -86,6 +131,8 @@ export function schemas(connection) {
             if (cell) return type(cell);
         }
 
+        // If we reach this point, the column is empty.
+        // Let's return 'String', as none of the cells can be converted to Number.
         return 'String';
     }
 }
