@@ -307,7 +307,7 @@ class Settings extends Component {
 
                         <TabList>
                             <Tab>Connection</Tab>
-                            {this.props.connectRequest.status === 200 ? (
+                            {this.props.connectRequest.status === 200 && selectedTable ? (
                                 <Tab>Query</Tab>
                             ) : (
                                 <Tab disabled={true}>Query</Tab>
@@ -326,7 +326,7 @@ class Settings extends Component {
                         </TabPanel>
 
                         <TabPanel className={['tab-panel-query', 'react-tabs__tab-panel']}>
-                            {this.props.connectRequest.status === 200 ? (
+                            {this.props.connectRequest.status === 200 && selectedTable ? (
                                 <SplitPane
                                     split="vertical"
                                     minSize={10}
