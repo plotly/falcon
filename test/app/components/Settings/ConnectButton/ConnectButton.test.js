@@ -1,4 +1,4 @@
-jest.dontMock('../../../../../app/components/Settings/ConnectButton/ConnectButton.react.js');
+jest.unmock('../../../../../app/components/Settings/ConnectButton/ConnectButton.react.js');
 import ConnectButton from '../../../../../app/components/Settings/ConnectButton/ConnectButton.react.js';
 import React from 'react';
 import { mount, configure } from 'enzyme';
