@@ -25,7 +25,6 @@ describe('Connect Button Test', () => {
             editMode={editMode}
         />);
 
-        expect(button).toBeDefined();
         expect(button.instance().connectionFailed()).toBe(true);
     });
 
@@ -44,7 +43,6 @@ describe('Connect Button Test', () => {
             editMode={editMode}
         />);
 
-        expect(button).toBeDefined();
         expect(button.instance().saveFailed()).toBe(true);
     });
 
@@ -63,7 +61,6 @@ describe('Connect Button Test', () => {
             editMode={editMode}
         />);
 
-        expect(button).toBeDefined();
         expect(button.instance().isConnected()).toBe(true);
     });
 
@@ -82,7 +79,6 @@ describe('Connect Button Test', () => {
             editMode={editMode}
         />);
 
-        expect(button).toBeDefined();
         expect(button.instance().isConnecting()).toBe(true);
     });
 
@@ -101,7 +97,6 @@ describe('Connect Button Test', () => {
             editMode={editMode}
         />);
 
-        expect(button).toBeDefined();
         expect(button.instance().isSaving()).toBe(true);
     });
 
@@ -121,8 +116,6 @@ describe('Connect Button Test', () => {
             saveConnectionsRequest={saveConnectionsRequest}
             editMode={editMode}
         />);
-
-        expect(button).toBeDefined();
 
         expect(button.instance().isSaved()).toBe(true);
     });
@@ -144,7 +137,6 @@ describe('Connect Button Test', () => {
             editMode={editMode}
         />);
 
-        expect(button).toBeDefined();
         expect(button.instance().connectionFailed()).toBe(true);
     });
 
@@ -164,7 +156,6 @@ describe('Connect Button Test', () => {
             editMode={editMode}
         />);
 
-        expect(buttonWrapper).toBeDefined();
         expect(buttonWrapper.instance().saveFailed()).toBe(true);
     });
 
@@ -184,8 +175,6 @@ describe('Connect Button Test', () => {
             saveConnectionsRequest={saveConnectionsRequest}
             editMode={editMode}
         />);
-
-        expect(button).toBeDefined();
 
         // Length is 1
         expect(button.find('.connectButtonContainer').length).toBe(1);
@@ -216,8 +205,6 @@ describe('Connect Button Test', () => {
             editMode={editMode}
         />);
 
-        expect(button).toBeDefined();
-
         // Length is 1
         expect(button.find('.connectButtonContainer').length).toBe(1);
 
@@ -243,8 +230,6 @@ describe('Connect Button Test', () => {
             saveConnectionsRequest={saveConnectionsRequest}
             editMode={editMode}
         />);
-
-        expect(button).toBeDefined();
 
         // Length is 1
         expect(button.find('.connectButtonContainer').length).toBe(1);
