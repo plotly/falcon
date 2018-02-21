@@ -5,9 +5,10 @@ import * as ApacheDrill from './ApacheDrill';
 import * as IbmDb2 from './ibmdb2';
 import * as ApacheLivy from './livy';
 import * as ApacheImpala from './impala';
-import * as CSV from './csv';
 import * as DataWorld from './dataworld';
 import * as DatastoreMock from './datastoremock';
+
+const CSV = require('./csv');
 
 /*
  * Switchboard to all of the different types of connections

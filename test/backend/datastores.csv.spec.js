@@ -10,6 +10,8 @@ import {
     tables
 } from '../../backend/persistent/datastores/Datastores.js';
 
+const setSize = require('../../backend/persistent/datastores/csv.js').setSize;
+
 const csvFile = [
     'col1,col 2,"col 3",col 4',
     '1,1.1,2018-01-10,UK',
@@ -51,11 +53,38 @@ describe('CSV:', function () {
         nock.restore();
     });
 
-    it('connect succeeds', function() {
+    it('connect fails if storage size is exceeded', function() {
         // mock connect response
         nock(host)
         .get(path)
         .reply(200, csvFile);
+
+        // set storage size of CSV connector to a small number,
+        // so that next attempt to connect fails
+        setSize(84);
+
+        return connect(connection)
+        .then(() => {
+            throw new Error('connect() should have thrown an exception');
+
+        }, (error) => {
+            assert.equal(error.name, 'FetchError', 'Unexpected error name');
+            assert.equal(
+                error.message,
+                'content size at https://csv.example.com/table.csv over limit: 84',
+                'Unexpected error message'
+            );
+        });
+    });
+
+    it('connect succeeds if storage size limit is disabled', function() {
+        // mock connect response
+        nock(host)
+        .get(path)
+        .reply(200, csvFile);
+
+        // set storage size of CSV connector to 0 to disable size limit
+        setSize(0);
 
         return connect(connection)
         .then(conn => {
