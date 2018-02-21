@@ -33,20 +33,6 @@ The following are the instructions for updating the Tab React JS file
     ....
 ```
 
-## Updating the Settings.react.js
-Update the fetchData function to make the calls to appropriate sessions.js backend.  
-Add your new connection to the following list:
-
-```javascript
-    if (contains(connectionObject.dialect, [
-                    DIALECTS.APACHE_IMPALA,
-                    DIALECTS.APACHE_SPARK,
-                    DIALECTS.IBM_DB2,
-                    DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
-                    DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE
-    ])) {
-```
-
 ## New Datastore file
 This file should be added in the following location
 backend/persistent/datastores
