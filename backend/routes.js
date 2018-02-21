@@ -1,8 +1,10 @@
 var restify = require('restify');
 var CookieParser = require('restify-cookies');
-import * as Datastores from './persistent/datastores/Datastores.js';
 import * as fs from 'fs';
 import path from 'path';
+
+import * as Datastores from './persistent/datastores/Datastores.js';
+const setSizeCSVStorage = require('./persistent/datastores/csv.js').setSize;
 
 import {PlotlyOAuth} from './plugins/authorization.js';
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
@@ -34,6 +36,13 @@ export default class Servers {
      * The httpsServer starts when certificates have been created.
      */
     constructor(args = {createCerts: true, startHttps: true, isElectron: false}) {
+        try {
+            setSizeCSVStorage(getSetting('CSV_STORAGE_SIZE'));
+        } catch (error) {
+            Logger.log(`Failed to get setting CSV_STORAGE_SIZE: ${error.message}`);
+            setSizeCSVStorage(0);
+        }
+
         this.httpServer = {
             port: null,
             server: null,
