@@ -7,11 +7,11 @@ import {pathOr} from 'ramda';
  * @param {function} connect - Connect function
  * @param {object} connectRequest - Connection Request
  * @param {number || string} connectRequest.status -- 400 or loading
+ * @param {Error} connectRequest.error
  * @param {object} saveConnectionsRequest - Saved Connection Request
  * @param {number || string } saveConnectionsRequest.status -- 400 or loading
+ * @param {Error} saveConnectionsRequest.error
  * @param {boolean} editMode  - Enabled if Editting credentials
- * @param {Error} [connectRequest.error]
- * @param {Error} [saveConnectionsRequest.error]
  * @returns {ConnectButton}
  */
 export default class ConnectButton extends Component {
@@ -78,7 +78,10 @@ export default class ConnectButton extends Component {
         let buttonClick = () => {};
         let error = null;
 
-        if (this.isConnecting() || this.isSaving()) {
+        if (!editMode) {
+            buttonText = 'Connected';
+
+        } else if (this.isConnecting() || this.isSaving()) {
             buttonText = 'Connecting...';
 
         } else if (this.connectionFailed() || this.saveFailed()) {
@@ -95,16 +98,12 @@ export default class ConnectButton extends Component {
             const errorMessage = connectErrorMessage || saveErrorMessage || genericErrorMessage;
             error = <div className={'errorMessage'}>{errorMessage}</div>;
 
-        } else if (this.isConnected()) {
+        } else if (this.isConnected() && this.isSaved()) {
             buttonText = 'Save changes';
             buttonClick = connect;
         } else {
+            buttonText = 'Connect';
             buttonClick = connect;
-            if (!editMode) {
-                buttonText = 'Connected';
-            } else {
-                buttonText = 'Connect';
-            }
         }
 
         return (

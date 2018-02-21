@@ -159,6 +159,35 @@ describe('Connect Button Test', () => {
         expect(buttonWrapper.instance().saveFailed()).toBe(true);
     });
 
+    it('should create valid save changes button', () => {
+        expect(ConnectButton).toBeDefined();
+
+        const connect = function() {};
+        const connectRequest = {
+            status: 200
+        };
+        const saveConnectionsRequest = {
+            status: 200
+        };
+        const editMode = true;
+
+        const button = mount(<ConnectButton connect={connect} connectRequest={connectRequest}
+            saveConnectionsRequest={saveConnectionsRequest}
+            editMode={editMode}
+        />);
+
+        // Length is 1
+        expect(button.find('.connectButtonContainer').length).toBe(1);
+
+        // Length is 0
+        expect(button.find('.not-defined').length).toBe(0);
+
+        // Verify that the error message div is not defined
+        expect(button.find('.errorMessage').length).toBe(0);
+
+        expect(button.find('#test-connect-button').text()).toBe('Save changes');
+    });
+
     it('should create valid connected button', () => {
         expect(ConnectButton).toBeDefined();
 
@@ -185,7 +214,7 @@ describe('Connect Button Test', () => {
         // Verify that the error message div is not defined
         expect(button.find('.errorMessage').length).toBe(0);
 
-        expect(button.find('#test-connect-button').text()).toBe('Save changes');
+        expect(button.find('#test-connect-button').text()).toBe('Connected');
     });
 
     it('should connected button with error due to connect request error', () => {
@@ -198,7 +227,7 @@ describe('Connect Button Test', () => {
         const saveConnectionsRequest = {
             status: 400
         };
-        const editMode = false;
+        const editMode = true;
 
         const button = mount(<ConnectButton connect={connect} connectRequest={connectRequest}
             saveConnectionsRequest={saveConnectionsRequest}
@@ -209,7 +238,7 @@ describe('Connect Button Test', () => {
         expect(button.find('.connectButtonContainer').length).toBe(1);
 
         // Verify that the error message div is defined
-        // expect(button.find('.errorMessage').length).toBe(1);
+        expect(button.find('.errorMessage').length).toBe(1);
 
         expect(button.find('#test-connect-button').text()).toBe('Connect');
     });
@@ -224,7 +253,7 @@ describe('Connect Button Test', () => {
         const saveConnectionsRequest = {
             status: 400
         };
-        const editMode = false;
+        const editMode = true;
 
         const button = mount(<ConnectButton connect={connect} connectRequest={connectRequest}
             saveConnectionsRequest={saveConnectionsRequest}
@@ -235,7 +264,7 @@ describe('Connect Button Test', () => {
         expect(button.find('.connectButtonContainer').length).toBe(1);
 
         // Verify that the error message div is defined
-        // expect(button.find('.errorMessage').length).toBe(1);
+        expect(button.find('.errorMessage').length).toBe(1);
 
         expect(button.find('#test-connect-button').text()).toBe('Connect');
     });
