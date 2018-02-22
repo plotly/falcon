@@ -194,14 +194,7 @@ class Settings extends Component {
         }
 
         const connectionObject = connections[selectedTab] || {};
-        if (contains(connectionObject.dialect, [
-                    DIALECTS.APACHE_IMPALA,
-                    DIALECTS.APACHE_SPARK,
-                    DIALECTS.IBM_DB2,
-                    DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
-                    DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE,
-                    DIALECTS.DATA_WORLD
-        ])) {
+        if (contains(connectionObject.dialect, SQL_DIALECTS_USING_EDITOR)) {
             if (connectRequest.status === 200 && !tablesRequest.status) {
                 this.setState({editMode: false});
                 getTables();
