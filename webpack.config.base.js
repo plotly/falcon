@@ -2,6 +2,7 @@ import path from 'path';
 
 export default {
     module: {
+        noParse: [/alasql/],
         rules: [{
             test: /\.jsx?$/,
             use: [{
