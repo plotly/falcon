@@ -10,5 +10,7 @@ describe('Dialog Selector Test', () => {
         configure({ adapter: new Adapter() });
     });
 
-   
+   //1. Test that the output picks up and matches existing
+   //2. Test that the output does not match output
+   //3. Test that update connection is being called
 });
