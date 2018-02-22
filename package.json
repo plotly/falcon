@@ -223,6 +223,7 @@
   "dependencies": {
     "alasql": "^0.4.5",
     "csv-parse": "^2.0.0",
+    "data-urls": "^1.0.0",
     "font-awesome": "^4.6.1",
     "ibm_db": "git+https://git@github.com/n-riesco/node-ibm_db.git#patched-v2.2.1",
     "mysql": "^2.15.0",
@@ -233,7 +234,8 @@
     "sequelize": "^3.30.4",
     "source-map-support": "^0.5.0",
     "sqlite3": "^3.1.13",
-    "tedious": "^2.1.4"
+    "tedious": "^2.1.4",
+    "whatwg-encoding": "^1.0.3"
   },
   "engines": {
     "node": "6",

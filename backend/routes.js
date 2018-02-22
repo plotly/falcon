@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import path from 'path';
 
 import * as Datastores from './persistent/datastores/Datastores.js';
-const setSizeCSVStorage = require('./persistent/datastores/csv.js').setSize;
+const setCSVStorageSize = require('./persistent/datastores/csv.js').setStorageSize;
 
 import {PlotlyOAuth} from './plugins/authorization.js';
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
@@ -37,10 +37,10 @@ export default class Servers {
      */
     constructor(args = {createCerts: true, startHttps: true, isElectron: false}) {
         try {
-            setSizeCSVStorage(getSetting('CSV_STORAGE_SIZE'));
+            setCSVStorageSize(getSetting('CSV_STORAGE_SIZE'));
         } catch (error) {
             Logger.log(`Failed to get setting CSV_STORAGE_SIZE: ${error.message}`);
-            setSizeCSVStorage(0);
+            setCSVStorageSize(0);
         }
 
         this.httpServer = {

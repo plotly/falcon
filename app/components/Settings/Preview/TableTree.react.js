@@ -33,6 +33,10 @@ class TableTree extends Component {
               return BASENAME_RE.exec(connectionObject.storage)[0] || connectionObject.storage;
             case DIALECTS.DATA_WORLD:
               return getPathNames(connectionObject.url)[2];
+            case DIALECTS.CSV:
+              return (connectionObject.database.startsWith('data:')) ?
+                  connectionObject.id :
+                  connectionObject.database;
             default:
               return connectionObject.database;
         }
