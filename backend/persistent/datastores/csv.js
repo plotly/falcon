@@ -10,7 +10,9 @@ module.exports = {
     tables: tables,
     schemas: schemas,
     query: query,
+    disconnect: disconnect,
 
+    getAvailableSize: getAvailableSize,
     setStorageSize: setStorageSize
 };
 
@@ -45,7 +47,15 @@ function getData(connection) {
 }
 
 function putData(connection, data) {
+    const size = connection.size || 0;
+    STORAGE.used += size;
     STORAGE.data[connection.database] = data;
+}
+
+function deleteData(connection) {
+    const size = connection.size || 0;
+    STORAGE.used = Math.max(0, STORAGE.used - size);
+    delete STORAGE.data[connection.database];
 }
 
 function setStorageSize(size) {
@@ -69,15 +79,12 @@ function getAvailableSize() {
     return available;
 }
 
-function increaseUsedSize(bytes) {
-    STORAGE.used += bytes;
-}
-
 
 /**
  * @typedef {object} CSVConnection Connection to a CSV file
  *
  * @property {string} database URL of the CSV file
+ * @property {number} size     File size
  */
 
 /**
@@ -86,28 +93,40 @@ function increaseUsedSize(bytes) {
  * @returns {Promise.<CSVConnection>} that resolves when the connection succeeds
  */
 function connect(connection) {
+    // check if the CSV file is already in the storage
+    if (getData(connection)) {
+        return Promise.resolve(connection);
+    }
+
     const url = connection.database;
 
-    const size = getAvailableSize();
-    if (size === -1) {
+    const availableSize = getAvailableSize();
+    if (availableSize === -1) {
         throw new Error('Out of memory');
     }
 
     let getCSVFile;
     if (url.startsWith('data:')) {
-        const body = new Buffer(url.slice(1 + url.indexOf(',')), 'base64').toString();
+        const data = url.slice(1 + url.indexOf(','));
 
-        if (size !== 0 && body.length > size) {
+        // base64 encodes 6 bits per byte
+        const estimatedSize = data.length * 6 / 8;
+        if (availableSize !== 0 && estimatedSize > availableSize) {
             throw new Error('Out of memory');
         }
 
+        const body = new Buffer(url.slice(1 + url.indexOf(',')), 'base64').toString();
         getCSVFile = Promise.resolve(body);
+
     } else {
-        getCSVFile = fetch(url, {size: size}).then(res => res.text());
+        getCSVFile = fetch(url, {size: availableSize}).then(res => res.text());
     }
 
     return getCSVFile.then(body => {
-        increaseUsedSize(body.length);
+        const fileSize = body.length;
+        if (availableSize !== 0 && fileSize > availableSize) {
+            throw new Error('Out of memory');
+        }
 
         return new Promise(function(resolve) {
             papa.parse(body, {
@@ -123,6 +142,7 @@ function connect(connection) {
                     }
 
                     connection.meta = meta;
+                    connection.size = fileSize;
 
                     putData(connection, data);
 
@@ -131,6 +151,16 @@ function connect(connection) {
             });
         });
     });
+}
+
+/**
+ * disconnect deletes the CSV file from the storage
+ * @param {CSVConnection} connection Connection to a CSV file
+ * @returns {Promise.<CSVConnection>} that resolves when the connection has been disconnected
+ */
+function disconnect(connection) {
+    deleteData(connection);
+    return Promise.resolve(connection);
 }
 
 /**

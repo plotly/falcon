@@ -7,10 +7,14 @@ import {
     connect,
     query,
     schemas,
-    tables
+    tables,
+    disconnect
 } from '../../backend/persistent/datastores/Datastores.js';
 
-const {setStorageSize} = require('../../backend/persistent/datastores/csv.js');
+const {
+    getAvailableSize,
+    setStorageSize
+} = require('../../backend/persistent/datastores/csv.js');
 
 const csvFile = [
     'col1,col 2,"col 3",col 4',
@@ -136,6 +140,35 @@ describe('CSV:', function () {
         .then(({columnnames, rows}) => {
             assert.deepEqual(columnnames, expected.columnnames, 'Unexpected columnnames');
             assert.deepEqual(rows, expected.rows, 'Unexpected rows');
+        });
+    });
+
+    it('disconnect removes a CSV file from the storage', function() {
+        // mock connect response
+        nock(host)
+        .get(path)
+        .reply(200, csvFile);
+
+        // set storage size of CSV connector to 0 to disable size limit
+        const storageSize = 200;
+        setStorageSize(storageSize);
+
+        // test connections.size has been set to the file size
+        assert.equal(connection.size, csvFile.length, 'Unexpected connection size');
+
+        // assuming the previous tests didn't disconnect connection and  connectionDataURL
+        let expectedAvailableSize = storageSize - connection.size - connectionDataURL.size;
+        assert.equal(getAvailableSize(), expectedAvailableSize, 'Unexpected available size');
+
+        return disconnect(connection)
+        .then(() => {
+            expectedAvailableSize = storageSize - connectionDataURL.size;
+            assert.equal(getAvailableSize(), expectedAvailableSize, 'Unexpected available size');
+
+            return disconnect(connectionDataURL);
+        })
+        .then(() => {
+            assert.equal(getAvailableSize(), storageSize, 'Unexpected storage size');
         });
     });
 });

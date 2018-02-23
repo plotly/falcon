@@ -71,11 +71,22 @@ export function query(queryObject, connection) {
 }
 
 /*
- * connect functions attempt to ping the connection and
- * return a promise that is empty
+ * connect attempts to ping the connection and
+ * returns a promise that resolves to the connection object
  */
 export function connect(connection) {
     return getDatastoreClient(connection).connect(connection);
+}
+
+/*
+ * disconnect closes the connection and
+ * returns a promise that resolves to the connection object
+ */
+export function disconnect(connection) {
+    const client = getDatastoreClient(connection);
+    return (client.disconnect) ?
+        client.disconnect(connection) :
+        Promise.resolve(connection);
 }
 
 /* SQL-like Connectors */
