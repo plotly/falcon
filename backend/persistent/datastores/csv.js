@@ -1,9 +1,7 @@
 const alasql = require('alasql');
-import parseDataURL from 'data-urls';
 import fetch from 'node-fetch';
 import papa from 'papaparse';
 import {type} from 'ramda';
-import {decode, labelToName} from 'whatwg-encoding';
 
 import {parseSQL} from '../../parse';
 
@@ -97,13 +95,11 @@ function connect(connection) {
 
     let getCSVFile;
     if (url.startsWith('data:')) {
-        if (size !== 0 && url.length > size) {
+        const body = new Buffer(url.slice(1 + url.indexOf(',')), 'base64').toString();
+
+        if (size !== 0 && body.length > size) {
             throw new Error('Out of memory');
         }
-
-        const dataURL = parseDataURL(url);
-        const encoding = labelToName(dataURL.mimeType.parameters.get('charset'));
-        const body = decode(dataURL.body, encoding);
 
         getCSVFile = Promise.resolve(body);
     } else {

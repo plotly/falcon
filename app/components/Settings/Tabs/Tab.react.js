@@ -33,9 +33,7 @@ export default class ConnectionTab extends Component {
         } else if (dialect === DIALECTS.APACHE_SPARK) {
             label = `Apache Spark (${connectionObject.host}:${connectionObject.port})`;
         } else if (connectionObject.dialect === DIALECTS.CSV) {
-            label = (!connectionObject.database || connectionObject.database.startsWith('data:')) ?
-                connectionObject.id :
-                `CSV (${connectionObject.database})`;
+            label = connectionObject.label || connectionObject.id || connectionObject.database;
         } else if (connectionObject.dialect === DIALECTS.ELASTICSEARCH) {
             label = `Elasticsearch (${connectionObject.host})`;
         } else if (connectionObject.dialect === DIALECTS.SQLITE) {

@@ -30,15 +30,13 @@ class TableTree extends Component {
     getLabel(connectionObject) {
         switch (connectionObject.dialect) {
             case DIALECTS.SQLITE:
-              return BASENAME_RE.exec(connectionObject.storage)[0] || connectionObject.storage;
+                return BASENAME_RE.exec(connectionObject.storage)[0] || connectionObject.storage;
             case DIALECTS.DATA_WORLD:
-              return getPathNames(connectionObject.url)[2];
+                return getPathNames(connectionObject.url)[2];
             case DIALECTS.CSV:
-              return (connectionObject.database.startsWith('data:')) ?
-                  connectionObject.id :
-                  connectionObject.database;
+                return connectionObject.label || connectionObject.id || connectionObject.database;
             default:
-              return connectionObject.database;
+                return connectionObject.database;
         }
     }
 
