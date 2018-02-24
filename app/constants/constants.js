@@ -435,8 +435,8 @@ export const SAMPLE_DBS = {
         s3Outputlocation: 'plotly-s3-connector-test',
         accessKey: 'AKIAIMHMSHTGARJYSKMQ',
         secretKey: 'Urvus4R7MnJOAqT4U3eovlCBimQ4Zg2Y9sV5LWow',
-        region: 'us-west-2',
-        database: 'default',
+        region: 'us-east-1',
+        database: 'falcon',
         queryTimeout: 5000
     },
     [DIALECTS.DATA_WORLD]: {
