@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {flatten, keys} from 'ramda';
 import Select from 'react-select';
-
+import SQLOptions from './SQLOptions.react';
+import ESIndicesOptions from './ESDocsOptions.react';
 export default class OptionsDropdown extends Component {
     constructor(props) {
         super(props);
@@ -15,7 +16,6 @@ export default class OptionsDropdown extends Component {
         // See type of react-select's Select `value` property
         selectedTable: PropTypes.any,
         selectedIndex: PropTypes.any,
-
         tablesRequest: PropTypes.object,
         setTable: PropTypes.func,
         elasticsearchMappingsRequest: PropTypes.object,
@@ -24,38 +24,8 @@ export default class OptionsDropdown extends Component {
 
     renderSQLOptions() {
         const {selectedTable, tablesRequest, setTable} = this.props;
-        if (!tablesRequest.status) {
-            return null;
-        } else if (tablesRequest.status === 'loading') {
-            return <div>{'Loading tables'}</div>;
-        } else if (tablesRequest.status > 300) {
-            // TODO - Make this prettier.
-            return (
-                <div>
-                    <div>{'Hm.. there was an error loading up your tables'}</div>
-                    <div style={{color: 'red'}}>{JSON.stringify(tablesRequest)}</div>
-                </div>
-            );
-        } else if (tablesRequest.status === 200) {
-            const tablesList = flatten(tablesRequest.content);
-            if (tablesList.length === 0) {
-                return <div>{'No tables found'}</div>;
-            }
-            return (
-                <div className={'dropdown'}
-                    id="test-table-dropdown"
-                >
-                    <Select
-                        options={tablesList.map(t => ({label: t, value: t}))}
-                        value={selectedTable}
-                        searchable={false}
-                        onChange={option => {
-                            setTable(option.value);
-                        }}
-                    />
-                </div>
-            );
-        }
+
+        return (<SQLOptions selectedTable={selectedTable} tablesRequest={tablesRequest} setTable={setTable} />);
     }
 
     renderElasticsearchIndecies() {
@@ -64,7 +34,11 @@ export default class OptionsDropdown extends Component {
             setIndex,
             selectedIndex
         } = this.props;
-        if (!EMR.status) {
+
+        return (<ESIndicesOptions  elasticsearchMappingsRequest={EMR} 
+                                    setIndex={setIndex} 
+                                    selectedIndex={selectedIndex}/>);
+        /*if (!EMR.status) {
             return null;
         } else if (EMR.status === 'loading') {
             return <div>{'Loading docs'}</div>;
@@ -95,7 +69,7 @@ export default class OptionsDropdown extends Component {
                     />
                 </div>
             );
-        }
+        }*/
     }
 
     renderElasticsearchDocs() {
