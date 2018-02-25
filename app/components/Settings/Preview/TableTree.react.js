@@ -9,11 +9,6 @@ import {getPathNames} from '../../../utils/utils';
 const BASENAME_RE = /[^\\/]+$/;
 
 class TableTree extends Component {
-    constructor(props) {
-        super(props);
-
-        this.storeSchemaTree = this.storeSchemaTree.bind(this);
-    }
 
     static propTypes = {
         schemaRequest: PropTypes.object,
@@ -27,6 +22,30 @@ class TableTree extends Component {
         })
     }
 
+    /**
+     * 
+     * @param {object} props - Component Props 
+     * @param {object} props.schemaRequest - Schema Request
+     * @param {function} props.getSqlSchema - Get SQL Schema Function
+     * @param {function} props.updatePreview - Update Preview Function
+     * @param {object} props.preview - Preview details
+     * @param {object} props.connectionObject - Connection Object
+     * @param {object} props.connectionObject.database - Database Name
+     * @param {object} props.connectionObject.dialect - Dialect for DB
+     * @param {object} props.connectionObject.storage - Storage
+     */
+    constructor(props) {
+        super(props);
+        this.storeSchemaTree = this.storeSchemaTree.bind(this);
+    }
+
+    /**
+     * Gets the label for tree
+     * @param {object} connectionObject - Connection Object
+     * @param {object} connectionObject.database - Database if not dialect not Data World or SQLite
+     * @param {object} connectionObject.storage - If dialect is SQLLite
+     * @param {object} connectionObject.url - If dialect is Dataworld
+     */
     getLabel(connectionObject) {
         switch (connectionObject.dialect) {
             case DIALECTS.SQLITE:
@@ -38,8 +57,36 @@ class TableTree extends Component {
         }
     }
 
+    /**
+     * Checks to see whether it is still loading the request for the schema.  If loading 
+     * or undefined, returns loading.  If status not 200 returns Error message
+     * @param {object} status - Request Status 
+     * @param {object} schemaRequest - Scheme Request
+     * @param {object} treeSchema - Tree Schema
+     */
+    isConnecting(status, schemaRequest, treeSchema){
+        if (typeof status === 'undefined' || status === 'loading') {
+            return (<div className="loading">{'Loading'}</div>);
+        }
+
+        if (status !== 200) {
+            return (
+                <div style={{padding: '5px', fontSize: '12px'}}>
+                    {`ERROR ${JSON.stringify(schemaRequest)}`}
+                </div>
+            );
+        }
+
+        if (!treeSchema) {
+            return (<div className="loading">{'Updating'}</div>);
+        }
+    }
+
+    /** 
+     * The following method will store the schema request 
+    */
     storeSchemaTree() {
-        const {schemaRequest, getSqlSchema, updatePreview} = this.props;
+        const {schemaRequest, getSqlSchema, updatePreview, preview} = this.props;
 
         if (typeof schemaRequest === 'undefined') {
             getSqlSchema();
@@ -47,7 +94,7 @@ class TableTree extends Component {
         else if (isEmpty(schemaRequest)) {
             getSqlSchema();
         }
-        else if (schemaRequest.status === 200 && !has('treeSchema', this.props.preview)) {
+        else if (schemaRequest.status === 200 && !has('treeSchema', preview)) {
             const treeSchema = {};
             schemaRequest.content.rows.forEach(function(row) {
                 const [tableName, columnName, dataType] = row;
@@ -65,6 +112,30 @@ class TableTree extends Component {
         }
     }
 
+    /**
+     * The following method will return a list of tree nodes based on 
+     * the tree schema.  Returns nothing if treeSchema is undefined
+     * @param {object} treeSchema 
+     * @param {string} tableName 
+     */
+    getTreeNodes(treeSchema){
+        if( typeof treeSchema !== 'undefined'){
+            Object.getOwnPropertyNames(treeSchema).sort().map(tableName => {
+                const tableSchema = treeSchema[tableName];
+                const tableLabel = <span className="node">{tableName}</span>;
+                return (
+                    <TreeView nodeLabel={tableLabel} key={tableName} defaultCollapsed={true}>{
+                        Object.getOwnPropertyNames(tableSchema).sort().map(columnName => {
+                            return (
+                                <div className="info">{columnName}: <code>{tableSchema[columnName]}</code></div>
+                            );
+                        })
+                    }</TreeView>
+                );
+            })
+        }
+    }
+
     componentDidMount() {
         this.storeSchemaTree();
     }
@@ -76,25 +147,10 @@ class TableTree extends Component {
     render() {
         const schemaRequest = this.props.schemaRequest || {};
         const status = schemaRequest.status;
-
-        if (typeof status === 'undefined' || status === 'loading') {
-            return (<div className="loading">{'Loading'}</div>);
-        }
-
-        if (status !== 200) {
-            return (
-                <div style={{padding: '5px', fontSize: '12px'}}>
-                    {`ERROR ${JSON.stringify(schemaRequest)}`}
-                </div>
-            );
-        }
-
         const preview = this.props.preview || {};
         const treeSchema = preview.treeSchema;
 
-        if (!treeSchema) {
-            return (<div className="loading">{'Updating'}</div>);
-        }
+        this.isConnecting( status, schemaRequest, treeSchema );
 
         const label = this.getLabel(this.props.connectionObject);
         const labelNode = <span className="node">{label}</span>;
@@ -102,19 +158,7 @@ class TableTree extends Component {
         return (
             <div style={{padding: '5px 0 0 10px'}}>
                 <TreeView key={label} nodeLabel={labelNode} defaultCollapsed={false}>{
-                    Object.getOwnPropertyNames(treeSchema).sort().map(tableName => {
-                        const tableSchema = treeSchema[tableName];
-                        const tableLabel = <span className="node">{tableName}</span>;
-                        return (
-                            <TreeView nodeLabel={tableLabel} key={tableName} defaultCollapsed={true}>{
-                                Object.getOwnPropertyNames(tableSchema).sort().map(columnName => {
-                                    return (
-                                        <div className="info">{columnName}: <code>{tableSchema[columnName]}</code></div>
-                                    );
-                                })
-                            }</TreeView>
-                        );
-                    })
+                    this.getTreeNodes(treeSchema)
                 }</TreeView>
             </div>
         );
