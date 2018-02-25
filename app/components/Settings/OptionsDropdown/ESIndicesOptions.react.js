@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import {keys} from 'ramda';
+import Select from 'react-select';
 
 export default class ESIndicesOptions extends Component {
     static propTypes = {
@@ -13,13 +15,13 @@ export default class ESIndicesOptions extends Component {
      * @param {object} props  - Component Properties
      * @param {object} props.elasticsearchMappingsRequest - The ES Mapping Request
      * @param {object} props.setIndex - The Set Index Function
-     * @param {object} props.electedIndex - The Selected Index
+     * @param {object} props.selectedIndex - The Selected Index
      */
     constructor(props) {
         super(props);
     }
 
-    render(){
+    render() {
         const {
             elasticsearchMappingsRequest: EMR,
             setIndex,

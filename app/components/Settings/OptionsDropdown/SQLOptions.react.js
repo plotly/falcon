@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-export default class SQLOptions extends Component {
+import {flatten} from 'ramda';
+import Select from 'react-select';
 
+export default class SQLOptions extends Component {
 
     static propTypes = {
         selectedTable: PropTypes.any,
@@ -14,17 +16,15 @@ export default class SQLOptions extends Component {
      * @param {object} props  - Component Properties
      * @param {object} props.selectedTable - The selected table
      * @param {object} props.tablesRequest - The Requested Table
-     * @param {object} props.setTable - The set table function
+     * @param {function} props.setTable - The set table function
      */
     constructor(props) {
         super(props);
     }
 
-    render(){
-        console.log( 'Start Rendering the SQL Options');
+    render() {
         const {selectedTable, tablesRequest, setTable} = this.props;
         if (!tablesRequest.status) {
-            console.log( 'Returning null from SQL Options');
             return null;
         } else if (tablesRequest.status === 'loading') {
             return <div>{'Loading tables'}</div>;
