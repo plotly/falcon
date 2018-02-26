@@ -19,7 +19,7 @@
     "rebuild:modules:electron": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/rebuild-modules.js --electron",
     "rebuild:modules:node": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/rebuild-modules.js",
     "fix:module:ibmdb": "node scripts/fix-module-ibmdb.js",
-    "lint": "eslint app test backend scripts *.js",
+    "lint": "eslint app test backend scripts *.js --ext .js,.jsx",
     "test": "yarn run lint && yarn run test-unit-all && yarn run test-e2e && yarn run test-jest",
     "test-e2e": "cross-env NODE_ENV=test mocha --bail --full-trace --compilers js:babel-register --require babel-polyfill ./test/integration_test.js",
     "test-e2e-local": "source test/set_creds.sh && yarn run test-e2e",
