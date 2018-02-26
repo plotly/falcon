@@ -8,27 +8,27 @@ export default class Filedrop extends Component {
         settings: PropTypes.object,
         connection: PropTypes.object,
         updateConnection: PropTypes.func,
-        sampleCredentialsStyle : PropTypes.object
+        sampleCredentialsStyle: PropTypes.object
     }
 
     /**
      * Filedrop is an input component where users can type an URL or drop a file
-     * 
+     *
      * @param {object} props - Component properties
-     * 
+     *
      * @param {object} props.settings - FileDrop settings
      * @param {string} props.settings.type - Set to 'filedrop'
      * @param {string} props.settings.value - Target property in the connection object
      * @param {string} props.settings.inputLabel - Label for input box
      * @param {string} props.settings.dropLabel - Label for drop box
      * @param {string} props.settings.placeholder - Placeholder for input box
-     * 
+     *
      * @param {object} props.connection - Connection object
      * @param {string} props.connection.dialect - Connection dialect
      * @param {string} props.connection.label - Connection label
-     * 
+     *
      * @param {function} props.updateConnection - Callback to update the connection object
-     * 
+     *
      * @param {object} props.sampleCredentialsStyle - To control the display of sample credentials
      */
     constructor(props) {
@@ -36,7 +36,7 @@ export default class Filedrop extends Component {
 
         const {
             settings,
-            connection,
+            connection
         } = this.props;
 
         const url = connection[settings.value];
@@ -48,10 +48,10 @@ export default class Filedrop extends Component {
          */
         this.state = (typeof url === 'string' && url.startsWith('data:')) ? {
             inputValue: connection.label || url.slice(0, 64),
-            dropValue: url,
+            dropValue: url
         } : {
-            inputValue: url,
-            dropValue: '',
+            inputValue: url || '',
+            dropValue: ''
         };
     }
 
@@ -94,7 +94,7 @@ export default class Filedrop extends Component {
                 </label>
                 <div className={'wrapInput'}>
                     <input
-                        style={{'background-color': (drag || dropValue) ? 'lightcyan' : null}}
+                        style={{backgroundColor: (drag || dropValue) ? 'lightcyan' : null}}
                         onChange={onChange}
                         onDragEnter={onDragEnter}
                         onDragLeave={onDragLeave}
@@ -102,11 +102,7 @@ export default class Filedrop extends Component {
                         placeholder={placeholder}
                         type={'text'}
                     />
-                    <small style={{
-                        clear: 'both',
-                        float: 'left',
-                        'margin-left': '20px'
-                    }} >
+                    <small style={{clear: 'both', float: 'left', marginLeft: '20px'}}>
                         {dropLabel}
                     </small>
                     <div style={sampleCredentialsStyle}>
@@ -150,10 +146,10 @@ export default class Filedrop extends Component {
         function onDrop(event) {
             event.stopPropagation();
             event.preventDefault();
-            setState({drag: false});
 
             const files = event.dataTransfer.files;
             if (!files || files.length !== 1) {
+                setState({drag: false});
                 return;
             }
 
@@ -161,6 +157,7 @@ export default class Filedrop extends Component {
             const reader = new FileReader();
             reader.onload = () => {
                 setState({
+                    drag: false,
                     dropValue: reader.result,
                     inputValue: file.name
                 });
