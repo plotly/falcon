@@ -1,15 +1,16 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import SQLOptions from './SQLOptions.react';
-import ESIndicesOptions from './ESIndicesOptions.react';
-import ESDocsOptions from './ESDocsOptions.react';
+import SQLOptions from './sql-options';
+import ESIndicesOptions from './es-indices-options';
+import ESDocsOptions from './es-docs-options';
 
 export default class OptionsDropdown extends Component {
 
     static propTypes = {
         // See type of react-select's Select `value` property
-        selectedTable: PropTypes.any,
-        selectedIndex: PropTypes.any,
+        selectedTable: PropTypes.string,
+        selectedIndex: PropTypes.string,
+
         tablesRequest: PropTypes.object,
         setTable: PropTypes.func,
         elasticsearchMappingsRequest: PropTypes.object,
@@ -29,54 +30,32 @@ export default class OptionsDropdown extends Component {
      */
     constructor(props) {
         super(props);
-        this.renderSQLOptions = this.renderSQLOptions.bind(this);
-        this.renderElasticsearchIndecies = this.renderElasticsearchIndecies.bind(this);
-        this.renderElasticsearchDocs = this.renderElasticsearchDocs.bind(this);
     }
 
-    renderSQLOptions() {
-        const {selectedTable, tablesRequest, setTable} = this.props;
-
-        return (<SQLOptions selectedTable={selectedTable}
-                            tablesRequest={tablesRequest}
-                            setTable={setTable}
-        />);
-    }
-
-    renderElasticsearchIndecies() {
+    render() {
         const {
+            selectedTable,
+            tablesRequest,
+            setTable,
             elasticsearchMappingsRequest: EMR,
             setIndex,
             selectedIndex
         } = this.props;
-
-        return (<ESIndicesOptions elasticsearchMappingsRequest={EMR}
+        return (
+            <div style={{marginTop: '25px'}}>
+                <SQLOptions selectedTable={selectedTable}
+                            tablesRequest={tablesRequest}
+                            setTable={setTable}
+                />
+                <ESIndicesOptions elasticsearchMappingsRequest={EMR}
                                   setIndex={setIndex}
                                   selectedIndex={selectedIndex}
-        />);
-    }
-
-    renderElasticsearchDocs() {
-        const {
-            selectedTable,
-            selectedIndex,
-            elasticsearchMappingsRequest: EMR,
-            setTable
-        } = this.props;
-
-        return (<ESDocsOptions selectedTable={selectedTable}
+                />
+                <ESDocsOptions selectedTable={selectedTable}
                                 selectedIndex={selectedIndex}
                                 elasticsearchMappingsRequest={EMR}
                                 setTable={setTable}
-        />);
-    }
-
-    render() {
-        return (
-            <div style={{marginTop: '25px'}}>
-                {this.renderSQLOptions()}
-                {this.renderElasticsearchIndecies()}
-                {this.renderElasticsearchDocs()}
+                />
             </div>
         );
     }

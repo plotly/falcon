@@ -5,8 +5,8 @@ import Select from 'react-select';
 
 export default class ESDocsOptions extends Component {
     static propTypes = {
-        selectedTable: PropTypes.any,
-        selectedIndex: PropTypes.any,
+        selectedTable: PropTypes.string,
+        selectedIndex: PropTypes.string,
         setTable: PropTypes.func,
         elasticsearchMappingsRequest: PropTypes.object
     }

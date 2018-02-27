@@ -7,7 +7,7 @@ export default class ESIndicesOptions extends Component {
     static propTypes = {
         elasticsearchMappingsRequest: PropTypes.object,
         setIndex: PropTypes.func,
-        selectedIndex: PropTypes.any
+        selectedIndex: PropTypes.string
     };
 
     /**

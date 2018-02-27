@@ -6,7 +6,7 @@ import Select from 'react-select';
 export default class SQLOptions extends Component {
 
     static propTypes = {
-        selectedTable: PropTypes.any,
+        selectedTable: PropTypes.string,
         tablesRequest: PropTypes.object,
         setTable: PropTypes.func
     };
