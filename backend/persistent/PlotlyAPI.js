@@ -42,6 +42,8 @@ export function newDatacache(payloadJSON, type, requestor) {
         u => u.username === requestor
     );
 
+    form.append('username', user.username);
+
     /*
      * Authentication is only required for on-premise private-mode for this
      * endpoint, so even if the user is not logged in, we should still be able
