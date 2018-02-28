@@ -1,0 +1,36 @@
+.sqltable-click-overlay {
+    float: left;
+    min-height: 32px;
+    min-width: 740px;
+    position: absolute;
+    z-index: 2;
+}
+
+.sqltable-click-overlay:hover {
+    background-color: #ccffff;
+    opacity: 0.5;
+}
+
+.react-grid-Container {
+    font-size: 12px;
+}
+
+.react-grid-Header {
+    max-height: 64px;
+    overflow: hidden;
+}
+
+.react-grid-HeaderRow {
+    max-height: 32px;
+    overflow: hidden;
+}
+
+.react-grid-HeaderCell .form-control {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: normal;
+    height: inherit;
+    margin: inherit;
+    padding: 0;
+    width: 100%;
+}

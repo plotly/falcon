@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import R, {has, isEmpty, propOr} from 'ramda';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 
-import SQLTable from './SQLTable.react.js';
+import SQLTable from './sql-table.jsx';
 import CodeEditorField from './CodeEditorField.react.js';
 import ChartEditor from './ChartEditor.react.js';
 import ApacheDrillPreview from './ApacheDrillPreview.js';

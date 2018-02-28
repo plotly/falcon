@@ -229,6 +229,8 @@
     "papaparse": "^4.3.7",
     "pg": "^4.5.5",
     "pg-hstore": "^2.3.2",
+    "react-data-grid": "^3.0.11",
+    "react-data-grid-addons": "^3.0.11",
     "restify": "^4.3.2",
     "sequelize": "^3.30.4",
     "source-map-support": "^0.5.0",

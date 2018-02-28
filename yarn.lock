@@ -8098,6 +8098,16 @@ react-cookies@^0.1.0:
     cookie "^0.3.1"
     object-assign "^4.1.1"
 
+react-data-grid-addons@^3.0.11:
+  version "3.0.11"
+  resolved "https://registry.yarnpkg.com/react-data-grid-addons/-/react-data-grid-addons-3.0.11.tgz#9d38c31aa1f475f93735246292395e6d1fa7eb38"
+  dependencies:
+    react-data-grid "^3.0.11"
+
+react-data-grid@^3.0.11:
+  version "3.0.11"
+  resolved "https://registry.yarnpkg.com/react-data-grid/-/react-data-grid-3.0.11.tgz#06329d1548a29de43b314dc51016f972ca34750a"
+
 react-deep-force-update@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/react-deep-force-update/-/react-deep-force-update-1.1.1.tgz#bcd31478027b64b3339f108921ab520b4313dc2c"
