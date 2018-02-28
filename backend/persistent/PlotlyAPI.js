@@ -33,6 +33,7 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
 export function newDatacache(payloadJSON, type, requestor) {
     const form = new FormData();
     form.append('type', type);
+    form.append('origin', 'Falcon');
     form.append('payload', payloadJSON);
     const body = form;
 
@@ -40,6 +41,8 @@ export function newDatacache(payloadJSON, type, requestor) {
     const user = users.find(
         u => u.username === requestor
     );
+
+    form.append('username', user.username);
 
     /*
      * Authentication is only required for on-premise private-mode for this
