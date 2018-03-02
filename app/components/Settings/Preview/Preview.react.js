@@ -66,14 +66,23 @@ class Preview extends Component {
         let rows = [];
         let columnNames = [];
         let isLoading = false;
-        let errorMsg = '';
         let successMsg = '';
+
+        let errorMsg = '';
+        function setErrorMsg(error) {
+            try {
+                errorMsg = error.content.error.message;
+            } catch (_) {
+                errorMsg = JSON.stringify(error);
+            }
+            errorMsg = String(errorMsg).trim();
+        }
 
         if (isEmpty(previewTableRequest) || previewTableRequest.status === 'loading') {
             isLoading = true;
         }
         else if (previewTableRequest.status !== 200) {
-            errorMsg = JSON.stringify(previewTableRequest);
+            setErrorMsg(previewTableRequest);
         }
         else if (isEmpty(queryRequest)) {
             rows = previewTableRequest.content.rows;
@@ -104,7 +113,7 @@ class Preview extends Component {
                 columnNames = previewTableRequest.content.columnnames;
                 successMsg = `${rows.length} rows retrieved`;
             }
-            errorMsg = JSON.stringify(queryRequest);
+            setErrorMsg(queryRequest);
         }
         else {
             // User's query worked
@@ -348,7 +357,7 @@ class Preview extends Component {
 
                 {errorMsg &&
                     <div className="errorStatus">
-                        <p>{`ERROR ${errorMsg}`}</p>
+                        <pre>{`ERROR: ${errorMsg}`}</pre>
                     </div>
                 }
 

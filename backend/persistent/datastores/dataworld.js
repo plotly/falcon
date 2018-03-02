@@ -88,6 +88,11 @@ export function query(queryString, connection) {
     body: params
   })
   .then(res => {
+    if (res.status !== 200) {
+      return res.text().then(body => {
+        throw new Error(body);
+      });
+    }
     return res.json();
   })
   .then(json => {
