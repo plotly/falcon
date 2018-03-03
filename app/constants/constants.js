@@ -76,9 +76,12 @@ const hadoopQLOptions = [
 export const CONNECTION_CONFIG = {
     [DIALECTS.APACHE_IMPALA]: hadoopQLOptions,
     [DIALECTS.APACHE_SPARK]: hadoopQLOptions,
-    [DIALECTS.CSV]: [
-        {'label': 'URL to CSV File', 'value': 'database', 'type': 'text'}
-    ],
+    [DIALECTS.CSV]: [{
+        'inputLabel': 'Type URL to a CSV file',
+        'dropLabel': '(or drop a CSV file here)',
+        'value': 'database',
+        'type': 'filedrop'
+    }],
     [DIALECTS.IBM_DB2]: commonSqlOptions,
     [DIALECTS.MYSQL]: commonSqlOptions,
     [DIALECTS.MARIADB]: commonSqlOptions,
