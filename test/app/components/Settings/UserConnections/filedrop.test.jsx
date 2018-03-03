@@ -5,7 +5,6 @@ import {configure, mount} from 'enzyme';
 import Adapter from 'enzyme-adapter-react-15';
 
 import {
-    CONNECTION_CONFIG,
     DIALECTS,
     SAMPLE_DBS
 } from '../../../../../app/constants/constants.js';
