@@ -23,8 +23,8 @@ class TableTree extends Component {
     }
 
     /**
-     * 
-     * @param {object} props - Component Props 
+     *
+     * @param {object} props - Component Props
      * @param {object} props.schemaRequest - Schema Request
      * @param {function} props.getSqlSchema - Get SQL Schema Function
      * @param {function} props.updatePreview - Update Preview Function
@@ -58,13 +58,13 @@ class TableTree extends Component {
     }
 
     /**
-     * Checks to see whether it is still loading the request for the schema.  If loading 
+     * Checks to see whether it is still loading the request for the schema.  If loading
      * or undefined, returns loading.  If status not 200 returns Error message
-     * @param {object} status - Request Status 
+     * @param {object} status - Request Status
      * @param {object} schemaRequest - Scheme Request
      * @param {object} treeSchema - Tree Schema
      */
-    isConnecting(status, schemaRequest, treeSchema){
+    isConnecting(status, schemaRequest, treeSchema) {
         if (typeof status === 'undefined' || status === 'loading') {
             return (<div className="loading">{'Loading'}</div>);
         }
@@ -82,8 +82,8 @@ class TableTree extends Component {
         }
     }
 
-    /** 
-     * The following method will store the schema request 
+    /**
+     * The following method will store the schema request
     */
     storeSchemaTree() {
         const {schemaRequest, getSqlSchema, updatePreview, preview} = this.props;
@@ -113,13 +113,13 @@ class TableTree extends Component {
     }
 
     /**
-     * The following method will return a list of tree nodes based on 
+     * The following method will return a list of tree nodes based on
      * the tree schema.  Returns nothing if treeSchema is undefined
-     * @param {object} treeSchema 
-     * @param {string} tableName 
+     * @param {object} treeSchema
+     * @param {string} tableName
      */
-    getTreeNodes(treeSchema){
-        if( typeof treeSchema !== 'undefined'){
+    getTreeNodes(treeSchema) {
+        if (typeof treeSchema !== 'undefined') {
             Object.getOwnPropertyNames(treeSchema).sort().map(tableName => {
                 const tableSchema = treeSchema[tableName];
                 const tableLabel = <span className="node">{tableName}</span>;
@@ -132,7 +132,7 @@ class TableTree extends Component {
                         })
                     }</TreeView>
                 );
-            })
+            });
         }
     }
 
@@ -150,7 +150,7 @@ class TableTree extends Component {
         const preview = this.props.preview || {};
         const treeSchema = preview.treeSchema;
 
-        this.isConnecting( status, schemaRequest, treeSchema );
+        this.isConnecting(status, schemaRequest, treeSchema);
 
         const label = this.getLabel(this.props.connectionObject);
         const labelNode = <span className="node">{label}</span>;

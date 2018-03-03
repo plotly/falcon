@@ -8,9 +8,9 @@ import React from 'react';
 import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-15';
 
-//TODO
-//1. Test isConnecting
-//2. Test Store Schema.  Verify that creation of the tree
+// TODO
+// 1. Test isConnecting
+// 2. Test Store Schema.  Verify that creation of the tree
 describe('Dialog Selector Test', () => {
 
     beforeAll(() => {
@@ -38,7 +38,7 @@ describe('Dialog Selector Test', () => {
             connectionObject={connectionObject}
         />);
 
-        //Note.  TableTree was crashing if treeSchema not defined
+        // Note.  TableTree was crashing if treeSchema not defined
         expect(tree).toBeDefined();
     });
 
@@ -47,7 +47,7 @@ describe('Dialog Selector Test', () => {
         const getSqlSchema = function() {};
         const updatePreview = function() {};
         const preview = {
-            treeSchema:{}
+            treeSchema: {}
         };
         const connectionObject = {
             database: 'plotly',
@@ -71,7 +71,7 @@ describe('Dialog Selector Test', () => {
         const getSqlSchema = function() {};
         const updatePreview = function() {};
         const preview = {
-            treeSchema:{}
+            treeSchema: {}
         };
         const connectionObject = {
             dialect: 'sqlite',
@@ -88,6 +88,98 @@ describe('Dialog Selector Test', () => {
 
         expect(tree.instance().getLabel(connectionObject)).toBe('plotly_datasets.db');
     });
+
+    it('should verify isConnecting status is loading', () => {
+        const schemaRequest = {};
+        const getSqlSchema = function() {};
+        const updatePreview = function() {};
+        const preview = {
+            treeSchema: {}
+        };
+        const connectionObject = {
+            dialect: 'sqlite',
+            storage: '/home/user/dbs/plotly_datasets.db'
+        };
+
+        let status;
+
+        const tree = mount(<TableTree
+            schemaRequest={schemaRequest}
+            getSqlSchema={getSqlSchema}
+            updatePreview={updatePreview}
+            preview={preview}
+            connectionObject={connectionObject}
+        />);
+
+        let connecting = mount(tree.instance().isConnecting(status, schemaRequest, {}));
+
+        expect(connecting.find('.loading').length).toBe(1);
+
+        status = 'loading';
+
+        connecting = mount(tree.instance().isConnecting(status, schemaRequest, {}));
+
+        expect(connecting.find('.loading').length).toBe(1);
+    });
+
+    it('should verify isConnecting status is error', () => {
+        const schemaRequest = {
+            message: 'error'
+        };
+        const getSqlSchema = function() {};
+        const updatePreview = function() {};
+        const preview = {
+            treeSchema: {}
+        };
+        const connectionObject = {
+            dialect: 'sqlite',
+            storage: '/home/user/dbs/plotly_datasets.db'
+        };
+
+        const status = 500;
+
+        const tree = mount(<TableTree
+            schemaRequest={schemaRequest}
+            getSqlSchema={getSqlSchema}
+            updatePreview={updatePreview}
+            preview={preview}
+            connectionObject={connectionObject}
+        />);
+
+        const connecting = mount(tree.instance().isConnecting(status, schemaRequest, {}));
+
+        expect(connecting.text()).toBe('ERROR {"message":"error"}');
+    });
+
+    it('should verify isConnecting status updating', () => {
+        const schemaRequest = {
+            message: 'error'
+        };
+        const getSqlSchema = function() {};
+        const updatePreview = function() {};
+        const preview = {
+            treeSchema: {}
+        };
+        const connectionObject = {
+            dialect: 'sqlite',
+            storage: '/home/user/dbs/plotly_datasets.db'
+        };
+
+        const status = 200;
+
+        const tree = mount(<TableTree
+            schemaRequest={schemaRequest}
+            getSqlSchema={getSqlSchema}
+            updatePreview={updatePreview}
+            preview={preview}
+            connectionObject={connectionObject}
+        />);
+
+        const connecting = mount(tree.instance().isConnecting(status, schemaRequest));
+
+        expect(connecting.text()).toBe('Updating');
+    });
+
 
 });
 
