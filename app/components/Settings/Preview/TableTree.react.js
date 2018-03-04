@@ -45,6 +45,7 @@ class TableTree extends Component {
      * @param {object} connectionObject.database - Database if not dialect not Data World or SQLite
      * @param {object} connectionObject.storage - If dialect is SQLLite
      * @param {object} connectionObject.url - If dialect is Dataworld
+     * @returns {string} label
      */
     getLabel(connectionObject) {
         switch (connectionObject.dialect) {
@@ -63,6 +64,7 @@ class TableTree extends Component {
      * @param {object} status - Request Status
      * @param {object} schemaRequest - Scheme Request
      * @param {object} treeSchema - Tree Schema
+     * @returns {object} div containing connect message
      */
     isConnecting(status, schemaRequest, treeSchema) {
         if (typeof status === 'undefined' || status === 'loading') {
@@ -84,6 +86,7 @@ class TableTree extends Component {
 
     /**
      * The following method will store the schema request
+     * @returns {undefined}
     */
     storeSchemaTree() {
         const {schemaRequest, getSqlSchema, updatePreview, preview} = this.props;
@@ -94,6 +97,7 @@ class TableTree extends Component {
         else if (isEmpty(schemaRequest)) {
             getSqlSchema();
         }
+        // TODO.  What is status is 201 ?
         else if (schemaRequest.status === 200 && !has('treeSchema', preview)) {
             const treeSchema = {};
             schemaRequest.content.rows.forEach(function(row) {
@@ -116,7 +120,7 @@ class TableTree extends Component {
      * The following method will return a list of tree nodes based on
      * the tree schema.  Returns nothing if treeSchema is undefined
      * @param {object} treeSchema
-     * @param {string} tableName
+     * @returns {array} TreeView
      */
     getTreeNodes(treeSchema) {
         if (typeof treeSchema !== 'undefined') {

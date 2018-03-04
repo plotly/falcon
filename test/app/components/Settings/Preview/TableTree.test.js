@@ -3,10 +3,10 @@ jest.unmock('../../../../../app/constants/constants.js');
 jest.unmock('../../../../../app/utils/utils.js');
 
 import TableTree from '../../../../../app/components/Settings/Preview/TableTree.react.js';
-import {DIALECTS} from '../../../../../app/constants/constants.js';
 import React from 'react';
 import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-15';
+import sinon from 'sinon';
 
 // TODO
 // 1. Test isConnecting
@@ -101,8 +101,6 @@ describe('Dialog Selector Test', () => {
             storage: '/home/user/dbs/plotly_datasets.db'
         };
 
-        let status;
-
         const tree = mount(<TableTree
             schemaRequest={schemaRequest}
             getSqlSchema={getSqlSchema}
@@ -110,12 +108,11 @@ describe('Dialog Selector Test', () => {
             preview={preview}
             connectionObject={connectionObject}
         />);
+        const status = 'loading';
 
         let connecting = mount(tree.instance().isConnecting(status, schemaRequest, {}));
 
         expect(connecting.find('.loading').length).toBe(1);
-
-        status = 'loading';
 
         connecting = mount(tree.instance().isConnecting(status, schemaRequest, {}));
 
@@ -180,6 +177,81 @@ describe('Dialog Selector Test', () => {
         expect(connecting.text()).toBe('Updating');
     });
 
+    it('should call getSqlSchema becuase schemaRequest undefined', () => {
+        let schemaRequest;
+        const getSqlSchema = sinon.spy();
+        const updatePreview = function() {};
+        const preview = {
+            treeSchema: {}
+        };
+        const connectionObject = {
+            dialect: 'sqlite',
+            storage: '/home/user/dbs/plotly_datasets.db'
+        };
+
+        const tree = mount(<TableTree
+            schemaRequest={schemaRequest}
+            getSqlSchema={getSqlSchema}
+            updatePreview={updatePreview}
+            preview={preview}
+            connectionObject={connectionObject}
+        />);
+
+        tree.instance().storeSchemaTree();
+
+        sinon.assert.calledTwice(getSqlSchema);
+    });
+
+    it('should call getSqlSchema becuase schemaRequest empty', () => {
+        const schemaRequest = {};
+        const getSqlSchema = sinon.spy();
+        const updatePreview = function() {};
+        const preview = {
+            treeSchema: {}
+        };
+        const connectionObject = {
+            dialect: 'sqlite',
+            storage: '/home/user/dbs/plotly_datasets.db'
+        };
+
+        const tree = mount(<TableTree
+            schemaRequest={schemaRequest}
+            getSqlSchema={getSqlSchema}
+            updatePreview={updatePreview}
+            preview={preview}
+            connectionObject={connectionObject}
+        />);
+
+        tree.instance().storeSchemaTree();
+        sinon.assert.calledTwice(getSqlSchema);
+    });
+
+    it('should call getSqlSchema becuase schemaRequest empty', () => {
+        const schemaRequest = {
+            status: 200
+        };
+        const getSqlSchema = sinon.spy();
+        const updatePreview = function() {};
+        const preview = {
+            treeSchema: {}
+        };
+        const connectionObject = {
+            dialect: 'sqlite',
+            storage: '/home/user/dbs/plotly_datasets.db'
+        };
+
+        const tree = mount(<TableTree
+            schemaRequest={schemaRequest}
+            getSqlSchema={getSqlSchema}
+            updatePreview={updatePreview}
+            preview={preview}
+            connectionObject={connectionObject}
+        />);
+
+        tree.instance().storeSchemaTree();
+
+        sinon.assert.notCalled(getSqlSchema);
+    });
 
 });
 
