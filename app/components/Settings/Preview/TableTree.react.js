@@ -85,6 +85,31 @@ class TableTree extends Component {
     }
 
     /**
+     * The following method will create the tree schema
+     * @param {object} schemaRequest - The Schema Request
+     * @returns {object} treeSchema - Formatted Tree Schema
+     */
+    createTreeSchema(schemaRequest) {
+        const treeSchema = {};
+        let rows = schemaRequest.content.rows;
+        console.log( 'rows', rows);
+        //TODO Fix issue
+        rows.forEach(function(row) {
+            const [tableName, columnName, dataType] = row;
+
+            if (treeSchema.hasOwnProperty(tableName)) {
+                treeSchema[tableName][columnName] = dataType;
+            } else {
+                treeSchema[tableName] = {
+                    [columnName]: dataType
+                };
+            }
+        });
+
+        return treeSchema;
+    }
+
+    /**
      * The following method will store the schema request
      * @returns {undefined}
     */
@@ -99,8 +124,8 @@ class TableTree extends Component {
         }
         // TODO.  What is status is 201 ?
         else if (schemaRequest.status === 200 && !has('treeSchema', preview)) {
-            const treeSchema = {};
-            schemaRequest.content.rows.forEach(function(row) {
+            const treeSchema = this.createTreeSchema(schemaRequest);
+            /* schemaRequest.content.rows.forEach(function(row) {
                 const [tableName, columnName, dataType] = row;
 
                 if (treeSchema.hasOwnProperty(tableName)) {
@@ -110,7 +135,7 @@ class TableTree extends Component {
                         [columnName]: dataType
                     };
                 }
-            });
+            });*/
 
             updatePreview({treeSchema});
         }
@@ -119,7 +144,7 @@ class TableTree extends Component {
     /**
      * The following method will return a list of tree nodes based on
      * the tree schema.  Returns nothing if treeSchema is undefined
-     * @param {object} treeSchema
+     * @param {object} treeSchema - Tree Schema
      * @returns {array} TreeView
      */
     getTreeNodes(treeSchema) {

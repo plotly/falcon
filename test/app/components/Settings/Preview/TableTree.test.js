@@ -253,5 +253,48 @@ describe('Dialog Selector Test', () => {
         sinon.assert.notCalled(getSqlSchema);
     });
 
+    it('should create the tree schema with one row', () => {
+
+        const rows = [];
+        let row = {
+            tableName:'test', 
+            columnName:'name', 
+            dataType:'varchar'
+        };
+
+        rows.push( row );
+        let content = {
+            rows: rows
+        };
+
+        const schemaRequest = {
+            status: 200,
+            content:content
+            
+        };
+        const getSqlSchema = sinon.spy();
+        const updatePreview = function() {};
+        const preview = {
+            treeSchema: {}
+        };
+        const connectionObject = {
+            dialect: 'sqlite',
+            storage: '/home/user/dbs/plotly_datasets.db'
+        };
+
+        const tree = mount(<TableTree
+            schemaRequest={schemaRequest}
+            getSqlSchema={getSqlSchema}
+            updatePreview={updatePreview}
+            preview={preview}
+            connectionObject={connectionObject}
+        />);
+
+        const treeSchema = tree.instance().createTreeSchema( schemaRequest );
+
+        expect(treeSchema).toBeDefined();
+
+    });
+
 });
 
