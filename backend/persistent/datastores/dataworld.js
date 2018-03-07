@@ -90,7 +90,13 @@ export function query(queryString, connection) {
   .then(res => {
     if (res.status !== 200) {
       return res.text().then(body => {
-        throw new Error(body);
+        let error;
+        try {
+          error = new Error(JSON.parse(body).message);
+        } catch (_) {
+          error = new Error(body);
+        }
+        throw error;
       });
     }
     return res.json();
