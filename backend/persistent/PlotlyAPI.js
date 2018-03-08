@@ -70,10 +70,15 @@ export function newDatacache(payloadJSON, type, requestor) {
             'Authorization': authorization
         }
     }).then(res => {
-        return res;
+        if (res.status !== 200) {
+            return res.text().then(text => {
+                throw new Error(`Failed request 'datacache'. Status: ${res.status}. Body: ${text}`);
+            });
+        }
+        return res.json();
     }).catch(err => {
         Logger.log(err, 0);
-        throw new Error(err);
+        throw err;
     });
 }
 

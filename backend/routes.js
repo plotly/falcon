@@ -593,10 +593,10 @@ export default class Servers {
 
             if (contentType !== 'csv') {
                 const datacacheResp = newDatacache(payload, contentType, requestor);
-                datacacheResp.then(plotlyRes => plotlyRes.json().then(resJSON => {
-                    res.json(plotlyRes.status, resJSON);
+                datacacheResp.then(json => {
+                    res.json(200, json);
                     return next();
-                })).catch(error => {
+                }).catch(error => {
                     res.json(500, {error: {message: error.message}});
                     return next();
                 });
