@@ -6,7 +6,7 @@ import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 
 import SQLTable from './sql-table.jsx';
 import CodeEditorField from './CodeEditorField.react.js';
-import ChartEditor from './ChartEditor.react.js';
+import ChartEditor from './chart-editor.jsx';
 import ApacheDrillPreview from './ApacheDrillPreview.js';
 import S3Preview from './S3Preview.js';
 
@@ -365,30 +365,22 @@ class Preview extends Component {
                     <div>
                         <Tabs forceRenderTabPanel={true}>
                             <TabList>
-                                <Tab>Chart</Tab>
                                 <Tab>Table</Tab>
+                                <Tab>Chart</Tab>
                                 <Tab>Export</Tab>
                             </TabList>
-
-                            <TabPanel>
-                                <ChartEditor
-                                    rows={rows}
-                                    columnNames={columnNames}
-                                    plotJSON={plotJSON}
-                                    updateProps={newProps => {
-                                        updatePreview({'chartEditor': R.merge(
-                                            chartEditorState,
-                                            newProps
-                                        )});
-                                    }}
-                                    {...chartEditorState}
-                                />
-                            </TabPanel>
 
                             <TabPanel
                                 style={{fontFamily: "'Ubuntu Mono', courier, monospace", marginTop: '20px'}}
                             >
                                 <SQLTable
+                                    rows={rows}
+                                    columnNames={columnNames}
+                                />
+                            </TabPanel>
+
+                            <TabPanel>
+                                <ChartEditor
                                     rows={rows}
                                     columnNames={columnNames}
                                 />
