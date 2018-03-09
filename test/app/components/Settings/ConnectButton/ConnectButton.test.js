@@ -2,7 +2,7 @@ jest.unmock('../../../../../app/components/Settings/ConnectButton/ConnectButton.
 import ConnectButton from '../../../../../app/components/Settings/ConnectButton/ConnectButton.react.js';
 import React from 'react';
 import { mount, configure } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-15';
+import Adapter from 'enzyme-adapter-react-16';
 
 describe('Connect Button Test', () => {
 

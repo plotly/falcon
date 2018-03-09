@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+// Workaround to use `react-data-grid-addons` in React 16
+React.PropTypes = PropTypes;
+React.createClass = require('create-react-class');
+
 import ReactDataGrid from 'react-data-grid';
 const {Data: {Selectors}} = require('react-data-grid-addons');
 
