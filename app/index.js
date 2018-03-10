@@ -1,4 +1,8 @@
 import React from 'react';
+
+// Workaround to use `react-router@3` in React 16
+import PropTypes from 'prop-types'; // eslint-disable-line no-unused-vars
+
 import {render} from 'react-dom';
 import {Provider} from 'react-redux';
 import {Route, Router, browserHistory} from 'react-router';

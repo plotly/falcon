@@ -2,7 +2,7 @@ jest.unmock('../../../../../app/components/Settings/Preview/sql-table.jsx');
 import SQLTable from '../../../../../app/components/Settings/Preview/sql-table.jsx';
 import React from 'react';
 import {configure, mount} from 'enzyme';
-import Adapter from 'enzyme-adapter-react-15';
+import Adapter from 'enzyme-adapter-react-16';
 
 describe('SQLTable', () => {
     let sqlTable, columnNames, rows;
