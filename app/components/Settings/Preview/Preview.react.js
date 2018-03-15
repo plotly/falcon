@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import R, {has, isEmpty, propOr} from 'ramda';
+import {has, isEmpty, propOr} from 'ramda';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 
 import SQLTable from './sql-table.jsx';
@@ -24,7 +24,6 @@ class Preview extends Component {
         this.toggleEditor = this.toggleEditor.bind(this);
         this.runQuery = this.runQuery.bind(this);
         this.fetchDatacache = this.fetchDatacache.bind(this);
-        this.propsToState = this.propsToState.bind(this);
 
         this.state = {
             plotlyLinks: [],
@@ -34,8 +33,7 @@ class Preview extends Component {
             isLoading: false,
             errorMsg: '',
             successMsg: '',
-            timeQueryElapsedMsg: '',
-            chartEditorState: {}
+            timeQueryElapsedMsg: ''
         };
     }
 
@@ -44,6 +42,8 @@ class Preview extends Component {
         updatePreview: PropTypes.func,
         preview: PropTypes.obj,
         connectionObject: PropTypes.object,
+        previewTableRequest: PropTypes.object,
+        queryRequest: PropTypes.object,
         elasticsearchMappingsRequest: PropTypes.object,
         schemaRequest: PropTypes.object,
         selectedTable: PropTypes.any,
@@ -54,13 +54,14 @@ class Preview extends Component {
         username: PropTypes.string
     };
 
-    propsToState(nextProps, props) {
+    componentWillReceiveProps(nextProps) {
+        // TODO: issue #395: check whether state really needs updating
         const {
             preview,
             previewTableRequest,
             queryRequest
         } = nextProps;
-        const {chartEditor, lastSuccessfulQuery} = preview;
+        const {lastSuccessfulQuery} = preview;
 
         let rows = [];
         let columnNames = [];
@@ -126,49 +127,7 @@ class Preview extends Component {
             csvString = csvString + row.join(', ') + '\n';
         });
 
-        const chartEditorState = this.state.chartEditorState;
-        const defaultChartEditorState = {
-            xAxisColumnName: colNames => colNames[0],
-            yAxisColumnNames: colNames => [colNames[1]],
-            boxes: colNames => colNames.map(
-                colName => ({name: colName, type: 'column'})),
-            columnTraceTypes: colNames => (
-                R.reduce((r, k) => R.set(R.lensProp(k), 'scatter', r), {}, colNames)
-            ),
-            droppedBoxNames: () => [],
-            selectedColumn: () => '',
-            selectedChartType: () => 'scatter'
-        };
-
-        if (columnNames !== this.state.columnNames) {
-            // Reset props to defaults based off of columnNames
-            R.keys(defaultChartEditorState).forEach(k => {
-                chartEditorState[k] = defaultChartEditorState[k](columnNames);
-            });
-        } else if (columnNames.length === 0) {
-            ['droppedBoxNames', 'selectedColumn', 'selectedChartType'].forEach(
-                // Function body wrapped in block because without a wrapping block,
-                // JavaScript treats the assignment as the implicit return value,
-                // which in turn breaks ESLint `no-return-assign` rule
-                k => {
-                    chartEditorState[k] = defaultChartEditorState[k]();
-                }
-            );
-        } else {
-            R.keys(defaultChartEditorState).forEach(k => {
-                if (!R.has(k, chartEditor || {})) {
-                    chartEditorState[k] = defaultChartEditorState[k](columnNames);
-                } else {
-                    if (!R.has('chartEditor', props.preview) ||
-                        nextProps.preview.chartEditor[k] !== props.preview.chartEditor[k]) {
-                        chartEditorState[k] = nextProps.preview.chartEditor[k];
-                    }
-                }
-            });
-        }
-
         this.setState({
-            chartEditorState,
             columnNames,
             csvString,
             errorMsg,
@@ -256,14 +215,6 @@ class Preview extends Component {
         this.props.updatePreview({
             showEditor: showEditor ? false : true
         });
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this.propsToState(nextProps, this.props);
-    }
-
-    componentWillMount() {
-        this.propsToState(this.props, {});
     }
 
     render() {
