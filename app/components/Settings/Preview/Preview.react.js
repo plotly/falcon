@@ -352,6 +352,7 @@ class Preview extends Component {
                                             onClick={() => this.fetchDatacache(
                                                 JSON.stringify({
                                                     data: gd.data,
+                                                    frames: gd.frames,
                                                     layout: gd.layout
                                                 }),
                                                 'plot'

@@ -465,7 +465,7 @@ array-includes@^3.0.3:
     define-properties "^1.1.2"
     es-abstract "^1.7.0"
 
-array-normalize@^1.1.2, array-normalize@^1.1.3:
+array-normalize@^1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/array-normalize/-/array-normalize-1.1.3.tgz#73fb837f4816ec19151d3c5e8d853a4590ce01bd"
   dependencies:
@@ -1443,10 +1443,6 @@ base16@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/base16/-/base16-1.0.0.tgz#e297f60d7ec1014a7a971a39ebc8a98c0b681e70"
 
-base64-js@0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-0.0.2.tgz#024f0f72afa25b75f9c0ee73cd4f55ec1bed9784"
-
 base64-js@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.2.0.tgz#a39992d723584811982be5e290bb6a53d86700f1"
@@ -1583,13 +1579,6 @@ boom@5.x.x:
   resolved "https://registry.yarnpkg.com/boom/-/boom-5.2.0.tgz#5dd9da6ee3a5f302077436290cb717d3f4a54e02"
   dependencies:
     hoek "4.x.x"
-
-bops@0.0.6:
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/bops/-/bops-0.0.6.tgz#082d1d55fa01e60dbdc2ebc2dba37f659554cf3a"
-  dependencies:
-    base64-js "0.0.2"
-    to-utf8 "0.0.1"
 
 boundary-cells@^2.0.0:
   version "2.0.1"
@@ -2213,13 +2202,6 @@ color-normalize@^1.0.0, color-normalize@^1.0.3:
     color-rgba "^2.0.0"
     dtype "^2.0.0"
 
-color-parse@^1.3.4:
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/color-parse/-/color-parse-1.3.4.tgz#c7b741ff8a41b224a39c1f2d60c3b92b9fd993a3"
-  dependencies:
-    color-name "^1.0.0"
-    is-plain-obj "^1.1.0"
-
 color-parse@^1.3.5:
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/color-parse/-/color-parse-1.3.5.tgz#4c810f72e808e4f73b63f72acd78da538a515564"
@@ -2227,14 +2209,6 @@ color-parse@^1.3.5:
     color-name "^1.0.0"
     defined "^1.0.0"
     is-plain-obj "^1.1.0"
-
-color-rgba@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/color-rgba/-/color-rgba-1.1.1.tgz#eed993a4297880f44a77c2d62b2f6eba78101d78"
-  dependencies:
-    clamp "^1.0.1"
-    color-parse "^1.3.4"
-    color-space "^1.14.6"
 
 color-rgba@^2.0.0:
   version "2.0.0"
@@ -2370,12 +2344,6 @@ concat-stream@1.6.0, concat-stream@^1.5.2, concat-stream@^1.6.0, concat-stream@~
     inherits "^2.0.3"
     readable-stream "^2.2.2"
     typedarray "^0.0.6"
-
-concat-stream@~1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/concat-stream/-/concat-stream-1.2.1.tgz#f35100b6c46378bfba8b6b80f9f0d0ccdf13dc60"
-  dependencies:
-    bops "0.0.6"
 
 configstore@^3.0.0:
   version "3.1.1"
@@ -2609,7 +2577,7 @@ css-what@2.1:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/css-what/-/css-what-2.1.0.tgz#9467d032c38cfaefb9f2d79501253062f87fa1bd"
 
-csscolorparser@^1.0.2, csscolorparser@~1.0.2:
+csscolorparser@~1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/csscolorparser/-/csscolorparser-1.0.3.tgz#b34f391eea4da8f3e98231e2ccd8df9c041f171b"
 
@@ -3168,10 +3136,6 @@ duplexify@^3.4.5:
     inherits "^2.0.1"
     readable-stream "^2.0.0"
     stream-shift "^1.0.0"
-
-earcut@^2.0.3:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/earcut/-/earcut-2.1.1.tgz#157634e5f3ebb42224e475016e86a5b6ce556b45"
 
 earcut@^2.1.1, earcut@^2.1.3:
   version "2.1.3"
@@ -4004,10 +3968,6 @@ fd-slicer@~1.0.1:
   dependencies:
     pend "~1.2.0"
 
-feature-filter@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/feature-filter/-/feature-filter-2.2.0.tgz#3cc356015e968c362afbdf7ff1bb744ddf7fc2e0"
-
 fetch-cookie@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/fetch-cookie/-/fetch-cookie-0.7.0.tgz#a6fc137ad8363aa89125864c6451b86ecb7de802"
@@ -4112,7 +4072,7 @@ flow-remove-types@^1.1.2:
     babylon "^6.15.0"
     vlq "^0.2.1"
 
-font-atlas-sdf@^1.3.2, font-atlas-sdf@^1.3.3:
+font-atlas-sdf@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/font-atlas-sdf/-/font-atlas-sdf-1.3.3.tgz#8323f136c69d73a235aa8c6ada640e58f180b8c0"
   dependencies:
@@ -4302,20 +4262,6 @@ generic-pool@2.4.2:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/generic-pool/-/generic-pool-2.4.2.tgz#886bc5bf0beb7db96e81bcbba078818de5a62683"
 
-geojson-area@0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/geojson-area/-/geojson-area-0.1.0.tgz#d48d807082cfadf4a78df1349be50f38bf1894ae"
-  dependencies:
-    wgs84 "0.0.0"
-
-geojson-rewind@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/geojson-rewind/-/geojson-rewind-0.1.0.tgz#57022a054b196660d755354fe5d26684d90cd019"
-  dependencies:
-    concat-stream "~1.2.1"
-    geojson-area "0.1.0"
-    minimist "0.0.5"
-
 geojson-rewind@^0.3.0:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/geojson-rewind/-/geojson-rewind-0.3.1.tgz#22240797c847cc2f0c1d313e4aa0c915afa7f29d"
@@ -4324,10 +4270,6 @@ geojson-rewind@^0.3.0:
     concat-stream "~1.6.0"
     minimist "1.2.0"
     sharkdown "^0.1.0"
-
-geojson-vt@^2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/geojson-vt/-/geojson-vt-2.4.0.tgz#3c1cf44493f35eb4d2c70c95da6550de66072c05"
 
 geojson-vt@^3.0.0:
   version "3.0.0"
@@ -4402,20 +4344,6 @@ gl-constants@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/gl-constants/-/gl-constants-1.0.0.tgz#597a504e364750ff50253aa35f8dea7af4a5d233"
 
-gl-contour2d@^1.1.2:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/gl-contour2d/-/gl-contour2d-1.1.3.tgz#86275566ceac1b6eb76c00ad7297227835ccd364"
-  dependencies:
-    binary-search-bounds "^2.0.0"
-    cdt2d "^1.0.0"
-    clean-pslg "^1.1.0"
-    gl-buffer "^2.1.2"
-    gl-shader "^4.0.5"
-    glslify "^4.0.0"
-    iota-array "^1.0.0"
-    ndarray "^1.0.18"
-    surface-nets "^1.0.2"
-
 gl-contour2d@^1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/gl-contour2d/-/gl-contour2d-1.1.4.tgz#0d4fc9b59de4ae3e045218d3f67c7a33f9c93428"
@@ -4429,24 +4357,6 @@ gl-contour2d@^1.1.4:
     iota-array "^1.0.0"
     ndarray "^1.0.18"
     surface-nets "^1.0.2"
-
-gl-error2d@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/gl-error2d/-/gl-error2d-1.2.1.tgz#cc6977f6476f205db3c4eac5b8c48899e48dfdd1"
-  dependencies:
-    gl-buffer "^2.1.2"
-    gl-shader "^4.0.5"
-    glslify "^2.3.1"
-    typedarray-pool "^1.1.0"
-
-gl-error3d@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/gl-error3d/-/gl-error3d-1.0.6.tgz#be034667b61a28e830edd371a709ac1c227a3fdc"
-  dependencies:
-    gl-buffer "^2.1.2"
-    gl-shader "4.2.0"
-    gl-vao "^1.3.0"
-    glslify "^6.0.2"
 
 gl-error3d@^1.0.7:
   version "1.0.7"
@@ -4472,17 +4382,6 @@ gl-format-compiler-error@^1.0.2:
     glsl-shader-name "^1.0.0"
     sprintf-js "^1.0.3"
 
-gl-heatmap2d@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/gl-heatmap2d/-/gl-heatmap2d-1.0.3.tgz#69cb61512e31185ea8bd26f025f5c1af1f2b0a18"
-  dependencies:
-    binary-search-bounds "^2.0.3"
-    gl-buffer "^2.1.2"
-    gl-shader "^4.0.5"
-    glslify "^4.0.0"
-    iota-array "^1.0.0"
-    typedarray-pool "^1.1.0"
-
 gl-heatmap2d@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/gl-heatmap2d/-/gl-heatmap2d-1.0.4.tgz#0a11cc113dbb9744004f5d265e7d8c1935ebab15"
@@ -4493,31 +4392,6 @@ gl-heatmap2d@^1.0.4:
     glslify "^6.1.0"
     iota-array "^1.0.0"
     typedarray-pool "^1.1.0"
-
-gl-line2d@^1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/gl-line2d/-/gl-line2d-1.4.1.tgz#bf81794738f9a7637dcdde9668666a44c12a1110"
-  dependencies:
-    gl-buffer "^2.1.2"
-    gl-shader "^4.0.5"
-    gl-texture2d "^2.0.9"
-    glslify "^2.1.2"
-    ndarray "^1.0.18"
-    snap-points-2d "^1.0.1"
-    typedarray-pool "^1.1.0"
-
-gl-line3d@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/gl-line3d/-/gl-line3d-1.1.0.tgz#e8ae956b897f130fb1d58798fadf74bf9a21ab9b"
-  dependencies:
-    binary-search-bounds "^1.0.0"
-    gl-buffer "^2.0.8"
-    gl-shader "^4.0.4"
-    gl-texture2d "^2.0.2"
-    gl-vao "^1.1.3"
-    glsl-read-float "^1.0.0"
-    glslify "^2.1.2"
-    ndarray "^1.0.16"
 
 gl-line3d@^1.1.2:
   version "1.1.2"
@@ -4552,29 +4426,6 @@ gl-matrix-invert@^1.0.0:
     gl-mat3 "^1.0.0"
     gl-mat4 "^1.0.0"
 
-gl-matrix@^2.3.1:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/gl-matrix/-/gl-matrix-2.4.0.tgz#2089b13301a29eec822d9d99dffc1f78ee9a3c50"
-
-gl-mesh3d@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/gl-mesh3d/-/gl-mesh3d-1.3.0.tgz#c18968859291c5389239040b50bf9b3d264061a6"
-  dependencies:
-    barycentric "^1.0.1"
-    colormap "^2.1.0"
-    gl-buffer "^2.0.8"
-    gl-mat4 "^1.0.0"
-    gl-shader "4.2.0"
-    gl-texture2d "^2.0.8"
-    gl-vao "^1.1.3"
-    glsl-specular-cook-torrance "^2.0.1"
-    glslify "^2.1.2"
-    ndarray "^1.0.15"
-    normals "^1.0.1"
-    polytope-closest-point "^1.0.0"
-    simplicial-complex-contour "^1.0.0"
-    typedarray-pool "^1.1.0"
-
 gl-mesh3d@^1.3.2:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/gl-mesh3d/-/gl-mesh3d-1.3.2.tgz#1436104ad86a82c3d25f030ec0cf682db41ebdc2"
@@ -4594,18 +4445,6 @@ gl-mesh3d@^1.3.2:
     simplicial-complex-contour "^1.0.0"
     typedarray-pool "^1.1.0"
 
-gl-plot2d@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/gl-plot2d/-/gl-plot2d-1.2.0.tgz#99eead246d2f6473cc9a4bc08617fb6427ab622d"
-  dependencies:
-    binary-search-bounds "^2.0.3"
-    gl-buffer "^2.1.2"
-    gl-select-static "^2.0.2"
-    gl-shader "^4.2.1"
-    glsl-inverse "^1.0.0"
-    glslify "^2.2.1"
-    text-cache "^4.1.0"
-
 gl-plot2d@^1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/gl-plot2d/-/gl-plot2d-1.3.1.tgz#93a09daaeabdb24127a38309ff4a2ca67191f48d"
@@ -4617,23 +4456,6 @@ gl-plot2d@^1.3.1:
     glsl-inverse "^1.0.0"
     glslify "^6.1.0"
     text-cache "^4.1.0"
-
-gl-plot3d@^1.5.4:
-  version "1.5.4"
-  resolved "https://registry.yarnpkg.com/gl-plot3d/-/gl-plot3d-1.5.4.tgz#be9c1868c829a47d0a2ab03c70d528af868f9e86"
-  dependencies:
-    "3d-view-controls" "^2.2.0"
-    a-big-triangle "^1.0.0"
-    gl-axes3d "^1.2.5"
-    gl-fbo "^2.0.3"
-    gl-mat4 "^1.1.2"
-    gl-select-static "^2.0.2"
-    gl-shader "^4.0.4"
-    gl-spikes3d "^1.0.3"
-    glslify "^2.1.2"
-    is-mobile "^0.2.2"
-    mouse-change "^1.1.1"
-    ndarray "^1.0.16"
 
 gl-plot3d@^1.5.5:
   version "1.5.5"
@@ -4652,15 +4474,6 @@ gl-plot3d@^1.5.5:
     mouse-change "^1.1.1"
     ndarray "^1.0.16"
 
-gl-pointcloud2d@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/gl-pointcloud2d/-/gl-pointcloud2d-1.0.0.tgz#41bae996e049e0f1dfd8f9f8e15ff903fc4fbfdd"
-  dependencies:
-    gl-buffer "^2.1.2"
-    gl-shader "^4.2.1"
-    glslify "^2.1.2"
-    typedarray-pool "^1.1.0"
-
 gl-pointcloud2d@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/gl-pointcloud2d/-/gl-pointcloud2d-1.0.1.tgz#c87e55164346787af9e8a44459054ae52091546f"
@@ -4678,34 +4491,6 @@ gl-quat@^1.0.0:
     gl-vec3 "^1.0.3"
     gl-vec4 "^1.0.0"
 
-gl-scatter2d-sdf@^1.3.11:
-  version "1.3.11"
-  resolved "https://registry.yarnpkg.com/gl-scatter2d-sdf/-/gl-scatter2d-sdf-1.3.11.tgz#aa760905d3cb3c42f4a98a78f830cb3b52bda0f4"
-  dependencies:
-    binary-search-bounds "^2.0.3"
-    clamp "^1.0.1"
-    color-id "^1.1.0"
-    font-atlas-sdf "^1.3.2"
-    gl-buffer "^2.1.2"
-    gl-shader "^4.2.1"
-    gl-texture2d "^2.1.0"
-    glslify "^2.3.1"
-    snap-points-2d "^3.1.0"
-    typedarray-pool "^1.1.0"
-
-gl-scatter2d@^1.3.2:
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/gl-scatter2d/-/gl-scatter2d-1.3.2.tgz#27f12ffa7b4303f4215f2209a573d728f1804371"
-  dependencies:
-    array-bounds "^1.0.0"
-    array-normalize "^1.1.2"
-    binary-search-bounds "^2.0.3"
-    gl-buffer "^2.1.2"
-    gl-shader "^4.0.4"
-    glslify "^2.1.2"
-    snap-points-2d "^3.0.0"
-    typedarray-pool "^1.1.0"
-
 gl-scatter3d@^1.0.11:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/gl-scatter3d/-/gl-scatter3d-1.0.11.tgz#ac1e1d043381961558d414629ac9cb42c146e4c4"
@@ -4717,26 +4502,6 @@ gl-scatter3d@^1.0.11:
     glslify "^6.1.0"
     typedarray-pool "^1.0.2"
     vectorize-text "^3.0.0"
-
-gl-scatter3d@^1.0.4:
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/gl-scatter3d/-/gl-scatter3d-1.0.10.tgz#49c57f33108c3b56b3581541928a8feeb2d37e9e"
-  dependencies:
-    gl-buffer "^2.0.6"
-    gl-mat4 "^1.0.0"
-    gl-shader "^4.0.0"
-    gl-vao "^1.1.2"
-    glslify "^2.2.1"
-    typedarray-pool "^1.0.2"
-    vectorize-text "^3.0.0"
-
-gl-select-box@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/gl-select-box/-/gl-select-box-1.0.1.tgz#0cc8c905cce27fe8d918bb0ee1387f5838f959e9"
-  dependencies:
-    gl-buffer "^2.1.2"
-    gl-shader "^4.0.5"
-    glslify "^2.2.1"
 
 gl-select-box@^1.0.2:
   version "1.0.2"
@@ -4756,14 +4521,7 @@ gl-select-static@^2.0.2:
     ndarray "^1.0.15"
     typedarray-pool "^1.1.0"
 
-gl-shader@4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/gl-shader/-/gl-shader-4.2.0.tgz#28f77813effa0dd5cda9dab1f301d1b1cda3e87e"
-  dependencies:
-    gl-format-compiler-error "^1.0.2"
-    weakmap-shim "^1.1.0"
-
-gl-shader@^4.0.0, gl-shader@^4.0.4, gl-shader@^4.0.5, gl-shader@^4.2.0, gl-shader@^4.2.1:
+gl-shader@^4.0.4, gl-shader@^4.0.5, gl-shader@^4.2.0, gl-shader@^4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/gl-shader/-/gl-shader-4.2.1.tgz#bc9b808e9293c51b668e88de615b0c113708dc2f"
   dependencies:
@@ -4789,29 +4547,6 @@ gl-state@^1.0.0:
   dependencies:
     uniq "^1.0.0"
 
-gl-surface3d@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/gl-surface3d/-/gl-surface3d-1.3.1.tgz#cf9c177624eb50cf3b6cd7cc23a08858443da8f9"
-  dependencies:
-    binary-search-bounds "^1.0.0"
-    bit-twiddle "^1.0.2"
-    colormap "^2.1.0"
-    dup "^1.0.0"
-    gl-buffer "^2.0.3"
-    gl-mat4 "^1.0.0"
-    gl-shader "^4.2.0"
-    gl-texture2d "^2.0.0"
-    gl-vao "^1.1.1"
-    glsl-specular-beckmann "^1.1.2"
-    glslify "^2.1.2"
-    ndarray "^1.0.16"
-    ndarray-gradient "^1.0.0"
-    ndarray-ops "^1.2.1"
-    ndarray-pack "^1.0.1"
-    ndarray-scratch "^1.1.1"
-    surface-nets "^1.0.2"
-    typedarray-pool "^1.0.0"
-
 gl-surface3d@^1.3.4:
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/gl-surface3d/-/gl-surface3d-1.3.4.tgz#778f3d8f7598589997e17300d71d1da4eaf93529"
@@ -4835,7 +4570,7 @@ gl-surface3d@^1.3.4:
     surface-nets "^1.0.2"
     typedarray-pool "^1.0.0"
 
-gl-texture2d@^2.0.0, gl-texture2d@^2.0.2, gl-texture2d@^2.0.8, gl-texture2d@^2.0.9, gl-texture2d@^2.1.0:
+gl-texture2d@^2.0.0, gl-texture2d@^2.0.2, gl-texture2d@^2.0.8:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/gl-texture2d/-/gl-texture2d-2.1.0.tgz#ff6824e7e7c31a8ba6fdcdbe9e5c695d7e2187c7"
   dependencies:
@@ -5043,21 +4778,6 @@ glslify-bundle@^2.0.4:
     glsl-token-string "^1.0.1"
     glsl-tokenizer "^2.0.2"
 
-glslify-bundle@^4.0.0:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/glslify-bundle/-/glslify-bundle-4.0.1.tgz#af2cf206cd7985159100b33b5f1463a81b744da1"
-  dependencies:
-    glsl-inject-defines "^1.0.1"
-    glsl-token-defines "^1.0.0"
-    glsl-token-depth "^1.1.1"
-    glsl-token-descope "^1.0.2"
-    glsl-token-scope "^1.1.1"
-    glsl-token-string "^1.0.1"
-    glsl-token-whitespace-trim "^1.0.0"
-    glsl-tokenizer "^2.0.2"
-    murmurhash-js "^1.0.0"
-    shallow-copy "0.0.1"
-
 glslify-bundle@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/glslify-bundle/-/glslify-bundle-5.0.0.tgz#0252ada1ef9df30b660006e0bb21fd130b486e42"
@@ -5086,7 +4806,7 @@ glslify-deps@^1.2.0, glslify-deps@^1.2.5:
     map-limit "0.0.1"
     resolve "^1.0.0"
 
-glslify@^2.1.2, glslify@^2.2.1, glslify@^2.3.1:
+glslify@^2.1.2:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/glslify/-/glslify-2.3.1.tgz#47a8ce5bf08609556aa7ec76c6a7d3430776dd46"
   dependencies:
@@ -5095,20 +4815,6 @@ glslify@^2.1.2, glslify@^2.2.1, glslify@^2.3.1:
     glslify-bundle "^2.0.4"
     glslify-deps "^1.2.0"
     minimist "^1.1.0"
-    resolve "^1.1.5"
-    static-module "^1.1.2"
-    through2 "^0.6.3"
-    xtend "^4.0.0"
-
-glslify@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/glslify/-/glslify-4.0.0.tgz#4dbcfad136953f301503fa4a8e069b2336a14234"
-  dependencies:
-    bl "^1.0.0"
-    glsl-resolve "0.0.1"
-    glslify-bundle "^4.0.0"
-    glslify-deps "^1.2.5"
-    minimist "^1.2.0"
     resolve "^1.1.5"
     static-module "^1.1.2"
     through2 "^0.6.3"
@@ -6533,18 +6239,6 @@ lodash._basecreate@^3.0.0:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/lodash._basecreate/-/lodash._basecreate-3.0.3.tgz#1bc661614daa7fc311b7d03bf16806a0213cf821"
 
-lodash._baseisequal@^3.0.0:
-  version "3.0.7"
-  resolved "https://registry.yarnpkg.com/lodash._baseisequal/-/lodash._baseisequal-3.0.7.tgz#d8025f76339d29342767dcc887ce5cb95a5b51f1"
-  dependencies:
-    lodash.isarray "^3.0.0"
-    lodash.istypedarray "^3.0.0"
-    lodash.keys "^3.0.0"
-
-lodash._bindcallback@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/lodash._bindcallback/-/lodash._bindcallback-3.0.1.tgz#e531c27644cf8b57a99e17ed95b35c748789392e"
-
 lodash._getnative@^3.0.0:
   version "3.9.1"
   resolved "https://registry.yarnpkg.com/lodash._getnative/-/lodash._getnative-3.9.1.tgz#570bc7dede46d61cdcde687d65d3eecbaa3aaff5"
@@ -6607,20 +6301,9 @@ lodash.isarray@^3.0.0:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/lodash.isarray/-/lodash.isarray-3.0.4.tgz#79e4eb88c36a8122af86f844aa9bcd851b5fbb55"
 
-lodash.isequal@^3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-3.0.4.tgz#1c35eb3b6ef0cd1ff51743e3ea3cf7fdffdacb64"
-  dependencies:
-    lodash._baseisequal "^3.0.0"
-    lodash._bindcallback "^3.0.0"
-
 lodash.isequal@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
-
-lodash.istypedarray@^3.0.0:
-  version "3.0.6"
-  resolved "https://registry.yarnpkg.com/lodash.istypedarray/-/lodash.istypedarray-3.0.6.tgz#c9a477498607501d8e8494d283b87c39281cef62"
 
 lodash.keys@^3.0.0, lodash.keys@^3.1.2:
   version "3.1.2"
@@ -6728,31 +6411,6 @@ map-obj@^1.0.0, map-obj@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
 
-mapbox-gl-function@^1.2.1:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/mapbox-gl-function/-/mapbox-gl-function-1.3.0.tgz#cee3d95750c189d45e83ab41a0a57fc2a8a509bc"
-
-mapbox-gl-shaders@mapbox/mapbox-gl-shaders#de2ab007455aa2587c552694c68583f94c9f2747:
-  version "1.0.0"
-  resolved "https://codeload.github.com/mapbox/mapbox-gl-shaders/tar.gz/de2ab007455aa2587c552694c68583f94c9f2747"
-  dependencies:
-    brfs "^1.4.0"
-
-mapbox-gl-style-spec@mapbox/mapbox-gl-style-spec#83b1a3e5837d785af582efd5ed1a212f2df6a4ae:
-  version "8.8.0"
-  resolved "https://codeload.github.com/mapbox/mapbox-gl-style-spec/tar.gz/83b1a3e5837d785af582efd5ed1a212f2df6a4ae"
-  dependencies:
-    csscolorparser "~1.0.2"
-    jsonlint-lines-primitives "~1.6.0"
-    lodash.isequal "^3.0.4"
-    minimist "0.0.8"
-    rw "^0.1.4"
-    sort-object "^0.3.2"
-
-mapbox-gl-supported@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/mapbox-gl-supported/-/mapbox-gl-supported-1.2.0.tgz#cbd34df894206cadda9a33c8d9a4609f26bb1989"
-
 mapbox-gl@0.44.1:
   version "0.44.1"
   resolved "https://registry.yarnpkg.com/mapbox-gl/-/mapbox-gl-0.44.1.tgz#bd4964f71a937c0eca4cc8b00330f2bfcbddc37c"
@@ -6788,36 +6446,6 @@ mapbox-gl@0.44.1:
     unflowify "^1.0.0"
     vt-pbf "^3.0.1"
     webworkify "^1.5.0"
-
-mapbox-gl@^0.22.0:
-  version "0.22.1"
-  resolved "https://registry.yarnpkg.com/mapbox-gl/-/mapbox-gl-0.22.1.tgz#92a965547d4c2f24c22cbc487eeda48694cb627a"
-  dependencies:
-    csscolorparser "^1.0.2"
-    earcut "^2.0.3"
-    feature-filter "^2.2.0"
-    geojson-rewind "^0.1.0"
-    geojson-vt "^2.4.0"
-    gl-matrix "^2.3.1"
-    grid-index "^1.0.0"
-    mapbox-gl-function "^1.2.1"
-    mapbox-gl-shaders mapbox/mapbox-gl-shaders#de2ab007455aa2587c552694c68583f94c9f2747
-    mapbox-gl-style-spec mapbox/mapbox-gl-style-spec#83b1a3e5837d785af582efd5ed1a212f2df6a4ae
-    mapbox-gl-supported "^1.2.0"
-    pbf "^1.3.2"
-    pngjs "^2.2.0"
-    point-geometry "^0.0.0"
-    quickselect "^1.0.0"
-    request "^2.39.0"
-    resolve-url "^0.2.1"
-    shelf-pack "^1.0.0"
-    supercluster "^2.0.1"
-    unassertify "^2.0.0"
-    unitbezier "^0.0.0"
-    vector-tile "^1.3.0"
-    vt-pbf "^2.0.2"
-    webworkify "^1.3.0"
-    whoots-js "^2.0.0"
 
 marching-simplex-table@^1.0.0:
   version "1.0.0"
@@ -7817,13 +7445,6 @@ pathval@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/pathval/-/pathval-1.1.0.tgz#b942e6d4bde653005ef6b71361def8727d0645e0"
 
-pbf@^1.3.2:
-  version "1.3.7"
-  resolved "https://registry.yarnpkg.com/pbf/-/pbf-1.3.7.tgz#1e3d047ba3cbe8086ae854a25503ab4537d4335d"
-  dependencies:
-    ieee754 "^1.1.6"
-    resolve-protobuf-schema "^2.0.0"
-
 pbf@^3.0.5:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/pbf/-/pbf-3.1.0.tgz#f70004badcb281761eabb1e76c92f179f08189e9"
@@ -7977,62 +7598,7 @@ plotly-icons@latest:
     mdi-react "^2.1.19"
     prop-types "^15.6.1"
 
-plotly.js@^1.31.2:
-  version "1.31.2"
-  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-1.31.2.tgz#1b4100bc60957fe7589ce72cfccd4ee499dfaedb"
-  dependencies:
-    "3d-view" "^2.0.0"
-    "@plotly/d3-sankey" "^0.5.0"
-    alpha-shape "^1.0.0"
-    color-rgba "^1.1.1"
-    convex-hull "^1.0.3"
-    country-regex "^1.1.0"
-    d3 "^3.5.12"
-    d3-force "^1.0.6"
-    delaunay-triangulate "^1.1.6"
-    es6-promise "^3.0.2"
-    fast-isnumeric "^1.1.1"
-    font-atlas-sdf "^1.3.3"
-    gl-contour2d "^1.1.2"
-    gl-error2d "^1.2.1"
-    gl-error3d "^1.0.6"
-    gl-heatmap2d "^1.0.3"
-    gl-line2d "^1.4.1"
-    gl-line3d "^1.1.0"
-    gl-mat4 "^1.1.2"
-    gl-mesh3d "^1.3.0"
-    gl-plot2d "^1.2.0"
-    gl-plot3d "^1.5.4"
-    gl-pointcloud2d "^1.0.0"
-    gl-scatter2d "^1.3.2"
-    gl-scatter2d-sdf "^1.3.11"
-    gl-scatter3d "^1.0.4"
-    gl-select-box "^1.0.1"
-    gl-shader "4.2.0"
-    gl-spikes2d "^1.0.1"
-    gl-surface3d "^1.3.1"
-    has-hover "^1.0.1"
-    mapbox-gl "^0.22.0"
-    matrix-camera-controller "^2.1.3"
-    mouse-change "^1.4.0"
-    mouse-event-offset "^3.0.2"
-    mouse-wheel "^1.0.2"
-    ndarray "^1.0.18"
-    ndarray-fill "^1.0.2"
-    ndarray-homography "^1.0.0"
-    ndarray-ops "^1.2.2"
-    regl "^1.3.0"
-    right-now "^1.0.0"
-    robust-orientation "^1.1.3"
-    sane-topojson "^2.0.0"
-    strongly-connected-components "^1.0.1"
-    superscript-text "^1.0.0"
-    tinycolor2 "^1.3.0"
-    topojson-client "^2.1.0"
-    webgl-context "^2.2.0"
-    world-calendars "^1.0.3"
-
-plotly.js@^1.35.0:
+plotly.js@^1.35.0, plotly.js@^1.35.2:
   version "1.35.2"
   resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-1.35.2.tgz#543d914d4384eca1bddae1f6df6b42c1b85b749a"
   dependencies:
@@ -8101,14 +7667,6 @@ pluralize@^7.0.0:
 pn@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/pn/-/pn-1.1.0.tgz#e2f4cef0e219f463c179ab37463e4e1ecdccbafb"
-
-pngjs@^2.2.0:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/pngjs/-/pngjs-2.3.1.tgz#11d1e12b9cb64d63e30c143a330f4c1f567da85f"
-
-point-geometry@0.0.0, point-geometry@^0.0.0:
-  version "0.0.0"
-  resolved "https://registry.yarnpkg.com/point-geometry/-/point-geometry-0.0.0.tgz#6fcbcad7a803b6418247dd6e49c2853c584daff7"
 
 point-in-big-polygon@^2.0.0:
   version "2.0.0"
@@ -8758,9 +8316,9 @@ react-base16-styling@^0.5.1:
     lodash.flow "^3.3.0"
     pure-color "^1.2.0"
 
-react-chart-editor@^0.11.1:
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/react-chart-editor/-/react-chart-editor-0.11.1.tgz#409f63ce7b210f46312068a9e76901e5bb319f42"
+react-chart-editor@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/react-chart-editor/-/react-chart-editor-0.12.0.tgz#d22cc4799b1d0b8d3a60051b107a43b090870185"
   dependencies:
     classnames "^2.2.5"
     draft-js "^0.10.4"
@@ -9375,10 +8933,6 @@ regl-scatter2d@^2.1.17:
     to-float32 "^1.0.0"
     update-diff "^1.1.0"
 
-regl@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/regl/-/regl-1.3.0.tgz#ccde82eff8a8a068a559581ceacbef1afea78ebd"
-
 regl@^1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/regl/-/regl-1.3.1.tgz#2995e63a7984c520ef2da0f6f1027f7051338140"
@@ -9442,33 +8996,6 @@ request@2.81.0, request@~2.81.0:
     tunnel-agent "^0.6.0"
     uuid "^3.0.0"
 
-request@^2.39.0, request@^2.79.0:
-  version "2.82.0"
-  resolved "https://registry.yarnpkg.com/request/-/request-2.82.0.tgz#2ba8a92cd7ac45660ea2b10a53ae67cd247516ea"
-  dependencies:
-    aws-sign2 "~0.7.0"
-    aws4 "^1.6.0"
-    caseless "~0.12.0"
-    combined-stream "~1.0.5"
-    extend "~3.0.1"
-    forever-agent "~0.6.1"
-    form-data "~2.3.1"
-    har-validator "~5.0.3"
-    hawk "~6.0.2"
-    http-signature "~1.2.0"
-    is-typedarray "~1.0.0"
-    isstream "~0.1.2"
-    json-stringify-safe "~5.0.1"
-    mime-types "~2.1.17"
-    oauth-sign "~0.8.2"
-    performance-now "^2.1.0"
-    qs "~6.5.1"
-    safe-buffer "^5.1.1"
-    stringstream "~0.0.5"
-    tough-cookie "~2.3.2"
-    tunnel-agent "^0.6.0"
-    uuid "^3.1.0"
-
 request@^2.45.0, request@^2.83.0:
   version "2.83.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.83.0.tgz#ca0b65da02ed62935887808e6f510381034e3356"
@@ -9493,6 +9020,33 @@ request@^2.45.0, request@^2.83.0:
     safe-buffer "^5.1.1"
     stringstream "~0.0.5"
     tough-cookie "~2.3.3"
+    tunnel-agent "^0.6.0"
+    uuid "^3.1.0"
+
+request@^2.79.0:
+  version "2.82.0"
+  resolved "https://registry.yarnpkg.com/request/-/request-2.82.0.tgz#2ba8a92cd7ac45660ea2b10a53ae67cd247516ea"
+  dependencies:
+    aws-sign2 "~0.7.0"
+    aws4 "^1.6.0"
+    caseless "~0.12.0"
+    combined-stream "~1.0.5"
+    extend "~3.0.1"
+    forever-agent "~0.6.1"
+    form-data "~2.3.1"
+    har-validator "~5.0.3"
+    hawk "~6.0.2"
+    http-signature "~1.2.0"
+    is-typedarray "~1.0.0"
+    isstream "~0.1.2"
+    json-stringify-safe "~5.0.1"
+    mime-types "~2.1.17"
+    oauth-sign "~0.8.2"
+    performance-now "^2.1.0"
+    qs "~6.5.1"
+    safe-buffer "^5.1.1"
+    stringstream "~0.0.5"
+    tough-cookie "~2.3.2"
     tunnel-agent "^0.6.0"
     uuid "^3.1.0"
 
@@ -9538,10 +9092,6 @@ resolve-protobuf-schema@^2.0.0:
   resolved "https://registry.yarnpkg.com/resolve-protobuf-schema/-/resolve-protobuf-schema-2.0.0.tgz#e67b062a67f02d11bd6886e70efda788407e0fb4"
   dependencies:
     protocol-buffers-schema "^2.0.2"
-
-resolve-url@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/resolve-url/-/resolve-url-0.2.1.tgz#2c637fe77c893afd2a663fe21aa9080068e2052a"
 
 resolve@1.1.7:
   version "1.1.7"
@@ -9731,10 +9281,6 @@ run-series@^1.1.1:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/run-series/-/run-series-1.1.4.tgz#89a73ddc5e75c9ef8ab6320c0a1600d6a41179b9"
 
-rw@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/rw/-/rw-0.1.4.tgz#4903cbd80248ae0ede685bf58fd236a7a9b29a3e"
-
 rw@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/rw/-/rw-1.3.3.tgz#3f862dfa91ab766b14885ef4d01124bfda074fb4"
@@ -9905,10 +9451,6 @@ shebang-regex@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-1.0.0.tgz#da42f49740c0b42db2ca9728571cb190c98efea3"
 
-shelf-pack@^1.0.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/shelf-pack/-/shelf-pack-1.1.0.tgz#b4679afdd00ad68dfd9bbd2b5a3e819293a74d82"
-
 shellwords@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/shellwords/-/shellwords-0.1.1.tgz#d6b9181c1a48d397324c84871efbcfc73fc0654b"
@@ -10016,13 +9558,7 @@ slice-ansi@1.0.0:
   dependencies:
     is-fullwidth-code-point "^2.0.0"
 
-snap-points-2d@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/snap-points-2d/-/snap-points-2d-1.0.1.tgz#8a679a47e195fa31405b03dc6e0c03e18228dcf4"
-  dependencies:
-    typedarray-pool "^1.1.0"
-
-snap-points-2d@^3.0.0, snap-points-2d@^3.1.0, snap-points-2d@^3.2.0:
+snap-points-2d@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/snap-points-2d/-/snap-points-2d-3.2.0.tgz#0e19e22a3a0e96bce21cdf5c7f1d7ed5b96745f0"
   dependencies:
@@ -10411,7 +9947,7 @@ sumchecker@^2.0.1, sumchecker@^2.0.2:
   dependencies:
     debug "^2.2.0"
 
-supercluster@^2.0.1, supercluster@^2.3.0:
+supercluster@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/supercluster/-/supercluster-2.3.0.tgz#87ab56081bbea9a1d724df5351ee9e8c3af2f48b"
   dependencies:
@@ -10777,10 +10313,6 @@ to-px@^1.0.1:
   dependencies:
     parse-unit "^1.0.1"
 
-to-utf8@0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/to-utf8/-/to-utf8-0.0.1.tgz#d17aea72ff2fba39b9e43601be7b3ff72e089852"
-
 topojson-client@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/topojson-client/-/topojson-client-2.1.0.tgz#ff9f7bf38991185e0b4284c2b06ae834f0eac6c8"
@@ -11011,10 +10543,6 @@ unique-string@^1.0.0:
   dependencies:
     crypto-random-string "^1.0.0"
 
-unitbezier@^0.0.0:
-  version "0.0.0"
-  resolved "https://registry.yarnpkg.com/unitbezier/-/unitbezier-0.0.0.tgz#33bf7f5d7284c5350bfc5c7f770fba7549c54a5e"
-
 universalify@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.1.1.tgz#fa71badd4437af4c148841e3b3b165f9e9e590b7"
@@ -11124,12 +10652,6 @@ vasync@1.6.3:
   dependencies:
     verror "1.6.0"
 
-vector-tile@^1.1.3, vector-tile@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/vector-tile/-/vector-tile-1.3.0.tgz#06d516a83b063f04c82ef539cf1bb1aebeb696b4"
-  dependencies:
-    point-geometry "0.0.0"
-
 vectorize-text@^3.0.0, vectorize-text@^3.0.1:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/vectorize-text/-/vectorize-text-3.0.2.tgz#05ab1630e409f377964e2b9205b2d559a92f60d8"
@@ -11173,14 +10695,6 @@ vm-browserify@0.0.4:
 voc@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/voc/-/voc-1.0.0.tgz#5465c0ce11d0881f7d8e36d8ca587043f33a25ae"
-
-vt-pbf@^2.0.2:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/vt-pbf/-/vt-pbf-2.1.4.tgz#b5df7c3f9706156e0b9881a99dcb05635740b522"
-  dependencies:
-    pbf "^1.3.2"
-    point-geometry "0.0.0"
-    vector-tile "^1.1.3"
 
 vt-pbf@^3.0.1:
   version "3.1.0"
@@ -11281,10 +10795,6 @@ webpack@^3.8.1:
     webpack-sources "^1.0.1"
     yargs "^8.0.2"
 
-webworkify@^1.3.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/webworkify/-/webworkify-1.4.0.tgz#71245d1e34cacf54e426bd955f8cc6ee12d024c2"
-
 webworkify@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/webworkify/-/webworkify-1.5.0.tgz#734ad87a774de6ebdd546e1d3e027da5b8f4a42c"
@@ -11328,10 +10838,6 @@ which@^1.2.12, which@^1.2.9, which@^1.3.0:
   resolved "https://registry.yarnpkg.com/which/-/which-1.3.0.tgz#ff04bdfc010ee547d780bec38e1ac1c2777d253a"
   dependencies:
     isexe "^2.0.0"
-
-whoots-js@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/whoots-js/-/whoots-js-2.1.0.tgz#bcb201c34e0eaf335fcce5ae2cf874579a99c487"
 
 wide-align@^1.1.0:
   version "1.1.2"
