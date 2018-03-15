@@ -258,7 +258,15 @@ class Preview extends Component {
         } = this.state;
 
         const dialect = connectionObject.dialect;
+
+        const minSize = 10;
+        const defaultSize = 200;
+        const maxSize = -400;
+        const size = propOr(defaultSize, 'size')(preview);
+        const lastSize = propOr(defaultSize, 'lastSize')(preview);
+
         const showEditor = propOr(true, 'showEditor')(preview);
+
         const code = propOr(PREVIEW_QUERY(connectionObject, selectedTable), 'code')(preview);
         propOr('', 'error')(preview);
 
@@ -267,9 +275,17 @@ class Preview extends Component {
         return (
             <SplitPane
                 split="vertical"
-                minSize={10}
-                defaultSize={200}
-                maxSize={-400}
+
+                minSize={minSize}
+                defaultSize={defaultSize}
+                maxSize={maxSize}
+                size={size}
+                onChange={nextSize =>
+                    this.props.updatePreview({
+                        size: nextSize
+                    })
+                }
+
                 style={{position: 'relative !important'}}
             >
                 <div className="tree-view-container">
@@ -339,7 +355,45 @@ class Preview extends Component {
 
                         {dialect !== DIALECTS.S3 && dialect !== DIALECTS.APACHE_DRILL &&
                             <div>
-                                <Tabs forceRenderTabPanel={true}>
+                                <Tabs
+                                    forceRenderTabPanel={true}
+                                    onSelect={(index, lastIndex) => {
+                                        if (index === lastIndex) {
+                                            return;
+                                        }
+
+                                        const chartEditorSelected = (index === 1);
+                                        const schemasVisible = (size > minSize);
+                                        if (chartEditorSelected) {
+                                            if (schemasVisible) {
+                                                // If Chart Editor selected and Schemas Tree visible,
+                                                // then save size in lastSize before hiding
+                                                this.props.updatePreview({
+                                                    showEditor: false,
+                                                    lastSize: size,
+                                                    size: minSize
+                                                });
+                                            } else {
+                                                this.props.updatePreview({
+                                                    showEditor: false
+                                                });
+                                            }
+                                        } else {
+                                            if (!schemasVisible) {
+                                                // If Chart Editor not selected and Schemas Tree was hidden,
+                                                // then restore the last size
+                                                this.props.updatePreview({
+                                                    showEditor: true,
+                                                    size: lastSize
+                                                });
+                                            } else {
+                                                this.props.updatePreview({
+                                                    showEditor: true
+                                                });
+                                            }
+                                        }
+                                    }}
+                                >
                                     <TabList>
                                         <Tab>Table</Tab>
                                         <Tab>Chart</Tab>
