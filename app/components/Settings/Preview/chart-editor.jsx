@@ -11,7 +11,9 @@ const Plot = createPlotComponent(plotly);
 export default class ChartEditor extends React.Component {
     static propTypes = {
         columnNames: PropTypes.array,
-        rows: PropTypes.array
+        rows: PropTypes.array,
+        gd: PropTypes.object,
+        onUpdate: PropTypes.func
     }
 
     /**
@@ -21,6 +23,11 @@ export default class ChartEditor extends React.Component {
      *
      * @param {Array}         props.columnNames - Array of column names
      * @param {Array.<Array>} props.rows - Array of rows
+     *
+     * @param {object}        props.gd - Plotly graph div
+     * @param {Array}         [props.gd.data] - Plotly graph data
+     * @param {object}        [props.gd.layout] - Plotly graph layout
+     * @param {function}      props.onUpdate - Callback invoked to update gd
      */
     constructor(props) {
         super(props);
@@ -28,29 +35,16 @@ export default class ChartEditor extends React.Component {
         /**
          * @member {object} state - Component state
          * @property {object} state.dataSources - A data source per column (used by <PlotlyEditor>)
+         *
          * @property {Array.<object>} state.dataSourceOptions - Data source options (used by <PlotlyEditor>)
          * @property {string} state.dataSourceOptions.label - Data source label (used by <PlotlyEditor>)
          * @property {string} state.dataSourceOptions.value - Data source index in dataSources (used by <PlotlyEditor>)
-         * @property {object} [state.gd] - Graph div
-         * @property {number} state.revision - Revision number > 0
+         *
+         * @property {number} state.revision - Revision number
          */
-        this.state = {...ChartEditor.computeDataSources(this.props), revision: 1};
-
-        /**
-         * Increment revision counter
-         * @returns {undefined}
-         */
-        this.onEditorUpdate = () => {
-            this.setState(({revision: prevRevision}) => ({revision: prevRevision + 1}));
-        };
-
-        /**
-         * Updates graph div
-         * @param {object} gd - Graph div
-         * @returns {undefined}
-         */
-        this.onPlotUpdate = (gd) => {
-            this.setState({gd});
+        this.state = {
+            ...ChartEditor.computeDataSources(this.props),
+            revision: 0
         };
     }
 
@@ -91,7 +85,8 @@ export default class ChartEditor extends React.Component {
     }
 
     render() {
-        const {dataSources, dataSourceOptions, gd, revision} = this.state;
+        const {gd, onUpdate} = this.props;
+        const {dataSources, dataSourceOptions, revision} = this.state;
 
         const data = gd && gd.data;
         const layout = gd && gd.layout;
@@ -110,7 +105,9 @@ export default class ChartEditor extends React.Component {
                  >
                     <PlotlyEditor
                         graphDiv={gd}
-                        onUpdate={this.onEditorUpdate}
+                        onUpdate={() => {
+                            this.setState(({revision: prevRevision}) => ({revision: prevRevision + 1}));
+                        }}
                         dataSources={dataSources}
                         dataSourceOptions={dataSourceOptions}
                         plotly={plotly}
@@ -128,8 +125,8 @@ export default class ChartEditor extends React.Component {
                         config={config}
                         data={data}
                         layout={layout}
-                        onUpdate={this.onPlotUpdate}
-                        onInitialized={this.onPlotUpdate}
+                        onUpdate={onUpdate}
+                        onInitialized={onUpdate}
                         revision={revision}
                         style={{width: '100%', height: '100%'}}
                     />

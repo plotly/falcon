@@ -13,7 +13,6 @@ import S3Preview from './S3Preview.js';
 import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../../Link.react';
 import {DIALECTS, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
-import getPlotJsonFromState from './components/getPlotJsonFromState.js';
 import {homeUrl, isOnPrem} from '../../../utils/utils';
 
 class Preview extends Component {
@@ -29,7 +28,7 @@ class Preview extends Component {
 
         this.state = {
             plotlyLinks: [],
-            plotJSON: {},
+            gd: {},
             rows: [],
             columnNames: [],
             isLoading: false,
@@ -168,19 +167,12 @@ class Preview extends Component {
             });
         }
 
-        const plotJSON = getPlotJsonFromState({
-            columnNames,
-            rows,
-            ...chartEditorState
-        });
-
         this.setState({
             chartEditorState,
             columnNames,
             csvString,
             errorMsg,
             isLoading,
-            plotJSON,
             rows,
             successMsg
         });
@@ -293,8 +285,8 @@ class Preview extends Component {
             columnNames,
             csvString,
             errorMsg,
+            gd,
             isLoading,
-            plotJSON,
             rows,
             successMsg,
             timeQueryElapsedMsg
@@ -382,6 +374,9 @@ class Preview extends Component {
                                 <ChartEditor
                                     rows={rows}
                                     columnNames={columnNames}
+
+                                    gd={gd}
+                                    onUpdate={(nextGD) => this.setState({gd: nextGD})}
                                 />
                             </TabPanel>
 
@@ -404,7 +399,10 @@ class Preview extends Component {
                                         <button
                                             className="btn btn-outline"
                                             onClick={() => this.fetchDatacache(
-                                                JSON.stringify(plotJSON),
+                                                JSON.stringify({
+                                                    data: gd.data,
+                                                    layout: gd.layout
+                                                }),
                                                 'plot'
                                             )}
                                         >
