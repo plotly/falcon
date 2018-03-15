@@ -290,7 +290,6 @@ class Preview extends Component {
         } = this.props;
 
         const {
-            chartEditorState,
             columnNames,
             csvString,
             errorMsg,
