@@ -88,8 +88,10 @@ export default class ChartEditor extends React.Component {
         const frames = gd && gd.frames;
         const layout = gd && gd.layout;
 
+        window.dispatchEvent(new Event('resize'));
+
         return (
-            <div>
+            <div style={{height: 400}}>
                 <PlotlyEditor
                     plotly={plotly}
 
