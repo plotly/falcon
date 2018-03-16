@@ -8316,9 +8316,9 @@ react-base16-styling@^0.5.1:
     lodash.flow "^3.3.0"
     pure-color "^1.2.0"
 
-react-chart-editor@^0.12.0:
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/react-chart-editor/-/react-chart-editor-0.12.0.tgz#d22cc4799b1d0b8d3a60051b107a43b090870185"
+react-chart-editor@^0.13.0:
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/react-chart-editor/-/react-chart-editor-0.13.0.tgz#7e043d3fdbac400e458b94707937cb24e95769dd"
   dependencies:
     classnames "^2.2.5"
     draft-js "^0.10.4"
@@ -8333,7 +8333,7 @@ react-chart-editor@^0.12.0:
     raf "^3.4.0"
     react-color "^2.13.8"
     react-colorscales "^0.4.2"
-    react-plotly.js "^1.7.0"
+    react-plotly.js "^2.0.0"
     react-rangeslider "^2.2.0"
     react-select "^1.0.0-rc.10"
     react-tabs "^2.2.1"
@@ -8423,12 +8423,10 @@ react-json-tree@^0.11.0:
     prop-types "^15.5.8"
     react-base16-styling "^0.5.1"
 
-react-plotly.js@^1.7.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/react-plotly.js/-/react-plotly.js-1.7.0.tgz#a830abf4fdab799d3f74277c0f0a691a75360723"
+react-plotly.js@^2.0.0, react-plotly.js@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/react-plotly.js/-/react-plotly.js-2.1.0.tgz#53693cb7cbe3d815783343f2475038ae66e51ece"
   dependencies:
-    fast-isnumeric "^1.1.1"
-    object-assign "^4.1.1"
     prop-types "^15.5.10"
 
 react-proxy@^1.1.7:
