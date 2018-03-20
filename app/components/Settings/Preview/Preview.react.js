@@ -257,6 +257,8 @@ class Preview extends Component {
             timeQueryElapsedMsg
         } = this.state;
 
+        const chartEditorContainer = this.refs.chartEditor && this.refs.chartEditor.refs.container;
+
         const dialect = connectionObject.dialect;
 
         const minSize = 10;
@@ -411,11 +413,19 @@ class Preview extends Component {
 
                                     <TabPanel>
                                         <ChartEditor
+                                            ref="chartEditor"
+
                                             rows={rows}
                                             columnNames={columnNames}
 
                                             gd={gd}
                                             onUpdate={(nextGD) => this.setState({gd: nextGD})}
+
+                                            hidden={
+                                                !(chartEditorContainer instanceof Element) ||
+                                                !(chartEditorContainer.parentNode instanceof Element) ||
+                                                window.getComputedStyle(chartEditorContainer.parentNode).display === 'none'
+                                            }
                                         />
                                     </TabPanel>
 

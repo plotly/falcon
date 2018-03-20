@@ -9,8 +9,11 @@ export default class ChartEditor extends React.Component {
     static propTypes = {
         columnNames: PropTypes.array,
         rows: PropTypes.array,
+
         gd: PropTypes.object,
-        onUpdate: PropTypes.func
+        onUpdate: PropTypes.func,
+
+        hidden: PropTypes.bool
     }
 
     /**
@@ -26,6 +29,8 @@ export default class ChartEditor extends React.Component {
      * @param {Array}         [props.gd.frames] - Plotly graph frames
      * @param {object}        [props.gd.layout] - Plotly graph layout
      * @param {function}      props.onUpdate - Callback invoked to update gd
+     *
+     * @param {hidden}        props.hidden - If hidden, don't mount <PlotEditor>
      */
     constructor(props) {
         super(props);
@@ -78,7 +83,7 @@ export default class ChartEditor extends React.Component {
     }
 
     render() {
-        const {gd, onUpdate} = this.props;
+        const {gd, onUpdate, hidden} = this.props;
         const {dataSources, dataSourceOptions} = this.state;
 
         const config = {
@@ -88,11 +93,15 @@ export default class ChartEditor extends React.Component {
         const frames = gd && gd.frames;
         const layout = gd && gd.layout;
 
-        window.dispatchEvent(new Event('resize'));
-
         return (
-            <div style={{height: 400}}>
-                <PlotlyEditor
+            <div
+                ref={'container'}
+                style={{
+                    minHeight: 400,
+                    width: '100%'
+                }}
+            >
+                {hidden || <PlotlyEditor
                     plotly={plotly}
 
                     config={config}
@@ -114,7 +123,7 @@ export default class ChartEditor extends React.Component {
                     useResizeHandler
                     debug
                     advancedTraceTypeSelector
-                />
+                />}
             </div>
         );
     }
