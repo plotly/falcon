@@ -257,8 +257,6 @@ class Preview extends Component {
             timeQueryElapsedMsg
         } = this.state;
 
-        const chartEditorContainer = this.refs.chartEditor && this.refs.chartEditor.refs.container;
-
         const dialect = connectionObject.dialect;
 
         const minSize = 10;
@@ -268,6 +266,7 @@ class Preview extends Component {
         const lastSize = propOr(defaultSize, 'lastSize')(preview);
 
         const showEditor = propOr(true, 'showEditor')(preview);
+        const showChart = propOr(false, 'showChart')(preview);
 
         const code = propOr(PREVIEW_QUERY(connectionObject, selectedTable), 'code')(preview);
         propOr('', 'error')(preview);
@@ -371,12 +370,14 @@ class Preview extends Component {
                                                 // If Chart Editor selected and Schemas Tree visible,
                                                 // then save size in lastSize before hiding
                                                 this.props.updatePreview({
+                                                    showChart: true,
                                                     showEditor: false,
                                                     lastSize: size,
                                                     size: minSize
                                                 });
                                             } else {
                                                 this.props.updatePreview({
+                                                    showChart: true,
                                                     showEditor: false
                                                 });
                                             }
@@ -385,11 +386,13 @@ class Preview extends Component {
                                                 // If Chart Editor not selected and Schemas Tree was hidden,
                                                 // then restore the last size
                                                 this.props.updatePreview({
+                                                    showChart: false,
                                                     showEditor: true,
                                                     size: lastSize
                                                 });
                                             } else {
                                                 this.props.updatePreview({
+                                                    showChart: false,
                                                     showEditor: true
                                                 });
                                             }
@@ -421,11 +424,7 @@ class Preview extends Component {
                                             gd={gd}
                                             onUpdate={(nextGD) => this.setState({gd: nextGD})}
 
-                                            hidden={
-                                                !(chartEditorContainer instanceof Element) ||
-                                                !(chartEditorContainer.parentNode instanceof Element) ||
-                                                window.getComputedStyle(chartEditorContainer.parentNode).display === 'none'
-                                            }
+                                            hidden={!showChart}
                                         />
                                     </TabPanel>
 
