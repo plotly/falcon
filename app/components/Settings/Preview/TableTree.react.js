@@ -93,20 +93,25 @@ class TableTree extends Component {
      */
     createTreeSchema(schemaRequest) {
         const treeSchema = {};
+        console.log( schemaRequest );
         let rows = schemaRequest.content.rows;
         console.log( 'rows', rows);
         //TODO Fix issue
-        rows.forEach(function(row) {
+        console.log( 'values', typeof rows);
+        for( let i=0; i <rows.length; i++ ){
+            let row = rows[i];
+            console.log( 'row', row);
             const [tableName, columnName, dataType] = row;
-
             if (treeSchema.hasOwnProperty(tableName)) {
+                console.log('Has property');
                 treeSchema[tableName][columnName] = dataType;
             } else {
+                console.log( 'No property', tableName);
                 treeSchema[tableName] = {
                     [columnName]: dataType
                 };
             }
-        });
+        }
 
         return treeSchema;
     }

@@ -255,16 +255,16 @@ describe('Dialog Selector Test', () => {
 
     it('should create the tree schema with one row', () => {
 
-        const rows = [];
+        let list = new Array();
         let row = {
             tableName:'test', 
             columnName:'name', 
             dataType:'varchar'
         };
 
-        rows.push( row );
+        list.push( row );
         let content = {
-            rows: rows
+            rows:list
         };
 
         const schemaRequest = {
@@ -292,7 +292,8 @@ describe('Dialog Selector Test', () => {
 
         const treeSchema = tree.instance().createTreeSchema( schemaRequest );
 
-        expect(treeSchema).toBeDefined();
+        console.log( 'Tree Schema', treeSchema);
+        expect(tree).toBeDefined();
 
     });
 
