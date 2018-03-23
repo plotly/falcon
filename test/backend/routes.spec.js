@@ -268,6 +268,8 @@ describe('Routes:', () => {
                     'SELECT TOP 1 * FROM ' +
                     `${connection.database}.dbo.ebola_2014`
                 );
+            } else if (connection.dialect === 'redshift') {
+                sampleQuery = 'SELECT * FROM ebola_2014 WHERE month=3';
             } else if (connection.dialect === 'apache impala') {
                 sampleQuery = 'SELECT * FROM PLOTLY.ALCOHOL_CONSUMPTION_BY_COUNTRY_2010 LIMIT 1';
             }
@@ -290,7 +292,7 @@ describe('Routes:', () => {
                             rows: [
                                 ({
                                     'postgres': ['Guinea', 3, 14, '9.95', '-9.7', '122'],
-                                    'redshift': ['Guinea', 5, 14, '10', '-10', 291],
+                                    'redshift': ['Guinea', 3, 14, '10', '-10', 122],
                                     'mysql': ['Guinea', 3, 14, 10, -10, '122'],
                                     'mariadb': ['Guinea', 3, 14, 10, -10, '122'],
                                     'mssql': ['Guinea', 3, 14, 10, -10, '122'],

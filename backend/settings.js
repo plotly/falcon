@@ -36,6 +36,11 @@ const DEFAULT_SETTINGS = {
      */
     ADDITIONAL_CORS_ALLOWED_ORIGINS: [],
 
+    /*
+     * Storage size of CSV connector in bytes (0 to disable size limit)
+     */
+    CSV_STORAGE_SIZE: 0,
+
     DEFAULT_CORS_ALLOWED_ORIGINS: [
         'https://plot.ly',
         'https://stage.plot.ly',

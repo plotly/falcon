@@ -1,9 +1,11 @@
-var restify = require('restify');
-var CookieParser = require('restify-cookies');
-import * as Datastores from './persistent/datastores/Datastores.js';
+const restify = require('restify');
+const CookieParser = require('restify-cookies');
+const fetch = require('node-fetch');
+
 import * as fs from 'fs';
 import path from 'path';
 
+import * as Datastores from './persistent/datastores/Datastores.js';
 import {PlotlyOAuth} from './plugins/authorization.js';
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
 import {
@@ -25,7 +27,7 @@ import {checkWritePermissions, newDatacache} from './persistent/PlotlyAPI.js';
 import {contains, keys, isEmpty, merge, pluck} from 'ramda';
 import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
 import Logger from './logger';
-import fetch from 'node-fetch';
+import init from './init.js';
 
 export default class Servers {
     /*
@@ -34,6 +36,8 @@ export default class Servers {
      * The httpsServer starts when certificates have been created.
      */
     constructor(args = {createCerts: true, startHttps: true, isElectron: false}) {
+        init();
+
         this.httpServer = {
             port: null,
             server: null,
@@ -589,10 +593,10 @@ export default class Servers {
 
             if (contentType !== 'csv') {
                 const datacacheResp = newDatacache(payload, contentType, requestor);
-                datacacheResp.then(plotlyRes => plotlyRes.json().then(resJSON => {
-                    res.json(plotlyRes.status, resJSON);
+                datacacheResp.then(json => {
+                    res.json(200, json);
                     return next();
-                })).catch(error => {
+                }).catch(error => {
                     res.json(500, {error: {message: error.message}});
                     return next();
                 });

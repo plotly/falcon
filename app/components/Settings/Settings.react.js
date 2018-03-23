@@ -131,6 +131,10 @@ class Settings extends Component {
                     editMode={this.state.editMode}
                     saveConnectionsRequest={saveConnectionsRequest}
                 />
+                {!isElectron() && <div className={'description'}>
+                    Warning:
+                    connections set up in this instance of Falcon are accessible to all Plotly On-Premise users.
+                </div>}
             </div>
         );
     }

@@ -5,7 +5,7 @@ import DialectSelector from '../../../../../app/components/Settings/DialectSelec
 import {DIALECTS} from '../../../../../app/constants/constants.js';
 import React from 'react';
 import { mount, configure } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-15';
+import Adapter from 'enzyme-adapter-react-16';
 
 describe('Dialog Selector Test', () => {
 

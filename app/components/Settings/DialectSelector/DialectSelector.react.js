@@ -12,7 +12,7 @@ import classnames from 'classnames';
  * @param {object} props.connectionObject - Connect Object
  * @param {string} props.connectionObject.dialect - Dialect
  * @param {function} props.updateConnection - Updates the Connection with dialect
- * @returns {DialectSelector}
+ * @returns {ReactElement} rendered element
  */
 const DialectSelector = function DialectSelector(props) {
     const {connectionObject, updateConnection} = props;

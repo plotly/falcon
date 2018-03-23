@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import Filedrop from './filedrop.jsx';
+
 import {contains} from 'ramda';
+
 import {CONNECTION_CONFIG, SAMPLE_DBS} from '../../../constants/constants';
 import {dynamicRequireElectron} from '../../../utils/utils';
 
@@ -150,6 +153,15 @@ export default class UserConnections extends Component {
                                 />
                             </div>
                         </div>
+                    );
+                } else if (setting.type === 'filedrop') {
+                    input = (
+                        <Filedrop
+                            settings={setting}
+                            connection={connectionObject}
+                            updateConnection={updateConnection}
+                            sampleCredentialsStyle={sampleCredentialsStyle}
+                        />
                     );
                 }
 

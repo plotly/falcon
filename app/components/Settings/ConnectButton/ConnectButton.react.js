@@ -2,19 +2,19 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {pathOr} from 'ramda';
 
-/**
- * The following is the Connect Button which triggers the connection
- * @param {function} connect - Connect function
- * @param {object} connectRequest - Connection Request
- * @param {number || string} connectRequest.status -- 400 or loading
- * @param {Error} connectRequest.error
- * @param {object} saveConnectionsRequest - Saved Connection Request
- * @param {number || string } saveConnectionsRequest.status -- 400 or loading
- * @param {Error} saveConnectionsRequest.error
- * @param {boolean} editMode  - Enabled if Editting credentials
- * @returns {ConnectButton}
- */
 export default class ConnectButton extends Component {
+    /**
+     * Component props
+     * @type     {object}          props
+     * @property {function}        props.connect - Connect function
+     * @property {object}          props.connectRequest - Connection Request
+     * @property {(number|string)} props.connectRequest.status - 400 or loading
+     * @property {Error}           props.connectRequest.error
+     * @property {object}          props.saveConnectionsRequest - Saved Connection Request
+     * @property {(number|string)} props.saveConnectionsRequest.status - 400 or loading
+     * @property {Error}           props.saveConnectionsRequest.error
+     * @property {boolean}         props.editMode  - Enabled if editing credentials
+     */
     static propTypes = {
         connect: PropTypes.func,
         connectRequest: PropTypes.object,
