@@ -23,6 +23,7 @@
     "test": "yarn run lint && yarn run test-unit-all && yarn run test-e2e && yarn run test-jest",
     "test-e2e": "cross-env NODE_ENV=test mocha --bail --full-trace --compilers js:babel-register --require babel-polyfill ./test/integration_test.js",
     "test-e2e-local": "source test/set_creds.sh && yarn run test-e2e",
+    "test-jest": "jest test/app",
     "test-unit": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --bail --timeout 90000 --compilers js:babel-register ",
     "test-unit-all": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --bail --full-trace --timeout 90000 --compilers js:babel-register --recursive test/**/*.spec.js",
     "test-unit-all-watch": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --bail --full-trace --timeout 90000  --compilers js:babel-register --recursive test/**/*.spec.js --watch",
@@ -41,7 +42,6 @@
     "test-unit-scheduler": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/QueryScheduler.spec.js",
     "test-unit-routes": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/routes.spec.js",
     "test-unit-mock": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/datastores.mock.spec.js",
-    "test-jest": "./node_modules/.bin/jest ./test/app",
     "pack": "cross-env NODE_ENV=production electron-builder --publish=never",
     "package": "cross-env NODE_ENV=production node -r babel-register package.js",
     "package-all": "yarn run package -- --all",
@@ -55,6 +55,11 @@
     "dist-w": "build -w",
     "dist-m": "build -m",
     "dist-l": "build -l"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.css$": "identity-obj-proxy"
+    }
   },
   "build": {
     "appId": "org.plotly.connector",
@@ -174,6 +179,7 @@
     "fetch-cookie": "^0.7.0",
     "form-data": "^2.3.1",
     "fs-extra": "^4.0.2",
+    "identity-obj-proxy": "^3.0.0",
     "immutable": "^3.8.2",
     "jest": "^22.3.0",
     "json-loader": "^0.5.4",
