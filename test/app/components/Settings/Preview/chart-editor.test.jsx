@@ -12,7 +12,7 @@ const ChartEditor = require('../../../../../app/components/Settings/Preview/char
 
 describe('ChartEditor', () => {
     const MAX_LENGTH = 100000;
-    let chartEditor, columnNames, rows, gd, onUpdate, hidden;
+    let chartEditor, columnNames, rows, plotlyJSON, onUpdate, hidden;
 
     beforeAll(() => {
         configure({adapter: new Adapter()});
@@ -24,9 +24,9 @@ describe('ChartEditor', () => {
             rows.push([i, 10 * i]);
         }
 
-        gd = {};
+        plotlyJSON = {};
 
-        onUpdate = (nextGD) => {gd = nextGD;};
+        onUpdate = (nextPlotlyJSON) => {plotlyJSON = nextPlotlyJSON;};
 
         hidden = true;
 
@@ -35,7 +35,7 @@ describe('ChartEditor', () => {
                 columnNames={columnNames}
                 rows={rows}
 
-                gd={gd}
+                plotlyJSON={plotlyJSON}
                 onUpdate={onUpdate}
 
                 hidden={hidden}
@@ -47,7 +47,7 @@ describe('ChartEditor', () => {
         expect(chartEditor.prop('columnNames')).toBe(columnNames);
         expect(chartEditor.prop('rows')).toBe(rows);
 
-        expect(chartEditor.prop('gd')).toBe(gd);
+        expect(chartEditor.prop('plotlyJSON')).toBe(plotlyJSON);
         expect(chartEditor.prop('onUpdate')).toBe(onUpdate);
 
         expect(chartEditor.prop('hidden')).toBe(hidden);

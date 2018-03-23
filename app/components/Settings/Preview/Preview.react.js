@@ -55,7 +55,7 @@ class Preview extends Component {
         this.fetchDatacache = this.fetchDatacache.bind(this);
 
         this.state = Preview.checkQueryResults(this.props);
-        this.state.gd = {};
+        this.state.plotlyJSON = {};
         this.state.plotlyLinks = [];
         this.state.timeQueryElapsedMsg = '';
     }
@@ -270,7 +270,7 @@ class Preview extends Component {
         const {
             columnNames,
             errorMsg,
-            gd,
+            plotlyJSON,
             isLoading,
             rows,
             successMsg,
@@ -443,8 +443,8 @@ class Preview extends Component {
                                             rows={rows}
                                             columnNames={columnNames}
 
-                                            gd={gd}
-                                            onUpdate={(nextGD) => this.setState({gd: nextGD})}
+                                            plotlyJSON={plotlyJSON}
+                                            onUpdate={(nextPlotlyJSON) => this.setState({plotlyJSON: nextPlotlyJSON})}
 
                                             hidden={!showChart}
                                         />
@@ -469,11 +469,7 @@ class Preview extends Component {
                                                 <button
                                                     className="btn btn-outline"
                                                     onClick={() => this.fetchDatacache(
-                                                        JSON.stringify({
-                                                            data: gd.data,
-                                                            frames: gd.frames,
-                                                            layout: gd.layout
-                                                        }),
+                                                        JSON.stringify(this.state.plotlyJSON),
                                                         'plot'
                                                     )}
                                                 >

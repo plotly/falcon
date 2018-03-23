@@ -10,7 +10,7 @@ export default class ChartEditor extends React.Component {
         columnNames: PropTypes.array,
         rows: PropTypes.array,
 
-        gd: PropTypes.object,
+        plotlyJSON: PropTypes.object,
         onUpdate: PropTypes.func,
 
         hidden: PropTypes.bool
@@ -24,11 +24,11 @@ export default class ChartEditor extends React.Component {
      * @param {Array}         props.columnNames - Array of column names
      * @param {Array.<Array>} props.rows - Array of rows
      *
-     * @param {object}        props.gd - Plotly graph div
-     * @param {Array}         [props.gd.data] - Plotly graph data
-     * @param {Array}         [props.gd.frames] - Plotly graph frames
-     * @param {object}        [props.gd.layout] - Plotly graph layout
-     * @param {function}      props.onUpdate - Callback invoked to update gd
+     * @param {object}        props.plotlyJSON - Plotly graph div
+     * @param {Array}         [props.plotlyJSON.data] - Plotly graph data
+     * @param {Array}         [props.plotlyJSON.frames] - Plotly graph frames
+     * @param {object}        [props.plotlyJSON.layout] - Plotly graph layout
+     * @param {function}      props.onUpdate - Callback invoked to update plotlyJSON
      *
      * @param {hidden}        props.hidden - If hidden, don't mount <PlotEditor>
      */
@@ -90,15 +90,15 @@ export default class ChartEditor extends React.Component {
     }
 
     render() {
-        const {gd, onUpdate, hidden} = this.props;
+        const {plotlyJSON, onUpdate, hidden} = this.props;
         const {dataSources, dataSourceOptions} = this.state;
 
         const config = {
             editable: true
         };
-        const data = gd && gd.data;
-        const frames = gd && gd.frames;
-        const layout = gd && gd.layout;
+        const data = plotlyJSON && plotlyJSON.data;
+        const frames = plotlyJSON && plotlyJSON.frames;
+        const layout = plotlyJSON && plotlyJSON.layout;
 
         return (
             <div
