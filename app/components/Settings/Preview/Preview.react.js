@@ -419,7 +419,9 @@ class Preview extends Component {
                                         }
                                     }}
                                 >
-                                    <TabList>
+                                    <TabList
+                                        style={{userSelect: 'none'}}
+                                    >
                                         <Tab>Table</Tab>
                                         <Tab>Chart</Tab>
                                         <Tab>Export</Tab>
