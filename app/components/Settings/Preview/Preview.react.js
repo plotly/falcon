@@ -19,27 +19,6 @@ import {DIALECTS, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../../const
 import {homeUrl, isOnPrem} from '../../../utils/utils';
 
 class Preview extends Component {
-
-    constructor(props) {
-        super(props);
-        this.testClass = this.testClass.bind(this);
-        this.updateCode = this.updateCode.bind(this);
-        this.toggleEditor = this.toggleEditor.bind(this);
-        this.runQuery = this.runQuery.bind(this);
-        this.fetchDatacache = this.fetchDatacache.bind(this);
-
-        this.state = {
-            plotlyLinks: [],
-            gd: {},
-            rows: [],
-            columnNames: [],
-            isLoading: false,
-            errorMsg: '',
-            successMsg: '',
-            timeQueryElapsedMsg: ''
-        };
-    }
-
     static propTypes = {
         connections: PropTypes.object,
         connectionObject: PropTypes.object,
@@ -66,13 +45,27 @@ class Preview extends Component {
         username: PropTypes.string
     };
 
-    componentWillReceiveProps(nextProps) {
-        // TODO: issue #395: check whether state really needs updating
+    constructor(props) {
+        super(props);
+
+        this.testClass = this.testClass.bind(this);
+        this.updateCode = this.updateCode.bind(this);
+        this.toggleEditor = this.toggleEditor.bind(this);
+        this.runQuery = this.runQuery.bind(this);
+        this.fetchDatacache = this.fetchDatacache.bind(this);
+
+        this.state = Preview.checkQueryResults(this.props);
+        this.state.gd = {};
+        this.state.plotlyLinks = [];
+        this.state.timeQueryElapsedMsg = '';
+    }
+
+    static checkQueryResults(props) {
         const {
             preview,
             previewTableRequest,
             queryRequest
-        } = nextProps;
+        } = props;
         const {lastSuccessfulQuery} = preview;
 
         let rows = [];
@@ -134,19 +127,47 @@ class Preview extends Component {
             successMsg = `${rows.length} rows retrieved`;
         }
 
+        return {
+            rows,
+            columnNames,
+            isLoading,
+            successMsg,
+            errorMsg
+        };
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const {
+            preview,
+            previewTableRequest,
+            queryRequest
+        } = nextProps;
+
+        let hasChanged = (preview.lastSuccessfulQuery !== this.props.preview.lastSuccessfulQuery);
+
+        hasChanged = hasChanged || (previewTableRequest.status !== this.props.previewTableRequest.status);
+        hasChanged = hasChanged || (previewTableRequest.columnnames !== this.props.previewTableRequest.columnnames);
+        hasChanged = hasChanged || (previewTableRequest.rows !== this.props.previewTableRequest.rows);
+
+        hasChanged = hasChanged || (queryRequest.status !== this.props.queryRequest.status);
+        hasChanged = hasChanged || (queryRequest.columnnames !== this.props.queryRequest.columnnames);
+        hasChanged = hasChanged || (queryRequest.rows !== this.props.queryRequest.rows);
+
+        if (hasChanged) {
+            const nextState = Preview.checkQueryResults(nextProps);
+            this.setState(nextState);
+        }
+    }
+
+    getCSVString() {
+        const {columnNames, rows} = this.state;
+
         let csvString = columnNames.join(', ') + '\n';
-        rows.map(row => {
-            csvString = csvString + row.join(', ') + '\n';
+        rows.forEach(row => {
+            csvString += row.join(', ') + '\n';
         });
 
-        this.setState({
-            columnNames,
-            csvString,
-            errorMsg,
-            isLoading,
-            rows,
-            successMsg
-        });
+        return csvString;
     }
 
     fetchDatacache(payload, type) {
@@ -248,7 +269,6 @@ class Preview extends Component {
 
         const {
             columnNames,
-            csvString,
             errorMsg,
             gd,
             isLoading,
@@ -433,14 +453,14 @@ class Preview extends Component {
                                             <div style={{margin: '20px 0'}}>
                                                 <button
                                                     className="btn btn-outline"
-                                                    onClick={() => this.fetchDatacache(csvString, 'grid')}
+                                                    onClick={() => this.fetchDatacache(this.getCSVString(), 'grid')}
                                                 >
                                                     Send CSV to Chart Studio
                                                 </button>
                                                 {!isOnPrem() &&
                                                 <button
                                                     className="btn btn-outline"
-                                                    onClick={() => this.fetchDatacache(csvString, 'csv')}
+                                                    onClick={() => this.fetchDatacache(this.getCSVString(), 'csv')}
                                                 >
                                                     Download CSV
                                                 </button>}
