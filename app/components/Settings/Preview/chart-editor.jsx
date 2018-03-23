@@ -53,12 +53,19 @@ export default class ChartEditor extends React.Component {
         columnNames.forEach(name => {
             dataSources[name] = [];
         });
-        rows.forEach(row => {
-            row.forEach((v, i) => {
-                const columnName = columnNames[i];
-                dataSources[columnName].push(v);
-            });
-        });
+
+        // Cap plots to 100k rows
+        const length = Math.min(rows.length, 100000);
+
+        for (let i = 0; i < length; i++) {
+            const row = rows[i];
+
+            for (let j = 0; j < row.length; j++) {
+                const value = row[j];
+                const columnName = columnNames[j];
+                dataSources[columnName].push(value);
+            }
+        }
 
         const dataSourceOptions = columnNames.map(name => ({value: name, label: name}));
 
