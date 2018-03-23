@@ -5,7 +5,7 @@ jest.unmock('../../../../../app/utils/utils.js');
 import TableTree from '../../../../../app/components/Settings/Preview/TableTree.react.js';
 import React from 'react';
 import { mount, configure } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-15';
+import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
 
 // TODO
