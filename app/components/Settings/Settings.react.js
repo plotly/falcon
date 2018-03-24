@@ -6,14 +6,12 @@ import ReactToolTip from 'react-tooltip';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
 import fetch from 'isomorphic-fetch';
-import SplitPane from 'react-split-pane';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import ConnectionTabs from './Tabs/Tabs.react';
 import UserConnections from './UserConnections/UserConnections.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import Preview from './Preview/Preview.react';
-import TableTree from './Preview/TableTree.react.js';
 import {Link} from '../Link.react';
 import {DIALECTS, FAQ, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
 import {isElectron, isOnPrem} from '../../utils/utils';
@@ -324,47 +322,35 @@ class Settings extends Component {
 
                         <TabPanel className={['tab-panel-query', 'react-tabs__tab-panel']}>
                             {this.props.connectRequest.status === 200 && selectedTable ? (
-                                <SplitPane
-                                    split="vertical"
-                                    minSize={10}
-                                    defaultSize={200}
-                                    maxSize={-400}
-                                    style={{position: 'relative !important'}}
-                                >
-                                    <div className="tree-view-container">
-                                        {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
-                                            <TableTree
-                                                connectionObject={connections[selectedTab]}
-                                                preview={preview || {}}
-                                                updatePreview={updatePreview}
+                                <Preview
+                                    username={username}
 
-                                                getSqlSchema={getSqlSchema}
-                                                schemaRequest={schemaRequest}
-                                            />
-                                        }
-                                    </div>
-                                    <div>
-                                        <Preview
-                                            connectionObject={connections[selectedTab]}
-                                            previewTableRequest={previewTableRequest || {}}
-                                            s3KeysRequest={s3KeysRequest}
-                                            apacheDrillStorageRequest={apacheDrillStorageRequest}
-                                            apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
-                                            preview={preview || {}}
-                                            updatePreview={updatePreview}
-                                            selectedTable={selectedTable}
-                                            elasticsearchMappingsRequest={elasticsearchMappingsRequest}
-                                            tablesRequest={tablesRequest}
-                                            setTable={setTable}
-                                            setIndex={setIndex}
-                                            selectedIndex={selectedIndex}
-                                            schemaRequest={schemaRequest}
-                                            runSqlQuery={runSqlQuery}
-                                            queryRequest={queryRequest || {}}
-                                            username={username}
-                                        />
-                                    </div>
-                                </SplitPane>
+                                    connections={connections}
+                                    connectionObject={connections[selectedTab]}
+
+                                    selectedTab={selectedTab}
+
+                                    selectedIndex={selectedIndex}
+                                    setIndex={setIndex}
+
+                                    selectedTable={selectedTable}
+                                    setTable={setTable}
+
+                                    getSqlSchema={getSqlSchema}
+                                    schemaRequest={schemaRequest}
+
+                                    preview={preview || {}}
+                                    updatePreview={updatePreview}
+
+                                    runSqlQuery={runSqlQuery}
+                                    queryRequest={queryRequest || {}}
+                                    s3KeysRequest={s3KeysRequest}
+                                    apacheDrillStorageRequest={apacheDrillStorageRequest}
+                                    apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+                                    elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                                    previewTableRequest={previewTableRequest || {}}
+                                    tablesRequest={tablesRequest}
+                                />
                             ) : (
                                 <div className="big-whitespace-tab">
                                     <p>Please connect to a data store in the Connection tab first.</p>
