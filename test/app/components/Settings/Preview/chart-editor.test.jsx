@@ -11,7 +11,6 @@ jest.unmock('../../../../../app/components/Settings/Preview/chart-editor.jsx');
 const ChartEditor = require('../../../../../app/components/Settings/Preview/chart-editor.jsx');
 
 describe('ChartEditor', () => {
-    const MAX_LENGTH = 100000;
     let chartEditor, columnNames, rows, plotlyJSON, onUpdate, hidden;
 
     beforeAll(() => {
@@ -20,7 +19,7 @@ describe('ChartEditor', () => {
         columnNames = ['x', 'y'];
 
         rows = [];
-        for (let i = 0; i < 100001; i++) {
+        for (let i = 0; i < 1 + ChartEditor.MAX_ROWS; i++) {
             rows.push([i, 10 * i]);
         }
 
@@ -58,19 +57,19 @@ describe('ChartEditor', () => {
             const dataSourceOption = dataSourceOptions[i];
             expect(dataSourceOption).toEqual({value: name, label: name});
 
-            // check length has been capped to 100000
+            // check length has been capped
             const dataSource = dataSources[name];
-            expect(dataSource.length).toEqual(MAX_LENGTH);
+            expect(dataSource.length).toEqual(ChartEditor.MAX_ROWS);
         });
 
         // check a few data
         expect(dataSources.x[0]).toBe(0);
         expect(dataSources.x[1]).toBe(1);
-        expect(dataSources.x[MAX_LENGTH - 1]).toBe(MAX_LENGTH - 1);
+        expect(dataSources.x[ChartEditor.MAX_ROWS - 1]).toBe(ChartEditor.MAX_ROWS - 1);
 
         expect(dataSources.y[0]).toBe(0);
         expect(dataSources.y[1]).toBe(10);
-        expect(dataSources.y[MAX_LENGTH - 1]).toBe(10 * (MAX_LENGTH - 1));
+        expect(dataSources.y[ChartEditor.MAX_ROWS - 1]).toBe(10 * (ChartEditor.MAX_ROWS - 1));
     });
 
     // requires node-canvas

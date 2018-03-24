@@ -17,6 +17,13 @@ export default class ChartEditor extends React.Component {
     }
 
     /**
+     * Maximum number of rows to be displayed in a chart
+     *
+     * @type {number}
+     */
+    static MAX_ROWS = 100000;
+
+    /**
      * ChartEditor displays a Plotly.js chart using the query results
      *
      * @param {object} props - Component properties
@@ -54,8 +61,8 @@ export default class ChartEditor extends React.Component {
             dataSources[name] = [];
         });
 
-        // Cap plots to 100k rows
-        const length = Math.min(rows.length, 100000);
+        // Cap number of rows displayed in a chart
+        const length = Math.min(rows.length, ChartEditor.MAX_ROWS);
 
         for (let i = 0; i < length; i++) {
             const row = rows[i];
