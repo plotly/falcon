@@ -94,7 +94,8 @@ class TableTree extends Component {
     createTreeSchema(schemaRequest) {
         const treeSchema = {};
 
-        if( ( schemaRequest ) && (schemaRequest.content) && ( schemaRequest.content.rows.length > 0) ){
+        if ((schemaRequest) && (schemaRequest.content) && 
+                (schemaRequest.content.rows) && (schemaRequest.content.rows.length > 0)) {
             schemaRequest.content.rows.forEach(function(row) {
                 const {tableName, columnName, dataType} = row;
 
@@ -127,18 +128,6 @@ class TableTree extends Component {
         // TODO.  What is status is 201 ?
         else if (schemaRequest.status === 200 && !has('treeSchema', preview)) {
             const treeSchema = this.createTreeSchema(schemaRequest);
-            /* schemaRequest.content.rows.forEach(function(row) {
-                const [tableName, columnName, dataType] = row;
-
-                if (treeSchema.hasOwnProperty(tableName)) {
-                    treeSchema[tableName][columnName] = dataType;
-                } else {
-                    treeSchema[tableName] = {
-                        [columnName]: dataType
-                    };
-                }
-            });*/
-
             updatePreview({treeSchema});
         }
     }

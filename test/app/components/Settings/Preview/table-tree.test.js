@@ -255,23 +255,23 @@ describe('Dialog Selector Test', () => {
 
     it('should create the tree schema with one row', () => {
 
-        let list = [];
+        const list = [];
 
-        let row = {
-            tableName:'test_table', 
-            columnName:'column_name', 
-            dataType:'varchar'
+        const row = {
+            tableName: 'test_table',
+            columnName: 'column_name',
+            dataType: 'varchar'
         };
 
-        list.push( row );
-        let content = {
-            rows:list
+        list.push(row);
+        const content = {
+            rows: list
         };
 
-        let schemaRequest = {
+        const schemaRequest = {
             status: 200,
-            content:content
-            
+            content: content
+
         };
         const getSqlSchema = sinon.spy();
         const updatePreview = function() {};
@@ -290,12 +290,85 @@ describe('Dialog Selector Test', () => {
             preview={preview}
             connectionObject={connectionObject}
         />);
-        const treeSchema = tree.instance().createTreeSchema( schemaRequest );
+        const treeSchema = tree.instance().createTreeSchema(schemaRequest);
+            
+        console.log( 'tree schmea', treeSchema);
+        expect(treeSchema).toBeDefined();
+        expect(treeSchema.test_table).toBeDefined();
+        expect(treeSchema.test_table.column_name).toBeDefined();
+        expect(treeSchema.test_table.column_name).toBe('varchar');
+    });
+
+    it('should create the tree schema with no rows', () => {
+
+        const list = [];
+
+        const content = {
+        };
+
+        const schemaRequest = {
+            status: 200,
+            content: content
+
+        };
+        const getSqlSchema = sinon.spy();
+        const updatePreview = function() {};
+        const preview = {
+            treeSchema: {}
+        };
+        const connectionObject = {
+            dialect: 'sqlite',
+            storage: '/home/user/dbs/plotly_datasets.db'
+        };
+
+        const tree = mount(<TableTree
+            schemaRequest={schemaRequest}
+            getSqlSchema={getSqlSchema}
+            updatePreview={updatePreview}
+            preview={preview}
+            connectionObject={connectionObject}
+        />);
+        const treeSchema = tree.instance().createTreeSchema(schemaRequest);
 
         expect(treeSchema).toBeDefined();
-        expect( treeSchema.test_table ).toBeDefined();
-        expect( treeSchema.test_table.column_name).toBeDefined();
-        expect( treeSchema.test_table.column_name).toBe('varchar');
+        expect(treeSchema.test_table).not.toBeDefined();
+    });
+
+    it('should create the tree nodes with one node', () => {
+
+        const treeSchema = {
+            test_table: {
+                column_name: {
+                    'test_table':'varchar'
+                }
+            }
+        };
+
+        const schemaRequest = {
+            status: 200,
+
+        };
+        const getSqlSchema = sinon.spy();
+        const updatePreview = function() {};
+        const preview = {
+            treeSchema: {}
+        };
+        const connectionObject = {
+            dialect: 'sqlite',
+            storage: '/home/user/dbs/plotly_datasets.db'
+        };
+
+        const tree = mount(<TableTree
+            schemaRequest={schemaRequest}
+            getSqlSchema={getSqlSchema}
+            updatePreview={updatePreview}
+            preview={preview}
+            connectionObject={connectionObject}
+        />);
+        const treeNodes = tree.instance().getTreeNodes(treeSchema);
+
+        console.log( 'Tree nodes', treeNodes);
+        expect(treeNodes).toBeDefined();
 
     });
 
