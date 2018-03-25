@@ -8,9 +8,6 @@ import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
 
-// TODO
-// 1. Test isConnecting
-// 2. Test Store Schema.  Verify that creation of the tree
 describe('Dialog Selector Test', () => {
 
     beforeAll(() => {
@@ -38,7 +35,6 @@ describe('Dialog Selector Test', () => {
             connectionObject={connectionObject}
         />);
 
-        // Note.  TableTree was crashing if treeSchema not defined
         expect(tree).toBeDefined();
     });
 
@@ -291,8 +287,7 @@ describe('Dialog Selector Test', () => {
             connectionObject={connectionObject}
         />);
         const treeSchema = tree.instance().createTreeSchema(schemaRequest);
-            
-        console.log( 'tree schmea', treeSchema);
+
         expect(treeSchema).toBeDefined();
         expect(treeSchema.test_table).toBeDefined();
         expect(treeSchema.test_table.column_name).toBeDefined();
@@ -300,9 +295,6 @@ describe('Dialog Selector Test', () => {
     });
 
     it('should create the tree schema with no rows', () => {
-
-        const list = [];
-
         const content = {
         };
 
@@ -332,44 +324,6 @@ describe('Dialog Selector Test', () => {
 
         expect(treeSchema).toBeDefined();
         expect(treeSchema.test_table).not.toBeDefined();
-    });
-
-    it('should create the tree nodes with one node', () => {
-
-        const treeSchema = {
-            test_table: {
-                column_name: {
-                    'test_table':'varchar'
-                }
-            }
-        };
-
-        const schemaRequest = {
-            status: 200,
-
-        };
-        const getSqlSchema = sinon.spy();
-        const updatePreview = function() {};
-        const preview = {
-            treeSchema: {}
-        };
-        const connectionObject = {
-            dialect: 'sqlite',
-            storage: '/home/user/dbs/plotly_datasets.db'
-        };
-
-        const tree = mount(<TableTree
-            schemaRequest={schemaRequest}
-            getSqlSchema={getSqlSchema}
-            updatePreview={updatePreview}
-            preview={preview}
-            connectionObject={connectionObject}
-        />);
-        const treeNodes = tree.instance().getTreeNodes(treeSchema);
-
-        console.log( 'Tree nodes', treeNodes);
-        expect(treeNodes).toBeDefined();
-
     });
 
 });

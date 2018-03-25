@@ -94,7 +94,7 @@ class TableTree extends Component {
     createTreeSchema(schemaRequest) {
         const treeSchema = {};
 
-        if ((schemaRequest) && (schemaRequest.content) && 
+        if ((schemaRequest) && (schemaRequest.content) &&
                 (schemaRequest.content.rows) && (schemaRequest.content.rows.length > 0)) {
             schemaRequest.content.rows.forEach(function(row) {
                 const {tableName, columnName, dataType} = row;
@@ -125,7 +125,7 @@ class TableTree extends Component {
         else if (isEmpty(schemaRequest)) {
             getSqlSchema();
         }
-        // TODO.  What is status is 201 ?
+
         else if (schemaRequest.status === 200 && !has('treeSchema', preview)) {
             const treeSchema = this.createTreeSchema(schemaRequest);
             updatePreview({treeSchema});
