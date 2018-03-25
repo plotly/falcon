@@ -1,67 +1,72 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import R, {has, isEmpty, propOr} from 'ramda';
+import {has, isEmpty, propOr} from 'ramda';
+
+import SplitPane from 'react-split-pane';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 
+import TableTree from './TableTree.react.js';
 import SQLTable from './sql-table.jsx';
 import CodeEditorField from './CodeEditorField.react.js';
-import ChartEditor from './ChartEditor.react.js';
+import ChartEditor from './chart-editor.jsx';
 import ApacheDrillPreview from './ApacheDrillPreview.js';
 import S3Preview from './S3Preview.js';
 
 import OptionsDropdown from '../OptionsDropdown/OptionsDropdown.react';
 import {Link} from '../../Link.react';
 import {DIALECTS, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants.js';
-import getPlotJsonFromState from './components/getPlotJsonFromState.js';
 import {homeUrl, isOnPrem} from '../../../utils/utils';
 
 class Preview extends Component {
+    static propTypes = {
+        connections: PropTypes.object,
+        connectionObject: PropTypes.object,
+
+        selectedTab: PropTypes.string,
+        selectedTable: PropTypes.any,
+        selectedIndex: PropTypes.any,
+        setTable: PropTypes.func,
+        setIndex: PropTypes.func,
+
+        preview: PropTypes.obj,
+        updatePreview: PropTypes.func,
+
+        tablesRequest: PropTypes.object,
+
+        schemaRequest: PropTypes.object,
+        getSqlSchema: PropTypes.func,
+
+        runSqlQuery: PropTypes.func,
+        previewTableRequest: PropTypes.object,
+        queryRequest: PropTypes.object,
+        elasticsearchMappingsRequest: PropTypes.object,
+
+        username: PropTypes.string
+    };
 
     constructor(props) {
         super(props);
+
         this.testClass = this.testClass.bind(this);
         this.updateCode = this.updateCode.bind(this);
         this.toggleEditor = this.toggleEditor.bind(this);
         this.runQuery = this.runQuery.bind(this);
         this.fetchDatacache = this.fetchDatacache.bind(this);
-        this.propsToState = this.propsToState.bind(this);
 
-        this.state = {
-            plotlyLinks: [],
-            plotJSON: {},
-            rows: [],
-            columnNames: [],
-            isLoading: false,
-            errorMsg: '',
-            successMsg: '',
-            timeQueryElapsedMsg: '',
-            chartEditorState: {}
-        };
+        this.state = Preview.checkQueryResults(this.props);
+        this.state.plotlyJSON = {};
+        this.state.plotlyLinks = [];
+        this.state.timeQueryElapsedMsg = '';
     }
 
-    static propTypes = {
-        runSqlQuery: PropTypes.func,
-        updatePreview: PropTypes.func,
-        preview: PropTypes.obj,
-        connectionObject: PropTypes.object,
-        elasticsearchMappingsRequest: PropTypes.object,
-        schemaRequest: PropTypes.object,
-        selectedTable: PropTypes.any,
-        selectedIndex: PropTypes.any,
-        tablesRequest: PropTypes.object,
-        setTable: PropTypes.func,
-        setIndex: PropTypes.func,
-        username: PropTypes.string
-    };
-
-    propsToState(nextProps, props) {
+    static checkQueryResults(props) {
         const {
             preview,
             previewTableRequest,
             queryRequest
-        } = nextProps;
-        const {chartEditor, lastSuccessfulQuery} = preview;
+        } = props;
+        const {lastSuccessfulQuery} = preview;
 
         let rows = [];
         let columnNames = [];
@@ -122,68 +127,47 @@ class Preview extends Component {
             successMsg = `${rows.length} rows retrieved`;
         }
 
-        let csvString = columnNames.join(', ') + '\n';
-        rows.map(row => {
-            csvString = csvString + row.join(', ') + '\n';
-        });
-
-        const chartEditorState = this.state.chartEditorState;
-        const defaultChartEditorState = {
-            xAxisColumnName: colNames => colNames[0],
-            yAxisColumnNames: colNames => [colNames[1]],
-            boxes: colNames => colNames.map(
-                colName => ({name: colName, type: 'column'})),
-            columnTraceTypes: colNames => (
-                R.reduce((r, k) => R.set(R.lensProp(k), 'scatter', r), {}, colNames)
-            ),
-            droppedBoxNames: () => [],
-            selectedColumn: () => '',
-            selectedChartType: () => 'scatter'
-        };
-
-        if (columnNames !== this.state.columnNames) {
-            // Reset props to defaults based off of columnNames
-            R.keys(defaultChartEditorState).forEach(k => {
-                chartEditorState[k] = defaultChartEditorState[k](columnNames);
-            });
-        } else if (columnNames.length === 0) {
-            ['droppedBoxNames', 'selectedColumn', 'selectedChartType'].forEach(
-                // Function body wrapped in block because without a wrapping block,
-                // JavaScript treats the assignment as the implicit return value,
-                // which in turn breaks ESLint `no-return-assign` rule
-                k => {
-                    chartEditorState[k] = defaultChartEditorState[k]();
-                }
-            );
-        } else {
-            R.keys(defaultChartEditorState).forEach(k => {
-                if (!R.has(k, chartEditor || {})) {
-                    chartEditorState[k] = defaultChartEditorState[k](columnNames);
-                } else {
-                    if (!R.has('chartEditor', props.preview) ||
-                        nextProps.preview.chartEditor[k] !== props.preview.chartEditor[k]) {
-                        chartEditorState[k] = nextProps.preview.chartEditor[k];
-                    }
-                }
-            });
-        }
-
-        const plotJSON = getPlotJsonFromState({
-            columnNames,
+        return {
             rows,
-            ...chartEditorState
-        });
-
-        this.setState({
-            chartEditorState,
             columnNames,
-            csvString,
-            errorMsg,
             isLoading,
-            plotJSON,
-            rows,
-            successMsg
+            successMsg,
+            errorMsg
+        };
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const {
+            preview,
+            previewTableRequest,
+            queryRequest
+        } = nextProps;
+
+        let hasChanged = (preview.lastSuccessfulQuery !== this.props.preview.lastSuccessfulQuery);
+
+        hasChanged = hasChanged || (previewTableRequest.status !== this.props.previewTableRequest.status);
+        hasChanged = hasChanged || (previewTableRequest.columnnames !== this.props.previewTableRequest.columnnames);
+        hasChanged = hasChanged || (previewTableRequest.rows !== this.props.previewTableRequest.rows);
+
+        hasChanged = hasChanged || (queryRequest.status !== this.props.queryRequest.status);
+        hasChanged = hasChanged || (queryRequest.columnnames !== this.props.queryRequest.columnnames);
+        hasChanged = hasChanged || (queryRequest.rows !== this.props.queryRequest.rows);
+
+        if (hasChanged) {
+            const nextState = Preview.checkQueryResults(nextProps);
+            this.setState(nextState);
+        }
+    }
+
+    getCSVString() {
+        const {columnNames, rows} = this.state;
+
+        let csvString = columnNames.join(', ') + '\n';
+        rows.forEach(row => {
+            csvString += row.join(', ') + '\n';
         });
+
+        return csvString;
     }
 
     fetchDatacache(payload, type) {
@@ -266,21 +250,15 @@ class Preview extends Component {
         });
     }
 
-    componentWillReceiveProps(nextProps) {
-        this.propsToState(nextProps, this.props);
-    }
-
-    componentWillMount() {
-        this.propsToState(this.props, {});
-    }
-
     render() {
-
         const {
+            connections,
             connectionObject,
             elasticsearchMappingsRequest,
+            getSqlSchema,
             preview,
             schemaRequest,
+            selectedTab,
             selectedIndex,
             selectedTable,
             setIndex,
@@ -290,183 +268,263 @@ class Preview extends Component {
         } = this.props;
 
         const {
-            chartEditorState,
             columnNames,
-            csvString,
             errorMsg,
+            plotlyJSON,
             isLoading,
-            plotJSON,
             rows,
             successMsg,
             timeQueryElapsedMsg
         } = this.state;
 
         const dialect = connectionObject.dialect;
+
+        const minSize = 10;
+        const defaultSize = 200;
+        const maxSize = -400;
+        const size = propOr(defaultSize, 'size')(preview);
+        const lastSize = propOr(defaultSize, 'lastSize')(preview);
+
         const showEditor = propOr(true, 'showEditor')(preview);
+        const showChart = propOr(false, 'showChart')(preview);
+
         const code = propOr(PREVIEW_QUERY(connectionObject, selectedTable), 'code')(preview);
         propOr('', 'error')(preview);
 
         // Surpressing ESLint cause restricting line length would harm JSX readability
         /* eslint-disable max-len */
         return (
-            <div className={'previewContainer'}>
-                <div>
+            <SplitPane
+                split="vertical"
+
+                minSize={minSize}
+                defaultSize={defaultSize}
+                maxSize={maxSize}
+                size={size}
+                onChange={nextSize =>
+                    this.props.updatePreview({
+                        size: nextSize
+                    })
+                }
+
+                style={{position: 'relative !important'}}
+            >
+                <div className="tree-view-container">
                     {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
-                        <div>
-                            <code>
-                                <small>
-                                    <a onClick={this.toggleEditor}>
-                                        {showEditor ? 'Hide Editor' : 'Show Editor'}
-                                    </a>
-                                </small>
-                            </code>
+                        <TableTree
+                            connectionObject={connections[selectedTab]}
+                            preview={preview || {}}
+                            updatePreview={updatePreview}
 
-                            <div style={{display: showEditor ? 'block' : 'none', position: 'relative'}}>
-                                <CodeEditorField
-                                    value={code}
-                                    onChange={this.updateCode}
-                                    connectionObject={connectionObject}
-                                    runQuery={this.runQuery}
-                                    schemaRequest={schemaRequest}
-                                    preview={preview}
-                                    updatePreview={updatePreview}
-                                />
-                                <a
-                                    className="btn btn-primary runButton"
-                                    onClick={this.runQuery}
-                                    disabled={!isLoading}
-                                >
-                                    {isLoading ? 'Loading...' : 'Run'}
-                                </a>
-                            </div>
-                        </div>
-                    }
-
-                    {!SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
-                        <OptionsDropdown
-                            connectionObject={connectionObject}
-                            selectedTable={selectedTable}
-                            elasticsearchMappingsRequest={elasticsearchMappingsRequest}
-                            tablesRequest={tablesRequest}
-                            setTable={setTable}
-                            setIndex={setIndex}
-                            selectedIndex={selectedIndex}
+                            getSqlSchema={getSqlSchema}
+                            schemaRequest={schemaRequest}
                         />
                     }
                 </div>
+                <div>
+                    <div className={'previewContainer'}>
+                        <div>
+                            {SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
+                                <div>
+                                    <code>
+                                        <small>
+                                            <a onClick={this.toggleEditor}>
+                                                {showEditor ? 'Hide Editor' : 'Show Editor'}
+                                            </a>
+                                        </small>
+                                    </code>
 
-                {errorMsg &&
-                    <div className="errorStatus">
-                        <pre>{`ERROR: ${errorMsg}`}</pre>
-                    </div>
-                }
-
-                {dialect !== DIALECTS.S3 && dialect !== DIALECTS.APACHE_DRILL &&
-                    <div>
-                        <Tabs forceRenderTabPanel={true}>
-                            <TabList>
-                                <Tab>Chart</Tab>
-                                <Tab>Table</Tab>
-                                <Tab>Export</Tab>
-                            </TabList>
-
-                            <TabPanel>
-                                <ChartEditor
-                                    rows={rows}
-                                    columnNames={columnNames}
-                                    plotJSON={plotJSON}
-                                    updateProps={newProps => {
-                                        updatePreview({'chartEditor': R.merge(
-                                            chartEditorState,
-                                            newProps
-                                        )});
-                                    }}
-                                    {...chartEditorState}
-                                />
-                            </TabPanel>
-
-                            <TabPanel
-                                style={{fontFamily: "'Ubuntu Mono', courier, monospace", marginTop: '20px'}}
-                            >
-                                <SQLTable
-                                    rows={rows}
-                                    columnNames={columnNames}
-                                />
-                            </TabPanel>
-
-                            <TabPanel>
-                                <div className="export-options-container">
-                                    <div style={{margin: '20px 0'}}>
-                                        <button
-                                            className="btn btn-outline"
-                                            onClick={() => this.fetchDatacache(csvString, 'grid')}
+                                    <div style={{display: showEditor ? 'block' : 'none', position: 'relative'}}>
+                                        <CodeEditorField
+                                            value={code}
+                                            onChange={this.updateCode}
+                                            connectionObject={connectionObject}
+                                            runQuery={this.runQuery}
+                                            schemaRequest={schemaRequest}
+                                            preview={preview}
+                                            updatePreview={updatePreview}
+                                        />
+                                        <a
+                                            className="btn btn-primary runButton"
+                                            onClick={this.runQuery}
+                                            disabled={!isLoading}
                                         >
-                                            Send CSV to Chart Studio
-                                        </button>
-                                        {!isOnPrem() &&
-                                        <button
-                                            className="btn btn-outline"
-                                            onClick={() => this.fetchDatacache(csvString, 'csv')}
-                                        >
-                                            Download CSV
-                                        </button>}
-                                        <button
-                                            className="btn btn-outline"
-                                            onClick={() => this.fetchDatacache(
-                                                JSON.stringify(plotJSON),
-                                                'plot'
-                                            )}
-                                        >
-                                            Send chart to Chart Studio
-                                        </button>
-                                    </div>
-                                    <div style={{width: 650, height: 200, border: '1px solid #dfe8f3',
-                                        fontFamily: '\'Ubuntu Mono\', courier, monospace', paddingTop: 10,
-                                        padding: 20, marginTop: 10, overflow: 'hidden', overflowY: 'scroll'}}
-                                    >
-                                        {this.state.plotlyLinks.map(link => (
-                                            <div style={{borderTop: '1px solid #dfe8f3', marginTop: 20}}>
-                                                {link.type === 'grid' &&
-                                                    <div>
-                                                        <div style={{color: '#00cc96'}}>🎉  Link to your CSV on Chart Studio ⬇️</div>
-                                                        <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
-                                                    </div>
-                                                }
-                                                {link.type === 'csv' &&
-                                                    <div>
-                                                        <div style={{color: '#00cc96'}}>💾  Your CSV has been saved ⬇️</div>
-                                                        <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
-                                                    </div>
-                                                }
-                                                {link.type === 'plot' &&
-                                                    <div>
-                                                        <div style={{color: '#00cc96'}}>📈  Link to your chart on Chart Studio ⬇️</div>
-                                                        <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
-                                                    </div>
-                                                }
-                                                {link.type === 'error' &&
-                                                    <div>
-                                                        <div style={{color: '#D36046'}}>{`[ERROR] ${link.message}`}</div>
-                                                    </div>
-                                                }
-                                            </div>
-                                        ))}
+                                            {isLoading ? 'Loading...' : 'Run'}
+                                        </a>
                                     </div>
                                 </div>
-                            </TabPanel>
-                        </Tabs>
-                    </div>
-                }
+                            }
 
-                {successMsg &&
-                    <div className="successMsg">
-                        <p>{successMsg} {timeQueryElapsedMsg}</p>
-                    </div>
-                }
+                            {!SQL_DIALECTS_USING_EDITOR.includes(dialect) &&
+                                <OptionsDropdown
+                                    connectionObject={connectionObject}
+                                    selectedTable={selectedTable}
+                                    elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                                    tablesRequest={tablesRequest}
+                                    setTable={setTable}
+                                    setIndex={setIndex}
+                                    selectedIndex={selectedIndex}
+                                />
+                            }
+                        </div>
 
-               {S3Preview(this.props)}
-               {ApacheDrillPreview(this.props)}
-            </div>
+                        {errorMsg &&
+                            <div className="errorStatus">
+                                <pre>{`ERROR: ${errorMsg}`}</pre>
+                            </div>
+                        }
+
+                        {dialect !== DIALECTS.S3 && dialect !== DIALECTS.APACHE_DRILL &&
+                            <div>
+                                <Tabs
+                                    forceRenderTabPanel={true}
+                                    onSelect={(index, lastIndex) => {
+                                        if (index === lastIndex) {
+                                            return;
+                                        }
+
+                                        const chartEditorSelected = (index === 1);
+                                        const schemasVisible = (size > minSize);
+                                        if (chartEditorSelected) {
+                                            if (schemasVisible) {
+                                                // If Chart Editor selected and Schemas Tree visible,
+                                                // then save size in lastSize before hiding
+                                                this.props.updatePreview({
+                                                    showChart: true,
+                                                    showEditor: false,
+                                                    lastSize: size,
+                                                    size: minSize
+                                                });
+                                            } else {
+                                                this.props.updatePreview({
+                                                    showChart: true,
+                                                    showEditor: false
+                                                });
+                                            }
+                                        } else {
+                                            if (!schemasVisible) {
+                                                // If Chart Editor not selected and Schemas Tree was hidden,
+                                                // then restore the last size
+                                                this.props.updatePreview({
+                                                    showChart: false,
+                                                    showEditor: true,
+                                                    size: lastSize
+                                                });
+                                            } else {
+                                                this.props.updatePreview({
+                                                    showChart: false,
+                                                    showEditor: true
+                                                });
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <TabList
+                                        style={{userSelect: 'none'}}
+                                    >
+                                        <Tab>Table</Tab>
+                                        <Tab>Chart</Tab>
+                                        <Tab>Export</Tab>
+                                    </TabList>
+
+                                    <TabPanel
+                                        style={{fontFamily: "'Ubuntu Mono', courier, monospace", marginTop: '20px'}}
+                                    >
+                                        <SQLTable
+                                            rows={rows}
+                                            columnNames={columnNames}
+                                        />
+                                    </TabPanel>
+
+                                    <TabPanel>
+                                        <ChartEditor
+                                            ref="chartEditor"
+
+                                            rows={rows}
+                                            columnNames={columnNames}
+
+                                            plotlyJSON={plotlyJSON}
+                                            onUpdate={(nextPlotlyJSON) => this.setState({plotlyJSON: nextPlotlyJSON})}
+
+                                            hidden={!showChart}
+                                        />
+                                    </TabPanel>
+
+                                    <TabPanel>
+                                        <div className="export-options-container">
+                                            <div style={{margin: '20px 0'}}>
+                                                <button
+                                                    className="btn btn-outline"
+                                                    onClick={() => this.fetchDatacache(this.getCSVString(), 'grid')}
+                                                >
+                                                    Send CSV to Chart Studio
+                                                </button>
+                                                {!isOnPrem() &&
+                                                <button
+                                                    className="btn btn-outline"
+                                                    onClick={() => this.fetchDatacache(this.getCSVString(), 'csv')}
+                                                >
+                                                    Download CSV
+                                                </button>}
+                                                <button
+                                                    className="btn btn-outline"
+                                                    onClick={() => this.fetchDatacache(
+                                                        JSON.stringify(this.state.plotlyJSON),
+                                                        'plot'
+                                                    )}
+                                                >
+                                                    Send chart to Chart Studio
+                                                </button>
+                                            </div>
+                                            <div style={{width: 650, height: 200, border: '1px solid #dfe8f3',
+                                                fontFamily: '\'Ubuntu Mono\', courier, monospace', paddingTop: 10,
+                                                padding: 20, marginTop: 10, overflow: 'hidden', overflowY: 'scroll'}}
+                                            >
+                                                {this.state.plotlyLinks.map(link => (
+                                                    <div style={{borderTop: '1px solid #dfe8f3', marginTop: 20}}>
+                                                        {link.type === 'grid' &&
+                                                            <div>
+                                                                <div style={{color: '#00cc96'}}>🎉  Link to your CSV on Chart Studio ⬇️</div>
+                                                                <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
+                                                            </div>
+                                                        }
+                                                        {link.type === 'csv' &&
+                                                            <div>
+                                                                <div style={{color: '#00cc96'}}>💾  Your CSV has been saved ⬇️</div>
+                                                                <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
+                                                            </div>
+                                                        }
+                                                        {link.type === 'plot' &&
+                                                            <div>
+                                                                <div style={{color: '#00cc96'}}>📈  Link to your chart on Chart Studio ⬇️</div>
+                                                                <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
+                                                            </div>
+                                                        }
+                                                        {link.type === 'error' &&
+                                                            <div>
+                                                                <div style={{color: '#D36046'}}>{`[ERROR] ${link.message}`}</div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </TabPanel>
+                                </Tabs>
+                            </div>
+                        }
+
+                        {successMsg &&
+                            <div className="successMsg">
+                                <p>{successMsg} {timeQueryElapsedMsg}</p>
+                            </div>
+                        }
+
+                       {S3Preview(this.props)}
+                       {ApacheDrillPreview(this.props)}
+                    </div>
+                </div>
+            </SplitPane>
         );
         /* eslint-enable max-len */
     }
