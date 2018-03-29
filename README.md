@@ -37,6 +37,7 @@ We want to encourage a warm, welcoming, and safe environment for contributing to
 |**Nicolas Riesco**| [@n-riesco](https://github.com/n-riesco) | |
 |**Tarun Gaba**| [@tarzzz](https://github.com/tarzzz) | |
 |**Shannon Lal**| [@shannonlal](https://github.com/shannonlal) | |
+|**Kinuthia Ndung'u**| [@kndungu](https://github.com/kndungu) | |
 
 ## Credit
 
