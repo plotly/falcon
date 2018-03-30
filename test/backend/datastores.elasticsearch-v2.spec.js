@@ -1,5 +1,7 @@
+// do not use import, otherwise other test units won't be able to reactivate nock
+const nock = require('nock');
+
 import {assert} from 'chai';
-import nock from 'nock';
 import {range} from 'ramda';
 
 import {
@@ -7,15 +9,31 @@ import {
     elasticsearchConnections,
     getResponseJson
 } from './utils.js';
-// elasticsearchConnections.host = 'http://localhost';
-// elasticsearchConnections.port = '9200';
-const url = `${elasticsearchConnections.host}:${elasticsearchConnections.port}`;
 
 import {
     query, connect, elasticsearchMappings
 } from '../../backend/persistent/datastores/Datastores.js';
 
-describe('Elasticsearch:', function () {
+describe('Elasticsearch v2:', function () {
+    let url;
+
+    before(function() {
+        url = `${elasticsearchConnections.host}:${elasticsearchConnections.port}`;
+
+        // Enable nock if it has been disabled by other specs
+        if (!nock.isActive()) nock.activate();
+
+        // Uncomment to test dockerized server:
+        //
+        // elasticsearchConnections.host = 'http://localhost';
+        // elasticsearchConnections.port = '9200';
+        // nock.restore();
+    });
+
+    after(function() {
+        nock.restore();
+    });
+
     const expectedMappingsResponse = {
         'test-types': {
             'mappings': {
@@ -143,52 +161,32 @@ describe('Elasticsearch:', function () {
                 health: 'yellow',
                 status: 'open',
                 index: 'test-types',
-                pri: '1',
-                rep: '1',
                 'docs.count': '3',
-                'docs.deleted': '0',
-                'store.size': '8kb',
-                'pri.store.size': '8kb'
+                'docs.deleted': '0'
             }, {
                 health: 'yellow',
                 status: 'open',
                 index: 'plotly_datasets',
-                pri: '1',
-                rep: '1',
                 'docs.count': '28187',
-                'docs.deleted': '0',
-                'store.size': '5.8mb',
-                'pri.store.size': '5.8mb'
+                'docs.deleted': '0'
             }, {
                 health: 'yellow',
                 status: 'open',
                 index: 'test-scroll',
-                pri: '1',
-                rep: '1',
                 'docs.count': '200000',
-                'docs.deleted': '0',
-                'store.size': '42.5mb',
-                'pri.store.size': '42.5mb'
+                'docs.deleted': '0'
             }, {
                 health: 'yellow',
                 status: 'open',
                 index: 'live-data',
-                pri: '1',
-                rep: '1',
                 'docs.count': '1000',
-                'docs.deleted': '0',
-                'store.size': '576.9kb',
-                'pri.store.size': '576.9kb'
+                'docs.deleted': '0'
             }, {
                 health: 'yellow',
                 status: 'open',
                 index: 'sample-data',
-                pri: '1',
-                rep: '1',
                 'docs.count': '200111',
-                'docs.deleted': '0',
-                'store.size': '42.8mb',
-                'pri.store.size': '42.8mb'
+                'docs.deleted': '0'
             }
         ];
 
@@ -207,7 +205,7 @@ describe('Elasticsearch:', function () {
             });
 
             expectedConnectResponse.forEach(expectedIndex => {
-                assert.deepEqual(
+                assert.deepInclude(
                     obtained[expectedIndex.index],
                     expectedIndex,
                     `Unexpected result for ${expectedIndex.index}`

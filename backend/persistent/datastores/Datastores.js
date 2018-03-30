@@ -9,6 +9,8 @@ import * as DataWorld from './dataworld';
 import * as DatastoreMock from './datastoremock';
 import * as Athena from './athena';
 
+const CSV = require('./csv');
+
 /*
  * Switchboard to all of the different types of connections
  * that we support.
@@ -46,6 +48,8 @@ function getDatastoreClient(connection) {
         return ApacheLivy;
     } else if (dialect === 'apache impala') {
         return ApacheImpala;
+    } else if (dialect === 'csv') {
+        return CSV;
     } else if (dialect === 'ibm db2') {
         return IbmDb2;
     } else if (dialect === 'data.world') {
@@ -56,45 +60,62 @@ function getDatastoreClient(connection) {
     return Sql;
 }
 
-/*
- * query functions take a configuration, query a connection and
- * return a promise with the results as an object:
- *
- *  {
- *      rows: [...],
- *      columnnames: [...]
- *  }
- *
+/**
+ * query makes a query
+ * @param {(object|string)} queryStatement Query
+ * @param {object}          connection     Connection object
+ * @returns {Promise.<object>} that resolves to the results as:
+ *   {
+ *       columnnames: [...],
+ *       rows: [...]
+ *   }
  */
-export function query(queryObject, connection) {
-    return getDatastoreClient(connection).query(queryObject, connection);
+export function query(queryStatement, connection) {
+    return getDatastoreClient(connection).query(queryStatement, connection);
 }
 
-/*
- * connect functions attempt to ping the connection and
- * return a promise that is empty
+/**
+ * connect attempts to ping the connection
+ * @param {object} connection Connection object
+ * @returns {Promise} that resolves when the connection succeeds
  */
 export function connect(connection) {
     return getDatastoreClient(connection).connect(connection);
 }
 
+/**
+ * disconnect closes the connection and
+ * @param {object} connection Connection object
+ * @returns {Promise} that resolves when the connection succeeds
+ */
+export function disconnect(connection) {
+    const client = getDatastoreClient(connection);
+    return (client.disconnect) ?
+        client.disconnect(connection) :
+        Promise.resolve(connection);
+}
+
 /* SQL-like Connectors */
 
-/*
- * return a promise that resolves to an array of [table_name, column_name, data_type]
- * available from a database.
- *
+/**
+ * schemas retrieves a list of table names, column names and column data types
+ * @param {object} connection Connection object
+ * @returns {Promise.<object>} that resolves to the results as:
+ *   {
+ *       columnnames: [...],
+ *       rows: [[table_name, column_name, data_type], ...]
+ *   }
  */
 export function schemas(connection) {
     return getDatastoreClient(connection).schemas(connection);
 }
 
-/*
- * return a promise with the available tables from a database
- *
- * this can have flexible meaning for other datastores.
- * e.g., for elasticsearch, this means return the available
- * "documents" per an "index"
+/**
+ * tables retrieves a list of table names
+ * @param {object} connection Connection object
+ * @returns {Promise.<Array>} that resolves to a list of the available tables.
+ * This can have flexible meaning for other datastores. E.g.:
+ * for elasticsearch, this means return the available "documents" per an "index"
  */
 export function tables(connection) {
     return getDatastoreClient(connection).tables(connection);

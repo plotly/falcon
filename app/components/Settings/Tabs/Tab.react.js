@@ -32,6 +32,8 @@ export default class ConnectionTab extends Component {
               label = `Apache Impala (${connectionObject.host}:${connectionObject.port})`;
         } else if (dialect === DIALECTS.APACHE_SPARK) {
             label = `Apache Spark (${connectionObject.host}:${connectionObject.port})`;
+        } else if (connectionObject.dialect === DIALECTS.CSV) {
+            label = connectionObject.label || connectionObject.id || connectionObject.database;
         } else if (connectionObject.dialect === DIALECTS.ELASTICSEARCH) {
             label = `Elasticsearch (${connectionObject.host})`;
         } else if (connectionObject.dialect === DIALECTS.ATHENA) {

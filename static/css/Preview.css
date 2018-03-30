@@ -5,62 +5,46 @@ table {
 
 th, td {
     border: 1px solid #828282;
-    padding: 0.3125rem 0.625rem;
     color: #828282;
     font-size: 0.875em;
+    padding: 0.3125rem 0.625rem;
     text-align: left;
 }
 
-.Pane.vertical {
-    overflow-x: auto;
-}
-
 .previewContainer {
+    border-radius: 3px;
     margin: 0 25px 25px 25px;
     overflow: auto;
-    border-radius: 3px;
-}
-
-.tableHeader {
-    padding-top: 6px;
-    padding-bottom: 6px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .runButton {
+    bottom: 18px;
     position: absolute;
     right: 18px;
-    bottom: 18px;
     width: 70px;
     z-index: 10;
 }
 
-.errorStatus p {
-    padding: 20px;
-    margin: 0 0 20px 0;
+.errorStatus pre {
     background: none;
     border: none;
-    color: rgb(211, 96, 70);
     border-bottom: 1px solid #ebf0f8;
-    font-size: 14px;
+    color: rgb(211, 96, 70);
     font-family: 'Ubuntu Mono';
-    overflow-x: hidden;
-    overflow-y: scroll;
+    font-size: 12px;
+    margin: 0 0 20px 0;
     max-height: 150px;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding: 20px;
 }
 
 .successMsg p {
-    padding: 20px;
-    margin: 0;
     background: none;
     border: none;
     color: #00cc96;
+    font-family: 'Ubuntu Mono';
     font-size: 14px;
-    font-family: 'Ubuntu Mono';  
+    margin: 0;
+    padding: 20px;
 }
-
-
-
-
-

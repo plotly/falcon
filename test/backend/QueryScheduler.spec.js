@@ -1,6 +1,5 @@
-import chai, {expect, assert} from 'chai';
-import spies from 'chai-spies';
-chai.use(spies);
+import {assert} from 'chai';
+import sinon from 'sinon';
 
 import {merge} from 'ramda';
 
@@ -49,7 +48,7 @@ describe('QueryScheduler', function() {
     });
 
     it('executes a function on an interval', function () {
-        const spy = chai.spy(() => {});
+        const spy = sinon.spy();
         const refreshInterval = 1; // second
 
         queryScheduler.job = spy;
@@ -61,17 +60,17 @@ describe('QueryScheduler', function() {
             connectionId: '...'
         });
 
-        expect(spy).to.not.have.been.called();
+        assert(spy.notCalled, 'job should not have been called yet');
 
         return wait(1.5 * refreshInterval * 1000)
-            .then(() => expect(spy).to.have.been.called())
+            .then(() => assert(spy.called, 'job should have been called'))
             .then(() => wait(refreshInterval * 1000))
-            .then(() => expect(spy).to.have.been.called.twice());
+            .then(() => assert(spy.calledTwice, 'job should have been called twice'));
     });
 
     it('overwrites interval functions', function () {
-        const spy1 = chai.spy(() => {});
-        const spy2 = chai.spy(() => {});
+        const spy1 = sinon.spy();
+        const spy2 = sinon.spy();
         const refreshInterval = 1; // second
 
         const query = {
@@ -86,29 +85,29 @@ describe('QueryScheduler', function() {
         queryScheduler.job = spy1;
         queryScheduler.scheduleQuery(query);
 
-        expect(spy1).to.not.have.been.called();
+        assert(spy1.notCalled, 'job1 should not have been called yet');
 
         return wait(3.25 * refreshInterval * 1000)
-            .then(() => {
-                expect(spy1).to.have.been.called.exactly(3);
+        .then(() => {
+            assert(spy1.calledThrice, 'job1 should have been called three times');
 
-                queryScheduler.job = spy2;
-                queryScheduler.scheduleQuery(merge(query, {query: 'query-2'}));
-            })
-            .then(() => wait(3.25 * refreshInterval * 1000))
-            .then(() => {
-                expect(spy1).to.have.been.called.exactly(3);
-                expect(spy1).to.have.been.called.always.with.exactly(
-                    query.fid, query.uids, query.query,
-                    query.connectionId, query.requestor
-                );
+            queryScheduler.job = spy2;
+            queryScheduler.scheduleQuery(merge(query, {query: 'query-2'}));
+        })
+        .then(() => wait(3.25 * refreshInterval * 1000))
+        .then(() => {
+            assert(spy1.calledThrice, 'job1 should have been called three times');
+            assert(spy1.alwaysCalledWith(
+                query.fid, query.uids, query.query,
+                query.connectionId, query.requestor
+            ), `job1 was called with unexpected args: ${spy1.args}`);
 
-                expect(spy2).to.have.been.called.exactly(3);
-                expect(spy2).to.have.been.called.always.with.exactly(
-                    query.fid, query.uids, 'query-2',
-                    query.connectionId, query.requestor
-                );
-            });
+            assert(spy2.calledThrice, 'job2 should have been called three times');
+            assert(spy2.alwaysCalledWith(
+                query.fid, query.uids, 'query-2',
+                query.connectionId, query.requestor
+            ), `job2 was called with unexpected args: ${spy2.args}`);
+        });
     });
 
     it('saves queries to file', function() {

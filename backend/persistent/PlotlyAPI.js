@@ -33,6 +33,7 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
 export function newDatacache(payloadJSON, type, requestor) {
     const form = new FormData();
     form.append('type', type);
+    form.append('origin', 'Falcon');
     form.append('payload', payloadJSON);
     const body = form;
 
@@ -40,6 +41,8 @@ export function newDatacache(payloadJSON, type, requestor) {
     const user = users.find(
         u => u.username === requestor
     );
+
+    form.append('username', user.username);
 
     /*
      * Authentication is only required for on-premise private-mode for this
@@ -67,10 +70,15 @@ export function newDatacache(payloadJSON, type, requestor) {
             'Authorization': authorization
         }
     }).then(res => {
-        return res;
+        if (res.status !== 200) {
+            return res.text().then(text => {
+                throw new Error(`Failed request 'datacache'. Status: ${res.status}. Body: ${text}`);
+            });
+        }
+        return res.json();
     }).catch(err => {
         Logger.log(err, 0);
-        throw new Error(err);
+        throw err;
     });
 }
 
@@ -149,8 +157,8 @@ export function checkWritePermissions(fid, requestor) {
         } else if (res.status === 401) {
             throw new Error('Unauthenticated');
         } else if (res.status !== 200) {
-            return res.json().then(json => {
-                throw new Error(`${res.status}: ${JSON.stringify(json, null, 2)}`);
+            return res.text().then(body => {
+                throw new Error(`Failed request 'grids/${fid}'. Status: ${res.status}. Body: ${body}`);
             });
         } else {
             return res.json();

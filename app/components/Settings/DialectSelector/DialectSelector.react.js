@@ -6,6 +6,14 @@ import {
 } from '../../../constants/constants';
 import classnames from 'classnames';
 
+/**
+ * The following is the Dialect Selector
+ * @param {object} props - Properties
+ * @param {object} props.connectionObject - Connect Object
+ * @param {string} props.connectionObject.dialect - Dialect
+ * @param {function} props.updateConnection - Updates the Connection with dialect
+ * @returns {ReactElement} rendered element
+ */
 const DialectSelector = function DialectSelector(props) {
     const {connectionObject, updateConnection} = props;
 

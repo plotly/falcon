@@ -16,7 +16,8 @@ export const DIALECTS = {
     APACHE_IMPALA: 'apache impala',
     APACHE_DRILL: 'apache drill',
     DATA_WORLD: 'data.world',
-    ATHENA: 'athena'
+    ATHENA: 'athena',
+    CSV: 'csv'
 };
 
 export const SQL_DIALECTS_USING_EDITOR = [
@@ -30,7 +31,8 @@ export const SQL_DIALECTS_USING_EDITOR = [
     'apache spark',
     'apache impala',
     'data.world',
-    'athena'
+    'athena',
+    'csv'
 ];
 
 const commonSqlOptions = [
@@ -76,6 +78,12 @@ const hadoopQLOptions = [
 export const CONNECTION_CONFIG = {
     [DIALECTS.APACHE_IMPALA]: hadoopQLOptions,
     [DIALECTS.APACHE_SPARK]: hadoopQLOptions,
+    [DIALECTS.CSV]: [{
+        'inputLabel': 'Type URL to a CSV file',
+        'dropLabel': '(or drop a CSV file here)',
+        'value': 'database',
+        'type': 'filedrop'
+    }],
     [DIALECTS.IBM_DB2]: commonSqlOptions,
     [DIALECTS.MYSQL]: commonSqlOptions,
     [DIALECTS.MARIADB]: commonSqlOptions,
@@ -234,6 +242,7 @@ export const CONNECTION_CONFIG = {
 export const LOGOS = {
     [DIALECTS.APACHE_SPARK]: 'images/spark-logo.png',
     [DIALECTS.APACHE_IMPALA]: 'images/impala-logo.png',
+    [DIALECTS.CSV]: 'images/csv-logo.png',
     [DIALECTS.IBM_DB2]: 'images/ibmdb2-logo.png',
     [DIALECTS.REDSHIFT]: 'images/redshift-logo.png',
     [DIALECTS.POSTGRES]: 'images/postgres-logo.png',
@@ -250,6 +259,8 @@ export const LOGOS = {
 
 export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
     switch (connection.dialect) {
+        case DIALECTS.CSV:
+            return 'SELECT TOP 1000 * FROM ?';
         case DIALECTS.IBM_DB2:
             return `SELECT * FROM ${table} FETCH FIRST 1000 ROWS ONLY`;
         case DIALECTS.APACHE_IMPALA:
@@ -358,6 +369,10 @@ export const SAMPLE_DBS = {
         port: 8998,
         host: 'spark.test.plotly.host',
         dialect: DIALECTS.APACHE_SPARK
+    },
+    [DIALECTS.CSV]: {
+        dialect: DIALECTS.CSV,
+        database: 'http://www.fdic.gov/bank/individual/failed/banklist.csv'
     },
     [DIALECTS.IBM_DB2]: {
         username: 'db2user1',

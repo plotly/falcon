@@ -1,109 +1,33 @@
-.containerWrapper {
-	width: 100%;
-}
-
-.container {
-	width: 100%;
-	max-width: 800px;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-.tabsContainer {
-    text-align: center;
-}
-
 .openTab {
-    border-radius: 0 0 6px 6px;
+    background: rgb(251, 252, 253);
+    border-bottom: 1px solid #c8dfe3;
     border-left: 1px solid #c8dfe3;
-		border-right: 1px solid #c8dfe3;
-		border-bottom: 1px solid #c8dfe3;
-    background: rgb(251, 252, 253)
+    border-radius: 0 0 6px 6px;
+    border-right: 1px solid #c8dfe3;
 }
 
 .configurationContainer {
-	width: 100%;
-	text-align: center;
     font-family: 'Ubuntu';
-}
-
-.stepTitleContainer {
-    padding: 20px 30px 0px 30px;
-}
-
-.stepTitle {
-    border-bottom: 1px solid #E7E8E9;
-    cursor: pointer;
+    text-align: center;
+    width: 100%;
 }
 
 .disabledSection {
-    pointer-events: none;
     opacity: 0.4;
+    pointer-events: none;
 }
 
 .info {
-	padding: 25px;
     font-size: 14px;
-}
-
-.userConnections {
-	margin-left: auto;
-	margin-right: auto;
+    padding: 25px;
 }
 
 .dialectSelector {
-	display: inline-block;
-}
-
-.previewController {
-	max-height: 500px;
-	max-width: 100%;
-	overflow-y: scroll;
-    border: 1px solid #BEC8D9;
-	border-radius: 3px;
-	padding: 10px;
-	margin-left: 25px;
-	margin-right: 25px;
-}
-
-.logContainer {
-    max-height: 300px;
-	margin-top: 40px;
-}
-
-.log {
-	margin-bottom: 100px;
-}
-
-.unfoldIcon {
-    width: 18px;
-    padding-left: 10px;
-    position: relative;
-    top: 3px;
-}
-
-.workspaceLink {
-    border-radius: 4px;
-    border: 1px solid #8d98af;
-    font-size: 16px;
-    font-weight: 100;
-    letter-spacing: 1px;
-    margin: 60px auto;
-    max-width: 25%;
-    padding: 10px;
-    text-align: center;
+    display: inline-block;
 }
 
 .editButtonContainer {
     margin: 20px 0;
-}
-
-.collapsed .unfoldIcon{
-    position: relative;
-    top: 6px;
-    transform:rotate(-90deg);
-    -ms-transform:rotate(-90deg); /* IE 9 */
-    -webkit-transform:rotate(-90deg); /* Safari and Chrome */
 }
 
 .url {

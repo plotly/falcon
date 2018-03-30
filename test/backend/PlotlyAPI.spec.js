@@ -1,6 +1,4 @@
-import chai, {assert} from 'chai';
-import spies from 'chai-spies';
-chai.use(spies);
+import {assert} from 'chai';
 
 import {
     PlotlyAPIRequest,
