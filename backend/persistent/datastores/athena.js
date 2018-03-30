@@ -5,6 +5,31 @@ const SHOW_TABLES_QUERY = 'SHOW TABLES';
 const SHOW_SCHEMA_QUERY = 'SELECT table_name, column_name, data_type FROM '
     + 'information_schema.columns WHERE table_schema ';
 const DEFAULT_QUERY_INTERVAL = 2000;
+
+/**
+ * The following function will create an AWS Athena Client
+ * @param {object} connection - AWS Athena Connection Parameters
+ * @param {string} connection.accessKey - AWS Access Key
+ * @param {string} connection.secretAccessKey - AWS Secret Key
+ * @param {string} connection.region - AWS Region
+ * @returns {object} AWS Athena Client
+ */
+function createAthenaClient(connection) {
+    const connectionParams = {
+        apiVersion: '2017-05-18',
+        accessKeyId: connection.accessKey,
+        secretAccessKey: connection.secretAccessKey,
+        region: connection.region,
+        maxRetries: NUMBER_OF_RETRIES
+    };
+
+    if (connection.sslEnabled) {
+        connectionParams.sslEnabled = connection.sslEnabled;
+    }
+    const athenaClient = new AWS.Athena(connectionParams);
+
+    return athenaClient;
+}
 /*
  * The connection function will validate the parameters and return the connection
  * parameters
@@ -19,44 +44,18 @@ const DEFAULT_QUERY_INTERVAL = 2000;
  * @returns {Promise} that resolves connection
  */
 export function connect(connection) {
-    const {
-        region, accessKey, secretKey, database, sqlStatement, outputS3Bucket, sslEnabled
-    } = connection;
-    let queryInterval = connection.timeout;
+
 
     return new Promise(function(resolve, reject) {
 
-        if (!region) {
-            return reject(new Error('The AWS Region was not defined'));
+        if (!connection.timeout && connection.timeout < 0) {
+            connection.timeout = DEFAULT_QUERY_INTERVAL;
         }
 
-        if (!accessKey) {
-            return reject(new Error('The AWS access key was not defined'));
-        }
-
-        if (!secretKey) {
-            return reject(new Error('The AWS secret key was not defined'));
-        }
-
-        if (!database) {
-            return reject(new Error('The Database Name was not defined'));
-        }
-
-        if (!outputS3Bucket) {
-            return reject(new Error('The Athena S3 Results Output Bucket was not defined'));
-        }
-
-        if (!queryInterval && queryInterval < 0) {
-            queryInterval = DEFAULT_QUERY_INTERVAL;
-        }
-
-        const con = {
-            region, accessKey, secretKey, database, sqlStatement, outputS3Bucket, queryInterval, sslEnabled
-        };
-
+        connection.athenaClient = createAthenaClient( connection );
         // Test the connection to get a list of schemas
         // This will validate that the connection properties work
-        schemas(con).then(() => {
+        schemas(connection).then(() => {
             resolve(con);
         }).catch(err => {
             Logger.log(err);

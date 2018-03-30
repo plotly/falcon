@@ -4,30 +4,6 @@ const AWS = require('aws-sdk');
 import Logger from '../../../logger';
 const NUMBER_OF_RETRIES = 50;
 
-/**
- * The following function will create an AWS Athena Client
- * @param {object} connection - AWS Athena Connection Parameters
- * @param {string} connection.accessKey - AWS Access Key
- * @param {string} connection.secretAccessKey - AWS Secret Key
- * @param {string} connection.region - AWS Region
- * @returns {object} AWS Athena Client
- */
-export function createAthenaClient(connection) {
-    const connectionParams = {
-        apiVersion: '2017-05-18',
-        accessKeyId: connection.accessKey,
-        secretAccessKey: connection.secretAccessKey,
-        region: connection.region,
-        maxRetries: NUMBER_OF_RETRIES
-    };
-
-    if (connection.sslEnabled) {
-        connectionParams.sslEnabled = connection.sslEnabled;
-    }
-    const athenaClient = new AWS.Athena(connectionParams);
-
-    return athenaClient;
-}
 
 /**
  * The following method will execute the sql statement to query the
@@ -39,7 +15,7 @@ export function createAthenaClient(connection) {
  * @param {string} params.outputS3Bucket - Location will Athena will output resutls of query
  * @return {string} requestId
  */
-export function startQuery(athenaClient, params) {
+function startQuery(athenaClient, params) {
     const client = athenaClient;
 
     const queryParams = {
@@ -74,7 +50,7 @@ export function startQuery(athenaClient, params) {
  * @param {string} queryExecutionId - AWS Query Execution Id
  * @returns {int} -1 : Error, 0 : Still running, 1 : Completed
  */
-export function queryResultsCompleted(athenaClient, queryExecutionId) {
+function queryResultsCompleted(athenaClient, queryExecutionId) {
     const client = athenaClient;
 
     const queryParams = {
@@ -131,7 +107,7 @@ export function queryResultsCompleted(athenaClient, queryExecutionId) {
  * @param {string} queryExecutionId - AWS Athena Query Id
  * @returns {Promise} That resolves to AWS Stop Request
  */
-export function stopQuery(athenaClient, queryExecutionId) {
+function stopQuery(athenaClient, queryExecutionId) {
     const client = athenaClient;
 
     const queryParams = {
@@ -155,7 +131,7 @@ export function stopQuery(athenaClient, queryExecutionId) {
  * @param {string} queryExecutionId - AWS Athena Query Id
  * @returns {Promise} Resolves to AWS Query Response
  */
-export function getQueryResults(athenaClient, queryExecutionId) {
+function getQueryResults(athenaClient, queryExecutionId) {
     const client = athenaClient;
 
     const queryParams = {
@@ -187,10 +163,11 @@ export function getQueryResults(athenaClient, queryExecutionId) {
  * @param {string} queryParams.sqlStatement - SQL statement to execute
  * @param {string} queryParams.s3Outputlocation - Location will Athena will output resutls of query
  * @param {number} queryParams.queryInterval  - The timeout interval when the query should stop
+ * @param {AWS Athena} queryParams.athenaClient - The AWS Athena Client
  * @returns {Promise} resolve to AWS Query Response
  */
 export function executeQuery(queryParams) {
-    const client = createAthenaClient(queryParams);
+    const client = queryParams.athenaClient;
 
     return new Promise(function(resolve, reject) {
         return startQuery(client, queryParams).then(queryExecutionId => {
