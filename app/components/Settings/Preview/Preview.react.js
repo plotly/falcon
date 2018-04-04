@@ -8,7 +8,7 @@ import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 
 import TableTree from './TableTree.react.js';
 import SQLTable from './sql-table.jsx';
-import CodeEditorField from './CodeEditorField.react.js';
+import CodeEditor from './code-editor.jsx';
 import ChartEditor from './chart-editor.jsx';
 import ApacheDrillPreview from './ApacheDrillPreview.js';
 import S3Preview from './S3Preview.js';
@@ -335,14 +335,13 @@ class Preview extends Component {
                                     </code>
 
                                     <div style={{display: showEditor ? 'block' : 'none', position: 'relative'}}>
-                                        <CodeEditorField
+                                        <CodeEditor
                                             value={code}
                                             onChange={this.updateCode}
-                                            connectionObject={connectionObject}
                                             runQuery={this.runQuery}
+
+                                            dialect={dialect}
                                             schemaRequest={schemaRequest}
-                                            preview={preview}
-                                            updatePreview={updatePreview}
                                         />
                                         <a
                                             className="btn btn-primary runButton"

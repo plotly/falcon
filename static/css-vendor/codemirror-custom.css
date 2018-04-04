@@ -1,15 +1,12 @@
 .CodeMirror {
-   font-family: 'Ubuntu Mono', monospace;
-   height: 250px;
+    border: 1px solid #c8d4e3;
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 14px;
+    height: 250px;
+    margin-bottom: 20px;
 }
 
 .CodeMirror-gutters {
     background-color: #f3f6fa;
     border-right: 1px solid #c8d4e3;
-}
-
-.ReactCodeMirror {
-    border: 1px solid #c8d4e3;
-    font-size: 14px;
-    margin-bottom: 20px;
 }

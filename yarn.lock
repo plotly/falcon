@@ -8349,6 +8349,10 @@ react-chart-editor@^0.13.0:
     react-tabs "^2.2.1"
     tinycolor2 "^1.4.1"
 
+react-codemirror2@^4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/react-codemirror2/-/react-codemirror2-4.2.1.tgz#4ad3c5c60ebbcb34880f961721b51527324ec021"
+
 react-codemirror@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/react-codemirror/-/react-codemirror-1.0.0.tgz#91467b53b1f5d80d916a2fd0b4c7adb85a9001ba"
