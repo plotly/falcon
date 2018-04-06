@@ -338,18 +338,12 @@ class Preview extends Component {
                                         <CodeEditor
                                             value={code}
                                             onChange={this.updateCode}
-                                            runQuery={this.runQuery}
 
                                             dialect={dialect}
+                                            runQuery={this.runQuery}
                                             schemaRequest={schemaRequest}
+                                            isLoading={isLoading}
                                         />
-                                        <a
-                                            className="btn btn-primary runButton"
-                                            onClick={this.runQuery}
-                                            disabled={!isLoading}
-                                        >
-                                            {isLoading ? 'Loading...' : 'Run'}
-                                        </a>
                                     </div>
                                 </div>
                             }

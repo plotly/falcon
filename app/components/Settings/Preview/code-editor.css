@@ -10,3 +10,7 @@
     background-color: #f3f6fa;
     border-right: 1px solid #c8d4e3;
 }
+
+.react-resizable-handle {
+    z-index: 9;
+}

@@ -3,9 +3,16 @@ import PropTypes from 'prop-types';
 
 import {Controlled as CodeMirror} from 'react-codemirror2';
 import CM from 'codemirror';
-import 'codemirror/mode/sql/sql';
-import 'codemirror/addon/hint/show-hint';
-import 'codemirror/addon/hint/sql-hint';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/sql/sql.js';
+import 'codemirror/addon/hint/show-hint.js';
+import 'codemirror/addon/hint/show-hint.css';
+import 'codemirror/addon/hint/sql-hint.js';
+
+import {ResizableBox} from 'react-resizable';
+import 'react-resizable/css/styles.css';
+
+import './code-editor.css';
 
 import {DIALECTS} from '../../../constants/constants';
 
@@ -13,10 +20,11 @@ export default class CodeEditor extends React.Component {
     static propTypes = {
         value: PropTypes.string,
         onChange: PropTypes.func,
-        runQuery: PropTypes.func,
 
         dialect: PropTypes.string,
-        schemaRequest: PropTypes.object
+        runQuery: PropTypes.func,
+        schemaRequest: PropTypes.object,
+        isLoading: PropTypes.bool
     }
 
 
@@ -25,12 +33,13 @@ export default class CodeEditor extends React.Component {
      *
      * @param {object} props - Component properties
      *
-     * @param {string} props.dialect       - Connector dialect
-     * @param {object} props.schemaRequest - /connections/:id/sql-schemas API request
-     *
      * @param {string}   props.value    - Value
      * @param {onChange} props.onChange - Callback to handle a value change
-     * @param {runQuery} props.runQuery - Callback to run a SQL query
+     *
+     * @param {string}   props.dialect       - Connector dialect
+     * @param {runQuery} props.runQuery      - Callback to run a SQL query
+     * @param {object}   props.schemaRequest - /connections/:id/sql-schemas API request
+     * @param {object}   props.isLoading     - true if last run query is still running
      */
     constructor(props) {
         super(props);
@@ -38,8 +47,14 @@ export default class CodeEditor extends React.Component {
         /**
          * @member {object} state - Component state
          * @property {object} state.tables - Tables schemas (used in hintOptions)
+         * @property {number} state.height - Height in pixels
+         * @property {?number} state.width - Width in pixels
          */
         this.state = {
+            height: 250,
+            width: null,
+            minConstraints: [200, 74],
+            maxConstraints: [Infinity, Infinity],
             tables: CodeEditor.computeAutocompleteTables(this.props)
         };
 
@@ -70,6 +85,30 @@ export default class CodeEditor extends React.Component {
             // Reference the hint function imported here when including other hint addons
             // or supply your own
             CM.showHint(editor, CM.hint.sql, hintOptions);
+        };
+
+        this.editorDidMount = (editor) => {
+            this.editor = editor;
+
+            const wrapperElement = this.editor.getWrapperElement();
+            const height = wrapperElement.clientHeight;
+            const width = wrapperElement.clientWidth;
+
+            const minConstraints = [width, 74];
+            const maxConstraints = [width, Infinity];
+
+            this.setState({height, width, minConstraints, maxConstraints});
+        };
+
+        this.onResize = (event, data) => {
+            const height = data.size.height;
+
+            const wrapperElement = this.editor ? this.editor.getWrapperElement() : {};
+            const width = wrapperElement.clientWidth;
+
+            if (this.editor) this.editor.setSize(width, height);
+
+            this.setState({height, width});
         };
     }
 
@@ -124,6 +163,27 @@ export default class CodeEditor extends React.Component {
     }
 
     render() {
+        const {
+            editorDidMount,
+            onBeforeChange,
+            onChange,
+            onResize
+        } = this;
+
+        const {
+            value,
+            dialect,
+            runQuery,
+            isLoading
+        } = this.props;
+
+        const {
+            height,
+            width,
+            minConstraints,
+            maxConstraints
+        } = this.state;
+
         const mode = {
             [DIALECTS.APACHE_SPARK]: 'text/x-sparksql',
             [DIALECTS.MYSQL]: 'text/x-mysql',
@@ -132,7 +192,7 @@ export default class CodeEditor extends React.Component {
             [DIALECTS.POSTGRES]: 'text/x-pgsql',
             [DIALECTS.REDSHIFT]: 'text/x-pgsql',
             [DIALECTS.MSSQL]: 'text/x-mssql'
-        }[this.props.dialect] || 'text/x-sql';
+        }[dialect] || 'text/x-sql';
 
         const options = {
             lineNumbers: true,
@@ -140,17 +200,33 @@ export default class CodeEditor extends React.Component {
             tabSize: 4,
             readOnly: false,
             extraKeys: {
-                'Shift-Enter': this.props.runQuery
+                'Shift-Enter': runQuery
             }
         };
 
         return (
-            <CodeMirror
-                value={this.props.value}
-                options={options}
-                onBeforeChange={this.onBeforeChange}
-                onChange={this.onChange}
-            />
+            <ResizableBox
+                height={height}
+                width={width}
+                minConstraints={minConstraints}
+                maxConstraints={maxConstraints}
+                onResize={onResize}
+            ><div>
+                <CodeMirror
+                    options={options}
+                    value={value}
+                    onBeforeChange={onBeforeChange}
+                    onChange={onChange}
+                    editorDidMount={editorDidMount}
+                />
+                <a
+                    className="btn btn-primary runButton"
+                    onClick={runQuery}
+                    disabled={!isLoading}
+                >
+                    {isLoading ? 'Loading...' : 'Run'}
+                </a>
+            </div></ResizableBox>
         );
     }
 }
