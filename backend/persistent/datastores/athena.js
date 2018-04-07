@@ -113,7 +113,6 @@ export function query(queryObject, connection) {
 export function schemas(connection) {
     const columnnames = ['table_name', 'column_name', 'data_type'];
     const rows = [];
-
     connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.database}'` ;
     connection.queryInterval = DEFAULT_QUERY_INTERVAL;
     return new Promise(function(resolve, reject) {
@@ -121,7 +120,6 @@ export function schemas(connection) {
             if (dataSet && dataSet.length > 0) {
                 for (let i = 0; i < dataSet.length; i++) {
                     const data = dataSet[i];
-
                     if (data && data.Data && data.Data.length > 0) {
                         if (i !== 0) {
                             const row = [];

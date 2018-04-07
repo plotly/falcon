@@ -211,7 +211,7 @@ export const CONNECTION_CONFIG = {
             'label': 'S3 Access Key', 'value': 'accessKey', 'type': 'password'
         },
         {
-            'label': 'S3 Secret Access Key', 'value': 'secretKey', 'type': 'password'
+            'label': 'S3 Secret Access Key', 'value': 'secretAccessKey', 'type': 'password'
         },
         {
             'label': 'AWS Region', 'value': 'region', 'type': 'text',
