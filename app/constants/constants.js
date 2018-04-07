@@ -449,7 +449,7 @@ export const SAMPLE_DBS = {
     [DIALECTS.ATHENA]: {
         s3Outputlocation: 'plotly-s3-connector-test',
         accessKey: 'AKIAIMHMSHTGARJYSKMQ',
-        secretKey: 'Urvus4R7MnJOAqT4U3eovlCBimQ4Zg2Y9sV5LWow',
+        secretAccessKey: 'Urvus4R7MnJOAqT4U3eovlCBimQ4Zg2Y9sV5LWow',
         region: 'us-east-1',
         database: 'falcon',
         queryTimeout: 5000
