@@ -5,6 +5,8 @@ const SHOW_TABLES_QUERY = 'SHOW TABLES';
 const SHOW_SCHEMA_QUERY = 'SELECT table_name, column_name, data_type FROM '
     + 'information_schema.columns WHERE table_schema ';
 const DEFAULT_QUERY_INTERVAL = 2000;
+const NUMBER_OF_RETRIES = 50;
+const AWS = require('aws-sdk');
 
 /**
  * The following function will create an AWS Athena Client
@@ -44,24 +46,13 @@ function createAthenaClient(connection) {
  * @returns {Promise} that resolves connection
  */
 export function connect(connection) {
+    if (!connection.timeout && connection.timeout < 0) {
+        connection.timeout = DEFAULT_QUERY_INTERVAL;
+    }
 
+    connection.athenaClient = createAthenaClient(connection);
 
-    return new Promise(function(resolve, reject) {
-
-        if (!connection.timeout && connection.timeout < 0) {
-            connection.timeout = DEFAULT_QUERY_INTERVAL;
-        }
-
-        connection.athenaClient = createAthenaClient( connection );
-        // Test the connection to get a list of schemas
-        // This will validate that the connection properties work
-        schemas(connection).then(() => {
-            resolve(con);
-        }).catch(err => {
-            Logger.log(err);
-            reject(err);
-        });
-    });
+    return schemas(connection);
 }
 
 /**
@@ -104,7 +95,7 @@ export function query(queryObject, connection) {
             resolve({columnnames, rows});
         }).catch(err => {
             Logger.log(err);
-            throw err;
+            reject(err);
         });
     });
 }
@@ -120,12 +111,12 @@ export function query(queryObject, connection) {
  * @returns {Promise} that resolves to { columnnames, rows }
  */
 export function schemas(connection) {
-    const columnnames = ['Table', 'column_name', 'data_type'];
+    const columnnames = ['table_name', 'column_name', 'data_type'];
     const rows = [];
 
     connection.sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.database}'` ;
     connection.queryInterval = DEFAULT_QUERY_INTERVAL;
-    return new Promise(function(resolve) {
+    return new Promise(function(resolve, reject) {
         executeQuery(connection).then(dataSet => {
             if (dataSet && dataSet.length > 0) {
                 for (let i = 0; i < dataSet.length; i++) {
@@ -145,7 +136,7 @@ export function schemas(connection) {
             return resolve({columnnames, rows});
         }).catch(err => {
             Logger.log(err);
-            throw err;
+            reject(err);
         });
     });
 }

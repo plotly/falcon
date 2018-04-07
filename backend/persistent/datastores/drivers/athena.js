@@ -1,9 +1,6 @@
 'use strict';
 
-const AWS = require('aws-sdk');
 import Logger from '../../../logger';
-const NUMBER_OF_RETRIES = 50;
-
 
 /**
  * The following method will execute the sql statement to query the
@@ -107,7 +104,7 @@ function queryResultsCompleted(athenaClient, queryExecutionId) {
  * @param {string} queryExecutionId - AWS Athena Query Id
  * @returns {Promise} That resolves to AWS Stop Request
  */
-function stopQuery(athenaClient, queryExecutionId) {
+export function stopQuery(athenaClient, queryExecutionId) {
     const client = athenaClient;
 
     const queryParams = {
