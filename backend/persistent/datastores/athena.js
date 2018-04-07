@@ -52,7 +52,14 @@ export function connect(connection) {
 
     connection.athenaClient = createAthenaClient(connection);
 
-    return schemas(connection);
+    return new Promise(function(resolve, reject) {
+        return schemas(connection).then(() => {
+            resolve(connection);
+        }).catch(err => {
+            Logger.log(err);
+            reject(err);
+        });
+    });
 }
 
 /**
