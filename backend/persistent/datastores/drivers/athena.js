@@ -1,6 +1,33 @@
 'use strict';
 
+const AWS = require('aws-sdk');
 import Logger from '../../../logger';
+const NUMBER_OF_RETRIES = 50;
+
+/**
+ * The following function will create an AWS Athena Client
+ * @param {object} connection - AWS Athena Connection Parameters
+ * @param {string} connection.accessKey - AWS Access Key
+ * @param {string} connection.secretAccessKey - AWS Secret Key
+ * @param {string} connection.region - AWS Region
+ * @returns {object} AWS Athena Client
+ */
+export function createAthenaClient(connection) {
+    const connectionParams = {
+        apiVersion: '2017-05-18',
+        accessKeyId: connection.accessKey,
+        secretAccessKey: connection.secretAccessKey,
+        region: connection.region,
+        maxRetries: NUMBER_OF_RETRIES
+    };
+
+    if (connection.sslEnabled) {
+        connectionParams.sslEnabled = connection.sslEnabled;
+    }
+    const athenaClient = new AWS.Athena(connectionParams);
+
+    return athenaClient;
+}
 
 /**
  * The following method will execute the sql statement to query the
