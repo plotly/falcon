@@ -3,13 +3,23 @@ const nock = require('nock');
 
 import {assert} from 'chai';
 import uuid from 'uuid';
-import AWS from 'aws-sdk';
 
-import {schemas, query, tables} from '../../backend/persistent/datastores/athena';
+import {connect, schemas, query, tables} from '../../backend/persistent/datastores/athena';
 
 describe('Athena:', function () {
     const URL = 'https://athena.us-east-1.amazonaws.com:443';
     const PATH = '/';
+
+    // Connection object shared by all the tests
+    const conn = {
+        region: 'us-east-1',
+        accessKey: 'XXXXXXXX',
+        secretAccessKey: 'XXXXXAAAA',
+        database: 'PLOT.LY-TEST',
+        outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
+        queryInterval: 1000,
+        maxRetries: 50
+    };
 
     before(function() {
         // Enable nock if it has been disabled by other specs
@@ -17,97 +27,28 @@ describe('Athena:', function () {
     });
 
     after(function() {
+        // Disable nock
         nock.restore();
     });
 
+    it('connect() succeeds', function() {
+        const queryStatement = 'SELECT table_name FROM information_schema.columns LIMIT 1';
+        const columnNames = [];
+        const rows = [];
+
+        mockAthenaResponses(queryStatement, columnNames, rows);
+
+        return connect(conn).then(function(connection) {
+            assert.isDefined(connection.athenaClient, 'connection.athenaClient is undefined');
+        });
+    });
+
     it('schemas() retrieves schemas of all tables', function() {
-        const options = {
-            region: 'us-east-1',
-            accessKey: 'XXXXXXXX',
-            secretAccessKey: 'XXXXXAAAA',
-            database: 'PLOT.LY-TEST',
-            outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
-            queryInterval: 1000,
-            maxRetries: 50
-        };
-
-        const athenaClient = new AWS.Athena(options);
-        const conn = { ...options, athenaClient};
-
-        const {database, outputS3Bucket} = conn.database;
-        const queryStatement =
-        `SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema  = '${database}'`;
-        const queryExecutionId = uuid.v4();
-        const submissionDateTime = 1522797420.024;
-
-        // mock connect response
-        nock(URL).post(PATH).reply(200, {
-            QueryExecutionId: queryExecutionId
-        });
-
-        nock(URL).post(PATH).reply(200, {
-            'QueryExecution': {
-                'Query': queryStatement,
-                'QueryExecutionContext': {'Database': database},
-                'QueryExecutionId': queryExecutionId,
-                'ResultConfiguration': {
-                    'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'},
-                    'OutputLocation': outputS3Bucket
-                },
-                'Statistics': {},
-                'Status': {
-                    'State': 'RUNNING',
-                    'SubmissionDateTime': submissionDateTime
-                }
-            },
-            'QueryExecutionDetail': {
-                'OutputLocation': outputS3Bucket,
-                'Query': queryStatement,
-                'QueryExecutionContext': {'Database': database},
-                'QueryExecutionId': queryExecutionId,
-                'ResultConfiguration': {
-                    'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'},
-                    'OutputLocation': outputS3Bucket
-                },
-                'Stats': {},
-                'Status': {
-                    'State': 'RUNNING',
-                    'SubmissionDateTime': submissionDateTime
-                }
-            }
-        });
-
-        nock(URL).post(PATH).reply(200, {
-            'QueryExecution': {
-                'Query': queryStatement,
-                'QueryExecutionContext': {'Database': database},
-                'QueryExecutionId': queryExecutionId,
-                'ResultConfiguration': {
-                    'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'},
-                    'OutputLocation': outputS3Bucket
-                },
-                'Statistics': {},
-                'Status': {
-                    'State': 'SUCCEEDED',
-                    'SubmissionDateTime': submissionDateTime
-                }
-            },
-            'QueryExecutionDetail': {
-                'OutputLocation': outputS3Bucket,
-                'Query': queryStatement,
-                'QueryExecutionContext': {'Database': database},
-                'QueryExecutionId': queryExecutionId,
-                'ResultConfiguration': {
-                    'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'},
-                    'OutputLocation': outputS3Bucket
-                },
-                'Stats': {},
-                'Status': {
-                    'State': 'SUCCEEDED',
-                    'SubmissionDateTime': submissionDateTime
-                }
-            }
-        });
+        const queryStatement = `
+            SELECT table_name, column_name, data_type
+            FROM information_schema.columns
+            WHERE table_schema  = '${conn.database}'
+        `;
 
         const columnNames = [
             'table_name',
@@ -135,49 +76,7 @@ describe('Athena:', function () {
             ['glue_cleaned_logs', 'subtype', 'varchar']
         ];
 
-        const headerAndRows = [columnNames].concat(rows);
-
-        const columnInfos = columnNames.map(function(name) {
-            return {
-                'CaseSensitive': true,
-                'CatalogName': 'hive',
-                'Label': name,
-                'Name': name,
-                'Nullable': 'UNKNOWN',
-                'Precision': 2147483647,
-                'Scale': 0,
-                'SchemaName': '',
-                'TableName': '',
-                'Type': 'varchar'
-            };
-        });
-
-        const resultRows = headerAndRows.map(function(row) {
-            return {
-                'Data': row
-            };
-        });
-
-        const resultRows2 = headerAndRows.map(function(row) {
-            return {
-                'Data': row.map(function(value) {
-                    return {'VarCharValue': value};
-                })
-            };
-        });
-
-        nock(URL).post(PATH).reply(200, {
-            'ResultSet': {
-                'ColumnInfos': columnInfos,
-                'ResultRows': resultRows,
-                'ResultSetMetadata': {
-                    'ColumnInfo': columnInfos
-                },
-                'Rows': resultRows2
-            },
-            'UpdateCount': 0,
-            'UpdateType': ''
-        });
+        mockAthenaResponses(queryStatement, columnNames, rows);
 
         return schemas(conn).then(function(results) {
             assert.deepEqual(results.columnnames, columnNames, 'Unexpected column names');
@@ -186,93 +85,7 @@ describe('Athena:', function () {
     });
 
     it('query() executes a query', function() {
-        const options = {
-            region: 'us-east-1',
-            accessKey: 'XXXXXXXX',
-            secretAccessKey: 'XXXXXAAAA',
-            database: 'PLOT.LY-TEST',
-            outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
-            queryInterval: 1000,
-            maxRetries: 50
-        };
-
-        const athenaClient = new AWS.Athena(options);
-        const conn = { ...options, athenaClient};
-
-        const {database, outputS3Bucket} = conn.database;
-        const queryStatement =
-        `SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema  = '${database}'`;
-        const queryExecutionId = uuid.v4();
-        const submissionDateTime = 1522797420.024;
-
-        // mock connect response
-        nock(URL).post(PATH).reply(200, {
-            QueryExecutionId: queryExecutionId
-        });
-
-        nock(URL).post(PATH).reply(200, {
-            'QueryExecution': {
-                'Query': queryStatement,
-                'QueryExecutionContext': {'Database': database},
-                'QueryExecutionId': queryExecutionId,
-                'ResultConfiguration': {
-                    'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'},
-                    'OutputLocation': outputS3Bucket
-                },
-                'Statistics': {},
-                'Status': {
-                    'State': 'RUNNING',
-                    'SubmissionDateTime': submissionDateTime
-                }
-            },
-            'QueryExecutionDetail': {
-                'OutputLocation': outputS3Bucket,
-                'Query': queryStatement,
-                'QueryExecutionContext': {'Database': database},
-                'QueryExecutionId': queryExecutionId,
-                'ResultConfiguration': {
-                    'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'},
-                    'OutputLocation': outputS3Bucket
-                },
-                'Stats': {},
-                'Status': {
-                    'State': 'RUNNING',
-                    'SubmissionDateTime': submissionDateTime
-                }
-            }
-        });
-
-        nock(URL).post(PATH).reply(200, {
-            'QueryExecution': {
-                'Query': queryStatement,
-                'QueryExecutionContext': {'Database': database},
-                'QueryExecutionId': queryExecutionId,
-                'ResultConfiguration': {
-                    'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'},
-                    'OutputLocation': outputS3Bucket
-                },
-                'Statistics': {},
-                'Status': {
-                    'State': 'SUCCEEDED',
-                    'SubmissionDateTime': submissionDateTime
-                }
-            },
-            'QueryExecutionDetail': {
-                'OutputLocation': outputS3Bucket,
-                'Query': queryStatement,
-                'QueryExecutionContext': {'Database': database},
-                'QueryExecutionId': queryExecutionId,
-                'ResultConfiguration': {
-                    'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'},
-                    'OutputLocation': outputS3Bucket
-                },
-                'Stats': {},
-                'Status': {
-                    'State': 'SUCCEEDED',
-                    'SubmissionDateTime': submissionDateTime
-                }
-            }
-        });
+        const queryStatement = "select serialnumber from clean_logs where serialnumber != '' limit 10";
 
         const columnNames = [
             'serialnumber'
@@ -291,74 +104,38 @@ describe('Athena:', function () {
             [ '864875034115451' ]
         ];
 
-        const headerAndRows = [columnNames].concat(rows);
+        mockAthenaResponses(queryStatement, columnNames, rows);
 
-        const columnInfos = columnNames.map(function(name) {
-            return {
-                'CaseSensitive': true,
-                'CatalogName': 'hive',
-                'Label': name,
-                'Name': name,
-                'Nullable': 'UNKNOWN',
-                'Precision': 2147483647,
-                'Scale': 0,
-                'SchemaName': '',
-                'TableName': '',
-                'Type': 'varchar'
-            };
-        });
-
-        const resultRows = headerAndRows.map(function(row) {
-            return {
-                'Data': row
-            };
-        });
-
-        const resultRows2 = headerAndRows.map(function(row) {
-            return {
-                'Data': row.map(function(value) {
-                    return {'VarCharValue': value};
-                })
-            };
-        });
-
-        nock(URL).post(PATH).reply(200, {
-            'ResultSet': {
-                'ColumnInfos': columnInfos,
-                'ResultRows': resultRows,
-                'ResultSetMetadata': {
-                    'ColumnInfo': columnInfos
-                },
-                'Rows': resultRows2
-            },
-            'UpdateCount': 0,
-            'UpdateType': ''
-        });
-
-        const stmt = "select serialnumber from clean_logs where serialnumber != '' limit 10";
-        return query(stmt, conn).then(function(results) {
+        return query(queryStatement, conn).then(function(results) {
             assert.deepEqual(results.columnnames, columnNames, 'Unexpected column names');
             assert.deepEqual(results.rows, rows, 'Unexpected rows');
         });
     });
 
     it('tables() executes a query', function() {
-        const options = {
-            region: 'us-east-1',
-            accessKey: 'XXXXXXXX',
-            secretAccessKey: 'XXXXXAAAA',
-            database: 'PLOT.LY-TEST',
-            outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
-            queryInterval: 1000,
-            maxRetries: 50
-        };
+        const queryStatement = 'SHOW TABLES';
 
-        const athenaClient = new AWS.Athena(options);
-        const conn = { ...options, athenaClient};
+        const columnNames = [
+            'table_name'
+        ];
 
+        const rows = [
+            [ 'clean_logs' ],
+            [ 'clean_logs_json' ],
+            [ 'glue_cleaned_logs' ],
+            [ 'test' ]
+        ];
+
+        mockAthenaResponses(queryStatement, columnNames, rows);
+
+        return tables(conn).then(function(results) {
+            const expectedRows = rows.map(row => row[0]);
+            assert.deepEqual(results, expectedRows, 'Unexpected rows');
+        });
+    });
+
+    function mockAthenaResponses(queryStatement, columnNames, rows) {
         const {database, outputS3Bucket} = conn.database;
-        const queryStatement =
-        'SHOW TABLES';
         const queryExecutionId = uuid.v4();
         const submissionDateTime = 1522797420.024;
 
@@ -431,17 +208,6 @@ describe('Athena:', function () {
             }
         });
 
-        const columnNames = [
-            'table_name'
-        ];
-
-        const rows = [
-            [ 'clean_logs' ],
-            [ 'clean_logs_json' ],
-            [ 'glue_cleaned_logs' ],
-            [ 'test' ]
-        ];
-
         const headerAndRows = [columnNames].concat(rows);
 
         const columnInfos = columnNames.map(function(name) {
@@ -485,11 +251,5 @@ describe('Athena:', function () {
             'UpdateCount': 0,
             'UpdateType': ''
         });
-
-        const expectedRows = ['table_name', 'clean_logs', 'clean_logs_json', 'glue_cleaned_logs', 'test'];
-        return tables(conn).then(function(results) {
-            // assert.deepEqual(results.columnnames, columnNames, 'Unexpected column names');
-            assert.deepEqual(results, expectedRows, 'Unexpected rows');
-        });
-    });
+    }
 });
