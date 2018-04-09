@@ -3,6 +3,7 @@ import {executeQuery} from './drivers/athena';
 const SHOW_TABLES_QUERY = 'SHOW TABLES';
 const SHOW_SCHEMA_QUERY =
     'SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema';
+const ATHENA_DEFAULT_QUERY = 'SELECT table_name FROM information_schema.columns LIMIT 1';
 const DEFAULT_QUERY_INTERVAL = 2000;
 
 /*
@@ -23,8 +24,8 @@ export function connect(connection) {
         connection.timeout = DEFAULT_QUERY_INTERVAL;
     }
 
-    return query('SELECT table_name FROM information_schema.columns LIMIT 1', connection)
-    .then(() => {return;});
+    return query(ATHENA_DEFAULT_QUERY, connection)
+    .then(() => connection);
 }
 
 /**
