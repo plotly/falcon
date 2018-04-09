@@ -1,4 +1,4 @@
-import {createAthenaClient, executeQuery} from './drivers/athena';
+import {executeQuery} from './drivers/athena';
 
 const SHOW_TABLES_QUERY = 'SHOW TABLES';
 const SHOW_SCHEMA_QUERY =
@@ -23,10 +23,8 @@ export function connect(connection) {
         connection.timeout = DEFAULT_QUERY_INTERVAL;
     }
 
-    connection.athenaClient = createAthenaClient(connection);
-
     return query('SELECT table_name FROM information_schema.columns LIMIT 1', connection)
-        .then(() => connection);
+    .then(() => {return;});
 }
 
 /**
@@ -66,7 +64,6 @@ export function query(queryObject, connection) {
  */
 export function schemas(connection) {
     const sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.database}'` ;
-
     return query(sqlStatement, connection);
 }
 
@@ -83,7 +80,6 @@ export function schemas(connection) {
  */
 export function tables(connection) {
     connection.sqlStatement = SHOW_TABLES_QUERY;
-
     return executeQuery(connection).then(dataSet => {
         const tableNames = dataSet.slice(1).map(row => row.Data[0].VarCharValue);
         return tableNames;

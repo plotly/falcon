@@ -191,7 +191,7 @@ function getQueryResults(athenaClient, queryExecutionId) {
  * @returns {Promise} resolve to AWS Query Response
  */
 export function executeQuery(queryParams) {
-    const client = queryParams.athenaClient;
+    const client = createAthenaClient(queryParams);
 
     return new Promise(function(resolve, reject) {
         return startQuery(client, queryParams).then(queryExecutionId => {

@@ -39,7 +39,7 @@ describe('Athena:', function () {
         mockAthenaResponses(queryStatement, columnNames, rows);
 
         return connect(conn).then(function(connection) {
-            assert.isDefined(connection.athenaClient, 'connection.athenaClient is undefined');
+            assert.isUndefined(connection, 'connection is undefined');
         });
     });
 
