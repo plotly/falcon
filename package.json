@@ -232,7 +232,7 @@
     "alasql": "^0.4.5",
     "csv-parse": "^2.0.0",
     "font-awesome": "^4.6.1",
-    "ibm_db": "git+https://git@github.com/n-riesco/node-ibm_db.git#patched-v2.2.1",
+    "ibm_db": "^2.3.0",
     "mysql": "^2.15.0",
     "papaparse": "^4.3.7",
     "pg": "^4.5.5",
