@@ -334,7 +334,13 @@ class Preview extends Component {
                                         </small>
                                     </code>
 
-                                    <div style={{display: showEditor ? 'block' : 'none', position: 'relative'}}>
+                                    <div
+                                        style={{
+                                            display: showEditor ? 'block' : 'none',
+                                            position: 'relative',
+                                            marginBottom: 20
+                                        }}
+                                    >
                                         <CodeEditor
                                             value={code}
                                             onChange={this.updateCode}
@@ -421,7 +427,7 @@ class Preview extends Component {
                                     </TabList>
 
                                     <TabPanel
-                                        style={{fontFamily: "'Ubuntu Mono', courier, monospace", marginTop: '20px'}}
+                                        style={{fontFamily: "'Ubuntu Mono', courier, monospace"}}
                                     >
                                         <SQLTable
                                             rows={rows}

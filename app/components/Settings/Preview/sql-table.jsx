@@ -115,25 +115,19 @@ export default class SQLTable extends React.Component {
 
     render() {
         return (
-            <div>
-                <div
-                    className={'sqltable-click-overlay'}
-
-                    style={{
-                        float: 'left',
-                        minWidth: '100%',
-                        minHeight: '32px',
-                        position: 'absolute',
-                        zIndex: 2
-                    }}
-
-                    onClick={() => this.refs.reactDataGrid.onToggleFilter()}
-                />
+            <div className={'sqltable'}>
+                <code>
+                    <small>
+                        <a onClick={() => this.refs.reactDataGrid.onToggleFilter()}>
+                            Toggle Row Filter
+                        </a>
+                    </small>
+                </code>
                 <ReactDataGrid
                     ref={'reactDataGrid'}
 
                     minWidth={740}
-                    minHeight={200}
+                    minHeight={300}
                     headerRowHeight={32}
                     rowHeight={30}
 
@@ -141,20 +135,9 @@ export default class SQLTable extends React.Component {
                     rowGetter={this.getRow}
                     rowsCount={this.getSize()}
 
-                    enableCellSelect={true}
-
                     onAddFilter={this.onAddFilter}
                     onClearFilters={this.onClearFilters}
                 />
-                <small><code
-                    style={{
-                        display: 'block',
-                        textAlign: 'center',
-                        width: '100%'
-                    }}
-                >
-                    (click on header to toggle row filter)
-                </code></small>
             </div>
         );
     }
