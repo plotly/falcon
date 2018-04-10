@@ -7,6 +7,7 @@ import * as ApacheLivy from './livy';
 import * as ApacheImpala from './impala';
 import * as DataWorld from './dataworld';
 import * as DatastoreMock from './datastoremock';
+import * as Athena from './athena';
 
 const CSV = require('./csv');
 
@@ -36,6 +37,7 @@ function getDatastoreClient(connection) {
     }
 
     const {dialect} = connection;
+
     if (dialect === 'elasticsearch') {
         return Elasticsearch;
     } else if (dialect === 's3') {
@@ -52,6 +54,8 @@ function getDatastoreClient(connection) {
         return IbmDb2;
     } else if (dialect === 'data.world') {
         return DataWorld;
+    } else if (dialect === 'athena') {
+        return Athena;
     }
     return Sql;
 }

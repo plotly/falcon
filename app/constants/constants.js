@@ -16,6 +16,7 @@ export const DIALECTS = {
     APACHE_IMPALA: 'apache impala',
     APACHE_DRILL: 'apache drill',
     DATA_WORLD: 'data.world',
+    ATHENA: 'athena',
     CSV: 'csv'
 };
 
@@ -30,6 +31,7 @@ export const SQL_DIALECTS_USING_EDITOR = [
     'apache spark',
     'apache impala',
     'data.world',
+    'athena',
     'csv'
 ];
 
@@ -189,6 +191,7 @@ export const CONNECTION_CONFIG = {
             'type': 'password'
         }
     ], // TODO - password options for apache drill
+
     [DIALECTS.DATA_WORLD]: [
         {
             'label': 'Dataset/Project URL',
@@ -201,6 +204,36 @@ export const CONNECTION_CONFIG = {
             'value': 'token',
             'type': 'password',
             'description': 'Your data.world read/write token. It can be obtained from https://data.world/settings/advanced'
+        }
+    ],
+    [DIALECTS.ATHENA]: [
+        {
+            'label': 'S3 Access Key', 'value': 'accessKey', 'type': 'password'
+        },
+        {
+            'label': 'S3 Secret Access Key', 'value': 'secretAccessKey', 'type': 'password'
+        },
+        {
+            'label': 'AWS Region', 'value': 'region', 'type': 'text',
+            'description': 'The AWS region (i.e. us-east-1) where the database resides'
+        },
+        {
+            'label': 'S3 Bucket', 'value': 'outputS3Bucket', 'type': 'text',
+            'description': 'The Athena connector will store query results in this location.'
+        },
+        {
+            'label': 'Database', 'value': 'database', 'type': 'text'
+        },
+        {
+            'label': 'Query Interval', 'value': 'queryInterval', 'type': 'number',
+            'description': 'The Interval (In Milliseconds) that Falcon will check to see \
+                             if the Athena Query is done. Default 2 seconds'
+        },
+        {
+            'label': 'SSL Enabled', 'value': 'sslEnabled', 'type': 'checkbox',
+            'description': 'Does your database require that you connect to it via SSL? \
+                            Note that this is just the connection between this app and your database; \
+                            connections to plot.ly or your plotly instance are always encrypted.'
         }
     ]
 };
@@ -220,7 +253,8 @@ export const LOGOS = {
     [DIALECTS.SQLITE]: 'images/sqlite-logo.png',
     [DIALECTS.S3]: 'images/s3-logo.png',
     [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png',
-    [DIALECTS.DATA_WORLD]: 'images/dataworld-logo.png'
+    [DIALECTS.DATA_WORLD]: 'images/dataworld-logo.png',
+    [DIALECTS.ATHENA]: 'images/athena-logo.png'
 };
 
 export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
@@ -237,6 +271,7 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
         case DIALECTS.POSTGRES:
         case DIALECTS.DATA_WORLD:
         case DIALECTS.REDSHIFT:
+        case DIALECTS.ATHENA:
             return `SELECT * FROM ${table} LIMIT 1000`;
         case DIALECTS.MSSQL:
             return `SELECT TOP 1000 * FROM ${connection.database}.dbo.${table}`;
@@ -410,6 +445,14 @@ export const SAMPLE_DBS = {
     [DIALECTS.SQLITE]: {
         dialect: 'sqlite',
         storage: `${__dirname}/plotly_datasets.db`
+    },
+    [DIALECTS.ATHENA]: {
+        s3Outputlocation: 'plotly-s3-connector-test',
+        accessKey: 'AKIAIMHMSHTGARJYSKMQ',
+        secretAccessKey: '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',
+        region: 'us-east-1',
+        database: 'falcon',
+        queryTimeout: 5000
     },
     [DIALECTS.DATA_WORLD]: {
         url: 'https://data.world/rflprr/reported-lyme-disease-cases-by-state'
