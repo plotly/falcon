@@ -8,6 +8,8 @@ React.createClass = require('create-react-class');
 import ReactDataGrid from 'react-data-grid';
 const {Data: {Selectors}} = require('react-data-grid-addons');
 
+import './sql-table.css';
+
 export default class SQLTable extends React.Component {
     static propTypes = {
         columnNames: PropTypes.array,
