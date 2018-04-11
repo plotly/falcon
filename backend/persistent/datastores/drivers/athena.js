@@ -182,12 +182,10 @@ function getQueryResults(athenaClient, queryExecutionId) {
  * @param {string} queryParams.accessKey - AWS Access Key
  * @param {string} queryParams.secretAccessKey - AWS Secret Key
  * @param {string} queryParams.region - AWS Region
- * @param {string} queryParams.region - AWS Region
  * @param {string} queryParams.dbName - Database name to connect to
  * @param {string} queryParams.sqlStatement - SQL statement to execute
  * @param {string} queryParams.s3Outputlocation - Location will Athena will output resutls of query
  * @param {number} queryParams.queryInterval  - The timeout interval when the query should stop
- * @param {AWS Athena} queryParams.athenaClient - The AWS Athena Client
  * @returns {Promise} resolve to AWS Query Response
  */
 export function executeQuery(queryParams) {
