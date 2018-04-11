@@ -16,6 +16,8 @@ import './code-editor.css';
 
 import {DIALECTS} from '../../../constants/constants';
 
+const MIN_CONSTRAINTS_HEIGHT = 74;
+
 export default class CodeEditor extends React.Component {
     static propTypes = {
         value: PropTypes.string,
@@ -53,7 +55,7 @@ export default class CodeEditor extends React.Component {
         this.state = {
             height: 250,
             width: null,
-            minConstraints: [200, 74],
+            minConstraints: [200, MIN_CONSTRAINTS_HEIGHT],
             maxConstraints: [Infinity, Infinity],
             tables: CodeEditor.computeAutocompleteTables(this.props)
         };
@@ -94,7 +96,7 @@ export default class CodeEditor extends React.Component {
             const height = wrapperElement.clientHeight;
             const width = wrapperElement.clientWidth;
 
-            const minConstraints = [width, 74];
+            const minConstraints = [width, MIN_CONSTRAINTS_HEIGHT];
             const maxConstraints = [width, Infinity];
 
             this.setState({height, width, minConstraints, maxConstraints});
