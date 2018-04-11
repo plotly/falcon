@@ -49,12 +49,12 @@ describe('SQLTable', () => {
     });
 
     it('can toggle row filters', () => {
-        const overlay = sqlTable.find('.sqltable-click-overlay').first();
+        const toggle = sqlTable.find('a').first();
 
         // before clicking
         expect(sqlTable.find('.react-grid-HeaderRow').length).toBe(1);
 
-        overlay.simulate('click');
+        toggle.simulate('click');
 
         // after clicking
         expect(sqlTable.find('.react-grid-HeaderRow').length).toBe(2);
