@@ -20,6 +20,29 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 
+## [2.6.0] - 2018-04-13
+
+### Added
+* Connector to AWS Athena service (#352 contributed by Shannon Lal @shannonlal)
+* Connector to query CSV files (via URL or drag'n'drop) (#375 and #385)
+* New chart editor based on Plotly React Component Suite (#405)
+* New code editor, resizeable and with improved performance (#411)
+* New table view with row filters (#393)
+* Test UI using jest and enzyme
+
+### Changed
+* ElasticSearch: Use mocked servers for testing
+* ElasticSearch: Run tests against elasticsearch v2 and v5
+* Query: Show query times (#358 contributed by Álvaro Abella Bascarán, @alvaroabascar)
+* Query: Improved error displays (#394)
+
+### Fixed
+* CodeEditor: Fixed initial query (#371)
+* ElasticSearch: Fixed connection to an elasticsearch server behind nginx (#377)
+* Query: Prevent the code editor from opening before a table has been selected (#379)
+* Test: Improved logging of backend failures
+
+
 ## [2.5.0] - 2018-01-19
 
 ### Added
