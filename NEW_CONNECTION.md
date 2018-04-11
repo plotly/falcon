@@ -9,7 +9,7 @@ Please verify that the icon looks good with the following CSS specs:
  max-height: 70px;
 ```
 
-## Updating the constants.js file
+## Update app/constants/constants.js
 The following are the instructions for updating the Constants File:
 1. Add an entry in DIALECTS
 2. Add an entry in SQL_DIALECTS_USING_EDITOR
@@ -18,7 +18,7 @@ The following are the instructions for updating the Constants File:
 5. Add the preview query in the PREVIEW_QUERY section
 6. Add sample credentials for your connector in the SAMPLE_DBS 
 
-## Updating the Tab.react.js 
+## Update app/components/Settings/Tabs/Tab.react.js
 The following are the instructions for updating the Tab React JS file
 1. Customise the label for your connector in the render function:
 
@@ -31,6 +31,23 @@ The following are the instructions for updating the Tab React JS file
             label = `NEW CONNECTION (${connectionObject.host})`;
         }
     ....
+```
+
+## Update app/components/Settings/Preview/code-editor.jsx
+By default, the code editor uses codemirror's mode `text/x-sql`. If the new
+connector needs to set an alternative mode, then do so inside the render
+function:
+
+```js
+        const mode = {
+            [DIALECTS.APACHE_SPARK]: 'text/x-sparksql',
+            [DIALECTS.MYSQL]: 'text/x-mysql',
+            [DIALECTS.SQLITE]: 'text/x-sqlite',
+            [DIALECTS.MARIADB]: 'text/x-mariadb',
+            [DIALECTS.POSTGRES]: 'text/x-pgsql',
+            [DIALECTS.REDSHIFT]: 'text/x-pgsql',
+            [DIALECTS.MSSQL]: 'text/x-mssql'
+        }[dialect] || 'text/x-sql';
 ```
 
 ## New Datastore file
