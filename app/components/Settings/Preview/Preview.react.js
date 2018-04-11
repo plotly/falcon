@@ -367,7 +367,7 @@ class Preview extends Component {
                             }
                         </div>
 
-                        {errorMsg &&
+                        {errorMsg && showEditor &&
                             <div className="errorStatus">
                                 <pre>{`ERROR: ${errorMsg}`}</pre>
                             </div>
