@@ -289,7 +289,14 @@ class Settings extends Component {
                     connections={connections}
                     selectedTab={selectedTab}
                     newTab={newTab}
-                    setTab={setTab}
+                    setTab={tabId => {
+                        setTab(tabId);
+                        updatePreview({
+                            showChart: false,
+                            showEditor: true,
+                            size: 200
+                        });
+                    }}
                     deleteTab={deleteTab}
                 />
 
