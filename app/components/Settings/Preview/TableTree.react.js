@@ -102,7 +102,7 @@ class TableTree extends Component {
         const labelNode = <span className="node">{label}</span>;
 
         return (
-            <div style={{padding: '5px 0 0 10px'}}>
+            <div style={{padding: '5px 0 0 10px', maxHeight: 650, overflowY: 'auto'}}>
                 <TreeView key={label} nodeLabel={labelNode} defaultCollapsed={false}>{
                     Object.getOwnPropertyNames(treeSchema).sort().map(tableName => {
                         const tableSchema = treeSchema[tableName];
