@@ -28,7 +28,8 @@ app.on('ready', () => {
     let mainWindow = new BrowserWindow({
         show: true,
         width: 1024,
-        height: 1024
+        height: 1024,
+        webPreferences: {nodeIntegration: false}
     });
 
     const {httpServer, httpsServer} = server;

@@ -82,7 +82,16 @@
            url('static/fonts/ubuntu-mono-v7-greek_latin-ext_greek-ext_cyrillic-ext_cyrillic_latin-regular.woff2') format('woff2');
     }
     </style>
+    <script>
 
+        // Disable drag-and-drop to prevent links being dropped on falcon window.
+        document.addEventListener('dragover', function() {
+            event.preventDefault();
+        }, false);
+        document.addEventListener('drop', function() {
+            event.preventDefault();
+        }, false);
+    </script>
 </head>
 <body>
     <div id="root"></div>
