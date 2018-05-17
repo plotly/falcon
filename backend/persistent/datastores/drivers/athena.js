@@ -39,7 +39,7 @@ export function createAthenaClient(connection) {
  * @param {string} params.outputS3Bucket - Location will Athena will output resutls of query
  * @return {string} requestId
  */
-export function startQuery(athenaClient, params) {
+function startQuery(athenaClient, params) {
     const client = athenaClient;
 
     const queryParams = {
@@ -74,7 +74,7 @@ export function startQuery(athenaClient, params) {
  * @param {string} queryExecutionId - AWS Query Execution Id
  * @returns {int} -1 : Error, 0 : Still running, 1 : Completed
  */
-export function queryResultsCompleted(athenaClient, queryExecutionId) {
+function queryResultsCompleted(athenaClient, queryExecutionId) {
     const client = athenaClient;
 
     const queryParams = {
@@ -155,7 +155,7 @@ export function stopQuery(athenaClient, queryExecutionId) {
  * @param {string} queryExecutionId - AWS Athena Query Id
  * @returns {Promise} Resolves to AWS Query Response
  */
-export function getQueryResults(athenaClient, queryExecutionId) {
+function getQueryResults(athenaClient, queryExecutionId) {
     const client = athenaClient;
 
     const queryParams = {
@@ -181,7 +181,6 @@ export function getQueryResults(athenaClient, queryExecutionId) {
  * @param {object} queryParams - Query Parameters
  * @param {string} queryParams.accessKey - AWS Access Key
  * @param {string} queryParams.secretAccessKey - AWS Secret Key
- * @param {string} queryParams.region - AWS Region
  * @param {string} queryParams.region - AWS Region
  * @param {string} queryParams.dbName - Database name to connect to
  * @param {string} queryParams.sqlStatement - SQL statement to execute

@@ -211,7 +211,7 @@ export const CONNECTION_CONFIG = {
             'label': 'S3 Access Key', 'value': 'accessKey', 'type': 'password'
         },
         {
-            'label': 'S3 Secret Access Key', 'value': 'secretKey', 'type': 'password'
+            'label': 'S3 Secret Access Key', 'value': 'secretAccessKey', 'type': 'password'
         },
         {
             'label': 'AWS Region', 'value': 'region', 'type': 'text',
@@ -449,7 +449,7 @@ export const SAMPLE_DBS = {
     [DIALECTS.ATHENA]: {
         s3Outputlocation: 'plotly-s3-connector-test',
         accessKey: 'AKIAIMHMSHTGARJYSKMQ',
-        secretKey: 'Urvus4R7MnJOAqT4U3eovlCBimQ4Zg2Y9sV5LWow',
+        secretAccessKey: 'Urvus4R7MnJOAqT4U3eovlCBimQ4Zg2Y9sV5LWow',
         region: 'us-east-1',
         database: 'falcon',
         queryTimeout: 5000

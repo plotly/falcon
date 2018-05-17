@@ -42,7 +42,9 @@ export function newDatacache(payloadJSON, type, requestor) {
         u => u.username === requestor
     );
 
-    form.append('username', user.username);
+    if (user) {
+        form.append('username', user.username);
+    }
 
     /*
      * Authentication is only required for on-premise private-mode for this

@@ -1,209 +1,255 @@
+// do not use import, otherwise other test units won't be able to reactivate nock
+const nock = require('nock');
+
 import {assert} from 'chai';
+import uuid from 'uuid';
 
-import {connect} from '../../backend/persistent/datastores/athena';
+import {connect, schemas, query, tables} from '../../backend/persistent/datastores/athena';
 
-/* eslint-disable no-invalid-this */
-describe('Athena Unit Tests:', function () {
-    it('Invalid connection strings because incorrect credentials', function() {
-        const conn = {
-            region: 'us-east-1',
-            accessKey: 'XXXXXXXX',
-            secretKey: 'XXXXXAAAA',
-            database: 'PLOT.LY-TEST',
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100',
-            outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
-            queryInterval: 1000
-        };
-        connect(conn).then(() => {
-           throw new Error('Should NOT have obtained a valid connection');
-        }).catch(err => {
-            assert.isDefined(err, 'Connection failed due to incorrect connection string');
+describe('Athena:', function () {
+    const URL = 'https://athena.us-east-1.amazonaws.com:443';
+    const PATH = '/';
 
+    // Connection object shared by all the tests
+    const conn = {
+        region: 'us-east-1',
+        accessKey: 'XXXXXXXX',
+        secretAccessKey: 'XXXXXAAAA',
+        database: 'PLOT.LY-TEST',
+        outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
+        queryInterval: 1000,
+        maxRetries: 50
+    };
+
+    before(function() {
+        // Enable nock if it has been disabled by other specs
+        if (!nock.isActive()) nock.activate();
+    });
+
+    after(function() {
+        // Disable nock
+        nock.restore();
+    });
+
+    it('connect() succeeds', function() {
+        const queryStatement = 'SELECT table_name FROM information_schema.columns LIMIT 1';
+        const columnNames = [];
+        const rows = [];
+
+        mockAthenaResponses(queryStatement, columnNames, rows);
+
+        return connect(conn).then(function(connection) {
+            assert.isDefined(connection, 'connection is defined');
         });
     });
 
-    it('connect fails missing region', function() {
-        const conn = {
-            accessKey: 'XXXXXXXX',
-            secretKey: 'XXXXXAAAA',
-            database: 'PLOT.LY-TEST',
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100',
-            outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
-            queryInterval: 1000
-        };
+    it('schemas() retrieves schemas of all tables', function() {
+        const queryStatement = `
+            SELECT table_name, column_name, data_type
+            FROM information_schema.columns
+            WHERE table_schema  = '${conn.database}'
+        `;
 
-        return connect(conn).then(() => {
-            throw new Error('Connection did not fail when missing region');
-        }).catch(err => {
-            assert.isDefined(err, 'err is defined as expected');
-            assert.equal(err.message, 'The AWS Region was not defined');
+        const columnNames = [
+            'table_name',
+            'column_name',
+            'data_type'
+        ];
+
+        const rows = [
+            ['table_name', 'column_name', 'data_type'],
+            ['clean_logs', 'serialnumber', 'varchar'],
+            ['clean_logs', 'email', 'varchar'],
+            ['clean_logs', 'company', 'varchar'],
+            ['clean_logs', 'platform', 'varchar'],
+            ['test', 'company', 'varchar'],
+            ['test', 'log_type', 'varchar'],
+            ['test', 'product', 'varchar'],
+            ['test', 'timestamp', 'timestamp'],
+            ['clean_logs_json', 'company', 'varchar'],
+            ['clean_logs_json', 'loglevel', 'varchar'],
+            ['clean_logs_json', 'type', 'varchar'],
+            ['clean_logs_json', 'subtype', 'varchar'],
+            ['glue_cleaned_logs', 'company', 'varchar'],
+            ['glue_cleaned_logs', 'loglevel', 'varchar'],
+            ['glue_cleaned_logs', 'type', 'varchar'],
+            ['glue_cleaned_logs', 'subtype', 'varchar']
+        ];
+
+        mockAthenaResponses(queryStatement, columnNames, rows);
+
+        return schemas(conn).then(function(results) {
+            assert.deepEqual(results.columnnames, columnNames, 'Unexpected column names');
+            assert.deepEqual(results.rows, rows, 'Unexpected rows');
         });
     });
 
-    it('connect fails AWS Region is empty', function() {
-        const conn = {
-            region: '',
-            accessKey: 'XXXXXXXX',
-            secretKey: 'XXXXXAAAA',
-            database: 'PLOT.LY-TEST',
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100',
-            outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
-            queryInterval: 1000
-        };
+    it('query() executes a query', function() {
+        const queryStatement = "select serialnumber from clean_logs where serialnumber != '' limit 10";
 
-        return connect(conn).then(() => {
-            throw new Error('Connection did not fail when region not defined?');
-        }).catch((err) => {
-            assert.isDefined(err, 'Error is defined as expected due to missing aws region');
-            assert.equal(err.message, 'The AWS Region was not defined');
+        const columnNames = [
+            'serialnumber'
+        ];
+
+        const rows = [
+            [ '9e2c31ec-b944-4baf-aaa5-4c672a0c048f-2017-06-22-14:49:36.458' ],
+            [ '864041030069248' ],
+            [ '3190d6df-325d-431b-aea7-a7fb8f306b9d-2017-07-18-19:00:27.284' ],
+            [ 'd72afd2e-be50-436e-88bd-60e9ee2841bf-2017-06-21-19:58:04.638' ],
+            [ '355757082591351' ],
+            [ '05c4cb35-0cec-4877-a645-f9dd8eba4940-2017-09-11-16:18:32.274' ],
+            [ '357125071914133' ],
+            [ '864041030068687' ],
+            [ '862789030222843' ],
+            [ '864875034115451' ]
+        ];
+
+        mockAthenaResponses(queryStatement, columnNames, rows);
+
+        return query(queryStatement, conn).then(function(results) {
+            assert.deepEqual(results.columnnames, columnNames, 'Unexpected column names');
+            assert.deepEqual(results.rows, rows, 'Unexpected rows');
         });
     });
 
-    it('connect fails missing AWS access key', function() {
-        const conn = {
-            region: 'us-east-1',
-            secretKey: 'XXXXXAAAA',
-            database: 'PLOT.LY-TEST',
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100',
-            outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
-            queryInterval: 1000
-        };
-        return connect(conn).then(() => {
-            throw new Error('Connection did not fail when AWS Access key not defined?');
-        }).catch((err) => {
-            assert.isDefined(err, 'Error defined as expected due to missing aws access key');
-            assert.equal(err.message, 'The AWS access key was not defined');
+    it('tables() executes a query', function() {
+        const queryStatement = 'SHOW TABLES';
+
+        const columnNames = [
+            'table_name'
+        ];
+
+        const rows = [
+            [ 'clean_logs' ],
+            [ 'clean_logs_json' ],
+            [ 'glue_cleaned_logs' ],
+            [ 'test' ]
+        ];
+
+        mockAthenaResponses(queryStatement, columnNames, rows);
+
+        return tables(conn).then(function(results) {
+            const expectedRows = rows.map(row => row[0]);
+            assert.deepEqual(results, expectedRows, 'Unexpected rows');
         });
     });
 
-    it('connect fails AWS Access key is empty', function() {
-        const conn = {
-            region: 'us-east-1',
-            accessKey: '',
-            secretKey: 'XXXXXAAAA',
-            database: 'PLOT.LY-TEST',
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100',
-            outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
-            queryInterval: 1000
-        };
+    function mockAthenaResponses(queryStatement, columnNames, rows) {
+        const {database, outputS3Bucket} = conn.database;
+        const queryExecutionId = uuid.v4();
+        const submissionDateTime = 1522797420.024;
 
-        return connect(conn).then(() => {
-            throw new Error('Connection did not fail when AWS Access key not defined?');
-        }).catch((err) => {
-            assert.isDefined(err, 'Should have not have occured do to missing aws access key');
-            assert.equal(err.message, 'The AWS access key was not defined');
+        // mock connect response
+        nock(URL).post(PATH).reply(200, {
+            QueryExecutionId: queryExecutionId
         });
-    });
 
-    it('connect fails missing secret key', function() {
-        const conn = {
-            region: 'us-east-1',
-            accessKey: 'XXXXXXXX',
-            database: 'PLOT.LY-TEST',
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100',
-            outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
-            queryInterval: 1000
-        };
-
-        return connect(conn).then(() => {
-            throw new Error('Connection did not fail when AWS Secret key not defined?');
-        }).catch((err) => {
-            assert.isDefined(err, 'Should have not have occured do to missing secret key');
-            assert.equal(err.message, 'The AWS secret key was not defined');
+        nock(URL).post(PATH).reply(200, {
+            'QueryExecution': {
+                'Query': queryStatement,
+                'QueryExecutionContext': {'Database': database},
+                'QueryExecutionId': queryExecutionId,
+                'ResultConfiguration': {
+                    'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'},
+                    'OutputLocation': outputS3Bucket
+                },
+                'Statistics': {},
+                'Status': {
+                    'State': 'RUNNING',
+                    'SubmissionDateTime': submissionDateTime
+                }
+            },
+            'QueryExecutionDetail': {
+                'OutputLocation': outputS3Bucket,
+                'Query': queryStatement,
+                'QueryExecutionContext': {'Database': database},
+                'QueryExecutionId': queryExecutionId,
+                'ResultConfiguration': {
+                    'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'},
+                    'OutputLocation': outputS3Bucket
+                },
+                'Stats': {},
+                'Status': {
+                    'State': 'RUNNING',
+                    'SubmissionDateTime': submissionDateTime
+                }
+            }
         });
-    });
 
-    it('connect fails secret key is empty', function() {
-        const conn = {
-            region: 'us-east-1',
-            accessKey: 'AAAAAAA',
-            secretKey: '',
-            database: 'PLOT.LY-TEST',
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100',
-            outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
-            queryInterval: 1000
-        };
-
-        return connect(conn).then(() => {
-            throw new Error('Connection did not fail when AWS Secret key is empty?');
-        }).catch((err) => {
-            assert.isDefined(err, 'Should have not have occured do to missing secret key');
-            assert.equal(err.message, 'The AWS secret key was not defined');
+        nock(URL).post(PATH).reply(200, {
+            'QueryExecution': {
+                'Query': queryStatement,
+                'QueryExecutionContext': {'Database': database},
+                'QueryExecutionId': queryExecutionId,
+                'ResultConfiguration': {
+                    'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'},
+                    'OutputLocation': outputS3Bucket
+                },
+                'Statistics': {},
+                'Status': {
+                    'State': 'SUCCEEDED',
+                    'SubmissionDateTime': submissionDateTime
+                }
+            },
+            'QueryExecutionDetail': {
+                'OutputLocation': outputS3Bucket,
+                'Query': queryStatement,
+                'QueryExecutionContext': {'Database': database},
+                'QueryExecutionId': queryExecutionId,
+                'ResultConfiguration': {
+                    'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'},
+                    'OutputLocation': outputS3Bucket
+                },
+                'Stats': {},
+                'Status': {
+                    'State': 'SUCCEEDED',
+                    'SubmissionDateTime': submissionDateTime
+                }
+            }
         });
-    });
 
-    it('connect fails missing db name', function() {
-        const conn = {
-            region: 'us-east-1',
-            accessKey: 'XXXXXXXX',
-            secretKey: 'XXXXXX',
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100',
-            outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
-            queryInterval: 1000
-        };
+        const headerAndRows = [columnNames].concat(rows);
 
-        return connect(conn).then(() => {
-            throw new Error('Connection did not fail when DB Name not defind?');
-        }).catch((err) => {
-            assert.isDefined(err, 'Should have not have occured do to missing db namey');
-            assert.equal(err.message, 'The Database Name was not defined');
+        const columnInfos = columnNames.map(function(name) {
+            return {
+                'CaseSensitive': true,
+                'CatalogName': 'hive',
+                'Label': name,
+                'Name': name,
+                'Nullable': 'UNKNOWN',
+                'Precision': 2147483647,
+                'Scale': 0,
+                'SchemaName': '',
+                'TableName': '',
+                'Type': 'varchar'
+            };
         });
-    });
 
-    it('connect fails db name is empty', function() {
-        const conn = {
-            region: 'us-east-1',
-            accessKey: 'AAAAAAA',
-            secretKey: 'XXXXXX',
-            database: '',
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100',
-            outputS3Bucket: 's3://aws-athena-query-results-11111111-us-east-1/',
-            queryInterval: 1000
-        };
-
-        return connect(conn).then(() => {
-            throw new Error('Connection did not fail when DB Name is empty?');
-        }).catch((err) => {
-            assert.isDefined(err, 'Should have not have occured do to missing db namey');
-            assert.equal(err.message, 'The Database Name was not defined');
+        const resultRows = headerAndRows.map(function(row) {
+            return {
+                'Data': row
+            };
         });
-    });
 
-    it('connect fails missing S3 Output location', function() {
-        const conn = {
-            region: 'us-east-1',
-            accessKey: 'XXXXXXXX',
-            secretKey: 'XXXXXX',
-            database: 'PLOT.LY-TEST',
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100',
-            queryInteval: 1000
-        };
-
-        return connect(conn).then(() => {
-            throw new Error('Connection did not fail when S3 Output Location is empty?');
-        }).catch((err) => {
-            assert.isDefined(err, 'Should have not have occured do to missing S3 Location');
-            assert.equal(err.message, 'The Athena S3 Results Output Bucket was not defined');
+        const resultRows2 = headerAndRows.map(function(row) {
+            return {
+                'Data': row.map(function(value) {
+                    return {'VarCharValue': value};
+                })
+            };
         });
-    });
 
-    it('connect fails S3 Output Bucket is empty', function() {
-        const conn = {
-            region: 'us-east-1',
-            accessKey: 'AAAAAAA',
-            secretKey: 'XXXXXX',
-            database: 'PLOT.LY-TEST',
-            sqlStatement: 'SELECT * FROM TEST_TABLE LIMIT 100',
-            outputS3Bucket: '',
-            queryInterval: 1000
-        };
-
-        return connect(conn).then(() => {
-            throw new Error('Connection did not fail when DB Name is empty?');
-        }).catch((err) => {
-            assert.isDefined(err, 'Should have not have occured do to missing S3 Location');
-            assert.equal(err.message, 'The Athena S3 Results Output Bucket was not defined');
+        nock(URL).post(PATH).reply(200, {
+            'ResultSet': {
+                'ColumnInfos': columnInfos,
+                'ResultRows': resultRows,
+                'ResultSetMetadata': {
+                    'ColumnInfo': columnInfos
+                },
+                'Rows': resultRows2
+            },
+            'UpdateCount': 0,
+            'UpdateType': ''
         });
-    });
+    }
 });
-/* eslint-enable no-invalid-this */
