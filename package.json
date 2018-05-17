@@ -16,6 +16,8 @@
     "docker:db2:start": "docker run --rm -ti -p 50000:50000 pdc-db2",
     "docker:falcon:build": "docker build -t falcon-sql-client:local .",
     "docker:falcon:start": "docker run -ti --rm -p 9494:9494 -e PLOTLY_CONNECTOR_AUTH_ENABLED=$PLOTLY_CONNECTOR_AUTH_ENABLED -e PLOTLY_CONNECTOR_ALLOWED_USERS=$PLOTLY_CONNECTOR_ALLOWED_USERS falcon-sql-client:local",
+    "docker:oracle:build": "docker build test/docker/oracle -t falcon-test-oracle --no-cache",
+    "docker:oracle:start": "docker run --rm -ti -p 1521:1521 falcon-test-oracle",
     "rebuild:modules:electron": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/rebuild-modules.js --electron",
     "rebuild:modules:node": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/rebuild-modules.js",
     "fix:module:ibmdb": "node scripts/fix-module-ibmdb.js",
@@ -39,6 +41,8 @@
     "test-unit-livy": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/datastores.livy.spec.js",
     "test-unit-athena": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/datastores.athena.spec.js",
     "test-unit-oauth2": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/routes.oauth2.spec.js",
+    "test-unit-oracle": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/datastores.oracle.spec.js",
+    "test-unit-oracle:node": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/datastores.oracle.spec.js",
     "test-unit-plotly": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/PlotlyAPI.spec.js",
     "test-unit-scheduler": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/QueryScheduler.spec.js",
     "test-unit-routes": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 electron-mocha --full-trace --timeout 90000 --compilers js:babel-register test/backend/routes.spec.js",
@@ -165,7 +169,7 @@
     "css-loader": "^0.28.7",
     "del": "^3.0.0",
     "devtron": "^1.3.0",
-    "electron": "^1.7.8",
+    "electron": "2.0",
     "electron-builder": "^19.46.4",
     "electron-debug": "^1.4.0",
     "electron-mocha": "^4.0.3",
@@ -234,6 +238,7 @@
     "font-awesome": "^4.6.1",
     "ibm_db": "^2.3.0",
     "mysql": "^2.15.0",
+    "oracledb": "^2.2.0",
     "papaparse": "^4.3.7",
     "pg": "^4.5.5",
     "pg-hstore": "^2.3.2",
@@ -244,11 +249,11 @@
     "tedious": "^2.1.4"
   },
   "engines": {
-    "node": "6",
+    "node": "8",
     "yarn": "1"
   },
   "devEngines": {
-    "node": "6",
+    "node": "8",
     "yarn": "1"
   }
 }
