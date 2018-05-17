@@ -8,7 +8,7 @@ import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 
 import TableTree from './TableTree.react.js';
 import SQLTable from './sql-table.jsx';
-import CodeEditorField from './CodeEditorField.react.js';
+import CodeEditor from './code-editor.jsx';
 import ChartEditor from './chart-editor.jsx';
 import ApacheDrillPreview from './ApacheDrillPreview.js';
 import S3Preview from './S3Preview.js';
@@ -334,23 +334,22 @@ class Preview extends Component {
                                         </small>
                                     </code>
 
-                                    <div style={{display: showEditor ? 'block' : 'none', position: 'relative'}}>
-                                        <CodeEditorField
+                                    <div
+                                        style={{
+                                            display: showEditor ? 'block' : 'none',
+                                            position: 'relative',
+                                            marginBottom: 20
+                                        }}
+                                    >
+                                        <CodeEditor
                                             value={code}
                                             onChange={this.updateCode}
-                                            connectionObject={connectionObject}
+
+                                            dialect={dialect}
                                             runQuery={this.runQuery}
                                             schemaRequest={schemaRequest}
-                                            preview={preview}
-                                            updatePreview={updatePreview}
+                                            isLoading={isLoading}
                                         />
-                                        <a
-                                            className="btn btn-primary runButton"
-                                            onClick={this.runQuery}
-                                            disabled={!isLoading}
-                                        >
-                                            {isLoading ? 'Loading...' : 'Run'}
-                                        </a>
                                     </div>
                                 </div>
                             }
@@ -368,7 +367,7 @@ class Preview extends Component {
                             }
                         </div>
 
-                        {errorMsg &&
+                        {errorMsg && showEditor &&
                             <div className="errorStatus">
                                 <pre>{`ERROR: ${errorMsg}`}</pre>
                             </div>
@@ -428,7 +427,7 @@ class Preview extends Component {
                                     </TabList>
 
                                     <TabPanel
-                                        style={{fontFamily: "'Ubuntu Mono', courier, monospace", marginTop: '20px'}}
+                                        style={{fontFamily: "'Ubuntu Mono', courier, monospace"}}
                                     >
                                         <SQLTable
                                             rows={rows}
