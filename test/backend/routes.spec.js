@@ -1578,7 +1578,7 @@ describe('Routes:', () => {
                 .then(getResponseJson).then(json => {
                     assert.deepEqual(
                         json,
-                        {error: 'password authentication failed for user "banana"'}
+                        {error: {message: 'password authentication failed for user "banana"'}}
                     );
                     assert.deepEqual(
                         getConnections(),
