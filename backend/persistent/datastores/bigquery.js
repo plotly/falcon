@@ -6,6 +6,7 @@ const SHOW_SCHEMA_QUERY =
 const ATHENA_DEFAULT_QUERY = 'SELECT table_name FROM information_schema.columns LIMIT 1';
 const DEFAULT_QUERY_INTERVAL = 2000;
 
+const BigQuery = require('@google-cloud/bigquery');
 /*
  * The connection function will validate the parameters and return the connection
  * parameters
