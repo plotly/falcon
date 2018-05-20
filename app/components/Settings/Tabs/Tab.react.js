@@ -40,6 +40,8 @@ export default class ConnectionTab extends Component {
             label = `Athena (${connectionObject.database})`;
         } else if (connectionObject.dialect === DIALECTS.SQLITE) {
             label = connectionObject.storage;
+        } else if (connectionObject.dialect === DIALECTS.BIGQUERY) {
+            label = `Big Query ${connectionObject.database}`;
         } else if (connectionObject.dialect === DIALECTS.DATA_WORLD) {
             const pathNames = getPathNames(connectionObject.url);
             if (pathNames.length >= 3) {

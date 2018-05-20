@@ -8,6 +8,7 @@ import * as ApacheImpala from './impala';
 import * as DataWorld from './dataworld';
 import * as DatastoreMock from './datastoremock';
 import * as Athena from './athena';
+import * as BigQuery from './bigquery';
 
 const CSV = require('./csv');
 
@@ -56,6 +57,8 @@ function getDatastoreClient(connection) {
         return DataWorld;
     } else if (dialect === 'athena') {
         return Athena;
+    }else if (dialect === 'bigquery') {
+        return BigQuery;
     }
     return Sql;
 }

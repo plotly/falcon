@@ -193,7 +193,8 @@ export default class CodeEditor extends React.Component {
             [DIALECTS.MARIADB]: 'text/x-mariadb',
             [DIALECTS.POSTGRES]: 'text/x-pgsql',
             [DIALECTS.REDSHIFT]: 'text/x-pgsql',
-            [DIALECTS.MSSQL]: 'text/x-mssql'
+            [DIALECTS.MSSQL]: 'text/x-mssql',
+            [DIALECTS.BIGQUERY]:'text/x-sql'
         }[dialect] || 'text/x-sql';
 
         const options = {
