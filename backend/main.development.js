@@ -59,6 +59,12 @@ app.on('ready', () => {
         mainWindow.openDevTools();
     }
 
+    // prevent navigation out of HTTP_URL
+    // see https://electronjs.org/docs/api/web-contents#event-will-navigate
+    mainWindow.webContents.on('will-navigate', (event, url) => {
+        if (!url.startsWith(HTTP_URL)) event.preventDefault();
+    });
+
     mainWindow.on('closed', () => {
         mainWindow = null;
     });

@@ -149,11 +149,21 @@ export default class Servers {
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
         server.pre(function (request, response, next) {
-            Logger.log(`Request: ${request.href()}`, 2);
+            const href = request.href();
+            const skip =
+                href.startsWith('/settings/urls') ||
+                href.startsWith('/static') ||
+                href.startsWith('/images');
+            if (!skip) Logger.log(`Request: ${href}`, 2);
             next();
         });
         server.use(function (request, response, next) {
-            Logger.log(`Response: ${request.href()}`, 2);
+            const href = request.href();
+            const skip =
+                href.startsWith('/settings/urls') ||
+                href.startsWith('/static') ||
+                href.startsWith('/images');
+            if (!skip) Logger.log(`Response: ${href}`, 2);
             next();
         });
 
