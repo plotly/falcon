@@ -59,8 +59,26 @@ export function query(queryObject, connection) {
  * @returns {Promise} that resolves to { columnnames, rows }
  */
 export function schemas(connection) {
-    const sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.database}'` ;
-    //return query(sqlStatement, connection);
+
+    //TODO Complete this.
+    let tableNames = [];
+    const bigquery = new BigQuery({
+      keyFilename: connection.keyfileName,
+      projectId: connection.projectId
+    });
+    bigquery.dataset( dbname ).getTables().then( results =>{
+        const tables = results[0];
+        console.log('Tables:', tables);
+        console.log('Number of tables :', tables.length);
+        tables.forEach(table => { 
+            console.log(table);
+            console.log( 'Table name', table.id);
+            return table.getMetadata().then( m =>{
+                const meta = m[0];
+                console.log( 'Meta data', meta.schema.fields);
+            })
+        });
+     })
 }
 
 
@@ -74,9 +92,21 @@ export function schemas(connection) {
  * @returns {Promise} that resolves to { columnnames, rows }
  */
 export function tables(connection) {
-    connection.sqlStatement = SHOW_TABLES_QUERY;
-    /*return executeQuery(connection).then(dataSet => {
-        const tableNames = dataSet.slice(1).map(row => row.Data[0].VarCharValue);
-        return tableNames;
-    });*/
+
+    let tableNames = [];
+    const bigquery = new BigQuery({
+      keyFilename: connection.keyfileName,
+      projectId: connection.projectId
+    });
+ 
+    bigquery.dataset( connection.database ).getTables().then( results =>{
+       const tables = results[0];
+
+       if( results && results.length >0){
+            tables.forEach(table => { 
+                tableNames.push( table.id );
+            });
+       }
+       return tableNames;
+    });
 }
