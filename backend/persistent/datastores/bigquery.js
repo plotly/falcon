@@ -3,10 +3,13 @@
 const SHOW_TABLES_QUERY = 'SHOW TABLES';
 const SHOW_SCHEMA_QUERY =
     'SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema';
-const ATHENA_DEFAULT_QUERY = 'SELECT table_name FROM information_schema.columns LIMIT 1';
+const BIGQUERY_DEFAULT_QUERY = `SELECT * FROM FROM ${database}.__TABLES__ `;
 const DEFAULT_QUERY_INTERVAL = 2000;
 
 const BigQuery = require('@google-cloud/bigquery');
+
+//TODO.  1. Simple connect and run preview query
+//2. Get a list of schema's via API
 /*
  * The connection function will validate the parameters and return the connection
  * parameters
@@ -17,7 +20,8 @@ const BigQuery = require('@google-cloud/bigquery');
  * @returns {Promise} that resolves connection
  */
 export function connect(connection) {
-    
+    let defaultQuery = `SELECT * FROM FROM ${connection.database}.__TABLES__ `;
+    return query(defaultQuery, connection).then(() => connection);
 }
 
 /**
