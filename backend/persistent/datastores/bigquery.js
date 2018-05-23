@@ -3,10 +3,10 @@
 const SHOW_TABLES_QUERY = 'SHOW TABLES';
 const SHOW_SCHEMA_QUERY =
     'SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema';
-const BIGQUERY_DEFAULT_QUERY = `SELECT * FROM FROM ${database}.__TABLES__ `;
+//const BIGQUERY_DEFAULT_QUERY = `SELECT * FROM FROM ${database}.__TABLES__ `;
 const DEFAULT_QUERY_INTERVAL = 2000;
 
-const BigQuery = require('@google-cloud/bigquery');
+//const BigQuery = require('@google-cloud/bigquery');
 
 //TODO.  1. Simple connect and run preview query
 //2. Get a list of schema's via API
@@ -20,8 +20,11 @@ const BigQuery = require('@google-cloud/bigquery');
  * @returns {Promise} that resolves connection
  */
 export function connect(connection) {
-    let defaultQuery = `SELECT * FROM FROM ${connection.database}.__TABLES__ `;
-    return query(defaultQuery, connection).then(() => connection);
+    //let defaultQuery = `SELECT * FROM FROM ${connection.database}.__TABLES__ `;
+    //return query(defaultQuery, connection).then(() => connection);
+    return new Promise(function(resolve, reject) {
+        resolve( connection );
+    });
 }
 
 /**
@@ -33,6 +36,12 @@ export function connect(connection) {
 export function query(queryObject, connection) {
     connection.sqlStatement = queryObject;
 
+    let columnnames = ['advanced'];
+    let rows = [1,2,3];
+
+    return new Promise(function(resolve, reject) {
+        resolve( columnnames, rows);
+    });
     /*return executeQuery(connection).then(dataSet => {
         let columnnames = [];
         let rows = [];
@@ -61,7 +70,15 @@ export function query(queryObject, connection) {
 export function schemas(connection) {
 
     //TODO Complete this.
-    let tableNames = [];
+
+    let columnnames = ['advanced'];
+    let rows = ['A','B','C'];
+
+    return new Promise(function(resolve, reject) {
+        resolve( columnnames, rows);
+    });
+
+    /*let tableNames = [];
     const bigquery = new BigQuery({
       keyFilename: connection.keyfileName,
       projectId: connection.projectId
@@ -78,7 +95,7 @@ export function schemas(connection) {
                 console.log( 'Meta data', meta.schema.fields);
             })
         });
-     })
+     })*/
 }
 
 
@@ -93,7 +110,15 @@ export function schemas(connection) {
  */
 export function tables(connection) {
 
-    let tableNames = [];
+
+
+    let tables = ['advanced'];
+    //let rows = ['A','B','C'];
+
+    return new Promise(function(resolve, reject) {
+        resolve( tables);
+    });
+    /*let tableNames = [];
     const bigquery = new BigQuery({
       keyFilename: connection.keyfileName,
       projectId: connection.projectId
@@ -108,5 +133,5 @@ export function tables(connection) {
             });
        }
        return tableNames;
-    });
+    });*/
 }
