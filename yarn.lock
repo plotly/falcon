@@ -6755,7 +6755,7 @@ nan@^2.3.0, nan@^2.3.3, nan@~2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.7.0.tgz#d95bf721ec877e08db276ed3fc6eb78f9083ad46"
 
-nan@^2.7.0:
+nan@^2.7.0, nan@~2.8.0:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.8.0.tgz#ed715f3fe9de02b57a5e6252d90a96675e1f085a"
 
@@ -7239,9 +7239,11 @@ options@>=0.0.5:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/options/-/options-0.0.6.tgz#ec22d312806bb53e731773e7cdaefcf1c643128f"
 
-oracledb@^2.2.0:
+"oracledb@https://github.com/oracle/node-oracledb/releases/download/v2.2.0/oracledb-src-2.2.0.tgz":
   version "2.2.0"
-  resolved "https://registry.yarnpkg.com/oracledb/-/oracledb-2.2.0.tgz#424222d00721b1656181a0efa8b452193d113ba2"
+  resolved "https://github.com/oracle/node-oracledb/releases/download/v2.2.0/oracledb-src-2.2.0.tgz#44db77ad8db99c2646e611c2b33a6f8533e44e8e"
+  dependencies:
+    nan "~2.8.0"
 
 orbit-camera-controller@^4.0.0:
   version "4.0.0"
