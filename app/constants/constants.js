@@ -5,6 +5,7 @@ import {concat} from 'ramda';
 export const DIALECTS = {
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
+    ORACLE: 'oracle',
     POSTGRES: 'postgres',
     REDSHIFT: 'redshift',
     ELASTICSEARCH: 'elasticsearch',
@@ -23,6 +24,7 @@ export const DIALECTS = {
 export const SQL_DIALECTS_USING_EDITOR = [
     'mysql',
     'mariadb',
+    'oracle',
     'postgres',
     'redshift',
     'mssql',
@@ -139,6 +141,22 @@ export const CONNECTION_CONFIG = {
             }
         ]
     ),
+    [DIALECTS.ORACLE]: [
+        {'label': 'Username', 'value': 'username', 'type': 'text'},
+        {'label': 'Password', 'value': 'password', 'type': 'password'},
+        {
+            'label': 'Connection',
+            'value': 'connectionString',
+            'type': 'text',
+            'description': `
+                An Easy Connect string,
+                a Net Service Name from a local 'tnsnames.ora' file or an external naming service,
+                an SID of a local Oracle database instance,
+                or leave empty to connect to the local default database.
+                See https://oracle.github.io/node-oracledb/doc/api.html#connectionstrings for examples.
+            `
+        }
+    ],
     [DIALECTS.POSTGRES]: commonSqlOptions,
     [DIALECTS.REDSHIFT]: commonSqlOptions,
     [DIALECTS.SQLITE]: [
@@ -245,6 +263,7 @@ export const LOGOS = {
     [DIALECTS.CSV]: 'images/csv-logo.png',
     [DIALECTS.IBM_DB2]: 'images/ibmdb2-logo.png',
     [DIALECTS.REDSHIFT]: 'images/redshift-logo.png',
+    [DIALECTS.ORACLE]: 'images/oracle-logo.png',
     [DIALECTS.POSTGRES]: 'images/postgres-logo.png',
     [DIALECTS.ELASTICSEARCH]: 'images/elastic-logo.png',
     [DIALECTS.MYSQL]: 'images/mysql-logo.png',
@@ -263,6 +282,8 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
             return 'SELECT TOP 1000 * FROM ?';
         case DIALECTS.IBM_DB2:
             return `SELECT * FROM ${table} FETCH FIRST 1000 ROWS ONLY`;
+        case DIALECTS.ORACLE:
+            return `SELECT * FROM ${table} WHERE ROWNUM <= 1000`;
         case DIALECTS.APACHE_IMPALA:
         case DIALECTS.APACHE_SPARK:
         case DIALECTS.MYSQL:
@@ -381,6 +402,11 @@ export const SAMPLE_DBS = {
         port: 50000,
         host: 'db2.test.plotly.host',
         dialect: DIALECTS.IBM_DB2
+    },
+    [DIALECTS.ORACLE]: {
+        username: 'XDB',
+        password: 'xdb',
+        connectionString: 'localhost/XE'
     },
     [DIALECTS.POSTGRES]: {
         username: 'masteruser',

@@ -467,11 +467,11 @@ export default class Servers {
                     return next();
                 }
                 Logger.log(validation, 2);
-                res.json(400, {error: validation.message});
+                res.json(400, {error: {message: validation.message}});
                 return next();
             }).catch(err => {
                 Logger.log(err, 2);
-                res.json(400, {error: err.message});
+                res.json(400, {error: {message: err.message}});
                 return next();
             });
         });

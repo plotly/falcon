@@ -2,7 +2,7 @@ version: 0.4.{build}
 
 environment:
   matrix:
-    - nodejs_version: 6
+    - nodejs_version: 8
       POSTGRES_PATH: C:\Program Files\PostgreSQL\9.6
 
 platform:

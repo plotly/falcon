@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:6.13.0-browsers
+      - image: circleci/node:8-browsers
       - image: quay.io/plotly/falcon-test-spark
       - image: quay.io/plotly/falcon-test-db2
     environment:

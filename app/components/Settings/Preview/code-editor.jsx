@@ -191,6 +191,7 @@ export default class CodeEditor extends React.Component {
             [DIALECTS.MYSQL]: 'text/x-mysql',
             [DIALECTS.SQLITE]: 'text/x-sqlite',
             [DIALECTS.MARIADB]: 'text/x-mariadb',
+            [DIALECTS.ORACLE]: 'text/x-plsql',
             [DIALECTS.POSTGRES]: 'text/x-pgsql',
             [DIALECTS.REDSHIFT]: 'text/x-pgsql',
             [DIALECTS.MSSQL]: 'text/x-mssql'

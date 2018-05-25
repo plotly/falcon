@@ -35,6 +35,7 @@ export default {
             'font-awesome': 'font-awesome',
             'ibm_db': 'commonjs ibm_db',
             'mysql': 'mysql',
+            'oracledb': 'commonjs oracledb',
             'pg': 'pg',
             'pg-hstore': 'pg-hstore',
             'restify': 'commonjs restify',

@@ -38,6 +38,8 @@ export default class ConnectionTab extends Component {
             label = `Elasticsearch (${connectionObject.host})`;
         } else if (connectionObject.dialect === DIALECTS.ATHENA) {
             label = `Athena (${connectionObject.database})`;
+        } else if (connectionObject.dialect === DIALECTS.ORACLE) {
+            label = `${connectionObject.connectionString}`;
         } else if (connectionObject.dialect === DIALECTS.SQLITE) {
             label = connectionObject.storage;
         } else if (connectionObject.dialect === DIALECTS.DATA_WORLD) {
