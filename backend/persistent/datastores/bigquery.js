@@ -23,6 +23,7 @@ export function connect(connection) {
     //let defaultQuery = `SELECT * FROM FROM ${connection.database}.__TABLES__ `;
     //return query(defaultQuery, connection).then(() => connection);
     return new Promise(function(resolve, reject) {
+        console.log( 'Returning connection');
         resolve( connection );
     });
 }
@@ -37,10 +38,11 @@ export function query(queryObject, connection) {
     connection.sqlStatement = queryObject;
 
     let columnnames = ['advanced'];
-    let rows = [1,2,3];
+    let rows = [[1],[2],[3]];
 
     return new Promise(function(resolve, reject) {
-        resolve( columnnames, rows);
+        console.log( 'Returning query');
+        resolve( {columnnames, rows});
     });
     /*return executeQuery(connection).then(dataSet => {
         let columnnames = [];
@@ -75,7 +77,8 @@ export function schemas(connection) {
     let rows = ['A','B','C'];
 
     return new Promise(function(resolve, reject) {
-        resolve( columnnames, rows);
+        console.log( 'Returning schema');
+        resolve( {columnnames, rows});
     });
 
     /*let tableNames = [];
@@ -116,6 +119,7 @@ export function tables(connection) {
     //let rows = ['A','B','C'];
 
     return new Promise(function(resolve, reject) {
+        console.log( 'Returning tables');
         resolve( tables);
     });
     /*let tableNames = [];

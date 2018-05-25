@@ -303,6 +303,8 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
                 }
             });
         case DIALECTS.BIGQUERY:
+            console.log( 'Getting Big Query', connection);
+            console.log( 'Getting Big Query table', table);
             return `SELECT TOP 1000 * FROM ${connection.database}.${table}`;
         default:
             return '';

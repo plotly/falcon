@@ -110,6 +110,7 @@ export function disconnect(connection) {
  *   }
  */
 export function schemas(connection) {
+    console.log( 'Geting schemas');
     return getDatastoreClient(connection).schemas(connection);
 }
 
