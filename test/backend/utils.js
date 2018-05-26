@@ -9,7 +9,7 @@ const restify = require('restify');
 
 import {dissoc, merge} from 'ramda';
 
-import {PlotlyAPIRequest} from '../../backend/persistent/PlotlyAPI.js';
+import {PlotlyAPIRequest} from '../../backend/persistent/plotly-api.js';
 import Servers from '../../backend/routes.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
 

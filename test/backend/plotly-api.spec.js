@@ -3,7 +3,7 @@ import {assert} from 'chai';
 import {
     PlotlyAPIRequest,
     updateGrid
-} from '../../backend/persistent/PlotlyAPI.js';
+} from '../../backend/persistent/plotly-api.js';
 import {saveSetting} from '../../backend/settings.js';
 import {
     apiKey,

@@ -6,7 +6,7 @@ import {merge} from 'ramda';
 import QueryScheduler from '../../backend/persistent/QueryScheduler.js';
 import {saveConnection} from '../../backend/persistent/Connections.js';
 import {getQueries} from '../../backend/persistent/Queries.js';
-import {PlotlyAPIRequest, updateGrid} from '../../backend/persistent/PlotlyAPI.js';
+import {PlotlyAPIRequest, updateGrid} from '../../backend/persistent/plotly-api.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
 import {
     apiKey,

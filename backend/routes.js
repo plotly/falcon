@@ -23,7 +23,7 @@ import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
 import {generateAndSaveAccessToken} from './utils/authUtils';
 import {getAccessTokenCookieOptions, getCookieOptions} from './constants';
-import {checkWritePermissions, newDatacache} from './persistent/PlotlyAPI.js';
+import {checkWritePermissions, newDatacache} from './persistent/plotly-api.js';
 import {contains, keys, isEmpty, merge, pluck} from 'ramda';
 import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
 import Logger from './logger';

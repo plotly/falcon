@@ -3,7 +3,7 @@ import {getConnectionById} from './Connections';
 import {getQuery, getQueries, saveQuery, deleteQuery} from './Queries';
 import {getSetting} from '../settings';
 import Logger from '../logger';
-import {PlotlyAPIRequest, updateGrid} from './PlotlyAPI';
+import {PlotlyAPIRequest, updateGrid} from './plotly-api.js';
 import {has} from 'ramda';
 
 class QueryScheduler {
