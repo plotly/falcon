@@ -1,10 +1,22 @@
-import * as Connections from './datastores/Datastores';
-import {getConnectionById} from './Connections';
-import {getQuery, getQueries, saveQuery, deleteQuery} from './Queries';
-import {getSetting} from '../settings';
-import Logger from '../logger';
-import {PlotlyAPIRequest, updateGrid} from './plotly-api.js';
 import {has} from 'ramda';
+
+import {getConnectionById} from './Connections.js';
+import * as Connections from './datastores/Datastores.js';
+import Logger from '../logger';
+import {
+    getQuery,
+    getQueries,
+    saveQuery,
+    deleteQuery
+} from './Queries.js';
+import {
+    getCredentials,
+    getSetting
+} from '../settings.js';
+import {
+    PlotlyAPIRequest,
+    updateGrid
+} from './plotly-api.js';
 
 class QueryScheduler {
     constructor() {
@@ -118,16 +130,12 @@ class QueryScheduler {
          * If the user is the owner, then requestor === fid.split(':')[0]
          * If the user is a collaborator, then requestor is different
          */
-        const username = requestor;
-        const user = getSetting('USERS').find(
-             u => u.username === username
-        );
+        const {username, apiKey, accessToken} = getCredentials(requestor);
 
         // Check if the user even exists
-        if (!user || !(user.apiKey || user.accessToken)) {
+        if (!username || !(apiKey || accessToken)) {
             /*
-             * Heads up - the front end looks for "Unauthenticated" in this
-             * error message. So don't change it!
+             * Warning: The front end looks for "Unauthenticated" in this error message. Don't change it!
              */
             const errorMessage = (
                 `Unauthenticated: Attempting to update grid ${fid} but the ` +
@@ -136,7 +144,7 @@ class QueryScheduler {
             Logger.log(errorMessage, 0);
             throw new Error(errorMessage);
         }
-        const {apiKey, accessToken} = user;
+
         // Check if the credentials are valid
         return PlotlyAPIRequest('users/current', {
             method: 'GET', username, apiKey, accessToken
