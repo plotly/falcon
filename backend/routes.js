@@ -643,42 +643,65 @@ export default class Servers {
             return next();
         });
 
-        // register or overwrite a query
+        // register/update a query (and create/update a grid)
         /*
          * TODO - Updating a query should be a PATCH or PUT under
          * the endpoint `/queries/:fid`
          */
         server.post('/queries', function postQueriesHandler(req, res, next) {
-            // Make the query and update the user's grid
-            const {fid, uids, query, connectionId, requestor} = req.params;
+            const {filename, fid, uids, query, connectionId, requestor} = req.params;
 
-            // Check that the user has permission to edit the grid
+            // If a filename has been provided,
+            // make the query and create a new grid
+            if (filename) {
+                return that.queryScheduler.queryAndCreateGrid(
+                    filename, query, connectionId, requestor
+                )
+                .then((newGridResponse) => {
+                    const queryObject = {
+                        ...req.params,
+                        fid: newGridResponse.file.fid,
+                        uids: newGridResponse.file.cols.map(col => col.uid)
+                    };
+                    that.queryScheduler.scheduleQuery(queryObject);
+                    res.json(201, queryObject);
+                    return next();
+                })
+                .catch(onError);
+            }
 
-            checkWritePermissions(fid, requestor)
-            .then(function nowQueryAndUpdateGrid() {
-                return that.queryScheduler.queryAndUpdateGrid(
-                    fid, uids, query, connectionId, requestor
-                );
-            })
-            .then(function returnSuccess() {
-                let status;
-                if (getQuery(req.params.fid)) {
-                    // TODO - Technically, this should be
-                    // under the endpoint `/queries/:fid`
-                    status = 200;
-                } else {
-                    status = 201;
-                }
-                that.queryScheduler.scheduleQuery(req.params);
-                res.json(status, {});
-                return next();
-            })
-            .catch(function returnError(error) {
+            // If a grid fid has been provided,
+            // check the user has permission to edit,
+            // make the query and update the grid
+            if (fid) {
+                return checkWritePermissions(fid, requestor).then(function () {
+                    return that.queryScheduler.queryAndUpdateGrid(
+                        fid, uids, query, connectionId, requestor
+                    );
+                })
+                .then(() => {
+                    let status;
+                    if (getQuery(req.params.fid)) {
+                        // TODO - Technically, this should be
+                        // under the endpoint `/queries/:fid`
+                        status = 200;
+                    } else {
+                        status = 201;
+                    }
+                    that.queryScheduler.scheduleQuery(req.params);
+                    res.json(status, {});
+                    return next();
+                })
+                .catch(onError);
+            }
+
+            return onError(new Error('Bad request'));
+
+            function onError(error) {
                 Logger.log(error, 0);
                 res.json(400, {error: {message: error.message}});
                 return next();
-            });
-
+            }
         });
 
         // delete a query

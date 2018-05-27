@@ -16,6 +16,7 @@ import {
 import {
     getCurrentUser,
     getGridMetadata,
+    newGrid,
     updateGrid
 } from './plotly-api.js';
 
@@ -25,6 +26,7 @@ class QueryScheduler {
         this.loadQueries = this.loadQueries.bind(this);
         this.clearQuery = this.clearQuery.bind(this);
         this.clearQueries = this.clearQueries.bind(this);
+        this.queryAndCreateGrid = this.queryAndCreateGrid.bind(this);
         this.queryAndUpdateGrid = this.queryAndUpdateGrid.bind(this);
 
         // this.job wraps this.queryAndUpdateGrid to avoid concurrent runs of the same job
@@ -119,7 +121,69 @@ class QueryScheduler {
         Object.keys(this.queryJobs).forEach(this.clearQuery);
     }
 
-    queryAndUpdateGrid (fid, uids, queryString, connectionId, requestor) {
+    queryAndCreateGrid(filename, query, connectionId, requestor) {
+        const {username, apiKey, accessToken} = getCredentials(requestor);
+        let startTime;
+
+        // Check if the user even exists
+        if (!username || !(apiKey || accessToken)) {
+            /*
+             * Warning: The front end looks for "Unauthenticated" in this error message. Don't change it!
+             */
+            const errorMessage = (
+                'Unauthenticated: Attempting to create a grid but the ' +
+                `authentication credentials for the user "${username}" do not exist.`
+            );
+            Logger.log(errorMessage, 0);
+            throw new Error(errorMessage);
+        }
+
+        // Check if the credentials are valid
+        return getCurrentUser(username).then(res => {
+            if (res.status !== 200) {
+                const errorMessage = (
+                    `Unauthenticated: ${getSetting('PLOTLY_API_URL')} failed to identify ${username}.`
+                );
+                Logger.log(errorMessage, 0);
+                throw new Error(errorMessage);
+            }
+
+
+            startTime = process.hrtime();
+
+            Logger.log(`Querying "${query}" with connection ${connectionId} to create a new grid`, 2);
+            return Connections.query(query, getConnectionById(connectionId));
+
+        }).then(({rows, columnnames}) => {
+            Logger.log(`Query "${query}" took ${process.hrtime(startTime)[0]} seconds`, 2);
+            Logger.log('Create a new grid with new data', 2);
+            Logger.log(`First row: ${JSON.stringify(rows.slice(0, 1))}`, 2);
+
+            startTime = process.hrtime();
+
+            return newGrid(
+                filename,
+                columnnames,
+                rows,
+                requestor
+            );
+
+        }).then(res => {
+            Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(startTime)[0]} seconds`, 2);
+
+            if (res.status !== 201) {
+                Logger.log(`Error ${res.status} while creating a grid`, 2);
+            }
+
+            return res.json().then((json) => {
+                Logger.log(`Grid ${json.file.fid} has been updated.`, 2);
+                return json;
+            });
+        });
+
+    }
+
+    queryAndUpdateGrid(fid, uids, query, connectionId, requestor) {
         const requestedDBConnections = getConnectionById(connectionId);
         let startTime = process.hrtime();
 
@@ -156,21 +220,22 @@ class QueryScheduler {
                 throw new Error(errorMessage);
             }
 
-            Logger.log(`Querying "${queryString}" with connection ${connectionId} to update grid ${fid}`, 2);
-            return Connections.query(queryString, requestedDBConnections);
+            Logger.log(`Querying "${query}" with connection ${connectionId} to update grid ${fid}`, 2);
+            return Connections.query(query, requestedDBConnections);
 
-        }).then(rowsAndColumns => {
+        }).then(({rows}) => {
 
-            Logger.log(`Query "${queryString}" took ${process.hrtime(startTime)[0]} seconds`, 2);
+            Logger.log(`Query "${query}" took ${process.hrtime(startTime)[0]} seconds`, 2);
             Logger.log(`Updating grid ${fid} with new data`, 2);
             Logger.log(
                 'First row: ' +
-                JSON.stringify(rowsAndColumns.rows.slice(0, 1)),
+                JSON.stringify(rows.slice(0, 1)),
             2);
 
             startTime = process.hrtime();
+
             return updateGrid(
-                rowsAndColumns.rows,
+                rows,
                 fid,
                 uids,
                 requestor
