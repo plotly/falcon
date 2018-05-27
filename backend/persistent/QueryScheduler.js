@@ -14,7 +14,8 @@ import {
     getSetting
 } from '../settings.js';
 import {
-    PlotlyAPIRequest,
+    getCurrentUser,
+    getGridMetadata,
     updateGrid
 } from './plotly-api.js';
 
@@ -146,9 +147,7 @@ class QueryScheduler {
         }
 
         // Check if the credentials are valid
-        return PlotlyAPIRequest('users/current', {
-            method: 'GET', username, apiKey, accessToken
-        }).then(res => {
+        return getCurrentUser(username).then(res => {
             if (res.status !== 200) {
                 const errorMessage = (
                     `Unauthenticated: ${getSetting('PLOTLY_API_URL')} failed to identify ${username}.`
@@ -204,16 +203,9 @@ class QueryScheduler {
                  * make an additional API call to GET it
                  */
 
-                return PlotlyAPIRequest(
-                    `grids/${fid}`,
-                    {username, apiKey, accessToken, method: 'GET'}
-                ).then(resFromGET => {
+                return getGridMetadata(fid, username).then(resFromGET => {
                     if (resFromGET.status === 404) {
-                        Logger.log(('' +
-                            `Grid ID ${fid} doesn't exist on Plotly anymore, ` +
-                            'removing persistent query.'),
-                             2
-                        );
+                        Logger.log(`Grid ID ${fid} doesn't exist on Plotly anymore, removing persistent query.`, 2);
                         this.clearQuery(fid);
                         return deleteQuery(fid);
                     }
@@ -224,7 +216,6 @@ class QueryScheduler {
                         try {
                             filemeta = JSON.parse(text);
                         } catch (e) {
-                            // Well, that's annoying.
                             Logger.log(`Failed to parse the JSON of request ${fid}`, 0);
                             Logger.log(e);
                             Logger.log('Text response: ' + text, 0);

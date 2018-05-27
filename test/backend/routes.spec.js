@@ -3,10 +3,11 @@ const fs = require('fs');
 import {assert} from 'chai';
 import {assoc, contains, dissoc, isEmpty, keys, merge} from 'ramda';
 
-import Servers from '../../backend/routes.js';
-import {getConnections, saveConnection} from '../../backend/persistent/Connections.js';
-import {getSetting, saveSetting} from '../../backend/settings.js';
 import {setCertificatesSettings} from '../../backend/certificates';
+import {getConnections, saveConnection} from '../../backend/persistent/Connections.js';
+import {deleteGrid} from '../../backend/persistent/plotly-api.js';
+import Servers from '../../backend/routes.js';
+import {getSetting, saveSetting} from '../../backend/settings.js';
 import {
     accessToken,
     apacheDrillConnections,
@@ -14,12 +15,12 @@ import {
     assertResponseStatus,
     clearSettings,
     closeTestServers,
-    createGrid,
     createTestServers,
     DELETE,
     fakeCerts,
     GET,
     getResponseJson,
+    initGrid,
     mysqlConnection,
     PATCH,
     POST,
@@ -1643,10 +1644,11 @@ describe('Routes:', () => {
 
         it('queries registers a query and returns saved queries', function() {
             // Save a grid that we can update
-            return createGrid('test interval')
+            let fid;
+            return initGrid('test interval')
                 .then(assertResponseStatus(201))
                 .then(getResponseJson).then(json => {
-                    const fid = json.file.fid;
+                    fid = json.file.fid;
                     const uids = json.file.cols.map(col => col.uid);
 
                     queryObject = {
@@ -1668,6 +1670,8 @@ describe('Routes:', () => {
                 })
                 .then(getResponseJson).then(json => {
                     assert.deepEqual(json, [queryObject]);
+
+                    return deleteGrid(fid, username);
                 });
         });
 

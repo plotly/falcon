@@ -1,21 +1,20 @@
 import {assert} from 'chai';
 
 import {
-    PlotlyAPIRequest,
+    deleteGrid,
+    getGrid,
     updateGrid
 } from '../../backend/persistent/plotly-api.js';
 import {saveSetting} from '../../backend/settings.js';
 import {
     apiKey,
     assertResponseStatus,
-    createGrid,
     getResponseJson,
+    initGrid,
     names,
     username
 } from './utils.js';
 
-// Suppressing ESLint cause Mocha ensures `this` is bound in test functions
-/* eslint-disable no-invalid-this */
 describe('Grid API Functions', function () {
     before(() => {
         saveSetting('USERS', [{username, apiKey}]);
@@ -29,7 +28,7 @@ describe('Grid API Functions', function () {
         // it works off of the assumption that a grid exists
 
         let fid;
-        return createGrid('Test updateGrid')
+        return initGrid('Test updateGrid')
         .then(assertResponseStatus(201))
         .then(getResponseJson).then(json => {
             fid = json.file.fid;
@@ -47,8 +46,7 @@ describe('Grid API Functions', function () {
         })
         .then(assertResponseStatus(200))
         .then(() => {
-            const url = `grids/${fid}/content`;
-            return PlotlyAPIRequest(url, {username, apiKey, method: 'GET'});
+            return getGrid(fid, username);
         })
         .then(assertResponseStatus(200))
         .then(getResponseJson).then(json => {
@@ -76,7 +74,7 @@ describe('Grid API Functions', function () {
                 json.cols[names[5]].data,
                 [130, 140, 150]
             );
-        });
+        })
+        .then(() => deleteGrid(fid, username));
     });
 });
-/* eslint-enable no-invalid-this */

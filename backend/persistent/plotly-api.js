@@ -11,8 +11,11 @@ import {
 // Module to access Plot.ly REST API
 //
 // See API documentation at https://api.plot.ly/v2/
+//
+// TODO: Refactor as a class with a constructor that takes username as input,
+// so that we don't call getCredentials(username) for every request.
 
-export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessToken, method}) {
+export function plotlyAPIRequest(relativeUrl, {body, username, apiKey, accessToken, method}) {
     let authorization;
     if (apiKey) {
         authorization = 'Basic ' + new Buffer(
@@ -80,11 +83,80 @@ export function newDatacache(payloadJSON, type, requestor) {
     });
 }
 
+export function getCurrentUser(requestor) {
+    const {username, apiKey, accessToken} = getCredentials(requestor);
+
+    return plotlyAPIRequest('users/current', {
+        method: 'GET',
+        username,
+        apiKey,
+        accessToken
+    });
+}
+
+export function newGrid(filename, columnnames, rows, requestor) {
+    const {username, apiKey, accessToken} = getCredentials(requestor);
+
+    const columns = getColumns(rows, columnnames.length);
+
+    const cols = {};
+    columnnames.forEach((name, i) => {
+        cols[name] = {'data': columns[i], order: i};
+    });
+    const grid = {cols};
+
+    return plotlyAPIRequest('grids', {
+        method: 'POST',
+        username,
+        apiKey,
+        accessToken,
+        body: {
+            data: grid,
+            world_readable: true,
+            parent: -1,
+            filename
+        }
+    });
+}
+
+export function getGridMetadata(fid, requestor) {
+    const {username, apiKey, accessToken} = getCredentials(requestor);
+
+    return plotlyAPIRequest(`grids/${fid}`, {
+        method: 'GET',
+        username,
+        apiKey,
+        accessToken
+    });
+}
+
+export function getGrid(fid, requestor) {
+    const {username, apiKey, accessToken} = getCredentials(requestor);
+
+    return plotlyAPIRequest(`grids/${fid}/content`, {
+        method: 'GET',
+        username,
+        apiKey,
+        accessToken
+    });
+}
+
+export function deleteGrid(fid, requestor) {
+    const {username, apiKey, accessToken} = getCredentials(requestor);
+
+    return plotlyAPIRequest(`grids/${fid}`, {
+        method: 'DELETE',
+        username,
+        apiKey,
+        accessToken
+    });
+}
+
 export function updateGrid(rows, fid, uids, requestor) {
     const {username, apiKey, accessToken} = getCredentials(requestor);
 
     // TODO - Test case where no rows are returned.
-    if (uids.length !== rows[0].length) {
+    if (uids.length !== (rows[0] || []).length) {
         Logger.log(`
             A different number of columns was returned in the
             query than what was initially saved in the grid.
@@ -96,25 +168,39 @@ export function updateGrid(rows, fid, uids, requestor) {
         `);
     }
 
-    const columns = uids.map(() => []);
-    for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
-        /*
-         * For now, only update up to the number of columns that are
-         * already saved. In the future, we should just create more
-         * columns. See error message above.
-         */
-        for (let j = 0; j < Math.min(uids.length, row.length); j++) {
-            columns[j][i] = row[j];
-        }
-    }
+    /*
+     * For now, only update up to the number of columns that are
+     * already saved. In the future, we should just create more
+     * columns. See error message above.
+     */
+    const columns = getColumns(rows, uids.length);
+
     const url = `grids/${fid}/col?uid=${uids.join(',')}`;
     const body = {
         cols: JSON.stringify(columns.map(column => ({
             data: column
         })))
     };
-    return PlotlyAPIRequest(url, {body, username, apiKey, accessToken, method: 'PUT'});
+    return plotlyAPIRequest(url, {body, username, apiKey, accessToken, method: 'PUT'});
+}
+
+function getColumns(rows, maxColumns) {
+    const columns = [];
+
+    // don't return more than maxColumns
+    const columnsLength = Math.min(maxColumns, (rows[0] || []).length);
+
+    for (let i = 0; i < columnsLength; i++) {
+        columns.push([]);
+    }
+
+    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+        for (let columnIndex = 0; columnIndex < columnsLength; columnIndex++) {
+            columns[columnIndex][rowIndex] = rows[rowIndex][columnIndex];
+        }
+    }
+
+    return columns;
 }
 
 // Resolve if the requestor has permission to update fid, reject otherwise
@@ -134,7 +220,7 @@ export function checkWritePermissions(fid, requestor) {
         throw new Error(errorMessage);
     }
 
-    return PlotlyAPIRequest(`grids/${fid}`, {
+    return plotlyAPIRequest(`grids/${fid}`, {
         username: requestor,
         apiKey,
         accessToken,

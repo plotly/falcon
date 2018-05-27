@@ -9,7 +9,7 @@ const restify = require('restify');
 
 import {dissoc, merge} from 'ramda';
 
-import {PlotlyAPIRequest} from '../../backend/persistent/plotly-api.js';
+import {newGrid} from '../../backend/persistent/plotly-api.js';
 import Servers from '../../backend/routes.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
 
@@ -122,18 +122,6 @@ export function clearSettings(...settingKeys) {
     });
 }
 
-export const names = [
-    'country', 'month', 'year', 'lat', 'lon', 'value'
-];
-export const columns = [
-    ['a', 'b', 'c'], // 'country'
-    [1, 2, 3], // 'month'
-    [4, 5, 6], // 'year'
-    [7, 8, 9], // 'lat'
-    [10, 11, 12], // 'lon'
-    [13, 14, 15] // 'value'
-];
-
 // test account on prod
 export const username = 'plotly-database-connector';
 export const apiKey = 'ccJMY9txxWhRRMWNLgOT';
@@ -157,6 +145,34 @@ export const accessToken = 'UcTdbxMlXyIWY45GOxyRALQhrXVIeq';
 export const validFid = 'plotly-database-connector:197';
 export const validUids = ['d5d91e', '89d77e', '45b645', 'a7011b', '7cf34b', '881702', '442fd5', 'f5993c', '6d6a67',
     'c3246c', 'eac785', '3c3ca8', '7ce7d7', 'f8cd7a', 'e52820', '0a91cc', 'c7dd62', 'b84d17', 'a6c128', 'ae9094'];
+
+
+// Helper function to initialise a grid for testing
+export const names = [
+    'country', 'month', 'year', 'lat', 'lon', 'value'
+];
+
+export const columns = [
+    ['a', 'b', 'c'], // 'country'
+    [1, 2, 3], // 'month'
+    [4, 5, 6], // 'year'
+    [7, 8, 9], // 'lat'
+    [10, 11, 12], // 'lon'
+    [13, 14, 15] // 'value'
+];
+
+export const rows = [
+    ['a', 1, 4, 7, 10, 13],
+    ['b', 2, 5, 8, 11, 14],
+    ['c', 3, 6, 9, 12, 15]
+];
+
+export function initGrid(filename) {
+    const uniqueFilename = `${filename} - ${Math.random().toString(36).substr(2, 5)}`;
+
+    return newGrid(uniqueFilename, names, rows, username);
+}
+
 
 // Helper functions for Servers
 export function createTestServers() {
@@ -196,26 +212,6 @@ export function closeTestServers(servers) {
     // and clear all queries
     .then(() => {
         servers.queryScheduler.clearQueries();
-    });
-}
-
-// Helper functions for PlotlyAPIRequest
-export function createGrid(filename) {
-    const cols = {};
-    names.forEach((name, i) => {
-        cols[name] = {'data': columns[i], order: i};
-    });
-    const grid = {cols};
-    return PlotlyAPIRequest('grids', {
-        method: 'POST',
-        username,
-        apiKey,
-        body: {
-            data: grid,
-            world_readable: true,
-            parent: -1,
-            filename: `${filename} - ${Math.random().toString(36).substr(2, 5)}`
-        }
     });
 }
 
