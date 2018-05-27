@@ -119,7 +119,7 @@ export function newGrid(filename, columnnames, rows, requestor) {
     });
 }
 
-export function getGridMetadata(fid, requestor) {
+export function getGridMeta(fid, requestor) {
     const {username, apiKey, accessToken} = getCredentials(requestor);
 
     return plotlyAPIRequest(`grids/${fid}`, {

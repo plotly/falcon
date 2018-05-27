@@ -15,7 +15,7 @@ import {
 } from '../settings.js';
 import {
     getCurrentUser,
-    getGridMetadata,
+    getGridMeta,
     newGrid,
     updateGrid
 } from './plotly-api.js';
@@ -268,7 +268,7 @@ class QueryScheduler {
                  * make an additional API call to GET it
                  */
 
-                return getGridMetadata(fid, username).then(resFromGET => {
+                return getGridMeta(fid, username).then(resFromGET => {
                     if (resFromGET.status === 404) {
                         Logger.log(`Grid ID ${fid} doesn't exist on Plotly anymore, removing persistent query.`, 2);
                         this.clearQuery(fid);
