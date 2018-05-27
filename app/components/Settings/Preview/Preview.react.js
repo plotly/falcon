@@ -389,15 +389,17 @@ class Preview extends Component {
                                                 // If Chart Editor selected and Schemas Tree visible,
                                                 // then save size in lastSize before hiding
                                                 this.props.updatePreview({
+                                                    // uncomment to hide sql editor
+                                                    // showEditor: false,
                                                     showChart: true,
-                                                    showEditor: false,
                                                     lastSize: size,
                                                     size: minSize
                                                 });
                                             } else {
                                                 this.props.updatePreview({
-                                                    showChart: true,
-                                                    showEditor: false
+                                                    // uncomment to hide sql editor
+                                                    // showEditor: false,
+                                                    showChart: true
                                                 });
                                             }
                                         } else {
@@ -405,14 +407,16 @@ class Preview extends Component {
                                                 // If Chart Editor not selected and Schemas Tree was hidden,
                                                 // then restore the last size
                                                 this.props.updatePreview({
+                                                    // uncomment to show sql editor
+                                                    // showEditor: true,
                                                     showChart: false,
-                                                    showEditor: true,
                                                     size: lastSize
                                                 });
                                             } else {
                                                 this.props.updatePreview({
-                                                    showChart: false,
-                                                    showEditor: true
+                                                    // uncomment to show sql editor
+                                                    // showEditor: true,
+                                                    showChart: false
                                                 });
                                             }
                                         }
