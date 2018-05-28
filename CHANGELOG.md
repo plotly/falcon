@@ -20,6 +20,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 
+## [2.7.0] - 2018-05-28
+
+### Added
+* Connector for Oracle databases (#437)
+* Backend: Added API for creating a grid to store results from scheduled queries (#444)
+
+### Changed
+* UI: Added a vertical scrollbar to the database view
+* UI: Don't hide the code editor when the chart editor opens (#445)
+* Log: Reduced verbosity
+
+### Fixed
+* Backend: Fixed error message on failed connection
+
+### Security
+* Upgraded to Electron v2.0.1 (and Node v8)
+* Prevent navigation on drag'n'drop (#436)
+
+
 ## [2.6.0] - 2018-04-13
 
 ### Added
