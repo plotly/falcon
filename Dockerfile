@@ -13,7 +13,7 @@
 #
 # Adapted from https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
 
-FROM node:6
+FROM node:8
 
 # I'd like to install the latest version of npm with something like this:
 # RUN npm install --global npm@4.0.3
