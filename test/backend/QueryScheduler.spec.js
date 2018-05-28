@@ -3,17 +3,21 @@ import sinon from 'sinon';
 
 import {merge} from 'ramda';
 
-import QueryScheduler from '../../backend/persistent/QueryScheduler.js';
 import {saveConnection} from '../../backend/persistent/Connections.js';
+import {
+    deleteGrid,
+    getGrid,
+    updateGrid
+} from '../../backend/persistent/plotly-api.js';
 import {getQueries} from '../../backend/persistent/Queries.js';
-import {PlotlyAPIRequest, updateGrid} from '../../backend/persistent/PlotlyAPI.js';
+import QueryScheduler from '../../backend/persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
 import {
     apiKey,
     assertResponseStatus,
     clearSettings,
-    createGrid,
     getResponseJson,
+    initGrid,
     names,
     sqlConnections,
     username,
@@ -173,7 +177,7 @@ describe('QueryScheduler', function() {
          * it only updates them
          */
         let fid, uids, queryObject;
-        return createGrid('test delete')
+        return initGrid('test delete')
         .then(assertResponseStatus(201))
         .then(getResponseJson).then(json => {
             fid = json.file.fid;
@@ -195,7 +199,7 @@ describe('QueryScheduler', function() {
             assert.deepEqual(getQueries(), [queryObject], 'Query has not been saved');
             assert(Boolean(queryScheduler.queryJobs[fid]), 'Query has not been scheduled');
 
-            return PlotlyAPIRequest(`grids/${fid}`, {username, apiKey, method: 'DELETE'});
+            return deleteGrid(fid, username);
         })
         .then(assertResponseStatus(204))
         .then(() => {
@@ -215,7 +219,7 @@ describe('QueryScheduler', function() {
 
     it('queries a database and updates a plotly grid on an interval', function() {
         function checkGridAgainstQuery(fid, name) {
-            return PlotlyAPIRequest(`grids/${fid}/content`, {username, apiKey, method: 'GET'})
+            return getGrid(fid, username)
             .then(assertResponseStatus(200))
             .then(getResponseJson).then(json => {
                 assert.deepEqual(
@@ -254,7 +258,7 @@ describe('QueryScheduler', function() {
         function resetAndVerifyGridContents(fid, uids) {
             return updateGrid([[1, 2, 3, 4, 5, 6]], fid, uids, username, apiKey)
             .then(assertResponseStatus(200)).then(() => {
-                return PlotlyAPIRequest(`grids/${fid}/content`, {username, apiKey, method: 'GET'});
+                return getGrid(fid, username);
             })
             .then(assertResponseStatus(200))
             .then(getResponseJson).then(json => {
@@ -282,7 +286,7 @@ describe('QueryScheduler', function() {
          * it only updates them
          */
         let fid, uids, queryObject;
-        return createGrid('test interval')
+        return initGrid('test interval')
         .then(assertResponseStatus(201))
         .then(getResponseJson).then(json => {
             fid = json.file.fid;
@@ -302,7 +306,8 @@ describe('QueryScheduler', function() {
         .then(() => checkGridAgainstQuery(fid, 'First check'))
         .then(() => resetAndVerifyGridContents(fid, uids))
         .then(() => wait(1.5 * refreshInterval * 1000))
-        .then(() => checkGridAgainstQuery(fid, 'Second check'));
+        .then(() => checkGridAgainstQuery(fid, 'Second check'))
+        .then(() => deleteGrid(fid, username));
     });
 
 });
