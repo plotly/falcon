@@ -290,12 +290,12 @@ class Settings extends Component {
                     selectedTab={selectedTab}
                     newTab={newTab}
                     setTab={tabId => {
-                        setTab(tabId);
                         updatePreview({
                             showChart: false,
                             showEditor: true,
                             size: 200
                         });
+                        setTab(tabId);
                     }}
                     deleteTab={deleteTab}
                 />
@@ -304,7 +304,14 @@ class Settings extends Component {
 
                     <Tabs
                         selectedIndex={this.state.selectedPanel[selectedTab] || 0}
-                        onSelect={panelIndex => this.setState({selectedPanel: {[selectedTab]: panelIndex}})}
+                        onSelect={(panelIndex) => {
+                            updatePreview({
+                                showChart: false,
+                                showEditor: true,
+                                size: 200
+                            });
+                            this.setState({selectedPanel: {[selectedTab]: panelIndex}});
+                        }}
                     >
 
                         <TabList>
