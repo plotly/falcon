@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Security
 
+## [2.7.0]
+
+### Security
+* Fixed a security issue to prevent XSS using external Urls.
+
 
 ## [2.6.0] - 2018-04-13
 
