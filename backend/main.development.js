@@ -1,5 +1,6 @@
 import {app, BrowserWindow, dialog, shell} from 'electron';
 import fs from 'fs';
+import path from 'path';
 
 import {contains} from 'ramda';
 
@@ -28,7 +29,10 @@ server.queryScheduler.loadQueries();
 app.on('ready', () => {
 
     let mainWindow = new BrowserWindow({
-        show: true,
+        webPreferences: {
+            nodeIntegration: false,
+            preload: path.resolve(path.join(__dirname, 'preload.js'))
+        },
         width: 1024,
         height: 1024
     });

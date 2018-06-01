@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import Login from './Login.react.js';
 import * as SessionsActions from '../actions/sessions.js';
 import Settings from './Settings/Settings.react.js';
-import {isElectron} from '../utils/utils.js';
+import {isElectron, setUsernameListener} from '../utils/utils.js';
 
 
 class Configuration extends Component {
@@ -28,12 +28,9 @@ class Configuration extends Component {
          * In the browser, the username is set with a cookie but in electron
          * this is set using electron's ipcRenderer.
          */
-        if (isElectron()) {
-            window.require('electron').ipcRenderer.once('username',
-                (event, message) => {
-                    this.setState({username: message});
-                });
-        }
+        setUsernameListener((event, message) => {
+            this.setState({username: message});}
+        );
     }
 
     toggle() {
