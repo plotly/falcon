@@ -1,13 +1,24 @@
+const fetch = require('node-fetch');
+import {contains, keys, isEmpty, merge, pluck} from 'ramda';
 const restify = require('restify');
 const CookieParser = require('restify-cookies');
-const fetch = require('node-fetch');
 
 import * as fs from 'fs';
 import path from 'path';
 
-import * as Datastores from './persistent/datastores/Datastores.js';
 import {PlotlyOAuth} from './plugins/authorization.js';
-import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
+import {generateAndSaveAccessToken} from './utils/authUtils.js';
+import {
+    getAccessTokenCookieOptions,
+    getCookieOptions,
+    getUnsecuredCookieOptions
+} from './constants.js';
+import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates.js';
+import * as Datastores from './persistent/datastores/Datastores.js';
+import init from './init.js';
+import Logger from './logger.js';
+import {checkWritePermissions, newDatacache} from './persistent/plotly-api.js';
+import {getQueries, getQuery, deleteQuery} from './persistent/Queries.js';
 import {
     deleteConnectionById,
     editConnectionById,
@@ -21,13 +32,7 @@ import {
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
-import {generateAndSaveAccessToken} from './utils/authUtils';
-import {getAccessTokenCookieOptions, getCookieOptions} from './constants';
-import {checkWritePermissions, newDatacache} from './persistent/plotly-api.js';
-import {contains, keys, isEmpty, merge, pluck} from 'ramda';
-import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
-import Logger from './logger';
-import init from './init.js';
+
 
 export default class Servers {
     /*
@@ -309,7 +314,7 @@ export default class Servers {
                         res.setCookie('db-connector-auth-token',
                                       db_connector_access_token,
                                       getAccessTokenCookieOptions());
-                        res.setCookie('db-connector-user', username, getCookieOptions());
+                        res.setCookie('db-connector-user', username, getUnsecuredCookieOptions());
 
                         const existingUsers = getSetting('USERS');
                         const existingUsernames = pluck('username', existingUsers);

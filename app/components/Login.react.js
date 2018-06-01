@@ -20,7 +20,6 @@ const CLOUD = 'cloud';
 const ONPREM = 'onprem';
 
 window.document.title = `${build.productName} v${version}`;
-let usernameLogged = '';
 
 class Login extends Component {
     constructor(props) {
@@ -35,6 +34,11 @@ class Login extends Component {
         this.buildOauthUrl = this.buildOauthUrl.bind(this);
         this.oauthPopUp = this.oauthPopUp.bind(this);
         this.logIn = this.logIn.bind(this);
+
+        // the web app:
+        // - sets this property to the popup window opened for authorization
+        // - and triggers a reload when `this.popup.closed` becomes true
+        this.popup = null;
     }
 
     componentDidMount() {
@@ -46,8 +50,7 @@ class Login extends Component {
          * to check for authentication.
          */
         setInterval(() => {
-            usernameLogged = cookie.load('db-connector-user');
-            if (usernameLogged) {
+            if (this.popup && this.popup.closed) {
                 if (serverType === ONPREM) {
                     this.setState({
                         status: 'authorized',
@@ -135,7 +138,7 @@ class Login extends Component {
         const left = ((width / 2) - (w / 2)) + dualScreenLeft;
         const top = ((height / 2) - (h / 2)) + dualScreenTop;
 
-        window.open(url, title, `scrollbars=yes, width=${w}, height=${h}, top=${top}, left=${left}`);
+        this.popup = window.open(url, title, `scrollbars=yes, width=${w}, height=${h}, top=${top}, left=${left}`);
     }
 
     logIn () {
