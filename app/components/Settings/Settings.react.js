@@ -60,10 +60,14 @@ class Settings extends Component {
 
         this.intervals.checkHTTPSEndpointInterval = setInterval(() => {
             if (this.state.urls.https) {
-                fetch(this.state.urls.https).then(() => {
+                fetch(this.state.urls.https)
+                .then(() => {
                     this.setState({httpsServerIsOK: true});
                     clearInterval(this.intervals.checkHTTPSEndpointInterval);
                     clearInterval(this.intervals.timeElapsedInterval);
+                })
+                .catch(() => {
+                    // silence fetch errors
                 });
             }
         }, 5 * 1000);
