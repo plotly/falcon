@@ -22,33 +22,11 @@ const ONPREM = 'onprem';
 window.document.title = `${build.productName} v${version}`;
 let usernameLogged = '';
 
-// http://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen
-const PopupCenter = (url, title, w, h) => {
-    // Fixes dual-screen position
-    const dualScreenLeft = 'screenLeft' in window ? window.screenLeft : screen.left;
-    const dualScreenTop = 'screenTop' in window ? window.screenTop : screen.top;
-
-    const width = window.innerWidth
-        ? window.innerWidth
-        : document.documentElement.clientWidth
-            ? document.documentElement.clientWidth
-            : screen.width;
-    const height = window.innerHeight
-        ? window.innerHeight
-        : document.documentElement.clientHeight
-            ? document.documentElement.clientHeight
-            : screen.height;
-
-    const left = ((width / 2) - (w / 2)) + dualScreenLeft;
-    const top = ((height / 2) - (h / 2)) + dualScreenTop;
-    const popupWindow = window.open(url, title, `scrollbars=yes, width=${w}, height=${h}, top=${top}, left=${left}`);
-    return popupWindow;
-};
-
 class Login extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            clientId: cookie.load('db-connector-client-id'),
             domain: (isOnPrem() ? plotlyUrl() : 'https://plot.ly'),
             statusMessage: '',
             serverType: CLOUD,
@@ -100,7 +78,6 @@ class Login extends Component {
     }
 
     saveDomainToSettings() {
-
         const {domain} = this.state;
         let PLOTLY_API_SSL_ENABLED = true;
         let PLOTLY_API_DOMAIN = '';
@@ -124,25 +101,41 @@ class Login extends Component {
 
     }
     buildOauthUrl() {
-        const {domain} = this.state;
-        /* global PLOTLY_ENV */
-        const oauthClientId = PLOTLY_ENV.OAUTH2_CLIENT_ID;
-
+        const {clientId, domain} = this.state;
         const redirect_uri = baseUrlWrapped;
         return (
             `${domain}/o/authorize/?response_type=token&` +
-            `client_id=${oauthClientId}&` +
+            `client_id=${clientId}&` +
             `redirect_uri=${redirect_uri}/oauth2/callback`
         );
     }
 
     oauthPopUp() {
-        const popupWindow = PopupCenter(
-            this.buildOauthUrl(), 'Authorization', '500', '500'
-        );
-        if (window.focus) {
-            popupWindow.focus();
-        }
+        // http://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen
+        const url = this.buildOauthUrl();
+        const title = 'Authorization';
+        const w = '600';
+        const h = '600';
+
+        // Fixes dual-screen position
+        const dualScreenLeft = 'screenLeft' in window ? window.screenLeft : screen.left;
+        const dualScreenTop = 'screenTop' in window ? window.screenTop : screen.top;
+
+        const width = window.innerWidth
+            ? window.innerWidth
+            : document.documentElement.clientWidth
+                ? document.documentElement.clientWidth
+                : screen.width;
+        const height = window.innerHeight
+            ? window.innerHeight
+            : document.documentElement.clientHeight
+                ? document.documentElement.clientHeight
+                : screen.height;
+
+        const left = ((width / 2) - (w / 2)) + dualScreenLeft;
+        const top = ((height / 2) - (h / 2)) + dualScreenTop;
+
+        window.open(url, title, `scrollbars=yes, width=${w}, height=${h}, top=${top}, left=${left}`);
     }
 
     logIn () {

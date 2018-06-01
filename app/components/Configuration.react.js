@@ -2,20 +2,21 @@ import cookie from 'react-cookies';
 import React, { Component, PropTypes } from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import Settings from './Settings/Settings.react';
-import {isElectron} from '../utils/utils';
-import * as SessionsActions from '../actions/sessions';
-import Login from './Login.react';
+
+import Login from './Login.react.js';
+import * as SessionsActions from '../actions/sessions.js';
+import Settings from './Settings/Settings.react.js';
+import {isElectron} from '../utils/utils.js';
 
 
 class Configuration extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            authEnabled: (cookie.load('db-connector-auth-enabled') === 'true'),
+            clientId: cookie.load('db-connector-client-id'),
             isMenuOpen: false,
-            username: cookie.load('db-connector-user'),
-            /* global PLOTLY_ENV */
-            authDisabled: !PLOTLY_ENV.AUTH_ENABLED
+            username: cookie.load('db-connector-user')
         };
         this.toggle = this.toggle.bind(this);
         this.close = this.close.bind(this);
@@ -44,26 +45,24 @@ class Configuration extends Component {
     }
 
     logOut() {
+        /*
+         * Delete all the cookies and reset user state. This does not kill
+         * any running connections, but user will not be able to access them
+         * without logging in again.
+         */
+        cookie.remove('db-connector-user');
+        cookie.remove('plotly-auth-token');
+        cookie.remove('db-connector-auth-token');
+        this.setState({ username: ''});
 
-      /*
-       * Delete all the cookies and reset user state. This does not kill
-       * any running connections, but user will not be able to access them
-       * without logging in again.
-       */
-      cookie.remove('db-connector-user');
-      cookie.remove('plotly-auth-token');
-      cookie.remove('db-connector-auth-token');
-      cookie.remove('db-connector-auth-disabled');
-      this.setState({ username: ''});
-
-      // reload page when running in browser:
-      if (!isElectron()) {
-          window.location.reload();
-      }
+        // reload page when running in browser:
+        if (!isElectron()) {
+            window.location.reload();
+        }
     }
 
     render() {
-        return (isElectron() || this.state.authDisabled || this.state.username) ? (
+        return (isElectron() || !this.state.authEnabled || this.state.username) ? (
             <div className="fullApp">
                 <Settings username={this.state.username} logout={this.logOut}/>
             </div>

@@ -49,4 +49,4 @@ RUN yarn run heroku-postbuild
 
 ENV PLOTLY_CONNECTOR_PORT 9494
 EXPOSE 9494
-ENTRYPOINT yarn run build-web && yarn run start-headless
+ENTRYPOINT yarn run start-headless
