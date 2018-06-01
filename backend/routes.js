@@ -613,13 +613,15 @@ export default class Servers {
             }
             else {
                 const rand = Math.round(Math.random() * 1000).toString();
-                const downloadPath = path.join(getSetting('STORAGE_PATH'), `data_export_${rand}.csv`);
+                const downloadPath = path.resolve(
+                    path.join(getSetting('STORAGE_PATH'), `data_export_${rand}.csv`)
+                );
                 fs.writeFile(downloadPath, payload, (err) => {
                     if (err) {
                         res.json({type: 'error', message: err});
                         return next();
                     }
-                    res.json({type: 'csv', url: 'file:///'.concat(downloadPath)});
+                    res.json({type: 'csv', url: 'file://'.concat(downloadPath)});
                     return next();
                 });
             }
