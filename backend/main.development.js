@@ -1,4 +1,4 @@
-import {app, BrowserWindow} from 'electron';
+import {app, BrowserWindow, shell} from 'electron';
 import {contains} from 'ramda';
 import Logger from './logger';
 import {setupMenus} from './menus';
@@ -68,7 +68,8 @@ app.on('ready', () => {
     // prevent navigation out of HTTP_URL
     // see https://electronjs.org/docs/api/web-contents#event-will-navigate
     mainWindow.webContents.on('new-window', (event, url) => {
-        if (!url.startsWith(HTTP_URL)) event.preventDefault();
+        event.preventDefault();
+        shell.openExternal(url);
     });
 
     mainWindow.on('closed', () => {
