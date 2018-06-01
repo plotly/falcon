@@ -4,7 +4,6 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {
     baseUrl,
-    dynamicRequireElectron,
     homeUrl,
     isOnPrem,
     plotlyUrl
@@ -138,21 +137,11 @@ class Login extends Component {
     }
 
     oauthPopUp() {
-        try {
-            const electron = dynamicRequireElectron();
-            const oauthUrl = this.buildOauthUrl();
-            electron.shell.openExternal(oauthUrl);
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.log('Unable to openExternal, opening a popupWindow instead:');
-            // eslint-disable-next-line no-console
-            console.log(e);
-            const popupWindow = PopupCenter(
-                this.buildOauthUrl(), 'Authorization', '500', '500'
-            );
-            if (window.focus) {
-                popupWindow.focus();
-            }
+        const popupWindow = PopupCenter(
+            this.buildOauthUrl(), 'Authorization', '500', '500'
+        );
+        if (window.focus) {
+            popupWindow.focus();
         }
     }
 
