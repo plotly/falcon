@@ -251,6 +251,7 @@ class Settings extends Component {
             apacheDrillStorageRequest,
             apacheDrillS3KeysRequest,
             connections,
+            connectRequest,
             deleteTab,
             elasticsearchMappingsRequest,
             getSqlSchema,
@@ -287,6 +288,11 @@ class Settings extends Component {
 
         const dialect = connections[selectedTab].dialect;
 
+        const queryPanelDisabled = (
+            connectRequest.status !== 200 ||
+            (!selectedTable && contains(dialect, SQL_DIALECTS_USING_EDITOR))
+        );
+
         return (
             <div>
                 <ConnectionTabs
@@ -320,11 +326,7 @@ class Settings extends Component {
 
                         <TabList>
                             <Tab>Connection</Tab>
-                            {this.props.connectRequest.status === 200 && selectedTable ? (
-                                <Tab>Query</Tab>
-                            ) : (
-                                <Tab disabled={true}>Query</Tab>
-                            )}
+                            <Tab disabled={queryPanelDisabled}>Query</Tab>
                             {isOnPrem() || <Tab
                                 className="test-ssl-tab react-tabs__tab"
                             >
@@ -339,7 +341,11 @@ class Settings extends Component {
                         </TabPanel>
 
                         <TabPanel className={['tab-panel-query', 'react-tabs__tab-panel']}>
-                            {this.props.connectRequest.status === 200 && selectedTable ? (
+                            {queryPanelDisabled ? (
+                                <div className="big-whitespace-tab">
+                                    <p>Please connect to a data store in the Connection tab first.</p>
+                                </div>
+                            ) : (
                                 <Preview
                                     username={username}
 
@@ -369,10 +375,6 @@ class Settings extends Component {
                                     previewTableRequest={previewTableRequest || {}}
                                     tablesRequest={tablesRequest}
                                 />
-                            ) : (
-                                <div className="big-whitespace-tab">
-                                    <p>Please connect to a data store in the Connection tab first.</p>
-                                </div>
                             )}
                         </TabPanel>
 
