@@ -171,7 +171,6 @@ class Preview extends Component {
     }
 
     fetchDatacache(payload, type) {
-
         const {username} = this.props;
         const payloadJSON = JSON.stringify({
             payload: payload, type: type, requestor: username});
@@ -187,7 +186,8 @@ class Preview extends Component {
         }).then(resp => {
             return resp.json();
         }).then(data => {
-            const plotlyLinks = this.state.plotlyLinks;
+            const {plotlyLinks} = this.state;
+
             let link;
 
             if (!('error' in data)) {
@@ -458,19 +458,6 @@ class Preview extends Component {
                                             <div style={{margin: '20px 0'}}>
                                                 <button
                                                     className="btn btn-outline"
-                                                    onClick={() => this.fetchDatacache(this.getCSVString(), 'grid')}
-                                                >
-                                                    Send CSV to Chart Studio
-                                                </button>
-                                                {!isOnPrem() &&
-                                                <button
-                                                    className="btn btn-outline"
-                                                    onClick={() => this.fetchDatacache(this.getCSVString(), 'csv')}
-                                                >
-                                                    Download CSV
-                                                </button>}
-                                                <button
-                                                    className="btn btn-outline"
                                                     onClick={() => this.fetchDatacache(
                                                         JSON.stringify(this.state.plotlyJSON),
                                                         'plot'
@@ -478,6 +465,21 @@ class Preview extends Component {
                                                 >
                                                     Send chart to Chart Studio
                                                 </button>
+                                                <button
+                                                    className="btn btn-outline"
+                                                    onClick={() => this.fetchDatacache(this.getCSVString(), 'grid')}
+                                                >
+                                                    Send CSV to Chart Studio
+                                                </button>
+                                                {!isOnPrem() &&
+                                                <button
+                                                    className="btn btn-outline"
+                                                    onClick={() => window.open(
+                                                        `data:text/csv;base64,${Buffer.from(this.getCSVString()).toString('base64')}`
+                                                    )}
+                                                >
+                                                    Download CSV
+                                                </button>}
                                             </div>
                                             <div style={{width: 650, height: 200, border: '1px solid #dfe8f3',
                                                 fontFamily: '\'Ubuntu Mono\', courier, monospace', paddingTop: 10,
@@ -488,12 +490,6 @@ class Preview extends Component {
                                                         {link.type === 'grid' &&
                                                             <div>
                                                                 <div style={{color: '#00cc96'}}>🎉  Link to your CSV on Chart Studio ⬇️</div>
-                                                                <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
-                                                            </div>
-                                                        }
-                                                        {link.type === 'csv' &&
-                                                            <div>
-                                                                <div style={{color: '#00cc96'}}>💾  Your CSV has been saved ⬇️</div>
                                                                 <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
                                                             </div>
                                                         }
