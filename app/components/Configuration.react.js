@@ -14,7 +14,7 @@ class Configuration extends Component {
         super(props);
         this.state = {
             authEnabled: (cookie.load('db-connector-auth-enabled') === 'true'),
-            clientId: cookie.load('db-connector-client-id'),
+            clientId: cookie.load('db-connector-oauth2-client-id'),
             isMenuOpen: false,
             username: cookie.load('db-connector-user')
         };

@@ -25,7 +25,7 @@ class Login extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            clientId: cookie.load('db-connector-client-id'),
+            clientId: cookie.load('db-connector-oauth2-client-id'),
             domain: (isOnPrem() ? plotlyUrl() : 'https://plot.ly'),
             statusMessage: '',
             serverType: CLOUD,

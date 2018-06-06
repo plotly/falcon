@@ -35,7 +35,7 @@ export function PlotlyOAuth(electron) {
 
         const clientId = process.env.PLOTLY_CONNECTOR_OAUTH2_CLIENT_ID ||
             'isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt';
-        res.setCookie('db-connector-client-id', clientId, getUnsecuredCookieOptions());
+        res.setCookie('db-connector-oauth2-client-id', clientId, getUnsecuredCookieOptions());
 
         const authEnabled = getSetting('AUTH_ENABLED');
         res.setCookie('db-connector-auth-enabled', authEnabled, getUnsecuredCookieOptions());
