@@ -75,7 +75,7 @@ app.on('ready', () => {
     });
 
     // prevent navigation out of HTTP_URL
-    // see https://electronjs.org/docs/api/web-contents#event-will-navigate
+    // see https://electronjs.org/docs/api/web-contents#event-new-window
     mainWindow.webContents.on('new-window', (event, url) => {
         event.preventDefault();
 
