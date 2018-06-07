@@ -20,6 +20,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 
+## [2.8.0] - 2018-06-07
+
+### Fixed
+* Fixed query panel for non-sql connectors (#451)
+* Fixed build failure with dtrace-provider (#421)
+* Fixed broken oauth redirection in web app (#260)
+
+### Security
+* Disabled nodeIntegration (#453)
+* Ensured new windows are created using `shell.openExternal` (#453)
+
+
 ## [2.7.0] - 2018-05-28
 
 ### Added
