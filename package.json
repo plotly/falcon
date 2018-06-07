@@ -172,7 +172,6 @@
     "electron-builder": "^19.46.4",
     "electron-debug": "^1.4.0",
     "electron-mocha": "^4.0.3",
-    "electron-packager": "^8.7.0",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "eslint": "^4.11.0",
