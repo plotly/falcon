@@ -21,7 +21,7 @@ install:
 script:
   - yarn run build
   - yarn run pack
-  - zip mac-release.zip release/Falcon* release/*.yml
+  - zip --junk-paths mac-release.zip release/*.dmg
 
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine

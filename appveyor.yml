@@ -28,10 +28,9 @@ build_script:
   - yarn run pack
 
 after_build:
-  - 7z a release.zip release/latest.yml release/*.exe
+  - cd release && 7z a win-release.zip *.exe
 
 artifacts:
-  - path: release.zip
-    name: release
+  - path: release\win-release.zip
 
 test: off
