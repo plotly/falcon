@@ -6,7 +6,7 @@ const SHOW_SCHEMA_QUERY =
 //const BIGQUERY_DEFAULT_QUERY = `SELECT * FROM FROM ${database}.__TABLES__ `;
 const DEFAULT_QUERY_INTERVAL = 2000;
 
-//const BigQuery = require('@google-cloud/bigquery');
+const BigQuery = require('@google-cloud/bigquery');
 
 //TODO.  1. Simple connect and run preview query
 //2. Get a list of schema's via API
