@@ -16,6 +16,7 @@
     "docker:db2:start": "docker run --rm -ti -p 50000:50000 pdc-db2",
     "docker:falcon:build": "docker build -t falcon-sql-client:local .",
     "docker:falcon:start": "docker run -ti --rm -p 9494:9494 -e PLOTLY_CONNECTOR_AUTH_ENABLED=$PLOTLY_CONNECTOR_AUTH_ENABLED -e PLOTLY_CONNECTOR_ALLOWED_USERS=$PLOTLY_CONNECTOR_ALLOWED_USERS falcon-sql-client:local",
+    "docker:mssql:start": "docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=yourStrong(!)Password' -p 1433:1433 -d microsoft/mssql-server-linux:latest",
     "docker:oracle:build": "docker build test/docker/oracle -t falcon-test-oracle --no-cache",
     "docker:oracle:start": "docker run --rm -ti -p 1521:1521 falcon-test-oracle",
     "rebuild:modules:electron": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/rebuild-modules.js --electron",
