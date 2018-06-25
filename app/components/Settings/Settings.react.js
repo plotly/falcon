@@ -13,9 +13,9 @@ import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import Preview from './Preview/Preview.react';
 import {Link} from '../Link.react';
+import Scheduler from './Scheduler.react';
 import {DIALECTS, FAQ, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
 import {isElectron, isOnPrem} from '../../utils/utils';
-
 
 class Settings extends Component {
     constructor(props) {
@@ -327,6 +327,7 @@ class Settings extends Component {
                         <TabList>
                             <Tab>Connection</Tab>
                             <Tab disabled={queryPanelDisabled}>Query</Tab>
+                            <Tab disabled={false}>Schedule</Tab>
                             {isOnPrem() || <Tab
                                 className="test-ssl-tab react-tabs__tab"
                             >
@@ -376,6 +377,10 @@ class Settings extends Component {
                                     tablesRequest={tablesRequest}
                                 />
                             )}
+                        </TabPanel>
+
+                        <TabPanel>
+                          <Scheduler />
                         </TabPanel>
 
                         {isOnPrem() || <TabPanel>
