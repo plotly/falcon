@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
+import tohash from 'tohash';
 
 const Row = props => (
   <div
@@ -111,40 +112,13 @@ function mapRows (sortFnKey, rows) {
 }
 
 class Scheduler extends Component {
-  // TODO props
-  rows = [
-    {
-      query: 'SELECT * FROM stripe.customers',
-      interval: 'Runs every 15 minutes',
-      tags: [{ title: 'XERO', color: '#f2c94c' }],
-      status: 'SUCCESS',
-      last_run: 1500,
-      size: 115,
-      time: 50 * 1000
-    },
-    {
-      query: 'SELECT * FROM amex.customers',
-      interval: 'Runs every Tuesday at 3:00pm',
-      tags: [{ title: 'XERO', color: '#f2c94c' }, { title: 'Important', color: '#56ccf2' }],
-      status: 'SUCCESS',
-      last_run: 1500,
-      size: 64,
-      time: 3 * 60 * 1000
-    },
-    {
-      query: 'SELECT * FROM amex.customers',
-      interval: 'Runs every Tuesday at 3:00pm',
-      tags: [{ title: 'Stage 2', color: '#d14cf2' }],
-      status: 'ERROR',
-      last_run: 1500,
-      size: 0,
-      time: 3000
-    }
-  ]
   constructor(props) {
     super(props);
+    const rows = this.props.rows.map(r =>
+      Object.assign(r, { tags: r.tags.map(t => this.props.tags[t]) }));
+
     this.state = {
-      rows: mapRows('recent', this.rows)
+      rows: mapRows('recent', rows)
     };
     this.sort = this.sort.bind(this);
   }
@@ -157,14 +131,14 @@ class Scheduler extends Component {
     {
       key: 'query',
       name: 'Query',
-      width: 650,
+      width: 725,
       filterable: true,
       formatter: QueryFormatter
     },
     {
       key: 'run',
       name: 'Last run',
-      width: 450,
+      width: 525,
       filterable: true,
       formatter: RunFormatter
     }
@@ -211,7 +185,7 @@ class Scheduler extends Component {
             </Row>
           </Column>
         </Row>
-        <Row style={{ padding: '0 16px' }}>
+        <Row style={{ padding: '0 16px', width: 'auto' }}>
           <ReactDataGrid
             ref={node => (this.grid = node)}
             columns={this.columns}
@@ -225,5 +199,43 @@ class Scheduler extends Component {
     );
   }
 }
+
+Scheduler.defaultProps = {
+  tags: tohash([
+    { title: 'XERO', color: '#f2c94c' },
+    { title: 'Important', color: '#56ccf2' },
+    { title: 'Stage 2', color: '#d14cf2' }
+  ], 'title'),
+
+  rows: [
+    {
+      query: 'SELECT * FROM stripe.customers',
+      interval: 'Runs every 15 minutes',
+      tags: ['XERO'],
+      status: 'SUCCESS',
+      last_run: 1500,
+      size: 115,
+      time: 50 * 1000
+    },
+    {
+      query: 'SELECT * FROM amex.customers',
+      interval: 'Runs every Tuesday at 3:00pm',
+      tags: ['XERO', 'Important'],
+      status: 'SUCCESS',
+      last_run: 1500,
+      size: 64,
+      time: 3 * 60 * 1000
+    },
+    {
+      query: 'SELECT * FROM amex.customers',
+      interval: 'Runs every Tuesday at 3:00pm',
+      tags: ['Stage 2'],
+      status: 'ERROR',
+      last_run: 1500,
+      size: 0,
+      time: 3000
+    }
+  ]
+};
 
 export default Scheduler;
