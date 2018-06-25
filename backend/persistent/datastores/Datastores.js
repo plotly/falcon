@@ -4,7 +4,7 @@ function logError(error) {
     throw error;
 }
 
-import * as Sql from './Sql';
+import * as Sql from './sql.js';
 import * as Elasticsearch from './Elasticsearch';
 import * as S3 from './S3';
 import * as ApacheDrill from './ApacheDrill';

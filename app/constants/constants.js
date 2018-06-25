@@ -295,7 +295,9 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
         case DIALECTS.ATHENA:
             return `SELECT * FROM ${table} LIMIT 1000`;
         case DIALECTS.MSSQL:
-            return `SELECT TOP 1000 * FROM ${connection.database}.dbo.${table}`;
+            return (connection.database) ?
+                `SELECT TOP 1000 * FROM "${connection.database}".${table}` :
+                `SELECT TOP 1000 * FROM ${table}`;
         case DIALECTS.ELASTICSEARCH:
             return JSON.stringify({
                 index: elasticsearchIndex || '_all',
