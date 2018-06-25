@@ -92,43 +92,65 @@ class RunFormatter extends React.Component {
   }
 }
 
+const SORT = {
+  recent: (a, b) => b.last_run - a.last_run,
+  latent: (a, b) => a.last_run - b.last_run,
+  longest: (a, b) => b.time - a.time,
+  shortest: (a, b) => a.time - b.time,
+  most: (a, b) => b.size - a.size,
+  least: (a, b) => a.size - b.size
+};
+
+function mapRows (sortFnKey, rows) {
+  return rows
+    .sort(SORT[sortFnKey])
+    .map(r => ({
+      query: r,
+      run: r
+    }));
+}
+
 class Scheduler extends Component {
+  // TODO props
+  rows = [
+    {
+      query: 'SELECT * FROM stripe.customers',
+      interval: 'Runs every 15 minutes',
+      tags: [{ title: 'XERO', color: '#f2c94c' }],
+      status: 'SUCCESS',
+      last_run: 1500,
+      size: 115,
+      time: 50 * 1000
+    },
+    {
+      query: 'SELECT * FROM amex.customers',
+      interval: 'Runs every Tuesday at 3:00pm',
+      tags: [{ title: 'XERO', color: '#f2c94c' }, { title: 'Important', color: '#56ccf2' }],
+      status: 'SUCCESS',
+      last_run: 1500,
+      size: 64,
+      time: 3 * 60 * 1000
+    },
+    {
+      query: 'SELECT * FROM amex.customers',
+      interval: 'Runs every Tuesday at 3:00pm',
+      tags: [{ title: 'Stage 2', color: '#d14cf2' }],
+      status: 'ERROR',
+      last_run: 1500,
+      size: 0,
+      time: 3000
+    }
+  ]
   constructor(props) {
     super(props);
     this.state = {
-      rows: [
-        {
-          query: 'SELECT * FROM stripe.customers',
-          interval: 'Runs every 15 minutes',
-          tags: [{ title: 'XERO', color: '#f2c94c' }],
-          status: 'SUCCESS',
-          last_run: 1500,
-          size: 115,
-          time: 50 * 1000
-        },
-        {
-          query: 'SELECT * FROM amex.customers',
-          interval: 'Runs every Tuesday at 3:00pm',
-          tags: [{ title: 'XERO', color: '#f2c94c' }, { title: 'Important', color: '#56ccf2' }],
-          status: 'SUCCESS',
-          last_run: 1500,
-          size: 64,
-          time: 3 * 60 * 1000
-        },
-        {
-          query: 'SELECT * FROM amex.customers',
-          interval: 'Runs every Tuesday at 3:00pm',
-          tags: [{ title: 'Stage 2', color: '#d14cf2' }],
-          status: 'ERROR',
-          last_run: 1500,
-          size: 0,
-          time: 3000
-        }
-      ].map(r => ({
-        query: r,
-        run: r
-      }))
+      rows: mapRows('recent', this.rows)
     };
+    this.sort = this.sort.bind(this);
+  }
+
+  sort(sortFnKey) {
+    this.setState(mapRows(sortFnKey, this.rows));
   }
 
   columns = [
