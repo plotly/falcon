@@ -131,7 +131,7 @@ class CreateModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      code: ''
+      code: props.initialCode
     };
     this.updateCode = this.updateCode.bind(this);
     this.options = {
@@ -263,10 +263,10 @@ class Scheduler extends Component {
                 {this.state.rows.length} queries
               </Column>
               <Column>
-                Success ({this.state.rows.filter(r => r.status === 'SUCCESS').length})
+                Success ({this.state.rows.filter(r => r.query.status === 'SUCCESS').length})
               </Column>
               <Column>
-                Error ({this.state.rows.filter(r => r.status === 'ERROR').length})
+                Error ({this.state.rows.filter(r => r.query.status === 'ERROR').length})
               </Column>
             </Row>
           </Column>
