@@ -4,8 +4,10 @@ import PropTypes from 'prop-types';
 import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import tohash from 'tohash';
-
 import {Controlled as CodeMirror} from 'react-codemirror2';
+import matchSorter from 'match-sorter';
+
+// import { Data } from 'react-data-grid-addons'
 
 const Row = props => (
   <div
@@ -43,7 +45,7 @@ const Tag = ({ title, color }) => (
   </span>
 );
 
-class QueryFormatter extends React.Component {
+const QueryFormatter = tags => class extends React.Component {
   static propTypes = {
     value: PropTypes.object
   }
@@ -66,13 +68,13 @@ class QueryFormatter extends React.Component {
         </Column>
         <Column style={{ padding: '0 24px' }}>
           <div>
-            {query.tags.map(Tag)}
+            {query.tags.map(t => tags[t]).map(Tag)}
           </div>
         </Column>
       </Row>
     );
   }
-}
+};
 
 class RunFormatter extends React.Component {
   static propTypes = {
@@ -195,9 +197,8 @@ const SORT = {
   least: (a, b) => a.size - b.size
 };
 
-function mapRows (sortFnKey, rows) {
+function mapRows (rows) {
   return rows
-    .sort(SORT[sortFnKey])
     .map(r => ({
       query: r,
       run: r
@@ -207,38 +208,53 @@ function mapRows (sortFnKey, rows) {
 class Scheduler extends Component {
   constructor(props) {
     super(props);
-    const rows = this.props.rows.map(r =>
-      Object.assign({}, r, { tags: r.tags.map(t => this.props.tags[t]) }));
-
     this.state = {
-      rows: mapRows('recent', rows),
-      createModalOpen: false
+      rows: this.props.rows,
+      sort: 'recent',
+      createModalOpen: false,
+      search: null
     };
     this.sort = this.sort.bind(this);
+    this.handleSearchChange = this.handleSearchChange.bind(this);
+    this.columns = [
+      {
+        key: 'query',
+        name: 'Query',
+        width: 875,
+        filterable: true,
+        // TODO this will use redux connect instead
+        formatter: QueryFormatter(this.props.tags)
+      },
+      {
+        key: 'run',
+        name: 'Last run',
+        width: 325,
+        filterable: true,
+        formatter: RunFormatter
+      }
+    ];
   }
 
   sort(sortFnKey) {
-    this.setState(mapRows(sortFnKey, this.rows));
+    this.setState({ sort: sortFnKey });
   }
 
-  columns = [
-    {
-      key: 'query',
-      name: 'Query',
-      width: 875,
-      filterable: true,
-      formatter: QueryFormatter
-    },
-    {
-      key: 'run',
-      name: 'Last run',
-      width: 325,
-      filterable: true,
-      formatter: RunFormatter
-    }
-  ]
+  handleSearchChange(e) {
+    this.setState({ search: e.target.value });
+  }
 
   render() {
+    const { createModalOpen, sort, search, rows: baseRows } = this.state;
+
+    const rows = mapRows(
+      matchSorter(
+        baseRows,
+        search,
+        { keys: ['query', 'tags', 'status'] }
+      )
+      .sort(SORT[sort])
+    );
+
     return (
       <React.Fragment>
         <Row
@@ -248,7 +264,11 @@ class Scheduler extends Component {
             justifyContent: 'space-between'
           }}
         >
-          <input placeholder="Search scheduled queries..."/>
+          <input
+            value={search}
+            onChange={this.handleSearchChange}
+            placeholder="Search scheduled queries..."
+          />
           <button
             style={{ marginRight: '16px' }}
             onClick={() => this.setState({ createModalOpen: true })}
@@ -260,13 +280,13 @@ class Scheduler extends Component {
           <Column style={{ width: 300 }}>
             <Row>
               <Column style={{ borderRight: '1px solid grey', marginRight: 12 }}>
-                {this.state.rows.length} queries
+                {rows.length} queries
               </Column>
               <Column>
-                Success ({this.state.rows.filter(r => r.query.status === 'SUCCESS').length})
+                Success ({rows.filter(r => r.query.status === 'SUCCESS').length})
               </Column>
               <Column>
-                Error ({this.state.rows.filter(r => r.query.status === 'ERROR').length})
+                Error ({rows.filter(r => r.query.status === 'ERROR').length})
               </Column>
             </Row>
           </Column>
@@ -286,16 +306,16 @@ class Scheduler extends Component {
         </Row>
         <Row style={{ padding: '0 16px', width: 'auto' }}>
           <ReactDataGrid
-            ref={node => (this.grid = node)}
+            // ref={node => (this.grid = node)}
             columns={this.columns}
-            rowGetter={index => this.state.rows[index]}
-            rowsCount={this.state.rows.length}
+            rowGetter={i => rows[i]}
+            rowsCount={rows.length}
             rowHeight={84}
             headerRowHeight={32}
           />
         </Row>
         <CreateModal
-          open={this.state.createModalOpen}
+          open={createModalOpen}
           onClickAway={() => this.setState({ createModalOpen: false })}
         />
       </React.Fragment>
