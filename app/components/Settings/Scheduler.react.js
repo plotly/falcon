@@ -5,10 +5,18 @@ import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import tohash from 'tohash';
 
+import {Controlled as CodeMirror} from 'react-codemirror2';
+
 const Row = props => (
   <div
     className="row" {...props}
-    style={{ display: 'flex', justifyContent: 'space-around', width: '100%', ...props.style }}
+    style={{
+      display: 'flex',
+      boxSizing: 'border-box',
+      justifyContent: 'space-around',
+      width: '100%',
+      ...props.style
+    }}
   >
     {props.children}
   </div>
@@ -93,6 +101,91 @@ class RunFormatter extends React.Component {
   }
 }
 
+const Overlay = props => (
+  props.open
+    ? (
+      <div
+        {...props}
+        onClick={props.onClick}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100vw',
+          height: '100vh',
+          margin: '0 auto',
+          position: 'fixed',
+          background: 'rgba(0, 0, 0, 0.1)',
+          top: 0,
+          left: 0,
+          zIndex: 9999
+        }}
+      >
+        {props.children}
+      </div>
+    )
+    : null
+);
+
+class CreateModal extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      code: ''
+    };
+    this.updateCode = this.updateCode.bind(this);
+    this.options = {
+      lineNumbers: true,
+      mode: 'text/x-mysql', // TODO
+      tabSize: 4,
+      readOnly: false
+      // extraKeys: {
+      //   'Shift-Enter': runQuery
+      // }
+    };
+  }
+
+  updateCode(editor, meta, code) {
+    this.setState({ code });
+  }
+
+  render() {
+    return (
+      <Overlay {...this.props} onClick={this.props.onClickAway} className="scheduler">
+        <Column
+          onClick={e => { e.preventDefault(); e.stopPropagation(); }}
+          style={{ width: '60%', background: 'white' }}
+        >
+          <Row>
+            <Column>
+              <h5 style={{ paddingLeft: '16px' }}>Create Scheduled Query</h5>
+              <p style={{ marginTop: 0 }}>
+                A scheduled query runs and updates its corresponding dataset in
+                Plotly Cloud. Learn more about scheduled queries here.
+              </p>
+            </Column>
+          </Row>
+          <Row>
+            <Column>
+              <Row style={{ justifyContent: 'flex-start' }}>
+                <div style={{ paddingLeft: '16px', marginRight: '24px' }}>Query</div>
+                <CodeMirror
+                  options={this.options}
+                  value={this.state.code}
+                  onBeforeChange={this.updateCode}
+                />
+              </Row>
+            </Column>
+          </Row>
+          <Row>
+            <button style={{ width: '100%', margin: '0 16px 16px' }}>Schedule Query</button>
+          </Row>
+        </Column>
+      </Overlay>
+    );
+  }
+}
+
 const SORT = {
   recent: (a, b) => b.last_run - a.last_run,
   latent: (a, b) => a.last_run - b.last_run,
@@ -115,10 +208,11 @@ class Scheduler extends Component {
   constructor(props) {
     super(props);
     const rows = this.props.rows.map(r =>
-      Object.assign(r, { tags: r.tags.map(t => this.props.tags[t]) }));
+      Object.assign({}, r, { tags: r.tags.map(t => this.props.tags[t]) }));
 
     this.state = {
-      rows: mapRows('recent', rows)
+      rows: mapRows('recent', rows),
+      createModalOpen: false
     };
     this.sort = this.sort.bind(this);
   }
@@ -131,14 +225,14 @@ class Scheduler extends Component {
     {
       key: 'query',
       name: 'Query',
-      width: 725,
+      width: 875,
       filterable: true,
       formatter: QueryFormatter
     },
     {
       key: 'run',
       name: 'Last run',
-      width: 525,
+      width: 325,
       filterable: true,
       formatter: RunFormatter
     }
@@ -155,7 +249,12 @@ class Scheduler extends Component {
           }}
         >
           <input placeholder="Search scheduled queries..."/>
-          <button style={{ marginRight: '16px' }}>Create Scheduled Query</button>
+          <button
+            style={{ marginRight: '16px' }}
+            onClick={() => this.setState({ createModalOpen: true })}
+          >
+            Create Scheduled Query
+          </button>
         </Row>
         <Row style={{ marginBottom: 16, padding: '0 16px', justifyContent: 'space-between' }}>
           <Column style={{ width: 300 }}>
@@ -195,6 +294,10 @@ class Scheduler extends Component {
             headerRowHeight={32}
           />
         </Row>
+        <CreateModal
+          open={this.state.createModalOpen}
+          onClickAway={() => this.setState({ createModalOpen: false })}
+        />
       </React.Fragment>
     );
   }
