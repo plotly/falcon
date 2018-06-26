@@ -7,7 +7,7 @@ import tohash from 'tohash';
 import {Controlled as CodeMirror} from 'react-codemirror2';
 import matchSorter from 'match-sorter';
 
-// import { Data } from 'react-data-grid-addons'
+import { Data } from 'react-data-grid-addons'
 
 const Row = props => (
   <div
@@ -214,8 +214,6 @@ class Scheduler extends Component {
       createModalOpen: false,
       search: null
     };
-    this.sort = this.sort.bind(this);
-    this.handleSearchChange = this.handleSearchChange.bind(this);
     this.columns = [
       {
         key: 'query',
@@ -233,6 +231,11 @@ class Scheduler extends Component {
         formatter: RunFormatter
       }
     ];
+
+    this.sort = this.sort.bind(this);
+    this.handleSearchChange = this.handleSearchChange.bind(this);
+    this.getRows = this.getRows.bind(this);
+    this.rowGetter = this.rowGetter.bind(this);
   }
 
   sort(sortFnKey) {
@@ -243,17 +246,26 @@ class Scheduler extends Component {
     this.setState({ search: e.target.value });
   }
 
-  render() {
-    const { createModalOpen, sort, search, rows: baseRows } = this.state;
+  getRows() {
+    // TODO use Selector.getRows(this.state)
+    const { sort, search, rows } = this.state;
 
-    const rows = mapRows(
+    return mapRows(
       matchSorter(
-        baseRows,
+        rows,
         search,
         { keys: ['query', 'tags', 'status'] }
       )
       .sort(SORT[sort])
     );
+  }
+
+  rowGetter(i) {
+    return this.getRows()[i];
+  }
+
+  render() {
+    const rows = this.getRows();
 
     return (
       <React.Fragment>
@@ -265,7 +277,7 @@ class Scheduler extends Component {
           }}
         >
           <input
-            value={search}
+            value={this.state.search}
             onChange={this.handleSearchChange}
             placeholder="Search scheduled queries..."
           />
@@ -308,14 +320,14 @@ class Scheduler extends Component {
           <ReactDataGrid
             // ref={node => (this.grid = node)}
             columns={this.columns}
-            rowGetter={i => rows[i]}
+            rowGetter={this.rowGetter}
             rowsCount={rows.length}
             rowHeight={84}
             headerRowHeight={32}
           />
         </Row>
         <CreateModal
-          open={createModalOpen}
+          open={this.state.createModalOpen}
           onClickAway={() => this.setState({ createModalOpen: false })}
         />
       </React.Fragment>
