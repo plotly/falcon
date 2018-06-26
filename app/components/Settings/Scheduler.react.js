@@ -7,7 +7,7 @@ import tohash from 'tohash';
 import {Controlled as CodeMirror} from 'react-codemirror2';
 import matchSorter from 'match-sorter';
 
-import { Data } from 'react-data-grid-addons'
+import { Data } from 'react-data-grid-addons';
 
 const Row = props => (
   <div
@@ -247,8 +247,9 @@ class Scheduler extends Component {
   }
 
   getRows() {
-    // TODO use Selector.getRows(this.state)
-    const { sort, search, rows } = this.state;
+    // TODO i think rows will come from store, i.e. props
+    const rows = Data.Selectors.getRows(this.state);
+    const { sort, search } = this.state;
 
     return mapRows(
       matchSorter(
