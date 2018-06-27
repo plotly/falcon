@@ -5,8 +5,6 @@ import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
 
-import { Data } from 'react-data-grid-addons';
-
 const Row = props => (
   <div
     className="row" {...props}
@@ -22,9 +20,18 @@ const Row = props => (
   </div>
 );
 
+Row.propTypes = {
+  children: PropTypes.node,
+  style: PropTypes.object
+};
+
 const Column = props => (
   <Row {...props} style={{ flexDirection: 'column', ...props.style }} />
 );
+
+Column.propTypes = {
+  style: PropTypes.object
+};
 
 class QueryFormatter extends React.Component {
   static propTypes = {
@@ -58,7 +65,7 @@ class IntervalFormatter extends React.Component {
         <Column style={{ padding: '0 24px' }}>
           <em
             style={{
-              fontSize: 18,
+              fontSize: 18
             }}
           >
             {`Runs every ${ms(run.refreshInterval * 1000, { long: true })}`}
@@ -110,15 +117,10 @@ class Scheduler extends Component {
   }
 
   getRows() {
-    // TODO i think rows will come from store, i.e. props
-    const { search } = this.state;
-    const rowsObj = { rows: this.props.queries };
-    const rows = Data.Selectors.getRows(rowsObj);
-
     return mapRows(
       matchSorter(
-        rows,
-        search,
+        this.props.queries,
+        this.state.search,
         { keys: ['query'] }
       )
     );
@@ -178,21 +180,12 @@ class Scheduler extends Component {
   }
 }
 
-Scheduler.defaultProps = {
-  // rows: [
-  //   {
-  //     query: 'SELECT * FROM stripe.customers',
-  //     interval: 15 * 60 * 1000
-  //   },
-  //   {
-  //     query: 'SELECT * FROM amex.customers',
-  //     interval: 30 * 60 * 1000
-  //   },
-  //   {
-  //     query: 'SELECT * FROM amex.customers',
-  //     interval: 60 * 1000
-  //   }
-  // ]
+Scheduler.propTypes = {
+  queries: PropTypes.arrayOf(PropTypes.shape({
+    query: PropTypes.string,
+    refreshInterval: PropTypes.number
+  })),
+  refreshQueries: PropTypes.func
 };
 
 export default Scheduler;
