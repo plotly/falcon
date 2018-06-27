@@ -61,7 +61,7 @@ class IntervalFormatter extends React.Component {
               fontSize: 18,
             }}
           >
-            {`Runs every ${ms(run.interval, { long: true })}`}
+            {`Runs every ${ms(run.refreshInterval * 1000, { long: true })}`}
           </em>
         </Column>
       </Row>
@@ -112,7 +112,8 @@ class Scheduler extends Component {
   getRows() {
     // TODO i think rows will come from store, i.e. props
     const { search } = this.state;
-    const rows = Data.Selectors.getRows(this.props);
+    const rowsObj = { rows: this.props.queries };
+    const rows = Data.Selectors.getRows(rowsObj);
 
     return mapRows(
       matchSorter(
@@ -157,7 +158,7 @@ class Scheduler extends Component {
           <Column style={{ width: 300 }}>
             <Row>
               <Column>
-                <button style={{ marginRight: '32px' }}>⟳</button>
+                <button onClick={this.props.refreshQueries} style={{ marginRight: '32px' }}>⟳</button>
               </Column>
             </Row>
           </Column>
@@ -178,20 +179,20 @@ class Scheduler extends Component {
 }
 
 Scheduler.defaultProps = {
-  rows: [
-    {
-      query: 'SELECT * FROM stripe.customers',
-      interval: 15 * 60 * 1000
-    },
-    {
-      query: 'SELECT * FROM amex.customers',
-      interval: 30 * 60 * 1000
-    },
-    {
-      query: 'SELECT * FROM amex.customers',
-      interval: 60 * 1000
-    }
-  ]
+  // rows: [
+  //   {
+  //     query: 'SELECT * FROM stripe.customers',
+  //     interval: 15 * 60 * 1000
+  //   },
+  //   {
+  //     query: 'SELECT * FROM amex.customers',
+  //     interval: 30 * 60 * 1000
+  //   },
+  //   {
+  //     query: 'SELECT * FROM amex.customers',
+  //     interval: 60 * 1000
+  //   }
+  // ]
 };
 
 export default Scheduler;

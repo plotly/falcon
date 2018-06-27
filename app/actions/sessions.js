@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import uuid from 'uuid';
+import {propEq} from 'ramda';
 import {createAction} from 'redux-actions';
 import {INITIAL_CONNECTIONS, PREVIEW_QUERY} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
@@ -9,6 +10,7 @@ export const mergeTabMap = createAction('MERGE_TAB_MAP');
 export const setTab = createAction('SET_TAB');
 export const setTable = createAction('SET_TABLE');
 export const setIndex = createAction('SET_INDEX');
+export const setScheduledQueries = createAction('SET_SCHEDULED_QUERIES');
 export const mergeConnections = createAction('MERGE_CONNECTIONS');
 export const updateConnection = createAction('UPDATE_CREDENTIAL');
 export const deleteConnection = createAction('DELETE_CREDENTIAL');
@@ -135,6 +137,21 @@ export function editConnections(connectionObject, connectionId) {
         connectionId,
         connectionObject
     );
+}
+
+export function getScheduledQueries(connectionId) {
+    return dispatch => {
+        return dispatch(apiThunk(
+            'queries',
+            'GET',
+            'scheduledQueriesRequest'
+        )).then((json => {
+            dispatch(setScheduledQueries(
+              json.filter(propEq('connectionId', connectionId))
+            ));
+            return json;
+        }));
+    };
 }
 
 export function connect(connectionId) {

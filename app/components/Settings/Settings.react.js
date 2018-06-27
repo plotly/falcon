@@ -169,6 +169,7 @@ class Settings extends Component {
             getApacheDrillS3Keys,
             getElasticsearchMappings,
             getTables,
+            getScheduledQueries,
             getS3Keys,
             getSettings,
             initialize,
@@ -181,7 +182,8 @@ class Settings extends Component {
             s3KeysRequest,
             selectedTab,
             selectedIndex,
-            tablesRequest
+            tablesRequest,
+            scheduledQueriesRequest
         } = this.props;
         if (connectionsRequest && !connectionsRequest.status) {
             initialize();
@@ -197,6 +199,10 @@ class Settings extends Component {
         // // get the settings to prefill the URL
         if (!settingsRequest.status) {
             getSettings();
+        }
+
+        if (connectRequest.status === 200 && !scheduledQueriesRequest.status) {
+          getScheduledQueries();
         }
 
         const connectionObject = connections[selectedTab] || {};
@@ -268,6 +274,8 @@ class Settings extends Component {
             setIndex,
             setTable,
             selectedTable,
+            selectedScheduledQueries,
+            getScheduledQueries,
             selectedIndex,
             setTab,
             tablesRequest,
@@ -380,7 +388,7 @@ class Settings extends Component {
                         </TabPanel>
 
                         <TabPanel>
-                          <Scheduler />
+                          <Scheduler queries={selectedScheduledQueries} refreshQueries={getScheduledQueries} />
                         </TabPanel>
 
                         {isOnPrem() || <TabPanel>
@@ -502,6 +510,8 @@ function mapStateToProps(state) {
         deleteConnectionsRequests,
         previewTableRequests,
         tablesRequests,
+        selectedScheduledQueries,
+        scheduledQueriesRequest,
         elasticsearchMappingsRequests,
         selectedTables,
         selectedIndecies,
@@ -538,6 +548,7 @@ function mapStateToProps(state) {
         deleteConnectionsRequest: deleteConnectionsRequests[selectedConnectionId] || {},
         previewTableRequest,
         tablesRequest: tablesRequests[selectedConnectionId] || {},
+        scheduledQueriesRequest: scheduledQueriesRequest || {},
         elasticsearchMappingsRequest: elasticsearchMappingsRequests[selectedConnectionId] || {},
         s3KeysRequest: s3KeysRequests[selectedConnectionId] || {},
         apacheDrillStorageRequest: apacheDrillStorageRequests[selectedConnectionId] || {},
@@ -551,6 +562,7 @@ function mapStateToProps(state) {
         schemaRequest: schemaRequests[selectedConnectionId],
         queryRequest: queryRequests[selectedConnectionId],
         selectedTable,
+        selectedScheduledQueries,
         selectedIndex,
         selectedConnectionId,
         settingsRequest,
@@ -590,6 +602,9 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     }
     function boundGetTables() {
         return dispatch(Actions.getTables(selectedConnectionId));
+    }
+    function boundGetScheduledQueries() {
+        return dispatch(Actions.getScheduledQueries(selectedConnectionId));
     }
     function boundGetElasticsearchMappings() {
         return dispatch(Actions.getElasticsearchMappings(selectedConnectionId));
@@ -684,6 +699,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             setConnectionNeedToBeSaved: boundSetConnectionNeedToBeSaved,
             updateConnection: boundUpdateConnection,
             getTables: boundGetTables,
+            getScheduledQueries: boundGetScheduledQueries,
             getElasticsearchMappings: boundGetElasticsearchMappings,
             setTable: boundSetTable,
             setIndex: boundSetIndex,
@@ -738,6 +754,12 @@ Settings.propTypes = {
     s3KeysRequest: PropTypes.object,
     selectedTab: PropTypes.string,
     selectedIndex: PropTypes.any,
+    selectedScheduledQueries: PropTypes.arrayOf(PropTypes.shape({
+        query: PropTypes.string,
+        refreshInterval: PropTypes.number
+    })),
+    scheduledQueriesRequest: PropTypes.object,
+    getScheduledQueries: PropTypes.func,
     tablesRequest: PropTypes.object,
     deleteTab: PropTypes.func,
     getSqlSchema: PropTypes.func,
