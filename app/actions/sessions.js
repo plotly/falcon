@@ -1,9 +1,5 @@
 import fetch from 'isomorphic-fetch';
 import uuid from 'uuid';
-<<<<<<< HEAD
-import {propEq} from 'ramda';
-=======
->>>>>>> save all queries in the store and filter by connection in Settings component
 import {createAction} from 'redux-actions';
 import {INITIAL_CONNECTIONS, PREVIEW_QUERY} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
