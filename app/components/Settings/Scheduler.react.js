@@ -94,14 +94,12 @@ class Scheduler extends Component {
       {
         key: 'query',
         name: 'Query',
-        width: 875,
         filterable: true,
         formatter: QueryFormatter
       },
       {
         key: 'run',
         name: 'Interval',
-        width: 325,
         filterable: true,
         formatter: IntervalFormatter
       }
