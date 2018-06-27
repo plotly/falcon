@@ -180,7 +180,7 @@ function selectedTables(state = {}, action) {
     return state;
 }
 
-function selectedScheduledQueries(state = [], action) {
+function scheduledQueries(state = [], action) {
     if (action.type === 'SET_SCHEDULED_QUERIES') {
         return action.payload;
     }
@@ -252,7 +252,7 @@ const rootReducer = combineReducers({
     createCertsRequest,
     selectedTab,
     selectedTables,
-    selectedScheduledQueries,
+    scheduledQueries,
     scheduledQueriesRequest,
     selectedIndecies,
     settingsRequest,

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {contains, dissoc, flip, head, hasIn, isEmpty, keys, merge, propOr, reduce} from 'ramda';
+import {contains, dissoc, flip, head, hasIn, isEmpty, keys, merge, propEq, propOr, reduce} from 'ramda';
 import {connect} from 'react-redux';
 import ReactToolTip from 'react-tooltip';
 import classnames from 'classnames';
@@ -510,7 +510,7 @@ function mapStateToProps(state) {
         deleteConnectionsRequests,
         previewTableRequests,
         tablesRequests,
-        selectedScheduledQueries,
+        scheduledQueries,
         scheduledQueriesRequest,
         elasticsearchMappingsRequests,
         selectedTables,
@@ -528,6 +528,7 @@ function mapStateToProps(state) {
     const connectionsHaveBeenSaved = Boolean(selectedConnectionId);
     const selectedTable = selectedTables[selectedConnectionId] || null;
     const selectedIndex = selectedIndecies[selectedConnectionId] || null;
+    const selectedScheduledQueries = scheduledQueries.filter(propEq('connectionId', selectedConnectionId)) 
 
     let previewTableRequest = {};
     if (previewTableRequests[selectedConnectionId] &&

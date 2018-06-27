@@ -1,6 +1,9 @@
 import fetch from 'isomorphic-fetch';
 import uuid from 'uuid';
+<<<<<<< HEAD
 import {propEq} from 'ramda';
+=======
+>>>>>>> save all queries in the store and filter by connection in Settings component
 import {createAction} from 'redux-actions';
 import {INITIAL_CONNECTIONS, PREVIEW_QUERY} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
@@ -146,10 +149,8 @@ export function getScheduledQueries(connectionId) {
             'GET',
             'scheduledQueriesRequest'
         )).then((json => {
-            dispatch(setScheduledQueries(
-              json.filter(propEq('connectionId', connectionId))
-            ));
-            return json;
+            dispatch(setScheduledQueries(json))
+            return json
         }));
     };
 }
