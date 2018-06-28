@@ -34,8 +34,10 @@ jobs:
       - run: yarn run build
       - run: yarn run test
       - run: yarn run pack
+      
+      # create artifacts/ and move installer from release/falcon-sql-client-vM.m.p.tar.gz to artifacts/linux-falcon-vM.m.p.tar.gz
       - run: mkdir artifacts
-      - run: mv release/*.yml artifacts || true
-      - run: mv release/falcon-sql-client* artifacts
+      - run: for f in release/falcon-sql-client-*.tar.gz ; do mv $f artifacts/linux-falcon-v${f#release/falcon-sql-client-}; done
+      
       - store_artifacts:
           path: artifacts
