@@ -4,38 +4,11 @@ import PropTypes from 'prop-types';
 import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
-import enhanceWithClickOutside from 'react-click-outside';
 
 import { Link } from '../Link.react';
+import { Row, Column } from '../Layout.react';
+import Modal from '../Modal.react';
 import { plotlyUrl } from '../../utils/utils';
-
-const Row = props => (
-  <div
-    className="row" {...props}
-    style={{
-      display: 'flex',
-      boxSizing: 'border-box',
-      justifyContent: 'space-around',
-      width: '100%',
-      ...props.style
-    }}
-  >
-    {props.children}
-  </div>
-);
-
-Row.propTypes = {
-  children: PropTypes.node,
-  style: PropTypes.object
-};
-
-const Column = props => (
-  <Row {...props} style={{ flexDirection: 'column', ...props.style }} />
-);
-
-Column.propTypes = {
-  style: PropTypes.object
-};
 
 class QueryFormatter extends React.Component {
   static propTypes = {
@@ -79,47 +52,6 @@ class IntervalFormatter extends React.Component {
     );
   }
 }
-
-const Modal = props => {
-  const EnhancedClass = enhanceWithClickOutside(class extends Component {
-    handleClickOutside() {
-      // eslint-disable-next-line
-      props.onClickAway();
-    }
-    render() {
-      return props.children;
-    }
-  });
-
-  return props.open
-    ? (
-      <div
-        {...props}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '100vw',
-          height: '100vh',
-          margin: '0 auto',
-          position: 'fixed',
-          background: 'rgba(0, 0, 0, 0.1)',
-          top: 0,
-          left: 0,
-          zIndex: 9999
-        }}
-      >
-        <EnhancedClass {...props}>{props.children}</EnhancedClass>
-      </div>
-    )
-    : null;
-};
-
-Modal.propTypes = {
-  children: PropTypes.node,
-  onClickAway: PropTypes.func,
-  open: PropTypes.bool
-};
 
 const rowStyle = {
   justifyContent: 'flex-start',
