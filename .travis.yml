@@ -21,7 +21,7 @@ install:
 script:
   - yarn run build
   - yarn run pack
-  - zip --junk-paths mac-release.zip release/*.dmg
+  - zip --junk-paths mac-falcon-v$(node -p "require('./package.json').version").zip release/*.dmg
 
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
@@ -29,5 +29,5 @@ before_cache:
 addons:
   artifacts:
     s3_region: us-east-1
-    paths: mac-release.zip
+    paths: $(ls mac-falcon-v*.zip | tr "\n" ":")
     debug: true
