@@ -138,15 +138,15 @@ export function editConnections(connectionObject, connectionId) {
     );
 }
 
-export function getScheduledQueries(connectionId) {
+export function getScheduledQueries(/* connectionId */) {
     return dispatch => {
         return dispatch(apiThunk(
             'queries',
             'GET',
             'scheduledQueriesRequest'
         )).then((json => {
-            dispatch(setScheduledQueries(json))
-            return json
+            dispatch(setScheduledQueries(json));
+            return json;
         }));
     };
 }

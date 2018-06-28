@@ -528,7 +528,7 @@ function mapStateToProps(state) {
     const connectionsHaveBeenSaved = Boolean(selectedConnectionId);
     const selectedTable = selectedTables[selectedConnectionId] || null;
     const selectedIndex = selectedIndecies[selectedConnectionId] || null;
-    const selectedScheduledQueries = scheduledQueries.filter(propEq('connectionId', selectedConnectionId)) 
+    const selectedScheduledQueries = scheduledQueries.filter(propEq('connectionId', selectedConnectionId));
 
     let previewTableRequest = {};
     if (previewTableRequests[selectedConnectionId] &&

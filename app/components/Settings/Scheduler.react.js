@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
-import enhanceWithClickOutside from 'react-click-outside'
+import enhanceWithClickOutside from 'react-click-outside';
 
 import { Link } from '../Link.react';
 import { plotlyUrl } from '../../utils/utils';
@@ -80,41 +80,44 @@ class IntervalFormatter extends React.Component {
   }
 }
 
-function mapRows (rows) {
-  return rows
-    .map(r => ({
-      query: r,
-      run: r
-    }));
-}
+const Modal = props => {
+  const EnhancedClass = enhanceWithClickOutside(class extends Component {
+    handleClickOutside() {
+      // eslint-disable-next-line
+      props.onClickAway();
+    }
+    render() {
+      return props.children;
+    }
+  });
 
-const Overlay = props => props.open
-  ? (
-    <div
-      {...props}
-      onClick={props.onClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100vw',
-        height: '100vh',
-        margin: '0 auto',
-        position: 'fixed',
-        background: 'rgba(0, 0, 0, 0.1)',
-        top: 0,
-        left: 0,
-        zIndex: 9999
-      }}
-    >
-      {props.children}
-    </div>
-  )
-  : null;
+  return props.open
+    ? (
+      <div
+        {...props}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100vw',
+          height: '100vh',
+          margin: '0 auto',
+          position: 'fixed',
+          background: 'rgba(0, 0, 0, 0.1)',
+          top: 0,
+          left: 0,
+          zIndex: 9999
+        }}
+      >
+        <EnhancedClass {...props}>{props.children}</EnhancedClass>
+      </div>
+    )
+    : null;
+};
 
-Overlay.propTypes = {
+Modal.propTypes = {
   children: PropTypes.node,
-  onClick: PropTypes.func,
+  onClickAway: PropTypes.func,
   open: PropTypes.bool
 };
 
@@ -125,58 +128,61 @@ const rowStyle = {
 };
 const boxStyle = { boxSizing: 'border-box', width: '50%' };
 
-const MetaPreview = enhanceWithClickOutside(class extends Component {
-  handleClickOutside() {
-    // eslint-disable-next-line
-    this.props.onClickAway();
+const MetaPreview = props => {
+  if (!props.query) {
+    return null;
   }
-  render() {
-    const props = this.props;
-
-    const [account, gridId] = props.query.fid.split(':');
-    const link = `${plotlyUrl()}/~${account}/${gridId}`;
-
-    return (
-      <Column
-        style={{ width: '50%', background: 'white' }}
-      >
-        <Row style={{ padding: '32px', justifyContent: 'flex-start' }}>
-          <h5 style={{ margin: 0 }}>{props.query.query}</h5>
-        </Row>
-        <Column style={{ background: '#F5F7FB', padding: '32px' }}>
-          <Row style={rowStyle}>
-            <div style={boxStyle}>Query</div>
-            <div style={boxStyle}>{props.query.query}</div>
-          </Row>
-          <Row style={rowStyle}>
-            <div style={boxStyle}>Interval</div>
-            <em style={boxStyle}>
-              Runs every <b>{ms(props.query.refreshInterval * 1000, { long: true })}</b>
-            </em>
-          </Row>
-          <Row style={rowStyle}>
-            <div style={boxStyle}>Live Dataset</div>
-            <Link href={link} style={boxStyle}>{link}</Link>
-          </Row>
-        </Column>
-      </Column>
-    );
-  }
-});
-
-const MetaPreviewModal = (props) => {
-  if (!props.query) return null;
+  const [account, gridId] = props.query.fid.split(':');
+  const link = `${plotlyUrl()}/~${account}/${gridId}`;
 
   return (
-    <Overlay {...props} open={props.query !== null} className="scheduler">
-      <MetaPreview {...props} />
-    </Overlay>
+    <Column
+      style={{ width: '50%', background: 'white' }}
+    >
+      <Row style={{ padding: '32px', justifyContent: 'flex-start' }}>
+        <h5 style={{ margin: 0 }}>{props.query.query}</h5>
+      </Row>
+      <Column style={{ background: '#F5F7FB', padding: '32px' }}>
+        <Row style={rowStyle}>
+          <div style={boxStyle}>Query</div>
+          <div style={boxStyle}>{props.query.query}</div>
+        </Row>
+        <Row style={rowStyle}>
+          <div style={boxStyle}>Interval</div>
+          <em style={boxStyle}>
+            Runs every <b>{ms(props.query.refreshInterval * 1000, { long: true })}</b>
+          </em>
+        </Row>
+        <Row style={rowStyle}>
+          <div style={boxStyle}>Live Dataset</div>
+          <Link href={link} style={boxStyle}>{link}</Link>
+        </Row>
+      </Column>
+    </Column>
   );
 };
+
+MetaPreview.propTypes = {
+  query: PropTypes.object
+};
+
+const MetaPreviewModal = props => (
+  <Modal {...props} open={props.query !== null}>
+    <MetaPreview {...props} />
+  </Modal>
+);
 
 MetaPreviewModal.propTypes = {
   query: PropTypes.object
 };
+
+function mapRows (rows) {
+  return rows
+    .map(r => ({
+      query: r,
+      run: r
+    }));
+}
 
 class Scheduler extends Component {
   constructor(props) {
