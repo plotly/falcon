@@ -28,9 +28,12 @@ build_script:
   - yarn run pack
 
 after_build:
-  - cd release && 7z a win-release.zip *.exe
+        - ps: |
+            $FALCON_VERSION = node -p "require('./package.json').version"
+            cd release
+            7z a win-falcon-v$FALCON_VERSION.zip *.exe
 
 artifacts:
-  - path: release\win-release.zip
+  - path: release\*.zip
 
 test: off
