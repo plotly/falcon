@@ -4,11 +4,14 @@ import PropTypes from 'prop-types';
 import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
+import Highlight from 'react-highlight';
 
 import { Link } from '../Link.react';
 import { Row, Column } from '../Layout.react';
 import Modal from '../Modal.react';
 import { plotlyUrl } from '../../utils/utils';
+
+const SQL = (props) => <Highlight className="sql">{props.children}</Highlight>
 
 class QueryFormatter extends React.Component {
   static propTypes = {
@@ -19,12 +22,9 @@ class QueryFormatter extends React.Component {
     const query = this.props.value;
     return (
       <Row>
-        <Column style={{ padding: '0 24px' }}>
-          <div style={{ fontSize: 18 }}>
-            {query.query}
-          </div>
+        <Column style={{ padding: '0 24px', fontSize: 18 }}>
+          <SQL>{query.query}</SQL>
         </Column>
-        {/* add tags here */}
       </Row>
     );
   }
@@ -77,7 +77,9 @@ const MetaPreview = props => {
       <Column style={{ background: '#F5F7FB', padding: '32px' }}>
         <Row style={rowStyle}>
           <div style={boxStyle}>Query</div>
-          <div style={boxStyle}>{props.query.query}</div>
+          <div style={boxStyle}>
+            <SQL>{props.query.query}</SQL>
+          </div>
         </Row>
         <Row style={rowStyle}>
           <div style={boxStyle}>Interval</div>

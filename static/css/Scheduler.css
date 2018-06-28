@@ -1,0 +1,25 @@
+/* SQL token highlighting */
+.hljs-keyword,
+.hljs-selector-tag {
+  color: #ab63fa;
+}
+
+.hljs-number,
+.hljs-meta,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params {
+  color: #00cc96;
+}
+
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet {
+  color: #119DFF;
+}
+
+.hljs {
+  color: #585260;
+}
