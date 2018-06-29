@@ -138,7 +138,7 @@ export function editConnections(connectionObject, connectionId) {
     );
 }
 
-export function getScheduledQueries(/* connectionId */) {
+export function getScheduledQueries() {
     return dispatch => {
         return dispatch(apiThunk(
             'queries',

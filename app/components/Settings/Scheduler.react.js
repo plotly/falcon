@@ -11,7 +11,12 @@ import { Row, Column } from '../Layout.react';
 import Modal from '../Modal.react';
 import { plotlyUrl } from '../../utils/utils';
 
-const SQL = (props) => <Highlight className="sql">{props.children}</Highlight>;
+const NO_OP = () => {};
+
+export const SQL = (props) => <Highlight className="sql">{props.children}</Highlight>;
+SQL.propTypes = {
+  children: PropTypes.string
+};
 
 class QueryFormatter extends React.Component {
   static propTypes = {
@@ -73,7 +78,12 @@ const MetaPreview = props => {
     >
       <Row style={{ padding: '32px', position: 'relative', justifyContent: 'flex-start' }}>
         <h5 style={{ margin: 0 }}>{props.query.query}</h5>
-        <button onClick={props.onCloseBtnClick} style={{ position: 'absolute', top: '16px', right: '16px', padding: '2px 4px' }}>&times;</button>
+        <button
+          onClick={props.onCloseBtnClick}
+          style={{ position: 'absolute', top: '16px', right: '16px', padding: '2px 4px' }}
+        >
+          &times;
+        </button>
       </Row>
       <Column style={{ background: '#F5F7FB', padding: '32px' }}>
         <Row style={rowStyle}>
@@ -98,11 +108,11 @@ const MetaPreview = props => {
 };
 
 MetaPreview.propTypes = {
-  onCloseBtnClick: PropTypes.function,
+  onCloseBtnClick: PropTypes.func,
   query: PropTypes.object
 };
 
-const MetaPreviewModal = props => (
+export const MetaPreviewModal = props => (
   <Modal {...props} open={props.query !== null}>
     <MetaPreview {...props} />
   </Modal>
@@ -124,7 +134,7 @@ class Scheduler extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      search: null,
+      search: '',
       selectedQuery: null
     };
     this.columns = [
@@ -192,7 +202,6 @@ class Scheduler extends Component {
             onChange={this.handleSearchChange}
             placeholder="Search scheduled queries..."
           />
-          {/* Add create scheduled query button here */}
         </Row>
         <Row style={{ marginBottom: 16, padding: '0 16px', justifyContent: 'space-between' }}>
           <Column style={{ width: 300 }}>
@@ -205,7 +214,13 @@ class Scheduler extends Component {
           <Column style={{ width: 300 }}>
             <Row>
               <Column>
-                <button onClick={this.props.refreshQueries} style={{ marginRight: '8px' }}>⟳</button>
+                <button
+                  className="refresh-button"
+                  onClick={this.props.refreshQueries}
+                  style={{ marginRight: '8px' }}
+                >
+                  ⟳
+                </button>
               </Column>
             </Row>
           </Column>
@@ -230,12 +245,18 @@ class Scheduler extends Component {
   }
 }
 
+Scheduler.defaultProps = {
+  queries: [],
+  refreshQueries: NO_OP
+};
+
 Scheduler.propTypes = {
   queries: PropTypes.arrayOf(PropTypes.shape({
-    query: PropTypes.string,
-    refreshInterval: PropTypes.number
-  })),
-  refreshQueries: PropTypes.func
+    query: PropTypes.string.isRequired,
+    refreshInterval: PropTypes.number.isRequired,
+    fid: PropTypes.string.isRequired
+  }).isRequired),
+  refreshQueries: PropTypes.func.isRequired
 };
 
 export default Scheduler;

@@ -17,7 +17,6 @@ const Modal = props => {
   return props.open
     ? (
       <div
-        {...props}
         style={{
           display: 'flex',
           alignItems: 'center',
