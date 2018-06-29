@@ -11,7 +11,7 @@ import { Row, Column } from '../Layout.react';
 import Modal from '../Modal.react';
 import { plotlyUrl } from '../../utils/utils';
 
-const SQL = (props) => <Highlight className="sql">{props.children}</Highlight>
+const SQL = (props) => <Highlight className="sql">{props.children}</Highlight>;
 
 class QueryFormatter extends React.Component {
   static propTypes = {
@@ -22,7 +22,7 @@ class QueryFormatter extends React.Component {
     const query = this.props.value;
     return (
       <Row>
-        <Column style={{ padding: '0 24px', fontSize: 18 }}>
+        <Column style={{ paddingRight: '24px', fontSize: 15 }}>
           <SQL>{query.query}</SQL>
         </Column>
       </Row>
@@ -39,10 +39,10 @@ class IntervalFormatter extends React.Component {
     const run = this.props.value;
     return (
       <Row>
-        <Column style={{ padding: '0 24px' }}>
+        <Column style={{ paddingRight: '24px' }}>
           <em
             style={{
-              fontSize: 18
+              fontSize: 15
             }}
           >
             {`Runs every ${ms(run.refreshInterval * 1000, { long: true })}`}
@@ -71,8 +71,9 @@ const MetaPreview = props => {
     <Column
       style={{ width: '50%', background: 'white' }}
     >
-      <Row style={{ padding: '32px', justifyContent: 'flex-start' }}>
+      <Row style={{ padding: '32px', position: 'relative', justifyContent: 'flex-start' }}>
         <h5 style={{ margin: 0 }}>{props.query.query}</h5>
+        <button onClick={props.onCloseBtnClick} style={{ position: 'absolute', top: '16px', right: '16px', padding: '2px 4px' }}>&times;</button>
       </Row>
       <Column style={{ background: '#F5F7FB', padding: '32px' }}>
         <Row style={rowStyle}>
@@ -82,7 +83,7 @@ const MetaPreview = props => {
           </div>
         </Row>
         <Row style={rowStyle}>
-          <div style={boxStyle}>Interval</div>
+          <div style={boxStyle}>Update Frequency</div>
           <em style={boxStyle}>
             Runs every <b>{ms(props.query.refreshInterval * 1000, { long: true })}</b>
           </em>
@@ -97,6 +98,7 @@ const MetaPreview = props => {
 };
 
 MetaPreview.propTypes = {
+  onCloseBtnClick: PropTypes.function,
   query: PropTypes.object
 };
 
@@ -203,12 +205,12 @@ class Scheduler extends Component {
           <Column style={{ width: 300 }}>
             <Row>
               <Column>
-                <button onClick={this.props.refreshQueries} style={{ marginRight: '32px' }}>⟳</button>
+                <button onClick={this.props.refreshQueries} style={{ marginRight: '8px' }}>⟳</button>
               </Column>
             </Row>
           </Column>
         </Row>
-        <Row style={{ padding: '0 16px', width: 'auto' }}>
+        <Row className="scheduler-table" style={{ padding: '0 16px', width: 'auto' }}>
           <ReactDataGrid
             onRowClick={this.openPreview}
             columns={this.columns}
@@ -219,6 +221,7 @@ class Scheduler extends Component {
           />
         </Row>
         <MetaPreviewModal
+          onCloseBtnClick={this.closePreview}
           onClickAway={this.closePreview}
           query={this.state.selectedQuery}
         />

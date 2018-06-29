@@ -23,3 +23,17 @@
 .hljs {
   color: #585260;
 }
+
+/* custom ReactDataGrid styles for scheduled queries table */
+.scheduler-table .react-grid-Row--odd .react-grid-Cell {
+    background: #fff;
+}
+
+.scheduler-table .react-grid-Row {
+  border-top: 1px solid #c8d4e3;
+  cursor: pointer;
+}
+
+.scheduler-table .react-grid-Row:first-child {
+  border-top: none;
+}

@@ -26,7 +26,7 @@ const Modal = props => {
           height: '100vh',
           margin: '0 auto',
           position: 'fixed',
-          background: 'rgba(0, 0, 0, 0.1)',
+          background: 'rgba(0, 0, 0, 0.2)',
           top: 0,
           left: 0,
           zIndex: 9999
