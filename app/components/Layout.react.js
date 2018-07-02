@@ -1,3 +1,7 @@
+/**
+ * This module contains a collection of helpful primitive components
+ * for layout purposes.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 
