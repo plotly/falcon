@@ -20,7 +20,13 @@ SQL.propTypes = {
 
 class QueryFormatter extends React.Component {
   static propTypes = {
-    value: PropTypes.object
+    /*
+     * Object passed by `react-data-grid` to each row. Here the value
+     * is an object containg the required `query` string.
+     */
+    value: PropTypes.shape({
+      query: PropTypes.string.isRequired
+    })
   }
 
   render() {
@@ -37,7 +43,13 @@ class QueryFormatter extends React.Component {
 
 class IntervalFormatter extends React.Component {
   static propTypes = {
-    value: PropTypes.object
+    /*
+     * Object passed by `react-data-grid` to each row. Here the value
+     * is an object containg the required `refreshInterval`.
+     */
+    value: PropTypes.shape({
+      refreshInterval: PropTypes.number.isRequired
+    })
   }
 
   render() {
