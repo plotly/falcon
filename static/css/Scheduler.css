@@ -37,3 +37,7 @@
 .scheduler-table .react-grid-Row:first-child {
   border-top: none;
 }
+
+.sql-preview pre {
+  white-space: pre-wrap;
+}
