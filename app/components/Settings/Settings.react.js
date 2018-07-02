@@ -17,8 +17,6 @@ import Scheduler from './scheduler.jsx';
 import {DIALECTS, FAQ, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
 import {isElectron, isOnPrem} from '../../utils/utils';
 
-import './scheduler.css';
-
 class Settings extends Component {
     constructor(props) {
         super(props);
@@ -390,7 +388,7 @@ class Settings extends Component {
                         </TabPanel>
 
                         <TabPanel>
-                          <Scheduler queries={selectedScheduledQueries} refreshQueries={getScheduledQueries} />
+                            <Scheduler queries={selectedScheduledQueries} refreshQueries={getScheduledQueries} />
                         </TabPanel>
 
                         {isOnPrem() || <TabPanel>

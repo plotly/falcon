@@ -1,7 +1,7 @@
 /* SQL token highlighting */
 .hljs-keyword,
 .hljs-selector-tag {
-  color: #ab63fa;
+    color: #ab63fa;
 }
 
 .hljs-number,
@@ -11,17 +11,17 @@
 .hljs-literal,
 .hljs-type,
 .hljs-params {
-  color: #00cc96;
+    color: #00cc96;
 }
 
 .hljs-string,
 .hljs-symbol,
 .hljs-bullet {
-  color: #119DFF;
+    color: #119DFF;
 }
 
 .hljs {
-  color: #585260;
+    color: #585260;
 }
 
 /* custom ReactDataGrid styles for scheduled queries table */
@@ -30,14 +30,14 @@
 }
 
 .scheduler-table .react-grid-Row {
-  border-top: 1px solid #c8d4e3;
-  cursor: pointer;
+    border-top: 1px solid #c8d4e3;
+    cursor: pointer;
 }
 
 .scheduler-table .react-grid-Row:first-child {
-  border-top: none;
+    border-top: none;
 }
 
 .sql-preview pre {
-  white-space: pre-wrap;
+    white-space: pre-wrap;
 }
