@@ -6,10 +6,10 @@ import ms from 'ms';
 import matchSorter from 'match-sorter';
 import Highlight from 'react-highlight';
 
-import { Link } from '../Link.react';
-import { Row, Column } from '../Layout.react';
-import Modal from '../Modal.react';
-import { plotlyUrl } from '../../utils/utils';
+import { Link } from '../Link.react.js';
+import { Row, Column } from '../Layout.react.js';
+import Modal from '../Modal.react.js';
+import { plotlyUrl } from '../../utils/utils.js';
 
 const NO_OP = () => {};
 
