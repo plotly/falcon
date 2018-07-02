@@ -99,7 +99,7 @@ const MetaPreview = props => {
                     justifyContent: 'flex-start'
                 }}
             >
-                <h5 style={{ margin: 0 }}>{props.query.query}</h5>
+                <h5 style={{ margin: 0, letterSpacing: '1px' }}>{props.query.query}</h5>
                 <button
                     onClick={props.onCloseBtnClick}
                     style={{
