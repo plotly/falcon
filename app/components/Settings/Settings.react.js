@@ -13,9 +13,11 @@ import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import Preview from './Preview/Preview.react';
 import {Link} from '../Link.react';
-import Scheduler from './Scheduler.react';
+import Scheduler from './scheduler.jsx';
 import {DIALECTS, FAQ, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
 import {isElectron, isOnPrem} from '../../utils/utils';
+
+import './scheduler.css';
 
 class Settings extends Component {
     constructor(props) {
