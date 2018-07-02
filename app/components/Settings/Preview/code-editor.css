@@ -15,8 +15,3 @@
 .react-resizable-handle {
     z-index: 9;
 }
-
-/* TODO move this override */
-.scheduler .CodeMirror {
-  width: 660px;
-}
