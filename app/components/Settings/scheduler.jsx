@@ -16,7 +16,7 @@ import './scheduler.css';
 const NO_OP = () => {};
 
 export const SQL = props => (
-    <Highlight className="sql">{props.children}</Highlight>
+    <Highlight className={`sql ${props.className || 'default'}`}>{props.children}</Highlight>
 );
 SQL.propTypes = {
     children: PropTypes.string
@@ -93,13 +93,16 @@ const MetaPreview = props => {
     return (
         <Column style={{ width: '50%', background: 'white' }}>
             <Row
+                className="sql-preview"
                 style={{
                     padding: '32px',
                     position: 'relative',
                     justifyContent: 'flex-start'
                 }}
             >
-                <h5 style={{ margin: 0, letterSpacing: '1px' }}>{props.query.query}</h5>
+                <h5 className="sql-preview" style={{ margin: 0, letterSpacing: '1px' }}>
+                    <SQL className="bold">{props.query.query}</SQL>
+                </h5>
                 <button
                     onClick={props.onCloseBtnClick}
                     style={{
@@ -115,7 +118,7 @@ const MetaPreview = props => {
             <Column style={{ background: '#F5F7FB', padding: '32px' }}>
                 <Row style={rowStyle}>
                     <div style={boxStyle}>Query</div>
-                    <div style={boxStyle}>
+                    <div className="sql-preview" style={boxStyle}>
                         <SQL>{props.query.query}</SQL>
                     </div>
                 </Row>
@@ -147,7 +150,7 @@ MetaPreview.propTypes = {
 };
 
 export const MetaPreviewModal = props => (
-    <Modal {...props} open={props.query !== null}>
+    <Modal {...props} className="meta-preview" open={props.query !== null}>
         <MetaPreview {...props} />
     </Modal>
 );
