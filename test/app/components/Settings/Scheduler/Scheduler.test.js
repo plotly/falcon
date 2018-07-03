@@ -4,7 +4,7 @@ import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
 import Scheduler, {
-    MetaPreviewModal,
+    SchedulerPreview,
     SQL
 } from '../../../../../app/components/Settings/scheduler.jsx';
 import Modal from '../../../../../app/components/modal.jsx';
@@ -69,7 +69,7 @@ describe('Scheduler Test', () => {
         expect(component.find(Modal).prop('open')).toBe(true);
         expect(
             component
-                .find(MetaPreviewModal)
+                .find(SchedulerPreview)
                 .find(SQL)
                 .text()
         ).toBe('SELECT * FROM foods;');

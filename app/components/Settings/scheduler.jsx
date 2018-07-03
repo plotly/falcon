@@ -83,79 +83,76 @@ const rowStyle = {
 };
 const boxStyle = { boxSizing: 'border-box', width: '50%' };
 
-const MetaPreview = props => {
+export const SchedulerPreview = props => {
+    let content;
     if (!props.query) {
-        return null;
-    }
-    const [account, gridId] = props.query.fid.split(':');
-    const link = `${plotlyUrl()}/~${account}/${gridId}`;
-
-    return (
-        <Column style={{ width: '50%', background: 'white' }}>
-            <Row
-                className="sql-preview"
-                style={{
-                    padding: '32px',
-                    position: 'relative',
-                    justifyContent: 'flex-start'
-                }}
-            >
-                <h5 className="sql-preview" style={{ margin: 0, letterSpacing: '1px' }}>
-                    <SQL className="bold">{props.query.query}</SQL>
-                </h5>
-                <button
-                    onClick={props.onCloseBtnClick}
+        content = null;
+    } else {
+        const [account, gridId] = props.query.fid.split(':');
+        const link = `${plotlyUrl()}/~${account}/${gridId}`;
+        content = (
+            <Column style={{ width: '50%', background: 'white' }}>
+                <Row
+                    className="sql-preview"
                     style={{
-                        position: 'absolute',
-                        top: '16px',
-                        right: '16px',
-                        padding: '2px 4px'
+                        padding: '32px',
+                        position: 'relative',
+                        justifyContent: 'flex-start'
                     }}
                 >
-                    &times;
-                </button>
-            </Row>
-            <Column style={{ background: '#F5F7FB', padding: '32px' }}>
-                <Row style={rowStyle}>
-                    <div style={boxStyle}>Query</div>
-                    <div className="sql-preview" style={boxStyle}>
-                        <SQL>{props.query.query}</SQL>
-                    </div>
+                    <h5 className="sql-preview" style={{ margin: 0, letterSpacing: '1px' }}>
+                        <SQL className="bold">{props.query.query}</SQL>
+                    </h5>
+                    <button
+                        onClick={props.onCloseBtnClick}
+                        style={{
+                            position: 'absolute',
+                            top: '16px',
+                            right: '16px',
+                            padding: '2px 4px'
+                        }}
+                    >
+                        &times;
+                    </button>
                 </Row>
-                <Row style={rowStyle}>
-                    <div style={boxStyle}>Update Frequency</div>
-                    <em style={boxStyle}>
-                        Runs every{' '}
-                        <b>
-                            {ms(props.query.refreshInterval * 1000, {
-                                long: true
-                            })}
-                        </b>
-                    </em>
-                </Row>
-                <Row style={rowStyle}>
-                    <div style={boxStyle}>Live Dataset</div>
-                    <Link href={link} style={boxStyle}>
-                        {link}
-                    </Link>
-                </Row>
+                <Column style={{ background: '#F5F7FB', padding: '32px' }}>
+                    <Row style={rowStyle}>
+                        <div style={boxStyle}>Query</div>
+                        <div className="sql-preview" style={boxStyle}>
+                            <SQL>{props.query.query}</SQL>
+                        </div>
+                    </Row>
+                    <Row style={rowStyle}>
+                        <div style={boxStyle}>Update Frequency</div>
+                        <em style={boxStyle}>
+                            Runs every{' '}
+                            <b>
+                                {ms(props.query.refreshInterval * 1000, {
+                                    long: true
+                                })}
+                            </b>
+                        </em>
+                    </Row>
+                    <Row style={rowStyle}>
+                        <div style={boxStyle}>Live Dataset</div>
+                        <Link href={link} style={boxStyle}>
+                            {link}
+                        </Link>
+                    </Row>
+                </Column>
             </Column>
-        </Column>
+        )
+    }
+
+    return (
+        <Modal {...props} className="meta-preview" open={props.query !== null}>
+          {content}
+        </Modal>
     );
 };
 
-MetaPreview.propTypes = {
+SchedulerPreview.propTypes = {
     onCloseBtnClick: PropTypes.func,
-    query: PropTypes.object
-};
-
-export const MetaPreviewModal = props => (
-    <Modal {...props} className="meta-preview" open={props.query !== null}>
-        <MetaPreview {...props} />
-    </Modal>
-);
-
-MetaPreviewModal.propTypes = {
     query: PropTypes.object
 };
 
@@ -278,7 +275,7 @@ class Scheduler extends Component {
                         headerRowHeight={32}
                     />
                 </Row>
-                <MetaPreviewModal
+                <SchedulerPreview
                     onCloseBtnClick={this.closePreview}
                     onClickAway={this.closePreview}
                     query={this.state.selectedQuery}
