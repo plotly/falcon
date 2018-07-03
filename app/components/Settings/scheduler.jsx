@@ -19,7 +19,8 @@ export const SQL = props => (
     <Highlight className={`sql ${props.className || 'default'}`}>{props.children}</Highlight>
 );
 SQL.propTypes = {
-    children: PropTypes.string
+    children: PropTypes.string,
+    className: PropTypes.string
 };
 
 class QueryFormatter extends React.Component {
