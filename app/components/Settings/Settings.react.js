@@ -335,7 +335,7 @@ class Settings extends Component {
                         <TabList>
                             <Tab>Connection</Tab>
                             <Tab disabled={queryPanelDisabled}>Query</Tab>
-                            <Tab disabled={false}>Schedule</Tab>
+                            <Tab>Schedule</Tab>
                             {isOnPrem() || <Tab
                                 className="test-ssl-tab react-tabs__tab"
                             >
