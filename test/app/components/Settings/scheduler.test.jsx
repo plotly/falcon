@@ -6,8 +6,8 @@ import Adapter from 'enzyme-adapter-react-16';
 import Scheduler, {
     SchedulerPreview,
     SQL
-} from '../../../../../app/components/Settings/scheduler.jsx';
-import Modal from '../../../../../app/components/modal.jsx';
+} from '../../../../app/components/Settings/scheduler.jsx';
+import Modal from '../../../../app/components/modal.jsx';
 
 const mockQueries = [
     {
@@ -67,12 +67,14 @@ describe('Scheduler Test', () => {
         component.setState({ selectedQuery: mockQueries[0] });
 
         expect(component.find(Modal).prop('open')).toBe(true);
-        expect(
-            component
-                .find(SchedulerPreview)
-                .find(SQL)
-                .text()
-        ).toBe('SELECT * FROM foods;');
+
+        const modalSqlElements = component
+            .find(SchedulerPreview)
+            .find(SQL);
+
+        modalSqlElements.forEach((element) => {
+            expect(element.text()).toBe('SELECT * FROM foods;');
+        });
 
         // clear selected query
         component.setState({ selectedQuery: null });
