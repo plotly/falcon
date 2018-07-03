@@ -141,7 +141,7 @@ export const SchedulerPreview = props => {
                     </Row>
                 </Column>
             </Column>
-        )
+        );
     }
 
     return (
@@ -264,7 +264,7 @@ class Scheduler extends Component {
                 </Row>
                 <Row
                     className="scheduler-table"
-                    style={{ padding: '0 16px', width: 'auto' }}
+                    style={{ padding: '0 16px 16px', width: 'auto' }}
                 >
                     <ReactDataGrid
                         onRowClick={this.openPreview}
