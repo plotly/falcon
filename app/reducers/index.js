@@ -151,6 +151,7 @@ export const elasticsearchMappingsRequests = createApiReducer('elasticsearchMapp
 export const previewTableRequests = createApiReducer('previewTableRequest');
 export const s3KeysRequests = createApiReducer('s3KeysRequests');
 export const tablesRequests = createApiReducer('tablesRequests');
+export const scheduledQueriesRequest = createApiReducer('scheduledQueriesRequest');
 export const schemaRequests = createApiReducer('schemaRequests');
 export const queryRequests = createApiReducer('queryRequests');
 
@@ -175,6 +176,13 @@ function selectedTables(state = {}, action) {
         return merge(state, action.payload);
     } else if (action.type === 'RESET') {
         return merge(state, assoc(action.payload.id, '', state));
+    }
+    return state;
+}
+
+function scheduledQueries(state = [], action) {
+    if (action.type === 'SET_SCHEDULED_QUERIES') {
+        return action.payload;
     }
     return state;
 }
@@ -244,6 +252,8 @@ const rootReducer = combineReducers({
     createCertsRequest,
     selectedTab,
     selectedTables,
+    scheduledQueries,
+    scheduledQueriesRequest,
     selectedIndecies,
     settingsRequest,
     connectRequests,

@@ -1,0 +1,52 @@
+/* SQL token highlighting */
+.default .hljs-keyword,
+.default .hljs-selector-tag {
+    color: #ab63fa;
+}
+
+.default .hljs-number,
+.default .hljs-meta,
+.default .hljs-built_in,
+.default .hljs-builtin-name,
+.default .hljs-literal,
+.default .hljs-type,
+.default .hljs-params {
+    color: #00cc96;
+}
+
+.default .hljs-string,
+.default .hljs-symbol,
+.default .hljs-bullet {
+    color: #119DFF;
+}
+
+.default .hljs {
+    color: #585260;
+}
+
+.bold .hljs-keyword,
+.bold .hljs-selector-tag {
+    font-weight: bold;
+}
+
+/* custom ReactDataGrid styles for scheduled queries table */
+.scheduler-table .react-grid-Row--odd .react-grid-Cell {
+    background: #fff;
+}
+
+.scheduler-table .react-grid-Row--odd:hover .react-grid-Cell {
+    background-color: #f9f9f9;
+}
+
+.scheduler-table .react-grid-Row {
+    border-top: 1px solid #c8d4e3;
+    cursor: pointer;
+}
+
+.scheduler-table .react-grid-Row:first-child {
+    border-top: none;
+}
+
+.sql-preview pre {
+    white-space: pre-wrap;
+}
