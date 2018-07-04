@@ -139,7 +139,7 @@ export const apiKey = 'ccJMY9txxWhRRMWNLgOT';
  * - Login as username 'plotly-database-connector`
  * - Once authorized, the access token can be found in the file ~/.plotly/connector/settings.yaml
  */
-export const accessToken = 'UcTdbxMlXyIWY45GOxyRALQhrXVIeq';
+export const accessToken = 'JxQPZSVFLVjEn93dOCgmYikDGS2FKc';
 
 // This fid with these UIDs actually exist on prod
 export const validFid = 'plotly-database-connector:197';
