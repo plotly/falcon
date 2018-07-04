@@ -17,6 +17,13 @@ th, td {
     overflow: auto;
 }
 
+.scheduleButton {
+    bottom: 18px;
+    position: absolute;
+    right: 136px;
+    z-index: 10;
+}
+
 .runButton {
     bottom: 18px;
     position: absolute;
@@ -47,4 +54,16 @@ th, td {
     font-size: 14px;
     margin: 0;
     padding: 20px;
+}
+
+.container-title {
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.export-options-group {
+  margin: 8px 0 20px;
+  padding: 20px;
+  background: #f3f6fa;
+  border: 1px solid #ebf0f8;
 }

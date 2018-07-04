@@ -13,7 +13,7 @@ import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import Preview from './Preview/Preview.react';
 import {Link} from '../Link.react';
-import Scheduler from './scheduler.jsx';
+import Scheduler from './Scheduler/scheduler.jsx';
 import {DIALECTS, FAQ, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
 import {isElectron, isOnPrem} from '../../utils/utils';
 
@@ -23,6 +23,8 @@ class Settings extends Component {
         this.fetchData = this.fetchData.bind(this);
         this.renderEditButton = this.renderEditButton.bind(this);
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
+        this.updateSelectedPanel = this.updateSelectedPanel.bind(this);
+        this.openScheduler = this.openScheduler.bind(this);
         this.state = {
             editMode: true,
             selectedPanel: {},
@@ -31,7 +33,8 @@ class Settings extends Component {
                 http: null
             },
             timeElapsed: 0,
-            httpsServerIsOK: false
+            httpsServerIsOK: false,
+            scheduledQuery: null
         };
         this.intervals = {
             timeElapsedInterval: null,
@@ -252,6 +255,27 @@ class Settings extends Component {
         }
     }
 
+    updateSelectedPanel(panelIndex, cb) {
+      this.props.updatePreview({
+          showChart: false,
+          showEditor: true,
+          size: 200
+      });
+      this.setState({
+        selectedPanel: {
+          [this.props.selectedTab]: panelIndex
+        }
+      }, typeof cb === 'function' ? cb : () => {});
+    }
+
+    openScheduler() {
+      this.setState({ scheduledQuery: this.props.preview.code }, () => {
+        this.updateSelectedPanel(2, () => {
+          this.setState({ scheduledQuery: null });
+        });
+      });
+    }
+
     render() {
         const {
             apacheDrillStorageRequest,
@@ -276,6 +300,9 @@ class Settings extends Component {
             selectedTable,
             selectedScheduledQueries,
             getScheduledQueries,
+            createScheduledQuery,
+            updateScheduledQuery,
+            deleteScheduledQuery,
             selectedIndex,
             setTab,
             tablesRequest,
@@ -322,14 +349,7 @@ class Settings extends Component {
 
                     <Tabs
                         selectedIndex={this.state.selectedPanel[selectedTab] || 0}
-                        onSelect={(panelIndex) => {
-                            updatePreview({
-                                showChart: false,
-                                showEditor: true,
-                                size: 200
-                            });
-                            this.setState({selectedPanel: {[selectedTab]: panelIndex}});
-                        }}
+                        onSelect={this.updateSelectedPanel}
                     >
 
                         <TabList>
@@ -376,6 +396,7 @@ class Settings extends Component {
                                     updatePreview={updatePreview}
 
                                     runSqlQuery={runSqlQuery}
+                                    openScheduler={this.openScheduler}
                                     queryRequest={queryRequest || {}}
                                     s3KeysRequest={s3KeysRequest}
                                     apacheDrillStorageRequest={apacheDrillStorageRequest}
@@ -388,7 +409,17 @@ class Settings extends Component {
                         </TabPanel>
 
                         <TabPanel>
-                            <Scheduler queries={selectedScheduledQueries} refreshQueries={getScheduledQueries} />
+                            <Scheduler
+                              queries={selectedScheduledQueries}
+                              refreshQueries={getScheduledQueries}
+                              createScheduledQuery={createScheduledQuery}
+                              updateScheduledQuery={updateScheduledQuery}
+                              deleteScheduledQuery={deleteScheduledQuery}
+                              initialCode={this.state.scheduledQuery}
+                              openLogin={this.updateSelectedPanel.bind(this, 3)}
+                              requestor={username}
+                              dialect={dialect}
+                            />
                         </TabPanel>
 
                         {isOnPrem() || <TabPanel>
@@ -607,6 +638,15 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     function boundGetScheduledQueries() {
         return dispatch(Actions.getScheduledQueries(selectedConnectionId));
     }
+    function boundCreateScheduledQuery(payload) {
+      return dispatch(Actions.createScheduledQuery(selectedConnectionId, payload));
+    }
+    function boundUpdateScheduledQuery(payload) {
+      return dispatch(Actions.updateScheduledQuery(selectedConnectionId, payload));
+    }
+    function boundDeleteScheduledQuery(fid) {
+      return dispatch(Actions.deleteScheduledQuery(fid));
+    }
     function boundGetElasticsearchMappings() {
         return dispatch(Actions.getElasticsearchMappings(selectedConnectionId));
     }
@@ -701,6 +741,9 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             updateConnection: boundUpdateConnection,
             getTables: boundGetTables,
             getScheduledQueries: boundGetScheduledQueries,
+            createScheduledQuery: boundCreateScheduledQuery,
+            updateScheduledQuery: boundUpdateScheduledQuery,
+            deleteScheduledQuery: boundDeleteScheduledQuery,
             getElasticsearchMappings: boundGetElasticsearchMappings,
             setTable: boundSetTable,
             setIndex: boundSetIndex,
@@ -761,6 +804,9 @@ Settings.propTypes = {
     })),
     scheduledQueriesRequest: PropTypes.object,
     getScheduledQueries: PropTypes.func,
+    createScheduledQuery: PropTypes.func,
+    updateScheduledQuery: PropTypes.func,
+    deleteScheduledQuery: PropTypes.func,
     tablesRequest: PropTypes.object,
     deleteTab: PropTypes.func,
     getSqlSchema: PropTypes.func,

@@ -25,6 +25,7 @@ export default class CodeEditor extends React.Component {
 
         dialect: PropTypes.string,
         runQuery: PropTypes.func,
+        scheduleQuery: PropTypes.func,
         schemaRequest: PropTypes.object,
         isLoading: PropTypes.bool
     }
@@ -176,7 +177,8 @@ export default class CodeEditor extends React.Component {
             value,
             dialect,
             runQuery,
-            isLoading
+            isLoading,
+            scheduleQuery
         } = this.props;
 
         const {
@@ -222,10 +224,17 @@ export default class CodeEditor extends React.Component {
                     onChange={onChange}
                     editorDidMount={editorDidMount}
                 />
+                <button
+                    className="btn btn-secondary scheduleButton"
+                    onClick={scheduleQuery}
+                    disabled={isLoading}
+                >
+                    {isLoading ? 'Loading...' : 'Schedule'}
+                </button>
                 <a
                     className="btn btn-primary runButton"
                     onClick={runQuery}
-                    disabled={!isLoading}
+                    disabled={isLoading}
                 >
                     {isLoading ? 'Loading...' : 'Run'}
                 </a>

@@ -3,20 +3,25 @@ import PropTypes from 'prop-types';
 
 import enhanceWithClickOutside from 'react-click-outside';
 
-const Modal = props => {
-    const EnhancedClass = enhanceWithClickOutside(
-        class extends Component {
-            handleClickOutside() {
-                props.onClickAway();
-            }
-            render() {
-                return props.children;
-            }
+const ClickAway = enhanceWithClickOutside(
+    class extends Component {
+        static propTypes = {
+          onClickAway: PropTypes.func,
+          children: PropTypes.node
         }
-    );
+        handleClickOutside() {
+            this.props.onClickAway();
+        }
+        render() {
+            return this.props.children;
+        }
+    }
+);
 
-    return props.open ?
+const Modal = props =>
+    props.open ? (
         <div
+            className={props.className}
             style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -31,14 +36,17 @@ const Modal = props => {
                 zIndex: 9999
             }}
         >
-            <EnhancedClass {...props}>{props.children}</EnhancedClass>
-        </div> : null;
-};
+            <ClickAway onClickAway={props.onClickAway}>
+                {props.children}
+            </ClickAway>
+        </div>
+    ) : null;
 
 Modal.propTypes = {
     children: PropTypes.node,
     onClickAway: PropTypes.func,
-    open: PropTypes.bool
+    open: PropTypes.bool,
+    className: PropTypes.string
 };
 
 export default Modal;

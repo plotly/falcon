@@ -38,6 +38,7 @@ class Preview extends Component {
         getSqlSchema: PropTypes.func,
 
         runSqlQuery: PropTypes.func,
+        openScheduler: PropTypes.func,
         previewTableRequest: PropTypes.object,
         queryRequest: PropTypes.object,
         elasticsearchMappingsRequest: PropTypes.object,
@@ -347,6 +348,7 @@ class Preview extends Component {
 
                                             dialect={dialect}
                                             runQuery={this.runQuery}
+                                            scheduleQuery={this.props.openScheduler}
                                             schemaRequest={schemaRequest}
                                             isLoading={isLoading}
                                         />
@@ -454,32 +456,41 @@ class Preview extends Component {
                                     </TabPanel>
 
                                     <TabPanel>
-                                        <div className="export-options-container">
-                                            <div style={{margin: '20px 0'}}>
-                                                <button
-                                                    className="btn btn-outline"
-                                                    onClick={() => this.fetchDatacache(
-                                                        JSON.stringify(this.state.plotlyJSON),
-                                                        'plot'
-                                                    )}
-                                                >
-                                                    Send chart to Chart Studio
-                                                </button>
-                                                <button
-                                                    className="btn btn-outline"
-                                                    onClick={() => this.fetchDatacache(this.getCSVString(), 'grid')}
-                                                >
-                                                    Send CSV to Chart Studio
-                                                </button>
-                                                {!isOnPrem() &&
-                                                <button
-                                                    className="btn btn-outline"
-                                                    onClick={() => window.open(
-                                                        `data:text/csv;base64,${Buffer.from(this.getCSVString()).toString('base64')}`
-                                                    )}
-                                                >
-                                                    Download CSV
-                                                </button>}
+                                        <div className="export-options-container" style={{ marginTop: 20 }}>
+                                            <div className="container-title">CHART STUDIO</div>
+                                            <div className="export-options-group">
+                                              <button
+                                                  className="btn btn-outline"
+                                                  onClick={() => this.fetchDatacache(
+                                                      JSON.stringify(this.state.plotlyJSON),
+                                                      'plot'
+                                                  )}
+                                              >
+                                                  Upload Chart
+                                              </button>
+                                              <button
+                                                  className="btn btn-outline"
+                                                  onClick={() => this.fetchDatacache(this.getCSVString(), 'grid')}
+                                              >
+                                                  Upload Dataset
+                                              </button>
+                                              <button
+                                                  className="btn btn-outline"
+                                              >
+                                                  Upload Dataset (auto-updating)
+                                              </button>
+                                            </div>
+                                            <div className="container-title">MY COMPUTER</div>
+                                            <div className="export-options-group">
+                                              {!isOnPrem() &&
+                                              <button
+                                                  className="btn btn-outline"
+                                                  onClick={() => window.open(
+                                                      `data:text/csv;base64,${Buffer.from(this.getCSVString()).toString('base64')}`
+                                                  )}
+                                              >
+                                                  Download CSV
+                                              </button>}
                                             </div>
                                             <div style={{width: 650, height: 200, border: '1px solid #dfe8f3',
                                                 fontFamily: '\'Ubuntu Mono\', courier, monospace', paddingTop: 10,

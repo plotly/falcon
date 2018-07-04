@@ -184,6 +184,27 @@ function scheduledQueries(state = [], action) {
     if (action.type === 'SET_SCHEDULED_QUERIES') {
         return action.payload;
     }
+    if (action.type === 'CREATE_SCHEDULED_QUERY') {
+      return [
+        action.payload,
+        ...state
+      ];
+    }
+    if (action.type === 'UPDATE_SCHEDULED_QUERY') {
+      return state.map(q => {
+        if (q.fid === action.payload.fid) {
+          return {
+            ...q,
+            ...action.payload
+          };
+        }
+        return q;
+      });
+    }
+    if (action.type === 'DELETE_SCHEDULED_QUERY') {
+      const fid = action.payload;
+      return state.filter(q => q.fid !== fid);
+    }
     return state;
 }
 
