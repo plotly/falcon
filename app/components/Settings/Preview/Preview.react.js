@@ -348,7 +348,7 @@ class Preview extends Component {
 
                                             dialect={dialect}
                                             runQuery={this.runQuery}
-                                            scheduleQuery={this.props.openScheduler}
+                                            openScheduler={this.props.openScheduler}
                                             schemaRequest={schemaRequest}
                                             isLoading={isLoading}
                                         />
@@ -473,11 +473,6 @@ class Preview extends Component {
                                                   onClick={() => this.fetchDatacache(this.getCSVString(), 'grid')}
                                               >
                                                   Upload Dataset
-                                              </button>
-                                              <button
-                                                  className="btn btn-outline"
-                                              >
-                                                  Upload Dataset (auto-updating)
                                               </button>
                                             </div>
                                             <div className="container-title">MY COMPUTER</div>
