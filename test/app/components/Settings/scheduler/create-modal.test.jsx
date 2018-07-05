@@ -45,7 +45,8 @@ describe('Create Modal Test', () => {
         expect(component.find(CodeMirror).get(0).props.value).toBe(
             'SELECT * FROM foods'
         );
-        expect(component.find('input').get(0).props.value).toBe('filename');
+        // TODO: Uncomment onces filename input is suppported
+        // expect(component.find('input').get(0).props.value).toBe('filename');
     });
 
     it('clicking X should call onClickAway', () => {
@@ -89,7 +90,8 @@ describe('Create Modal Test', () => {
             .simulate('click');
         expect(onSubmit).toHaveBeenCalled();
         expect(onSubmit).toHaveBeenCalledWith({
-            filename: 'filename',
+            // Once filename input is supported, this value should be: 'filename',
+            filename: expect.any(String),
             query: 'SELECT * FROM foods',
             refreshInterval: 60
         });

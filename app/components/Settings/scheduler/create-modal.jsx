@@ -9,7 +9,7 @@ import Modal from '../../modal.jsx';
 
 import { getHighlightMode } from '../../../constants/constants.js';
 
-import './create-modal.css'
+import './create-modal.css';
 
 function noop() {}
 
@@ -28,6 +28,17 @@ Error.propTypes = {
     message: PropTypes.string.isRequired
 };
 
+function generateFilename() {
+  let n = Math.floor(Math.random() * 1e8).toString();
+
+  // Pad 0 if needed
+  if (n.length < 8) {
+    n = `0${n}`;
+  }
+
+  return `Grid ${n}`;
+}
+
 export const FrequencySelector = props => (
     <Select
         options={FREQUENCIES}
@@ -45,6 +56,7 @@ FrequencySelector.propTypes = {
 class CreateModal extends Component {
     static propTypes = {
         initialCode: PropTypes.string,
+        // `initialFilename` currently unused but will be implemented once backend supports
         initialFilename: PropTypes.string,
         onClickAway: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired,
@@ -96,18 +108,18 @@ class CreateModal extends Component {
                 error: 'Please enter the query to be scheduled above.'
             });
         }
-        if (!this.state.filename || !this.state.filename.length) {
-            return this.setState({
-                error: 'Please enter a filename for your scheduled query.'
-            });
-        }
+        // if (!this.state.filename || !this.state.filename.length) {
+        //     return this.setState({
+        //         error: 'Please enter a filename for your scheduled query.'
+        //     });
+        // }
         if (!this.state.intervalType || !this.state.intervalType.value) {
             return this.setState({ error: 'Please select a frequency above.' });
         }
         this.props.onSubmit({
             query: this.state.code,
             refreshInterval: this.state.intervalType.value,
-            filename: this.state.filename
+            filename: generateFilename()
         });
         this.setState({
             code: '',
@@ -156,16 +168,18 @@ class CreateModal extends Component {
                                 />
                             </div>
                         </Row>
-                        <Row style={rowStyleOverride}>
-                            <div className="row-header">Filename</div>
-                            <div className="row-body">
-                                <input
-                                    placeholder="Enter filename here..."
-                                    value={this.state.filename}
-                                    onChange={this.handleFilenameChange}
-                                />
-                            </div>
-                        </Row>
+                        {/*
+                          <Row style={rowStyleOverride}>
+                              <div className="row-header">Filename</div>
+                              <div className="row-body">
+                                  <input
+                                      placeholder="Enter filename here..."
+                                      value={this.state.filename}
+                                      onChange={this.handleFilenameChange}
+                                  />
+                              </div>
+                          </Row>
+                        */}
                         <Row style={rowStyleOverride}>
                             <div className="row-header">Frequency</div>
                             <div className="row-body">
