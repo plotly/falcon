@@ -44,7 +44,7 @@ export const FrequencySelector = props => (
     />
 );
 FrequencySelector.propTypes = {
-  value: PropTypes.object,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   onChange: PropTypes.func
 };
 
@@ -92,7 +92,7 @@ class CreateModal extends Component {
         this.setState({ code });
     }
 
-    handleIntervalChange(intervalType) {
+    handleIntervalChange({ value: intervalType }) {
         this.setState({ intervalType });
     }
 
@@ -111,13 +111,13 @@ class CreateModal extends Component {
         //         error: 'Please enter a filename for your scheduled query.'
         //     });
         // }
-        if (!this.state.intervalType || !this.state.intervalType.value) {
+        if (!this.state.intervalType) {
             return this.setState({ error: 'Please select a frequency above.' });
         }
         this.setState({ loading: true });
         this.props.onSubmit({
             query: this.state.code,
-            refreshInterval: this.state.intervalType.value,
+            refreshInterval: this.state.intervalType,
             filename: this.state.filename
         })
         .then(() => {

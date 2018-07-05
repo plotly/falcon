@@ -83,7 +83,8 @@ describe('Create Modal Test', () => {
         expect(component.state().error).not.toBeNull();
         expect(onSubmit).not.toHaveBeenCalled();
 
-        component.setState({ intervalType: { value: 60 } });
+        const intervalType = 60;
+        component.setState({ intervalType });
         component
             .find('button')
             .at(1)
@@ -93,7 +94,7 @@ describe('Create Modal Test', () => {
             // Once filename input is supported, this value should be: 'filename',
             filename: expect.any(String),
             query: 'SELECT * FROM foods',
-            refreshInterval: 60
+            refreshInterval: intervalType
         });
     });
 });
