@@ -6,7 +6,8 @@ import { Controlled as CodeMirror } from 'react-codemirror2';
 
 import { Row, Column } from '../../layout.jsx';
 import Modal from '../../modal.jsx';
-import { mapDialect } from './util.js';
+
+import { getHighlightMode } from '../../../constants/constants.js';
 
 function noop() {}
 
@@ -98,7 +99,7 @@ class CreateModal extends Component {
             tabSize: 4,
             readOnly: false,
             extraKeys: {},
-            mode: mapDialect(this.props.dialect)
+            mode: getHighlightMode(this.props.dialect)
         };
         this.updateCode = this.updateCode.bind(this);
         this.handleIntervalChange = this.handleIntervalChange.bind(this);

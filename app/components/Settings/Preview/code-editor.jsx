@@ -14,7 +14,7 @@ import 'react-resizable/css/styles.css';
 
 import './code-editor.css';
 
-import {DIALECTS} from '../../../constants/constants';
+import {getHighlightMode} from '../../../constants/constants';
 
 const MIN_CONSTRAINTS_HEIGHT = 74;
 
@@ -188,16 +188,7 @@ export default class CodeEditor extends React.Component {
             maxConstraints
         } = this.state;
 
-        const mode = {
-            [DIALECTS.APACHE_SPARK]: 'text/x-sparksql',
-            [DIALECTS.MYSQL]: 'text/x-mysql',
-            [DIALECTS.SQLITE]: 'text/x-sqlite',
-            [DIALECTS.MARIADB]: 'text/x-mariadb',
-            [DIALECTS.ORACLE]: 'text/x-plsql',
-            [DIALECTS.POSTGRES]: 'text/x-pgsql',
-            [DIALECTS.REDSHIFT]: 'text/x-pgsql',
-            [DIALECTS.MSSQL]: 'text/x-mssql'
-        }[dialect] || 'text/x-sql';
+        const mode = getHighlightMode(dialect);
 
         const options = {
             lineNumbers: true,

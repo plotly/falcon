@@ -9,7 +9,7 @@ import { FrequencySelector } from './create-modal.jsx';
 import { Row, Column } from '../../layout.jsx';
 import SQL from './sql.jsx';
 import { plotlyUrl } from '../../../utils/utils.js';
-import { mapDialect } from './util.js';
+import { getHighlightMode } from '../../../constants/constants.js';
 
 const NO_OP = () => {};
 
@@ -159,7 +159,7 @@ export class PreviewModal extends Component {
                                                 lineNumbers: true,
                                                 tabSize: 4,
                                                 readOnly: false,
-                                                mode: mapDialect(this.props.dialect)
+                                                mode: getHighlightMode(this.props.dialect)
 
                                             }}
                                             value={this.state.code}
