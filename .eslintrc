@@ -1,5 +1,8 @@
 {
-    "extends": "eslint:recommended",
+    "extends": [
+        "eslint:recommended",
+        "plugin:prettier/recommended"
+    ],
     "parser": "babel-eslint",
     "env": {
         "browser": true,
@@ -66,6 +69,7 @@
         "no-useless-concat": [2],
         "no-warning-comments": [0],
         "no-with": [2],
+        "prettier/prettier": "error",
         "radix": [2],
         "vars-on-top": [0],
         "wrap-iife": [1],
@@ -118,6 +122,7 @@
         "jest": true
     },
     "plugins": [
+        "prettier",
         "react",
         "import"
     ],
