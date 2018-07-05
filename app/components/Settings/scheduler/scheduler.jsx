@@ -5,9 +5,9 @@ import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
 
-import CreateModal from './createModal.jsx';
-import PreviewModal from './previewModal.jsx';
-import PromptLoginModal from './loginModal.jsx';
+import CreateModal from './create-modal.jsx';
+import PreviewModal from './preview-modal.jsx';
+import PromptLoginModal from './login-modal.jsx';
 import { Row, Column } from '../../layout.jsx';
 import SQL from './sql.jsx';
 

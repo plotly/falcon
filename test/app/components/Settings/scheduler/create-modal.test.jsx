@@ -20,7 +20,7 @@ describe('Create Modal Test', () => {
             };
         };
         CreateModal =
-          require('../../../../../app/components/Settings/Scheduler/createModal.jsx').default;
+          require('../../../../../app/components/Settings/Scheduler/create-modal.jsx').default;
         CodeMirror = require('react-codemirror2').Controlled;
     });
 

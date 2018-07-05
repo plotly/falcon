@@ -5,7 +5,7 @@ import Adapter from 'enzyme-adapter-react-16';
 
 import Scheduler from '../../../../../app/components/Settings/Scheduler/scheduler.jsx';
 import SQL from '../../../../../app/components/Settings/Scheduler/sql.jsx';
-import SchedulerPreview from '../../../../../app/components/Settings/Scheduler/previewModal.jsx';
+import SchedulerPreview from '../../../../../app/components/Settings/Scheduler/preview-modal.jsx';
 import Modal from '../../../../../app/components/modal.jsx';
 
 const mockQueries = [

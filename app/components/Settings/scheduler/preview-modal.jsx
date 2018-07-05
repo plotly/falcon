@@ -5,7 +5,7 @@ import ms from 'ms';
 
 import Modal from '../../modal.jsx';
 import { Link } from '../../Link.react.js';
-import { FrequencySelector } from './createModal.jsx';
+import { FrequencySelector } from './create-modal.jsx';
 import { Row, Column } from '../../layout.jsx';
 import SQL from './sql.jsx';
 import { plotlyUrl } from '../../../utils/utils.js';
