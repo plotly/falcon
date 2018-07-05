@@ -1,3 +1,6 @@
+/**
+ * @prettier
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -27,8 +30,7 @@ export default class CodeEditor extends React.Component {
         runQuery: PropTypes.func,
         schemaRequest: PropTypes.object,
         isLoading: PropTypes.bool
-    }
-
+    };
 
     /**
      * CodeEditor displays a CodeMirror editor to run SQL queries
@@ -132,12 +134,12 @@ export default class CodeEditor extends React.Component {
                 bareTableName = tableName.split('.').slice(-1)[0];
 
                 const first = bareTableName.charAt(0);
-                if (first === '"' || first === '\'') {
+                if (first === '"' || first === "'") {
                     bareTableName = bareTableName.slice(1);
                 }
 
                 const last = bareTableName.charAt(bareTableName.length - 1);
-                if (last === '"' || last === '\'') {
+                if (last === '"' || last === "'") {
                     bareTableName = bareTableName.slice(0, -1);
                 }
 
@@ -165,37 +167,23 @@ export default class CodeEditor extends React.Component {
     }
 
     render() {
-        const {
-            editorDidMount,
-            onBeforeChange,
-            onChange,
-            onResize
-        } = this;
+        const {editorDidMount, onBeforeChange, onChange, onResize} = this;
 
-        const {
-            value,
-            dialect,
-            runQuery,
-            isLoading
-        } = this.props;
+        const {value, dialect, runQuery, isLoading} = this.props;
 
-        const {
-            height,
-            width,
-            minConstraints,
-            maxConstraints
-        } = this.state;
+        const {height, width, minConstraints, maxConstraints} = this.state;
 
-        const mode = {
-            [DIALECTS.APACHE_SPARK]: 'text/x-sparksql',
-            [DIALECTS.MYSQL]: 'text/x-mysql',
-            [DIALECTS.SQLITE]: 'text/x-sqlite',
-            [DIALECTS.MARIADB]: 'text/x-mariadb',
-            [DIALECTS.ORACLE]: 'text/x-plsql',
-            [DIALECTS.POSTGRES]: 'text/x-pgsql',
-            [DIALECTS.REDSHIFT]: 'text/x-pgsql',
-            [DIALECTS.MSSQL]: 'text/x-mssql'
-        }[dialect] || 'text/x-sql';
+        const mode =
+            {
+                [DIALECTS.APACHE_SPARK]: 'text/x-sparksql',
+                [DIALECTS.MYSQL]: 'text/x-mysql',
+                [DIALECTS.SQLITE]: 'text/x-sqlite',
+                [DIALECTS.MARIADB]: 'text/x-mariadb',
+                [DIALECTS.ORACLE]: 'text/x-plsql',
+                [DIALECTS.POSTGRES]: 'text/x-pgsql',
+                [DIALECTS.REDSHIFT]: 'text/x-pgsql',
+                [DIALECTS.MSSQL]: 'text/x-mssql'
+            }[dialect] || 'text/x-sql';
 
         const options = {
             lineNumbers: true,
@@ -214,22 +202,20 @@ export default class CodeEditor extends React.Component {
                 minConstraints={minConstraints}
                 maxConstraints={maxConstraints}
                 onResize={onResize}
-            ><div>
-                <CodeMirror
-                    options={options}
-                    value={value}
-                    onBeforeChange={onBeforeChange}
-                    onChange={onChange}
-                    editorDidMount={editorDidMount}
-                />
-                <a
-                    className="btn btn-primary runButton"
-                    onClick={runQuery}
-                    disabled={!isLoading}
-                >
-                    {isLoading ? 'Loading...' : 'Run'}
-                </a>
-            </div></ResizableBox>
+            >
+                <div>
+                    <CodeMirror
+                        options={options}
+                        value={value}
+                        onBeforeChange={onBeforeChange}
+                        onChange={onChange}
+                        editorDidMount={editorDidMount}
+                    />
+                    <a className="btn btn-primary runButton" onClick={runQuery} disabled={!isLoading}>
+                        {isLoading ? 'Loading...' : 'Run'}
+                    </a>
+                </div>
+            </ResizableBox>
         );
     }
 }
