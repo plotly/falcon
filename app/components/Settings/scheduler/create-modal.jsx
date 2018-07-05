@@ -61,6 +61,7 @@ class CreateModal extends Component {
     };
     static defaultProps = {
         initialCode: '',
+        initialFilename: '',
         onClickAway: noop,
         onSubmit: noop
     };
@@ -69,7 +70,7 @@ class CreateModal extends Component {
 
         this.state = {
             code: props.initialCode,
-            filename: props.initialFilename,
+            filename: props.initialFilename || generateFilename(),
             intervalType: null,
             error: null,
             loading: false
@@ -117,7 +118,7 @@ class CreateModal extends Component {
         this.props.onSubmit({
             query: this.state.code,
             refreshInterval: this.state.intervalType.value,
-            filename: generateFilename()
+            filename: this.state.filename
         })
         .then(() => {
             this.setState({
