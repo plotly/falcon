@@ -25,6 +25,7 @@ class Settings extends Component {
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
         this.updateSelectedPanel = this.updateSelectedPanel.bind(this);
         this.openScheduler = this.openScheduler.bind(this);
+        this.openLogin = this.updateSelectedPanel.bind(this, 3);
         this.state = {
             editMode: true,
             selectedPanel: {},
@@ -416,7 +417,7 @@ class Settings extends Component {
                               updateScheduledQuery={updateScheduledQuery}
                               deleteScheduledQuery={deleteScheduledQuery}
                               initialCode={this.state.scheduledQuery}
-                              openLogin={this.updateSelectedPanel.bind(this, 3)}
+                              openLogin={this.openLogin}
                               requestor={username}
                               dialect={dialect}
                             />

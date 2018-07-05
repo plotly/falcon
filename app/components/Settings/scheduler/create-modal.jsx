@@ -71,6 +71,7 @@ FrequencySelector.propTypes = {
   onChange: PropTypes.func
 };
 
+// implements a modal window to schedule a new query
 class CreateModal extends Component {
     static propTypes = {
         initialCode: PropTypes.string,

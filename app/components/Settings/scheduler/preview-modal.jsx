@@ -20,6 +20,7 @@ const rowStyle = {
 };
 const boxStyle = { boxSizing: 'border-box', width: '50%' };
 
+// implements a modal window to view details of a scheduled query
 export class PreviewModal extends Component {
     static defaultProps = {
         onSave: NO_OP,
@@ -40,7 +41,6 @@ export class PreviewModal extends Component {
             refreshInterval: props.query && props.query.refreshInterval,
             confirmedDelete: false
         };
-        this.toggleEditing = this.toggleEditing.bind(this);
         this.updateCode = this.updateCode.bind(this);
         this.updateRefreshInterval = this.updateRefreshInterval.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -48,13 +48,11 @@ export class PreviewModal extends Component {
         this.close = this.close.bind(this);
     }
 
-    componentDidUpdate(prevProps) {
+    componentWillReceiveProps(nextProps) {
         if (
             this.props.query &&
-            this.props.query.query !==
-                (prevProps.query && prevProps.query.query)
+            this.props.query.query !== (nextProps.query && nextProps.query.query)
         ) {
-            // eslint-disable-next-line
             this.setState({
                 code: this.props.query.query,
                 refreshInterval: this.props.query.refreshInterval
@@ -68,10 +66,6 @@ export class PreviewModal extends Component {
 
     updateRefreshInterval({ value: refreshInterval }) {
         this.setState({ refreshInterval });
-    }
-
-    toggleEditing() {
-        this.setState(({ editing }) => ({ editing: !editing }));
     }
 
     onSubmit() {
@@ -88,7 +82,7 @@ export class PreviewModal extends Component {
             });
             this.setState({ editing: false, confirmedDelete: false });
         } else {
-            this.toggleEditing();
+            this.setState({ editing: true, confirmedDelete: false });
         }
     }
 

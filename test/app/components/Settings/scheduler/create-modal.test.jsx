@@ -2,26 +2,24 @@ import React from 'react';
 import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
+global.document.createRange = function() {
+    return {
+        setEnd: function() {},
+        setStart: function() {},
+        getBoundingClientRect: function() {
+            return { right: 0 };
+        },
+        getClientRects: function() {
+            return { length: 0 };
+        }
+    };
+};
+const CreateModal = require('../../../../../app/components/Settings/Scheduler/create-modal.jsx').default;
+const CodeMirror = require('react-codemirror2').Controlled;
+
 describe('Create Modal Test', () => {
-    let CodeMirror;
-    let CreateModal;
     beforeAll(() => {
         configure({ adapter: new Adapter() });
-        global.document.createRange = function() {
-            return {
-                setEnd: function() {},
-                setStart: function() {},
-                getBoundingClientRect: function() {
-                    return { right: 0 };
-                },
-                getClientRects: function() {
-                    return { length: 0 };
-                }
-            };
-        };
-        CreateModal =
-          require('../../../../../app/components/Settings/Scheduler/create-modal.jsx').default;
-        CodeMirror = require('react-codemirror2').Controlled;
     });
 
     it("should not render the editor if it's closed", () => {
