@@ -17,13 +17,6 @@ th, td {
     overflow: auto;
 }
 
-.scheduleButton {
-    bottom: 18px;
-    position: absolute;
-    right: 136px;
-    z-index: 10;
-}
-
 .runButton {
     bottom: 18px;
     position: absolute;
