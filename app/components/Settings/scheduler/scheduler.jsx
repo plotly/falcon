@@ -179,8 +179,9 @@ class Scheduler extends Component {
             requestor: this.props.requestor
         };
         return this.props.createScheduledQuery(newQueryParams)
-          .then(() => {
+          .then(res => {
             this.closeCreateModal();
+            return res;
           });
     }
 
@@ -189,8 +190,11 @@ class Scheduler extends Component {
             ...queryConfig,
             requestor: this.props.requestor
         };
-        this.props.updateScheduledQuery(newQueryParams);
-        this.closePreview();
+        return this.props.updateScheduledQuery(newQueryParams)
+          .then(res => {
+            this.closePreview();
+            return res;
+          });
     }
 
     handleDelete(fid) {

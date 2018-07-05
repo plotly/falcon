@@ -6,6 +6,7 @@ import { Controlled as CodeMirror } from 'react-codemirror2';
 
 import { Row, Column } from '../../layout.jsx';
 import Modal from '../../modal.jsx';
+import Error from '../../error.jsx';
 
 import { getHighlightMode } from '../../../constants/constants.js';
 
@@ -22,11 +23,6 @@ const FREQUENCIES = [
 ];
 
 const rowStyleOverride = { justifyContent: 'flex-start' };
-
-const Error = props => <div className="errorMessage">{props.message}</div>;
-Error.propTypes = {
-    message: PropTypes.string.isRequired
-};
 
 function generateFilename() {
   let n = Math.floor(Math.random() * 1e8).toString();

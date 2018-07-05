@@ -4,6 +4,7 @@ import { Controlled as CodeMirror } from 'react-codemirror2';
 import ms from 'ms';
 
 import Modal from '../../modal.jsx';
+import Error from '../../error.jsx';
 import { Link } from '../../Link.react.js';
 import { FrequencySelector } from './create-modal.jsx';
 import { Row, Column } from '../../layout.jsx';
@@ -39,7 +40,8 @@ export class PreviewModal extends Component {
             editing: false,
             code: props.query && props.query.query,
             refreshInterval: props.query && props.query.refreshInterval,
-            confirmedDelete: false
+            confirmedDelete: false,
+            loading: false
         };
         this.updateCode = this.updateCode.bind(this);
         this.updateRefreshInterval = this.updateRefreshInterval.bind(this);
@@ -50,12 +52,12 @@ export class PreviewModal extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (
-            this.props.query &&
-            this.props.query.query !== (nextProps.query && nextProps.query.query)
+            nextProps.query &&
+            nextProps.query.query !== (this.props.query && this.props.query.query)
         ) {
             this.setState({
-                code: this.props.query.query,
-                refreshInterval: this.props.query.refreshInterval
+                code: nextProps.query.query,
+                refreshInterval: nextProps.query.refreshInterval
             });
         }
     }
@@ -72,6 +74,7 @@ export class PreviewModal extends Component {
         if (this.state.editing) {
             const { connectionId, fid, requestor, uids } = this.props.query;
             const { code: query, refreshInterval } = this.state;
+            this.setState({ loading: true });
             this.props.onSave({
                 connectionId,
                 fid,
@@ -79,8 +82,10 @@ export class PreviewModal extends Component {
                 uids,
                 query,
                 refreshInterval
-            });
-            this.setState({ editing: false, confirmedDelete: false });
+            })
+            .then(() => this.setState({ editing: false, confirmedDelete: false }))
+            .catch(error => this.setState({ error }))
+            .then(() => this.setState({ loading: false }));
         } else {
             this.setState({ editing: true, confirmedDelete: false });
         }
@@ -110,7 +115,7 @@ export class PreviewModal extends Component {
         } else {
             const [account, gridId] = props.query.fid.split(':');
             const link = `${plotlyUrl()}/~${account}/${gridId}`;
-            const editing = this.state.editing;
+            const { editing, loading } = this.state;
             content = (
                 <Column style={{ width: '50%', background: 'white' }}>
                     <Row
@@ -194,6 +199,11 @@ export class PreviewModal extends Component {
                                 {link}
                             </Link>
                         </Row>
+                        {this.state.error && (
+                            <Row style={rowStyle}>
+                                <Error message={this.state.error} />
+                            </Row>
+                        )}
                         <Row
                             style={{
                                 ...rowStyle,
@@ -205,7 +215,7 @@ export class PreviewModal extends Component {
                                 style={{ margin: 0 }}
                                 onClick={this.onSubmit}
                             >
-                                {editing ? 'Save' : 'Edit'}
+                                {loading ? 'Loading...' : (editing ? 'Save' : 'Edit')}
                             </button>
                             {!editing && (
                                 <button
