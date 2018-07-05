@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
+import {contains} from 'ramda';
 import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
@@ -10,6 +11,8 @@ import PreviewModal from './preview-modal.jsx';
 import PromptLoginModal from './login-modal.jsx';
 import { Row, Column } from '../../layout.jsx';
 import SQL from './sql.jsx';
+
+import {SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants';
 
 import './scheduler.css';
 
@@ -211,12 +214,15 @@ class Scheduler extends Component {
                         onChange={this.handleSearchChange}
                         placeholder="Search scheduled queries..."
                     />
-                    <button
-                        style={{ marginRight: '16px' }}
-                        onClick={this.openCreateModal}
-                    >
-                        Create Scheduled Query
-                    </button>
+                    {!contains(this.props.dialect, SQL_DIALECTS_USING_EDITOR) && (
+                        <button
+                            style={{ marginRight: '16px' }}
+                            onClick={this.openCreateModal}
+                        >
+                            Create Scheduled Query
+                        </button>
+                    )}
+
                 </Row>
                 <Row
                     style={{
