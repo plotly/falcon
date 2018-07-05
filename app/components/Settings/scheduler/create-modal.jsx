@@ -127,12 +127,8 @@ class CreateModal extends Component {
                 error: null
             });
         })
-        .catch(error => {
-            this.setState({ error });
-        })
-        .then(() => {
-            this.setState({ loading: false });
-        });
+        .catch(error => this.setState({ error: error.message }))
+        .then(() => this.setState({ loading: false }));
     }
 
     render() {

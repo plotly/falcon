@@ -180,6 +180,9 @@ class Scheduler extends Component {
         };
         return this.props.createScheduledQuery(newQueryParams)
           .then(res => {
+            if (res.error) {
+              throw res.error;
+            }
             this.closeCreateModal();
             return res;
           });
@@ -192,6 +195,9 @@ class Scheduler extends Component {
         };
         return this.props.updateScheduledQuery(newQueryParams)
           .then(res => {
+            if (res.error) {
+              throw res.error;
+            }
             this.closePreview();
             return res;
           });

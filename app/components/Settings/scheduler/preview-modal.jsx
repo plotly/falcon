@@ -84,7 +84,7 @@ export class PreviewModal extends Component {
                 refreshInterval
             })
             .then(() => this.setState({ editing: false, confirmedDelete: false }))
-            .catch(error => this.setState({ error }))
+            .catch(error => this.setState({ error: error.message }))
             .then(() => this.setState({ loading: false }));
         } else {
             this.setState({ editing: true, confirmedDelete: false });
