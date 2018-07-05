@@ -9,10 +9,6 @@ export const mergeTabMap = createAction('MERGE_TAB_MAP');
 export const setTab = createAction('SET_TAB');
 export const setTable = createAction('SET_TABLE');
 export const setIndex = createAction('SET_INDEX');
-export const setScheduledQueries = createAction('SET_SCHEDULED_QUERIES');
-export const createScheduledQueryAction = createAction('CREATE_SCHEDULED_QUERY');
-export const updateScheduledQueryAction = createAction('UPDATE_SCHEDULED_QUERY');
-export const deleteScheduledQueryAction = createAction('DELETE_SCHEDULED_QUERY');
 export const mergeConnections = createAction('MERGE_CONNECTIONS');
 export const updateConnection = createAction('UPDATE_CREDENTIAL');
 export const deleteConnection = createAction('DELETE_CREDENTIAL');
@@ -148,7 +144,10 @@ export function getScheduledQueries() {
             'GET',
             'scheduledQueriesRequest'
         )).then((json => {
-            dispatch(setScheduledQueries(json));
+            dispatch({
+                type: 'SET_SCHEDULED_QUERIES',
+                payload: json
+            });
             return json;
         }));
     };
@@ -171,7 +170,10 @@ export function createScheduledQuery(connectionId, payload = {}) {
         connectionId
       }
     )).then((res) => {
-      dispatch(createScheduledQueryAction(res));
+      dispatch({
+          type: 'CREATE_SCHEDULED_QUERY',
+          payload: res
+      });
       return res;
     });
   };
@@ -196,7 +198,10 @@ export function updateScheduledQuery(connectionId, payload = {}) {
       payload.filename,
       body
     )).then((res) => {
-      dispatch(updateScheduledQueryAction(body));
+      dispatch({
+          type: 'UPDATE_SCHEDULED_QUERY',
+          payload: body
+      });
       return res;
     });
   };
@@ -209,7 +214,10 @@ export function deleteScheduledQuery(fid) {
       'DELETE',
       'createScheduledQueryRequest'
     )).then((res) => {
-      dispatch(deleteScheduledQueryAction(fid));
+      dispatch({
+          type: 'DELETE_SCHEDULED_QUERY',
+          payload: fid
+      });
       return res;
     });
   };
