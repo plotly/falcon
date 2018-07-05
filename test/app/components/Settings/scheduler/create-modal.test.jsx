@@ -67,7 +67,7 @@ describe('Create Modal Test', () => {
     });
 
     it('clicking set error state if not all criteria, otherwise call onSubmit', () => {
-        const onSubmit = jest.fn();
+        const onSubmit = jest.fn(() => Promise.resolve());
         const component = mount(
             <CreateModal
                 open={true}

@@ -178,8 +178,10 @@ class Scheduler extends Component {
             ...queryConfig,
             requestor: this.props.requestor
         };
-        this.props.createScheduledQuery(newQueryParams);
-        this.closeCreateModal();
+        return this.props.createScheduledQuery(newQueryParams)
+          .then(() => {
+            this.closeCreateModal();
+          });
     }
 
     handleUpdate(queryConfig) {

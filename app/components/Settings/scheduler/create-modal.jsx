@@ -75,7 +75,8 @@ class CreateModal extends Component {
             code: props.initialCode,
             filename: props.initialFilename,
             intervalType: null,
-            error: null
+            error: null,
+            loading: false
         };
         this.options = {
             lineNumbers: true,
@@ -116,16 +117,25 @@ class CreateModal extends Component {
         if (!this.state.intervalType || !this.state.intervalType.value) {
             return this.setState({ error: 'Please select a frequency above.' });
         }
+        this.setState({ loading: true });
         this.props.onSubmit({
             query: this.state.code,
             refreshInterval: this.state.intervalType.value,
             filename: generateFilename()
-        });
-        this.setState({
-            code: '',
-            filename: '',
-            intervalType: null,
-            error: null
+        })
+        .then(() => {
+            this.setState({
+                code: '',
+                filename: '',
+                intervalType: null,
+                error: null
+            });
+        })
+        .catch(error => {
+            this.setState({ error });
+        })
+        .then(() => {
+            this.setState({ loading: false });
         });
     }
 
@@ -203,7 +213,7 @@ class CreateModal extends Component {
                             className="submit"
                             onClick={this.submit}
                         >
-                            Schedule Query
+                            {this.state.loading ? 'Loading...' : 'Schedule Query'}
                         </button>
                     </Row>
                 </Column>
