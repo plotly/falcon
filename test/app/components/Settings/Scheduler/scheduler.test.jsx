@@ -3,10 +3,9 @@ import sinon from 'sinon';
 import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
-import Scheduler, {
-    SchedulerPreview,
-    SQL
-} from '../../../../../app/components/Settings/Scheduler/scheduler.jsx';
+import Scheduler from '../../../../../app/components/Settings/Scheduler/scheduler.jsx';
+import SQL from '../../../../../app/components/Settings/Scheduler/sql.jsx';
+import SchedulerPreview from '../../../../../app/components/Settings/Scheduler/previewModal.jsx';
 import Modal from '../../../../../app/components/modal.jsx';
 
 const mockQueries = [
