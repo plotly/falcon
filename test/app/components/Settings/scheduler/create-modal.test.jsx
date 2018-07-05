@@ -14,7 +14,7 @@ global.document.createRange = function() {
         }
     };
 };
-const CreateModal = require('../../../../../app/components/Settings/Scheduler/create-modal.jsx').default;
+const CreateModal = require('../../../../../app/components/Settings/scheduler/create-modal.jsx').default;
 const CodeMirror = require('react-codemirror2').Controlled;
 
 describe('Create Modal Test', () => {

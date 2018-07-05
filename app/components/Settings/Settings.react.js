@@ -13,7 +13,7 @@ import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import Preview from './Preview/Preview.react';
 import {Link} from '../Link.react';
-import Scheduler from './Scheduler/scheduler.jsx';
+import Scheduler from './scheduler/scheduler.jsx';
 import {DIALECTS, FAQ, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
 import {isElectron, isOnPrem} from '../../utils/utils';
 
