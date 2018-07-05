@@ -9,6 +9,8 @@ import Modal from '../../modal.jsx';
 
 import { getHighlightMode } from '../../../constants/constants.js';
 
+import './create-modal.css'
+
 function noop() {}
 
 const FREQUENCIES = [
@@ -19,39 +21,7 @@ const FREQUENCIES = [
     { label: 'Run weekly', value: 7 * 24 * 60 * 60 }
 ];
 
-const styles = {
-    column: { width: '60%', background: '#F5F7FB' },
-    innerColumn: { background: '#fff', position: 'relative' },
-    header: { marginBottom: '16px', padding: '0 32px' },
-    button: {
-        position: 'absolute',
-        top: '16px',
-        right: '16px',
-        padding: '2px 4px'
-    },
-    detailsColumn: { padding: '0 32px' },
-    p: { margin: '32px 0', padding: '16px' },
-    submit: {
-        width: '100%',
-        margin: '24px 32px 32px'
-    },
-    row: { justifyContent: 'flex-start' },
-    input: {
-        margin: '0 0 16px',
-        width: '70%'
-    },
-    dropdown: {
-        padding: 0,
-        marginBottom: '16px',
-        width: '100%',
-        maxWidth: '432px'
-    }
-};
-
-const rowStyles = {
-    header: { width: '20%' },
-    body: { width: '80%' }
-};
+const rowStyleOverride = { justifyContent: 'flex-start' };
 
 const Error = props => <div className="errorMessage">{props.message}</div>;
 Error.propTypes = {
@@ -152,33 +122,33 @@ class CreateModal extends Component {
             <Modal
                 open={this.props.open}
                 onClickAway={this.props.onClickAway}
-                className="scheduler"
+                className="scheduler create-modal"
             >
-                <Column style={styles.column}>
+                <Column className="container " style={{ width: '60%' }}>
                     <Row>
-                        <Column style={styles.innerColumn}>
-                            <h5 style={styles.header}>
+                        <Column className="innerColumn">
+                            <h5 className="header">
                                 Create Scheduled Query
                             </h5>
                             <button
+                                className="button"
                                 onClick={this.props.onClickAway}
-                                style={styles.button}
                             >
                                 &times;
                             </button>
                         </Column>
                     </Row>
-                    <Column style={styles.detailsColumn}>
+                    <Column className="detailsColumn">
                         <Row>
-                            <p style={styles.p}>
+                            <p>
                                 A scheduled query runs and updates its
                                 corresponding dataset in Plotly Cloud. Learn
                                 more about scheduled queries here.
                             </p>
                         </Row>
-                        <Row style={styles.row}>
-                            <div style={rowStyles.header}>Query</div>
-                            <div style={rowStyles.body}>
+                        <Row style={rowStyleOverride}>
+                            <div className="row-header">Query</div>
+                            <div className="row-body">
                                 <CodeMirror
                                     options={this.options}
                                     value={this.state.code}
@@ -186,24 +156,20 @@ class CreateModal extends Component {
                                 />
                             </div>
                         </Row>
-                        <Row style={styles.row}>
-                            <div style={rowStyles.header}>Filename</div>
-                            <div style={rowStyles.body}>
+                        <Row style={rowStyleOverride}>
+                            <div className="row-header">Filename</div>
+                            <div className="row-body">
                                 <input
-                                    style={styles.input}
                                     placeholder="Enter filename here..."
                                     value={this.state.filename}
                                     onChange={this.handleFilenameChange}
                                 />
                             </div>
                         </Row>
-                        <Row style={styles.row}>
-                            <div style={rowStyles.header}>Frequency</div>
-                            <div style={rowStyles.body}>
-                                <div
-                                    className="dropdown"
-                                    style={styles.dropdown}
-                                >
+                        <Row style={rowStyleOverride}>
+                            <div className="row-header">Frequency</div>
+                            <div className="row-body">
+                                <div className="dropdown">
                                     <FrequencySelector
                                         value={this.state.intervalType}
                                         onChange={this.handleIntervalChange}
@@ -212,7 +178,7 @@ class CreateModal extends Component {
                             </div>
                         </Row>
                         {this.state.error && (
-                            <Row style={styles.row}>
+                            <Row style={rowStyleOverride}>
                                 <Error message={this.state.error} />
                             </Row>
                         )}
@@ -220,7 +186,7 @@ class CreateModal extends Component {
                     <Row>
                         <button
                             type="submit"
-                            style={styles.submit}
+                            className="submit"
                             onClick={this.submit}
                         >
                             Schedule Query

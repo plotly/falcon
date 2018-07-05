@@ -1,0 +1,58 @@
+.create-modal .container {
+    background: #F5F7FB;
+}
+
+.create-modal .innerColumn {
+    background: #fff;
+    position: relative;
+}
+
+.create-modal .header {
+    margin-bottom: 16px;
+    padding: 0 32px;
+}
+
+.create-modal .button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 2px 4px;
+}
+
+.create-modal .detailsColumn {
+    padding: 0 32px;
+}
+
+.create-modal p {
+    margin: 32px 0;
+    padding: 16px;
+}
+
+.create-modal .submit {
+    width: 100%;
+    margin: 24px 32px 32px;
+}
+
+.create-modal .row {
+    justify-content: flex-start;
+}
+
+.create-modal input {
+    margin: 0 0 16px;
+    width: 70%;
+}
+
+.create-modal .dropdown {
+  padding: 0;
+  margin-bottom: 16px;
+  width: 100%;
+  max-width: 432px;
+}
+
+.create-modal .row-header {
+  width: 20%;
+}
+
+.create-modal .row-body {
+  width: 80%;
+}
