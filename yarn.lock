@@ -138,6 +138,12 @@
     d3-collection "1"
     d3-interpolate "1"
 
+"@plotly/draft-js-export-html@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@plotly/draft-js-export-html/-/draft-js-export-html-1.2.0.tgz#7a3f034148195593d4caf030cd3236fa4af3b49f"
+  dependencies:
+    draft-js-utils "^1.2.0"
+
 "@sinonjs/formatio@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@sinonjs/formatio/-/formatio-2.0.0.tgz#84db7e9eb5531df18a8c5e0bfb6e449e55e654b2"
@@ -190,6 +196,12 @@ acorn-dynamic-import@^2.0.0:
   dependencies:
     acorn "^4.0.3"
 
+acorn-dynamic-import@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/acorn-dynamic-import/-/acorn-dynamic-import-3.0.0.tgz#901ceee4c7faaef7e07ad2a47e890675da50a278"
+  dependencies:
+    acorn "^5.0.0"
+
 acorn-globals@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/acorn-globals/-/acorn-globals-4.1.0.tgz#ab716025dbe17c54d3ef81d32ece2b2d99fe2538"
@@ -201,6 +213,12 @@ acorn-jsx@^3.0.0, acorn-jsx@^3.0.1:
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-3.0.1.tgz#afdf9488fb1ecefc8348f6fb22f464e32a58b36b"
   dependencies:
     acorn "^3.0.4"
+
+acorn-jsx@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-4.1.1.tgz#e8e41e48ea2fe0c896740610ab6a4ffd8add225e"
+  dependencies:
+    acorn "^5.0.3"
 
 acorn-object-spread@^1.0.0:
   version "1.0.0"
@@ -225,6 +243,10 @@ acorn@^4.0.0, acorn@^4.0.3:
 acorn@^5.0.0:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.1.2.tgz#911cb53e036807cf0fa778dc5d370fbd864246d7"
+
+acorn@^5.0.3, acorn@^5.4.1:
+  version "5.7.1"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.7.1.tgz#f095829297706a7c9776958c0afc8930a9b9d9d8"
 
 acorn@^5.1.2:
   version "5.5.3"
@@ -485,6 +507,10 @@ array-range@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/array-range/-/array-range-1.0.1.tgz#f56e46591843611c6a56f77ef02eda7c50089bfc"
 
+array-rearrange@^2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/array-rearrange/-/array-rearrange-2.2.2.tgz#fa1a2acf8d02e88dd0c9602aa0e06a79158b2283"
+
 array-union@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/array-union/-/array-union-1.0.2.tgz#9a34410e4f4e3da23dea375be5be70f24778ec39"
@@ -592,6 +618,12 @@ asynckit@^0.4.0:
 atob-lite@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/atob-lite/-/atob-lite-1.0.0.tgz#b88dca6006922b962094f7556826bab31c4a296b"
+
+attr-accept@^1.0.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/attr-accept/-/attr-accept-1.1.3.tgz#48230c79f93790ef2775fcec4f0db0f5db41ca52"
+  dependencies:
+    core-js "^2.5.0"
 
 autoprefixer@^6.3.1:
   version "6.7.7"
@@ -1477,6 +1509,10 @@ binary-search-bounds@^2.0.0, binary-search-bounds@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/binary-search-bounds/-/binary-search-bounds-2.0.3.tgz#5ff8616d6dd2ca5388bc85b2d6266e2b9da502dc"
 
+binary-search-bounds@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/binary-search-bounds/-/binary-search-bounds-2.0.4.tgz#eea0e4081da93baa851c7d851a7e636c3d51307f"
+
 binary@~0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/binary/-/binary-0.3.0.tgz#9f60553bc5ce8c3386f3b553cff47462adecaa79"
@@ -1729,6 +1765,19 @@ buble@^0.18.0:
     os-homedir "^1.0.1"
     vlq "^0.2.2"
 
+buble@^0.19.3:
+  version "0.19.3"
+  resolved "https://registry.yarnpkg.com/buble/-/buble-0.19.3.tgz#01e9412062cff1da6f20342b6ecd72e7bf699d02"
+  dependencies:
+    acorn "^5.4.1"
+    acorn-dynamic-import "^3.0.0"
+    acorn-jsx "^4.1.1"
+    chalk "^2.3.1"
+    magic-string "^0.22.4"
+    minimist "^1.2.0"
+    os-homedir "^1.0.1"
+    vlq "^1.0.0"
+
 bubleify@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/bubleify/-/bubleify-0.7.0.tgz#d08ea642ffd085ff8711c8843f57072f0d5eb8f6"
@@ -1741,6 +1790,12 @@ bubleify@^1.0.0:
   resolved "https://registry.yarnpkg.com/bubleify/-/bubleify-1.1.0.tgz#ec689e8ed02d4e180d0c932bd2c24c091366a2d9"
   dependencies:
     buble "^0.18.0"
+
+bubleify@^1.1.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/bubleify/-/bubleify-1.2.0.tgz#17a65b6b70160c4d81a06f28fc2a461621415ea9"
+  dependencies:
+    buble "^0.19.3"
 
 buffer-equal@0.0.1:
   version "0.0.1"
@@ -2018,7 +2073,7 @@ chalk@^2.0.1, chalk@^2.1.0:
     escape-string-regexp "^1.0.5"
     supports-color "^4.0.0"
 
-chalk@^2.4.1:
+chalk@^2.3.1, chalk@^2.4.1:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.1.tgz#18c49ab16a037b6eb0152cc83e3471338215b66e"
   dependencies:
@@ -2208,6 +2263,12 @@ codepage@~1.12.0:
     exit-on-epipe "~1.0.1"
     voc "~1.0.0"
 
+color-alpha@^1.0.2:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/color-alpha/-/color-alpha-1.0.3.tgz#318e33edb215bd695d51cae4922640a44107e959"
+  dependencies:
+    color-parse "^1.2.0"
+
 color-convert@^1.3.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-1.9.0.tgz#1accf97dd739b983bf994d56fec8f95853641b7a"
@@ -2241,6 +2302,14 @@ color-normalize@^1.0.0, color-normalize@^1.0.3:
     clamp "^1.0.1"
     color-rgba "^2.0.0"
     dtype "^2.0.0"
+
+color-parse@^1.2.0:
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/color-parse/-/color-parse-1.3.7.tgz#34ac4fb0782b992d3614417b60896c4884771b26"
+  dependencies:
+    color-name "^1.0.0"
+    defined "^1.0.0"
+    is-plain-obj "^1.1.0"
 
 color-parse@^1.3.5:
   version "1.3.5"
@@ -3085,12 +3154,6 @@ double-bits@^1.1.0, double-bits@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/double-bits/-/double-bits-1.1.1.tgz#58abba45494da4d0fa36b73ad11a286c9184b1c6"
 
-"draft-js-export-html@github:plotly/draft-js-export-html":
-  version "1.2.0"
-  resolved "https://codeload.github.com/plotly/draft-js-export-html/tar.gz/1640a7542d74d5fcf67c3114fa519202c7fee47d"
-  dependencies:
-    draft-js-utils "^1.2.0"
-
 draft-js-import-element@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/draft-js-import-element/-/draft-js-import-element-1.2.1.tgz#9a6a56d74690d48d35d8d089564e6d710b4926eb"
@@ -3599,7 +3662,7 @@ es6-symbol@3.1.1, es6-symbol@^3.1.1, es6-symbol@~3.1.1:
     d "1"
     es5-ext "~0.10.14"
 
-es6-weak-map@^2.0.1:
+es6-weak-map@^2.0.1, es6-weak-map@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/es6-weak-map/-/es6-weak-map-2.0.2.tgz#5e3ab32251ffd1538a1f8e5ffa1357772f92d96f"
   dependencies:
@@ -4106,6 +4169,12 @@ flatten-vertex-data@^1.0.0:
     dtype "^2.0.0"
     is-typedarray "^1.0.0"
 
+flatten-vertex-data@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/flatten-vertex-data/-/flatten-vertex-data-1.0.2.tgz#889fd60bea506006ca33955ee1105175fb620219"
+  dependencies:
+    dtype "^2.0.0"
+
 flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
@@ -4355,6 +4424,15 @@ gl-buffer@^2.0.3, gl-buffer@^2.0.6, gl-buffer@^2.0.8, gl-buffer@^2.1.1, gl-buffe
     ndarray-ops "^1.1.0"
     typedarray-pool "^1.0.0"
 
+gl-cone3d@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/gl-cone3d/-/gl-cone3d-1.1.0.tgz#23cdf04be30f1047b7df6e60de371d55e9c59f3f"
+  dependencies:
+    gl-shader "^4.2.1"
+    gl-vec3 "^1.0.0"
+    glsl-inverse "^1.0.0"
+    glslify "^6.1.0"
+
 gl-constants@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/gl-constants/-/gl-constants-1.0.0.tgz#597a504e364750ff50253aa35f8dea7af4a5d233"
@@ -4433,6 +4511,10 @@ gl-mat4@^1.0.0, gl-mat4@^1.0.1, gl-mat4@^1.0.2, gl-mat4@^1.0.3, gl-mat4@^1.1.2:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/gl-mat4/-/gl-mat4-1.1.4.tgz#1e895b55892e56a896867abd837d38f37a178086"
 
+gl-mat4@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/gl-mat4/-/gl-mat4-1.2.0.tgz#49d8a7636b70aa00819216635f4a3fd3f4669b26"
+
 gl-matrix-invert@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/gl-matrix-invert/-/gl-matrix-invert-1.0.0.tgz#a36d7bde3654c4590a127ee7c68f6e13fea8c63d"
@@ -4441,9 +4523,9 @@ gl-matrix-invert@^1.0.0:
     gl-mat3 "^1.0.0"
     gl-mat4 "^1.0.0"
 
-gl-mesh3d@^1.3.2:
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/gl-mesh3d/-/gl-mesh3d-1.3.2.tgz#1436104ad86a82c3d25f030ec0cf682db41ebdc2"
+gl-mesh3d@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/gl-mesh3d/-/gl-mesh3d-2.0.0.tgz#e34b8dbe455a6fd7eae24d5d15f3cb93d8dda31b"
   dependencies:
     barycentric "^1.0.1"
     colormap "^2.1.0"
@@ -4452,6 +4534,7 @@ gl-mesh3d@^1.3.2:
     gl-shader "^4.2.1"
     gl-texture2d "^2.0.8"
     gl-vao "^1.1.3"
+    glsl-face-normal "^1.0.2"
     glsl-specular-cook-torrance "^2.0.1"
     glslify "^6.1.0"
     ndarray "^1.0.15"
@@ -4597,6 +4680,10 @@ gl-vao@^1.1.1, gl-vao@^1.1.2, gl-vao@^1.1.3, gl-vao@^1.2.0, gl-vao@^1.2.1, gl-va
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/gl-vao/-/gl-vao-1.3.0.tgz#e9e92aa95588cab9d5c2f04b693440c3df691923"
 
+gl-vec3@^1.0.0:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/gl-vec3/-/gl-vec3-1.1.3.tgz#a47c62f918774a06cbed1b65bcd0288ecbb03826"
+
 gl-vec3@^1.0.2, gl-vec3@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/gl-vec3/-/gl-vec3-1.0.3.tgz#110fd897d0729f6398307381567d0944941bf22b"
@@ -4691,6 +4778,10 @@ globby@^6.1.0:
     object-assign "^4.0.1"
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
+
+glsl-face-normal@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/glsl-face-normal/-/glsl-face-normal-1.0.2.tgz#7ee775d919a4f2ee92f57bb698e87cc75dbf1288"
 
 glsl-inject-defines@^1.0.1:
   version "1.0.3"
@@ -5514,7 +5605,7 @@ is-number@^3.0.0:
   dependencies:
     kind-of "^3.0.2"
 
-is-obj@^1.0.0:
+is-obj@^1.0.0, is-obj@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/is-obj/-/is-obj-1.0.1.tgz#3e4729ac1f5fde025cd7d83a896dab9f4f67db0f"
 
@@ -6139,10 +6230,6 @@ kdbush@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/kdbush/-/kdbush-1.0.1.tgz#3cbd03e9dead9c0f6f66ccdb96450e5cecc640e0"
 
-kdgrass@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/kdgrass/-/kdgrass-1.0.1.tgz#8c2a72df8f81f27d98617e30569420136a72fcd3"
-
 keep-alive-agent@^0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/keep-alive-agent/-/keep-alive-agent-0.0.1.tgz#44847ca394ce8d6b521ae85816bd64509942b385"
@@ -6529,6 +6616,10 @@ material-colors@^1.2.1:
 math-expression-evaluator@^1.2.14:
   version "1.2.17"
   resolved "https://registry.yarnpkg.com/math-expression-evaluator/-/math-expression-evaluator-1.2.17.tgz#de819fdbcd84dccd8fae59c6aeb79615b9d266ac"
+
+math-log2@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/math-log2/-/math-log2-1.0.1.tgz#fb8941be5f5ebe8979e718e6273b178e58694565"
 
 matrix-camera-controller@^2.1.1, matrix-camera-controller@^2.1.3:
   version "2.1.3"
@@ -7393,6 +7484,12 @@ parse-rect@^1.1.0:
   dependencies:
     pick-by-alias "^1.2.0"
 
+parse-rect@^1.1.1, parse-rect@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/parse-rect/-/parse-rect-1.2.0.tgz#e0a5b0dbaaaee637a0a1eb9779969e19399d8dec"
+  dependencies:
+    pick-by-alias "^1.2.0"
+
 parse-svg-path@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/parse-svg-path/-/parse-svg-path-0.1.2.tgz#7a7ec0d1eb06fa5325c7d3e009b859a09b5d49eb"
@@ -7630,15 +7727,14 @@ plotly-icons@latest:
     mdi-react "^2.1.19"
     prop-types "^15.6.1"
 
-plotly.js@^1.35.0, plotly.js@^1.35.2:
-  version "1.35.2"
-  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-1.35.2.tgz#543d914d4384eca1bddae1f6df6b42c1b85b749a"
+plotly.js@1.38.3:
+  version "1.38.3"
+  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-1.38.3.tgz#e9429dac9c324119322af0f8966e1ed7e2885d41"
   dependencies:
     "3d-view" "^2.0.0"
     "@plotly/d3-sankey" "^0.5.0"
     alpha-shape "^1.0.0"
     array-range "^1.0.1"
-    bubleify "^1.0.0"
     canvas-fit "^1.5.0"
     color-normalize "^1.0.3"
     color-rgba "^2.0.0"
@@ -7650,12 +7746,13 @@ plotly.js@^1.35.0, plotly.js@^1.35.2:
     es6-promise "^3.0.2"
     fast-isnumeric "^1.1.1"
     font-atlas-sdf "^1.3.3"
+    gl-cone3d "^1.1.0"
     gl-contour2d "^1.1.4"
     gl-error3d "^1.0.7"
     gl-heatmap2d "^1.0.4"
     gl-line3d "^1.1.2"
-    gl-mat4 "^1.1.2"
-    gl-mesh3d "^1.3.2"
+    gl-mat4 "^1.2.0"
+    gl-mesh3d "^2.0.0"
     gl-plot2d "^1.3.1"
     gl-plot3d "^1.5.5"
     gl-pointcloud2d "^1.0.1"
@@ -7666,7 +7763,6 @@ plotly.js@^1.35.0, plotly.js@^1.35.2:
     glslify "^6.1.1"
     has-hover "^1.0.1"
     has-passive-events "^1.0.0"
-    kdgrass "^1.0.1"
     mapbox-gl "0.44.1"
     matrix-camera-controller "^2.1.3"
     mouse-change "^1.4.0"
@@ -7676,11 +7772,13 @@ plotly.js@^1.35.0, plotly.js@^1.35.2:
     ndarray-fill "^1.0.2"
     ndarray-homography "^1.0.0"
     ndarray-ops "^1.2.2"
+    point-cluster "^3.1.4"
     polybooljs "^1.2.0"
     regl "^1.3.1"
-    regl-error2d "^2.0.3"
-    regl-line2d "^2.1.5"
-    regl-scatter2d "^2.1.17"
+    regl-error2d "^2.0.5"
+    regl-line2d "^3.0.9"
+    regl-scatter2d "^3.0.4"
+    regl-splom "^1.0.3"
     right-now "^1.0.0"
     robust-orientation "^1.1.3"
     sane-topojson "^2.0.0"
@@ -7699,6 +7797,31 @@ pluralize@^7.0.0:
 pn@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/pn/-/pn-1.1.0.tgz#e2f4cef0e219f463c179ab37463e4e1ecdccbafb"
+
+point-cluster@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/point-cluster/-/point-cluster-1.0.2.tgz#553b1f8732a8c6ea7042a450447111c56c8ab683"
+  dependencies:
+    array-bounds "^1.0.1"
+    array-normalize "^1.1.3"
+    binary-search-bounds "^2.0.4"
+    clamp "^1.0.1"
+    parse-rect "^1.1.1"
+
+point-cluster@^3.1.2, point-cluster@^3.1.4:
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/point-cluster/-/point-cluster-3.1.4.tgz#785fe5ca1351e2cf00f8291a5a653113db892f8e"
+  dependencies:
+    array-bounds "^1.0.1"
+    array-normalize "^1.1.3"
+    binary-search-bounds "^2.0.4"
+    bubleify "^1.1.0"
+    clamp "^1.0.1"
+    dtype "^2.0.0"
+    flatten-vertex-data "^1.0.0"
+    is-obj "^1.0.1"
+    math-log2 "^1.0.1"
+    parse-rect "^1.2.0"
 
 point-in-big-polygon@^2.0.0:
   version "2.0.0"
@@ -8310,26 +8433,27 @@ react-base16-styling@^0.5.1:
     lodash.flow "^3.3.0"
     pure-color "^1.2.0"
 
-react-chart-editor@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/react-chart-editor/-/react-chart-editor-0.13.0.tgz#7e043d3fdbac400e458b94707937cb24e95769dd"
+react-chart-editor@0.18:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/react-chart-editor/-/react-chart-editor-0.18.0.tgz#8caa8c144fe3e551e50aa71ca409f9d9c1ffa104"
   dependencies:
+    "@plotly/draft-js-export-html" "1.2.0"
     classnames "^2.2.5"
     draft-js "^0.10.4"
-    draft-js-export-html "github:plotly/draft-js-export-html"
     draft-js-import-html "^1.2.1"
     draft-js-utils "^1.2.0"
     fast-isnumeric "^1.1.1"
     immutability-helper "^2.6.4"
     plotly-icons latest
-    plotly.js "^1.35.0"
+    plotly.js "1.38.3"
     prop-types "^15.5.10"
     raf "^3.4.0"
     react-color "^2.13.8"
     react-colorscales "^0.4.2"
-    react-plotly.js "^2.0.0"
+    react-dropzone "^4.2.9"
+    react-plotly.js "^2.2.0"
     react-rangeslider "^2.2.0"
-    react-select "^1.0.0-rc.10"
+    react-select "^1.2.0"
     react-tabs "^2.2.1"
     tinycolor2 "^1.4.1"
 
@@ -8405,6 +8529,13 @@ react-dom@^16.2.0:
     classnames "^2.2.5"
     prop-types "^15.6.0"
 
+react-dropzone@^4.2.9:
+  version "4.2.13"
+  resolved "https://registry.yarnpkg.com/react-dropzone/-/react-dropzone-4.2.13.tgz#31393c079b4e5ddcc176c095cebc3545d1248b9d"
+  dependencies:
+    attr-accept "^1.0.3"
+    prop-types "^15.5.7"
+
 react-highlight@^0.12.0:
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/react-highlight/-/react-highlight-0.12.0.tgz#34de986a0bfdf228904d0c269b69538d95b35802"
@@ -8429,9 +8560,9 @@ react-json-tree@^0.11.0:
     prop-types "^15.5.8"
     react-base16-styling "^0.5.1"
 
-react-plotly.js@^2.0.0, react-plotly.js@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/react-plotly.js/-/react-plotly.js-2.1.0.tgz#53693cb7cbe3d815783343f2475038ae66e51ece"
+react-plotly.js@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/react-plotly.js/-/react-plotly.js-2.2.0.tgz#238a242f3c05c993c72e1435d0c9ae2f34d7e86a"
   dependencies:
     prop-types "^15.5.10"
 
@@ -8519,7 +8650,7 @@ react-router@^4.2.0:
     prop-types "^15.5.4"
     warning "^3.0.0"
 
-react-select@^1.0.0-rc.10, react-select@^1.2.1:
+react-select@^1.2.0, react-select@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/react-select/-/react-select-1.2.1.tgz#a2fe58a569eb14dcaa6543816260b97e538120d1"
   dependencies:
@@ -8895,54 +9026,72 @@ regjsparser@^0.1.4:
   dependencies:
     jsesc "~0.5.0"
 
-regl-error2d@^2.0.3:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/regl-error2d/-/regl-error2d-2.0.4.tgz#2737970889882fefeff4b9e063a10177c6f42646"
+regl-error2d@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/regl-error2d/-/regl-error2d-2.0.5.tgz#7a8c3920ed334437676f6fb758b552ecf1e5adec"
   dependencies:
     array-bounds "^1.0.1"
     bubleify "^1.0.0"
-    color-normalize "^1.0.0"
+    color-normalize "^1.0.3"
     flatten-vertex-data "^1.0.0"
     object-assign "^4.1.1"
     pick-by-alias "^1.1.1"
     to-float32 "^1.0.0"
     update-diff "^1.0.2"
 
-regl-line2d@^2.1.5:
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/regl-line2d/-/regl-line2d-2.1.5.tgz#f95fa7ee8329084cb163d454f92dfbed7fc11488"
+regl-line2d@^3.0.9:
+  version "3.0.9"
+  resolved "https://registry.yarnpkg.com/regl-line2d/-/regl-line2d-3.0.9.tgz#9cbf9d35ac8dee8d220432c67958764a3aece7fd"
   dependencies:
     array-bounds "^1.0.0"
     array-normalize "^1.1.3"
     bubleify "^1.0.0"
     color-normalize "^1.0.0"
     earcut "^2.1.1"
+    es6-weak-map "^2.0.2"
     flatten-vertex-data "^1.0.0"
     glslify "^6.1.0"
     object-assign "^4.1.1"
+    parse-rect "^1.2.0"
     pick-by-alias "^1.1.0"
     to-float32 "^1.0.0"
-    update-diff "^1.0.2"
 
-regl-scatter2d@^2.1.17:
-  version "2.1.17"
-  resolved "https://registry.yarnpkg.com/regl-scatter2d/-/regl-scatter2d-2.1.17.tgz#e556286360397d648eeda3e438f44bb419e2186f"
+regl-scatter2d@^3.0.0, regl-scatter2d@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/regl-scatter2d/-/regl-scatter2d-3.0.4.tgz#139743a0077637e1621f313e0b0d312aeca51209"
   dependencies:
     array-range "^1.0.1"
-    binary-search-bounds "^2.0.3"
+    array-rearrange "^2.2.2"
     bubleify "^1.0.0"
     clamp "^1.0.1"
     color-id "^1.1.0"
     color-normalize "^1.0.3"
     flatten-vertex-data "^1.0.0"
-    glslify "^6.1.0"
+    glslify "^6.1.1"
     is-iexplorer "^1.0.0"
     object-assign "^4.1.1"
     parse-rect "^1.1.0"
     pick-by-alias "^1.0.0"
-    snap-points-2d "^3.2.0"
+    point-cluster "^3.1.2"
     to-float32 "^1.0.0"
     update-diff "^1.1.0"
+
+regl-splom@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/regl-splom/-/regl-splom-1.0.3.tgz#f2623f69cda74895ab37b192f79a42043bb1e93b"
+  dependencies:
+    array-bounds "^1.0.1"
+    array-range "^1.0.1"
+    bubleify "^1.1.0"
+    color-alpha "^1.0.2"
+    defined "^1.0.0"
+    flatten-vertex-data "^1.0.2"
+    left-pad "^1.2.0"
+    parse-rect "^1.2.0"
+    pick-by-alias "^1.2.0"
+    point-cluster "^1.0.2"
+    raf "^3.4.0"
+    regl-scatter2d "^3.0.0"
 
 regl@^1.3.1:
   version "1.3.1"
@@ -9564,12 +9713,6 @@ slice-ansi@1.0.0:
   resolved "https://registry.yarnpkg.com/slice-ansi/-/slice-ansi-1.0.0.tgz#044f1a49d8842ff307aad6b505ed178bd950134d"
   dependencies:
     is-fullwidth-code-point "^2.0.0"
-
-snap-points-2d@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/snap-points-2d/-/snap-points-2d-3.2.0.tgz#0e19e22a3a0e96bce21cdf5c7f1d7ed5b96745f0"
-  dependencies:
-    array-bounds "^1.0.1"
 
 sntp@1.x.x:
   version "1.0.9"
@@ -10697,6 +10840,10 @@ verror@1.6.0:
 vlq@^0.2.1, vlq@^0.2.2:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/vlq/-/vlq-0.2.3.tgz#8f3e4328cf63b1540c0d67e1b2778386f8975b26"
+
+vlq@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/vlq/-/vlq-1.0.0.tgz#8101be90843422954c2b13eb27f2f3122bdcc806"
 
 vm-browserify@0.0.4:
   version "0.0.4"
