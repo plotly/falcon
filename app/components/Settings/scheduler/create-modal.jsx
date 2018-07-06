@@ -106,7 +106,7 @@ class CreateModal extends Component {
                 error: 'Please enter the query to be scheduled above.'
             });
         }
-        // if (!this.state.filename || !this.state.filename.length) {
+        // if (!this.state.filename) {
         //     return this.setState({
         //         error: 'Please enter a filename for your scheduled query.'
         //     });
