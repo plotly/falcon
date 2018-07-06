@@ -32,7 +32,8 @@ export class PreviewModal extends Component {
         onSave: PropTypes.func,
         onDelete: PropTypes.func,
         onClickAway: PropTypes.func,
-        dialect: PropTypes.string
+        dialect: PropTypes.string,
+        loggedIn: PropTypes.bool
     };
     constructor(props) {
         super(props);
@@ -204,34 +205,36 @@ export class PreviewModal extends Component {
                                 <Error message={this.state.error} />
                             </Row>
                         )}
-                        <Row
-                            style={{
-                                ...rowStyle,
-                                justifyContent: 'space-between',
-                                border: 'none'
-                            }}
-                        >
-                            <button
-                                style={{ margin: 0 }}
-                                onClick={this.onSubmit}
-                            >
-                                {loading ? 'Loading...' : (editing ? 'Save' : 'Edit')}
-                            </button>
-                            {!editing && (
-                                <button
-                                    style={{
-                                        margin: 0,
-                                        border: 'none',
-                                        background: 'red'
-                                    }}
-                                    onClick={this.onDelete}
-                                >
-                                    {this.state.confirmedDelete
-                                        ? 'Click to confirm'
-                                        : 'Delete'}
-                                </button>
-                            )}
-                        </Row>
+                        {this.props.loggedIn && (
+                          <Row
+                              style={{
+                                  ...rowStyle,
+                                  justifyContent: 'space-between',
+                                  border: 'none'
+                              }}
+                          >
+                              <button
+                                  style={{ margin: 0 }}
+                                  onClick={this.onSubmit}
+                              >
+                                  {loading ? 'Loading...' : (editing ? 'Save' : 'Edit')}
+                              </button>
+                              {!editing && (
+                                  <button
+                                      style={{
+                                          margin: 0,
+                                          border: 'none',
+                                          background: 'red'
+                                      }}
+                                      onClick={this.onDelete}
+                                  >
+                                      {this.state.confirmedDelete
+                                          ? 'Click to confirm'
+                                          : 'Delete'}
+                                  </button>
+                              )}
+                          </Row>
+                        )}
                     </Column>
                 </Column>
             );

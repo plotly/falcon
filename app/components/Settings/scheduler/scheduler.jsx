@@ -303,6 +303,7 @@ class Scheduler extends Component {
                 <PreviewModal
                     onClickAway={this.closePreview}
                     query={this.state.selectedQuery}
+                    loggedIn={loggedIn}
                     onSave={this.handleUpdate}
                     onDelete={this.handleDelete}
                     dialect={this.props.dialect}
