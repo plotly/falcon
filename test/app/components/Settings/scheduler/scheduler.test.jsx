@@ -82,4 +82,29 @@ describe('Scheduler Test', () => {
 
         expect(component.find(Modal).get(2).props.open).toBe(false);
     });
+
+    it('should not create if not logged in', () => {
+        const create = jest.fn();
+        const update = jest.fn();
+        const del = jest.fn();
+
+        // eslint-disable-next-line
+        const loggedIn = undefined;
+        const component = mount(
+          <Scheduler
+            requestor={loggedIn}
+            queries={mockQueries}
+            createScheduledQuery={create}
+            updateScheduledQuery={update}
+            deleteScheduledQuery={del}
+          />
+        );
+        component.setState({ selectedQuery: mockQueries[0] });
+        component.instance().createQuery();
+        component.instance().handleUpdate();
+        component.instance().handleDelete();
+        expect(create).not.toHaveBeenCalled();
+        expect(update).not.toHaveBeenCalled();
+        expect(del).not.toHaveBeenCalled();
+    });
 });

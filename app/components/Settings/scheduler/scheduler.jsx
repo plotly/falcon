@@ -174,6 +174,9 @@ class Scheduler extends Component {
     }
 
     createQuery(queryConfig) {
+        if (!this.props.requestor) {
+            return;
+        }
         const newQueryParams = {
             ...queryConfig,
             requestor: this.props.requestor
@@ -189,6 +192,9 @@ class Scheduler extends Component {
     }
 
     handleUpdate(queryConfig) {
+        if (!this.props.requestor) {
+            return;
+        }
         const newQueryParams = {
             ...queryConfig,
             requestor: this.props.requestor
@@ -204,6 +210,9 @@ class Scheduler extends Component {
     }
 
     handleDelete(fid) {
+        if (!this.props.requestor) {
+            return;
+        }
         this.props.deleteScheduledQuery(fid);
         this.closePreview();
     }
