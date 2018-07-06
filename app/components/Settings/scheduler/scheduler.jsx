@@ -219,7 +219,7 @@ class Scheduler extends Component {
 
     render() {
         const rows = this.getRows();
-        const loggedIn = this.props.requestor;
+        const loggedIn = Boolean(this.props.requestor);
 
         return (
             <React.Fragment>
