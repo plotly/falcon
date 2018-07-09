@@ -481,26 +481,31 @@ class Settings extends Component {
                                     ) : (
                                         <div>
                                             <p>
-                                                <a onClick={() => window.location.assign('/login')}>Log into Plotly</a>
-                                                <br/>
-                                                Log in to Plotly in order to schedule queries and make queries
-                                                directly from the <a href={`https://${plotlyUrl}/create`}>
-                                                Plotly Chart Studio </a>
+                                                Please connect to Plotly
+                                                to generate an SSL certificate and a URL for you.
                                             </p>
                                         </div>
-                                    )
-                                    }
+                                    )}
                                 </div>
                             ) : (
                                 <div className="big-whitespace-tab">
                                     <p>Please connect to a data store in the Connection tab first.</p>
                                 </div>
                             )}
-                            {username && <p style={{textAlign: 'right'}}>
-                                {`Logged in as "${username}"`}
-                                <br/>
-                                <a onClick={logout}>Log Out</a>
-                            </p>}
+
+                            {(username) ? (
+                                <p style={{textAlign: 'right'}}>
+                                    {`Logged in as "${username}"`}
+                                    <br/>
+                                    <a onClick={logout}>Log Out</a>
+                                </p>
+                            ) : (
+                                <p style={{textAlign: 'right'}}>
+                                    Not logged in
+                                    <br/>
+                                    <a onClick={() => window.location.assign('/login')}>Log into Plotly</a>
+                                </p>
+                            )}
                         </TabPanel> }
 
                         {isElectron() && <TabPanel>
