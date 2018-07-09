@@ -47,6 +47,10 @@
     border-top: none;
 }
 
+.scheduler .CodeMirror {
+    width: 100%;
+}
+
 .sql-preview pre {
     white-space: pre-wrap;
 }

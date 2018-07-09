@@ -9,7 +9,6 @@ export const mergeTabMap = createAction('MERGE_TAB_MAP');
 export const setTab = createAction('SET_TAB');
 export const setTable = createAction('SET_TABLE');
 export const setIndex = createAction('SET_INDEX');
-export const setScheduledQueries = createAction('SET_SCHEDULED_QUERIES');
 export const mergeConnections = createAction('MERGE_CONNECTIONS');
 export const updateConnection = createAction('UPDATE_CREDENTIAL');
 export const deleteConnection = createAction('DELETE_CREDENTIAL');
@@ -145,10 +144,83 @@ export function getScheduledQueries() {
             'GET',
             'scheduledQueriesRequest'
         )).then((json => {
-            dispatch(setScheduledQueries(json));
+            dispatch({
+                type: 'SET_SCHEDULED_QUERIES',
+                payload: json
+            });
             return json;
         }));
     };
+}
+
+export function createScheduledQuery(connectionId, payload = {}) {
+  return (dispatch) => {
+    return dispatch(apiThunk(
+      'queries',
+      'POST',
+      'createScheduledQueryRequest',
+      payload.filename,
+      {
+        requestor: payload.requestor,
+        uids: payload.uids,
+        fid: payload.fid,
+        filename: payload.filename,
+        refreshInterval: payload.refreshInterval,
+        query: payload.query,
+        connectionId
+      }
+    )).then((res) => {
+      dispatch({
+          type: 'CREATE_SCHEDULED_QUERY',
+          payload: res
+      });
+      return res;
+    });
+  };
+}
+
+export function updateScheduledQuery(connectionId, payload = {}) {
+  return (dispatch) => {
+    const body = {
+      requestor: payload.requestor,
+      uids: payload.uids,
+      fid: payload.fid,
+      filename: payload.filename,
+      refreshInterval: payload.refreshInterval,
+      query: payload.query,
+      connectionId
+    };
+
+    return dispatch(apiThunk(
+      'queries',
+      'POST',
+      'createScheduledQueryRequest',
+      payload.filename,
+      body
+    )).then((res) => {
+      dispatch({
+          type: 'UPDATE_SCHEDULED_QUERY',
+          payload: body
+      });
+      return res;
+    });
+  };
+}
+
+export function deleteScheduledQuery(fid) {
+  return (dispatch) => {
+    return dispatch(apiThunk(
+      `queries/${fid}`,
+      'DELETE',
+      'createScheduledQueryRequest'
+    )).then((res) => {
+      dispatch({
+          type: 'DELETE_SCHEDULED_QUERY',
+          payload: fid
+      });
+      return res;
+    });
+  };
 }
 
 export function connect(connectionId) {

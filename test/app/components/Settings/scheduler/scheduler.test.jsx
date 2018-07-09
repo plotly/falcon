@@ -3,11 +3,10 @@ import sinon from 'sinon';
 import { mount, configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
-import Scheduler, {
-    SchedulerPreview,
-    SQL
-} from '../../../../app/components/Settings/scheduler.jsx';
-import Modal from '../../../../app/components/modal.jsx';
+import Scheduler from '../../../../../app/components/Settings/scheduler/scheduler.jsx';
+import SQL from '../../../../../app/components/Settings/scheduler/sql.jsx';
+import SchedulerPreview from '../../../../../app/components/Settings/scheduler/preview-modal.jsx';
+import Modal from '../../../../../app/components/modal.jsx';
 
 const mockQueries = [
     {
@@ -59,14 +58,16 @@ describe('Scheduler Test', () => {
     });
 
     it('should open and close modal with correct query', () => {
-        const component = mount(<Scheduler queries={mockQueries} />);
+        const component = mount(
+          <Scheduler requestor="fake_login" queries={mockQueries} />
+        );
 
-        expect(component.find(Modal).prop('open')).toBe(false);
+        expect(component.find(Modal).get(2).props.open).toBe(false);
 
         // set selected query
         component.setState({ selectedQuery: mockQueries[0] });
 
-        expect(component.find(Modal).prop('open')).toBe(true);
+        expect(component.find(Modal).get(2).props.open).toBe(true);
 
         const modalSqlElements = component
             .find(SchedulerPreview)
@@ -79,6 +80,31 @@ describe('Scheduler Test', () => {
         // clear selected query
         component.setState({ selectedQuery: null });
 
-        expect(component.find(Modal).prop('open')).toBe(false);
+        expect(component.find(Modal).get(2).props.open).toBe(false);
+    });
+
+    it('should not create if not logged in', () => {
+        const create = jest.fn();
+        const update = jest.fn();
+        const del = jest.fn();
+
+        // eslint-disable-next-line
+        const loggedIn = undefined;
+        const component = mount(
+          <Scheduler
+            requestor={loggedIn}
+            queries={mockQueries}
+            createScheduledQuery={create}
+            updateScheduledQuery={update}
+            deleteScheduledQuery={del}
+          />
+        );
+        component.setState({ selectedQuery: mockQueries[0] });
+        component.instance().createQuery();
+        component.instance().handleUpdate();
+        component.instance().handleDelete();
+        expect(create).not.toHaveBeenCalled();
+        expect(update).not.toHaveBeenCalled();
+        expect(del).not.toHaveBeenCalled();
     });
 });

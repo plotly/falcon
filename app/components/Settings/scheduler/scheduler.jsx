@@ -1,27 +1,22 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
+import {contains} from 'ramda';
 import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
-import Highlight from 'react-highlight';
 
-import { Link } from '../Link.react.js';
-import { Row, Column } from '../layout.jsx';
-import Modal from '../modal.jsx';
-import { plotlyUrl } from '../../utils/utils.js';
+import CreateModal from './create-modal.jsx';
+import PreviewModal from './preview-modal.jsx';
+import PromptLoginModal from './login-modal.jsx';
+import { Row, Column } from '../../layout.jsx';
+import SQL from './sql.jsx';
+
+import {SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants';
 
 import './scheduler.css';
 
 const NO_OP = () => {};
-
-export const SQL = props => (
-    <Highlight className={`sql ${props.className || 'default'}`}>{props.children}</Highlight>
-);
-SQL.propTypes = {
-    children: PropTypes.string,
-    className: PropTypes.string
-};
 
 class QueryFormatter extends React.Component {
     static propTypes = {
@@ -61,7 +56,7 @@ class IntervalFormatter extends React.Component {
         const run = this.props.value;
         return (
             <Row>
-                <Column style={{ paddingRight: '24px' }}>
+                <Column>
                     <em
                         style={{
                             fontSize: 15
@@ -77,86 +72,6 @@ class IntervalFormatter extends React.Component {
     }
 }
 
-const rowStyle = {
-    justifyContent: 'flex-start',
-    borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
-    padding: '16px 0px'
-};
-const boxStyle = { boxSizing: 'border-box', width: '50%' };
-
-export const SchedulerPreview = props => {
-    let content;
-    if (!props.query) {
-        content = null;
-    } else {
-        const [account, gridId] = props.query.fid.split(':');
-        const link = `${plotlyUrl()}/~${account}/${gridId}`;
-        content = (
-            <Column style={{ width: '50%', background: 'white' }}>
-                <Row
-                    className="sql-preview"
-                    style={{
-                        padding: '32px',
-                        position: 'relative',
-                        justifyContent: 'flex-start'
-                    }}
-                >
-                    <h5 className="sql-preview" style={{ margin: 0, letterSpacing: '1px' }}>
-                        <SQL className="bold">{props.query.query}</SQL>
-                    </h5>
-                    <button
-                        onClick={props.onCloseBtnClick}
-                        style={{
-                            position: 'absolute',
-                            top: '16px',
-                            right: '16px',
-                            padding: '2px 4px'
-                        }}
-                    >
-                        &times;
-                    </button>
-                </Row>
-                <Column style={{ background: '#F5F7FB', padding: '32px' }}>
-                    <Row style={rowStyle}>
-                        <div style={boxStyle}>Query</div>
-                        <div className="sql-preview" style={boxStyle}>
-                            <SQL>{props.query.query}</SQL>
-                        </div>
-                    </Row>
-                    <Row style={rowStyle}>
-                        <div style={boxStyle}>Update Frequency</div>
-                        <em style={boxStyle}>
-                            Runs every{' '}
-                            <b>
-                                {ms(props.query.refreshInterval * 1000, {
-                                    long: true
-                                })}
-                            </b>
-                        </em>
-                    </Row>
-                    <Row style={rowStyle}>
-                        <div style={boxStyle}>Live Dataset</div>
-                        <Link href={link} style={boxStyle}>
-                            {link}
-                        </Link>
-                    </Row>
-                </Column>
-            </Column>
-        );
-    }
-
-    return (
-        <Modal {...props} className="meta-preview" open={props.query !== null}>
-          {content}
-        </Modal>
-    );
-};
-
-SchedulerPreview.propTypes = {
-    onCloseBtnClick: PropTypes.func,
-    query: PropTypes.object
-};
-
 function mapRows(rows) {
     return rows.map(r => ({
         query: r,
@@ -165,11 +80,39 @@ function mapRows(rows) {
 }
 
 class Scheduler extends Component {
+    static defaultProps = {
+        queries: [],
+        refreshQueries: NO_OP,
+        openLogin: NO_OP,
+        createScheduledQuery: NO_OP,
+        updateScheduledQuery: NO_OP,
+        deleteScheduledQuery: NO_OP
+    };
+
+    static propTypes = {
+        queries: PropTypes.arrayOf(
+            PropTypes.shape({
+                query: PropTypes.string.isRequired,
+                refreshInterval: PropTypes.number.isRequired,
+                fid: PropTypes.string.isRequired
+            }).isRequired
+        ),
+        initialCode: PropTypes.string,
+        requestor: PropTypes.string,
+        dialect: PropTypes.string,
+        refreshQueries: PropTypes.func.isRequired,
+        openLogin: PropTypes.func.isRequired,
+        createScheduledQuery: PropTypes.func.isRequired,
+        updateScheduledQuery: PropTypes.func.isRequired,
+        deleteScheduledQuery: PropTypes.func.isRequired
+    };
+
     constructor(props) {
         super(props);
         this.state = {
             search: '',
-            selectedQuery: null
+            selectedQuery: null,
+            createModalOpen: Boolean(this.props.initialCode)
         };
         this.columns = [
             {
@@ -191,6 +134,11 @@ class Scheduler extends Component {
         this.rowGetter = this.rowGetter.bind(this);
         this.openPreview = this.openPreview.bind(this);
         this.closePreview = this.closePreview.bind(this);
+        this.openCreateModal = this.openCreateModal.bind(this);
+        this.closeCreateModal = this.closeCreateModal.bind(this);
+        this.createQuery = this.createQuery.bind(this);
+        this.handleUpdate = this.handleUpdate.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
     handleSearchChange(e) {
@@ -217,8 +165,61 @@ class Scheduler extends Component {
         this.setState({ selectedQuery: null });
     }
 
+    openCreateModal() {
+        this.setState({ createModalOpen: true });
+    }
+
+    closeCreateModal() {
+        this.setState({ createModalOpen: false });
+    }
+
+    createQuery(queryConfig) {
+        if (!this.props.requestor) {
+            return;
+        }
+        const newQueryParams = {
+            ...queryConfig,
+            requestor: this.props.requestor
+        };
+        return this.props.createScheduledQuery(newQueryParams)
+          .then(res => {
+            if (res.error) {
+              throw res.error;
+            }
+            this.closeCreateModal();
+            return res;
+          });
+    }
+
+    handleUpdate(queryConfig) {
+        if (!this.props.requestor) {
+            return;
+        }
+        const newQueryParams = {
+            ...queryConfig,
+            requestor: this.props.requestor
+        };
+        return this.props.updateScheduledQuery(newQueryParams)
+          .then(res => {
+            if (res.error) {
+              throw res.error;
+            }
+            this.closePreview();
+            return res;
+          });
+    }
+
+    handleDelete(fid) {
+        if (!this.props.requestor) {
+            return;
+        }
+        this.props.deleteScheduledQuery(fid);
+        this.closePreview();
+    }
+
     render() {
         const rows = this.getRows();
+        const loggedIn = Boolean(this.props.requestor);
 
         return (
             <React.Fragment>
@@ -234,6 +235,15 @@ class Scheduler extends Component {
                         onChange={this.handleSearchChange}
                         placeholder="Search scheduled queries..."
                     />
+                    {!contains(this.props.dialect, SQL_DIALECTS_USING_EDITOR) && (
+                        <button
+                            style={{ marginRight: '16px' }}
+                            onClick={this.openCreateModal}
+                        >
+                            Create Scheduled Query
+                        </button>
+                    )}
+
                 </Row>
                 <Row
                     style={{
@@ -276,30 +286,31 @@ class Scheduler extends Component {
                         headerRowHeight={32}
                     />
                 </Row>
-                <SchedulerPreview
-                    onCloseBtnClick={this.closePreview}
+
+                <CreateModal
+                    initialCode={this.props.initialCode}
+                    open={loggedIn && this.state.createModalOpen}
+                    onClickAway={this.closeCreateModal}
+                    onSubmit={this.createQuery}
+                    dialect={this.props.dialect}
+                />
+                <PromptLoginModal
+                    open={!loggedIn && this.state.createModalOpen}
+                    onClickAway={this.closeCreateModal}
+                    onSubmit={this.props.openLogin}
+                />
+
+                <PreviewModal
                     onClickAway={this.closePreview}
                     query={this.state.selectedQuery}
+                    loggedIn={loggedIn}
+                    onSave={this.handleUpdate}
+                    onDelete={this.handleDelete}
+                    dialect={this.props.dialect}
                 />
             </React.Fragment>
         );
     }
 }
-
-Scheduler.defaultProps = {
-    queries: [],
-    refreshQueries: NO_OP
-};
-
-Scheduler.propTypes = {
-    queries: PropTypes.arrayOf(
-        PropTypes.shape({
-            query: PropTypes.string.isRequired,
-            refreshInterval: PropTypes.number.isRequired,
-            fid: PropTypes.string.isRequired
-        }).isRequired
-    ),
-    refreshQueries: PropTypes.func.isRequired
-};
 
 export default Scheduler;
