@@ -43,16 +43,16 @@
 }
 
 .create-modal .dropdown {
-  padding: 0;
-  margin-bottom: 16px;
-  width: 100%;
-  max-width: 432px;
+    padding: 0;
+    margin-bottom: 16px;
+    width: 100%;
+    max-width: 432px;
 }
 
 .create-modal .row-header {
-  width: 20%;
+    width: 20%;
 }
 
 .create-modal .row-body {
-  width: 80%;
+    width: 80%;
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import sinon from 'sinon';
-import { mount, configure } from 'enzyme';
+import {mount, configure} from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
 import Scheduler from '../../../../../app/components/Settings/scheduler/scheduler.jsx';
@@ -23,7 +23,7 @@ const mockQueries = [
 
 describe('Scheduler Test', () => {
     beforeAll(() => {
-        configure({ adapter: new Adapter() });
+        configure({adapter: new Adapter()});
     });
 
     it('should have no rows if not passed any queries', () => {
@@ -40,7 +40,7 @@ describe('Scheduler Test', () => {
         const component = mount(<Scheduler queries={mockQueries} />);
 
         // set search to only match one mock query
-        component.setState({ search: 'color' });
+        component.setState({search: 'color'});
 
         expect(component.instance().getRows().length).toBe(1);
     });
@@ -59,26 +59,24 @@ describe('Scheduler Test', () => {
 
     it('should open and close modal with correct query', () => {
         const component = mount(
-          <Scheduler requestor="fake_login" queries={mockQueries} />
+            <Scheduler requestor="fake_login" queries={mockQueries} />
         );
 
         expect(component.find(Modal).get(2).props.open).toBe(false);
 
         // set selected query
-        component.setState({ selectedQuery: mockQueries[0] });
+        component.setState({selectedQuery: mockQueries[0]});
 
         expect(component.find(Modal).get(2).props.open).toBe(true);
 
-        const modalSqlElements = component
-            .find(SchedulerPreview)
-            .find(SQL);
+        const modalSqlElements = component.find(SchedulerPreview).find(SQL);
 
-        modalSqlElements.forEach((element) => {
+        modalSqlElements.forEach(element => {
             expect(element.text()).toBe('SELECT * FROM foods;');
         });
 
         // clear selected query
-        component.setState({ selectedQuery: null });
+        component.setState({selectedQuery: null});
 
         expect(component.find(Modal).get(2).props.open).toBe(false);
     });
@@ -91,15 +89,15 @@ describe('Scheduler Test', () => {
         // eslint-disable-next-line
         const loggedIn = undefined;
         const component = mount(
-          <Scheduler
-            requestor={loggedIn}
-            queries={mockQueries}
-            createScheduledQuery={create}
-            updateScheduledQuery={update}
-            deleteScheduledQuery={del}
-          />
+            <Scheduler
+                requestor={loggedIn}
+                queries={mockQueries}
+                createScheduledQuery={create}
+                updateScheduledQuery={update}
+                deleteScheduledQuery={del}
+            />
         );
-        component.setState({ selectedQuery: mockQueries[0] });
+        component.setState({selectedQuery: mockQueries[0]});
         component.instance().createQuery();
         component.instance().handleUpdate();
         component.instance().handleDelete();

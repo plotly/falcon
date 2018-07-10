@@ -2,6 +2,9 @@
 /* eslint-disable no-multi-str */
 import {concat} from 'ramda';
 
+// Default to 1 week for `refreshInterval` for backwards compatability
+export const DEFAULT_REFRESH_INTERVAL = 7 * 24 * 60 * 60;
+
 export const DIALECTS = {
     MYSQL: 'mysql',
     MARIADB: 'mariadb',

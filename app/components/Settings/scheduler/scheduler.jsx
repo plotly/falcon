@@ -9,7 +9,7 @@ import matchSorter from 'match-sorter';
 import CreateModal from './create-modal.jsx';
 import PreviewModal from './preview-modal.jsx';
 import PromptLoginModal from './login-modal.jsx';
-import { Row, Column } from '../../layout.jsx';
+import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
 
 import {SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants';
@@ -33,7 +33,7 @@ class QueryFormatter extends React.Component {
         const query = this.props.value;
         return (
             <Row>
-                <Column style={{ paddingRight: '24px', fontSize: 15 }}>
+                <Column style={{paddingRight: '24px', fontSize: 15}}>
                     <SQL>{query.query}</SQL>
                 </Column>
             </Row>
@@ -142,7 +142,7 @@ class Scheduler extends Component {
     }
 
     handleSearchChange(e) {
-        this.setState({ search: e.target.value });
+        this.setState({search: e.target.value});
     }
 
     getRows() {
@@ -158,19 +158,19 @@ class Scheduler extends Component {
     }
 
     openPreview(i, query) {
-        this.setState({ selectedQuery: query.query });
+        this.setState({selectedQuery: query.query});
     }
 
     closePreview() {
-        this.setState({ selectedQuery: null });
+        this.setState({selectedQuery: null});
     }
 
     openCreateModal() {
-        this.setState({ createModalOpen: true });
+        this.setState({createModalOpen: true});
     }
 
     closeCreateModal() {
-        this.setState({ createModalOpen: false });
+        this.setState({createModalOpen: false});
     }
 
     createQuery(queryConfig) {
@@ -181,14 +181,13 @@ class Scheduler extends Component {
             ...queryConfig,
             requestor: this.props.requestor
         };
-        return this.props.createScheduledQuery(newQueryParams)
-          .then(res => {
+        return this.props.createScheduledQuery(newQueryParams).then(res => {
             if (res.error) {
-              throw res.error;
+                throw res.error;
             }
             this.closeCreateModal();
             return res;
-          });
+        });
     }
 
     handleUpdate(queryConfig) {
@@ -199,14 +198,13 @@ class Scheduler extends Component {
             ...queryConfig,
             requestor: this.props.requestor
         };
-        return this.props.updateScheduledQuery(newQueryParams)
-          .then(res => {
+        return this.props.updateScheduledQuery(newQueryParams).then(res => {
             if (res.error) {
-              throw res.error;
+                throw res.error;
             }
             this.closePreview();
             return res;
-          });
+        });
     }
 
     handleDelete(fid) {
@@ -235,15 +233,17 @@ class Scheduler extends Component {
                         onChange={this.handleSearchChange}
                         placeholder="Search scheduled queries..."
                     />
-                    {!contains(this.props.dialect, SQL_DIALECTS_USING_EDITOR) && (
+                    {!contains(
+                        this.props.dialect,
+                        SQL_DIALECTS_USING_EDITOR
+                    ) && (
                         <button
-                            style={{ marginRight: '16px' }}
+                            style={{marginRight: '16px'}}
                             onClick={this.openCreateModal}
                         >
                             Create Scheduled Query
                         </button>
                     )}
-
                 </Row>
                 <Row
                     style={{
@@ -252,20 +252,20 @@ class Scheduler extends Component {
                         justifyContent: 'space-between'
                     }}
                 >
-                    <Column style={{ width: 300 }}>
+                    <Column style={{width: 300}}>
                         <Row>
-                            <Column style={{ marginLeft: 8 }}>
+                            <Column style={{marginLeft: 8}}>
                                 {rows.length} queries
                             </Column>
                         </Row>
                     </Column>
-                    <Column style={{ width: 300 }}>
+                    <Column style={{width: 300}}>
                         <Row>
                             <Column>
                                 <button
                                     className="refresh-button"
                                     onClick={this.props.refreshQueries}
-                                    style={{ marginRight: '8px' }}
+                                    style={{marginRight: '8px'}}
                                 >
                                     ⟳
                                 </button>
@@ -275,7 +275,7 @@ class Scheduler extends Component {
                 </Row>
                 <Row
                     className="scheduler-table"
-                    style={{ padding: '0 16px 16px', width: 'auto' }}
+                    style={{padding: '0 16px 16px', width: 'auto'}}
                 >
                     <ReactDataGrid
                         onRowClick={this.openPreview}

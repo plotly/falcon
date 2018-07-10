@@ -1,0 +1,19 @@
+.time-picker .Select-control {
+    /* all other time related dropdowns */
+    width: 56px;
+}
+
+.cron-row {
+    vertical-align: center;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.cron-details-row {
+    align-items: center;
+    height: 56px;
+    background: #E8E8E8;
+    border-left: 4px solid #828282;
+    padding: 0 16px;
+    margin-bottom: 16px;
+}

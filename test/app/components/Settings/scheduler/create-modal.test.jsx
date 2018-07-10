@@ -1,5 +1,6 @@
 import React from 'react';
-import { mount, configure } from 'enzyme';
+import {mount, configure} from 'enzyme';
+
 import Adapter from 'enzyme-adapter-react-16';
 
 global.document.createRange = function() {
@@ -7,19 +8,21 @@ global.document.createRange = function() {
         setEnd: function() {},
         setStart: function() {},
         getBoundingClientRect: function() {
-            return { right: 0 };
+            return {right: 0};
         },
         getClientRects: function() {
-            return { length: 0 };
+            return {length: 0};
         }
     };
 };
-const CreateModal = require('../../../../../app/components/Settings/scheduler/create-modal.jsx').default;
+
+const {DEFAULT_REFRESH_INTERVAL} = require('../../../../../app/constants/constants');
 const CodeMirror = require('react-codemirror2').Controlled;
+const CreateModal = require('../../../../../app/components/Settings/scheduler/create-modal.jsx');
 
 describe('Create Modal Test', () => {
     beforeAll(() => {
-        configure({ adapter: new Adapter() });
+        configure({adapter: new Adapter()});
     });
 
     it("should not render the editor if it's closed", () => {
@@ -83,18 +86,28 @@ describe('Create Modal Test', () => {
         expect(component.state().error).not.toBeNull();
         expect(onSubmit).not.toHaveBeenCalled();
 
-        const intervalType = 60;
-        component.setState({ intervalType });
+        const cronInterval = '15 * * * *';
+        component.setState({interval: cronInterval});
         component
             .find('button')
             .at(1)
             .simulate('click');
         expect(onSubmit).toHaveBeenCalled();
+        expect(onSubmit).toHaveBeenCalledWith(
+            expect.objectContaining({
+                // Once filename input is supported, this value should be: 'filename',
+                filename: expect.any(String),
+                query: 'SELECT * FROM foods',
+                refreshInterval: DEFAULT_REFRESH_INTERVAL,
+                cronInterval
+            })
+        );
         expect(onSubmit).toHaveBeenCalledWith({
             // Once filename input is supported, this value should be: 'filename',
             filename: expect.any(String),
             query: 'SELECT * FROM foods',
-            refreshInterval: intervalType
+            refreshInterval: DEFAULT_REFRESH_INTERVAL,
+            cronInterval
         });
     });
 });

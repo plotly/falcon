@@ -1,52 +1,30 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
-import Select from 'react-select';
-import { Controlled as CodeMirror } from 'react-codemirror2';
+import {Controlled as CodeMirror} from 'react-codemirror2';
 
-import { Row, Column } from '../../layout.jsx';
+import {Row, Column} from '../../layout.jsx';
 import Modal from '../../modal.jsx';
 import Error from '../../error.jsx';
+import CronPicker from '../cron-picker/cron-picker.jsx';
 
-import { getHighlightMode } from '../../../constants/constants.js';
+import {getHighlightMode, DEFAULT_REFRESH_INTERVAL} from '../../../constants/constants.js';
 
 import './create-modal.css';
 
 function noop() {}
-
-const FREQUENCIES = [
-    { label: 'Run every minute', value: 60 },
-    { label: 'Run every 5 minutes', value: 5 * 60 },
-    { label: 'Run hourly', value: 60 * 60 },
-    { label: 'Run daily', value: 24 * 60 * 60 },
-    { label: 'Run weekly', value: 7 * 24 * 60 * 60 }
-];
-
-const rowStyleOverride = { justifyContent: 'flex-start' };
+const rowStyleOverride = {justifyContent: 'flex-start'};
 
 function generateFilename() {
-  let n = Math.floor(Math.random() * 1e8).toString();
+    let n = Math.floor(Math.random() * 1e8).toString();
 
-  // Pad 0 if needed
-  if (n.length < 8) {
-    n = `0${n}`;
-  }
+    // Pad 0 if needed
+    if (n.length < 8) {
+        n = `0${n}`;
+    }
 
-  return `Grid ${n}`;
+    return `Grid_${n}`;
 }
-
-export const FrequencySelector = props => (
-    <Select
-        options={FREQUENCIES}
-        value={props.value}
-        searchable={false}
-        onChange={props.onChange}
-    />
-);
-FrequencySelector.propTypes = {
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  onChange: PropTypes.func
-};
 
 // implements a modal window to schedule a new query
 class CreateModal extends Component {
@@ -70,8 +48,8 @@ class CreateModal extends Component {
 
         this.state = {
             code: props.initialCode,
-            filename: props.initialFilename || generateFilename(),
-            intervalType: null,
+            filename: props.initialFilename,
+            interval: null,
             error: null,
             loading: false
         };
@@ -89,15 +67,15 @@ class CreateModal extends Component {
     }
 
     updateCode(editor, meta, code) {
-        this.setState({ code });
+        this.setState({code});
     }
 
-    handleIntervalChange({ value: intervalType }) {
-        this.setState({ intervalType });
+    handleIntervalChange(newInterval) {
+        this.setState({interval: newInterval});
     }
 
     handleFilenameChange(e) {
-        this.setState({ filename: e.target.value });
+        this.setState({filename: e.target.value});
     }
 
     submit() {
@@ -111,25 +89,28 @@ class CreateModal extends Component {
         //         error: 'Please enter a filename for your scheduled query.'
         //     });
         // }
-        if (!this.state.intervalType) {
-            return this.setState({ error: 'Please select a frequency above.' });
+        if (!this.state.interval) {
+            return this.setState({error: 'Please select an interval above.'});
         }
-        this.setState({ loading: true });
-        this.props.onSubmit({
-            query: this.state.code,
-            refreshInterval: this.state.intervalType,
-            filename: this.state.filename
-        })
-        .then(() => {
-            this.setState({
-                code: '',
-                filename: '',
-                intervalType: null,
-                error: null
-            });
-        })
-        .catch(error => this.setState({ error: error.message }))
-        .then(() => this.setState({ loading: false }));
+
+        this.setState({loading: true});
+        this.props
+            .onSubmit({
+                query: this.state.code,
+                refreshInterval: DEFAULT_REFRESH_INTERVAL,
+                filename: generateFilename(),
+                cronInterval: this.state.interval
+            })
+            .then(() => {
+                this.setState({
+                    code: '',
+                    filename: '',
+                    interval: null,
+                    error: null
+                });
+            })
+            .catch(error => this.setState({error: error.message}))
+            .then(() => this.setState({loading: false}));
     }
 
     render() {
@@ -139,12 +120,10 @@ class CreateModal extends Component {
                 onClickAway={this.props.onClickAway}
                 className="scheduler create-modal"
             >
-                <Column className="container " style={{ width: '60%' }}>
+                <Column className="container " style={{width: '60%'}}>
                     <Row>
                         <Column className="innerColumn">
-                            <h5 className="header">
-                                Create Scheduled Query
-                            </h5>
+                            <h5 className="header">Create Scheduled Query</h5>
                             <button
                                 className="button"
                                 onClick={this.props.onClickAway}
@@ -183,15 +162,10 @@ class CreateModal extends Component {
                               </div>
                           </Row>
                         */}
-                        <Row style={rowStyleOverride}>
-                            <div className="row-header">Frequency</div>
-                            <div className="row-body">
-                                <div className="dropdown">
-                                    <FrequencySelector
-                                        value={this.state.intervalType}
-                                        onChange={this.handleIntervalChange}
-                                    />
-                                </div>
+                        <Row style={Object.assign({}, rowStyleOverride, { marginTop: '8px', borderTop: '1px solid #c8d4e3', paddingTop: '24px' })}>
+                            <div className="row-header" style={{ paddingTop: 5 }}>Frequency</div>
+                            <div className="row-body" style={{minHeight: '108px'}}>
+                                <CronPicker onChange={this.handleIntervalChange} />
                             </div>
                         </Row>
                         {this.state.error && (
