@@ -74,7 +74,7 @@ describe('Create Modal Test', () => {
         const component = mount(
             <CreateModal
                 open={true}
-                initialCode="SELECT * FROM foods"
+                initialCode=""
                 initialFilename="filename"
                 onSubmit={onSubmit}
             />
@@ -87,7 +87,7 @@ describe('Create Modal Test', () => {
         expect(onSubmit).not.toHaveBeenCalled();
 
         const cronInterval = '15 * * * *';
-        component.setState({interval: cronInterval});
+        component.setState({code: 'SELECT * FROM foods', interval: cronInterval});
         component
             .find('button')
             .at(1)

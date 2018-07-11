@@ -49,7 +49,7 @@ class CreateModal extends Component {
         this.state = {
             code: props.initialCode,
             filename: props.initialFilename,
-            interval: null,
+            interval: '* * * * *',
             error: null,
             loading: false
         };
