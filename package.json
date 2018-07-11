@@ -242,6 +242,7 @@
     "font-awesome": "^4.6.1",
     "ibm_db": "^2.3.0",
     "mysql": "^2.15.0",
+    "node-schedule": "^1.3.0",
     "oracledb": "https://github.com/oracle/node-oracledb/releases/download/v2.2.0/oracledb-src-2.2.0.tgz",
     "papaparse": "^4.3.7",
     "pg": "^4.5.5",

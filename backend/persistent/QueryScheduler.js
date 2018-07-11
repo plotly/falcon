@@ -1,7 +1,9 @@
 import {has} from 'ramda';
+import * as scheduler from 'node-schedule';
 
 import {getConnectionById} from './Connections.js';
 import * as Connections from './datastores/Datastores.js';
+import { mapRefreshToCron } from '../utils/cronUtils.js';
 import Logger from '../logger';
 import {
     getQuery,
@@ -59,12 +61,13 @@ class QueryScheduler {
         requestor,
         fid,
         uids,
-        refreshInterval,
+        refreshInterval = null,
+        cronInterval = null,
         query,
         connectionId
     }) {
-        if (!refreshInterval) {
-            throw new Error('Refresh interval was not supplied');
+        if (!cronInterval && !refreshInterval) {
+            throw new Error('A scheduling interval was not supplied');
         } else if (refreshInterval < this.minimumRefreshInterval) {
             throw new Error([
                 `Refresh interval must be at least ${this.minimumRefreshInterval} seconds`,
@@ -90,17 +93,20 @@ class QueryScheduler {
             fid,
             uids,
             refreshInterval,
+            cronInterval,
             query,
             connectionId
         });
 
         // Schedule
-        this.queryJobs[fid] = setInterval(
-            () => {
-                this.job(fid, uids, query, connectionId, requestor);
-            },
-            refreshInterval * 1000
-        );
+        const job = () => this.job(fid, uids, query, connectionId, requestor);
+        let jobInterval = cronInterval;
+        if (!jobInterval) {
+            // convert refresh interval to cron representation
+            jobInterval = mapRefreshToCron(refreshInterval);
+        }
+
+        this.queryJobs[fid] = scheduler.scheduleJob(jobInterval, job);
     }
 
     // Load and schedule queries - To be run on app start.
@@ -112,7 +118,7 @@ class QueryScheduler {
 
     // Remove query from memory
     clearQuery(fid) {
-        clearInterval(this.queryJobs[fid]);
+        this.queryJobs[fid].cancel();
         delete this.queryJobs[fid];
     }
 
