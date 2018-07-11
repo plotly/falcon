@@ -5,6 +5,7 @@ import {contains} from 'ramda';
 import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
+import * as prettyCron from 'prettycron';
 
 import CreateModal from './create-modal.jsx';
 import PreviewModal from './preview-modal.jsx';
@@ -48,12 +49,14 @@ class IntervalFormatter extends React.Component {
          * is an object containg the required `refreshInterval`.
          */
         value: PropTypes.shape({
-            refreshInterval: PropTypes.number.isRequired
+            refreshInterval: PropTypes.number.isRequired,
+            cronInterval: PropTypes.string
         })
     };
 
     render() {
         const run = this.props.value;
+
         return (
             <Row>
                 <Column>
@@ -62,9 +65,12 @@ class IntervalFormatter extends React.Component {
                             fontSize: 15
                         }}
                     >
-                        {`Runs every ${ms(run.refreshInterval * 1000, {
-                            long: true
-                        })}`}
+                        {run.cronInterval
+                          ? prettyCron.toString(run.cronInterval)
+                          : `Runs every ${ms(run.refreshInterval * 1000, {
+                              long: true
+                          })}`
+                        }
                     </em>
                 </Column>
             </Row>

@@ -194,6 +194,7 @@
     "nock": "^9.1.5",
     "node-fetch": "^1.7.2",
     "node-impala": "^2.0.4",
+    "prettycron": "^0.10.0",
     "prop-types": "^15.6.0",
     "query-string": "^5.0.1",
     "ramda": "^0.21.0",
