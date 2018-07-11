@@ -304,6 +304,7 @@ class Scheduler extends Component {
                     onClickAway={this.closePreview}
                     query={this.state.selectedQuery}
                     loggedIn={loggedIn}
+                    onLogin={this.props.openLogin}
                     onSave={this.handleUpdate}
                     onDelete={this.handleDelete}
                     dialect={this.props.dialect}

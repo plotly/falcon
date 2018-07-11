@@ -11,6 +11,7 @@ import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
 import {plotlyUrl} from '../../../utils/utils.js';
 import {getHighlightMode, DEFAULT_REFRESH_INTERVAL} from '../../../constants/constants.js';
+import {getInitialCronMode} from '../cron-picker/cron-helpers.js';
 
 const NO_OP = () => {};
 
@@ -26,12 +27,14 @@ const valueStyle = {boxSizing: 'border-box', width: '65%'};
 export class PreviewModal extends Component {
     static defaultProps = {
         onSave: NO_OP,
-        onDelete: NO_OP
+        onDelete: NO_OP,
+        onLogin: NO_OP
     };
     static propTypes = {
         query: PropTypes.object,
         onSave: PropTypes.func,
         onDelete: PropTypes.func,
+        onLogin: PropTypes.func,
         onClickAway: PropTypes.func,
         dialect: PropTypes.string,
         loggedIn: PropTypes.bool
@@ -122,6 +125,8 @@ export class PreviewModal extends Component {
             const [account, gridId] = props.query.fid.split(':');
             const link = `${plotlyUrl()}/~${account}/${gridId}`;
             const {editing, loading} = this.state;
+
+            const initialModeId = getInitialCronMode(props.query);
             content = (
                 <Column style={{width: '60%', background: 'white'}}>
                     <Row
@@ -179,7 +184,10 @@ export class PreviewModal extends Component {
                             <div style={keyStyle}>Frequency</div>
                             {editing ? (
                                 <div style={{width: '65%', minHeight: '108px'}}>
-                                    <CronPicker onChange={this.handleIntervalChange} />
+                                    <CronPicker
+                                      onChange={this.handleIntervalChange}
+                                      initialModeId={initialModeId}
+                                    />
                                 </div>
                             ) : (
                                 <em style={valueStyle}>
@@ -206,40 +214,48 @@ export class PreviewModal extends Component {
                                 <Error message={this.state.error} />
                             </Row>
                         )}
-                        {this.props.loggedIn && (
-                            <Row
-                                style={{
-                                    ...rowStyle,
-                                    justifyContent: 'space-between',
-                                    border: 'none',
-                                    marginTop: 48,
-                                    paddingBottom: 0
-                                }}
-                            >
+                        <Row
+                            style={{
+                                ...rowStyle,
+                                justifyContent: 'space-between',
+                                border: 'none',
+                                marginTop: 48,
+                                paddingBottom: 0
+                            }}
+                        >
+                            {!this.props.loggedIn && (
+                              <button
+                                  style={{margin: 0}}
+                                  onClick={this.props.onLogin}
+                              >
+                                  Log in to edit query
+                              </button>
+                            )}
+                            {this.props.loggedIn && (
+                              <button
+                                  style={{margin: 0}}
+                                  onClick={this.onSubmit}
+                              >
+                                  {loading
+                                      ? 'Loading...'
+                                      : editing
+                                          ? 'Save'
+                                          : 'Edit'}
+                              </button>
+                            )}
+                            {this.props.loggedIn && !editing && (
                                 <button
-                                    style={{margin: 0}}
-                                    onClick={this.onSubmit}
+                                    style={{
+                                        margin: 0,
+                                        border: 'none',
+                                        background: 'red'
+                                    }}
+                                    onClick={this.onDelete}
                                 >
-                                    {loading
-                                        ? 'Loading...'
-                                        : editing
-                                            ? 'Save'
-                                            : 'Edit'}
+                                    {this.state.confirmedDelete ? 'Click to confirm' : 'Delete'}
                                 </button>
-                                {!editing && (
-                                    <button
-                                        style={{
-                                            margin: 0,
-                                            border: 'none',
-                                            background: 'red'
-                                        }}
-                                        onClick={this.onDelete}
-                                    >
-                                        {this.state.confirmedDelete ? 'Click to confirm' : 'Delete'}
-                                    </button>
-                                )}
-                            </Row>
-                        )}
+                            )}
+                        </Row>
                     </Column>
                 </Column>
             );

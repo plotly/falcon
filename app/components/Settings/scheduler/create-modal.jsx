@@ -162,7 +162,13 @@ class CreateModal extends Component {
                               </div>
                           </Row>
                         */}
-                        <Row style={Object.assign({}, rowStyleOverride, { marginTop: '8px', borderTop: '1px solid #c8d4e3', paddingTop: '24px' })}>
+                        <Row
+                          style={Object.assign(
+                            {},
+                            rowStyleOverride,
+                            { marginTop: '8px', borderTop: '1px solid #c8d4e3', paddingTop: '24px' }
+                          )}
+                        >
                             <div className="row-header" style={{ paddingTop: 5 }}>Frequency</div>
                             <div className="row-body" style={{minHeight: '108px'}}>
                                 <CronPicker onChange={this.handleIntervalChange} />
