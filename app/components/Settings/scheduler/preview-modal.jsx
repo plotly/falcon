@@ -37,7 +37,7 @@ export class PreviewModal extends Component {
         onLogin: PropTypes.func,
         onClickAway: PropTypes.func,
         dialect: PropTypes.string,
-        loggedIn: PropTypes.bool
+        currentRequestor: PropTypes.string
     };
     constructor(props) {
         super(props);
@@ -127,6 +127,8 @@ export class PreviewModal extends Component {
             const {editing, loading} = this.state;
 
             const initialModeId = getInitialCronMode(props.query);
+
+            const canEdit = this.props.currentRequestor && this.props.currentRequestor === props.query.requestor;
             content = (
                 <Column style={{width: '60%', minWidth: 640, background: 'white'}}>
                     <Row
@@ -223,7 +225,7 @@ export class PreviewModal extends Component {
                                 paddingBottom: 0
                             }}
                         >
-                            {!this.props.loggedIn && (
+                            {!canEdit && (
                               <button
                                   style={{margin: 0}}
                                   onClick={this.props.onLogin}
@@ -231,7 +233,7 @@ export class PreviewModal extends Component {
                                   Log in to edit query
                               </button>
                             )}
-                            {this.props.loggedIn && (
+                            {canEdit && (
                               <button
                                   style={{margin: 0}}
                                   onClick={this.onSubmit}
@@ -243,7 +245,7 @@ export class PreviewModal extends Component {
                                           : 'Edit'}
                               </button>
                             )}
-                            {this.props.loggedIn && !editing && (
+                            {canEdit && !editing && (
                                 <button
                                     style={{
                                         margin: 0,

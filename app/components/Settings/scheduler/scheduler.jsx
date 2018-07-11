@@ -309,7 +309,7 @@ class Scheduler extends Component {
                 <PreviewModal
                     onClickAway={this.closePreview}
                     query={this.state.selectedQuery}
-                    loggedIn={loggedIn}
+                    currentRequestor={this.props.requestor}
                     onLogin={this.props.openLogin}
                     onSave={this.handleUpdate}
                     onDelete={this.handleDelete}
