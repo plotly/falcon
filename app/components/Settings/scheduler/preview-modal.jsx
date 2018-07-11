@@ -128,7 +128,7 @@ export class PreviewModal extends Component {
 
             const initialModeId = getInitialCronMode(props.query);
             content = (
-                <Column style={{width: '60%', background: 'white'}}>
+                <Column style={{width: '60%', minWidth: 640, background: 'white'}}>
                     <Row
                         className="sql-preview"
                         style={{

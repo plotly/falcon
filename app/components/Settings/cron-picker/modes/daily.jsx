@@ -68,7 +68,7 @@ class component extends React.Component {
         );
         const amPmInput = (
             <AmPmInput
-                style={{marginRight: 8}}
+                style={{marginRight: 8, width: 64}}
                 value={this.state.time.amPm}
                 onChange={this.onChange.bind(this, 'amPm')}
             />
