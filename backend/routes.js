@@ -148,6 +148,14 @@ export default class Servers {
 
         that.electronWindow = that.httpsServer.electronWindow || that.httpServer.electronWindow;
 
+        server.pre(function (req, res, next) {
+            res.header(
+                'X-Frame-Options',
+                'DENY'
+            );
+            next();
+        });
+
         server.use(CookieParser.parse);
         server.use(PlotlyOAuth(Boolean(that.isElectron)));
 
