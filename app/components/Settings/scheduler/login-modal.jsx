@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Row, Column } from '../../layout.jsx';
+import {Row, Column} from '../../layout.jsx';
 import Modal from '../../modal.jsx';
 
 import './login-modal.css';
 
-const containerOverrideStyle = { width: '400px' };
+const containerOverrideStyle = {width: '400px'};
 
 const PromptLoginModal = props => (
     <Modal
