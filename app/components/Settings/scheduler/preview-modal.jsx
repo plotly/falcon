@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {Controlled as CodeMirror} from 'react-codemirror2';
 import ms from 'ms';
+import cronstrue from 'cronstrue';
 
 import Modal from '../../modal.jsx';
 import Error from '../../error.jsx';
@@ -193,15 +194,22 @@ export class PreviewModal extends Component {
                                 </div>
                             ) : (
                                 <em style={valueStyle}>
-                                    Runs every{' '}
-                                    <b>
-                                        {ms(
-                                            props.query.refreshInterval * 1000,
-                                            {
-                                                long: true
-                                            }
-                                        )}
-                                    </b>
+                                    {props.query.cronInterval
+                                      ? <b>{cronstrue.toString(props.query.cronInterval)}</b>
+                                      : (
+                                        <React.Fragment>
+                                          Runs every{' '}
+                                          <b>
+                                              {ms(
+                                                  props.query.refreshInterval * 1000,
+                                                  {
+                                                      long: true
+                                                  }
+                                              )}
+                                          </b>
+                                        </React.Fragment>
+                                      )
+                                    }
                                 </em>
                             )}
                         </Row>
