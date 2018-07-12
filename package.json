@@ -165,6 +165,7 @@
     "chromedriver": "^2.33.2",
     "classnames": "^2.2.5",
     "codemirror": "^5.32.0",
+    "cronstrue": "^1.31.0",
     "cross-env": "^5.1.1",
     "css-loader": "^0.28.7",
     "del": "^3.0.0",
@@ -236,7 +237,6 @@
   },
   "dependencies": {
     "alasql": "^0.4.5",
-    "cronstrue": "^1.31.0",
     "csv-parse": "^2.0.0",
     "dtrace-provider": "^0.8.6",
     "font-awesome": "^4.6.1",
