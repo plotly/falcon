@@ -42,7 +42,7 @@ describe('Create Modal Test', () => {
         expect(component.find(CodeMirror).get(0).props.value).toBe('');
     });
 
-    it('should allow you to pass initialCode and initialFilename', () => {
+    it('should allow you to pass initialCode, dialect and initialFilename', () => {
         const component = mount(
             <CreateModal
                 open={true}
@@ -57,6 +57,11 @@ describe('Create Modal Test', () => {
         expect(component.find(CodeMirror).get(0).props.options.mode).toBe('text/x-pgsql');
         // TODO: Uncomment onces filename input is suppported
         // expect(component.find('input').get(0).props.value).toBe('filename');
+
+        const component2 = mount(
+          <CreateModal open={true} dialect="athena" />
+        );
+        expect(component2.find(CodeMirror).get(0).props.options.mode).toBe('text/x-sql');
     });
 
     it('clicking X should call onClickAway', () => {
