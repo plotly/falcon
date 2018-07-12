@@ -3,6 +3,7 @@ import {mount, configure} from 'enzyme';
 
 import Adapter from 'enzyme-adapter-react-16';
 
+
 global.document.createRange = function() {
     return {
         setEnd: function() {},
@@ -16,9 +17,13 @@ global.document.createRange = function() {
     };
 };
 
+const wait = () => new Promise(resolve => setTimeout(resolve, 0));
+
 const {DEFAULT_REFRESH_INTERVAL} = require('../../../../../app/constants/constants');
 const CodeMirror = require('react-codemirror2').Controlled;
 const CreateModal = require('../../../../../app/components/Settings/scheduler/create-modal.jsx');
+const ErrorComponent = require('../../../../../app/components/error.jsx');
+const CronPicker = require('../../../../../app/components/Settings/cron-picker/cron-picker.jsx');
 
 describe('Create Modal Test', () => {
     beforeAll(() => {
@@ -109,5 +114,48 @@ describe('Create Modal Test', () => {
             refreshInterval: DEFAULT_REFRESH_INTERVAL,
             cronInterval
         });
+    });
+
+    it('should display backend error to user on failures', async () => {
+        const onSubmit = jest.fn(() => Promise.reject(new Error('Oops')));
+        const component = mount(
+            <CreateModal
+                open={true}
+                initialCode="SELECT * FROM foods"
+                initialFilename="filename"
+                onSubmit={onSubmit}
+            />
+        );
+
+        component
+            .find('button')
+            .at(1)
+            .simulate('click');
+
+        // onSubmit is asynchronous
+        await wait();
+        expect(component.state('error')).toBe('Oops');
+        component.update();
+        expect(component.find(ErrorComponent).length).toBe(1);
+    });
+
+    it('changing Cron picker should update create modal state', () => {
+        const onSubmit = jest.fn(() => Promise.reject(new Error('Oops')));
+        const component = mount(
+            <CreateModal
+                open={true}
+                initialCode="SELECT * FROM foods"
+                initialFilename="filename"
+                onSubmit={onSubmit}
+            />
+        );
+
+        expect(component.state('interval')).toBe('* * * * *');
+
+        component.find(CronPicker)
+          .instance()
+          .onModeChange({ value: 'MONTHLY' });
+
+        expect(component.state('interval')).toBe('0 0 1 * *');
     });
 });

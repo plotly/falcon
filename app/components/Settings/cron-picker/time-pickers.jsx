@@ -83,7 +83,7 @@ export const AmPmInput = props => (
     />
 );
 AmPmInput.propTypes = {
-    value: PropTypes.number.isRequired,
+    value: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired
 };
 

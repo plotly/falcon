@@ -5,7 +5,7 @@ import {Controlled as CodeMirror} from 'react-codemirror2';
 
 import {Row, Column} from '../../layout.jsx';
 import Modal from '../../modal.jsx';
-import Error from '../../error.jsx';
+import ErrorMessage from '../../error.jsx';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 
 import {getHighlightMode, DEFAULT_REFRESH_INTERVAL} from '../../../constants/constants.js';
@@ -176,7 +176,7 @@ class CreateModal extends Component {
                         </Row>
                         {this.state.error && (
                             <Row style={rowStyleOverride}>
-                                <Error message={this.state.error} />
+                                <ErrorMessage message={this.state.error} />
                             </Row>
                         )}
                     </Column>

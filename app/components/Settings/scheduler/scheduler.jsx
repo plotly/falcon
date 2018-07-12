@@ -5,7 +5,7 @@ import {contains} from 'ramda';
 import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
-import cronstrue from 'cronstrue'
+import cronstrue from 'cronstrue';
 
 import CreateModal from './create-modal.jsx';
 import PreviewModal from './preview-modal.jsx';
