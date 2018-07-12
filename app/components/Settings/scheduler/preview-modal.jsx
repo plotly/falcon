@@ -29,7 +29,8 @@ export class PreviewModal extends Component {
     static defaultProps = {
         onSave: NO_OP,
         onDelete: NO_OP,
-        onLogin: NO_OP
+        onLogin: NO_OP,
+        onClickAway: NO_OP
     };
     static propTypes = {
         query: PropTypes.object,
@@ -45,7 +46,7 @@ export class PreviewModal extends Component {
         this.state = {
             editing: false,
             code: props.query && props.query.query,
-            cronInterval: null,
+            cronInterval: props.query && props.query.cronInterval,
             confirmedDelete: false,
             loading: false
         };
@@ -63,7 +64,8 @@ export class PreviewModal extends Component {
         ) {
             this.setState({
                 code: nextProps.query.query,
-                refreshInterval: nextProps.query.refreshInterval
+                refreshInterval: nextProps.query.refreshInterval,
+                cronInterval: nextProps.query.cronInterval
             });
         }
     }
@@ -78,7 +80,7 @@ export class PreviewModal extends Component {
 
     onSubmit() {
         if (this.state.editing) {
-            const {connectionId, fid, requestor, uids} = this.props.query;
+            const {connectionId, fid, requestor, uids, refreshInterval} = this.props.query;
             const {code: query, cronInterval} = this.state;
             this.setState({loading: true});
             this.props
@@ -89,7 +91,7 @@ export class PreviewModal extends Component {
                     uids,
                     query,
                     cronInterval,
-                    refreshInterval: DEFAULT_REFRESH_INTERVAL
+                    refreshInterval: refreshInterval || DEFAULT_REFRESH_INTERVAL
                 })
                 .then(() =>
                     this.setState({editing: false, confirmedDelete: false})

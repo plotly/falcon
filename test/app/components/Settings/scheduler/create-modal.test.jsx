@@ -48,11 +48,13 @@ describe('Create Modal Test', () => {
                 open={true}
                 initialCode="SELECT * FROM foods"
                 initialFilename="filename"
+                dialect="postgres"
             />
         );
         expect(component.find(CodeMirror).get(0).props.value).toBe(
             'SELECT * FROM foods'
         );
+        expect(component.find(CodeMirror).get(0).props.options.mode).toBe('text/x-pgsql');
         // TODO: Uncomment onces filename input is suppported
         // expect(component.find('input').get(0).props.value).toBe('filename');
     });
