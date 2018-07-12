@@ -5,7 +5,7 @@ import {contains} from 'ramda';
 import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
-import * as prettyCron from 'prettycron';
+import cronstrue from 'cronstrue'
 
 import CreateModal from './create-modal.jsx';
 import PreviewModal from './preview-modal.jsx';
@@ -66,7 +66,7 @@ class IntervalFormatter extends React.Component {
                         }}
                     >
                         {run.cronInterval
-                          ? prettyCron.toString(run.cronInterval)
+                          ? cronstrue.toString(run.cronInterval)
                           : `Runs every ${ms(run.refreshInterval * 1000, {
                               long: true
                           })}`

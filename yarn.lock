@@ -2579,6 +2579,10 @@ create-react-class@^15.5.1:
     loose-envify "^1.3.1"
     object-assign "^4.1.1"
 
+cronstrue@^1.31.0:
+  version "1.31.0"
+  resolved "https://registry.yarnpkg.com/cronstrue/-/cronstrue-1.31.0.tgz#fd3db94b52c296550a5f53efe04691a1380e294d"
+
 cross-env@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/cross-env/-/cross-env-5.1.1.tgz#b6d8ab97f304c0f71dae7277b75fe424c08dfa74"
@@ -6268,10 +6272,6 @@ klaw@^1.0.0:
   optionalDependencies:
     graceful-fs "^4.1.9"
 
-later@^1.1.6:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/later/-/later-1.2.0.tgz#f2cf6c4dd7956dd2f520adf0329836e9876bad0f"
-
 latest-version@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/latest-version/-/latest-version-3.1.0.tgz#a205383fea322b33b5ae3b18abee0dc2f356ee15"
@@ -6804,10 +6804,6 @@ moment-timezone@^0.5.4:
 "moment@>= 2.9.0", moment@^2.10.6, moment@^2.13.0:
   version "2.18.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.18.1.tgz#c36193dd3ce1c2eed2adb7c802dbbc77a81b1c0f"
-
-moment@^2.8.4:
-  version "2.22.2"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
 
 monotone-convex-hull-2d@^1.0.1:
   version "1.0.1"
@@ -8143,13 +8139,6 @@ pretty-format@^22.1.0:
   dependencies:
     ansi-regex "^3.0.0"
     ansi-styles "^3.2.0"
-
-prettycron@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/prettycron/-/prettycron-0.10.0.tgz#10af0dfa20bbd9f6596d7fb5bb8b8546cac527bb"
-  dependencies:
-    later "^1.1.6"
-    moment "^2.8.4"
 
 printj@~1.1.0, printj@~1.1.1:
   version "1.1.1"
