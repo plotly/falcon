@@ -36,6 +36,7 @@ describe('Routes:', () => {
             fid: validFid,
             uids: validUids.slice(0, 2), // since this particular query only has 2 columns
             refreshInterval: 60, // every minute
+            cronInterval: null,
             query: 'SELECT * FROM ebola_2014 LIMIT 1',
             connectionId: connectionId,
             requestor: validFid.split(':')[0]
@@ -69,6 +70,7 @@ describe('Routes:', () => {
             queryObject = {
                 requestor: username,
                 refreshInterval: 60,
+                cronInterval: null,
                 connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2'
             };
@@ -107,6 +109,7 @@ describe('Routes:', () => {
                         requestor: fid.split(':')[0],
                         uids,
                         refreshInterval: 60,
+                        cronInterval: null,
                         connectionId,
                         query: 'SELECT * from ebola_2014 LIMIT 2'
                     };
@@ -148,6 +151,7 @@ describe('Routes:', () => {
                 requestor: collaborator,
                 uids,
                 refreshInterval: 60,
+                cronInterval: null,
                 connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2'
             };
@@ -178,6 +182,7 @@ describe('Routes:', () => {
                 requestor: viewer,
                 uids,
                 refreshInterval: 60,
+                cronInterval: null,
                 connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2'
             };
@@ -214,6 +219,7 @@ describe('Routes:', () => {
                 requestor: viewer,
                 uids,
                 refreshInterval: 60,
+                cronInterval: null,
                 connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2'
             };
