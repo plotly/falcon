@@ -146,7 +146,7 @@ describe('Scheduler Test', () => {
     });
 
     describe('Creating Queries', () => {
-      it('should handle success cases', () => {
+      it('should schedule a query only if logged in', () => {
         const mockResult = {};
         const createScheduledQuery = jest.fn(() => Promise.resolve(mockResult));
         let component = mount(
@@ -175,7 +175,7 @@ describe('Scheduler Test', () => {
           });
       });
 
-      it('should throw GraphQL errors on failure', () => {
+      it('should throw errors from backend on failure', () => {
         const mockResult = { error: 'Error' };
         const createScheduledQuery = jest.fn(() => Promise.resolve(mockResult));
         const component = mount(
@@ -192,7 +192,7 @@ describe('Scheduler Test', () => {
     });
 
     describe('Updating Queries', () => {
-      it('should handle success cases', () => {
+      it('should update a scheduled query only if logged in', () => {
         const mockResult = {};
         const updateScheduledQuery = jest.fn(() => Promise.resolve(mockResult));
         let component = mount(
@@ -221,7 +221,7 @@ describe('Scheduler Test', () => {
           });
       });
 
-      it('should throw GraphQL errors on failure', () => {
+      it('should throw errors from backend on failure', () => {
         const mockResult = { error: 'Error' };
         const updateScheduledQuery = jest.fn(() => Promise.resolve(mockResult));
         const component = mount(
