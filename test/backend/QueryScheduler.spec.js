@@ -53,11 +53,12 @@ describe('QueryScheduler', function() {
 
     it('executes a function on an interval', function () {
         const spy = sinon.spy();
-        const refreshInterval = 1; // second
+        const refreshInterval = 5; // 5 seconds
+        const cronInterval = `*/${refreshInterval} * * * * *`;
 
         queryScheduler.job = spy;
         queryScheduler.scheduleQuery({
-            refreshInterval,
+            cronInterval,
             fid: '...',
             uids: '...',
             query: '...',
@@ -66,7 +67,7 @@ describe('QueryScheduler', function() {
 
         assert(spy.notCalled, 'job should not have been called yet');
 
-        return wait(1.5 * refreshInterval * 1000)
+        return wait(1.2 * refreshInterval * 1000)
             .then(() => assert(spy.called, 'job should have been called'))
             .then(() => wait(refreshInterval * 1000))
             .then(() => assert(spy.calledTwice, 'job should have been called twice'));
@@ -75,13 +76,14 @@ describe('QueryScheduler', function() {
     it('overwrites interval functions', function () {
         const spy1 = sinon.spy();
         const spy2 = sinon.spy();
-        const refreshInterval = 1; // second
+        const refreshInterval = 5; // 5 seconds
+        const cronInterval = `*/${refreshInterval} * * * * *`;
 
         const query = {
             requestor: 'requestor',
             fid: 'fid',
             uids: 'uids',
-            refreshInterval,
+            cronInterval,
             query: 'query-1',
             connectionId: '1'
         };
@@ -119,6 +121,7 @@ describe('QueryScheduler', function() {
 
         const queryObject = {
             refreshInterval: 1,
+            cronInterval: null,
             fid: 'test-fid:10',
             uids: '',
             query: '',
@@ -142,6 +145,7 @@ describe('QueryScheduler', function() {
 
         const queryObject = {
             refreshInterval: 1,
+            cronInterval: null,
             fid: 'test-fid:10',
             uids: '',
             query: 'my query',
@@ -163,7 +167,8 @@ describe('QueryScheduler', function() {
     });
 
     it('clears and deletes the query if its associated grid was deleted', function() {
-        const refreshInterval = 1;
+        const refreshInterval = 5;
+        const cronInterval = `*/${refreshInterval} * * * * *`;
 
         /*
          * Save the sqlConnections to a file.
@@ -185,7 +190,8 @@ describe('QueryScheduler', function() {
             queryObject = {
                 fid,
                 uids,
-                refreshInterval,
+                refreshInterval: null,
+                cronInterval,
                 connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2',
                 requestor: fid.split(':')[0]

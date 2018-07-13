@@ -68,7 +68,7 @@ class QueryScheduler {
     }) {
         if (!cronInterval && !refreshInterval) {
             throw new Error('A scheduling interval was not supplied');
-        } else if (refreshInterval < this.minimumRefreshInterval) {
+        } else if (refreshInterval && refreshInterval < this.minimumRefreshInterval) {
             throw new Error([
                 `Refresh interval must be at least ${this.minimumRefreshInterval} seconds`,
                 `(supplied ${refreshInterval})`
