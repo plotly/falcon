@@ -52,13 +52,13 @@ describe('QueryScheduler', function() {
     });
 
     it('executes a function on an interval', function () {
+        const clock = sinon.useFakeTimers();
         const spy = sinon.spy();
-        const refreshInterval = 5; // 5 seconds
-        const cronInterval = `*/${refreshInterval} * * * * *`;
+        const refreshInterval = 86400; // one day
 
         queryScheduler.job = spy;
         queryScheduler.scheduleQuery({
-            cronInterval,
+            refreshInterval,
             fid: '...',
             uids: '...',
             query: '...',
@@ -67,23 +67,25 @@ describe('QueryScheduler', function() {
 
         assert(spy.notCalled, 'job should not have been called yet');
 
-        return wait(1.2 * refreshInterval * 1000)
-            .then(() => assert(spy.called, 'job should have been called'))
-            .then(() => wait(refreshInterval * 1000))
-            .then(() => assert(spy.calledTwice, 'job should have been called twice'));
+        clock.tick(1.5 * refreshInterval * 1000);
+        assert(spy.called, 'job should have been called');
+        clock.tick(refreshInterval * 1000);
+        assert(spy.calledTwice, 'job should have been called twice');
+
+        clock.restore();
     });
 
     it('overwrites interval functions', function () {
+        const clock = sinon.useFakeTimers();
         const spy1 = sinon.spy();
         const spy2 = sinon.spy();
-        const refreshInterval = 5; // 5 seconds
-        const cronInterval = `*/${refreshInterval} * * * * *`;
+        const refreshInterval = 86400; // one day
 
         const query = {
             requestor: 'requestor',
             fid: 'fid',
             uids: 'uids',
-            cronInterval,
+            refreshInterval,
             query: 'query-1',
             connectionId: '1'
         };
@@ -93,27 +95,25 @@ describe('QueryScheduler', function() {
 
         assert(spy1.notCalled, 'job1 should not have been called yet');
 
-        return wait(3.25 * refreshInterval * 1000)
-        .then(() => {
-            assert(spy1.calledThrice, 'job1 should have been called three times');
+        clock.tick(3.25 * refreshInterval * 1000);
+        assert(spy1.calledThrice, 'job1 should have been called three times');
 
-            queryScheduler.job = spy2;
-            queryScheduler.scheduleQuery(merge(query, {query: 'query-2'}));
-        })
-        .then(() => wait(3.25 * refreshInterval * 1000))
-        .then(() => {
-            assert(spy1.calledThrice, 'job1 should have been called three times');
-            assert(spy1.alwaysCalledWith(
-                query.fid, query.uids, query.query,
-                query.connectionId, query.requestor
-            ), `job1 was called with unexpected args: ${spy1.args}`);
+        queryScheduler.job = spy2;
+        queryScheduler.scheduleQuery(merge(query, {query: 'query-2'}));
 
-            assert(spy2.calledThrice, 'job2 should have been called three times');
-            assert(spy2.alwaysCalledWith(
-                query.fid, query.uids, 'query-2',
-                query.connectionId, query.requestor
-            ), `job2 was called with unexpected args: ${spy2.args}`);
-        });
+        clock.tick(3.25 * refreshInterval * 1000);
+        assert(spy1.calledThrice, 'job1 should have been called three times');
+        assert(spy1.alwaysCalledWith(
+            query.fid, query.uids, query.query,
+            query.connectionId, query.requestor
+        ), `job1 was called with unexpected args: ${spy1.args}`);
+        assert(spy2.calledThrice, 'job2 should have been called three times');
+        assert(spy2.alwaysCalledWith(
+            query.fid, query.uids, 'query-2',
+            query.connectionId, query.requestor
+        ), `job2 was called with unexpected args: ${spy2.args}`);
+
+        clock.restore();
     });
 
     it('saves queries to file', function() {
