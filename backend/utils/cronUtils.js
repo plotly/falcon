@@ -1,21 +1,26 @@
-export function mapRefreshToCron (refreshInterval) {
-  const now = new Date();
+const ONE_MINUTE = 60;
+const FIVE_MINUTES = 300;
+const ONE_HOUR = 3600;
+const ONE_DAY = 86400;
 
-  switch (refreshInterval) {
-    case 60:
-        // every minute
+export function mapRefreshToCron (refreshInterval) {
+    const now = new Date();
+
+    // try to intelligently select interval
+    if (refreshInterval <= ONE_MINUTE) {
         return '* * * * *';
-    case 300:
-        // every 5 minutes
-        return '*/5 * * * *';
-    case 3600:
-        // every hour
+    } else if (refreshInterval <= FIVE_MINUTES) {
+        return `${now.getSeconds()} ${calculateOffset(now)}/5 * * * *`;
+    } else if (refreshInterval <= ONE_HOUR) {
         return `${now.getMinutes()} * * * *`;
-    case 86400:
-        // every day
+    } else if (refreshInterval <= ONE_DAY) {
         return `${now.getMinutes()} ${now.getHours()} * * *`;
-    default:
-        // every week
-        return `${now.getMinutes()} ${now.getHours()} * * ${now.getDay()}`;
-  }
+    }
+   
+    // otherwise, default to once a week
+    return `${now.getMinutes()} ${now.getHours()} * * ${now.getDay()}`;
+}
+
+function calculateOffset (now) {
+    return now.getMinutes() % 5;
 }
