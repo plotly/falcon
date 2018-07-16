@@ -16,7 +16,7 @@ export function mapRefreshToCron (refreshInterval) {
     } else if (refreshInterval <= ONE_DAY) {
         return `${now.getMinutes()} ${now.getHours()} * * *`;
     }
-   
+
     // otherwise, default to once a week
     return `${now.getMinutes()} ${now.getHours()} * * ${now.getDay()}`;
 }
