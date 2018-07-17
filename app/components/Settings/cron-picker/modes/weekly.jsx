@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {Row} from '../../../layout.jsx';
 import {DayInput, HourInput, MinuteInput, AmPmInput} from '../time-pickers.jsx';
 import {mapHourToCronFormat} from '../cron-helpers.js';
-import { DetailsRow, DetailsColumn } from '../details.jsx';
+import { DetailsColumn } from '../details.jsx';
 
 const id = 'WEEKLY';
 const name = 'Run every week';

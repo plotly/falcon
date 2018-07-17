@@ -7,12 +7,13 @@ import cronstrue from 'cronstrue';
 import Modal from '../../modal.jsx';
 import SuccessMessage from '../../success.jsx';
 import RequestError from './request-error.jsx';
+import TimedMessage from './timed-message.jsx';
 import {Link} from '../../Link.react.js';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
 import {plotlyUrl} from '../../../utils/utils.js';
-import {getHighlightMode, DEFAULT_REFRESH_INTERVAL} from '../../../constants/constants.js';
+import {getHighlightMode, DEFAULT_REFRESH_INTERVAL, WAITING_MESSAGE} from '../../../constants/constants.js';
 import {getInitialCronMode} from '../cron-picker/cron-helpers.js';
 
 const NO_OP = () => {};
@@ -224,6 +225,15 @@ export class PreviewModal extends Component {
                                   {this.state.error}
                                 </RequestError>
                             </Row>
+                        )}
+                        {loading && (
+                          <Row style={{justifyContent: 'flex-start'}}>
+                            <TimedMessage>
+                              <div style={{fontSize: 16, paddingTop: 16}}>
+                                {WAITING_MESSAGE}
+                              </div>
+                            </TimedMessage>
+                          </Row>
                         )}
                         <Row
                             style={{

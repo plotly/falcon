@@ -7,9 +7,10 @@ import {Row, Column} from '../../layout.jsx';
 import Modal from '../../modal.jsx';
 import SuccessMessage from '../../success.jsx';
 import RequestError from './request-error.jsx';
+import TimedMessage from './timed-message.jsx';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 
-import {getHighlightMode, DEFAULT_REFRESH_INTERVAL} from '../../../constants/constants.js';
+import {getHighlightMode, DEFAULT_REFRESH_INTERVAL, WAITING_MESSAGE} from '../../../constants/constants.js';
 
 import './create-modal.css';
 
@@ -178,6 +179,15 @@ class CreateModal extends Component {
                                 {this.state.error}
                               </RequestError>
                             </Row>
+                        )}
+                        {this.state.saving && (
+                          <Row style={rowStyleOverride}>
+                            <TimedMessage>
+                              <div style={{fontSize: 16, paddingTop: 16}}>
+                                {WAITING_MESSAGE}
+                              </div>
+                            </TimedMessage>
+                          </Row>
                         )}
                     </Column>
                     <Row>

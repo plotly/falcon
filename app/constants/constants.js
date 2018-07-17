@@ -509,3 +509,6 @@ export function getHighlightMode(dialect) {
             [DIALECTS.MSSQL]: 'text/x-mssql'
     }[dialect] || 'text/x-sql';
 }
+
+export const WAITING_MESSAGE = 'This may take a long time. Your query is ' +
+  'currently executing and must finish before it can be saved.';
