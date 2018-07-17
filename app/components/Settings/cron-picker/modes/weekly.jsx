@@ -11,7 +11,7 @@ const name = 'Run every week';
 class component extends React.Component {
     static defaultProps = {
         initialTime: {
-            day: 'MON',
+            days: ['MON'],
             hour: 12,
             minute: 0,
             amPm: 'AM'
@@ -35,15 +35,25 @@ class component extends React.Component {
         this.onChange = this.onChange.bind(this);
     }
 
-    toCronExpression({day, hour, minute, amPm}) {
+    toCronExpression({days, hour, minute, amPm}) {
         // adjust hour to fit cron format if needed
         const normalizedHour = mapHourToCronFormat(hour, amPm);
 
-        return `${minute} ${normalizedHour} * * ${day}`;
+        return `${minute} ${normalizedHour} * * ${days.join(',')}`;
     }
 
     onChange(key, selectedOption) {
-        const newValue = selectedOption.value;
+        let newValue = Array.isArray(selectedOption) ?
+            selectedOption.map(item => item.value):
+            selectedOption.value;
+
+        if (Array.isArray(newValue) && !newValue.length) {
+            // then the days multi-select is empty.
+            // This would be an invalid state, so
+            // don't allow the update
+            return;
+        }
+            
         const time = this.state.time;
 
         time[key] = newValue;
@@ -56,8 +66,9 @@ class component extends React.Component {
         const dayInput = (
             <DayInput
                 style={{width: '96px', marginLeft: 8, marginRight: 8}}
-                value={this.state.time.day}
-                onChange={this.onChange.bind(this, 'day')}
+                value={this.state.time.days}
+                multi={true}
+                onChange={this.onChange.bind(this, 'days')}
             />
         );
         const hourInput = (

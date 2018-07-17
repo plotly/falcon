@@ -5,8 +5,8 @@ import ms from 'ms';
 import cronstrue from 'cronstrue';
 
 import Modal from '../../modal.jsx';
-import ErrorMessage from '../../error.jsx';
 import SuccessMessage from '../../success.jsx';
+import RequestError from './request-error.jsx';
 import {Link} from '../../Link.react.js';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 import {Row, Column} from '../../layout.jsx';
@@ -31,13 +31,15 @@ export class PreviewModal extends Component {
         onSave: NO_OP,
         onDelete: NO_OP,
         onLogin: NO_OP,
-        onClickAway: NO_OP
+        onClickAway: NO_OP,
+        openQueryPage: NO_OP
     };
     static propTypes = {
         query: PropTypes.object,
         onSave: PropTypes.func,
         onDelete: PropTypes.func,
         onLogin: PropTypes.func,
+        openQueryPage: PropTypes.func,
         onClickAway: PropTypes.func,
         dialect: PropTypes.string,
         currentRequestor: PropTypes.string
@@ -218,7 +220,9 @@ export class PreviewModal extends Component {
                         </Row>
                         {this.state.error && (
                             <Row style={rowStyle}>
-                                <ErrorMessage message={this.state.error} />
+                                <RequestError onClick={this.props.openQueryPage}>
+                                  {this.state.error}
+                                </RequestError>
                             </Row>
                         )}
                         <Row

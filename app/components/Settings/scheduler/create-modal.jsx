@@ -5,8 +5,8 @@ import {Controlled as CodeMirror} from 'react-codemirror2';
 
 import {Row, Column} from '../../layout.jsx';
 import Modal from '../../modal.jsx';
-import ErrorMessage from '../../error.jsx';
 import SuccessMessage from '../../success.jsx';
+import RequestError from './request-error.jsx';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 
 import {getHighlightMode, DEFAULT_REFRESH_INTERVAL} from '../../../constants/constants.js';
@@ -25,10 +25,6 @@ function generateFilename() {
     }
 
     return `Grid_${n}`;
-}
-
-function capitalize(s) {
-  return s[0].toUpperCase() + s.slice(1);
 }
 
 // implements a modal window to schedule a new query
@@ -113,30 +109,7 @@ class CreateModal extends Component {
                 this.setState({successMessage: 'Scheduled query saved successfully!', saving: false});
                 setTimeout(this.props.onClickAway, 2500);
             })
-            .catch(error => {
-              let message = capitalize(error.message);
-              if (message.toLowerCase().includes('syntax')) {
-                message = (
-                  <React.Fragment>
-                    {message}
-                    . Syntax errors are usually easy to fix. We recommend making
-                    sure your query is correct in the
-                    {' '}
-                    <a
-                      onClick={() => {
-                        this.setState({error: null, saving: false});
-                        this.props.openQueryPage();
-                      }}
-                    >
-                      preview editor
-                    </a>
-                    {' '}
-                    before scheduling it.
-                  </React.Fragment>
-                );
-              }
-              this.setState({error: message, saving: false});
-            });
+            .catch(error => this.setState({error: error.message, saving: false}));
     }
 
     render() {
@@ -201,7 +174,9 @@ class CreateModal extends Component {
                         </Row>
                         {this.state.error && (
                             <Row style={rowStyleOverride}>
-                                <ErrorMessage message={this.state.error} />
+                              <RequestError onClick={this.props.openQueryPage}>
+                                {this.state.error}
+                              </RequestError>
                             </Row>
                         )}
                     </Column>

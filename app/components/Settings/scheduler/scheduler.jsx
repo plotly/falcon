@@ -307,6 +307,10 @@ class Scheduler extends Component {
                     onSubmit={this.props.openLogin}
                 />
 
+                {/*
+                  Preview modal is now only rendered if a `selectedQuery` has been
+                  set. This simplifies the rerender logic.
+                */}
                 {this.state.selectedQuery && (
                   <PreviewModal
                       onClickAway={this.closePreview}
@@ -316,6 +320,7 @@ class Scheduler extends Component {
                       onSave={this.handleUpdate}
                       onDelete={this.handleDelete}
                       dialect={this.props.dialect}
+                      openQueryPage={this.props.openQueryPage}
                   />
                 )}
             </React.Fragment>

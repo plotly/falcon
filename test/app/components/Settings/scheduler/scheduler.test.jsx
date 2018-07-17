@@ -62,7 +62,9 @@ describe('Scheduler Test', () => {
             <Scheduler requestor="fake_login" queries={mockQueries} />
         );
 
-        expect(component.find(Modal).get(2).props.open).toBe(false);
+        // Preview modal is now only rendered if a `selectedQuery` has been set
+        // This simplifies the rerender logic
+        expect(component.find(Modal).get(2)).toBeUndefined();
 
         // set selected query
         component.setState({selectedQuery: mockQueries[0]});
@@ -78,7 +80,7 @@ describe('Scheduler Test', () => {
         // clear selected query
         component.setState({selectedQuery: null});
 
-        expect(component.find(Modal).get(2).props.open).toBe(false);
+        expect(component.find(Modal).get(2)).toBeUndefined();
     });
 
     it('should not create if not logged in', () => {
