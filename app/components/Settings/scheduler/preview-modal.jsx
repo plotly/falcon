@@ -82,7 +82,7 @@ export class PreviewModal extends Component {
         if (this.state.editing) {
             const {connectionId, fid, requestor, uids, refreshInterval} = this.props.query;
             const {code: query, cronInterval} = this.state;
-            this.setState({loading: true});
+            this.setState({loading: true, error: null});
             this.props
                 .onSave({
                     connectionId,

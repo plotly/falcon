@@ -93,7 +93,7 @@ class CreateModal extends Component {
             return this.setState({error: 'Please select an interval above.'});
         }
 
-        this.setState({loading: true});
+        this.setState({loading: true, error: null});
         this.props
             .onSubmit({
                 query: this.state.code,
