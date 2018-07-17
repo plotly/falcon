@@ -27,6 +27,10 @@ function generateFilename() {
     return `Grid_${n}`;
 }
 
+function capitalize(s) {
+  return s[0].toUpperCase() + s.slice(1);
+}
+
 // implements a modal window to schedule a new query
 class CreateModal extends Component {
     static propTypes = {
@@ -35,6 +39,7 @@ class CreateModal extends Component {
         initialFilename: PropTypes.string,
         onClickAway: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired,
+        openQueryPage: PropTypes.func.isRequired,
         open: PropTypes.bool,
         dialect: PropTypes.string
     };
@@ -42,7 +47,8 @@ class CreateModal extends Component {
         initialCode: '',
         initialFilename: '',
         onClickAway: noop,
-        onSubmit: noop
+        onSubmit: noop,
+        openQueryPage: noop
     };
     constructor(props) {
         super(props);
@@ -107,7 +113,30 @@ class CreateModal extends Component {
                 this.setState({successMessage: 'Scheduled query saved successfully!', saving: false});
                 setTimeout(this.props.onClickAway, 2500);
             })
-            .catch(error => this.setState({error: error.message, saving: false}));
+            .catch(error => {
+              let message = capitalize(error.message);
+              if (message.toLowerCase().includes('syntax')) {
+                message = (
+                  <React.Fragment>
+                    {message}
+                    . Syntax errors are usually easy to fix. We recommend making
+                    sure your query is correct in the
+                    {' '}
+                    <a
+                      onClick={() => {
+                        this.setState({error: null, saving: false});
+                        this.props.openQueryPage();
+                      }}
+                    >
+                      preview editor
+                    </a>
+                    {' '}
+                    before scheduling it.
+                  </React.Fragment>
+                );
+              }
+              this.setState({error: message, saving: false});
+            });
     }
 
     render() {

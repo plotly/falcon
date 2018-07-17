@@ -92,7 +92,8 @@ class Scheduler extends Component {
         openLogin: NO_OP,
         createScheduledQuery: NO_OP,
         updateScheduledQuery: NO_OP,
-        deleteScheduledQuery: NO_OP
+        deleteScheduledQuery: NO_OP,
+        openQueryPage: NO_OP
     };
 
     static propTypes = {
@@ -110,7 +111,8 @@ class Scheduler extends Component {
         openLogin: PropTypes.func.isRequired,
         createScheduledQuery: PropTypes.func.isRequired,
         updateScheduledQuery: PropTypes.func.isRequired,
-        deleteScheduledQuery: PropTypes.func.isRequired
+        deleteScheduledQuery: PropTypes.func.isRequired,
+        openQueryPage: PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -297,6 +299,7 @@ class Scheduler extends Component {
                     onClickAway={this.closeCreateModal}
                     onSubmit={this.createQuery}
                     dialect={this.props.dialect}
+                    openQueryPage={this.props.openQueryPage}
                 />
                 <PromptLoginModal
                     open={!loggedIn && this.state.createModalOpen}
