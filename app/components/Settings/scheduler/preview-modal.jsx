@@ -244,7 +244,7 @@ export class PreviewModal extends Component {
                                   onClick={this.onSubmit}
                               >
                                   {loading
-                                      ? 'Loading...'
+                                      ? 'Saving...'
                                       : editing
                                           ? 'Save'
                                           : 'Edit'}
