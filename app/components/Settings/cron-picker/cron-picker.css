@@ -9,11 +9,11 @@
     margin-bottom: 16px;
 }
 
-.cron-details-row {
+.cron-details {
     align-items: center;
-    height: 56px;
+    min-height: 56px;
     background: #E8E8E8;
     border-left: 4px solid #828282;
-    padding: 0 16px;
+    padding: 8px 16px;
     margin-bottom: 16px;
 }

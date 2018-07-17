@@ -1,12 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {Row} from '../../../layout.jsx';
 import {DayInput, HourInput, MinuteInput, AmPmInput} from '../time-pickers.jsx';
 import {mapHourToCronFormat} from '../cron-helpers.js';
-import DetailsRow from '../details-row.jsx';
+import { DetailsRow, DetailsColumn } from '../details.jsx';
 
 const id = 'WEEKLY';
 const name = 'Run every week';
+
+const rowStyle = { justifyContent: 'flex-start' };
 
 class component extends React.Component {
     static defaultProps = {
@@ -43,8 +46,8 @@ class component extends React.Component {
     }
 
     onChange(key, selectedOption) {
-        let newValue = Array.isArray(selectedOption) ?
-            selectedOption.map(item => item.value):
+        const newValue = Array.isArray(selectedOption) ?
+            selectedOption.map(item => item.value) :
             selectedOption.value;
 
         if (Array.isArray(newValue) && !newValue.length) {
@@ -53,7 +56,7 @@ class component extends React.Component {
             // don't allow the update
             return;
         }
-            
+
         const time = this.state.time;
 
         time[key] = newValue;
@@ -65,7 +68,7 @@ class component extends React.Component {
     render() {
         const dayInput = (
             <DayInput
-                style={{width: '96px', marginLeft: 8, marginRight: 8}}
+                style={{width: '100%', marginLeft: 8, marginRight: 8}}
                 value={this.state.time.days}
                 multi={true}
                 onChange={this.onChange.bind(this, 'days')}
@@ -73,7 +76,7 @@ class component extends React.Component {
         );
         const hourInput = (
             <HourInput
-                style={{marginLeft: 8, marginRight: 2}}
+                style={{marginLeft: 13, marginRight: 2}}
                 value={this.state.time.hour}
                 onChange={this.onChange.bind(this, 'hour')}
             />
@@ -93,9 +96,10 @@ class component extends React.Component {
         );
 
         return (
-            <DetailsRow>
-                on {dayInput} at {hourInput}:{minuteInput} {amPmInput}
-            </DetailsRow>
+            <DetailsColumn style={{justifyContent: 'start'}}>
+              <Row style={{ marginBottom: '8px', ...rowStyle}}>on {dayInput}</Row>
+              <Row style={rowStyle}>at {hourInput}:{minuteInput} {amPmInput}</Row>
+            </DetailsColumn>
         );
     }
 }

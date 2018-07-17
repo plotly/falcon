@@ -8,7 +8,7 @@ import {
     AmPmInput
 } from '../time-pickers.jsx';
 import {mapHourToCronFormat} from '../cron-helpers.js';
-import DetailsRow from '../details-row.jsx';
+import { DetailsRow } from '../details.jsx';
 
 const id = 'MONTHLY';
 const name = 'Run every month';

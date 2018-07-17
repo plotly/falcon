@@ -143,7 +143,7 @@ export class PreviewModal extends Component {
                             className="sql-preview"
                             style={{margin: 0, letterSpacing: '1px'}}
                         >
-                            <SQL className="bold">{props.query.query}</SQL>
+                            <SQL className="bold">{this.state.code}</SQL>
                         </h5>
                         <button
                             onClick={this.close}
@@ -178,7 +178,7 @@ export class PreviewModal extends Component {
                                         />
                                     </div>
                                 ) : (
-                                    <SQL>{props.query.query}</SQL>
+                                    <SQL>{this.state.code}</SQL>
                                 )}
                             </div>
                         </Row>

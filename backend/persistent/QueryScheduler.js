@@ -118,7 +118,9 @@ class QueryScheduler {
 
     // Remove query from memory
     clearQuery(fid) {
-        this.queryJobs[fid].cancel();
+        if (this.queryJobs[fid]) {
+            this.queryJobs[fid].cancel();
+        }
         delete this.queryJobs[fid];
     }
 
@@ -160,6 +162,11 @@ class QueryScheduler {
             Logger.log(`Querying "${query}" with connection ${connectionId} to create a new grid`, 2);
             return Connections.query(query, getConnectionById(connectionId));
 
+        }).catch((e) => {
+            /*
+             * Warning: The front end looks for "QueryExecutionError" in this error message. Don't change it!
+             */
+            throw new Error(`QueryExecutionError: ${e.message}`);
         }).then(({rows, columnnames}) => {
             Logger.log(`Query "${query}" took ${process.hrtime(startTime)[0]} seconds`, 2);
             Logger.log('Create a new grid with new data', 2);
@@ -185,6 +192,11 @@ class QueryScheduler {
                 Logger.log(`Grid ${json.file.fid} has been updated.`, 2);
                 return json;
             });
+        }).catch((e) => {
+            /*
+             * Warning: The front end looks for "PlotlyApiError" in this error message. Don't change it!
+             */
+            throw new Error(`PlotlyApiError: ${e.message}`);
         });
 
     }
@@ -229,6 +241,11 @@ class QueryScheduler {
             Logger.log(`Querying "${query}" with connection ${connectionId} to update grid ${fid}`, 2);
             return Connections.query(query, requestedDBConnections);
 
+        }).catch((e) => {
+            /*
+             * Warning: The front end looks for "QueryExecutionError" in this error message. Don't change it!
+             */
+            throw new Error(`QueryExecutionError: ${e.message}`);
         }).then(({rows}) => {
 
             Logger.log(`Query "${query}" took ${process.hrtime(startTime)[0]} seconds`, 2);
@@ -309,6 +326,11 @@ class QueryScheduler {
             return res.json().then(() => {
                 Logger.log(`Grid ${fid} has been updated.`, 2);
             });
+        }).catch((e) => {
+            /*
+             * Warning: The front end looks for "PlotlyApiError" in this error message. Don't change it!
+             */
+            throw new Error(`PlotlyApiError: ${e.message}`);
         });
 
     }

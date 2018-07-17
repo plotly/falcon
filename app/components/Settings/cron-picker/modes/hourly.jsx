@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import {MinuteInput} from '../time-pickers.jsx';
 
-import DetailsRow from '../details-row.jsx';
+import { DetailsRow } from '../details.jsx';
 
 const id = 'HOURLY';
 const name = 'Run every hour';
