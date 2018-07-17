@@ -250,7 +250,7 @@ export class PreviewModal extends Component {
                                           : 'Edit'}
                               </button>
                             )}
-                            {!success && !canEdit && !editing && (
+                            {!success && canEdit && !editing && (
                                 <button
                                     style={{
                                         margin: 0,
