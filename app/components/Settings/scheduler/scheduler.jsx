@@ -176,7 +176,7 @@ class Scheduler extends Component {
     }
 
     closeCreateModal() {
-        this.setState({createModalOpen: false});
+        this.setState({createModalOpen: false, successMessage: null});
     }
 
     createQuery(queryConfig) {
@@ -191,7 +191,6 @@ class Scheduler extends Component {
             if (res.error) {
                 throw res.error;
             }
-            this.closeCreateModal();
             return res;
         });
     }
@@ -208,7 +207,6 @@ class Scheduler extends Component {
             if (res.error) {
                 throw res.error;
             }
-            this.closePreview();
             return res;
         });
     }
@@ -306,15 +304,17 @@ class Scheduler extends Component {
                     onSubmit={this.props.openLogin}
                 />
 
-                <PreviewModal
-                    onClickAway={this.closePreview}
-                    query={this.state.selectedQuery}
-                    currentRequestor={this.props.requestor}
-                    onLogin={this.props.openLogin}
-                    onSave={this.handleUpdate}
-                    onDelete={this.handleDelete}
-                    dialect={this.props.dialect}
-                />
+                {this.state.selectedQuery && (
+                  <PreviewModal
+                      onClickAway={this.closePreview}
+                      query={this.state.selectedQuery}
+                      currentRequestor={this.props.requestor}
+                      onLogin={this.props.openLogin}
+                      onSave={this.handleUpdate}
+                      onDelete={this.handleDelete}
+                      dialect={this.props.dialect}
+                  />
+                )}
             </React.Fragment>
         );
     }

@@ -5,7 +5,8 @@ import ms from 'ms';
 import cronstrue from 'cronstrue';
 
 import Modal from '../../modal.jsx';
-import Error from '../../error.jsx';
+import ErrorMessage from '../../error.jsx';
+import SuccessMessage from '../../success.jsx';
 import {Link} from '../../Link.react.js';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 import {Row, Column} from '../../layout.jsx';
@@ -44,6 +45,7 @@ export class PreviewModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            successMessage: null,
             editing: false,
             code: props.query && props.query.query,
             cronInterval: props.query && props.query.cronInterval,
@@ -55,19 +57,6 @@ export class PreviewModal extends Component {
         this.onDelete = this.onDelete.bind(this);
         this.close = this.close.bind(this);
         this.handleIntervalChange = this.handleIntervalChange.bind(this);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (
-            nextProps.query &&
-            nextProps.query.query !== (this.props.query && this.props.query.query)
-        ) {
-            this.setState({
-                code: nextProps.query.query,
-                refreshInterval: nextProps.query.refreshInterval,
-                cronInterval: nextProps.query.cronInterval
-            });
-        }
     }
 
     updateCode(editor, meta, code) {
@@ -93,11 +82,16 @@ export class PreviewModal extends Component {
                     cronInterval,
                     refreshInterval: refreshInterval || DEFAULT_REFRESH_INTERVAL
                 })
-                .then(() =>
-                    this.setState({editing: false, confirmedDelete: false})
-                )
-                .catch(error => this.setState({error: error.message}))
-                .then(() => this.setState({loading: false}));
+                .then(() => {
+                  this.setState({
+                    successMessage: 'Query saved successfully!',
+                    loading: false,
+                    editing: false,
+                    confirmedDelete: false
+                  });
+                  setTimeout(this.props.onClickAway, 2500);
+                })
+                .catch(error => this.setState({error: error.message}));
         } else {
             this.setState({editing: true, confirmedDelete: false});
         }
@@ -132,6 +126,7 @@ export class PreviewModal extends Component {
             const initialModeId = getInitialCronMode(props.query);
 
             const canEdit = this.props.currentRequestor && this.props.currentRequestor === props.query.requestor;
+            const success = this.state.successMessage;
             content = (
                 <Column style={{width: '60%', minWidth: 640, background: 'white'}}>
                     <Row
@@ -223,7 +218,7 @@ export class PreviewModal extends Component {
                         </Row>
                         {this.state.error && (
                             <Row style={rowStyle}>
-                                <Error message={this.state.error} />
+                                <ErrorMessage message={this.state.error} />
                             </Row>
                         )}
                         <Row
@@ -235,7 +230,7 @@ export class PreviewModal extends Component {
                                 paddingBottom: 0
                             }}
                         >
-                            {!canEdit && (
+                            {!success && !canEdit && (
                               <button
                                   style={{margin: 0}}
                                   onClick={this.props.onLogin}
@@ -243,7 +238,7 @@ export class PreviewModal extends Component {
                                   Log in to edit query
                               </button>
                             )}
-                            {canEdit && (
+                            {!success && canEdit && (
                               <button
                                   style={{margin: 0}}
                                   onClick={this.onSubmit}
@@ -255,7 +250,7 @@ export class PreviewModal extends Component {
                                           : 'Edit'}
                               </button>
                             )}
-                            {canEdit && !editing && (
+                            {!success && !canEdit && !editing && (
                                 <button
                                     style={{
                                         margin: 0,
@@ -266,6 +261,9 @@ export class PreviewModal extends Component {
                                 >
                                     {this.state.confirmedDelete ? 'Click to confirm' : 'Delete'}
                                 </button>
+                            )}
+                            {success && (
+                              <SuccessMessage>{this.state.successMessage}</SuccessMessage>
                             )}
                         </Row>
                     </Column>

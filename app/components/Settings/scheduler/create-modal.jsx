@@ -6,6 +6,7 @@ import {Controlled as CodeMirror} from 'react-codemirror2';
 import {Row, Column} from '../../layout.jsx';
 import Modal from '../../modal.jsx';
 import ErrorMessage from '../../error.jsx';
+import SuccessMessage from '../../success.jsx';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 
 import {getHighlightMode, DEFAULT_REFRESH_INTERVAL} from '../../../constants/constants.js';
@@ -47,11 +48,12 @@ class CreateModal extends Component {
         super(props);
 
         this.state = {
+            successMessage: null,
             code: props.initialCode,
             filename: props.initialFilename,
             interval: '* * * * *',
             error: null,
-            loading: false
+            saving: false
         };
         this.options = {
             lineNumbers: true,
@@ -93,7 +95,7 @@ class CreateModal extends Component {
             return this.setState({error: 'Please select an interval above.'});
         }
 
-        this.setState({loading: true, error: null});
+        this.setState({saving: true, error: null});
         this.props
             .onSubmit({
                 query: this.state.code,
@@ -102,15 +104,10 @@ class CreateModal extends Component {
                 cronInterval: this.state.interval
             })
             .then(() => {
-                this.setState({
-                    code: '',
-                    filename: '',
-                    interval: null,
-                    error: null
-                });
+                this.setState({successMessage: 'Scheduled query saved successfully!', saving: false});
+                setTimeout(this.props.onClickAway, 2500);
             })
-            .catch(error => this.setState({error: error.message}))
-            .then(() => this.setState({loading: false}));
+            .catch(error => this.setState({error: error.message}));
     }
 
     render() {
@@ -181,13 +178,19 @@ class CreateModal extends Component {
                         )}
                     </Column>
                     <Row>
-                        <button
-                            type="submit"
-                            className="submit"
-                            onClick={this.submit}
-                        >
-                            {this.state.loading ? 'Loading...' : 'Schedule Query'}
-                        </button>
+                        {this.state.successMessage ? (
+                          <SuccessMessage>
+                            {this.state.successMessage}
+                          </SuccessMessage>
+                        ) : (
+                          <button
+                              type="submit"
+                              className="submit"
+                              onClick={this.submit}
+                          >
+                              {this.state.saving ? 'Saving...' : 'Schedule Query'}
+                          </button>
+                        )}
                     </Row>
                 </Column>
             </Modal>
