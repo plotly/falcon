@@ -107,7 +107,7 @@ class CreateModal extends Component {
                 this.setState({successMessage: 'Scheduled query saved successfully!', saving: false});
                 setTimeout(this.props.onClickAway, 2500);
             })
-            .catch(error => this.setState({error: error.message}));
+            .catch(error => this.setState({error: error.message, saving: false}));
     }
 
     render() {
@@ -133,8 +133,7 @@ class CreateModal extends Component {
                         <Row>
                             <p>
                                 A scheduled query runs and updates its
-                                corresponding dataset in Plotly Cloud. Learn
-                                more about scheduled queries here.
+                                corresponding dataset in Plotly Cloud.
                             </p>
                         </Row>
                         <Row style={rowStyleOverride}>
