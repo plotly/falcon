@@ -1,3 +1,5 @@
+const MAX_CRON_MINUTE = 59;
+
 const ONE_MINUTE = 60;
 const FIVE_MINUTES = 300;
 const ONE_HOUR = 3600;
@@ -10,7 +12,7 @@ export function mapRefreshToCron (refreshInterval) {
     if (refreshInterval <= ONE_MINUTE) {
         return '* * * * *';
     } else if (refreshInterval <= FIVE_MINUTES) {
-        return `${now.getSeconds()} ${calculateOffset(now)}/5 * * * *`;
+        return `${now.getSeconds()} ${computeMinutes(now)} * * * *`;
     } else if (refreshInterval <= ONE_HOUR) {
         return `${now.getMinutes()} * * * *`;
     } else if (refreshInterval <= ONE_DAY) {
@@ -21,6 +23,14 @@ export function mapRefreshToCron (refreshInterval) {
     return `${now.getMinutes()} ${now.getHours()} * * ${now.getDay()}`;
 }
 
-function calculateOffset (now) {
-    return now.getMinutes() % 5;
+function computeMinutes (now) {
+    let currMinute = now.getMinutes() % 5; // start at 5 min offset
+    const minutes = [];
+
+    while (currMinute < MAX_CRON_MINUTE) {
+        minutes.push(currMinute);
+        currMinute += 5;
+    }
+
+    return minutes.join(',');
 }
