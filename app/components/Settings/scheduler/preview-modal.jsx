@@ -164,6 +164,7 @@ export class PreviewModal extends Component {
                                         <CodeMirror
                                             options={{
                                                 lineNumbers: true,
+                                                lineWrapping: true,
                                                 tabSize: 4,
                                                 readOnly: false,
                                                 mode: getHighlightMode(this.props.dialect)
