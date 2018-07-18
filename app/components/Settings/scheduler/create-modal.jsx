@@ -115,29 +115,19 @@ class CreateModal extends Component {
 
     render() {
         return (
-            <Modal
-                open={this.props.open}
-                onClickAway={this.props.onClickAway}
-                className="scheduler create-modal"
-            >
+            <Modal open={this.props.open} onClickAway={this.props.onClickAway} className="scheduler create-modal">
                 <Column className="container " style={{width: '60%', minWidth: 640}}>
                     <Row>
                         <Column className="innerColumn">
                             <h5 className="header">Create Scheduled Query</h5>
-                            <button
-                                className="button"
-                                onClick={this.props.onClickAway}
-                            >
+                            <button className="button" onClick={this.props.onClickAway}>
                                 &times;
                             </button>
                         </Column>
                     </Row>
                     <Column className="detailsColumn">
                         <Row>
-                            <p>
-                                A scheduled query runs and updates its
-                                corresponding dataset in Plotly Cloud.
-                            </p>
+                            <p>A scheduled query runs and updates its corresponding dataset in Plotly Cloud.</p>
                         </Row>
                         <Row style={rowStyleOverride}>
                             <div className="row-header">Query</div>
@@ -162,47 +152,39 @@ class CreateModal extends Component {
                           </Row>
                         */}
                         <Row
-                          style={Object.assign(
-                            {},
-                            rowStyleOverride,
-                            { marginTop: '8px', borderTop: '1px solid #c8d4e3', paddingTop: '24px' }
-                          )}
+                            style={Object.assign({}, rowStyleOverride, {
+                                marginTop: '8px',
+                                borderTop: '1px solid #c8d4e3',
+                                paddingTop: '24px'
+                            })}
                         >
-                            <div className="row-header" style={{ paddingTop: 5 }}>Frequency</div>
+                            <div className="row-header" style={{paddingTop: 5}}>
+                                Frequency
+                            </div>
                             <div className="row-body" style={{minHeight: '108px'}}>
                                 <CronPicker onChange={this.handleIntervalChange} />
                             </div>
                         </Row>
                         {this.state.error && (
                             <Row style={rowStyleOverride}>
-                              <RequestError onClick={this.props.openQueryPage}>
-                                {this.state.error}
-                              </RequestError>
+                                <RequestError onClick={this.props.openQueryPage}>{this.state.error}</RequestError>
                             </Row>
                         )}
                         {this.state.saving && (
-                          <Row style={rowStyleOverride}>
-                            <TimedMessage>
-                              <div style={{fontSize: 16, paddingTop: 16}}>
-                                {WAITING_MESSAGE}
-                              </div>
-                            </TimedMessage>
-                          </Row>
+                            <Row style={rowStyleOverride}>
+                                <TimedMessage>
+                                    <div style={{fontSize: 16, paddingTop: 16}}>{WAITING_MESSAGE}</div>
+                                </TimedMessage>
+                            </Row>
                         )}
                     </Column>
                     <Row>
                         {this.state.successMessage ? (
-                          <SuccessMessage>
-                            {this.state.successMessage}
-                          </SuccessMessage>
+                            <SuccessMessage>{this.state.successMessage}</SuccessMessage>
                         ) : (
-                          <button
-                              type="submit"
-                              className="submit"
-                              onClick={this.submit}
-                          >
-                              {this.state.saving ? 'Saving...' : 'Schedule Query'}
-                          </button>
+                            <button type="submit" className="submit" onClick={this.submit}>
+                                {this.state.saving ? 'Saving...' : 'Schedule Query'}
+                            </button>
                         )}
                     </Row>
                 </Column>

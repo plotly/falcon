@@ -58,8 +58,7 @@ export default class CronPicker extends React.Component {
     }
 
     render() {
-        const ModeComponent = this.getModeById(this.state.currentModeId)
-            .component;
+        const ModeComponent = this.getModeById(this.state.currentModeId).component;
 
         return (
             <React.Fragment>
@@ -75,9 +74,7 @@ export default class CronPicker extends React.Component {
                         />
                     </div>
                 </Row>
-                {ModeComponent ? (
-                    <ModeComponent onChange={this.props.onChange} />
-                ) : null}
+                {ModeComponent ? <ModeComponent onChange={this.props.onChange} /> : null}
             </React.Fragment>
         );
     }

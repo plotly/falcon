@@ -86,13 +86,13 @@ export class PreviewModal extends Component {
                     refreshInterval: refreshInterval || DEFAULT_REFRESH_INTERVAL
                 })
                 .then(() => {
-                  this.setState({
-                    successMessage: 'Query saved successfully!',
-                    loading: false,
-                    editing: false,
-                    confirmedDelete: false
-                  });
-                  setTimeout(this.props.onClickAway, 2500);
+                    this.setState({
+                        successMessage: 'Query saved successfully!',
+                        loading: false,
+                        editing: false,
+                        confirmedDelete: false
+                    });
+                    setTimeout(this.props.onClickAway, 2500);
                 })
                 .catch(error => this.setState({error: error.message, loading: false}));
         } else {
@@ -140,10 +140,7 @@ export class PreviewModal extends Component {
                             justifyContent: 'flex-start'
                         }}
                     >
-                        <h5
-                            className="sql-preview"
-                            style={{margin: 0, letterSpacing: '1px'}}
-                        >
+                        <h5 className="sql-preview" style={{margin: 0, letterSpacing: '1px'}}>
                             <SQL className="bold">{this.state.code}</SQL>
                         </h5>
                         <button
@@ -161,10 +158,7 @@ export class PreviewModal extends Component {
                     <Column style={{background: '#F5F7FB', padding: '32px'}}>
                         <Row style={rowStyle}>
                             <div style={keyStyle}>Query</div>
-                            <div
-                                className="sql-preview scheduler"
-                                style={valueStyle}
-                            >
+                            <div className="sql-preview scheduler" style={valueStyle}>
                                 {editing ? (
                                     <div>
                                         <CodeMirror
@@ -187,29 +181,22 @@ export class PreviewModal extends Component {
                             <div style={keyStyle}>Frequency</div>
                             {editing ? (
                                 <div style={{width: '65%', minHeight: '108px'}}>
-                                    <CronPicker
-                                      onChange={this.handleIntervalChange}
-                                      initialModeId={initialModeId}
-                                    />
+                                    <CronPicker onChange={this.handleIntervalChange} initialModeId={initialModeId} />
                                 </div>
                             ) : (
                                 <em style={valueStyle}>
-                                    {props.query.cronInterval
-                                      ? <b>{cronstrue.toString(props.query.cronInterval)}</b>
-                                      : (
+                                    {props.query.cronInterval ? (
+                                        <b>{cronstrue.toString(props.query.cronInterval)}</b>
+                                    ) : (
                                         <React.Fragment>
-                                          Runs every{' '}
-                                          <b>
-                                              {ms(
-                                                  props.query.refreshInterval * 1000,
-                                                  {
-                                                      long: true
-                                                  }
-                                              )}
-                                          </b>
+                                            Runs every{' '}
+                                            <b>
+                                                {ms(props.query.refreshInterval * 1000, {
+                                                    long: true
+                                                })}
+                                            </b>
                                         </React.Fragment>
-                                      )
-                                    }
+                                    )}
                                 </em>
                             )}
                         </Row>
@@ -221,19 +208,15 @@ export class PreviewModal extends Component {
                         </Row>
                         {this.state.error && (
                             <Row style={rowStyle}>
-                                <RequestError onClick={this.props.openQueryPage}>
-                                  {this.state.error}
-                                </RequestError>
+                                <RequestError onClick={this.props.openQueryPage}>{this.state.error}</RequestError>
                             </Row>
                         )}
                         {loading && (
-                          <Row style={{justifyContent: 'flex-start'}}>
-                            <TimedMessage>
-                              <div style={{fontSize: 16, paddingTop: 16}}>
-                                {WAITING_MESSAGE}
-                              </div>
-                            </TimedMessage>
-                          </Row>
+                            <Row style={{justifyContent: 'flex-start'}}>
+                                <TimedMessage>
+                                    <div style={{fontSize: 16, paddingTop: 16}}>{WAITING_MESSAGE}</div>
+                                </TimedMessage>
+                            </Row>
                         )}
                         <Row
                             style={{
@@ -244,41 +227,33 @@ export class PreviewModal extends Component {
                                 paddingBottom: 0
                             }}
                         >
-                            {!success && !canEdit && (
-                              <button
-                                  style={{margin: 0}}
-                                  onClick={this.props.onLogin}
-                              >
-                                  Log in to edit query
-                              </button>
-                            )}
-                            {!success && canEdit && (
-                              <button
-                                  style={{margin: 0}}
-                                  onClick={this.onSubmit}
-                              >
-                                  {loading
-                                      ? 'Saving...'
-                                      : editing
-                                          ? 'Save'
-                                          : 'Edit'}
-                              </button>
-                            )}
-                            {!success && canEdit && !editing && (
-                                <button
-                                    style={{
-                                        margin: 0,
-                                        border: 'none',
-                                        background: 'red'
-                                    }}
-                                    onClick={this.onDelete}
-                                >
-                                    {this.state.confirmedDelete ? 'Click to confirm' : 'Delete'}
-                                </button>
-                            )}
-                            {success && (
-                              <SuccessMessage>{this.state.successMessage}</SuccessMessage>
-                            )}
+                            {!success &&
+                                !canEdit && (
+                                    <button style={{margin: 0}} onClick={this.props.onLogin}>
+                                        Log in to edit query
+                                    </button>
+                                )}
+                            {!success &&
+                                canEdit && (
+                                    <button style={{margin: 0}} onClick={this.onSubmit}>
+                                        {loading ? 'Saving...' : editing ? 'Save' : 'Edit'}
+                                    </button>
+                                )}
+                            {!success &&
+                                canEdit &&
+                                !editing && (
+                                    <button
+                                        style={{
+                                            margin: 0,
+                                            border: 'none',
+                                            background: 'red'
+                                        }}
+                                        onClick={this.onDelete}
+                                    >
+                                        {this.state.confirmedDelete ? 'Click to confirm' : 'Delete'}
+                                    </button>
+                                )}
+                            {success && <SuccessMessage>{this.state.successMessage}</SuccessMessage>}
                         </Row>
                     </Column>
                 </Column>
@@ -286,11 +261,7 @@ export class PreviewModal extends Component {
         }
 
         return (
-            <Modal
-                onClickAway={this.close}
-                className="meta-preview"
-                open={props.query !== null}
-            >
+            <Modal onClickAway={this.close} className="meta-preview" open={props.query !== null}>
                 {content}
             </Modal>
         );

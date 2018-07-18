@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import {HourInput, MinuteInput, AmPmInput} from '../time-pickers.jsx';
 
-import { DetailsRow } from '../details.jsx';
+import {DetailsRow} from '../details.jsx';
 import {mapHourToCronFormat} from '../cron-helpers.js';
 
 const id = 'DAILY';

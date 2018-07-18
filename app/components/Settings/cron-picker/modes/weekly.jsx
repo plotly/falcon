@@ -4,12 +4,12 @@ import PropTypes from 'prop-types';
 import {Row} from '../../../layout.jsx';
 import {DayInput, HourInput, MinuteInput, AmPmInput} from '../time-pickers.jsx';
 import {mapHourToCronFormat} from '../cron-helpers.js';
-import { DetailsColumn } from '../details.jsx';
+import {DetailsColumn} from '../details.jsx';
 
 const id = 'WEEKLY';
 const name = 'Run every week';
 
-const rowStyle = { justifyContent: 'flex-start' };
+const rowStyle = {justifyContent: 'flex-start'};
 
 class component extends React.Component {
     static defaultProps = {
@@ -46,9 +46,7 @@ class component extends React.Component {
     }
 
     onChange(key, selectedOption) {
-        const newValue = Array.isArray(selectedOption) ?
-            selectedOption.map(item => item.value) :
-            selectedOption.value;
+        const newValue = Array.isArray(selectedOption) ? selectedOption.map(item => item.value) : selectedOption.value;
 
         if (Array.isArray(newValue) && !newValue.length) {
             // then the days multi-select is empty.
@@ -88,17 +86,14 @@ class component extends React.Component {
                 onChange={this.onChange.bind(this, 'minute')}
             />
         );
-        const amPmInput = (
-            <AmPmInput
-                value={this.state.time.amPm}
-                onChange={this.onChange.bind(this, 'amPm')}
-            />
-        );
+        const amPmInput = <AmPmInput value={this.state.time.amPm} onChange={this.onChange.bind(this, 'amPm')} />;
 
         return (
             <DetailsColumn style={{justifyContent: 'start'}}>
-              <Row style={{ marginBottom: '8px', ...rowStyle}}>on {dayInput}</Row>
-              <Row style={rowStyle}>at {hourInput}:{minuteInput} {amPmInput}</Row>
+                <Row style={{marginBottom: '8px', ...rowStyle}}>on {dayInput}</Row>
+                <Row style={rowStyle}>
+                    at {hourInput}:{minuteInput} {amPmInput}
+                </Row>
             </DetailsColumn>
         );
     }

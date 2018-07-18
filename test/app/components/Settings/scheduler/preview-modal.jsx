@@ -25,52 +25,62 @@ describe('Preview Modal Tests', () => {
     });
 
     it('should not render the preview if query is falsey', () => {
-        const component = mount(
-          <PreviewModal query={null} />
-        );
+        const component = mount(<PreviewModal query={null} />);
 
         expect(component.children().instance()).toBeNull();
     });
     it('should render login button if not logged in, or the user is not the same', () => {
         const component = mount(
-          <PreviewModal query={{
-              query: 'SELECT * FROM table',
-              fid: 'fid:1',
-              refreshInterval: 60,
-              requestor: 'user1' }}
-          />
+            <PreviewModal
+                query={{
+                    query: 'SELECT * FROM table',
+                    fid: 'fid:1',
+                    refreshInterval: 60,
+                    requestor: 'user1'
+                }}
+            />
         );
 
-        expect(component.find('button').at(1).text()).toEqual(expect.stringContaining('Log in'));
+        expect(
+            component
+                .find('button')
+                .at(1)
+                .text()
+        ).toEqual(expect.stringContaining('Log in'));
 
         const component2 = mount(
-          <PreviewModal
-            query={{
-              query: 'SELECT * FROM table',
-              fid: 'fid:1',
-              refreshInterval: 60,
-              requestor: 'user1'
-            }}
-            currentRequestor="user2"
-          />
+            <PreviewModal
+                query={{
+                    query: 'SELECT * FROM table',
+                    fid: 'fid:1',
+                    refreshInterval: 60,
+                    requestor: 'user1'
+                }}
+                currentRequestor="user2"
+            />
         );
 
-        expect(component2.find('button').at(1).text()).toEqual(expect.stringContaining('Log in'));
+        expect(
+            component2
+                .find('button')
+                .at(1)
+                .text()
+        ).toEqual(expect.stringContaining('Log in'));
     });
 
     it('should render edit and delete buttons if logged in', () => {
         const onDelete = jest.fn();
         const component = mount(
-          <PreviewModal
-            query={{
-              query: 'SELECT * FROM table',
-              fid: 'fid:1',
-              refreshInterval: 60,
-              requestor: 'user'
-            }}
-            currentRequestor="user"
-            onDelete={onDelete}
-          />
+            <PreviewModal
+                query={{
+                    query: 'SELECT * FROM table',
+                    fid: 'fid:1',
+                    refreshInterval: 60,
+                    requestor: 'user'
+                }}
+                currentRequestor="user"
+                onDelete={onDelete}
+            />
         );
 
         const editButton = component.find('button').at(1);
@@ -92,45 +102,45 @@ describe('Preview Modal Tests', () => {
     });
 
     it('should reset state on close', () => {
-      const component = mount(
-        <PreviewModal
-          query={{
-            query: 'SELECT * FROM table',
-            fid: 'fid:1',
-            requestor: 'user',
-            cronInterval: '* * * * *'
-          }}
-          currentRequestor="user"
-        />
-      );
+        const component = mount(
+            <PreviewModal
+                query={{
+                    query: 'SELECT * FROM table',
+                    fid: 'fid:1',
+                    requestor: 'user',
+                    cronInterval: '* * * * *'
+                }}
+                currentRequestor="user"
+            />
+        );
 
-      const editButton = component.find('button').at(1);
-      const deleteButton = component.find('button').at(2);
+        const editButton = component.find('button').at(1);
+        const deleteButton = component.find('button').at(2);
 
-      editButton.simulate('click');
-      expect(component.state('editing')).toBe(true);
+        editButton.simulate('click');
+        expect(component.state('editing')).toBe(true);
 
-      deleteButton.simulate('click');
-      expect(component.state('confirmedDelete')).toBe(true);
+        deleteButton.simulate('click');
+        expect(component.state('confirmedDelete')).toBe(true);
 
-      component.instance().close();
-      expect(component.state('editing')).toBe(false);
-      expect(component.state('confirmedDelete')).toBe(false);
+        component.instance().close();
+        expect(component.state('editing')).toBe(false);
+        expect(component.state('confirmedDelete')).toBe(false);
     });
 
     it('should edit button should send correct params', () => {
         const onSave = jest.fn(() => Promise.resolve());
         const component = mount(
-          <PreviewModal
-            query={{
-              query: 'SELECT * FROM table',
-              fid: 'fid:1',
-              requestor: 'user',
-              cronInterval: '* * * * *'
-            }}
-            currentRequestor="user"
-            onSave={onSave}
-          />
+            <PreviewModal
+                query={{
+                    query: 'SELECT * FROM table',
+                    fid: 'fid:1',
+                    requestor: 'user',
+                    cronInterval: '* * * * *'
+                }}
+                currentRequestor="user"
+                onSave={onSave}
+            />
         );
 
         const editButton = component.find('button').at(1);
@@ -140,13 +150,15 @@ describe('Preview Modal Tests', () => {
         // submit
         editButton.simulate('click');
 
-        expect(onSave).toHaveBeenCalledWith(expect.objectContaining({
-          fid: 'fid:1',
-          requestor: 'user',
-          query: 'SELECT * FROM table',
-          cronInterval: '* * * * *',
-          // This is necessary to prevent older versions from breaking
-          refreshInterval: DEFAULT_REFRESH_INTERVAL
-        }));
+        expect(onSave).toHaveBeenCalledWith(
+            expect.objectContaining({
+                fid: 'fid:1',
+                requestor: 'user',
+                query: 'SELECT * FROM table',
+                cronInterval: '* * * * *',
+                // This is necessary to prevent older versions from breaking
+                refreshInterval: DEFAULT_REFRESH_INTERVAL
+            })
+        );
     });
 });

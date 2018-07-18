@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import {MinuteInput} from '../time-pickers.jsx';
 
-import { DetailsRow } from '../details.jsx';
+import {DetailsRow} from '../details.jsx';
 
 const id = 'HOURLY';
 const name = 'Run every hour';
@@ -44,11 +44,7 @@ class component extends React.Component {
         return (
             <DetailsRow>
                 at minute
-                <MinuteInput
-                    style={{marginLeft: '8px'}}
-                    value={this.state.minute}
-                    onChange={this.onChange}
-                />
+                <MinuteInput style={{marginLeft: '8px'}} value={this.state.minute} onChange={this.onChange} />
             </DetailsRow>
         );
     }

@@ -66,11 +66,10 @@ class IntervalFormatter extends React.Component {
                         }}
                     >
                         {run.cronInterval
-                          ? cronstrue.toString(run.cronInterval)
-                          : `Runs every ${ms(run.refreshInterval * 1000, {
-                              long: true
-                          })}`
-                        }
+                            ? cronstrue.toString(run.cronInterval)
+                            : `Runs every ${ms(run.refreshInterval * 1000, {
+                                  long: true
+                              })}`}
                     </em>
                 </Column>
             </Row>
@@ -239,14 +238,8 @@ class Scheduler extends Component {
                         onChange={this.handleSearchChange}
                         placeholder="Search scheduled queries..."
                     />
-                    {!contains(
-                        this.props.dialect,
-                        SQL_DIALECTS_USING_EDITOR
-                    ) && (
-                        <button
-                            style={{marginRight: '16px'}}
-                            onClick={this.openCreateModal}
-                        >
+                    {!contains(this.props.dialect, SQL_DIALECTS_USING_EDITOR) && (
+                        <button style={{marginRight: '16px'}} onClick={this.openCreateModal}>
                             Create Scheduled Query
                         </button>
                     )}
@@ -260,9 +253,7 @@ class Scheduler extends Component {
                 >
                     <Column style={{width: 300}}>
                         <Row>
-                            <Column style={{marginLeft: 8}}>
-                                {rows.length} queries
-                            </Column>
+                            <Column style={{marginLeft: 8}}>{rows.length} queries</Column>
                         </Row>
                     </Column>
                     <Column style={{width: 300}}>
@@ -279,10 +270,7 @@ class Scheduler extends Component {
                         </Row>
                     </Column>
                 </Row>
-                <Row
-                    className="scheduler-table"
-                    style={{padding: '0 16px 16px', width: 'auto'}}
-                >
+                <Row className="scheduler-table" style={{padding: '0 16px 16px', width: 'auto'}}>
                     <ReactDataGrid
                         onRowClick={this.openPreview}
                         columns={this.columns}
@@ -312,16 +300,16 @@ class Scheduler extends Component {
                   set. This simplifies the rerender logic.
                 */}
                 {this.state.selectedQuery && (
-                  <PreviewModal
-                      onClickAway={this.closePreview}
-                      query={this.state.selectedQuery}
-                      currentRequestor={this.props.requestor}
-                      onLogin={this.props.openLogin}
-                      onSave={this.handleUpdate}
-                      onDelete={this.handleDelete}
-                      dialect={this.props.dialect}
-                      openQueryPage={this.props.openQueryPage}
-                  />
+                    <PreviewModal
+                        onClickAway={this.closePreview}
+                        query={this.state.selectedQuery}
+                        currentRequestor={this.props.requestor}
+                        onLogin={this.props.openLogin}
+                        onSave={this.handleUpdate}
+                        onDelete={this.handleDelete}
+                        dialect={this.props.dialect}
+                        openQueryPage={this.props.openQueryPage}
+                    />
                 )}
             </React.Fragment>
         );

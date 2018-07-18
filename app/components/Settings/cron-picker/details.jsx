@@ -6,9 +6,9 @@ import {Column, Row} from '../../layout.jsx';
 const style = {justifyContent: 'flex-start'};
 
 const DetailsRow = props => (
-  <Row style={style} className="cron-details">
-      {props.children}
-  </Row>
+    <Row style={style} className="cron-details">
+        {props.children}
+    </Row>
 );
 
 DetailsRow.propTypes = {
@@ -16,9 +16,9 @@ DetailsRow.propTypes = {
 };
 
 const DetailsColumn = props => (
-  <Column style={style} className="cron-details">
-      {props.children}
-  </Column>
+    <Column style={style} className="cron-details">
+        {props.children}
+    </Column>
 );
 
 DetailsColumn.propTypes = {

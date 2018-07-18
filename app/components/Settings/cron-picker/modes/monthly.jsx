@@ -1,14 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {
-    DateInput,
-    HourInput,
-    MinuteInput,
-    AmPmInput
-} from '../time-pickers.jsx';
+import {DateInput, HourInput, MinuteInput, AmPmInput} from '../time-pickers.jsx';
 import {mapHourToCronFormat} from '../cron-helpers.js';
-import { DetailsRow } from '../details.jsx';
+import {DetailsRow} from '../details.jsx';
 
 const id = 'MONTHLY';
 const name = 'Run every month';
@@ -80,11 +75,7 @@ class component extends React.Component {
             />
         );
         const amPmInput = (
-            <AmPmInput
-                style={{width: 64}}
-                value={this.state.time.amPm}
-                onChange={this.onChange.bind(this, 'amPm')}
-            />
+            <AmPmInput style={{width: 64}} value={this.state.time.amPm} onChange={this.onChange.bind(this, 'amPm')} />
         );
 
         return (
