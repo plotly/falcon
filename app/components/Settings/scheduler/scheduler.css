@@ -41,6 +41,7 @@
 /* fix horizontal overflow issues */
 .scheduler-table .react-grid-Cell {
   box-sizing: border-box;
+  border-right: none;
 }
 
 .scheduler-table .react-grid-Row {
