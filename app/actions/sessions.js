@@ -200,10 +200,12 @@ export function updateScheduledQuery(connectionId, payload = {}) {
       payload.filename,
       body
     )).then((res) => {
-      dispatch({
+      if (!res.error) {
+        dispatch({
           type: 'UPDATE_SCHEDULED_QUERY',
           payload: body
-      });
+        });
+      }
       return res;
     });
   };
