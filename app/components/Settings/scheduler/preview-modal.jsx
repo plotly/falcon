@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {Controlled as CodeMirror} from 'react-codemirror2';
 import ms from 'ms';
@@ -13,7 +13,12 @@ import CronPicker from '../cron-picker/cron-picker.jsx';
 import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
 import {plotlyUrl} from '../../../utils/utils.js';
-import {getHighlightMode, DEFAULT_REFRESH_INTERVAL, WAITING_MESSAGE} from '../../../constants/constants.js';
+import {
+    getHighlightMode,
+    DEFAULT_REFRESH_INTERVAL,
+    WAITING_MESSAGE,
+    SAVE_WARNING
+} from '../../../constants/constants.js';
 import {getInitialCronMode} from '../cron-picker/cron-helpers.js';
 
 const NO_OP = () => {};
@@ -59,6 +64,7 @@ export class PreviewModal extends Component {
         this.onSubmit = this.onSubmit.bind(this);
         this.onDelete = this.onDelete.bind(this);
         this.close = this.close.bind(this);
+        this.renderButtonRow = this.renderButtonRow.bind(this);
         this.handleIntervalChange = this.handleIntervalChange.bind(this);
     }
 
@@ -115,6 +121,53 @@ export class PreviewModal extends Component {
         this.props.onClickAway();
     }
 
+    renderButtonRow() {
+        const {loading, editing} = this.state;
+        const canEdit = this.props.currentRequestor && this.props.currentRequestor === this.props.query.requestor;
+        const success = this.state.successMessage;
+
+        if (!canEdit) {
+            return (
+                <button style={{margin: 0}} onClick={this.props.onLogin}>
+                    Log in to edit query
+                </button>
+            );
+        }
+
+        if (success) {
+            return <SuccessMessage>{this.state.successMessage}</SuccessMessage>;
+        }
+
+        if (editing) {
+            return (
+                <Column>
+                    <button style={{margin: 0}} onClick={this.onSubmit}>
+                        {loading ? 'Saving...' : 'Save'}
+                    </button>
+                    <div style={{fontSize: 12, margin: '16px 0px 0px', opacity: 0.7}}>{SAVE_WARNING}</div>
+                </Column>
+            );
+        }
+
+        return (
+            <Fragment>
+                <button style={{margin: 0}} onClick={this.onSubmit}>
+                    Edit
+                </button>
+                <button
+                    style={{
+                        margin: 0,
+                        border: 'none',
+                        background: 'red'
+                    }}
+                    onClick={this.onDelete}
+                >
+                    {this.state.confirmedDelete ? 'Click to confirm' : 'Delete'}
+                </button>
+            </Fragment>
+        );
+    }
+
     render() {
         const props = this.props;
 
@@ -128,8 +181,6 @@ export class PreviewModal extends Component {
 
             const initialModeId = getInitialCronMode(props.query);
 
-            const canEdit = this.props.currentRequestor && this.props.currentRequestor === props.query.requestor;
-            const success = this.state.successMessage;
             content = (
                 <Column style={{width: '60%', minWidth: 640, background: 'white'}}>
                     <Row
@@ -179,7 +230,7 @@ export class PreviewModal extends Component {
                             </div>
                         </Row>
                         <Row style={rowStyle}>
-                            <div style={keyStyle}>Frequency</div>
+                            <div style={keyStyle}>Interval</div>
                             {editing ? (
                                 <div style={{width: '65%', minHeight: '108px'}}>
                                     <CronPicker onChange={this.handleIntervalChange} initialModeId={initialModeId} />
@@ -228,33 +279,7 @@ export class PreviewModal extends Component {
                                 paddingBottom: 0
                             }}
                         >
-                            {!success &&
-                                !canEdit && (
-                                    <button style={{margin: 0}} onClick={this.props.onLogin}>
-                                        Log in to edit query
-                                    </button>
-                                )}
-                            {!success &&
-                                canEdit && (
-                                    <button style={{margin: 0}} onClick={this.onSubmit}>
-                                        {loading ? 'Saving...' : editing ? 'Save' : 'Edit'}
-                                    </button>
-                                )}
-                            {!success &&
-                                canEdit &&
-                                !editing && (
-                                    <button
-                                        style={{
-                                            margin: 0,
-                                            border: 'none',
-                                            background: 'red'
-                                        }}
-                                        onClick={this.onDelete}
-                                    >
-                                        {this.state.confirmedDelete ? 'Click to confirm' : 'Delete'}
-                                    </button>
-                                )}
-                            {success && <SuccessMessage>{this.state.successMessage}</SuccessMessage>}
+                            {this.renderButtonRow()}
                         </Row>
                     </Column>
                 </Column>
