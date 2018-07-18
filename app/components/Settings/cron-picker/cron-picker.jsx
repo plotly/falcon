@@ -40,6 +40,12 @@ export default class CronPicker extends React.Component {
             currentModeId: props.initialModeId
         };
 
+        // if possible, immediately emit default expression
+        const initialMode = this.getModeById(props.initialModeId);
+        if (initialMode.staticCronExpression) {
+            props.onChange(initialMode.staticCronExpression);
+        }
+
         this.onModeChange = this.onModeChange.bind(this);
     }
 

@@ -54,7 +54,7 @@ class CreateModal extends Component {
             successMessage: null,
             code: props.initialCode,
             filename: props.initialFilename,
-            interval: '* * * * *',
+            interval: '*/5 * * * *',
             error: null,
             saving: false
         };
