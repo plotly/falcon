@@ -1,21 +1,20 @@
 const MAX_CRON_MINUTE = 59;
 
-const ONE_MINUTE = 60;
-const FIVE_MINUTES = 300;
-const ONE_HOUR = 3600;
-const ONE_DAY = 86400;
-
 export function mapRefreshToCron (refreshInterval) {
     const now = new Date();
 
     // try to intelligently select interval
-    if (refreshInterval <= ONE_MINUTE) {
+    if (refreshInterval <= (60 * (1 + 5)) / 2) {
+        // case: refreshInterval is closer to 1 minute than to 5 minutes
         return '* * * * *';
-    } else if (refreshInterval <= FIVE_MINUTES) {
+    } else if (refreshInterval <= (60 * (5 + 60)) / 2) {
+        // case: refreshInterval is closer to 5 minutes than to 1 hour
         return `${now.getSeconds()} ${computeMinutes(now)} * * * *`;
-    } else if (refreshInterval <= ONE_HOUR) {
+    } else if (refreshInterval <= (60 * 60 * (1 + 24)) / 2) {
+        // case: refreshInterval is closer to 1 hour than to 1 day
         return `${now.getMinutes()} * * * *`;
-    } else if (refreshInterval <= ONE_DAY) {
+    } else if (refreshInterval <= (24 * 60 * 60 * (1 + 7)) / 2) {
+        // case: refreshInterval is closer to 1 day than to 1 week
         return `${now.getMinutes()} ${now.getHours()} * * *`;
     }
 

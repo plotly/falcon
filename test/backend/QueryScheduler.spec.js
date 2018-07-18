@@ -219,7 +219,7 @@ describe('QueryScheduler', function() {
         checkCase(86400, 'refreshInterval of 86400 should run one day later');
         checkCase(604800, 'refreshInterval of 604800 should run one week later');
 
-        clock.reset();
+        clock.restore();
     });
 
     it('overwrites interval functions', function () {
@@ -337,7 +337,7 @@ describe('QueryScheduler', function() {
             queryObject = {
                 fid,
                 uids,
-                refreshInterval: null,
+                refreshInterval,
                 cronInterval,
                 connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2',
