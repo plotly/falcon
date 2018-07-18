@@ -347,7 +347,7 @@ describe('Routes:', () => {
             .then(getResponseJson).then(json => {
                 assert.deepEqual(
                     json,
-                    {error: {message: 'syntax error at or near "SELECZ"'}}
+                    {error: {message: 'QueryExecutionError: syntax error at or near "SELECZ"'}}
                 );
             });
         });
