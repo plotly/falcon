@@ -270,15 +270,15 @@ class Scheduler extends Component {
                         </Row>
                     </Column>
                 </Row>
-                <Row className="scheduler-table" style={{padding: '0 16px 16px', width: 'auto'}}>
-                    <ReactDataGrid
-                        onRowClick={this.openPreview}
-                        columns={this.columns}
-                        rowGetter={this.rowGetter}
-                        rowsCount={rows.length}
-                        rowHeight={84}
-                        headerRowHeight={32}
-                    />
+                <Row className="scheduler-table" style={{margin: '0 16px 16px', width: 'auto'}}>
+                  <ReactDataGrid
+                      onRowClick={this.openPreview}
+                      columns={this.columns}
+                      rowGetter={this.rowGetter}
+                      rowsCount={rows.length}
+                      rowHeight={84}
+                      headerRowHeight={32}
+                  />
                 </Row>
 
                 <CreateModal
