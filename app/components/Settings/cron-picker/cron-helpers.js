@@ -30,17 +30,29 @@ export function getInitialCronMode(query) {
             return 'MONTHLY';
         }
     } else if (refreshInterval) {
+        // case: refreshInterval is closer to 1 minute than to 5 minutes
         if (refreshInterval <= (60 * (1 + 5)) / 2) {
             return 'MINUTE';
-        } else if (refreshInterval <= (60 * (5 + 60)) / 2) {
+        }
+        // case: refreshInterval is closer to 5 minutes than to 1 hour
+        else if (refreshInterval <= (60 * (5 + 60)) / 2) {
             return 'FREQUENTLY';
-        } else if (refreshInterval <= (60 * 60 * (1 + 24)) / 2) {
+        }
+        // case: refreshInterval is closer to 1 hour than to 1 day
+        else if (refreshInterval <= (60 * 60 * (1 + 24)) / 2) {
             return 'HOURLY';
-        } else if (refreshInterval <= (24 * 60 * 60 * (1 + 7)) / 2) {
+        }
+        // case: refreshInterval is closer to 1 day than to 1 week
+        else if (refreshInterval <= (24 * 60 * 60 * (1 + 7)) / 2) {
             return 'DAILY';
-        } else if (refreshInterval <= (24 * 60 * 60 * (7 + 30)) / 2) {
+        }
+        // case: refreshInterval is closer to 1 week than to 1 month
+        else if (refreshInterval <= (24 * 60 * 60 * (7 + 30)) / 2) {
             return 'WEEKLY';
-        } else if (refreshInterval < MAXIMUM_REFRESH_INTERVAL) {
+        }
+        // Values larger than MAXIMUM_REFRESH_INTERVAL are invalid, and setTimeout treats them as 0
+        // We don't want to run the queries so often, so FREQUENTLY is safer default.
+        else if (refreshInterval < MAXIMUM_REFRESH_INTERVAL) {
             return 'MONTHLY';
         }
     } else {

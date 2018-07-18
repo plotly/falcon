@@ -177,7 +177,7 @@ class Scheduler extends Component {
     }
 
     closeCreateModal() {
-        this.setState({createModalOpen: false, successMessage: null});
+        this.setState({createModalOpen: false});
     }
 
     createQuery(queryConfig) {
