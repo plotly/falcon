@@ -23,6 +23,11 @@ import './create-modal.css';
 
 function noop() {}
 const rowStyleOverride = {justifyContent: 'flex-start'};
+const secondaryRowStyle = Object.assign({}, rowStyleOverride, {
+    marginTop: '8px',
+    borderTop: '1px solid #c8d4e3',
+    paddingTop: '18px'
+});
 
 function generateFilename() {
     let n = Math.floor(Math.random() * 1e8).toString();
@@ -39,8 +44,7 @@ function generateFilename() {
 class CreateModal extends Component {
     static propTypes = {
         initialCode: PropTypes.string,
-        // `initialFilename` currently unused but will be implemented once backend supports
-        initialFilename: PropTypes.string,
+        initialQueryName: PropTypes.string,
         onClickAway: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired,
         openQueryPage: PropTypes.func.isRequired,
@@ -49,7 +53,7 @@ class CreateModal extends Component {
     };
     static defaultProps = {
         initialCode: '',
-        initialFilename: '',
+        initialQueryName: '',
         onClickAway: noop,
         onSubmit: noop,
         openQueryPage: noop
@@ -60,7 +64,7 @@ class CreateModal extends Component {
         this.state = {
             successMessage: null,
             code: props.initialCode,
-            filename: props.initialFilename,
+            queryName: props.initialQueryName,
             interval: '*/5 * * * *',
             error: null,
             saving: false
@@ -74,7 +78,7 @@ class CreateModal extends Component {
         };
         this.updateCode = this.updateCode.bind(this);
         this.handleIntervalChange = this.handleIntervalChange.bind(this);
-        this.handleFilenameChange = this.handleFilenameChange.bind(this);
+        this.handleQueryNameChange = this.handleQueryNameChange.bind(this);
         this.submit = this.submit.bind(this);
     }
 
@@ -86,8 +90,8 @@ class CreateModal extends Component {
         this.setState({interval: newInterval});
     }
 
-    handleFilenameChange(e) {
-        this.setState({filename: e.target.value});
+    handleQueryNameChange(e) {
+        this.setState({queryName: e.target.value});
     }
 
     submit() {
@@ -96,11 +100,6 @@ class CreateModal extends Component {
                 error: 'Please enter the query to be scheduled above.'
             });
         }
-        // if (!this.state.filename) {
-        //     return this.setState({
-        //         error: 'Please enter a filename for your scheduled query.'
-        //     });
-        // }
         if (!this.state.interval) {
             return this.setState({error: 'Please select an interval above.'});
         }
@@ -111,7 +110,8 @@ class CreateModal extends Component {
                 query: this.state.code,
                 refreshInterval: DEFAULT_REFRESH_INTERVAL,
                 filename: generateFilename(),
-                cronInterval: this.state.interval
+                cronInterval: this.state.interval,
+                queryName: this.state.queryName
             })
             .then(() => {
                 this.setState({successMessage: 'Scheduled query saved successfully!', saving: false});
@@ -149,25 +149,17 @@ class CreateModal extends Component {
                                 )}
                             </div>
                         </Row>
-                        {/*
-                          <Row style={rowStyleOverride}>
-                              <div className="row-header">Filename</div>
-                              <div className="row-body">
-                                  <input
-                                      placeholder="Enter filename here..."
-                                      value={this.state.filename}
-                                      onChange={this.handleFilenameChange}
-                                  />
-                              </div>
-                          </Row>
-                        */}
-                        <Row
-                            style={Object.assign({}, rowStyleOverride, {
-                                marginTop: '8px',
-                                borderTop: '1px solid #c8d4e3',
-                                paddingTop: '24px'
-                            })}
-                        >
+                        <Row style={secondaryRowStyle}>
+                            <div className="row-header">Query name</div>
+                            <div className="row-body">
+                                <input
+                                    placeholder="Enter query name here..."
+                                    value={this.state.queryName}
+                                    onChange={this.handleQueryNameChange}
+                                />
+                            </div>
+                        </Row>
+                        <Row style={secondaryRowStyle}>
                             <div className="row-header" style={{paddingTop: 5}}>
                                 Schedule
                             </div>

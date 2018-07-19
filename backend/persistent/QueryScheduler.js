@@ -75,7 +75,7 @@ class QueryScheduler {
                 `(supplied ${refreshInterval})`
             ].join(' '));
         }
-        
+
         if (name && name.length > 150) {
             throw new Error('Invalid query name. Must be less than 150 characters.');
         }
