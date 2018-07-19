@@ -159,12 +159,13 @@ export function createScheduledQuery(connectionId, payload = {}) {
       'queries',
       'POST',
       'createScheduledQueryRequest',
-      payload.filename,
+      payload.fid,
       {
         requestor: payload.requestor,
         uids: payload.uids,
         fid: payload.fid,
         filename: payload.filename,
+        queryName: payload.queryName,
         refreshInterval: payload.refreshInterval,
         query: payload.query,
         cronInterval: payload.cronInterval,
@@ -187,6 +188,7 @@ export function updateScheduledQuery(connectionId, payload = {}) {
       uids: payload.uids,
       fid: payload.fid,
       filename: payload.filename,
+      queryName: payload.queryName,
       refreshInterval: payload.refreshInterval,
       query: payload.query,
       cronInterval: payload.cronInterval,
@@ -197,7 +199,7 @@ export function updateScheduledQuery(connectionId, payload = {}) {
       'queries',
       'POST',
       'createScheduledQueryRequest',
-      payload.filename,
+      payload.fid,
       body
     )).then((res) => {
       if (!res.error) {

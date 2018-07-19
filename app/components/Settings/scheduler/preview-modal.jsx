@@ -26,10 +26,11 @@ const NO_OP = () => {};
 const rowStyle = {
     justifyContent: 'flex-start',
     borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
-    padding: '16px 0px'
+    padding: '12px 0px'
 };
 const keyStyle = {boxSizing: 'border-box', width: '35%'};
 const valueStyle = {boxSizing: 'border-box', width: '65%'};
+const noMargin = {margin: 0};
 
 // implements a modal window to view details of a scheduled query
 export class PreviewModal extends Component {
@@ -57,6 +58,7 @@ export class PreviewModal extends Component {
             editing: false,
             code: props.query && props.query.query,
             cronInterval: props.query && props.query.cronInterval,
+            queryName: props.query && props.query.queryName,
             confirmedDelete: false,
             loading: false
         };
@@ -66,6 +68,7 @@ export class PreviewModal extends Component {
         this.close = this.close.bind(this);
         this.renderButtonRow = this.renderButtonRow.bind(this);
         this.handleIntervalChange = this.handleIntervalChange.bind(this);
+        this.handleQueryNameChange = this.handleQueryNameChange.bind(this);
     }
 
     updateCode(editor, meta, code) {
@@ -76,10 +79,14 @@ export class PreviewModal extends Component {
         this.setState({cronInterval: newInterval});
     }
 
+    handleQueryNameChange(e) {
+        this.setState({queryName: e.target.value});
+    }
+
     onSubmit() {
         if (this.state.editing) {
             const {connectionId, fid, requestor, uids, refreshInterval} = this.props.query;
-            const {code: query, cronInterval} = this.state;
+            const {code: query, cronInterval, queryName} = this.state;
             this.setState({loading: true, error: null});
             this.props
                 .onSave({
@@ -88,6 +95,7 @@ export class PreviewModal extends Component {
                     requestor,
                     uids,
                     query,
+                    queryName,
                     cronInterval,
                     refreshInterval: refreshInterval || DEFAULT_REFRESH_INTERVAL
                 })
@@ -127,7 +135,7 @@ export class PreviewModal extends Component {
 
         if (!canEdit) {
             return (
-                <button style={{margin: 0}} onClick={this.props.onLogin}>
+                <button style={noMargin} onClick={this.props.onLogin}>
                     Log in to edit query
                 </button>
             );
@@ -140,7 +148,7 @@ export class PreviewModal extends Component {
         if (editing) {
             return (
                 <Column>
-                    <button style={{margin: 0}} onClick={this.onSubmit}>
+                    <button style={noMargin} onClick={this.onSubmit}>
                         {loading ? 'Saving...' : 'Save'}
                     </button>
                     <div style={{fontSize: 12, margin: '16px 0px 0px', opacity: 0.7}}>{SAVE_WARNING}</div>
@@ -150,7 +158,7 @@ export class PreviewModal extends Component {
 
         return (
             <Fragment>
-                <button style={{margin: 0}} onClick={this.onSubmit}>
+                <button style={noMargin} onClick={this.onSubmit}>
                     Edit
                 </button>
                 <button
@@ -185,12 +193,12 @@ export class PreviewModal extends Component {
                     <Row
                         className="sql-preview"
                         style={{
-                            padding: '32px',
+                            padding: '16px 32px',
                             position: 'relative',
                             justifyContent: 'flex-start'
                         }}
                     >
-                        <h5 className="sql-preview" style={{margin: 0, letterSpacing: '1px'}}>
+                        <h5 className="sql-preview" style={{...noMargin, letterSpacing: '1px'}}>
                             <SQL className="bold">{this.state.code}</SQL>
                         </h5>
                         <button
@@ -205,7 +213,7 @@ export class PreviewModal extends Component {
                             &times;
                         </button>
                     </Row>
-                    <Column style={{background: '#F5F7FB', padding: '32px'}}>
+                    <Column style={{background: '#F5F7FB', padding: '16px 32px'}}>
                         <Row style={rowStyle}>
                             <div style={keyStyle}>Query</div>
                             <div className="sql-preview scheduler" style={valueStyle}>
@@ -228,6 +236,23 @@ export class PreviewModal extends Component {
                                 )}
                             </div>
                         </Row>
+                        {(this.state.queryName || editing) && (
+                            <Row style={rowStyle}>
+                                <div style={keyStyle}>Query Name</div>
+                                {editing ? (
+                                    <input
+                                        style={noMargin}
+                                        placeholder="Enter query name here..."
+                                        value={this.state.queryName}
+                                        onChange={this.handleQueryNameChange}
+                                    />
+                                ) : (
+                                    <em style={valueStyle}>
+                                        <b>{this.state.queryName}</b>
+                                    </em>
+                                )}
+                            </Row>
+                        )}
                         <Row style={rowStyle}>
                             <div style={keyStyle}>Schedule</div>
                             {editing ? (
