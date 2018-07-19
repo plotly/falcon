@@ -189,7 +189,7 @@ class CreateModal extends Component {
                         ) : (
                             <Column>
                                 <button type="submit" className="submit" onClick={this.submit}>
-                                    {this.state.saving ? 'Saving...' : 'Schedule Query'}
+                                    {this.state.saving ? 'Saving...' : 'Save'}
                                 </button>
                                 <div className="save-warning">{SAVE_WARNING}</div>
                             </Column>

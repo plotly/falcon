@@ -513,5 +513,5 @@ export function getHighlightMode(dialect) {
 export const WAITING_MESSAGE = 'This may take a long time. Your query is ' +
   'currently executing and must finish before it can be saved.';
 
-export const SAVE_WARNING = 'Note: when you click the button below, the query will ' +
+export const SAVE_WARNING = 'Note: when you save, the query will ' +
   'execute and update the dataset immediately. Thereafter it will do so at the requested interval.';
