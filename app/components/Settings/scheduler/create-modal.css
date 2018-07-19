@@ -62,3 +62,7 @@
 .create-modal .row-body {
     width: 80%;
 }
+
+.create-modal .row-body pre {
+    margin-top: 5px;
+}

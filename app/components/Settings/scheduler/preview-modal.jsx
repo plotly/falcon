@@ -98,7 +98,6 @@ export class PreviewModal extends Component {
                         editing: false,
                         confirmedDelete: false
                     });
-                    setTimeout(this.props.onClickAway, 2500);
                 })
                 .catch(error => this.setState({error: error.message, loading: false}));
         } else {

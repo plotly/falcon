@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
 import {Controlled as CodeMirror} from 'react-codemirror2';
+import cronstrue from 'cronstrue';
 
 import {Row, Column} from '../../layout.jsx';
 import Modal from '../../modal.jsx';
@@ -9,6 +10,7 @@ import SuccessMessage from '../../success.jsx';
 import RequestError from './request-error.jsx';
 import TimedMessage from './timed-message.jsx';
 import CronPicker from '../cron-picker/cron-picker.jsx';
+import SQL from './sql.jsx';
 
 import {
     getHighlightMode,
@@ -113,7 +115,6 @@ class CreateModal extends Component {
             })
             .then(() => {
                 this.setState({successMessage: 'Scheduled query saved successfully!', saving: false});
-                setTimeout(this.props.onClickAway, 2500);
             })
             .catch(error => this.setState({error: error.message, saving: false}));
     }
@@ -137,11 +138,15 @@ class CreateModal extends Component {
                         <Row style={rowStyleOverride}>
                             <div className="row-header">Query</div>
                             <div className="row-body">
-                                <CodeMirror
-                                    options={this.options}
-                                    value={this.state.code}
-                                    onBeforeChange={this.updateCode}
-                                />
+                                {this.state.successMessage ? (
+                                    <SQL>{this.state.code}</SQL>
+                                ) : (
+                                    <CodeMirror
+                                        options={this.options}
+                                        value={this.state.code}
+                                        onBeforeChange={this.updateCode}
+                                    />
+                                )}
                             </div>
                         </Row>
                         {/*
@@ -167,7 +172,13 @@ class CreateModal extends Component {
                                 Schedule
                             </div>
                             <div className="row-body" style={{minHeight: '108px'}}>
-                                <CronPicker onChange={this.handleIntervalChange} />
+                                {this.state.successMessage ? (
+                                    <em style={{marginTop: 5, display: 'inherit'}}>
+                                        <b>{cronstrue.toString(this.state.interval)}</b>
+                                    </em>
+                                ) : (
+                                    <CronPicker onChange={this.handleIntervalChange} />
+                                )}
                             </div>
                         </Row>
                         {this.state.error && (
