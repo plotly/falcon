@@ -63,6 +63,7 @@ class QueryScheduler {
         uids,
         refreshInterval = null,
         cronInterval = null,
+        name,
         query,
         connectionId
     }) {
@@ -73,6 +74,10 @@ class QueryScheduler {
                 `Refresh interval must be at least ${this.minimumRefreshInterval} seconds`,
                 `(supplied ${refreshInterval})`
             ].join(' '));
+        }
+        
+        if (name && name.length > 150) {
+            throw new Error('Invalid query name. Must be less than 150 characters.');
         }
 
         Logger.log(`Scheduling "${query}" with connection ${connectionId} updating grid ${fid}`);
@@ -94,6 +99,7 @@ class QueryScheduler {
             uids,
             refreshInterval,
             cronInterval,
+            name,
             query,
             connectionId
         });
