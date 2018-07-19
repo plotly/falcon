@@ -253,7 +253,9 @@ class Scheduler extends Component {
                 >
                     <Column style={{width: 300}}>
                         <Row>
-                            <Column style={{marginLeft: 8}}>{rows.length} queries</Column>
+                            <Column style={{marginLeft: 8}}>
+                                {rows.length} {rows.length === 1 ? ' query' : ' queries'}
+                            </Column>
                         </Row>
                     </Column>
                     <Column style={{width: 300}}>
