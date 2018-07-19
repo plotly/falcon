@@ -230,7 +230,7 @@ export class PreviewModal extends Component {
                             </div>
                         </Row>
                         <Row style={rowStyle}>
-                            <div style={keyStyle}>Interval</div>
+                            <div style={keyStyle}>Schedule</div>
                             {editing ? (
                                 <div style={{width: '65%', minHeight: '108px'}}>
                                     <CronPicker onChange={this.handleIntervalChange} initialModeId={initialModeId} />

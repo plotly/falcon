@@ -132,7 +132,7 @@ describe('Create Modal Test', () => {
             <CreateModal open={true} initialCode="SELECT * FROM foods" initialFilename="filename" onSubmit={onSubmit} />
         );
 
-        expect(component.state('interval')).toBe('* * * * *');
+        expect(component.state('interval')).toBe('*/5 * * * *');
 
         component
             .find(CronPicker)

@@ -164,7 +164,7 @@ class CreateModal extends Component {
                             })}
                         >
                             <div className="row-header" style={{paddingTop: 5}}>
-                                Interval
+                                Schedule
                             </div>
                             <div className="row-body" style={{minHeight: '108px'}}>
                                 <CronPicker onChange={this.handleIntervalChange} />
