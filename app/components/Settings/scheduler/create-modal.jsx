@@ -153,6 +153,7 @@ class CreateModal extends Component {
                             <div className="row-header">Query name</div>
                             <div className="row-body">
                                 <input
+                                    maxLength="150"
                                     placeholder="Enter query name here..."
                                     value={this.state.name}
                                     onChange={this.handleNameChange}
