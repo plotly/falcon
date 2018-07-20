@@ -44,7 +44,7 @@ function generateFilename() {
 class CreateModal extends Component {
     static propTypes = {
         initialCode: PropTypes.string,
-        initialQueryName: PropTypes.string,
+        initialName: PropTypes.string,
         onClickAway: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired,
         openQueryPage: PropTypes.func.isRequired,
@@ -53,7 +53,7 @@ class CreateModal extends Component {
     };
     static defaultProps = {
         initialCode: '',
-        initialQueryName: '',
+        initialName: '',
         onClickAway: noop,
         onSubmit: noop,
         openQueryPage: noop
@@ -64,7 +64,7 @@ class CreateModal extends Component {
         this.state = {
             successMessage: null,
             code: props.initialCode,
-            queryName: props.initialQueryName,
+            name: props.initialName,
             interval: '*/5 * * * *',
             error: null,
             saving: false
@@ -78,7 +78,7 @@ class CreateModal extends Component {
         };
         this.updateCode = this.updateCode.bind(this);
         this.handleIntervalChange = this.handleIntervalChange.bind(this);
-        this.handleQueryNameChange = this.handleQueryNameChange.bind(this);
+        this.handleNameChange = this.handleNameChange.bind(this);
         this.submit = this.submit.bind(this);
     }
 
@@ -90,8 +90,8 @@ class CreateModal extends Component {
         this.setState({interval: newInterval});
     }
 
-    handleQueryNameChange(e) {
-        this.setState({queryName: e.target.value});
+    handleNameChange(e) {
+        this.setState({name: e.target.value});
     }
 
     submit() {
@@ -111,7 +111,7 @@ class CreateModal extends Component {
                 refreshInterval: DEFAULT_REFRESH_INTERVAL,
                 filename: generateFilename(),
                 cronInterval: this.state.interval,
-                queryName: this.state.queryName
+                name: this.state.name
             })
             .then(() => {
                 this.setState({successMessage: 'Scheduled query saved successfully!', saving: false});
@@ -154,8 +154,8 @@ class CreateModal extends Component {
                             <div className="row-body">
                                 <input
                                     placeholder="Enter query name here..."
-                                    value={this.state.queryName}
-                                    onChange={this.handleQueryNameChange}
+                                    value={this.state.name}
+                                    onChange={this.handleNameChange}
                                 />
                             </div>
                         </Row>

@@ -58,7 +58,7 @@ export class PreviewModal extends Component {
             editing: false,
             code: props.query && props.query.query,
             cronInterval: props.query && props.query.cronInterval,
-            queryName: props.query && props.query.queryName,
+            name: props.query && props.query.name,
             confirmedDelete: false,
             loading: false
         };
@@ -68,7 +68,7 @@ export class PreviewModal extends Component {
         this.close = this.close.bind(this);
         this.renderButtonRow = this.renderButtonRow.bind(this);
         this.handleIntervalChange = this.handleIntervalChange.bind(this);
-        this.handleQueryNameChange = this.handleQueryNameChange.bind(this);
+        this.handleNameChange = this.handleNameChange.bind(this);
     }
 
     updateCode(editor, meta, code) {
@@ -79,14 +79,14 @@ export class PreviewModal extends Component {
         this.setState({cronInterval: newInterval});
     }
 
-    handleQueryNameChange(e) {
-        this.setState({queryName: e.target.value});
+    handleNameChange(e) {
+        this.setState({name: e.target.value});
     }
 
     onSubmit() {
         if (this.state.editing) {
             const {connectionId, fid, requestor, uids, refreshInterval} = this.props.query;
-            const {code: query, cronInterval, queryName} = this.state;
+            const {code: query, cronInterval, name} = this.state;
             this.setState({loading: true, error: null});
             this.props
                 .onSave({
@@ -95,7 +95,7 @@ export class PreviewModal extends Component {
                     requestor,
                     uids,
                     query,
-                    queryName,
+                    name,
                     cronInterval,
                     refreshInterval: refreshInterval || DEFAULT_REFRESH_INTERVAL
                 })
@@ -199,7 +199,7 @@ export class PreviewModal extends Component {
                         }}
                     >
                         <h5 className="sql-preview" style={{...noMargin, letterSpacing: '1px'}}>
-                            <SQL className="bold">{this.state.code}</SQL>
+                            {this.state.name ? <b>{this.state.name}</b> : <SQL className="bold">{this.state.code}</SQL>}
                         </h5>
                         <button
                             onClick={this.close}
@@ -236,19 +236,19 @@ export class PreviewModal extends Component {
                                 )}
                             </div>
                         </Row>
-                        {(this.state.queryName || editing) && (
+                        {(this.state.name || editing) && (
                             <Row style={rowStyle}>
                                 <div style={keyStyle}>Query Name</div>
                                 {editing ? (
                                     <input
                                         style={noMargin}
                                         placeholder="Enter query name here..."
-                                        value={this.state.queryName}
-                                        onChange={this.handleQueryNameChange}
+                                        value={this.state.name}
+                                        onChange={this.handleNameChange}
                                     />
                                 ) : (
                                     <em style={valueStyle}>
-                                        <b>{this.state.queryName}</b>
+                                        <b>{this.state.name}</b>
                                     </em>
                                 )}
                             </Row>

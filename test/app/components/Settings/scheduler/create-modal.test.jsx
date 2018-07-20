@@ -41,14 +41,9 @@ describe('Create Modal Test', () => {
         expect(component.find(CodeMirror).get(0).props.value).toBe('');
     });
 
-    it('should allow you to pass initialCode, dialect and initialQueryName', () => {
+    it('should allow you to pass initialCode, dialect and initialName', () => {
         const component = mount(
-            <CreateModal
-                open={true}
-                initialCode="SELECT * FROM foods"
-                initialQueryName="queryname"
-                dialect="postgres"
-            />
+            <CreateModal open={true} initialCode="SELECT * FROM foods" initialName="queryname" dialect="postgres" />
         );
         expect(component.find(CodeMirror).get(0).props.value).toBe('SELECT * FROM foods');
         expect(component.find(CodeMirror).get(0).props.options.mode).toBe('text/x-pgsql');
@@ -64,7 +59,7 @@ describe('Create Modal Test', () => {
             <CreateModal
                 open={true}
                 initialCode="SELECT * FROM foods"
-                initialQueryName="query name"
+                initialName="query name"
                 onClickAway={onClickAway}
             />
         );
@@ -76,11 +71,9 @@ describe('Create Modal Test', () => {
     });
 
     it('clicking set error state if not all criteria, otherwise call onSubmit', () => {
-        const queryName = 'queryname';
+        const name = 'queryname';
         const onSubmit = jest.fn(() => Promise.resolve());
-        const component = mount(
-            <CreateModal open={true} initialCode="" initialQueryName={queryName} onSubmit={onSubmit} />
-        );
+        const component = mount(<CreateModal open={true} initialCode="" initialName={name} onSubmit={onSubmit} />);
         component
             .find('button')
             .at(1)
@@ -110,19 +103,14 @@ describe('Create Modal Test', () => {
             query: 'SELECT * FROM foods',
             refreshInterval: DEFAULT_REFRESH_INTERVAL,
             cronInterval,
-            queryName
+            name
         });
     });
 
     it('should display backend error to user on failures', async () => {
         const onSubmit = jest.fn(() => Promise.reject(new Error('Oops')));
         const component = mount(
-            <CreateModal
-                open={true}
-                initialCode="SELECT * FROM foods"
-                initialQueryName="queryname"
-                onSubmit={onSubmit}
-            />
+            <CreateModal open={true} initialCode="SELECT * FROM foods" initialName="queryname" onSubmit={onSubmit} />
         );
 
         component
@@ -140,12 +128,7 @@ describe('Create Modal Test', () => {
     it('changing Cron picker should update create modal state', () => {
         const onSubmit = jest.fn(() => Promise.reject(new Error('Oops')));
         const component = mount(
-            <CreateModal
-                open={true}
-                initialCode="SELECT * FROM foods"
-                initialQueryName="queryname"
-                onSubmit={onSubmit}
-            />
+            <CreateModal open={true} initialCode="SELECT * FROM foods" initialName="queryname" onSubmit={onSubmit} />
         );
 
         expect(component.state('interval')).toBe('*/5 * * * *');

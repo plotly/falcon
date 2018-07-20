@@ -35,7 +35,7 @@ class QueryFormatter extends React.Component {
         return (
             <Row>
                 <Column style={{paddingRight: '24px', fontSize: 15}}>
-                    <SQL>{query.query}</SQL>
+                    {query.name ? <span style={{fontSize: 16}}>{query.name}</span> : <SQL>{query.query}</SQL>}
                 </Column>
             </Row>
         );
