@@ -241,6 +241,7 @@ export class PreviewModal extends Component {
                                 <div style={keyStyle}>Query Name</div>
                                 {editing ? (
                                     <input
+                                        maxLength="150"
                                         style={noMargin}
                                         placeholder="Enter query name here..."
                                         value={this.state.name}
