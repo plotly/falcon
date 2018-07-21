@@ -122,7 +122,7 @@ class CreateModal extends Component {
     render() {
         return (
             <Modal open={this.props.open} onClickAway={this.props.onClickAway} className="scheduler create-modal">
-                <Column className="container " style={{width: '60%', minWidth: 640}}>
+                <Column className="container" style={{width: '60%', maxHeight: '100vh', minWidth: 640}}>
                     <Row>
                         <Column className="innerColumn">
                             <h5 className="header">Create Scheduled Query</h5>

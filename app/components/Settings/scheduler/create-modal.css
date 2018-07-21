@@ -31,12 +31,13 @@
 .create-modal .submit {
     width: auto;
     margin: 24px 32px 16px;
+    min-height: 28px;
 }
 
 .create-modal .save-warning {
-  font-size: 12px;
-  margin: 0 32px 32px;
-  opacity: 0.7;
+    font-size: 12px;
+    margin: 0 32px 16px;
+    opacity: 0.7;
 }
 
 .create-modal .row {

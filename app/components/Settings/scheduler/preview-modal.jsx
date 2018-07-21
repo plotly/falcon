@@ -32,6 +32,17 @@ const keyStyle = {boxSizing: 'border-box', width: '35%'};
 const valueStyle = {boxSizing: 'border-box', width: '65%'};
 const noMargin = {margin: 0};
 
+const formatTitleText = s => {
+    const rows = s.split('\n');
+    if (rows.length > 3) {
+        return rows
+            .slice(0, 3)
+            .concat('...')
+            .join('\n');
+    }
+    return s;
+};
+
 // implements a modal window to view details of a scheduled query
 export class PreviewModal extends Component {
     static defaultProps = {
@@ -189,7 +200,7 @@ export class PreviewModal extends Component {
             const initialModeId = getInitialCronMode(props.query);
 
             content = (
-                <Column style={{width: '60%', minWidth: 640, background: 'white'}}>
+                <Column style={{width: '60%', maxHeight: '100vh', minWidth: 640, background: 'white'}}>
                     <Row
                         className="sql-preview"
                         style={{
@@ -199,7 +210,11 @@ export class PreviewModal extends Component {
                         }}
                     >
                         <h5 className="sql-preview" style={{...noMargin, letterSpacing: '1px'}}>
-                            {this.state.name ? <b>{this.state.name}</b> : <SQL className="bold">{this.state.code}</SQL>}
+                            {this.state.name ? (
+                                <b>{this.state.name}</b>
+                            ) : (
+                                <SQL className="bold">{formatTitleText(this.state.code)}</SQL>
+                            )}
                         </h5>
                         <button
                             onClick={this.close}
@@ -216,7 +231,7 @@ export class PreviewModal extends Component {
                     <Column style={{background: '#F5F7FB', padding: '16px 32px'}}>
                         <Row style={rowStyle}>
                             <div style={keyStyle}>Query</div>
-                            <div className="sql-preview scheduler" style={valueStyle}>
+                            <div className="sql-preview scheduler" style={{...valueStyle, overflowY: 'auto'}}>
                                 {editing ? (
                                     <div>
                                         <CodeMirror
