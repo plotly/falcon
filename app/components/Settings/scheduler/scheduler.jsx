@@ -19,6 +19,8 @@ import './scheduler.css';
 
 const NO_OP = () => {};
 
+const ROW_HEIGHT = 84;
+
 class QueryFormatter extends React.Component {
     static propTypes = {
         /*
@@ -34,8 +36,17 @@ class QueryFormatter extends React.Component {
         const query = this.props.value;
         return (
             <Row>
-                <Column style={{paddingRight: '24px', fontSize: 15}}>
-                    {query.name ? <span style={{fontSize: 16}}>{query.name}</span> : <SQL>{query.query}</SQL>}
+                <Column
+                    className="query-column"
+                    style={{maxHeight: ROW_HEIGHT, padding: 8, paddingRight: '24px', fontSize: 15}}
+                >
+                    {query.name ? (
+                        <span className="ellipsis" style={{fontSize: 16}}>
+                            {query.name}
+                        </span>
+                    ) : (
+                        <SQL>{query.query}</SQL>
+                    )}
                 </Column>
             </Row>
         );
@@ -278,7 +289,7 @@ class Scheduler extends Component {
                         columns={this.columns}
                         rowGetter={this.rowGetter}
                         rowsCount={rows.length}
-                        rowHeight={84}
+                        rowHeight={ROW_HEIGHT}
                         headerRowHeight={32}
                     />
                 </Row>
