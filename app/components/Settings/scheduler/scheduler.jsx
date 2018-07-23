@@ -166,7 +166,7 @@ class Scheduler extends Component {
     getRows() {
         return mapRows(
             matchSorter(this.props.queries, this.state.search, {
-                keys: ['query']
+                keys: ['query', 'name']
             })
         );
     }
