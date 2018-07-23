@@ -10,6 +10,40 @@ export function mapHourToCronFormat(hour, amPm) {
     return hour;
 }
 
+export function mapCronToHourFormat(cronExpression) {
+    if (!cronExpression) {
+        return null;
+    }
+
+    const cronParts = cronExpression.split(' ');
+
+    if (cronParts.length < 5) {
+        return null;
+    }
+
+    if (cronParts.length === 6) {
+        // disregard seconds component
+        cronParts.shift();
+    }
+    const [cronMinute, cronHour, cronDayOfMonth, cronMonth, cronDaysOfWeek] = cronParts;
+
+    const time = {};
+    time.minute = cronMinute.includes('*') ? 0 : Number(cronMinute);
+    time.date = cronDayOfMonth.includes('*') ? 1 : Number(cronDayOfMonth);
+    time.month = cronMonth.includes('*') ? 1 : Number(cronMonth);
+    time.days = cronDaysOfWeek.includes('*') ? ['MON'] : cronDaysOfWeek.split(',');
+
+    if (cronHour.includes('*') && Number(cronHour) > 12) {
+        time.hour = Number(cronHour) - 12;
+        time.amPm = 'PM';
+    } else {
+        time.hour = cronHour.includes('*') || Number(cronHour) === 0 ? 12 : Number(cronHour);
+        time.amPm = 'AM';
+    }
+
+    return time;
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout#Maximum_delay_value
 const MAXIMUM_REFRESH_INTERVAL = 2147483647 / 1000;
 export function getInitialCronMode(query) {

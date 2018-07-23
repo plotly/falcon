@@ -4,6 +4,7 @@ import Select from 'react-select';
 import {find, propEq} from 'ramda';
 
 import MODES from './modes';
+import {mapCronToHourFormat} from './cron-helpers.js';
 
 import './cron-picker.css';
 
@@ -29,6 +30,7 @@ export default class CronPicker extends React.Component {
     };
 
     static propTypes = {
+        initialCronExpression: PropTypes.string,
         initialModeId: PropTypes.string,
         onChange: PropTypes.func.isRequired
     };
@@ -65,7 +67,7 @@ export default class CronPicker extends React.Component {
 
     render() {
         const ModeComponent = this.getModeById(this.state.currentModeId).component;
-
+        const initialTime = mapCronToHourFormat(this.props.initialCronExpression);
         return (
             <React.Fragment>
                 <Row style={rowStyle}>
@@ -80,7 +82,10 @@ export default class CronPicker extends React.Component {
                         />
                     </div>
                 </Row>
-                {ModeComponent ? <ModeComponent onChange={this.props.onChange} /> : null}
+                {ModeComponent ? (
+                    // eslint-disable-next-line
+                    <ModeComponent initialTime={initialTime || undefined} onChange={this.props.onChange} />
+                ) : null}
             </React.Fragment>
         );
     }
