@@ -29,6 +29,10 @@
     font-weight: bold;
 }
 
+.scheduler pre {
+    white-space: pre-wrap;
+}
+
 /* custom ReactDataGrid styles for scheduled queries table */
 .scheduler-table .react-grid-Row--odd .react-grid-Cell {
     background: #fff;
@@ -62,11 +66,13 @@
     width: 100%;
 }
 
-.sql-preview pre {
-    white-space: pre-wrap;
+.ellipsis {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
-.ellipsis {
+.ellipsis pre {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;

@@ -37,7 +37,7 @@ class QueryFormatter extends React.Component {
         return (
             <Row>
                 <Column
-                    className="query-column"
+                    className="ellipsis"
                     style={{maxHeight: ROW_HEIGHT, padding: 8, paddingRight: '24px', fontSize: 15}}
                 >
                     {query.name ? (

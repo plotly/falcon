@@ -32,17 +32,6 @@ const keyStyle = {boxSizing: 'border-box', width: '35%'};
 const valueStyle = {boxSizing: 'border-box', width: '65%'};
 const noMargin = {margin: 0};
 
-const formatTitleText = s => {
-    const rows = s.split('\n');
-    if (rows.length > 3) {
-        return rows
-            .slice(0, 3)
-            .concat('...')
-            .join('\n');
-    }
-    return s;
-};
-
 // implements a modal window to view details of a scheduled query
 export class PreviewModal extends Component {
     static defaultProps = {
@@ -209,12 +198,8 @@ export class PreviewModal extends Component {
                             justifyContent: 'flex-start'
                         }}
                     >
-                        <h5 className="sql-preview" style={{...noMargin, letterSpacing: '1px'}}>
-                            {this.state.name ? (
-                                <b>{this.state.name}</b>
-                            ) : (
-                                <SQL className="bold">{formatTitleText(this.state.code)}</SQL>
-                            )}
+                        <h5 className="sql-preview ellipsis" style={{...noMargin, letterSpacing: '1px'}}>
+                            {this.state.name ? <b>{this.state.name}</b> : <SQL className="bold">{this.state.code}</SQL>}
                         </h5>
                         <button
                             onClick={this.close}
@@ -247,7 +232,7 @@ export class PreviewModal extends Component {
                                         />
                                     </div>
                                 ) : (
-                                    <SQL>{this.state.code}</SQL>
+                                    <SQL className="default wrap">{this.state.code}</SQL>
                                 )}
                             </div>
                         </Row>
