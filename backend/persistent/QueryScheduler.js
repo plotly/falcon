@@ -93,16 +93,23 @@ class QueryScheduler {
         }
 
         // Save query to a file
-        saveQuery({
+        const queryParams = {
             requestor,
             fid,
             uids,
             refreshInterval,
             cronInterval,
-            name,
             query,
             connectionId
-        });
+        };
+
+        // explicitly omit name unless truthy to prevent 'yamljs' from
+        // coerecing an undefined key into null
+        if (name) {
+            queryParams.name = name;
+        }
+
+        saveQuery(queryParams);
 
         // Schedule
         const job = () => this.job(fid, uids, query, connectionId, requestor);
