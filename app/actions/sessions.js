@@ -159,7 +159,7 @@ export function createScheduledQuery(connectionId, payload = {}) {
       'queries',
       'POST',
       'createScheduledQueryRequest',
-      payload.fid,
+      payload.filename,
       {
         requestor: payload.requestor,
         uids: payload.uids,
@@ -199,7 +199,7 @@ export function updateScheduledQuery(connectionId, payload = {}) {
       'queries',
       'POST',
       'createScheduledQueryRequest',
-      payload.fid,
+      payload.filename,
       body
     )).then((res) => {
       if (!res.error) {
