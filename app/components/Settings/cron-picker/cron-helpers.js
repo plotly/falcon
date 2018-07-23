@@ -1,3 +1,5 @@
+import cronstrue from 'cronstrue';
+
 export function mapHourToCronFormat(hour, amPm) {
     if (hour === 12) {
         if (amPm === 'AM') {
@@ -11,16 +13,13 @@ export function mapHourToCronFormat(hour, amPm) {
 }
 
 export function mapCronToHourFormat(cronExpression) {
-    if (!cronExpression) {
+    try {
+        cronstrue.toString(cronExpression);
+    } catch (_) {
         return null;
     }
 
     const cronParts = cronExpression.split(' ');
-
-    if (cronParts.length < 5) {
-        return null;
-    }
-
     if (cronParts.length === 6) {
         // disregard seconds component
         cronParts.shift();
