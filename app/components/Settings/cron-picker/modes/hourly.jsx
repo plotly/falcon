@@ -10,11 +10,13 @@ const name = 'Run every hour';
 
 class component extends React.Component {
     static defaultProps = {
-        initialMinute: 0
+        initialTime: {
+            minute: 0
+        }
     };
 
     static propTypes = {
-        initialMinute: PropTypes.object,
+        initialTime: PropTypes.object,
         onChange: PropTypes.func.isRequired
     };
 
@@ -22,10 +24,10 @@ class component extends React.Component {
         super(props);
 
         this.state = {
-            minute: props.initialMinute
+            time: props.initialTime
         };
 
-        props.onChange(this.toCronExpression(props.initialMinute));
+        props.onChange(this.toCronExpression(props.initialTime.minute));
 
         this.onChange = this.onChange.bind(this);
     }
@@ -36,7 +38,7 @@ class component extends React.Component {
 
     onChange(minuteOption) {
         const newMinute = minuteOption.value;
-        this.setState({minute: newMinute});
+        this.setState({time: {minute: newMinute}});
         this.props.onChange(this.toCronExpression(newMinute));
     }
 
@@ -44,7 +46,7 @@ class component extends React.Component {
         return (
             <DetailsRow>
                 at minute
-                <MinuteInput style={{marginLeft: '8px'}} value={this.state.minute} onChange={this.onChange} />
+                <MinuteInput style={{marginLeft: '8px'}} value={this.state.time.minute} onChange={this.onChange} />
             </DetailsRow>
         );
     }

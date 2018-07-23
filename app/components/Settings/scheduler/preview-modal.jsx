@@ -258,7 +258,11 @@ export class PreviewModal extends Component {
                             <div style={keyStyle}>Schedule</div>
                             {editing ? (
                                 <div style={{width: '65%', minHeight: '108px'}}>
-                                    <CronPicker onChange={this.handleIntervalChange} initialModeId={initialModeId} />
+                                    <CronPicker
+                                        onChange={this.handleIntervalChange}
+                                        initialModeId={initialModeId}
+                                        initialCronExpression={this.state.cronInterval}
+                                    />
                                 </div>
                             ) : (
                                 <em style={valueStyle}>
