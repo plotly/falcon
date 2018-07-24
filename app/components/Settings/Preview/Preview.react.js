@@ -428,8 +428,8 @@ class Preview extends Component {
                                         style={{userSelect: 'none'}}
                                     >
                                         <Tab>Table</Tab>
-                                        <Tab>Chart</Tab>
-                                        <Tab>Export</Tab>
+                                        {!isOnPrem() && <Tab>Chart</Tab>}
+                                        {!isOnPrem() && <Tab>Export</Tab>}
                                     </TabList>
 
                                     <TabPanel
@@ -441,6 +441,7 @@ class Preview extends Component {
                                         />
                                     </TabPanel>
 
+                                    {!isOnPrem() &&
                                     <TabPanel>
                                         <ChartEditor
                                             ref="chartEditor"
@@ -453,8 +454,9 @@ class Preview extends Component {
 
                                             hidden={!showChart}
                                         />
-                                    </TabPanel>
+                                    </TabPanel>}
 
+                                    {!isOnPrem() &&
                                     <TabPanel>
                                         <div className="export-options-container" style={{ marginTop: 20 }}>
                                             <div className="container-title">CHART STUDIO</div>
@@ -477,7 +479,6 @@ class Preview extends Component {
                                             </div>
                                             <div className="container-title">MY COMPUTER</div>
                                             <div className="export-options-group">
-                                              {!isOnPrem() &&
                                               <button
                                                   className="btn btn-outline"
                                                   onClick={() => window.open(
@@ -485,7 +486,7 @@ class Preview extends Component {
                                                   )}
                                               >
                                                   Download CSV
-                                              </button>}
+                                              </button>
                                             </div>
                                             <div style={{width: 650, height: 200, border: '1px solid #dfe8f3',
                                                 fontFamily: '\'Ubuntu Mono\', courier, monospace', paddingTop: 10,
@@ -514,7 +515,7 @@ class Preview extends Component {
                                                 ))}
                                             </div>
                                         </div>
-                                    </TabPanel>
+                                    </TabPanel>}
                                 </Tabs>
                             </div>
                         }
