@@ -248,7 +248,7 @@ export class PreviewModal extends Component {
                                         onChange={this.handleNameChange}
                                     />
                                 ) : (
-                                    <em style={valueStyle}>
+                                    <em style={{...valueStyle, wordWrap: 'break-word'}}>
                                         <b>{this.state.name}</b>
                                     </em>
                                 )}
