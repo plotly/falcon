@@ -265,8 +265,8 @@ class Scheduler extends Component {
                             justifyContent: 'flex-start'
                         }}
                     >
-                        <b>Scheduled queries will not run unless you are logged in.</b> Click <a href="/login">here</a>{' '}
-                        to log in.
+                        <b>Scheduled queries will not run unless you are logged in</b>.
+                        Click <a href="/login">here</a> to log in.
                     </Row>
                 )}
                 <Row
