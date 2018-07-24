@@ -152,12 +152,18 @@ class CreateModal extends Component {
                         <Row style={secondaryRowStyle}>
                             <div className="row-header">Query name</div>
                             <div className="row-body">
-                                <input
-                                    maxLength="150"
-                                    placeholder="Enter query name here..."
-                                    value={this.state.name}
-                                    onChange={this.handleNameChange}
-                                />
+                                {this.state.successMessage ? (
+                                    <em style={{marginTop: 5, display: 'inherit'}}>
+                                        <b>{this.state.name}</b>
+                                    </em>
+                                ) : (
+                                    <input
+                                        maxLength="150"
+                                        placeholder="Enter query name here..."
+                                        value={this.state.name}
+                                        onChange={this.handleNameChange}
+                                    />
+                                )}
                             </div>
                         </Row>
                         <Row style={secondaryRowStyle}>
