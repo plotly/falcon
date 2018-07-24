@@ -1,7 +1,9 @@
 import {has} from 'ramda';
+import * as scheduler from 'node-schedule';
 
 import {getConnectionById} from './Connections.js';
 import * as Connections from './datastores/Datastores.js';
+import { mapRefreshToCron } from '../utils/cronUtils.js';
 import Logger from '../logger';
 import {
     getQuery,
@@ -59,17 +61,23 @@ class QueryScheduler {
         requestor,
         fid,
         uids,
-        refreshInterval,
+        refreshInterval = null,
+        cronInterval = null,
+        name,
         query,
         connectionId
     }) {
-        if (!refreshInterval) {
-            throw new Error('Refresh interval was not supplied');
-        } else if (refreshInterval < this.minimumRefreshInterval) {
+        if (!cronInterval && !refreshInterval) {
+            throw new Error('A scheduling interval was not supplied');
+        } else if (refreshInterval && refreshInterval < this.minimumRefreshInterval) {
             throw new Error([
                 `Refresh interval must be at least ${this.minimumRefreshInterval} seconds`,
                 `(supplied ${refreshInterval})`
             ].join(' '));
+        }
+
+        if (name && name.length > 150) {
+            throw new Error('Invalid query name. Must be less than 150 characters.');
         }
 
         Logger.log(`Scheduling "${query}" with connection ${connectionId} updating grid ${fid}`);
@@ -85,22 +93,33 @@ class QueryScheduler {
         }
 
         // Save query to a file
-        saveQuery({
+        const queryParams = {
             requestor,
             fid,
             uids,
             refreshInterval,
+            cronInterval,
             query,
             connectionId
-        });
+        };
+
+        // explicitly omit name unless truthy to prevent 'yamljs' from
+        // coerecing an undefined key into null
+        if (name) {
+            queryParams.name = name;
+        }
+
+        saveQuery(queryParams);
 
         // Schedule
-        this.queryJobs[fid] = setInterval(
-            () => {
-                this.job(fid, uids, query, connectionId, requestor);
-            },
-            refreshInterval * 1000
-        );
+        const job = () => this.job(fid, uids, query, connectionId, requestor);
+        let jobInterval = cronInterval;
+        if (!jobInterval) {
+            // convert refresh interval to cron representation
+            jobInterval = mapRefreshToCron(refreshInterval);
+        }
+
+        this.queryJobs[fid] = scheduler.scheduleJob(jobInterval, job);
     }
 
     // Load and schedule queries - To be run on app start.
@@ -112,7 +131,9 @@ class QueryScheduler {
 
     // Remove query from memory
     clearQuery(fid) {
-        clearInterval(this.queryJobs[fid]);
+        if (this.queryJobs[fid]) {
+            this.queryJobs[fid].cancel();
+        }
         delete this.queryJobs[fid];
     }
 
@@ -152,8 +173,12 @@ class QueryScheduler {
             startTime = process.hrtime();
 
             Logger.log(`Querying "${query}" with connection ${connectionId} to create a new grid`, 2);
-            return Connections.query(query, getConnectionById(connectionId));
-
+            return Connections.query(query, getConnectionById(connectionId)).catch((e) => {
+                /*
+                * Warning: The front end looks for "QueryExecutionError" in this error message. Don't change it!
+                */
+                throw new Error(`QueryExecutionError: ${e.message}`);
+            });
         }).then(({rows, columnnames}) => {
             Logger.log(`Query "${query}" took ${process.hrtime(startTime)[0]} seconds`, 2);
             Logger.log('Create a new grid with new data', 2);
@@ -166,8 +191,12 @@ class QueryScheduler {
                 columnnames,
                 rows,
                 requestor
-            );
-
+            ).catch((e) => {
+                /*
+                * Warning: The front end looks for "PlotlyApiError" in this error message. Don't change it!
+                */
+                throw new Error(`PlotlyApiError: ${e.message}`);
+            });
         }).then(res => {
             Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(startTime)[0]} seconds`, 2);
 
@@ -221,8 +250,12 @@ class QueryScheduler {
             }
 
             Logger.log(`Querying "${query}" with connection ${connectionId} to update grid ${fid}`, 2);
-            return Connections.query(query, requestedDBConnections);
-
+            return Connections.query(query, requestedDBConnections).catch((e) => {
+                /*
+                * Warning: The front end looks for "QueryExecutionError" in this error message. Don't change it!
+                */
+                throw new Error(`QueryExecutionError: ${e.message}`);
+            });
         }).then(({rows}) => {
 
             Logger.log(`Query "${query}" took ${process.hrtime(startTime)[0]} seconds`, 2);
@@ -239,8 +272,12 @@ class QueryScheduler {
                 fid,
                 uids,
                 requestor
-            );
-
+            ).catch((e) => {
+                /*
+                * Warning: The front end looks for "PlotlyApiError" in this error message. Don't change it!
+                */
+                throw new Error(`PlotlyApiError: ${e.message}`);
+            });
         }).then(res => {
             Logger.log(`Request to Plotly for grid ${fid} took ${process.hrtime(startTime)[0]} seconds`, 2);
             if (res.status !== 200) {

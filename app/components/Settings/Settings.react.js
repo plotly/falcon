@@ -25,7 +25,7 @@ class Settings extends Component {
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
         this.updateSelectedPanel = this.updateSelectedPanel.bind(this);
         this.openScheduler = this.openScheduler.bind(this);
-        this.openLogin = this.updateSelectedPanel.bind(this, 3);
+        this.openLogin = () => window.location.assign('/login');
         this.state = {
             editMode: true,
             selectedPanel: {},
@@ -272,9 +272,12 @@ class Settings extends Component {
     openScheduler() {
       this.setState({ scheduledQuery: this.props.preview.code }, () => {
         this.updateSelectedPanel(2, () => {
-          // Setting scheduledQuery to `null` right after opening the Schedule panel ensures that,
-          // when the user switches to another connector,
-          // `initialCode` isn't set to the `scheduledQuery` used in the previous connector.
+          /*
+           * Setting scheduledQuery to `null` right after opening the Schedule panel
+           * ensures that when the user switches to another connector, or back
+           * and forth between tabs, `initialCode` isn't set to the
+           * `scheduledQuery` causing the create modal to be open..
+           */
           this.setState({ scheduledQuery: null });
         });
       });
@@ -423,6 +426,7 @@ class Settings extends Component {
                               openLogin={this.openLogin}
                               requestor={username}
                               dialect={dialect}
+                              openQueryPage={() => this.updateSelectedPanel(1)}
                             />
                         </TabPanel>
 

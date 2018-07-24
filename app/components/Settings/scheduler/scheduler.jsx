@@ -5,11 +5,12 @@ import {contains} from 'ramda';
 import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
+import cronstrue from 'cronstrue';
 
 import CreateModal from './create-modal.jsx';
 import PreviewModal from './preview-modal.jsx';
 import PromptLoginModal from './login-modal.jsx';
-import { Row, Column } from '../../layout.jsx';
+import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
 
 import {SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants';
@@ -17,6 +18,8 @@ import {SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants';
 import './scheduler.css';
 
 const NO_OP = () => {};
+
+const ROW_HEIGHT = 84;
 
 class QueryFormatter extends React.Component {
     static propTypes = {
@@ -33,8 +36,17 @@ class QueryFormatter extends React.Component {
         const query = this.props.value;
         return (
             <Row>
-                <Column style={{ paddingRight: '24px', fontSize: 15 }}>
-                    <SQL>{query.query}</SQL>
+                <Column
+                    className="ellipsis"
+                    style={{maxHeight: ROW_HEIGHT, padding: 8, paddingRight: '24px', fontSize: 15}}
+                >
+                    {query.name ? (
+                        <span className="ellipsis" style={{fontSize: 16}}>
+                            {query.name}
+                        </span>
+                    ) : (
+                        <SQL>{query.query}</SQL>
+                    )}
                 </Column>
             </Row>
         );
@@ -48,12 +60,14 @@ class IntervalFormatter extends React.Component {
          * is an object containg the required `refreshInterval`.
          */
         value: PropTypes.shape({
-            refreshInterval: PropTypes.number.isRequired
+            refreshInterval: PropTypes.number.isRequired,
+            cronInterval: PropTypes.string
         })
     };
 
     render() {
         const run = this.props.value;
+
         return (
             <Row>
                 <Column>
@@ -62,9 +76,11 @@ class IntervalFormatter extends React.Component {
                             fontSize: 15
                         }}
                     >
-                        {`Runs every ${ms(run.refreshInterval * 1000, {
-                            long: true
-                        })}`}
+                        {run.cronInterval
+                            ? cronstrue.toString(run.cronInterval)
+                            : `Runs every ${ms(run.refreshInterval * 1000, {
+                                  long: true
+                              })}`}
                     </em>
                 </Column>
             </Row>
@@ -86,7 +102,8 @@ class Scheduler extends Component {
         openLogin: NO_OP,
         createScheduledQuery: NO_OP,
         updateScheduledQuery: NO_OP,
-        deleteScheduledQuery: NO_OP
+        deleteScheduledQuery: NO_OP,
+        openQueryPage: NO_OP
     };
 
     static propTypes = {
@@ -104,7 +121,8 @@ class Scheduler extends Component {
         openLogin: PropTypes.func.isRequired,
         createScheduledQuery: PropTypes.func.isRequired,
         updateScheduledQuery: PropTypes.func.isRequired,
-        deleteScheduledQuery: PropTypes.func.isRequired
+        deleteScheduledQuery: PropTypes.func.isRequired,
+        openQueryPage: PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -142,13 +160,13 @@ class Scheduler extends Component {
     }
 
     handleSearchChange(e) {
-        this.setState({ search: e.target.value });
+        this.setState({search: e.target.value});
     }
 
     getRows() {
         return mapRows(
             matchSorter(this.props.queries, this.state.search, {
-                keys: ['query']
+                keys: ['query', 'name']
             })
         );
     }
@@ -158,19 +176,19 @@ class Scheduler extends Component {
     }
 
     openPreview(i, query) {
-        this.setState({ selectedQuery: query.query });
+        this.setState({selectedQuery: query.query});
     }
 
     closePreview() {
-        this.setState({ selectedQuery: null });
+        this.setState({selectedQuery: null});
     }
 
     openCreateModal() {
-        this.setState({ createModalOpen: true });
+        this.setState({createModalOpen: true});
     }
 
     closeCreateModal() {
-        this.setState({ createModalOpen: false });
+        this.setState({createModalOpen: false});
     }
 
     createQuery(queryConfig) {
@@ -181,14 +199,12 @@ class Scheduler extends Component {
             ...queryConfig,
             requestor: this.props.requestor
         };
-        return this.props.createScheduledQuery(newQueryParams)
-          .then(res => {
+        return this.props.createScheduledQuery(newQueryParams).then(res => {
             if (res.error) {
-              throw res.error;
+                throw res.error;
             }
-            this.closeCreateModal();
             return res;
-          });
+        });
     }
 
     handleUpdate(queryConfig) {
@@ -199,14 +215,12 @@ class Scheduler extends Component {
             ...queryConfig,
             requestor: this.props.requestor
         };
-        return this.props.updateScheduledQuery(newQueryParams)
-          .then(res => {
+        return this.props.updateScheduledQuery(newQueryParams).then(res => {
             if (res.error) {
-              throw res.error;
+                throw res.error;
             }
-            this.closePreview();
             return res;
-          });
+        });
     }
 
     handleDelete(fid) {
@@ -236,14 +250,10 @@ class Scheduler extends Component {
                         placeholder="Search scheduled queries..."
                     />
                     {!contains(this.props.dialect, SQL_DIALECTS_USING_EDITOR) && (
-                        <button
-                            style={{ marginRight: '16px' }}
-                            onClick={this.openCreateModal}
-                        >
+                        <button style={{marginRight: '16px'}} onClick={this.openCreateModal}>
                             Create Scheduled Query
                         </button>
                     )}
-
                 </Row>
                 <Row
                     style={{
@@ -252,20 +262,20 @@ class Scheduler extends Component {
                         justifyContent: 'space-between'
                     }}
                 >
-                    <Column style={{ width: 300 }}>
+                    <Column style={{width: 300}}>
                         <Row>
-                            <Column style={{ marginLeft: 8 }}>
-                                {rows.length} queries
+                            <Column style={{marginLeft: 8}}>
+                                {rows.length} {rows.length === 1 ? ' query' : ' queries'}
                             </Column>
                         </Row>
                     </Column>
-                    <Column style={{ width: 300 }}>
+                    <Column style={{width: 300}}>
                         <Row>
                             <Column>
                                 <button
                                     className="refresh-button"
                                     onClick={this.props.refreshQueries}
-                                    style={{ marginRight: '8px' }}
+                                    style={{marginRight: '8px'}}
                                 >
                                     ⟳
                                 </button>
@@ -273,16 +283,13 @@ class Scheduler extends Component {
                         </Row>
                     </Column>
                 </Row>
-                <Row
-                    className="scheduler-table"
-                    style={{ padding: '0 16px 16px', width: 'auto' }}
-                >
+                <Row className="scheduler-table" style={{margin: '0 16px 16px', width: 'auto'}}>
                     <ReactDataGrid
                         onRowClick={this.openPreview}
                         columns={this.columns}
                         rowGetter={this.rowGetter}
                         rowsCount={rows.length}
-                        rowHeight={84}
+                        rowHeight={ROW_HEIGHT}
                         headerRowHeight={32}
                     />
                 </Row>
@@ -293,6 +300,7 @@ class Scheduler extends Component {
                     onClickAway={this.closeCreateModal}
                     onSubmit={this.createQuery}
                     dialect={this.props.dialect}
+                    openQueryPage={this.props.openQueryPage}
                 />
                 <PromptLoginModal
                     open={!loggedIn && this.state.createModalOpen}
@@ -300,14 +308,22 @@ class Scheduler extends Component {
                     onSubmit={this.props.openLogin}
                 />
 
-                <PreviewModal
-                    onClickAway={this.closePreview}
-                    query={this.state.selectedQuery}
-                    loggedIn={loggedIn}
-                    onSave={this.handleUpdate}
-                    onDelete={this.handleDelete}
-                    dialect={this.props.dialect}
-                />
+                {/*
+                  Preview modal is now only rendered if a `selectedQuery` has been
+                  set. This simplifies the rerender logic.
+                */}
+                {this.state.selectedQuery && (
+                    <PreviewModal
+                        onClickAway={this.closePreview}
+                        query={this.state.selectedQuery}
+                        currentRequestor={this.props.requestor}
+                        onLogin={this.props.openLogin}
+                        onSave={this.handleUpdate}
+                        onDelete={this.handleDelete}
+                        dialect={this.props.dialect}
+                        openQueryPage={this.props.openQueryPage}
+                    />
+                )}
             </React.Fragment>
         );
     }

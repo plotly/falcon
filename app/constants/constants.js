@@ -2,6 +2,12 @@
 /* eslint-disable no-multi-str */
 import {concat} from 'ramda';
 
+/**
+ * Default to '1 week' for `refreshInterval` for backwards compatability. For
+ * older versions this will prevent issues such as `setInterval(runQuery, NaN)`
+ */
+export const DEFAULT_REFRESH_INTERVAL = 7 * 24 * 60 * 60;
+
 export const DIALECTS = {
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
@@ -503,3 +509,9 @@ export function getHighlightMode(dialect) {
             [DIALECTS.MSSQL]: 'text/x-mssql'
     }[dialect] || 'text/x-sql';
 }
+
+export const WAITING_MESSAGE = 'This may take a long time. Your query is ' +
+  'currently executing and must finish before it can be saved.';
+
+export const SAVE_WARNING = 'Note: when you save, the query will ' +
+  'execute and update the dataset immediately. Thereafter it will do so on the requested schedule.';

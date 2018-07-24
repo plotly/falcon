@@ -11,6 +11,13 @@
     border-color: #c8d4e3 !important;
 }
 
+/* fix horizontal overflow issues */
+.react-grid-Cell {
+  box-sizing: border-box;
+  border-right: none !important;
+}
+
+
 .react-grid-Header {
     box-shadow: unset !important;
     max-height: 64px;

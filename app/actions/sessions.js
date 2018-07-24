@@ -165,8 +165,10 @@ export function createScheduledQuery(connectionId, payload = {}) {
         uids: payload.uids,
         fid: payload.fid,
         filename: payload.filename,
+        name: payload.name,
         refreshInterval: payload.refreshInterval,
         query: payload.query,
+        cronInterval: payload.cronInterval,
         connectionId
       }
     )).then((res) => {
@@ -186,8 +188,10 @@ export function updateScheduledQuery(connectionId, payload = {}) {
       uids: payload.uids,
       fid: payload.fid,
       filename: payload.filename,
+      name: payload.name,
       refreshInterval: payload.refreshInterval,
       query: payload.query,
+      cronInterval: payload.cronInterval,
       connectionId
     };
 
@@ -198,10 +202,12 @@ export function updateScheduledQuery(connectionId, payload = {}) {
       payload.filename,
       body
     )).then((res) => {
-      dispatch({
+      if (!res.error) {
+        dispatch({
           type: 'UPDATE_SCHEDULED_QUERY',
           payload: body
-      });
+        });
+      }
       return res;
     });
   };

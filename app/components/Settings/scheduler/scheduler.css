@@ -29,6 +29,10 @@
     font-weight: bold;
 }
 
+.scheduler pre {
+    white-space: pre-wrap;
+}
+
 /* custom ReactDataGrid styles for scheduled queries table */
 .scheduler-table .react-grid-Row--odd .react-grid-Cell {
     background: #fff;
@@ -36,6 +40,12 @@
 
 .scheduler-table .react-grid-Row--odd:hover .react-grid-Cell {
     background-color: #f9f9f9;
+}
+
+/* fix horizontal overflow issues */
+.scheduler-table .react-grid-Cell {
+    box-sizing: border-box;
+    border-right: none;
 }
 
 .scheduler-table .react-grid-Row {
@@ -47,10 +57,27 @@
     border-top: none;
 }
 
+.sql pre {
+    margin: 0 auto;
+    max-height: 100%;
+}
+
 .scheduler .CodeMirror {
     width: 100%;
 }
 
-.sql-preview pre {
-    white-space: pre-wrap;
+.ellipsis {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.ellipsis pre {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.meta-preview button {
+    min-height: 28px;
 }
