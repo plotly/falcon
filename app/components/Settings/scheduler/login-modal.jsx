@@ -15,7 +15,10 @@ const PromptLoginModal = props => (
                 &times;
             </button>
             <Row className="header">
-                <p>To create a scheduled query, you'll need to be logged into Plotly.</p>
+                <p>
+                    To create a scheduled query, you'll need to be logged into Plotly. Logging in will reset your query,
+                    so please save it elsewhere before doing so.
+                </p>
             </Row>
             <Row>
                 <button type="submit" className="submit" onClick={props.onSubmit}>
