@@ -348,8 +348,8 @@ describe('QueryScheduler', function() {
         const spy = sinon.spy();
         queryScheduler.job = spy;
         queryScheduler.scheduleQuery({
-            // every day at 15 minutes past the current hour on
-            // the second day of the month
+            // 15 minutes past the current hour
+            // every second day of the month
             cronInterval: `15 ${currentHour} 2 * *`,
             fid: '...',
             uids: '...',
