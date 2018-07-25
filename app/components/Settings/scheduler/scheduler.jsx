@@ -141,7 +141,7 @@ class Scheduler extends Component {
             },
             {
                 key: 'run',
-                name: 'Interval',
+                name: 'Schedule',
                 filterable: true,
                 formatter: IntervalFormatter
             }
