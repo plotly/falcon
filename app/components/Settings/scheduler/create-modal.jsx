@@ -70,6 +70,7 @@ class CreateModal extends Component {
             saving: false
         };
         this.options = {
+            lineWrapping: true,
             lineNumbers: true,
             tabSize: 4,
             readOnly: false,
