@@ -64,6 +64,8 @@
     width: 80%;
 }
 
-.create-modal .row-body pre {
+.create-modal .row-body > pre {
     margin-top: 5px;
+    overflow-y: auto;
+    max-height: 300px;
 }

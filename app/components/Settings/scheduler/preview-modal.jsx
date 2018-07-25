@@ -207,11 +207,12 @@ export class PreviewModal extends Component {
             const initialModeId = getInitialCronMode(props.query);
 
             content = (
-                <Column style={{width: '60%', maxHeight: '100vh', minWidth: 640, background: 'white'}}>
+                <Column style={{width: '60%', maxHeight: '100vh', minWidth: 640, background: 'white', paddingTop: 16}}>
+                    { editing && <Row style={{ padding: '0 32px', justifyContent: 'flex-start', fontSize: 12, marginTop: 8, fontWeight: 600, opacity: 0.4, letterSpacing: '0.5px' }}>EDITING</Row> }
                     <Row
                         className="sql-preview"
                         style={{
-                            padding: '16px 32px',
+                            padding: '0 32px 16px',
                             position: 'relative',
                             justifyContent: 'flex-start'
                         }}
@@ -234,9 +235,9 @@ export class PreviewModal extends Component {
                     <Column style={{background: '#F5F7FB', padding: '16px 32px'}}>
                         <Row style={rowStyle}>
                             <div style={keyStyle}>Query</div>
-                            <div className="sql-preview scheduler" style={{...valueStyle, overflowY: 'auto'}}>
+                            <div className="sql-preview scheduler" style={{...valueStyle, overflowY: 'auto', maxHeight: 300}}>
                                 {editing ? (
-                                    <div>
+                                    <div style={{ width: '99%' }}>
                                         <CodeMirror
                                             options={{
                                                 lineNumbers: true,
@@ -323,7 +324,7 @@ export class PreviewModal extends Component {
                                 justifyContent: 'space-between',
                                 border: 'none',
                                 marginTop: 48,
-                                paddingBottom: 0
+                                paddingBottom: 16
                             }}
                         >
                             {this.renderButtonRow()}
