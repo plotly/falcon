@@ -87,6 +87,11 @@ export class PreviewModal extends Component {
         if (this.state.editing) {
             const {connectionId, fid, requestor, uids, refreshInterval} = this.props.query;
             const {code: query, cronInterval, name} = this.state;
+
+            if (this.state.name && this.state.name.trim().length === 0) {
+              return this.setState({error: 'Please enter a valid query name above.'});
+            }
+
             this.setState({loading: true, error: null});
             this.props
                 .onSave({
