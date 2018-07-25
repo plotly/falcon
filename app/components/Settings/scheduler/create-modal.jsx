@@ -105,7 +105,7 @@ class CreateModal extends Component {
             return this.setState({error: 'Please select an interval above.'});
         }
         if (this.state.name && this.state.name.trim().length === 0) {
-          return this.setState({error: 'Please enter a valid query name above.'});
+            return this.setState({error: 'Please enter a valid query name above.'});
         }
 
         this.setState({saving: true, error: null});
@@ -126,7 +126,10 @@ class CreateModal extends Component {
     render() {
         return (
             <Modal open={this.props.open} onClickAway={this.props.onClickAway} className="scheduler create-modal">
-                <Column className="container" style={{width: '60%', maxHeight: '100vh', minWidth: 640, paddingBottom: '16px'}}>
+                <Column
+                    className="container"
+                    style={{width: '60%', maxHeight: '100vh', minWidth: 640, paddingBottom: '16px'}}
+                >
                     <Row>
                         <Column className="innerColumn">
                             <h5 className="header">Create Scheduled Query</h5>

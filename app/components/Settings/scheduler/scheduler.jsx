@@ -69,19 +69,19 @@ class IntervalFormatter extends React.Component {
         const run = this.props.value;
 
         return (
-          <em
-              className="ellipsis"
-              style={{
-                  display: 'block',
-                  fontSize: 15
-              }}
-          >
-              {run.cronInterval
-                  ? cronstrue.toString(run.cronInterval)
-                  : `Runs every ${ms(run.refreshInterval * 1000, {
-                        long: true
-                    })}`}
-          </em>
+            <em
+                className="ellipsis"
+                style={{
+                    display: 'block',
+                    fontSize: 15
+                }}
+            >
+                {run.cronInterval
+                    ? cronstrue.toString(run.cronInterval)
+                    : `Runs every ${ms(run.refreshInterval * 1000, {
+                          long: true
+                      })}`}
+            </em>
         );
     }
 }

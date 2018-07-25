@@ -89,7 +89,7 @@ export class PreviewModal extends Component {
             const {code: query, cronInterval, name} = this.state;
 
             if (this.state.name && this.state.name.trim().length === 0) {
-              return this.setState({error: 'Please enter a valid query name above.'});
+                return this.setState({error: 'Please enter a valid query name above.'});
             }
 
             this.setState({loading: true, error: null});
@@ -213,7 +213,21 @@ export class PreviewModal extends Component {
 
             content = (
                 <Column style={{width: '60%', maxHeight: '100vh', minWidth: 640, background: 'white', paddingTop: 16}}>
-                    { editing && <Row style={{ padding: '0 32px', justifyContent: 'flex-start', fontSize: 12, marginTop: 8, fontWeight: 600, opacity: 0.4, letterSpacing: '0.5px' }}>EDITING</Row> }
+                    {editing && (
+                        <Row
+                            style={{
+                                padding: '0 32px',
+                                justifyContent: 'flex-start',
+                                fontSize: 12,
+                                marginTop: 8,
+                                fontWeight: 600,
+                                opacity: 0.4,
+                                letterSpacing: '0.5px'
+                            }}
+                        >
+                            EDITING
+                        </Row>
+                    )}
                     <Row
                         className="sql-preview"
                         style={{
@@ -240,9 +254,12 @@ export class PreviewModal extends Component {
                     <Column style={{background: '#F5F7FB', padding: '16px 32px'}}>
                         <Row style={rowStyle}>
                             <div style={keyStyle}>Query</div>
-                            <div className="sql-preview scheduler" style={{...valueStyle, overflowY: 'auto', maxHeight: 300}}>
+                            <div
+                                className="sql-preview scheduler"
+                                style={{...valueStyle, overflowY: 'auto', maxHeight: 300}}
+                            >
                                 {editing ? (
-                                    <div style={{ width: '99%' }}>
+                                    <div style={{width: '99%'}}>
                                         <CodeMirror
                                             options={{
                                                 lineNumbers: true,
