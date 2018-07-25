@@ -59,7 +59,7 @@ h6 { font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; }
 
 p {
   margin-top: 0.5rem;
-  margin-bottom: 0.5rem; 
+  margin-bottom: 0.5rem;
 }
 
 *::-webkit-input-placeholder {
@@ -109,14 +109,14 @@ button, .btn-primary {
 }
 
 button.btn-secondary {
-    color: #506784;    
+    color: #506784;
     background-color: #ebf0f8;
     border: 1px solid #dfe8f3;
     text-shadow: none;
 }
 
 button:hover, .btn-primary:hover {
-    color: #ffffff;    
+    color: #ffffff;
     background-color: #0f89df;
     border: 1px solid #0f89df;
 }
@@ -124,17 +124,17 @@ button:hover, .btn-primary:hover {
 button.btn-secondary:hover {
     background-color: #dfe8f3;
     border: 1px solid #c8d4e3;
-    color: #2a3f5f;    
+    color: #2a3f5f;
 }
-    
+
 button:active, .btn-primary:active {
-    color: #ffffff;    
+    color: #ffffff;
     background-color: #0d76bf;
     border: 1px solid #0d76bf;
 }
 
 button.btn-outline {
-    background: #fff;
+    background: transparent;
     color: #119DFF;
     display: inline-block;
     margin-right: 20px;
@@ -142,7 +142,7 @@ button.btn-outline {
     padding: 9px 18px;
     font-weight: 300;
     border-radius: 4px;
-    font-size: 12px;    
+    font-size: 12px;
 }
 
 .dd-menu > button {
