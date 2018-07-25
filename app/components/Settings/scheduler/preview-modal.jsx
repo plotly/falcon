@@ -130,14 +130,32 @@ export class PreviewModal extends Component {
 
     renderButtonRow() {
         const {loading, editing} = this.state;
+        const loggedIn = this.props.currentRequestor;
         const canEdit = this.props.currentRequestor && this.props.currentRequestor === this.props.query.requestor;
         const success = this.state.successMessage;
 
         if (!canEdit) {
             return (
-                <button style={noMargin} onClick={this.props.onLogin}>
-                    Log in to edit query
-                </button>
+                <React.Fragment>
+                    {loggedIn ? (
+                        <Column>
+                            <Row>
+                                <p style={{fontSize: 12, marginBottom: '16px', opacity: 0.7, width: '100%'}}>
+                                    This query was created by another user. To modify, please log in as that user.
+                                </p>
+                            </Row>
+                            <Row style={{justifyContent: 'flex-start'}}>
+                                <button style={noMargin} onClick={this.props.onLogin}>
+                                    {loggedIn ? 'Switch users' : 'Log in to edit query'}
+                                </button>
+                            </Row>
+                        </Column>
+                    ) : (
+                        <button style={noMargin} onClick={this.props.onLogin}>
+                            Log in to edit query
+                        </button>
+                    )}
+                </React.Fragment>
             );
         }
 

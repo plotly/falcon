@@ -255,20 +255,6 @@ class Scheduler extends Component {
                         </button>
                     )}
                 </Row>
-                {!loggedIn && (
-                    <Row
-                        style={{
-                            display: 'box',
-                            borderLeft: '4px solid red',
-                            padding: '6px',
-                            margin: '24px 0 24px 20px',
-                            justifyContent: 'flex-start'
-                        }}
-                    >
-                        <b>Scheduled queries will not run unless you are logged in</b>.
-                        Click <a href="/login">here</a> to log in.
-                    </Row>
-                )}
                 <Row
                     style={{
                         marginBottom: 16,
