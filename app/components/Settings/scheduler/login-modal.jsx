@@ -17,7 +17,8 @@ const PromptLoginModal = props => (
             </button>
             <Row className="header">
                 <p>
-                    To create a scheduled query, you'll need to be logged into Plotly.<br/><br/>
+                    To create a scheduled query, you'll need to be logged into Plotly.<br />
+                    <br />
                     Note: logging in will reset your query, click the button below to copy the query to your clipboard.
                 </p>
             </Row>
@@ -26,9 +27,7 @@ const PromptLoginModal = props => (
                     Log In
                 </button>
                 <CopyToClipboard text={props.preview.code}>
-                  <button className="btn-secondary">
-                    Copy Query
-                  </button>
+                    <button className="btn-secondary">Copy Query</button>
                 </CopyToClipboard>
             </Row>
         </Column>

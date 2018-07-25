@@ -212,7 +212,28 @@ export class PreviewModal extends Component {
             const initialModeId = getInitialCronMode(props.query);
 
             content = (
-                <Column style={{width: '60%', maxHeight: '100vh', minWidth: 640, background: 'white', paddingTop: 16}}>
+                <Column
+                    style={{
+                        width: '60%',
+                        maxHeight: '100vh',
+                        minWidth: 640,
+                        background: 'white',
+                        paddingTop: 16,
+                        position: 'relative'
+                    }}
+                >
+                    <button
+                        onClick={this.close}
+                        style={{
+                            position: 'absolute',
+                            top: '16px',
+                            right: '16px',
+                            padding: '2px 4px',
+                            zIndex: 99
+                        }}
+                    >
+                        &times;
+                    </button>
                     {editing && (
                         <Row
                             style={{
@@ -239,17 +260,6 @@ export class PreviewModal extends Component {
                         <h5 className="sql-preview ellipsis" style={{...noMargin, letterSpacing: '1px'}}>
                             {this.state.name ? <b>{this.state.name}</b> : <SQL className="bold">{this.state.code}</SQL>}
                         </h5>
-                        <button
-                            onClick={this.close}
-                            style={{
-                                position: 'absolute',
-                                top: '16px',
-                                right: '16px',
-                                padding: '2px 4px'
-                            }}
-                        >
-                            &times;
-                        </button>
                     </Row>
                     <Column style={{background: '#F5F7FB', padding: '16px 32px'}}>
                         <Row style={rowStyle}>
