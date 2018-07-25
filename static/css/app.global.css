@@ -22,8 +22,7 @@ a:hover {
 body {
     background-color: #F3F6FA;
     position: relative;
-    height: 100vh;
-    overflow-y: scroll;
+    overflow-y: auto;
     font-weight: 200;
     font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
     line-height: 1.6;
