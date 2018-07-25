@@ -115,6 +115,7 @@ class Scheduler extends Component {
         initialCode: PropTypes.string,
         requestor: PropTypes.string,
         dialect: PropTypes.string,
+        preview: PropTypes.string,
         refreshQueries: PropTypes.func.isRequired,
         openLogin: PropTypes.func.isRequired,
         createScheduledQuery: PropTypes.func.isRequired,
@@ -304,6 +305,7 @@ class Scheduler extends Component {
                     open={!loggedIn && this.state.createModalOpen}
                     onClickAway={this.closeCreateModal}
                     onSubmit={this.props.openLogin}
+                    preview={this.props.preview}
                 />
 
                 {/*

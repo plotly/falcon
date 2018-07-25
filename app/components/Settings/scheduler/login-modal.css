@@ -20,7 +20,7 @@
     padding: 16px;
 }
 
-.login-modal .submit {
+.login-modal .actions button {
     width: 50%;
     margin: 24px 32px 32px;
 }

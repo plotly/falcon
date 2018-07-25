@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 import {Row, Column} from '../../layout.jsx';
 import Modal from '../../modal.jsx';
@@ -16,14 +17,19 @@ const PromptLoginModal = props => (
             </button>
             <Row className="header">
                 <p>
-                    To create a scheduled query, you'll need to be logged into Plotly. Logging in will reset your query,
-                    so please save it elsewhere before doing so.
+                    To create a scheduled query, you'll need to be logged into Plotly.<br/><br/>
+                    Note: logging in will reset your query, click the button below to copy the query to your clipboard.
                 </p>
             </Row>
-            <Row>
-                <button type="submit" className="submit" onClick={props.onSubmit}>
+            <Row className="actions">
+                <button type="submit" onClick={props.onSubmit}>
                     Log In
                 </button>
+                <CopyToClipboard text={props.preview.code}>
+                  <button className="btn-secondary">
+                    Copy Query
+                  </button>
+                </CopyToClipboard>
             </Row>
         </Column>
     </Modal>
@@ -31,6 +37,7 @@ const PromptLoginModal = props => (
 
 PromptLoginModal.propTypes = {
     open: PropTypes.bool.isRequired,
+    preview: PropTypes.string.isRequired,
     onClickAway: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired
 };
