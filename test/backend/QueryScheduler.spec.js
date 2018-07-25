@@ -163,6 +163,219 @@ describe('QueryScheduler', function() {
         clock.restore();
     });
 
+    it('correctly schedules every minute cron interval', function () {
+        const clock = sinon.useFakeTimers();
+        const spy = sinon.spy();
+        const ONE_MINUTE = 60;
+        const cronInterval = '* * * * *'; // every minute
+
+        queryScheduler.job = spy;
+        queryScheduler.scheduleQuery({
+            cronInterval,
+            fid: '...',
+            uids: '...',
+            query: '...',
+            connectionId: '...'
+        });
+
+        assert(spy.notCalled, 'job should not have been called yet');
+        clock.tick(0.5 * ONE_MINUTE * 1000);
+        assert(spy.notCalled, 'job should not have been called yet');
+        clock.tick(ONE_MINUTE * 1000);
+        assert(spy.called, 'job should have been called');
+        clock.tick(ONE_MINUTE * 1000);
+        assert(spy.calledTwice, 'job should have been called twice');
+
+        clock.restore();
+    });
+
+    it('correctly schedules every five minutes cron interval', function () {
+        const clock = sinon.useFakeTimers();
+        const spy = sinon.spy();
+        const ONE_MINUTE = 60;
+        const cronInterval = '*/5 * * * *'; // every 5 minutes
+
+        queryScheduler.job = spy;
+        queryScheduler.scheduleQuery({
+            cronInterval,
+            fid: '...',
+            uids: '...',
+            query: '...',
+            connectionId: '...'
+        });
+
+        assert(spy.notCalled, 'job should not have been called yet');
+        clock.tick(4 * ONE_MINUTE * 1000);
+        assert(spy.notCalled, 'job should not have been called yet');
+        clock.tick(2 * ONE_MINUTE * 1000);
+        assert(spy.called, 'job should have been called');
+        clock.tick(5 * ONE_MINUTE * 1000);
+        assert(spy.calledTwice, 'job should have been called twice');
+
+        clock.restore();
+    });
+
+    it('correctly schedules every hour cron interval', function () {
+        let clock = sinon.useFakeTimers();
+        const ONE_HOUR = 3600;
+
+        const spy1 = sinon.spy();
+        queryScheduler.job = spy1;
+        queryScheduler.scheduleQuery({
+            cronInterval: '31 * * * *', // every hour at minute 31
+            fid: '...',
+            uids: '...',
+            query: '...',
+            connectionId: '...'
+        });
+
+        assert(spy1.notCalled, 'job should not have been called yet');
+        clock.tick(0.5 * ONE_HOUR * 1000);
+        assert(spy1.notCalled, 'job should not have been called yet');
+        clock.tick(ONE_HOUR * 1000);
+        assert(spy1.called, 'job should have been called');
+        clock.tick(ONE_HOUR * 1000);
+        assert(spy1.calledTwice, 'job should have been called twice');
+
+        clock.restore();
+        clock = sinon.useFakeTimers();
+
+        const spy2 = sinon.spy();
+        queryScheduler.job = spy2;
+        queryScheduler.scheduleQuery({
+            cronInterval: '29 * * * *', // every hour at minute 29
+            fid: '...',
+            uids: '...',
+            query: '...',
+            connectionId: '...'
+        });
+
+        assert(spy2.notCalled, 'job should not have been called yet');
+        clock.tick(0.5 * ONE_HOUR * 1000);
+        assert(spy2.called, 'job should have been called');
+        clock.tick(ONE_HOUR * 1000);
+        assert(spy2.calledTwice, 'job should have been called twice');
+
+        clock.restore();
+    });
+
+    it('correctly schedules every day cron interval', function () {
+        const clock = sinon.useFakeTimers();
+        const currentHour = (new Date()).getHours();
+
+        const ONE_MINUTE = 60;
+        const ONE_DAY = 86400;
+
+        const spy = sinon.spy();
+        queryScheduler.job = spy;
+        queryScheduler.scheduleQuery({
+            // every day at 15 minutes past the current hour
+            cronInterval: `15 ${currentHour} * * *`,
+            fid: '...',
+            uids: '...',
+            query: '...',
+            connectionId: '...'
+        });
+
+        assert(spy.notCalled, 'job should not have been called yet');
+        clock.tick(14 * ONE_MINUTE * 1000);
+        assert(spy.notCalled, 'job should not have been called yet');
+        clock.tick(2 * ONE_MINUTE * 1000);
+        assert(spy.called, 'job should have been called');
+        clock.tick(ONE_DAY * 1000);
+        assert(spy.calledTwice, 'job should have been called twice');
+        clock.tick(8 * ONE_DAY * 1000);
+        assert.equal(spy.callCount, 10, 'job should have been called twice');
+
+        clock.restore();
+    });
+
+    it('correctly schedules weekly cron interval', function () {
+        const clock = sinon.useFakeTimers();
+        const currentHour = (new Date()).getHours();
+        const currentDay = (new Date()).getDay();
+
+        const ONE_MINUTE = 60;
+        const ONE_DAY = 86400;
+        const ONE_WEEK = ONE_DAY * 7;
+
+        if (currentDay !== 3) {
+            // timezone is UTC or later, go back
+            // to Wednesday
+            clock.tick(-1 * ONE_DAY * 1000);
+        }
+
+        const spy = sinon.spy();
+        queryScheduler.job = spy;
+        queryScheduler.scheduleQuery({
+            // minute 15 of current hour on Monday, Wednesday, and Thursday
+            cronInterval: `15 ${currentHour} * * MON,WED,THU`,
+            fid: '...',
+            uids: '...',
+            query: '...',
+            connectionId: '...'
+        });
+
+        assert(spy.notCalled, 'job should not have been called yet');
+        clock.tick(14 * ONE_MINUTE * 1000);
+        assert(spy.notCalled, 'job should not have been called yet');
+        clock.tick(2 * ONE_MINUTE * 1000);
+        assert(spy.called, 'job should have been called');
+        clock.tick(ONE_DAY * 1000); // now Thursday
+        assert(spy.calledTwice, 'job should have been called twice');
+        clock.tick(ONE_DAY * 1000); // now Friday
+        assert(spy.calledTwice, 'job still should have been called twice on Friday');
+        clock.tick(ONE_DAY * 1000); // now Saturday
+        assert(spy.calledTwice, 'job still should have been called twice on Saturday');
+        clock.tick(ONE_DAY * 1000); // now Sunday
+        assert(spy.calledTwice, 'job still should have been called twice on Sunday');
+        clock.tick(ONE_DAY * 1000); // now Monday
+        assert(spy.calledThrice, 'job should have been called three times on Monday');
+        clock.tick(ONE_WEEK * 1000); // now Monday
+        assert.equal(spy.callCount, 6, 'job should have been called three more times one week later');
+
+        clock.restore();
+    });
+
+    it('correctly schedules every month cron interval', function () {
+        const clock = sinon.useFakeTimers();
+        const currentHour = (new Date()).getHours();
+        const currentMonth = (new Date()).getMonth();
+
+        const ONE_MINUTE = 60;
+        const ONE_DAY = 86400;
+
+        const spy = sinon.spy();
+        queryScheduler.job = spy;
+        queryScheduler.scheduleQuery({
+            // every day at 15 minutes past the current hour on
+            // the second day of the month
+            cronInterval: `15 ${currentHour} 2 * *`,
+            fid: '...',
+            uids: '...',
+            query: '...',
+            connectionId: '...'
+        });
+
+        if (currentMonth !== 0) {
+            // timezone is before UTC, fastforward to January 1
+            clock.tick(ONE_DAY * 1000);
+        }
+        assert(spy.notCalled, 'job should not have been called yet');
+        clock.tick(14 * ONE_MINUTE * 1000);
+        assert(spy.notCalled, 'job should not have been called yet');
+        clock.tick(ONE_DAY * 1000); // Jan 2
+        assert(spy.notCalled, 'job should not have been called yet');
+        clock.tick(2 * ONE_MINUTE * 1000);
+        assert(spy.called, 'job should have been called');
+        clock.tick(30 * ONE_DAY * 1000); // Feb 1
+        assert(spy.calledOnce, 'job still should have been called once');
+        clock.tick(ONE_DAY * 1000); // Feb 2
+        assert(spy.calledTwice, 'job should have been called twice');
+
+        clock.restore();
+    });
+
     it('cronInteval overrules refreshInterval', function () {
         const clock = sinon.useFakeTimers();
         const spy = sinon.spy();
