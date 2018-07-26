@@ -115,7 +115,7 @@ class Scheduler extends Component {
         initialCode: PropTypes.string,
         requestor: PropTypes.string,
         dialect: PropTypes.string,
-        preview: PropTypes.string,
+        preview: PropTypes.object,
         refreshQueries: PropTypes.func.isRequired,
         openLogin: PropTypes.func.isRequired,
         createScheduledQuery: PropTypes.func.isRequired,

@@ -36,7 +36,7 @@ const PromptLoginModal = props => (
 
 PromptLoginModal.propTypes = {
     open: PropTypes.bool.isRequired,
-    preview: PropTypes.string.isRequired,
+    preview: PropTypes.object.isRequired,
     onClickAway: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired
 };
