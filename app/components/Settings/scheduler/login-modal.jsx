@@ -13,7 +13,7 @@ const successTextStyle = {color: '#00cc96'};
 class PromptLoginModal extends React.Component {
     static propTypes = {
         open: PropTypes.bool.isRequired,
-        preview: PropTypes.object.isRequired,
+        preview: PropTypes.object,
         onClickAway: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired
     };
@@ -53,7 +53,7 @@ class PromptLoginModal extends React.Component {
                         <button type="submit" onClick={this.props.onSubmit}>
                             Log In
                         </button>
-                        <CopyToClipboard text={this.props.preview.code} onCopy={this.onCopy}>
+                        <CopyToClipboard text={this.props.preview ? this.props.preview.code : ''} onCopy={this.onCopy}>
                             <button className="btn-secondary">
                                 {this.state.copyCoolingDown ? (
                                     <span style={successTextStyle}>Copied!</span>
