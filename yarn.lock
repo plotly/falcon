@@ -8588,9 +8588,9 @@ react-base16-styling@^0.5.1:
     lodash.flow "^3.3.0"
     pure-color "^1.2.0"
 
-react-chart-editor@0.21:
-  version "0.21.0"
-  resolved "https://registry.yarnpkg.com/react-chart-editor/-/react-chart-editor-0.21.0.tgz#5637328be7860cf7d63905ef54ce296a2abd253b"
+react-chart-editor@0.21.1:
+  version "0.21.1"
+  resolved "https://registry.yarnpkg.com/react-chart-editor/-/react-chart-editor-0.21.1.tgz#e90dbafc07ed66439ee92b1c8a729156608a5729"
   dependencies:
     "@plotly/draft-js-export-html" "1.2.0"
     classnames "^2.2.5"
