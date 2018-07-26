@@ -104,9 +104,6 @@ class CreateModal extends Component {
         if (!this.state.interval) {
             return this.setState({error: 'Please select an interval above.'});
         }
-        if (this.state.name && this.state.name.trim().length === 0) {
-            return this.setState({error: 'Please enter a valid query name above.'});
-        }
 
         this.setState({saving: true, error: null});
         this.props
@@ -115,7 +112,7 @@ class CreateModal extends Component {
                 refreshInterval: DEFAULT_REFRESH_INTERVAL,
                 filename: generateFilename(),
                 cronInterval: this.state.interval,
-                name: this.state.name
+                name: this.state.name ? this.state.name.trim() : ''
             })
             .then(() => {
                 this.setState({successMessage: 'Scheduled query saved successfully!', saving: false});
