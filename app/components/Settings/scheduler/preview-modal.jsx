@@ -86,7 +86,9 @@ export class PreviewModal extends Component {
     onSubmit() {
         if (this.state.editing) {
             const {connectionId, fid, requestor, uids, refreshInterval} = this.props.query;
-            const {code: query, cronInterval, name} = this.state;
+            const {code: query, cronInterval} = this.state;
+            const name = this.state.name ? this.state.name.trim() : '';
+
             this.setState({loading: true, error: null});
             this.props
                 .onSave({
@@ -130,14 +132,32 @@ export class PreviewModal extends Component {
 
     renderButtonRow() {
         const {loading, editing} = this.state;
+        const loggedIn = this.props.currentRequestor;
         const canEdit = this.props.currentRequestor && this.props.currentRequestor === this.props.query.requestor;
         const success = this.state.successMessage;
 
         if (!canEdit) {
             return (
-                <button style={noMargin} onClick={this.props.onLogin}>
-                    Log in to edit query
-                </button>
+                <React.Fragment>
+                    {loggedIn ? (
+                        <Column>
+                            <Row>
+                                <p style={{fontSize: 12, marginBottom: '16px', opacity: 0.7, width: '100%'}}>
+                                    This query was created by another user. To modify, please log in as that user.
+                                </p>
+                            </Row>
+                            <Row style={{justifyContent: 'flex-start'}}>
+                                <button style={noMargin} onClick={this.props.onLogin}>
+                                    {loggedIn ? 'Switch users' : 'Log in to edit query'}
+                                </button>
+                            </Row>
+                        </Column>
+                    ) : (
+                        <button style={noMargin} onClick={this.props.onLogin}>
+                            Log in to edit query
+                        </button>
+                    )}
+                </React.Fragment>
             );
         }
 
@@ -189,11 +209,47 @@ export class PreviewModal extends Component {
             const initialModeId = getInitialCronMode(props.query);
 
             content = (
-                <Column style={{width: '60%', maxHeight: '100vh', minWidth: 640, background: 'white'}}>
+                <Column
+                    style={{
+                        width: '60%',
+                        maxHeight: '100vh',
+                        minWidth: 640,
+                        background: 'white',
+                        paddingTop: 16,
+                        position: 'relative'
+                    }}
+                >
+                    <button
+                        onClick={this.close}
+                        style={{
+                            position: 'absolute',
+                            top: '16px',
+                            right: '16px',
+                            padding: '2px 4px',
+                            zIndex: 99
+                        }}
+                    >
+                        &times;
+                    </button>
+                    {editing && (
+                        <Row
+                            style={{
+                                padding: '0 32px',
+                                justifyContent: 'flex-start',
+                                fontSize: 12,
+                                marginTop: 8,
+                                fontWeight: 600,
+                                opacity: 0.4,
+                                letterSpacing: '0.5px'
+                            }}
+                        >
+                            EDITING
+                        </Row>
+                    )}
                     <Row
                         className="sql-preview"
                         style={{
-                            padding: '16px 32px',
+                            padding: '0 32px 16px',
                             position: 'relative',
                             justifyContent: 'flex-start'
                         }}
@@ -201,24 +257,16 @@ export class PreviewModal extends Component {
                         <h5 className="sql-preview ellipsis" style={{...noMargin, letterSpacing: '1px'}}>
                             {this.state.name ? <b>{this.state.name}</b> : <SQL className="bold">{this.state.code}</SQL>}
                         </h5>
-                        <button
-                            onClick={this.close}
-                            style={{
-                                position: 'absolute',
-                                top: '16px',
-                                right: '16px',
-                                padding: '2px 4px'
-                            }}
-                        >
-                            &times;
-                        </button>
                     </Row>
                     <Column style={{background: '#F5F7FB', padding: '16px 32px'}}>
                         <Row style={rowStyle}>
                             <div style={keyStyle}>Query</div>
-                            <div className="sql-preview scheduler" style={{...valueStyle, overflowY: 'auto'}}>
+                            <div
+                                className="sql-preview scheduler"
+                                style={{...valueStyle, overflowY: 'auto', maxHeight: 300}}
+                            >
                                 {editing ? (
-                                    <div>
+                                    <div style={{width: '99%'}}>
                                         <CodeMirror
                                             options={{
                                                 lineNumbers: true,
@@ -305,7 +353,7 @@ export class PreviewModal extends Component {
                                 justifyContent: 'space-between',
                                 border: 'none',
                                 marginTop: 48,
-                                paddingBottom: 0
+                                paddingBottom: 16
                             }}
                         >
                             {this.renderButtonRow()}

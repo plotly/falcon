@@ -69,21 +69,19 @@ class IntervalFormatter extends React.Component {
         const run = this.props.value;
 
         return (
-            <Row>
-                <Column>
-                    <em
-                        style={{
-                            fontSize: 15
-                        }}
-                    >
-                        {run.cronInterval
-                            ? cronstrue.toString(run.cronInterval)
-                            : `Runs every ${ms(run.refreshInterval * 1000, {
-                                  long: true
-                              })}`}
-                    </em>
-                </Column>
-            </Row>
+            <em
+                className="ellipsis"
+                style={{
+                    display: 'block',
+                    fontSize: 15
+                }}
+            >
+                {run.cronInterval
+                    ? cronstrue.toString(run.cronInterval)
+                    : `Runs every ${ms(run.refreshInterval * 1000, {
+                          long: true
+                      })}`}
+            </em>
         );
     }
 }
@@ -117,6 +115,7 @@ class Scheduler extends Component {
         initialCode: PropTypes.string,
         requestor: PropTypes.string,
         dialect: PropTypes.string,
+        preview: PropTypes.object,
         refreshQueries: PropTypes.func.isRequired,
         openLogin: PropTypes.func.isRequired,
         createScheduledQuery: PropTypes.func.isRequired,
@@ -141,7 +140,7 @@ class Scheduler extends Component {
             },
             {
                 key: 'run',
-                name: 'Interval',
+                name: 'Schedule',
                 filterable: true,
                 formatter: IntervalFormatter
             }
@@ -306,6 +305,7 @@ class Scheduler extends Component {
                     open={!loggedIn && this.state.createModalOpen}
                     onClickAway={this.closeCreateModal}
                     onSubmit={this.props.openLogin}
+                    preview={this.props.preview}
                 />
 
                 {/*

@@ -49,12 +49,7 @@
 }
 
 .scheduler-table .react-grid-Row {
-    border-top: 1px solid #c8d4e3;
     cursor: pointer;
-}
-
-.scheduler-table .react-grid-Row:first-child {
-    border-top: none;
 }
 
 .sql pre {
@@ -79,5 +74,5 @@
 }
 
 .meta-preview button {
-    min-height: 28px;
+    min-height: 21px;
 }

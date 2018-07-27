@@ -426,6 +426,7 @@ class Settings extends Component {
                               openLogin={this.openLogin}
                               requestor={username}
                               dialect={dialect}
+                              preview={preview}
                               openQueryPage={() => this.updateSelectedPanel(1)}
                             />
                         </TabPanel>

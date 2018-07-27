@@ -70,6 +70,7 @@ class CreateModal extends Component {
             saving: false
         };
         this.options = {
+            lineWrapping: true,
             lineNumbers: true,
             tabSize: 4,
             readOnly: false,
@@ -111,7 +112,7 @@ class CreateModal extends Component {
                 refreshInterval: DEFAULT_REFRESH_INTERVAL,
                 filename: generateFilename(),
                 cronInterval: this.state.interval,
-                name: this.state.name
+                name: this.state.name ? this.state.name.trim() : ''
             })
             .then(() => {
                 this.setState({successMessage: 'Scheduled query saved successfully!', saving: false});
@@ -122,7 +123,10 @@ class CreateModal extends Component {
     render() {
         return (
             <Modal open={this.props.open} onClickAway={this.props.onClickAway} className="scheduler create-modal">
-                <Column className="container" style={{width: '60%', maxHeight: '100vh', minWidth: 640}}>
+                <Column
+                    className="container"
+                    style={{width: '60%', maxHeight: '100vh', minWidth: 640, paddingBottom: '16px'}}
+                >
                     <Row>
                         <Column className="innerColumn">
                             <h5 className="header">Create Scheduled Query</h5>
@@ -152,12 +156,18 @@ class CreateModal extends Component {
                         <Row style={secondaryRowStyle}>
                             <div className="row-header">Query name</div>
                             <div className="row-body">
-                                <input
-                                    maxLength="150"
-                                    placeholder="Enter query name here..."
-                                    value={this.state.name}
-                                    onChange={this.handleNameChange}
-                                />
+                                {this.state.successMessage ? (
+                                    <em style={{marginTop: 5, display: 'inherit'}}>
+                                        <b>{this.state.name}</b>
+                                    </em>
+                                ) : (
+                                    <input
+                                        maxLength="150"
+                                        placeholder="Enter query name here..."
+                                        value={this.state.name}
+                                        onChange={this.handleNameChange}
+                                    />
+                                )}
                             </div>
                         </Row>
                         <Row style={secondaryRowStyle}>
