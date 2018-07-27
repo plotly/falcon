@@ -20,6 +20,29 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 
+## [3.0.0] - 2018-07-27
+
+### Added
+* Added UI to show scheduled queries (#472)
+* Added UI to create, update and delete scheduled queries (#476)
+* Support cron rules to schedule queries (#488)
+* Added UI to name scheduled queries (#500)
+
+### Changed
+* The refresh interval of scheduled queries created in previous versions of
+  Falcon is now converted into one of the following: every minute, every 5
+  minutes, hourly, daily and weekly (#488)
+
+### Removed
+* Removed the chart editor and the export tab when running onprem mode (#496)
+
+### Fixed
+* MSSQL: Fixed #299, #409 and #462 (#464)
+
+### Security
+* Mitigated clickjacking by setting `X-Frame-Options: DENY` (#489)
+
+
 ## [2.8.0] - 2018-06-07
 
 ### Fixed
