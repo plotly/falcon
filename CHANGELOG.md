@@ -20,6 +20,60 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 
+## [3.0.0] - 2018-07-27
+
+### Added
+* Added UI to show scheduled queries (#472)
+* Added UI to create, update and delete scheduled queries (#476)
+* Support cron rules to schedule queries (#488)
+* Added UI to name scheduled queries (#500)
+
+### Changed
+* The refresh interval of scheduled queries created in previous versions of
+  Falcon is now converted into one of the following: every minute, every 5
+  minutes, hourly, daily and weekly (#488)
+
+### Removed
+* Removed the chart editor and the export tab when running onprem mode (#496)
+
+### Fixed
+* MSSQL: Fixed #299, #409 and #462 (#464)
+
+### Security
+* Mitigated clickjacking by setting `X-Frame-Options: DENY` (#489)
+
+
+## [2.8.0] - 2018-06-07
+
+### Fixed
+* Fixed query panel for non-sql connectors (#451)
+* Fixed build failure with dtrace-provider (#421)
+* Fixed broken oauth redirection in web app (#260)
+
+### Security
+* Disabled nodeIntegration (#453)
+* Ensured new windows are created using `shell.openExternal` (#453)
+
+
+## [2.7.0] - 2018-05-28
+
+### Added
+* Connector for Oracle databases (#437)
+* Backend: Added API for creating a grid to store results from scheduled queries (#444)
+
+### Changed
+* UI: Added a vertical scrollbar to the database view
+* UI: Don't hide the code editor when the chart editor opens (#445)
+* Log: Reduced verbosity
+
+### Fixed
+* Backend: Fixed error message on failed connection
+
+### Security
+* Upgraded to Electron v2.0.1 (and Node v8)
+* Prevent navigation on drag'n'drop (#436)
+
+
 ## [2.6.0] - 2018-04-13
 
 ### Added

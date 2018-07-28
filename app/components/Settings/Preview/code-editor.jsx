@@ -14,7 +14,7 @@ import 'react-resizable/css/styles.css';
 
 import './code-editor.css';
 
-import {DIALECTS} from '../../../constants/constants';
+import {getHighlightMode} from '../../../constants/constants';
 
 const MIN_CONSTRAINTS_HEIGHT = 74;
 
@@ -25,6 +25,7 @@ export default class CodeEditor extends React.Component {
 
         dialect: PropTypes.string,
         runQuery: PropTypes.func,
+        openScheduler: PropTypes.func,
         schemaRequest: PropTypes.object,
         isLoading: PropTypes.bool
     }
@@ -176,7 +177,8 @@ export default class CodeEditor extends React.Component {
             value,
             dialect,
             runQuery,
-            isLoading
+            isLoading,
+            openScheduler
         } = this.props;
 
         const {
@@ -186,15 +188,7 @@ export default class CodeEditor extends React.Component {
             maxConstraints
         } = this.state;
 
-        const mode = {
-            [DIALECTS.APACHE_SPARK]: 'text/x-sparksql',
-            [DIALECTS.MYSQL]: 'text/x-mysql',
-            [DIALECTS.SQLITE]: 'text/x-sqlite',
-            [DIALECTS.MARIADB]: 'text/x-mariadb',
-            [DIALECTS.POSTGRES]: 'text/x-pgsql',
-            [DIALECTS.REDSHIFT]: 'text/x-pgsql',
-            [DIALECTS.MSSQL]: 'text/x-mssql'
-        }[dialect] || 'text/x-sql';
+        const mode = getHighlightMode(dialect);
 
         const options = {
             lineNumbers: true,
@@ -221,10 +215,17 @@ export default class CodeEditor extends React.Component {
                     onChange={onChange}
                     editorDidMount={editorDidMount}
                 />
+                <button
+                    className="btn btn-secondary scheduleButton"
+                    onClick={openScheduler}
+                    disabled={isLoading}
+                >
+                    {isLoading ? 'Loading...' : 'Schedule'}
+                </button>
                 <a
                     className="btn btn-primary runButton"
                     onClick={runQuery}
-                    disabled={!isLoading}
+                    disabled={isLoading}
                 >
                     {isLoading ? 'Loading...' : 'Run'}
                 </a>

@@ -1,13 +1,24 @@
+const fetch = require('node-fetch');
+import {contains, keys, isEmpty, merge, pluck} from 'ramda';
 const restify = require('restify');
 const CookieParser = require('restify-cookies');
-const fetch = require('node-fetch');
 
 import * as fs from 'fs';
 import path from 'path';
 
-import * as Datastores from './persistent/datastores/Datastores.js';
 import {PlotlyOAuth} from './plugins/authorization.js';
-import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
+import {generateAndSaveAccessToken} from './utils/authUtils.js';
+import {
+    getAccessTokenCookieOptions,
+    getCookieOptions,
+    getUnsecuredCookieOptions
+} from './constants.js';
+import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates.js';
+import * as Datastores from './persistent/datastores/Datastores.js';
+import init from './init.js';
+import Logger from './logger.js';
+import {checkWritePermissions, newDatacache} from './persistent/plotly-api.js';
+import {getQueries, getQuery, deleteQuery} from './persistent/Queries.js';
 import {
     deleteConnectionById,
     editConnectionById,
@@ -21,13 +32,7 @@ import {
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
-import {generateAndSaveAccessToken} from './utils/authUtils';
-import {getAccessTokenCookieOptions, getCookieOptions} from './constants';
-import {checkWritePermissions, newDatacache} from './persistent/PlotlyAPI.js';
-import {contains, keys, isEmpty, merge, pluck} from 'ramda';
-import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
-import Logger from './logger';
-import init from './init.js';
+
 
 export default class Servers {
     /*
@@ -143,17 +148,35 @@ export default class Servers {
 
         that.electronWindow = that.httpsServer.electronWindow || that.httpServer.electronWindow;
 
+        server.pre(function (req, res, next) {
+            res.header(
+                'X-Frame-Options',
+                'DENY'
+            );
+            next();
+        });
+
         server.use(CookieParser.parse);
         server.use(PlotlyOAuth(Boolean(that.isElectron)));
 
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
         server.pre(function (request, response, next) {
-            Logger.log(`Request: ${request.href()}`, 2);
+            const href = request.href();
+            const skip =
+                href.startsWith('/settings/urls') ||
+                href.startsWith('/static') ||
+                href.startsWith('/images');
+            if (!skip) Logger.log(`Request: ${href}`, 2);
             next();
         });
         server.use(function (request, response, next) {
-            Logger.log(`Response: ${request.href()}`, 2);
+            const href = request.href();
+            const skip =
+                href.startsWith('/settings/urls') ||
+                href.startsWith('/static') ||
+                href.startsWith('/images');
+            if (!skip) Logger.log(`Response: ${href}`, 2);
             next();
         });
 
@@ -299,7 +322,7 @@ export default class Servers {
                         res.setCookie('db-connector-auth-token',
                                       db_connector_access_token,
                                       getAccessTokenCookieOptions());
-                        res.setCookie('db-connector-user', username, getCookieOptions());
+                        res.setCookie('db-connector-user', username, getUnsecuredCookieOptions());
 
                         const existingUsers = getSetting('USERS');
                         const existingUsernames = pluck('username', existingUsers);
@@ -457,11 +480,11 @@ export default class Servers {
                     return next();
                 }
                 Logger.log(validation, 2);
-                res.json(400, {error: validation.message});
+                res.json(400, {error: {message: validation.message}});
                 return next();
             }).catch(err => {
                 Logger.log(err, 2);
-                res.json(400, {error: err.message});
+                res.json(400, {error: {message: err.message}});
                 return next();
             });
         });
@@ -603,13 +626,15 @@ export default class Servers {
             }
             else {
                 const rand = Math.round(Math.random() * 1000).toString();
-                const downloadPath = path.join(getSetting('STORAGE_PATH'), `data_export_${rand}.csv`);
+                const downloadPath = path.resolve(
+                    path.join(getSetting('STORAGE_PATH'), `data_export_${rand}.csv`)
+                );
                 fs.writeFile(downloadPath, payload, (err) => {
                     if (err) {
                         res.json({type: 'error', message: err});
                         return next();
                     }
-                    res.json({type: 'csv', url: 'file:///'.concat(downloadPath)});
+                    res.json({type: 'csv', url: 'file://'.concat(downloadPath)});
                     return next();
                 });
             }
@@ -633,42 +658,65 @@ export default class Servers {
             return next();
         });
 
-        // register or overwrite a query
+        // register/update a query (and create/update a grid)
         /*
          * TODO - Updating a query should be a PATCH or PUT under
          * the endpoint `/queries/:fid`
          */
         server.post('/queries', function postQueriesHandler(req, res, next) {
-            // Make the query and update the user's grid
-            const {fid, uids, query, connectionId, requestor} = req.params;
+            const {filename, fid, uids, query, connectionId, requestor} = req.params;
 
-            // Check that the user has permission to edit the grid
+            // If a filename has been provided,
+            // make the query and create a new grid
+            if (filename) {
+                return that.queryScheduler.queryAndCreateGrid(
+                    filename, query, connectionId, requestor
+                )
+                .then((newGridResponse) => {
+                    const queryObject = {
+                        ...req.params,
+                        fid: newGridResponse.file.fid,
+                        uids: newGridResponse.file.cols.map(col => col.uid)
+                    };
+                    that.queryScheduler.scheduleQuery(queryObject);
+                    res.json(201, queryObject);
+                    return next();
+                })
+                .catch(onError);
+            }
 
-            checkWritePermissions(fid, requestor)
-            .then(function nowQueryAndUpdateGrid() {
-                return that.queryScheduler.queryAndUpdateGrid(
-                    fid, uids, query, connectionId, requestor
-                );
-            })
-            .then(function returnSuccess() {
-                let status;
-                if (getQuery(req.params.fid)) {
-                    // TODO - Technically, this should be
-                    // under the endpoint `/queries/:fid`
-                    status = 200;
-                } else {
-                    status = 201;
-                }
-                that.queryScheduler.scheduleQuery(req.params);
-                res.json(status, {});
-                return next();
-            })
-            .catch(function returnError(error) {
+            // If a grid fid has been provided,
+            // check the user has permission to edit,
+            // make the query and update the grid
+            if (fid) {
+                return checkWritePermissions(fid, requestor).then(function () {
+                    return that.queryScheduler.queryAndUpdateGrid(
+                        fid, uids, query, connectionId, requestor
+                    );
+                })
+                .then(() => {
+                    let status;
+                    if (getQuery(req.params.fid)) {
+                        // TODO - Technically, this should be
+                        // under the endpoint `/queries/:fid`
+                        status = 200;
+                    } else {
+                        status = 201;
+                    }
+                    that.queryScheduler.scheduleQuery(req.params);
+                    res.json(status, {});
+                    return next();
+                })
+                .catch(onError);
+            }
+
+            return onError(new Error('Bad request'));
+
+            function onError(error) {
                 Logger.log(error, 0);
                 res.json(400, {error: {message: error.message}});
                 return next();
-            });
-
+            }
         });
 
         // delete a query

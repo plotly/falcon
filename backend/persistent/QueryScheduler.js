@@ -1,10 +1,26 @@
-import * as Connections from './datastores/Datastores';
-import {getConnectionById} from './Connections';
-import {getQuery, getQueries, saveQuery, deleteQuery} from './Queries';
-import {getSetting} from '../settings';
-import Logger from '../logger';
-import {PlotlyAPIRequest, updateGrid} from './PlotlyAPI';
 import {has} from 'ramda';
+import * as scheduler from 'node-schedule';
+
+import {getConnectionById} from './Connections.js';
+import * as Connections from './datastores/Datastores.js';
+import { mapRefreshToCron } from '../utils/cronUtils.js';
+import Logger from '../logger';
+import {
+    getQuery,
+    getQueries,
+    saveQuery,
+    deleteQuery
+} from './Queries.js';
+import {
+    getCredentials,
+    getSetting
+} from '../settings.js';
+import {
+    getCurrentUser,
+    getGridMeta,
+    newGrid,
+    updateGrid
+} from './plotly-api.js';
 
 class QueryScheduler {
     constructor() {
@@ -12,6 +28,7 @@ class QueryScheduler {
         this.loadQueries = this.loadQueries.bind(this);
         this.clearQuery = this.clearQuery.bind(this);
         this.clearQueries = this.clearQueries.bind(this);
+        this.queryAndCreateGrid = this.queryAndCreateGrid.bind(this);
         this.queryAndUpdateGrid = this.queryAndUpdateGrid.bind(this);
 
         // this.job wraps this.queryAndUpdateGrid to avoid concurrent runs of the same job
@@ -44,17 +61,23 @@ class QueryScheduler {
         requestor,
         fid,
         uids,
-        refreshInterval,
+        refreshInterval = null,
+        cronInterval = null,
+        name,
         query,
         connectionId
     }) {
-        if (!refreshInterval) {
-            throw new Error('Refresh interval was not supplied');
-        } else if (refreshInterval < this.minimumRefreshInterval) {
+        if (!cronInterval && !refreshInterval) {
+            throw new Error('A scheduling interval was not supplied');
+        } else if (refreshInterval && refreshInterval < this.minimumRefreshInterval) {
             throw new Error([
                 `Refresh interval must be at least ${this.minimumRefreshInterval} seconds`,
                 `(supplied ${refreshInterval})`
             ].join(' '));
+        }
+
+        if (name && name.length > 150) {
+            throw new Error('Invalid query name. Must be less than 150 characters.');
         }
 
         Logger.log(`Scheduling "${query}" with connection ${connectionId} updating grid ${fid}`);
@@ -70,22 +93,33 @@ class QueryScheduler {
         }
 
         // Save query to a file
-        saveQuery({
+        const queryParams = {
             requestor,
             fid,
             uids,
             refreshInterval,
+            cronInterval,
             query,
             connectionId
-        });
+        };
+
+        // explicitly omit name unless truthy to prevent 'yamljs' from
+        // coerecing an undefined key into null
+        if (name) {
+            queryParams.name = name;
+        }
+
+        saveQuery(queryParams);
 
         // Schedule
-        this.queryJobs[fid] = setInterval(
-            () => {
-                this.job(fid, uids, query, connectionId, requestor);
-            },
-            refreshInterval * 1000
-        );
+        const job = () => this.job(fid, uids, query, connectionId, requestor);
+        let jobInterval = cronInterval;
+        if (!jobInterval) {
+            // convert refresh interval to cron representation
+            jobInterval = mapRefreshToCron(refreshInterval);
+        }
+
+        this.queryJobs[fid] = scheduler.scheduleJob(jobInterval, job);
     }
 
     // Load and schedule queries - To be run on app start.
@@ -97,7 +131,9 @@ class QueryScheduler {
 
     // Remove query from memory
     clearQuery(fid) {
-        clearInterval(this.queryJobs[fid]);
+        if (this.queryJobs[fid]) {
+            this.queryJobs[fid].cancel();
+        }
         delete this.queryJobs[fid];
     }
 
@@ -106,7 +142,77 @@ class QueryScheduler {
         Object.keys(this.queryJobs).forEach(this.clearQuery);
     }
 
-    queryAndUpdateGrid (fid, uids, queryString, connectionId, requestor) {
+    queryAndCreateGrid(filename, query, connectionId, requestor) {
+        const {username, apiKey, accessToken} = getCredentials(requestor);
+        let startTime;
+
+        // Check if the user even exists
+        if (!username || !(apiKey || accessToken)) {
+            /*
+             * Warning: The front end looks for "Unauthenticated" in this error message. Don't change it!
+             */
+            const errorMessage = (
+                'Unauthenticated: Attempting to create a grid but the ' +
+                `authentication credentials for the user "${username}" do not exist.`
+            );
+            Logger.log(errorMessage, 0);
+            throw new Error(errorMessage);
+        }
+
+        // Check if the credentials are valid
+        return getCurrentUser(username).then(res => {
+            if (res.status !== 200) {
+                const errorMessage = (
+                    `Unauthenticated: ${getSetting('PLOTLY_API_URL')} failed to identify ${username}.`
+                );
+                Logger.log(errorMessage, 0);
+                throw new Error(errorMessage);
+            }
+
+
+            startTime = process.hrtime();
+
+            Logger.log(`Querying "${query}" with connection ${connectionId} to create a new grid`, 2);
+            return Connections.query(query, getConnectionById(connectionId)).catch((e) => {
+                /*
+                * Warning: The front end looks for "QueryExecutionError" in this error message. Don't change it!
+                */
+                throw new Error(`QueryExecutionError: ${e.message}`);
+            });
+        }).then(({rows, columnnames}) => {
+            Logger.log(`Query "${query}" took ${process.hrtime(startTime)[0]} seconds`, 2);
+            Logger.log('Create a new grid with new data', 2);
+            Logger.log(`First row: ${JSON.stringify(rows.slice(0, 1))}`, 2);
+
+            startTime = process.hrtime();
+
+            return newGrid(
+                filename,
+                columnnames,
+                rows,
+                requestor
+            ).catch((e) => {
+                /*
+                * Warning: The front end looks for "PlotlyApiError" in this error message. Don't change it!
+                */
+                throw new Error(`PlotlyApiError: ${e.message}`);
+            });
+        }).then(res => {
+            Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(startTime)[0]} seconds`, 2);
+
+            if (res.status !== 201) {
+                Logger.log(`Error ${res.status} while creating a grid`, 2);
+            }
+
+            return res.json().then((json) => {
+                Logger.log(`Grid ${json.file.fid} has been updated.`, 2);
+                return json;
+            });
+        });
+
+    }
+
+    queryAndUpdateGrid(fid, uids, query, connectionId, requestor) {
         const requestedDBConnections = getConnectionById(connectionId);
         let startTime = process.hrtime();
 
@@ -118,16 +224,12 @@ class QueryScheduler {
          * If the user is the owner, then requestor === fid.split(':')[0]
          * If the user is a collaborator, then requestor is different
          */
-        const username = requestor;
-        const user = getSetting('USERS').find(
-             u => u.username === username
-        );
+        const {username, apiKey, accessToken} = getCredentials(requestor);
 
         // Check if the user even exists
-        if (!user || !(user.apiKey || user.accessToken)) {
+        if (!username || !(apiKey || accessToken)) {
             /*
-             * Heads up - the front end looks for "Unauthenticated" in this
-             * error message. So don't change it!
+             * Warning: The front end looks for "Unauthenticated" in this error message. Don't change it!
              */
             const errorMessage = (
                 `Unauthenticated: Attempting to update grid ${fid} but the ` +
@@ -136,11 +238,9 @@ class QueryScheduler {
             Logger.log(errorMessage, 0);
             throw new Error(errorMessage);
         }
-        const {apiKey, accessToken} = user;
+
         // Check if the credentials are valid
-        return PlotlyAPIRequest('users/current', {
-            method: 'GET', username, apiKey, accessToken
-        }).then(res => {
+        return getCurrentUser(username).then(res => {
             if (res.status !== 200) {
                 const errorMessage = (
                     `Unauthenticated: ${getSetting('PLOTLY_API_URL')} failed to identify ${username}.`
@@ -149,26 +249,35 @@ class QueryScheduler {
                 throw new Error(errorMessage);
             }
 
-            Logger.log(`Querying "${queryString}" with connection ${connectionId} to update grid ${fid}`, 2);
-            return Connections.query(queryString, requestedDBConnections);
+            Logger.log(`Querying "${query}" with connection ${connectionId} to update grid ${fid}`, 2);
+            return Connections.query(query, requestedDBConnections).catch((e) => {
+                /*
+                * Warning: The front end looks for "QueryExecutionError" in this error message. Don't change it!
+                */
+                throw new Error(`QueryExecutionError: ${e.message}`);
+            });
+        }).then(({rows}) => {
 
-        }).then(rowsAndColumns => {
-
-            Logger.log(`Query "${queryString}" took ${process.hrtime(startTime)[0]} seconds`, 2);
+            Logger.log(`Query "${query}" took ${process.hrtime(startTime)[0]} seconds`, 2);
             Logger.log(`Updating grid ${fid} with new data`, 2);
             Logger.log(
                 'First row: ' +
-                JSON.stringify(rowsAndColumns.rows.slice(0, 1)),
+                JSON.stringify(rows.slice(0, 1)),
             2);
 
             startTime = process.hrtime();
+
             return updateGrid(
-                rowsAndColumns.rows,
+                rows,
                 fid,
                 uids,
                 requestor
-            );
-
+            ).catch((e) => {
+                /*
+                * Warning: The front end looks for "PlotlyApiError" in this error message. Don't change it!
+                */
+                throw new Error(`PlotlyApiError: ${e.message}`);
+            });
         }).then(res => {
             Logger.log(`Request to Plotly for grid ${fid} took ${process.hrtime(startTime)[0]} seconds`, 2);
             if (res.status !== 200) {
@@ -196,16 +305,9 @@ class QueryScheduler {
                  * make an additional API call to GET it
                  */
 
-                return PlotlyAPIRequest(
-                    `grids/${fid}`,
-                    {username, apiKey, accessToken, method: 'GET'}
-                ).then(resFromGET => {
+                return getGridMeta(fid, username).then(resFromGET => {
                     if (resFromGET.status === 404) {
-                        Logger.log(('' +
-                            `Grid ID ${fid} doesn't exist on Plotly anymore, ` +
-                            'removing persistent query.'),
-                             2
-                        );
+                        Logger.log(`Grid ID ${fid} doesn't exist on Plotly anymore, removing persistent query.`, 2);
                         this.clearQuery(fid);
                         return deleteQuery(fid);
                     }
@@ -216,7 +318,6 @@ class QueryScheduler {
                         try {
                             filemeta = JSON.parse(text);
                         } catch (e) {
-                            // Well, that's annoying.
                             Logger.log(`Failed to parse the JSON of request ${fid}`, 0);
                             Logger.log(e);
                             Logger.log('Text response: ' + text, 0);

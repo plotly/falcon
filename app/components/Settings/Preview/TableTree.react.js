@@ -35,6 +35,8 @@ class TableTree extends Component {
                 return getPathNames(connectionObject.url)[2];
             case DIALECTS.CSV:
                 return connectionObject.label || connectionObject.id || connectionObject.database;
+            case DIALECTS.ORACLE:
+                return connectionObject.connectionString;
             default:
                 return connectionObject.database;
         }

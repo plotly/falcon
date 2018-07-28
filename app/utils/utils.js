@@ -1,7 +1,20 @@
 import {contains} from 'ramda';
 
-export function dynamicRequireElectron() {
-    return window.require('electron');
+export function isElectron() {
+    // the electron's main process preloads a script that sets up `window.$falcon`
+    return Boolean(window.$falcon);
+}
+
+export function setUsernameListener(callback) {
+    if (isElectron()) {
+        window.$falcon.setUsernameListener(callback);
+    }
+}
+
+export function showOpenDialog(options, callback) {
+    if (isElectron()) {
+        return window.$falcon.showOpenDialog(options, callback);
+    }
 }
 
 export function baseUrl() {
@@ -38,10 +51,6 @@ export function plotlyUrl() {
         return window.location.origin;
     }
     return 'https://plot.ly';
-}
-
-export function isElectron() {
-    return window.process && window.process.type === 'renderer';
 }
 
 export function homeUrl() {

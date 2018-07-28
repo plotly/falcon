@@ -2,7 +2,7 @@ version: 0.4.{build}
 
 environment:
   matrix:
-    - nodejs_version: 6
+    - nodejs_version: 8
       POSTGRES_PATH: C:\Program Files\PostgreSQL\9.6
 
 platform:
@@ -28,10 +28,12 @@ build_script:
   - yarn run pack
 
 after_build:
-  - 7z a release.zip release/latest.yml release/*.exe
+        - ps: |
+            $FALCON_VERSION = node -p "require('./package.json').version"
+            cd release
+            7z a win-falcon-v$FALCON_VERSION.zip *.exe
 
 artifacts:
-  - path: release.zip
-    name: release
+  - path: release\*.zip
 
 test: off
