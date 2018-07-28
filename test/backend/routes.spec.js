@@ -3,10 +3,10 @@ const fs = require('fs');
 import {assert} from 'chai';
 import {assoc, contains, dissoc, isEmpty, keys, merge} from 'ramda';
 
-import Servers from '../../backend/routes.js';
-import {getConnections, saveConnection} from '../../backend/persistent/Connections.js';
-import {getSetting, saveSetting} from '../../backend/settings.js';
 import {setCertificatesSettings} from '../../backend/certificates';
+import {getConnections, saveConnection} from '../../backend/persistent/Connections.js';
+import Servers from '../../backend/routes.js';
+import {getSetting, saveSetting} from '../../backend/settings.js';
 import {
     accessToken,
     apacheDrillConnections,
@@ -14,7 +14,6 @@ import {
     assertResponseStatus,
     clearSettings,
     closeTestServers,
-    createGrid,
     createTestServers,
     DELETE,
     fakeCerts,
@@ -30,14 +29,10 @@ import {
     testConnections,
     testSqlConnections,
     username,
-    validFid,
-    validUids,
     wait
 } from './utils.js';
 
 
-
-let queryObject;
 let servers;
 let connectionId;
 
@@ -65,8 +60,6 @@ function closeServers() {
     });
 }
 
-// Suppressing ESLint cause Mocha ensures `this` is bound in test functions
-/* eslint-disable no-invalid-this */
 describe('Servers:', () => {
     beforeEach(() => {
         clearSettings('KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH');
@@ -133,14 +126,6 @@ describe('Routes:', () => {
 
         // Initialize query object
         connectionId = saveConnection(sqlConnections);
-        queryObject = {
-            fid: validFid,
-            uids: validUids.slice(0, 2), // since this particular query only has 2 columns
-            refreshInterval: 60, // every minute
-            query: 'SELECT * FROM ebola_2014 LIMIT 1',
-            connectionId: connectionId,
-            requestor: validFid.split(':')[0]
-        };
 
         // Sets cookies using `oauth` route, so that following requests will be authenticated
         return POST('oauth2', {access_token: accessToken})
@@ -381,7 +366,23 @@ describe('Routes:', () => {
                     'weather_data_seattle_2016',
                     'world_gdp_with_codes_2014'
                 ];
-                if (connection.dialect === 'postgres') {
+                if (connection.dialect === 'mssql') {
+                    tables = [
+                        '"dbo"."alcohol_consumption_by_country_2010"',
+                        '"dbo"."apple_stock_2014"',
+                        '"dbo"."ebola_2014"',
+                        '"dbo"."february_aa_flight_paths_2011"',
+                        '"dbo"."february_us_airport_traffic_2011"',
+                        '"dbo"."precipitation_2015_06_30"',
+                        '"dbo"."us_ag_exports_2011"',
+                        '"dbo"."us_cities_2014"',
+                        '"dbo"."usa_states_2014"',
+                        '"dbo"."walmart_store_openings_1962_2006"',
+                        '"dbo"."weather_data_seattle_2016"',
+                        '"dbo"."world_gdp_with_codes_2014"',
+                        '"guest"."apple_stock_2014"'
+                    ];
+                } else if (connection.dialect === 'postgres') {
                     tables = [
                         'alcohol_consumption_by_country_2010',
                         'apple_stock_2014',
@@ -1097,87 +1098,87 @@ describe('Routes:', () => {
                         ];
                     } else if (connection.dialect === 'mssql') {
                         rows = [
-                            [ 'walmart_store_openings_1962_2006', 'storenum', 'int'],
-                            [ 'walmart_store_openings_1962_2006', 'OPENDATE', 'varchar'],
-                            [ 'walmart_store_openings_1962_2006', 'date_super', 'varchar'],
-                            [ 'walmart_store_openings_1962_2006', 'conversion', 'varchar'],
-                            [ 'walmart_store_openings_1962_2006', 'st', 'int'],
-                            [ 'walmart_store_openings_1962_2006', 'county', 'int'],
-                            [ 'walmart_store_openings_1962_2006', 'STREETADDR', 'varchar'],
-                            [ 'walmart_store_openings_1962_2006', 'STRCITY', 'varchar'],
-                            [ 'walmart_store_openings_1962_2006', 'STRSTATE', 'varchar'],
-                            [ 'walmart_store_openings_1962_2006', 'ZIPCODE', 'int'],
-                            [ 'walmart_store_openings_1962_2006', 'type_store', 'varchar'],
-                            [ 'walmart_store_openings_1962_2006', 'LAT', 'decimal'],
-                            [ 'walmart_store_openings_1962_2006', 'LON', 'decimal'],
-                            [ 'walmart_store_openings_1962_2006', 'MONTH', 'int'],
-                            [ 'walmart_store_openings_1962_2006', 'DAY', 'int'],
-                            [ 'walmart_store_openings_1962_2006', 'YEAR', 'int'],
-                            [ 'alcohol_consumption_by_country_2010', 'location', 'varchar'],
-                            [ 'alcohol_consumption_by_country_2010', 'alcohol', 'varchar'],
-                            [ 'february_aa_flight_paths_2011', 'start_lat', 'decimal'],
-                            [ 'february_aa_flight_paths_2011', 'start_lon', 'decimal'],
-                            [ 'february_aa_flight_paths_2011', 'end_lat', 'decimal'],
-                            [ 'february_aa_flight_paths_2011', 'end_lon', 'decimal'],
-                            [ 'february_aa_flight_paths_2011', 'airline', 'varchar'],
-                            [ 'february_aa_flight_paths_2011', 'airport1', 'varchar'],
-                            [ 'february_aa_flight_paths_2011', 'airport2', 'varchar'],
-                            [ 'february_aa_flight_paths_2011', 'cnt', 'int'],
-                            [ 'february_us_airport_traffic_2011', 'iata', 'varchar'],
-                            [ 'february_us_airport_traffic_2011', 'airport', 'varchar'],
-                            [ 'february_us_airport_traffic_2011', 'city', 'varchar'],
-                            [ 'february_us_airport_traffic_2011', 'state', 'varchar'],
-                            [ 'february_us_airport_traffic_2011', 'country', 'varchar'],
-                            [ 'february_us_airport_traffic_2011', 'lat', 'decimal'],
-                            [ 'february_us_airport_traffic_2011', 'long', 'decimal'],
-                            [ 'february_us_airport_traffic_2011', 'cnt', 'int'],
-                            [ 'us_ag_exports_2011', 'code', 'varchar'],
-                            [ 'us_ag_exports_2011', 'state', 'varchar'],
-                            [ 'us_ag_exports_2011', 'category', 'varchar'],
-                            [ 'us_ag_exports_2011', 'total exports', 'decimal'],
-                            [ 'us_ag_exports_2011', 'beef', 'decimal'],
-                            [ 'us_ag_exports_2011', 'pork', 'decimal'],
-                            [ 'us_ag_exports_2011', 'poultry', 'decimal'],
-                            [ 'us_ag_exports_2011', 'dairy', 'decimal'],
-                            [ 'us_ag_exports_2011', 'fruits fresh', 'decimal'],
-                            [ 'us_ag_exports_2011', 'fruits proc', 'decimal'],
-                            [ 'us_ag_exports_2011', 'total fruits', 'decimal'],
-                            [ 'us_ag_exports_2011', 'veggies fresh', 'decimal'],
-                            [ 'us_ag_exports_2011', 'veggies proc', 'decimal'],
-                            [ 'us_ag_exports_2011', 'total veggies', 'decimal'],
-                            [ 'us_ag_exports_2011', 'corn', 'decimal'],
-                            [ 'us_ag_exports_2011', 'wheat', 'decimal'],
-                            [ 'us_ag_exports_2011', 'cotton', 'decimal'],
-                            [ 'apple_stock_2014', 'AAPL_x', 'datetime'],
-                            [ 'apple_stock_2014', 'AAPL_y', 'decimal'],
-                            [ 'ebola_2014', 'Country', 'varchar'],
-                            [ 'ebola_2014', 'Month', 'int'],
-                            [ 'ebola_2014', 'Year', 'int'],
-                            [ 'ebola_2014', 'Lat', 'decimal'],
-                            [ 'ebola_2014', 'Lon', 'decimal'],
-                            [ 'ebola_2014', 'Value', 'varchar'],
-                            [ 'us_cities_2014', 'name', 'varchar'],
-                            [ 'us_cities_2014', 'pop', 'int'],
-                            [ 'us_cities_2014', 'lat', 'decimal'],
-                            [ 'us_cities_2014', 'lon', 'decimal'],
-                            [ 'usa_states_2014', 'rank', 'int'],
-                            [ 'usa_states_2014', 'state', 'varchar'],
-                            [ 'usa_states_2014', 'postal', 'varchar'],
-                            [ 'usa_states_2014', 'pop', 'decimal'],
-                            [ 'world_gdp_with_codes_2014', 'COUNTRY', 'varchar'],
-                            [ 'world_gdp_with_codes_2014', 'GDP (BILLIONS)', 'decimal'],
-                            [ 'world_gdp_with_codes_2014', 'CODE', 'varchar'],
-                            [ 'precipitation_2015_06_30', 'Hrapx', 'varchar'],
-                            [ 'precipitation_2015_06_30', 'Hrapy', 'varchar'],
-                            [ 'precipitation_2015_06_30', 'Lat', 'decimal'],
-                            [ 'precipitation_2015_06_30', 'Lon', 'decimal'],
-                            [ 'precipitation_2015_06_30', 'Globvalue', 'decimal'],
-                            [ 'weather_data_seattle_2016', 'Date', 'varchar'],
-                            [ 'weather_data_seattle_2016', 'Max_TemperatureC', 'varchar'],
-                            [ 'weather_data_seattle_2016', 'Mean_TemperatureC', 'varchar'],
-                            [ 'weather_data_seattle_2016', 'Min_TemperatureC', 'varchar'],
-                            [ 'apple_stock_2014', 'AAPL_x', 'datetime'],
-                            [ 'apple_stock_2014', 'AAPL_y', 'decimal']
+                            [ '"dbo"."alcohol_consumption_by_country_2010"', 'alcohol', 'varchar' ],
+                            [ '"dbo"."alcohol_consumption_by_country_2010"', 'location', 'varchar' ],
+                            [ '"dbo"."apple_stock_2014"', 'AAPL_x', 'datetime' ],
+                            [ '"dbo"."apple_stock_2014"', 'AAPL_y', 'decimal' ],
+                            [ '"dbo"."ebola_2014"', 'Country', 'varchar' ],
+                            [ '"dbo"."ebola_2014"', 'Lat', 'decimal' ],
+                            [ '"dbo"."ebola_2014"', 'Lon', 'decimal' ],
+                            [ '"dbo"."ebola_2014"', 'Month', 'int' ],
+                            [ '"dbo"."ebola_2014"', 'Value', 'varchar' ],
+                            [ '"dbo"."ebola_2014"', 'Year', 'int' ],
+                            [ '"dbo"."february_aa_flight_paths_2011"', 'airline', 'varchar' ],
+                            [ '"dbo"."february_aa_flight_paths_2011"', 'airport1', 'varchar' ],
+                            [ '"dbo"."february_aa_flight_paths_2011"', 'airport2', 'varchar' ],
+                            [ '"dbo"."february_aa_flight_paths_2011"', 'cnt', 'int' ],
+                            [ '"dbo"."february_aa_flight_paths_2011"', 'end_lat', 'decimal' ],
+                            [ '"dbo"."february_aa_flight_paths_2011"', 'end_lon', 'decimal' ],
+                            [ '"dbo"."february_aa_flight_paths_2011"', 'start_lat', 'decimal' ],
+                            [ '"dbo"."february_aa_flight_paths_2011"', 'start_lon', 'decimal' ],
+                            [ '"dbo"."february_us_airport_traffic_2011"', 'airport', 'varchar' ],
+                            [ '"dbo"."february_us_airport_traffic_2011"', 'city', 'varchar' ],
+                            [ '"dbo"."february_us_airport_traffic_2011"', 'cnt', 'int' ],
+                            [ '"dbo"."february_us_airport_traffic_2011"', 'country', 'varchar' ],
+                            [ '"dbo"."february_us_airport_traffic_2011"', 'iata', 'varchar' ],
+                            [ '"dbo"."february_us_airport_traffic_2011"', 'lat', 'decimal' ],
+                            [ '"dbo"."february_us_airport_traffic_2011"', 'long', 'decimal' ],
+                            [ '"dbo"."february_us_airport_traffic_2011"', 'state', 'varchar' ],
+                            [ '"dbo"."precipitation_2015_06_30"', 'Globvalue', 'decimal' ],
+                            [ '"dbo"."precipitation_2015_06_30"', 'Hrapx', 'varchar' ],
+                            [ '"dbo"."precipitation_2015_06_30"', 'Hrapy', 'varchar' ],
+                            [ '"dbo"."precipitation_2015_06_30"', 'Lat', 'decimal' ],
+                            [ '"dbo"."precipitation_2015_06_30"', 'Lon', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'beef', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'category', 'varchar' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'code', 'varchar' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'corn', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'cotton', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'dairy', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'fruits fresh', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'fruits proc', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'pork', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'poultry', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'state', 'varchar' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'total exports', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'total fruits', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'total veggies', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'veggies fresh', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'veggies proc', 'decimal' ],
+                            [ '"dbo"."us_ag_exports_2011"', 'wheat', 'decimal' ],
+                            [ '"dbo"."us_cities_2014"', 'lat', 'decimal' ],
+                            [ '"dbo"."us_cities_2014"', 'lon', 'decimal' ],
+                            [ '"dbo"."us_cities_2014"', 'name', 'varchar' ],
+                            [ '"dbo"."us_cities_2014"', 'pop', 'int' ],
+                            [ '"dbo"."usa_states_2014"', 'pop', 'decimal' ],
+                            [ '"dbo"."usa_states_2014"', 'postal', 'varchar' ],
+                            [ '"dbo"."usa_states_2014"', 'rank', 'int' ],
+                            [ '"dbo"."usa_states_2014"', 'state', 'varchar' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'conversion', 'varchar' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'county', 'int' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'date_super', 'varchar' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'DAY', 'int' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'LAT', 'decimal' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'LON', 'decimal' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'MONTH', 'int' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'OPENDATE', 'varchar' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'st', 'int' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'storenum', 'int' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'STRCITY', 'varchar' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'STREETADDR', 'varchar' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'STRSTATE', 'varchar' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'type_store', 'varchar' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'YEAR', 'int' ],
+                            [ '"dbo"."walmart_store_openings_1962_2006"', 'ZIPCODE', 'int' ],
+                            [ '"dbo"."weather_data_seattle_2016"', 'Date', 'varchar' ],
+                            [ '"dbo"."weather_data_seattle_2016"', 'Max_TemperatureC', 'varchar' ],
+                            [ '"dbo"."weather_data_seattle_2016"', 'Mean_TemperatureC', 'varchar' ],
+                            [ '"dbo"."weather_data_seattle_2016"', 'Min_TemperatureC', 'varchar' ],
+                            [ '"dbo"."world_gdp_with_codes_2014"', 'CODE', 'varchar' ],
+                            [ '"dbo"."world_gdp_with_codes_2014"', 'COUNTRY', 'varchar' ],
+                            [ '"dbo"."world_gdp_with_codes_2014"', 'GDP (BILLIONS)', 'decimal' ],
+                            [ '"guest"."apple_stock_2014"', 'AAPL_x', 'datetime' ],
+                            [ '"guest"."apple_stock_2014"', 'AAPL_y', 'decimal' ]
                         ];
                     } else if (connection.dialect === 'apache impala') {
                         rows = [
@@ -1578,7 +1579,7 @@ describe('Routes:', () => {
                 .then(getResponseJson).then(json => {
                     assert.deepEqual(
                         json,
-                        {error: 'password authentication failed for user "banana"'}
+                        {error: {message: 'password authentication failed for user "banana"'}}
                     );
                     assert.deepEqual(
                         getConnections(),
@@ -1630,266 +1631,4 @@ describe('Routes:', () => {
                 });
         });
     });
-
-    describe('persistent queries:', function() {
-        beforeEach(function() {
-            // Verify that there are no queries saved
-            return GET('queries')
-                .then(assertResponseStatus(200))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, []);
-                });
-        });
-
-        it('queries registers a query and returns saved queries', function() {
-            // Save a grid that we can update
-            return createGrid('test interval')
-                .then(assertResponseStatus(201))
-                .then(getResponseJson).then(json => {
-                    const fid = json.file.fid;
-                    const uids = json.file.cols.map(col => col.uid);
-
-                    queryObject = {
-                        fid,
-                        requestor: fid.split(':')[0],
-                        uids,
-                        refreshInterval: 60,
-                        connectionId,
-                        query: 'SELECT * from ebola_2014 LIMIT 2'
-                    };
-
-                    return POST('queries', queryObject);
-                })
-                .then(assertResponseStatus(201))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {});
-
-                    return GET('queries');
-                })
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, [queryObject]);
-                });
-        });
-
-        it('queries can register queries if the user is a collaborator', function() {
-            /*
-             * Plotly doesn't have a v2 endpoint for creating
-             * collaborators, so we'll just use these hardcoded
-             * fids and uids that already have a collaborator
-             * assigned to them.
-             * This test won't work against any plotly server
-             * except https://plot.ly
-             */
-            const collaborator = 'plotly-connector-collaborator';
-            saveSetting('USERS', [{
-                username: collaborator,
-                apiKey: 'I6j80cqCVaBAnvH9ESD2'
-            }]);
-            const fid = 'plotly-database-connector:718';
-            const uids = ['d8ba6c', 'dfa411'];
-
-            queryObject = {
-                fid,
-                requestor: collaborator,
-                uids,
-                refreshInterval: 60,
-                connectionId,
-                query: 'SELECT * from ebola_2014 LIMIT 2'
-            };
-
-            return POST('queries', queryObject)
-                .then(assertResponseStatus(201))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {});
-                    return GET('queries');
-                })
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, [queryObject]);
-                });
-        });
-
-        it("queries can't register queries if the user can't view it", function() {
-            // The grid is not shared with this user
-            const viewer = 'plotly-connector-viewer';
-            saveSetting('USERS', [{
-                username: viewer,
-                apiKey: 'mUSjMmwa55d6hjvwvgI4'
-            }]);
-            const fid = 'plotly-database-connector:718';
-            const uids = ['d8ba6c', 'dfa411'];
-
-            queryObject = {
-                fid,
-                requestor: viewer,
-                uids,
-                refreshInterval: 60,
-                connectionId,
-                query: 'SELECT * from ebola_2014 LIMIT 2'
-            };
-
-            return POST('queries', queryObject)
-                .then(assertResponseStatus(400))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {error: {message: 'Not found'}});
-                    return GET('queries');
-                })
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, [], 'No queries were saved');
-                });
-        });
-
-        it("queries can't register queries if the user isn't a collaborator", function() {
-            // The grid is not shared with this user
-            const viewer = 'plotly-connector-viewer';
-            saveSetting('USERS', [{
-                username: viewer,
-                apiKey: 'mUSjMmwa55d6hjvwvgI4'
-            }]);
-            /*
-             * Unlike plotly-database-connector:718, this grid is public
-             * so requests won't fail because of a 404. They should, however,
-             * fail because there are no collaborators associated with this
-             * plot
-             */
-            const fid = 'plotly-database-connector:719';
-            const uids = ['3a6df9', 'b95e9d'];
-
-            queryObject = {
-                fid,
-                requestor: viewer,
-                uids,
-                refreshInterval: 60,
-                connectionId,
-                query: 'SELECT * from ebola_2014 LIMIT 2'
-            };
-
-            return POST('queries', queryObject)
-                .then(assertResponseStatus(400))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {error: {message: 'Permission denied'}});
-                    return GET('queries');
-                })
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, [], 'still no queries saved');
-                });
-        });
-
-        it('queries gets individual queries', function() {
-            return GET(`queries/${queryObject.fid}`)
-                .then(assertResponseStatus(404)).then(() => {
-                    return POST('queries', queryObject);
-                })
-                .then(assertResponseStatus(201))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {});
-                    return GET(`queries/${queryObject.fid}`);
-                })
-                .then(assertResponseStatus(200))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, queryObject);
-                });
-        });
-
-        it('queries deletes queries', function() {
-            return POST('queries', queryObject)
-                .then(assertResponseStatus(201))
-                .then(() => DELETE(`queries/${queryObject.fid}`))
-                .then(assertResponseStatus(200))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {});
-                    return GET(`queries/${queryObject.fid}`);
-                })
-                .then(assertResponseStatus(404));
-        });
-
-        it('queries returns 404s when getting queries that don\'t exist', function() {
-            return GET('queries/asdfasdf').then(assertResponseStatus(404));
-        });
-
-        it('queries returns 404s when deleting queries that don\'t exist', function() {
-            return DELETE('queries/asdfasdf').then(assertResponseStatus(404));
-        });
-
-        it("queries POST /queries fails when the user's API keys or oauth creds aren't saved", function() {
-            saveSetting('USERS', []);
-            assert.deepEqual(getSetting('USERS'), []);
-
-            return POST('queries', queryObject)
-            .then(assertResponseStatus(500))
-            .then(getResponseJson).then(json => {
-                assert.deepEqual(
-                    json,
-                    {error: {
-                        message: (
-                            'Unauthenticated: Attempting to update grid ' +
-                            'plotly-database-connector:197 ' +
-                            'but the authentication credentials ' +
-                            'for the user "plotly-database-connector" ' +
-                            'do not exist.'
-                        )
-                    }}
-                );
-            });
-        });
-
-        it("queries POST /queries fails when the user's API keys aren't correct", function() {
-            const creds = [{username: 'plotly-database-connector', apiKey: 'lah lah lemons'}];
-            saveSetting('USERS', creds);
-            assert.deepEqual(getSetting('USERS'), creds);
-
-            return POST('queries', queryObject)
-            .then(assertResponseStatus(400))
-            .then(getResponseJson).then(json => {
-                assert.deepEqual(
-                    json,
-                    {error: {
-                        message: (
-                            'Unauthenticated'
-                        )
-                    }}
-                );
-            });
-        });
-
-        it("queries POST /queries fails when it can't connect to the plotly server", function() {
-            const nonExistantServer = 'plotly.lah-lah-lemons.com';
-            saveSetting('PLOTLY_API_DOMAIN', nonExistantServer);
-            assert.deepEqual(getSetting('PLOTLY_API_URL'), `https://${nonExistantServer}`);
-
-            return POST('queries', queryObject)
-            .then(assertResponseStatus(400))
-            .then(getResponseJson).then(json => {
-                assert.deepEqual(
-                    json,
-                    {
-                        error: {
-                            message: (
-                                'request to ' +
-                                'https://plotly.lah-lah-lemons.com/v2/grids/plotly-database-connector:197 ' +
-                                'failed, reason: getaddrinfo ENOTFOUND plotly.lah-lah-lemons.com ' +
-                                'plotly.lah-lah-lemons.com:443'
-                            )
-                        }
-                    }
-                );
-            });
-        });
-
-        it('queries POST /queries fails when there is a syntax error in the query', function() {
-            const invalidQueryObject = merge(
-                queryObject,
-                {query: 'SELECZ'}
-            );
-
-            return POST('queries', invalidQueryObject)
-            .then(assertResponseStatus(400))
-            .then(getResponseJson).then(json => {
-                assert.deepEqual(
-                    json,
-                    {error: {message: 'syntax error at or near "SELECZ"'}}
-                );
-            });
-        });
-    });
 });
-/* eslint-enable no-invalid-this */

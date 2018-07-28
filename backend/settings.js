@@ -1,9 +1,11 @@
 import fs from 'fs';
+import os from 'os';
+import path from 'path';
+
 import {concat, contains, has} from 'ramda';
 import YAML from 'yamljs';
+
 import {createStoragePath} from './utils/homeFiles';
-import path from 'path';
-import os from 'os';
 
 const DEFAULT_SETTINGS = {
     HEADLESS: false,
@@ -225,4 +227,9 @@ export function saveSetting(settingName, settingValue) {
      * without a more thorough investigation.
      */
     fs.writeFileSync(getSetting('SETTINGS_PATH'), YAML.stringify(settingsOnFile));
+}
+
+// Get user credentials
+export function getCredentials(username) {
+    return getSetting('USERS').find(u => u.username === username) || {};
 }

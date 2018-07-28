@@ -38,6 +38,7 @@ class Preview extends Component {
         getSqlSchema: PropTypes.func,
 
         runSqlQuery: PropTypes.func,
+        openScheduler: PropTypes.func,
         previewTableRequest: PropTypes.object,
         queryRequest: PropTypes.object,
         elasticsearchMappingsRequest: PropTypes.object,
@@ -171,7 +172,6 @@ class Preview extends Component {
     }
 
     fetchDatacache(payload, type) {
-
         const {username} = this.props;
         const payloadJSON = JSON.stringify({
             payload: payload, type: type, requestor: username});
@@ -187,7 +187,8 @@ class Preview extends Component {
         }).then(resp => {
             return resp.json();
         }).then(data => {
-            const plotlyLinks = this.state.plotlyLinks;
+            const {plotlyLinks} = this.state;
+
             let link;
 
             if (!('error' in data)) {
@@ -347,6 +348,7 @@ class Preview extends Component {
 
                                             dialect={dialect}
                                             runQuery={this.runQuery}
+                                            openScheduler={this.props.openScheduler}
                                             schemaRequest={schemaRequest}
                                             isLoading={isLoading}
                                         />
@@ -389,15 +391,17 @@ class Preview extends Component {
                                                 // If Chart Editor selected and Schemas Tree visible,
                                                 // then save size in lastSize before hiding
                                                 this.props.updatePreview({
+                                                    // uncomment to hide sql editor
+                                                    // showEditor: false,
                                                     showChart: true,
-                                                    showEditor: false,
                                                     lastSize: size,
                                                     size: minSize
                                                 });
                                             } else {
                                                 this.props.updatePreview({
-                                                    showChart: true,
-                                                    showEditor: false
+                                                    // uncomment to hide sql editor
+                                                    // showEditor: false,
+                                                    showChart: true
                                                 });
                                             }
                                         } else {
@@ -405,14 +409,16 @@ class Preview extends Component {
                                                 // If Chart Editor not selected and Schemas Tree was hidden,
                                                 // then restore the last size
                                                 this.props.updatePreview({
+                                                    // uncomment to show sql editor
+                                                    // showEditor: true,
                                                     showChart: false,
-                                                    showEditor: true,
                                                     size: lastSize
                                                 });
                                             } else {
                                                 this.props.updatePreview({
-                                                    showChart: false,
-                                                    showEditor: true
+                                                    // uncomment to show sql editor
+                                                    // showEditor: true,
+                                                    showChart: false
                                                 });
                                             }
                                         }
@@ -422,8 +428,8 @@ class Preview extends Component {
                                         style={{userSelect: 'none'}}
                                     >
                                         <Tab>Table</Tab>
-                                        <Tab>Chart</Tab>
-                                        <Tab>Export</Tab>
+                                        {!isOnPrem() && <Tab>Chart</Tab>}
+                                        {!isOnPrem() && <Tab>Export</Tab>}
                                     </TabList>
 
                                     <TabPanel
@@ -435,6 +441,7 @@ class Preview extends Component {
                                         />
                                     </TabPanel>
 
+                                    {!isOnPrem() &&
                                     <TabPanel>
                                         <ChartEditor
                                             ref="chartEditor"
@@ -447,33 +454,39 @@ class Preview extends Component {
 
                                             hidden={!showChart}
                                         />
-                                    </TabPanel>
+                                    </TabPanel>}
 
+                                    {!isOnPrem() &&
                                     <TabPanel>
-                                        <div className="export-options-container">
-                                            <div style={{margin: '20px 0'}}>
-                                                <button
-                                                    className="btn btn-outline"
-                                                    onClick={() => this.fetchDatacache(this.getCSVString(), 'grid')}
-                                                >
-                                                    Send CSV to Chart Studio
-                                                </button>
-                                                {!isOnPrem() &&
-                                                <button
-                                                    className="btn btn-outline"
-                                                    onClick={() => this.fetchDatacache(this.getCSVString(), 'csv')}
-                                                >
-                                                    Download CSV
-                                                </button>}
-                                                <button
-                                                    className="btn btn-outline"
-                                                    onClick={() => this.fetchDatacache(
-                                                        JSON.stringify(this.state.plotlyJSON),
-                                                        'plot'
-                                                    )}
-                                                >
-                                                    Send chart to Chart Studio
-                                                </button>
+                                        <div className="export-options-container" style={{ marginTop: 20 }}>
+                                            <div className="container-title">CHART STUDIO</div>
+                                            <div className="export-options-group">
+                                              <button
+                                                  className="btn btn-outline"
+                                                  onClick={() => this.fetchDatacache(
+                                                      JSON.stringify(this.state.plotlyJSON),
+                                                      'plot'
+                                                  )}
+                                              >
+                                                  Upload Chart
+                                              </button>
+                                              <button
+                                                  className="btn btn-outline"
+                                                  onClick={() => this.fetchDatacache(this.getCSVString(), 'grid')}
+                                              >
+                                                  Upload Dataset
+                                              </button>
+                                            </div>
+                                            <div className="container-title">MY COMPUTER</div>
+                                            <div className="export-options-group">
+                                              <button
+                                                  className="btn btn-outline"
+                                                  onClick={() => window.open(
+                                                      `data:text/csv;base64,${Buffer.from(this.getCSVString()).toString('base64')}`
+                                                  )}
+                                              >
+                                                  Download CSV
+                                              </button>
                                             </div>
                                             <div style={{width: 650, height: 200, border: '1px solid #dfe8f3',
                                                 fontFamily: '\'Ubuntu Mono\', courier, monospace', paddingTop: 10,
@@ -484,12 +497,6 @@ class Preview extends Component {
                                                         {link.type === 'grid' &&
                                                             <div>
                                                                 <div style={{color: '#00cc96'}}>🎉  Link to your CSV on Chart Studio ⬇️</div>
-                                                                <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
-                                                            </div>
-                                                        }
-                                                        {link.type === 'csv' &&
-                                                            <div>
-                                                                <div style={{color: '#00cc96'}}>💾  Your CSV has been saved ⬇️</div>
                                                                 <Link href={link.url} target="_blank" className="externalLink">{link.url}</Link>
                                                             </div>
                                                         }
@@ -508,7 +515,7 @@ class Preview extends Component {
                                                 ))}
                                             </div>
                                         </div>
-                                    </TabPanel>
+                                    </TabPanel>}
                                 </Tabs>
                             </div>
                         }

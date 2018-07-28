@@ -4,6 +4,7 @@
     font-size: 14px;
     height: 140px;
     margin-bottom: 20px;
+    width: 740px;
 }
 
 .CodeMirror-gutters {
@@ -13,4 +14,11 @@
 
 .react-resizable-handle {
     z-index: 9;
+}
+
+.scheduleButton {
+    bottom: 18px;
+    position: absolute;
+    right: 136px;
+    z-index: 10;
 }

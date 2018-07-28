@@ -1,0 +1,26 @@
+.login-modal .container {
+    background: #F5F7FB;
+    position: relative;
+}
+
+.login-modal .header {
+    margin-bottom: 16px;
+    padding: 0 32px;
+}
+
+.login-modal .button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 2px 4px;
+}
+
+.login-modal p {
+    margin: 56px 0 8px;
+    padding: 16px;
+}
+
+.login-modal .actions button {
+    width: 50%;
+    margin: 24px 32px 32px;
+}

@@ -26,32 +26,6 @@ const REDSHIFT_OPTIONS = {
     }
 };
 
-const SHOW_TABLES_QUERY = {
-    [DIALECTS.MYSQL]: 'SHOW TABLES',
-    [DIALECTS.MARIADB]: 'SHOW TABLES',
-    [DIALECTS.SQLITE]: 'SELECT name FROM sqlite_master WHERE type="table"',
-    [DIALECTS.MSSQL]: (
-        'SELECT TABLE_NAME FROM ' +
-        'information_schema.tables'
-    ),
-    [DIALECTS.POSTGRES]: `
-        SELECT table_schema || '."'  || table_name || '"'
-        FROM information_schema.tables
-        WHERE table_type != 'VIEW'
-           AND table_schema != 'pg_catalog'
-           AND table_schema != 'information_schema'
-        ORDER BY table_schema, table_name
-    `,
-    [DIALECTS.REDSHIFT]: `
-        SELECT table_schema || '."'  || table_name || '"'
-        FROM information_schema.tables
-        WHERE table_type != 'VIEW'
-           AND table_schema != 'pg_catalog'
-           AND table_schema != 'information_schema'
-        ORDER BY table_schema, table_name
-    `
-};
-
 
 function createClient(connection) {
     const {
@@ -132,14 +106,43 @@ export function query(queryString, connection) {
 }
 
 export function tables(connection) {
+    const {dialect} = connection;
+
+    const SHOW_TABLES_QUERY = {
+        [DIALECTS.MYSQL]: 'SHOW TABLES',
+        [DIALECTS.MARIADB]: 'SHOW TABLES',
+        [DIALECTS.SQLITE]: 'SELECT name FROM sqlite_master WHERE type="table"',
+        [DIALECTS.MSSQL]: `
+            SELECT '"' + table_schema + '"."' + table_name + '"'
+            FROM information_schema.tables
+            ORDER BY table_schema, table_name
+        `,
+        [DIALECTS.POSTGRES]: `
+            SELECT table_schema || '."' || table_name || '"'
+            FROM information_schema.tables
+            WHERE table_type != 'VIEW'
+               AND table_schema != 'pg_catalog'
+               AND table_schema != 'information_schema'
+            ORDER BY table_schema, table_name
+        `,
+        [DIALECTS.REDSHIFT]: `
+            SELECT table_schema || '."'  || table_name || '"'
+            FROM information_schema.tables
+            WHERE table_type != 'VIEW'
+               AND table_schema != 'pg_catalog'
+               AND table_schema != 'information_schema'
+            ORDER BY table_schema, table_name
+        `
+    };
+
     return createClient(connection).query(
-        SHOW_TABLES_QUERY[connection.dialect],
+        SHOW_TABLES_QUERY[dialect],
         {type: Sequelize.QueryTypes.SELECT}
     ).then(tableList => {
 
         let tableNames;
 
-        if (connection.dialect === 'postgres' || connection.dialect === 'redshift') {
+        if (dialect === 'postgres' || dialect === 'redshift') {
             tableNames = tableList.map(data => {
                 let tableName = String(data['?column?']);
 
@@ -156,7 +159,7 @@ export function tables(connection) {
 
                 return tableName;
             });
-        } else if (connection.dialect === 'sqlite') {
+        } else if (dialect === 'sqlite') {
             tableNames = tableList;
         } else {
             tableNames = tableList.map(object => values(object)[0]);
@@ -170,22 +173,23 @@ export function tables(connection) {
 export function schemas(connection) {
     const {database, dialect} = connection;
 
-    // Suppressing ESLint cause single quote strings beside template strings
-    // would be inconvenient when changed queries
-    /* eslint-disable quotes */
     let queryString;
     switch (dialect) {
         case DIALECTS.MYSQL:
         case DIALECTS.MARIADB:
-            queryString = `SELECT table_name, column_name, data_type FROM information_schema.columns ` +
-                `WHERE table_schema = '${database}' ORDER BY table_name`;
+            queryString = `
+                SELECT table_name, column_name, data_type
+                FROM information_schema.columns
+                WHERE table_schema = '${database}'
+                ORDER BY table_name
+            `;
             break;
         case DIALECTS.SQLITE:
             return sqlite_schemas(connection);
         case DIALECTS.POSTGRES:
         case DIALECTS.REDSHIFT:
             queryString = `
-                SELECT table_schema || '."'  || table_name || '"', column_name, data_type
+                SELECT table_schema || '."' || table_name || '"', column_name, data_type
                 FROM information_schema.columns
                 WHERE table_catalog = '${database}'
                     AND table_schema != 'pg_catalog'
@@ -195,17 +199,14 @@ export function schemas(connection) {
             break;
         case DIALECTS.MSSQL:
             queryString = `
-                SELECT T.name AS Table_Name, C.name AS Column_Name, P.name AS Data_Type
-                FROM sys.objects AS T
-                   JOIN sys.columns AS C ON T.object_id = C.object_id
-                   JOIN sys.types AS P ON C.system_type_id = P.system_type_id
-                WHERE T.type_desc = 'USER_TABLE';
+                SELECT '"' + table_schema + '"."' + table_name + '"', column_name, data_type
+                FROM information_schema.columns
+                ORDER BY table_schema, table_name, column_name
             `;
             break;
         default:
             throw new Error(`Dialect ${dialect} is not one of the SQL DIALECTS`);
     }
-    /* eslint-enable quotes */
 
     return query(queryString, connection);
 }

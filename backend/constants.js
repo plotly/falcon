@@ -1,5 +1,11 @@
 import {getSetting} from './settings';
 
+export function getUnsecuredCookieOptions() {
+    return {
+        path: getSetting('WEB_BASE_PATHNAME')
+    };
+}
+
 export function getCookieOptions() {
     return {
         secure: getSetting('SSL_ENABLED'),
