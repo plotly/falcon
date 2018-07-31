@@ -22,6 +22,21 @@ export function mapRefreshToCron (refreshInterval) {
     return `${now.getMinutes()} ${now.getHours()} * * ${now.getDay()}`;
 }
 
+export function mapCronToRefresh (cronInterval) {
+    if (cronInterval === '* * * * *') {
+        return 60;
+    } else if (cronInterval === '*/5 * * * *') {
+        return 60 * 5;
+    } else if (cronInterval.match(/\S+? \* \* \* \*/)) {
+        return 60 * 60;
+    } else if (cronInterval.match(/\S+? \S+? \* \* \*/)) {
+        return 60 * 60 * 24;
+    }
+
+    // default to weekly
+    return 60 * 60 * 24 * 7;
+}
+
 function computeMinutes (now) {
     let currMinute = now.getMinutes() % 5; // start at 5 min offset
     const minutes = [];
