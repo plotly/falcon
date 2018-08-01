@@ -23,6 +23,12 @@ export function mapRefreshToCron (refreshInterval) {
 }
 
 export function mapCronToRefresh (cronInterval) {
+    const DEFAULT_INTERVAL = 60 * 60 * 24 * 7; // default to weekly
+
+    if (!cronInterval) {
+        return DEFAULT_INTERVAL;
+    }
+
     if (cronInterval === '* * * * *') {
         return 60;
     } else if (cronInterval === '*/5 * * * *') {
@@ -33,8 +39,7 @@ export function mapCronToRefresh (cronInterval) {
         return 60 * 60 * 24;
     }
 
-    // default to weekly
-    return 60 * 60 * 24 * 7;
+    return DEFAULT_INTERVAL;
 }
 
 function computeMinutes (now) {
