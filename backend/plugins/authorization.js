@@ -53,7 +53,7 @@ export function PlotlyOAuth(electron) {
         const plotlyAuthToken = req.cookies['plotly-auth-token'];
         const onprem = getSetting('IS_RUNNING_INSIDE_ON_PREM');
         if (path === '/' && !plotlyAuthToken && onprem) {
-            return res.redirect('/login', next);
+            return res.redirect('/external-data-connector/login', next);
         }
 
         // Auth is disabled for certain urls:
