@@ -23,8 +23,6 @@ import {
     updateGrid
 } from './plotly-api.js';
 
-const DEFAULT_REFRESH_INTERVAL = 60 * 60 * 24 * 7;
-
 class QueryScheduler {
     constructor() {
         this.scheduleQuery = this.scheduleQuery.bind(this);
@@ -100,7 +98,7 @@ class QueryScheduler {
             requestor,
             fid,
             uids,
-            refreshInterval: refreshInterval || DEFAULT_REFRESH_INTERVAL,
+            refreshInterval: refreshInterval || mapCronToRefresh(cronInterval),
             cronInterval,
             query,
             connectionId
