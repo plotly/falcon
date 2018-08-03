@@ -225,9 +225,9 @@ class QueryScheduler {
                 }
             ).catch((e) => {
                 /*
-                * Warning: The front end looks for "PlotlyApiError" in this error message. Don't change it!
+                * Warning: The front end looks for "MetadataError" in this error message. Don't change it!
                 */
-                throw new Error(`PlotlyApiError: ${e.message}`);
+                throw new Error(`MetadataError: ${e.message}`);
             });
         }).then(() => {
             Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(startTime)[0]} seconds`, 2);
@@ -377,9 +377,9 @@ class QueryScheduler {
                 }
             ).catch((e) => {
                 /*
-                * Warning: The front end looks for "PlotlyApiError" in this error message. Don't change it!
+                * Warning: The front end looks for "MetadataError" in this error message. Don't change it!
                 */
-                throw new Error(`PlotlyApiError: ${e.message}`);
+                throw new Error(`MetadataError: ${e.message}`);
             });
         }).then((res) => {
             Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(startTime)[0]} seconds`, 2);
