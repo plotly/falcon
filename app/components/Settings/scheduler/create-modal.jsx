@@ -12,12 +12,7 @@ import TimedMessage from './timed-message.jsx';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 import SQL from './sql.jsx';
 
-import {
-    getHighlightMode,
-    DEFAULT_REFRESH_INTERVAL,
-    WAITING_MESSAGE,
-    SAVE_WARNING
-} from '../../../constants/constants.js';
+import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../constants/constants.js';
 
 import './create-modal.css';
 
@@ -109,7 +104,6 @@ class CreateModal extends Component {
         this.props
             .onSubmit({
                 query: this.state.code,
-                refreshInterval: DEFAULT_REFRESH_INTERVAL,
                 filename: generateFilename(),
                 cronInterval: this.state.interval,
                 name: this.state.name ? this.state.name.trim() : ''

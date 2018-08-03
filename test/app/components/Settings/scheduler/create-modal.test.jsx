@@ -18,7 +18,6 @@ global.document.createRange = function() {
 
 const wait = () => new Promise(resolve => setTimeout(resolve, 0));
 
-const {DEFAULT_REFRESH_INTERVAL} = require('../../../../../app/constants/constants');
 const CodeMirror = require('react-codemirror2').Controlled;
 const CreateModal = require('../../../../../app/components/Settings/scheduler/create-modal.jsx');
 const ErrorComponent = require('../../../../../app/components/error.jsx');
@@ -93,7 +92,6 @@ describe('Create Modal Test', () => {
                 // Once filename input is supported, this value should be: 'filename',
                 filename: expect.any(String),
                 query: 'SELECT * FROM foods',
-                refreshInterval: DEFAULT_REFRESH_INTERVAL,
                 cronInterval
             })
         );
@@ -101,7 +99,6 @@ describe('Create Modal Test', () => {
             // Once filename input is supported, this value should be: 'filename',
             filename: expect.any(String),
             query: 'SELECT * FROM foods',
-            refreshInterval: DEFAULT_REFRESH_INTERVAL,
             cronInterval,
             name
         });

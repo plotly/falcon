@@ -13,12 +13,7 @@ import CronPicker from '../cron-picker/cron-picker.jsx';
 import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
 import {plotlyUrl} from '../../../utils/utils.js';
-import {
-    getHighlightMode,
-    DEFAULT_REFRESH_INTERVAL,
-    WAITING_MESSAGE,
-    SAVE_WARNING
-} from '../../../constants/constants.js';
+import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../constants/constants.js';
 import {getInitialCronMode} from '../cron-picker/cron-helpers.js';
 
 const NO_OP = () => {};
@@ -85,7 +80,7 @@ export class PreviewModal extends Component {
 
     onSubmit() {
         if (this.state.editing) {
-            const {connectionId, fid, requestor, uids, refreshInterval} = this.props.query;
+            const {connectionId, fid, requestor, uids} = this.props.query;
             const {code: query, cronInterval} = this.state;
             const name = this.state.name ? this.state.name.trim() : '';
 
@@ -98,8 +93,7 @@ export class PreviewModal extends Component {
                     uids,
                     query,
                     name,
-                    cronInterval,
-                    refreshInterval: refreshInterval || DEFAULT_REFRESH_INTERVAL
+                    cronInterval
                 })
                 .then(() => {
                     this.setState({

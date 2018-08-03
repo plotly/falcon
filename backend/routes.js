@@ -664,13 +664,22 @@ export default class Servers {
          * the endpoint `/queries/:fid`
          */
         server.post('/queries', function postQueriesHandler(req, res, next) {
-            const {filename, fid, uids, query, connectionId, requestor} = req.params;
+            const {
+                filename,
+                fid,
+                uids,
+                query,
+                connectionId,
+                requestor,
+                cronInterval = null,
+                refreshInterval = null
+            } = req.params;
 
             // If a filename has been provided,
             // make the query and create a new grid
             if (filename) {
                 return that.queryScheduler.queryAndCreateGrid(
-                    filename, query, connectionId, requestor
+                    filename, query, connectionId, requestor, cronInterval, refreshInterval
                 )
                 .then((newGridResponse) => {
                     const queryObject = {
@@ -691,7 +700,7 @@ export default class Servers {
             if (fid) {
                 return checkWritePermissions(fid, requestor).then(function () {
                     return that.queryScheduler.queryAndUpdateGrid(
-                        fid, uids, query, connectionId, requestor
+                        fid, uids, query, connectionId, requestor, cronInterval, refreshInterval
                     );
                 })
                 .then(() => {

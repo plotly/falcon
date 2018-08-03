@@ -166,7 +166,6 @@ export function createScheduledQuery(connectionId, payload = {}) {
         fid: payload.fid,
         filename: payload.filename,
         name: payload.name,
-        refreshInterval: payload.refreshInterval,
         query: payload.query,
         cronInterval: payload.cronInterval,
         connectionId
@@ -189,7 +188,6 @@ export function updateScheduledQuery(connectionId, payload = {}) {
       fid: payload.fid,
       filename: payload.filename,
       name: payload.name,
-      refreshInterval: payload.refreshInterval,
       query: payload.query,
       cronInterval: payload.cronInterval,
       connectionId

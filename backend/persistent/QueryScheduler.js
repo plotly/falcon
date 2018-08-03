@@ -3,7 +3,7 @@ import * as scheduler from 'node-schedule';
 
 import {getConnectionById} from './Connections.js';
 import * as Connections from './datastores/Datastores.js';
-import { mapRefreshToCron } from '../utils/cronUtils.js';
+import { mapRefreshToCron, mapCronToRefresh } from '../utils/cronUtils.js';
 import Logger from '../logger';
 import {
     getQuery,
@@ -19,6 +19,7 @@ import {
     getCurrentUser,
     getGridMeta,
     newGrid,
+    patchGrid,
     updateGrid
 } from './plotly-api.js';
 
@@ -97,7 +98,7 @@ class QueryScheduler {
             requestor,
             fid,
             uids,
-            refreshInterval,
+            refreshInterval: refreshInterval || mapCronToRefresh(cronInterval),
             cronInterval,
             query,
             connectionId
@@ -142,9 +143,11 @@ class QueryScheduler {
         Object.keys(this.queryJobs).forEach(this.clearQuery);
     }
 
-    queryAndCreateGrid(filename, query, connectionId, requestor) {
+    queryAndCreateGrid(filename, query, connectionId, requestor, cronInterval, refreshInterval) {
         const {username, apiKey, accessToken} = getCredentials(requestor);
+        const formattedRefresh = refreshInterval || mapCronToRefresh(cronInterval);
         let startTime;
+        let createdJson;
 
         // Check if the user even exists
         if (!username || !(apiKey || accessToken)) {
@@ -204,16 +207,38 @@ class QueryScheduler {
                 Logger.log(`Error ${res.status} while creating a grid`, 2);
             }
 
-            return res.json().then((json) => {
-                Logger.log(`Grid ${json.file.fid} has been updated.`, 2);
-                return json;
-            });
-        });
+            return res.json();
+        }).then((json) => {
+            createdJson = json;
+            startTime = process.hrtime();
 
+            return patchGrid(
+                createdJson.file.fid,
+                requestor,
+                {
+                    metadata: {
+                        query,
+                        connectionId,
+                        connectorUrl: `https://${getSetting('CONNECTOR_HTTPS_DOMAIN')}:${getSetting('PORT_HTTPS')}`
+                    },
+                    refresh_interval: formattedRefresh
+                }
+            ).catch((e) => {
+                /*
+                * Warning: The front end looks for "MetadataError" in this error message. Don't change it!
+                */
+                throw new Error(`MetadataError: ${e.message}`);
+            });
+        }).then(() => {
+            Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(startTime)[0]} seconds`, 2);
+            Logger.log(`Grid ${createdJson.file.fid} has been updated.`, 2);
+            return createdJson;
+        });
     }
 
-    queryAndUpdateGrid(fid, uids, query, connectionId, requestor) {
+    queryAndUpdateGrid(fid, uids, query, connectionId, requestor, cronInterval, refreshInterval) {
         const requestedDBConnections = getConnectionById(connectionId);
+        const formattedRefresh = refreshInterval || mapCronToRefresh(cronInterval);
         let startTime = process.hrtime();
 
         /*
@@ -337,13 +362,32 @@ class QueryScheduler {
 
             }
 
+            startTime = process.hrtime();
+
+            return patchGrid(
+                fid,
+                requestor,
+                {
+                    metadata: {
+                        query,
+                        connectionId,
+                        connectorUrl: `https://${getSetting('CONNECTOR_HTTPS_DOMAIN')}:${getSetting('PORT_HTTPS')}`
+                    },
+                    refresh_interval: formattedRefresh
+                }
+            ).catch((e) => {
+                /*
+                * Warning: The front end looks for "MetadataError" in this error message. Don't change it!
+                */
+                throw new Error(`MetadataError: ${e.message}`);
+            });
+        }).then((res) => {
+            Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(startTime)[0]} seconds`, 2);
             return res.json().then(() => {
                 Logger.log(`Grid ${fid} has been updated.`, 2);
             });
         });
-
     }
-
 }
 
 export default QueryScheduler;

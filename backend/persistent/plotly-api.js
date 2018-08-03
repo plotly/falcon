@@ -152,6 +152,18 @@ export function deleteGrid(fid, requestor) {
     });
 }
 
+export function patchGrid(fid, requestor, body) {
+    const {username, apiKey, accessToken} = getCredentials(requestor);
+
+    return plotlyAPIRequest(`grids/${fid}`, {
+        method: 'PATCH',
+        username,
+        apiKey,
+        accessToken,
+        body
+    });
+}
+
 export function updateGrid(rows, fid, uids, requestor) {
     const {username, apiKey, accessToken} = getCredentials(requestor);
 

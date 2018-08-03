@@ -17,7 +17,6 @@ global.document.createRange = function() {
 };
 
 const PreviewModal = require('../../../../../app/components/Settings/scheduler/preview-modal.jsx').default;
-const {DEFAULT_REFRESH_INTERVAL} = require('../../../../../app/constants/constants');
 
 describe('Preview Modal Tests', () => {
     beforeAll(() => {
@@ -155,9 +154,7 @@ describe('Preview Modal Tests', () => {
                 fid: 'fid:1',
                 requestor: 'user',
                 query: 'SELECT * FROM table',
-                cronInterval: '* * * * *',
-                // This is necessary to prevent older versions from breaking
-                refreshInterval: DEFAULT_REFRESH_INTERVAL
+                cronInterval: '* * * * *'
             })
         );
     });
