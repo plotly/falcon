@@ -164,36 +164,75 @@ export function patchGrid(fid, requestor, body) {
     });
 }
 
-export function updateGrid(rows, fid, uids, requestor) {
-    const {username, apiKey, accessToken} = getCredentials(requestor);
+export function updateGrid(rows, columnnames, fid, uids = [], requestor) {
+    const numColumns = columnnames.length;
+    const columns = getColumns(rows, numColumns);
+    const columnEntries = columns.map((column, columnIndex) => {
+        return { data: column, name: columnnames[columnIndex], order: columnIndex };
+    });
 
-    // TODO - Test case where no rows are returned.
-    if (uids.length !== (rows[0] || []).length) {
-        Logger.log(`
-            A different number of columns was returned in the
-            query than what was initially saved in the grid.
-            ${rows[0].length} columns were queried,
-            ${uids.length} columns were originally saved.
-            The connector does not create columns (yet),
-            and so we will only update the first ${uids.length}
-            columns.
-        `);
+    const {username, apiKey, accessToken} = getCredentials(requestor);
+    const baseUrl = `grids/${fid}/col`;
+    const baseParams = { username, apiKey, accessToken };
+
+    if (numColumns > uids.length) {
+        // repopulate existing columns
+        const putUrl = `${baseUrl}?uid=${uids.join(',')}`;
+        const putBody = { cols: columnEntries.slice(0, uids.length) };
+
+        // append new columns
+        const postUrl = baseUrl;
+        const postBody = { cols: columnEntries.slice(uids.length) };
+
+        return plotlyAPIRequest(putUrl, {
+            ...baseParams,
+            body: putBody,
+            method: 'PUT'
+        }).then((res) => {
+            if (res.status !== 200) {
+                return res;
+            }
+
+            return plotlyAPIRequest(postUrl, {
+                ...baseParams,
+                body: postBody,
+                method: 'POST'
+            });
+        });
+    } else if (numColumns < uids.length) {
+        // repopulate existing columns
+        const putUrl = `${baseUrl}?uid=${uids.slice(0, numColumns).join(',')}`;
+        const putBody = { cols: columnEntries };
+
+        // delete unused existing columns
+        const deleteUrl = `${baseUrl}?uid=${uids.slice(numColumns)}`;
+
+        return plotlyAPIRequest(putUrl, {
+            ...baseParams,
+            body: putBody,
+            method: 'PUT'
+        }).then((res) => {
+            if (res.status !== 200) {
+                return res;
+            }
+
+            return plotlyAPIRequest(deleteUrl, {
+                ...baseParams,
+                method: 'DELETE'
+            });
+        });
     }
 
-    /*
-     * For now, only update up to the number of columns that are
-     * already saved. In the future, we should just create more
-     * columns. See error message above.
-     */
-    const columns = getColumns(rows, uids.length);
+    // repopulate existing columns
+    const putUrl = `${baseUrl}?uid=${uids.join(',')}`;
+    const putBody = { cols: columnEntries };
 
-    const url = `grids/${fid}/col?uid=${uids.join(',')}`;
-    const body = {
-        cols: JSON.stringify(columns.map(column => ({
-            data: column
-        })))
-    };
-    return plotlyAPIRequest(url, {body, username, apiKey, accessToken, method: 'PUT'});
+    return plotlyAPIRequest(putUrl, {
+        ...baseParams,
+        body: putBody,
+        method: 'PUT'
+    });
+
 }
 
 function getColumns(rows, maxColumns) {

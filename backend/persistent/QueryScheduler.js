@@ -20,8 +20,11 @@ import {
     getGridMeta,
     newGrid,
     patchGrid,
-    updateGrid
+    updateGrid,
+    getGrid
 } from './plotly-api.js';
+
+const SUCCESS_CODES = [200, 201, 204];
 
 class QueryScheduler {
     constructor() {
@@ -281,8 +284,7 @@ class QueryScheduler {
                 */
                 throw new Error(`QueryExecutionError: ${e.message}`);
             });
-        }).then(({rows}) => {
-
+        }).then(({rows, columnnames}) => {
             Logger.log(`Query "${query}" took ${process.hrtime(startTime)[0]} seconds`, 2);
             Logger.log(`Updating grid ${fid} with new data`, 2);
             Logger.log(
@@ -294,6 +296,7 @@ class QueryScheduler {
 
             return updateGrid(
                 rows,
+                columnnames,
                 fid,
                 uids,
                 requestor
@@ -305,7 +308,7 @@ class QueryScheduler {
             });
         }).then(res => {
             Logger.log(`Request to Plotly for grid ${fid} took ${process.hrtime(startTime)[0]} seconds`, 2);
-            if (res.status !== 200) {
+            if (!SUCCESS_CODES.includes(res.status)) {
                 Logger.log(`Error ${res.status} while updating grid ${fid}.`, 2);
 
                 /*
@@ -357,6 +360,11 @@ class QueryScheduler {
                             this.clearQuery(fid);
                             return deleteQuery(fid);
                         }
+                            /*
+                            * Warning: The front end looks for "PlotlyApiError" in this error message. Don't change it!
+                            */
+                             throw new Error(`PlotlyApiError: non 200 grid update response code (got: ${res.status})`);
+
                     });
                 });
 
@@ -381,11 +389,17 @@ class QueryScheduler {
                 */
                 throw new Error(`MetadataError: ${e.message}`);
             });
-        }).then((res) => {
+        }).then(() => {
             Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(startTime)[0]} seconds`, 2);
-            return res.json().then(() => {
-                Logger.log(`Grid ${fid} has been updated.`, 2);
-            });
+            Logger.log(`Grid ${fid} has been updated.`, 2);
+
+            startTime = process.hrtime();
+
+            // fetch updated grid for returning
+            return getGrid(fid, requestor);
+        }).then((res) => {
+            Logger.log(`Request to Plotly for fetching updated grid took ${process.hrtime(startTime)[0]} seconds`, 2);
+            return res.json();
         });
     }
 }
