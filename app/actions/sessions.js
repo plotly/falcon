@@ -203,7 +203,7 @@ export function updateScheduledQuery(connectionId, payload = {}) {
       if (!res.error) {
         dispatch({
           type: 'UPDATE_SCHEDULED_QUERY',
-          payload: body
+          payload: res
         });
       }
       return res;
