@@ -1,6 +1,5 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
-import {Controlled as CodeMirror} from 'react-codemirror2';
 import ms from 'ms';
 import cronstrue from 'cronstrue';
 
@@ -13,7 +12,7 @@ import CronPicker from '../cron-picker/cron-picker.jsx';
 import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
 import {plotlyUrl} from '../../../utils/utils.js';
-import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../constants/constants.js';
+import {WAITING_MESSAGE, SAVE_WARNING} from '../../../constants/constants.js';
 import {getInitialCronMode} from '../cron-picker/cron-helpers.js';
 
 const NO_OP = () => {};
@@ -51,23 +50,17 @@ export class PreviewModal extends Component {
         this.state = {
             successMessage: null,
             editing: false,
-            code: props.query && props.query.query,
             cronInterval: props.query && props.query.cronInterval,
             name: props.query && props.query.name,
             confirmedDelete: false,
             loading: false
         };
-        this.updateCode = this.updateCode.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onDelete = this.onDelete.bind(this);
         this.close = this.close.bind(this);
         this.renderButtonRow = this.renderButtonRow.bind(this);
         this.handleIntervalChange = this.handleIntervalChange.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
-    }
-
-    updateCode(editor, meta, code) {
-        this.setState({code});
     }
 
     handleIntervalChange(newInterval) {
@@ -80,8 +73,8 @@ export class PreviewModal extends Component {
 
     onSubmit() {
         if (this.state.editing) {
-            const {connectionId, fid, requestor, uids} = this.props.query;
-            const {code: query, cronInterval} = this.state;
+            const {connectionId, fid, requestor, uids, query} = this.props.query;
+            const {cronInterval} = this.state;
             const name = this.state.name ? this.state.name.trim() : '';
 
             this.setState({loading: true, error: null});
@@ -202,6 +195,8 @@ export class PreviewModal extends Component {
 
             const initialModeId = getInitialCronMode(props.query);
 
+            const queryString = props.query && props.query.query;
+
             content = (
                 <Column
                     style={{
@@ -249,7 +244,7 @@ export class PreviewModal extends Component {
                         }}
                     >
                         <h5 className="sql-preview ellipsis" style={{...noMargin, letterSpacing: '1px'}}>
-                            {this.state.name ? <b>{this.state.name}</b> : <SQL className="bold">{this.state.code}</SQL>}
+                            {this.state.name ? <b>{this.state.name}</b> : <SQL className="bold">{queryString}</SQL>}
                         </h5>
                     </Row>
                     <Column style={{background: '#F5F7FB', padding: '16px 32px'}}>
@@ -259,23 +254,7 @@ export class PreviewModal extends Component {
                                 className="sql-preview scheduler"
                                 style={{...valueStyle, overflowY: 'auto', maxHeight: 300}}
                             >
-                                {editing ? (
-                                    <div style={{width: '99%'}}>
-                                        <CodeMirror
-                                            options={{
-                                                lineNumbers: true,
-                                                lineWrapping: true,
-                                                tabSize: 4,
-                                                readOnly: false,
-                                                mode: getHighlightMode(this.props.dialect)
-                                            }}
-                                            value={this.state.code}
-                                            onBeforeChange={this.updateCode}
-                                        />
-                                    </div>
-                                ) : (
-                                    <SQL className="default wrap">{this.state.code}</SQL>
-                                )}
+                                <SQL className="default wrap">{queryString}</SQL>
                             </div>
                         </Row>
                         {(this.state.name || editing) && (
