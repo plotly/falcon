@@ -703,7 +703,18 @@ export default class Servers {
                         fid, uids, query, connectionId, requestor, cronInterval, refreshInterval
                     );
                 })
-                .then(() => {
+                .then((updatedGridResponse) => {
+                    const orderedUids =
+                        Object.keys(updatedGridResponse.cols)
+                        .map(key => updatedGridResponse.cols[key])
+                        .sort((a, b) => a.order - b.order)
+                        .map(col => col.uid);
+
+                    const queryObject = {
+                        ...req.params,
+                        uids: orderedUids
+                    };
+
                     let status;
                     if (getQuery(req.params.fid)) {
                         // TODO - Technically, this should be
@@ -712,8 +723,8 @@ export default class Servers {
                     } else {
                         status = 201;
                     }
-                    that.queryScheduler.scheduleQuery(req.params);
-                    res.json(status, {});
+                    that.queryScheduler.scheduleQuery(queryObject);
+                    res.json(status, queryObject);
                     return next();
                 })
                 .catch(onError);
