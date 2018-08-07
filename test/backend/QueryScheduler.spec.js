@@ -622,8 +622,7 @@ describe('QueryScheduler', function() {
         }
 
         function resetAndVerifyGridContents(fid, uids) {
-            const placeholderColNames = Array(uids.length).fill('_');
-            return updateGrid([[1, 2, 3, 4, 5, 6]], placeholderColNames, fid, uids, username, apiKey)
+            return updateGrid([[1, 2, 3, 4, 5, 6]], names, fid, uids, username, apiKey)
             .then(assertResponseStatus(200)).then(() => {
                 return getGrid(fid, username);
             })
