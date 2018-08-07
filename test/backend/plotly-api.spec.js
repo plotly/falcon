@@ -39,6 +39,7 @@ describe('Grid API Functions', function () {
                     ['y', 20, 50, 80, 110, 140],
                     ['z', 30, 60, 90, 120, 150]
                 ],
+                Array(3).fill('_'), // placeholder column names
                 fid,
                 uids,
                 username
