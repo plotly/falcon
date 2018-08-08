@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 import sinon from 'sinon';
 
-import {merge} from 'ramda';
+import {merge, omit} from 'ramda';
 
 import {saveConnection} from '../../backend/persistent/Connections.js';
 import {
@@ -528,7 +528,7 @@ describe('QueryScheduler', function() {
 
     it('clears and deletes the query if its associated grid was deleted', function() {
         const refreshInterval = 5;
-        const cronInterval = `*/${refreshInterval} * * * * *`;
+        const cronInterval = `*/${refreshInterval} * * * * *`; // every 5 seconds
 
         /*
          * Save the sqlConnections to a file.
@@ -550,7 +550,6 @@ describe('QueryScheduler', function() {
             queryObject = {
                 fid,
                 uids,
-                refreshInterval,
                 cronInterval,
                 connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2',
@@ -562,7 +561,11 @@ describe('QueryScheduler', function() {
 
             queryScheduler.scheduleQuery(queryObject);
 
-            assert.deepEqual(getQueries(), [queryObject], 'Query has not been saved');
+            assert.deepEqual(
+                getQueries().map(query => omit('refreshInterval', query)),
+                [queryObject],
+                'Query has not been saved'
+            );
             assert(Boolean(queryScheduler.queryJobs[fid]), 'Query has not been scheduled');
 
             return deleteGrid(fid, username);
