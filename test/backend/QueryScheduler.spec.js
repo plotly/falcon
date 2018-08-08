@@ -464,13 +464,13 @@ describe('QueryScheduler', function() {
         clock.tick(3.25 * refreshInterval * 1000);
         assert(spy1.calledThrice, 'job1 should have been called three times');
         assert(spy1.alwaysCalledWith(
-            query.fid, query.uids, query.query,
+            query.fid, query.query,
             query.connectionId, query.requestor
         ), `job1 was called with unexpected args: ${spy1.args}`);
         assert(spy2.calledThrice, 'job2 should have been called three times');
         assert(spy2.alwaysCalledWith(
-            query.fid, query.uids, 'query-2',
-            query.connectionId, query.requestor
+            query.fid, 'query-2',
+            query.connectionId, query.requestor,
         ), `job2 was called with unexpected args: ${spy2.args}`);
 
         clock.restore();

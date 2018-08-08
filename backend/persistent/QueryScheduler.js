@@ -37,15 +37,14 @@ class QueryScheduler {
 
         // this.job wraps this.queryAndUpdateGrid to avoid concurrent runs of the same job
         this.runningJobs = {};
-        this.job = (fid, query, connectionId, requestor) => {
+        this.job = (fid, query, connectionId, requestor, cronInterval, refreshInterval) => {
             try {
                 if (this.runningJobs[fid]) {
                     return;
                 }
 
                 this.runningJobs[fid] = true;
-
-                return this.queryAndUpdateGrid(fid, query, connectionId, requestor)
+                return this.queryAndUpdateGrid(fid, query, connectionId, requestor, cronInterval, refreshInterval)
                     .catch(error => {
                         Logger.log(error, 0);
                     }).then(() => {
@@ -116,7 +115,7 @@ class QueryScheduler {
         saveQuery(queryParams);
 
         // Schedule
-        const job = () => this.job(fid, uids, query, connectionId, requestor);
+        const job = () => this.job(fid, query, connectionId, requestor, cronInterval, refreshInterval);
         let jobInterval = cronInterval;
         if (!jobInterval) {
             // convert refresh interval to cron representation
