@@ -1,5 +1,5 @@
 import {assert} from 'chai';
-import {merge} from 'ramda';
+import {merge, omit} from 'ramda';
 import uuid from 'uuid';
 
 import {saveConnection} from '../../backend/persistent/Connections.js';
@@ -114,18 +114,18 @@ describe('Routes:', () => {
                         query: 'SELECT * from ebola_2014 LIMIT 2'
                     };
 
-                    return POST('queries', queryObject);
-                })
-                .then(assertResponseStatus(201))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {});
+                    return POST('queries', queryObject)
+                    .then(assertResponseStatus(201))
+                    .then(getResponseJson).then(json2 => {
+                        assert.deepEqual(json2, queryObject);
 
-                    return GET('queries');
-                })
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, [queryObject]);
+                        return GET('queries');
+                    })
+                    .then(getResponseJson).then(json3 => {
+                        assert.deepEqual(json3, [queryObject]);
 
-                    return deleteGrid(fid, username);
+                        return deleteGrid(fid, username);
+                    });
                 });
         });
 
@@ -158,12 +158,13 @@ describe('Routes:', () => {
 
             return POST('queries', queryObject)
                 .then(assertResponseStatus(201))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {});
-                    return GET('queries');
-                })
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, [queryObject]);
+                .then(getResponseJson).then((json) => {
+                    assert.deepEqual(omit('uids', json), omit('uids', queryObject));
+                    assert.equal(json.uids.length, 6);
+                    return GET('queries').then(getResponseJson)
+                      .then((getResponse) => {
+                        assert.deepEqual(getResponse, [json]);
+                      });
                 });
         });
 
@@ -236,19 +237,34 @@ describe('Routes:', () => {
         });
 
         it('gets individual queries', function() {
-            return GET(`queries/${queryObject.fid}`)
-                .then(assertResponseStatus(404)).then(() => {
-                    return POST('queries', queryObject);
-                })
-                .then(assertResponseStatus(201))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {});
-                    return GET(`queries/${queryObject.fid}`);
-                })
-                .then(assertResponseStatus(200))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, queryObject);
-                });
+          // uids are hardcoded
+          const uids = [
+            '9bbb87',
+            '8d4dd0',
+            '3e40ef',
+            'b169c0',
+            '55e326',
+            'e69f70'
+          ];
+          return GET(`queries/${queryObject.fid}`)
+              .then(assertResponseStatus(404)).then(() => {
+                  return POST('queries', queryObject);
+              })
+              .then(assertResponseStatus(201))
+              .then(getResponseJson).then(json => {
+                  assert.deepEqual(json, {
+                    ...queryObject,
+                    uids
+                  });
+                  return GET(`queries/${queryObject.fid}`);
+              })
+              .then(assertResponseStatus(200))
+              .then(getResponseJson).then(json => {
+                  assert.deepEqual(json, {
+                    ...queryObject,
+                    uids
+                  });
+              });
         });
 
         it('deletes queries', function() {

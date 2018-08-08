@@ -164,7 +164,7 @@ export function patchGrid(fid, requestor, body) {
     });
 }
 
-export function updateGrid(rows, columnnames, fid, uids = [], requestor) {
+export function updateGrid(rows, columnnames, fid, _unusedUIDs, requestor) {
     const numColumns = columnnames.length;
     const columns = getColumns(rows, numColumns);
     const columnEntries = columns.map((column, columnIndex) => {
@@ -175,64 +175,73 @@ export function updateGrid(rows, columnnames, fid, uids = [], requestor) {
     const baseUrl = `grids/${fid}/col`;
     const baseParams = { username, apiKey, accessToken };
 
-    if (numColumns > uids.length) {
-        // repopulate existing columns
-        const putUrl = `${baseUrl}?uid=${uids.join(',')}`;
-        const putBody = { cols: columnEntries.slice(0, uids.length) };
+    // Fetch latest Grid to get the source of truth
+    return getGrid(fid, requestor)
+      .then(res => res.json())
+      .then(data => {
+          const uids = Object.keys(data.cols)
+            .map(key => data.cols[key])
+            .sort((a, b) => a.order - b.order)
+            .map(col => col.uid);
 
-        // append new columns
-        const postUrl = baseUrl;
-        const postBody = { cols: columnEntries.slice(uids.length) };
+          if (numColumns > uids.length) {
+              // repopulate existing columns
+              const putUrl = `${baseUrl}?uid=${uids.join(',')}`;
+              const putBody = { cols: columnEntries.slice(0, uids.length) };
 
-        return plotlyAPIRequest(putUrl, {
-            ...baseParams,
-            body: putBody,
-            method: 'PUT'
-        }).then((res) => {
-            if (res.status !== 200) {
-                return res;
-            }
+              // append new columns
+              const postUrl = baseUrl;
+              const postBody = { cols: columnEntries.slice(uids.length) };
 
-            return plotlyAPIRequest(postUrl, {
-                ...baseParams,
-                body: postBody,
-                method: 'POST'
-            });
-        });
-    } else if (numColumns < uids.length) {
-        // repopulate existing columns
-        const putUrl = `${baseUrl}?uid=${uids.slice(0, numColumns).join(',')}`;
-        const putBody = { cols: columnEntries };
+              return plotlyAPIRequest(postUrl, {
+                  ...baseParams,
+                  body: postBody,
+                  method: 'POST'
+              }).then((res) => {
+                  if (res.status !== 200) {
+                      return res;
+                  }
 
-        // delete unused existing columns
-        const deleteUrl = `${baseUrl}?uid=${uids.slice(numColumns)}`;
+                  return plotlyAPIRequest(putUrl, {
+                      ...baseParams,
+                      body: putBody,
+                      method: 'PUT'
+                  });
+              });
+          } else if (numColumns < uids.length) {
+              // repopulate existing columns
+              const putUrl = `${baseUrl}?uid=${uids.slice(0, numColumns).join(',')}`;
+              const putBody = { cols: columnEntries };
 
-        return plotlyAPIRequest(putUrl, {
-            ...baseParams,
-            body: putBody,
-            method: 'PUT'
-        }).then((res) => {
-            if (res.status !== 200) {
-                return res;
-            }
+              // delete unused existing columns
+              const deleteUrl = `${baseUrl}?uid=${uids.slice(numColumns)}`;
 
-            return plotlyAPIRequest(deleteUrl, {
-                ...baseParams,
-                method: 'DELETE'
-            });
-        });
-    }
+              return plotlyAPIRequest(putUrl, {
+                  ...baseParams,
+                  body: putBody,
+                  method: 'PUT'
+              }).then((res) => {
+                  if (res.status !== 200) {
+                      return res;
+                  }
 
-    // repopulate existing columns
-    const putUrl = `${baseUrl}?uid=${uids.join(',')}`;
-    const putBody = { cols: columnEntries };
+                  return plotlyAPIRequest(deleteUrl, {
+                      ...baseParams,
+                      method: 'DELETE'
+                  });
+              });
+          }
 
-    return plotlyAPIRequest(putUrl, {
-        ...baseParams,
-        body: putBody,
-        method: 'PUT'
+          // repopulate existing columns
+          const putUrl = `${baseUrl}?uid=${uids.join(',')}`;
+          const putBody = { cols: columnEntries };
+
+          return plotlyAPIRequest(putUrl, {
+              ...baseParams,
+              body: putBody,
+              method: 'PUT'
+          });
     });
-
 }
 
 function getColumns(rows, maxColumns) {
