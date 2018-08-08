@@ -114,18 +114,18 @@ describe('Routes:', () => {
                         query: 'SELECT * from ebola_2014 LIMIT 2'
                     };
 
-                    return POST('queries', queryObject)
-                    .then(assertResponseStatus(201))
-                    .then(getResponseJson).then(json2 => {
-                        assert.deepEqual(json2, queryObject);
+                    return POST('queries', queryObject);
+                })
+                .then(assertResponseStatus(201))
+                .then(getResponseJson).then(json => {
+                    assert.deepEqual(json, queryObject);
 
-                        return GET('queries');
-                    })
-                    .then(getResponseJson).then(json3 => {
-                        assert.deepEqual(json3, [queryObject]);
+                    return GET('queries');
+                })
+                .then(getResponseJson).then(json => {
+                    assert.deepEqual(json, [queryObject]);
 
-                        return deleteGrid(fid, username);
-                    });
+                    return deleteGrid(fid, username);
                 });
         });
 
