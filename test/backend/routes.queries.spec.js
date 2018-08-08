@@ -1,5 +1,5 @@
 import {assert} from 'chai';
-import {merge, omit} from 'ramda';
+import {merge} from 'ramda';
 import uuid from 'uuid';
 
 import {saveConnection} from '../../backend/persistent/Connections.js';
@@ -159,8 +159,17 @@ describe('Routes:', () => {
             return POST('queries', queryObject)
                 .then(assertResponseStatus(201))
                 .then(getResponseJson).then((json) => {
-                    assert.deepEqual(omit('uids', json), omit('uids', queryObject));
-                    assert.equal(json.uids.length, 6);
+                    assert.deepEqual(json, {
+                      ...queryObject,
+                      uids: [
+                        '08bd63',
+                        '3430b2',
+                        '618517',
+                        '812006',
+                        '3c7496',
+                        'b6b0bb'
+                      ]
+                    });
                     return GET('queries').then(getResponseJson)
                       .then((getResponse) => {
                         assert.deepEqual(getResponse, [json]);
@@ -243,12 +252,32 @@ describe('Routes:', () => {
                 })
                 .then(assertResponseStatus(201))
                 .then(getResponseJson).then(json => {
-                    assert.deepEqual(omit('uids', json), omit('uids', queryObject));
+                    assert.deepEqual(json, {
+                      ...queryObject,
+                      uids: [
+                        '9bbb87',
+                        '8d4dd0',
+                        '3e40ef',
+                        'b169c0',
+                        '55e326',
+                        'e69f70'
+                      ]
+                    });
                     return GET(`queries/${queryObject.fid}`);
                 })
                 .then(assertResponseStatus(200))
                 .then(getResponseJson).then(json => {
-                    assert.deepEqual(omit('uids', json), omit('uids', queryObject));
+                    assert.deepEqual(json, {
+                      ...queryObject,
+                      uids: [
+                        '9bbb87',
+                        '8d4dd0',
+                        '3e40ef',
+                        'b169c0',
+                        '55e326',
+                        'e69f70'
+                      ]
+                    });
                 });
         });
 
