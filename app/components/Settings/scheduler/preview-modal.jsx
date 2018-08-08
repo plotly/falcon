@@ -12,7 +12,7 @@ import {Link} from '../../Link.react.js';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
-import {plotlyUrl} from '../../../utils/utils.js';
+import {datasetUrl} from '../../../utils/utils.js';
 import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../constants/constants.js';
 import {getInitialCronMode} from '../cron-picker/cron-helpers.js';
 
@@ -156,7 +156,11 @@ export class PreviewModal extends Component {
         }
 
         if (success) {
-            return <SuccessMessage>{this.state.successMessage}</SuccessMessage>;
+            return (
+              <Column>
+                <SuccessMessage>{this.state.successMessage}</SuccessMessage>
+              </Column>
+            );
         }
 
         if (editing) {
@@ -196,8 +200,7 @@ export class PreviewModal extends Component {
         if (!props.query) {
             content = null;
         } else {
-            const [account, gridId] = props.query.fid.split(':');
-            const link = `${plotlyUrl()}/~${account}/${gridId}`;
+            const link = datasetUrl(props.query.fid);
             const {editing, loading} = this.state;
 
             const initialModeId = getInitialCronMode(props.query);
