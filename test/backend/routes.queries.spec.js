@@ -159,7 +159,7 @@ describe('Routes:', () => {
             return POST('queries', queryObject)
                 .then(assertResponseStatus(201))
                 .then(getResponseJson).then((json) => {
-                    assert.deepEqual(json, {
+                    queryObject = {
                       ...queryObject,
                       uids: [
                         '08bd63',
@@ -169,11 +169,12 @@ describe('Routes:', () => {
                         '3c7496',
                         'b6b0bb'
                       ]
-                    });
-                    return GET('queries').then(getResponseJson)
-                      .then((getResponse) => {
-                        assert.deepEqual(getResponse, [json]);
-                      });
+                    };
+                    assert.deepEqual(json, queryObject);
+                    return GET('queries');
+                })
+                .then(getResponseJson).then((json) => {
+                    assert.deepEqual(json, [queryObject]);
                 });
         });
 
