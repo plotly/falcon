@@ -387,19 +387,25 @@ class QueryScheduler {
                 */
                 throw new Error(`MetadataError: ${e.message}`);
             });
-        }).then(() => {
+        }).then(res => {
             Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(startTime)[0]} seconds`, 2);
             Logger.log(`Grid ${fid} has been updated.`, 2);
+
+            if (res.status !== 200) {
+              throw new Error(`MetadataError: error updating grid metadata (status: ${res.status})`);
+            }
 
             startTime = process.hrtime();
 
             // fetch updated grid column for returning
             return getGridColumn(fid, requestor);
-        }).then((res) => {
+        }).then(res => {
             Logger.log(`Request to Plotly for fetching updated grid took ${process.hrtime(startTime)[0]} seconds`, 2);
+
             if (res.status !== 200) {
-              return res.text();
+              throw new Error(`PlotlyApiError: error fetching updated columns (status: ${res.status})`);
             }
+
             return res.json();
         });
     }
