@@ -21,7 +21,7 @@ import {
     newGrid,
     patchGrid,
     updateGrid,
-    getGrid
+    getGridColumn
 } from './plotly-api.js';
 
 const SUCCESS_CODES = [200, 201, 204];
@@ -393,8 +393,8 @@ class QueryScheduler {
 
             startTime = process.hrtime();
 
-            // fetch updated grid for returning
-            return getGrid(fid, requestor);
+            // fetch updated grid column for returning
+            return getGridColumn(fid, requestor);
         }).then((res) => {
             Logger.log(`Request to Plotly for fetching updated grid took ${process.hrtime(startTime)[0]} seconds`, 2);
             if (res.status !== 200) {

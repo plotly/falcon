@@ -165,6 +165,17 @@ export function patchGrid(fid, requestor, body) {
     });
 }
 
+export function getGridColumn(fid, requestor) {
+    const {username, apiKey, accessToken} = getCredentials(requestor);
+
+    return plotlyAPIRequest(`grids/${fid}/col`, {
+        method: 'GET',
+        username,
+        apiKey,
+        accessToken
+    });
+}
+
 export function updateGrid(rows, columnnames, fid, requestor) {
     const numColumns = columnnames.length;
     const columns = getColumns(rows, numColumns);
@@ -177,7 +188,7 @@ export function updateGrid(rows, columnnames, fid, requestor) {
     const baseParams = { username, apiKey, accessToken };
 
     // fetch latest grid to get the source of truth
-    return plotlyAPIRequest(baseUrl, { ...baseParams, method: 'GET' })
+    return getGridColumn(fid, requestor)
         .then(res => {
             if (res.status !== 200) {
                 return res;
