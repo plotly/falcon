@@ -32,7 +32,6 @@ describe('Grid API Functions', function () {
         .then(assertResponseStatus(201))
         .then(getResponseJson).then(json => {
             fid = json.file.fid;
-            const uids = json.file.cols.map(col => col.uid);
             return updateGrid(
                 [
                     ['x', 10, 40, 70, 100, 130],
@@ -41,7 +40,6 @@ describe('Grid API Functions', function () {
                 ],
                 newColumnNames, // placeholder column names
                 fid,
-                uids,
                 username
             );
         })

@@ -6,6 +6,7 @@ import {
     getCredentials,
     getSetting
 } from '../settings.js';
+import {extractOrderedUids} from '../utils/gridUtils.js';
 
 
 // Module to access Plot.ly REST API
@@ -164,7 +165,7 @@ export function patchGrid(fid, requestor, body) {
     });
 }
 
-export function updateGrid(rows, columnnames, fid, _unusedUIDs, requestor) {
+export function updateGrid(rows, columnnames, fid, requestor) {
     const numColumns = columnnames.length;
     const columns = getColumns(rows, numColumns);
     const columnEntries = columns.map((column, columnIndex) => {
@@ -188,10 +189,7 @@ export function updateGrid(rows, columnnames, fid, _unusedUIDs, requestor) {
               return data;
           }
 
-          const uids = Object.keys(data.cols)
-            .map(key => data.cols[key])
-            .sort((a, b) => a.order - b.order)
-            .map(col => col.uid);
+          const uids = extractOrderedUids(data);
 
           if (numColumns > uids.length) {
               // repopulate existing columns

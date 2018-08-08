@@ -624,8 +624,8 @@ describe('QueryScheduler', function() {
             });
         }
 
-        function resetAndVerifyGridContents(fid, uids) {
-            return updateGrid([[1, 2, 3, 4, 5, 6]], names, fid, uids, username, apiKey)
+        function resetAndVerifyGridContents(fid) {
+            return updateGrid([[1, 2, 3, 4, 5, 6]], names, fid, username, apiKey)
             .then(assertResponseStatus(200)).then(() => {
                 return getGrid(fid, username);
             })
@@ -673,7 +673,7 @@ describe('QueryScheduler', function() {
         })
         .then(() => wait(1.5 * refreshInterval * 1000))
         .then(() => checkGridAgainstQuery(fid, 'First check'))
-        .then(() => resetAndVerifyGridContents(fid, uids))
+        .then(() => resetAndVerifyGridContents(fid))
         .then(() => wait(1.5 * refreshInterval * 1000))
         .then(() => checkGridAgainstQuery(fid, 'Second check'))
         .then(() => deleteGrid(fid, username));
