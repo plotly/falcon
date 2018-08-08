@@ -397,6 +397,9 @@ class QueryScheduler {
             return getGrid(fid, requestor);
         }).then((res) => {
             Logger.log(`Request to Plotly for fetching updated grid took ${process.hrtime(startTime)[0]} seconds`, 2);
+            if (res.status !== 200) {
+              return res.text();
+            }
             return res.json();
         });
     }
