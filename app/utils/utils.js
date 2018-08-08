@@ -59,6 +59,11 @@ export function homeUrl() {
         '';
 }
 
+export function datasetUrl(fid) {
+  const [account, gridId] = fid.split(':');
+  return `${plotlyUrl()}/~${account}/${gridId}`;
+}
+
 export function getPathNames(url) {
     const parser = document.createElement('a');
     parser.href = url;

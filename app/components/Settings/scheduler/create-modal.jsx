@@ -6,12 +6,14 @@ import cronstrue from 'cronstrue';
 
 import {Row, Column} from '../../layout.jsx';
 import Modal from '../../modal.jsx';
+import {Link} from '../../Link.react';
 import SuccessMessage from '../../success.jsx';
 import RequestError from './request-error.jsx';
 import TimedMessage from './timed-message.jsx';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 import SQL from './sql.jsx';
 
+import {datasetUrl as getDatasetURL} from '../../../utils/utils';
 import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../constants/constants.js';
 
 import './create-modal.css';
@@ -62,7 +64,8 @@ class CreateModal extends Component {
             name: props.initialName,
             interval: '*/5 * * * *',
             error: null,
-            saving: false
+            saving: false,
+            datasetUrl: null
         };
         this.options = {
             lineWrapping: true,
@@ -108,8 +111,12 @@ class CreateModal extends Component {
                 cronInterval: this.state.interval,
                 name: this.state.name ? this.state.name.trim() : ''
             })
-            .then(() => {
-                this.setState({successMessage: 'Scheduled query saved successfully!', saving: false});
+            .then((res) => {
+                this.setState({
+                  successMessage: 'Scheduled query saved successfully!',
+                  saving: false,
+                  datasetUrl: getDatasetURL(res.fid)
+                });
             })
             .catch(error => this.setState({error: error.message, saving: false}));
     }
@@ -193,7 +200,11 @@ class CreateModal extends Component {
                     </Column>
                     <Row>
                         {this.state.successMessage ? (
-                            <SuccessMessage>{this.state.successMessage}</SuccessMessage>
+                            <Column style={{ padding: '0 32px 16px' }}>
+                              <SuccessMessage message={this.state.successMessage}>
+                                <Link href={this.state.datasetUrl}>View Live Dataset</Link>
+                              </SuccessMessage>
+                            </Column>
                         ) : (
                             <Column>
                                 <button type="submit" className="submit" onClick={this.submit}>
