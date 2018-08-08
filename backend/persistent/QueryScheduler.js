@@ -391,7 +391,8 @@ class QueryScheduler {
             Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(startTime)[0]} seconds`, 2);
             Logger.log(`Grid ${fid} has been updated.`, 2);
 
-            if (res.status !== 200) {
+            // res is undefined if the `deleteQuery` is returned above
+            if (res && res.status && res.status !== 200) {
               throw new Error(`MetadataError: error updating grid metadata (status: ${res.status})`);
             }
 
