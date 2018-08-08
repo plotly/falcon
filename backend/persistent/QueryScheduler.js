@@ -37,7 +37,7 @@ class QueryScheduler {
 
         // this.job wraps this.queryAndUpdateGrid to avoid concurrent runs of the same job
         this.runningJobs = {};
-        this.job = (fid, uids, query, connectionId, requestor) => {
+        this.job = (fid, query, connectionId, requestor) => {
             try {
                 if (this.runningJobs[fid]) {
                     return;
@@ -45,7 +45,7 @@ class QueryScheduler {
 
                 this.runningJobs[fid] = true;
 
-                return this.queryAndUpdateGrid(fid, uids, query, connectionId, requestor)
+                return this.queryAndUpdateGrid(fid, query, connectionId, requestor)
                     .catch(error => {
                         Logger.log(error, 0);
                     }).then(() => {
@@ -239,7 +239,7 @@ class QueryScheduler {
         });
     }
 
-    queryAndUpdateGrid(fid, uids, query, connectionId, requestor, cronInterval, refreshInterval) {
+    queryAndUpdateGrid(fid, query, connectionId, requestor, cronInterval, refreshInterval) {
         const requestedDBConnections = getConnectionById(connectionId);
         const formattedRefresh = refreshInterval || mapCronToRefresh(cronInterval);
         let startTime = process.hrtime();
@@ -298,7 +298,6 @@ class QueryScheduler {
                 rows,
                 columnnames,
                 fid,
-                uids,
                 requestor
             ).catch((e) => {
                 /*
