@@ -308,7 +308,7 @@ export class PreviewModal extends Component {
                                 </div>
                             ) : (
                                 <em style={valueStyle}>
-                                    {props.query.cronInterval ? (
+                                    {this.state.cronInterval ? (
                                         <b>{cronstrue.toString(this.state.cronInterval)}</b>
                                     ) : (
                                         <React.Fragment>
