@@ -177,7 +177,7 @@ export function updateGrid(rows, columnnames, fid, requestor) {
     const baseParams = { username, apiKey, accessToken };
 
     // fetch latest grid to get the source of truth
-    return getGrid(fid, requestor)
+    return plotlyAPIRequest(baseUrl, { ...baseParams, method: 'GET' })
         .then(res => {
             if (res.status !== 200) {
                 return res;
