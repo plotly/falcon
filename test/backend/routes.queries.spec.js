@@ -237,34 +237,19 @@ describe('Routes:', () => {
         });
 
         it('gets individual queries', function() {
-          // uids are hardcoded
-          const uids = [
-            '9bbb87',
-            '8d4dd0',
-            '3e40ef',
-            'b169c0',
-            '55e326',
-            'e69f70'
-          ];
-          return GET(`queries/${queryObject.fid}`)
-              .then(assertResponseStatus(404)).then(() => {
-                  return POST('queries', queryObject);
-              })
-              .then(assertResponseStatus(201))
-              .then(getResponseJson).then(json => {
-                  assert.deepEqual(json, {
-                    ...queryObject,
-                    uids
-                  });
-                  return GET(`queries/${queryObject.fid}`);
-              })
-              .then(assertResponseStatus(200))
-              .then(getResponseJson).then(json => {
-                  assert.deepEqual(json, {
-                    ...queryObject,
-                    uids
-                  });
-              });
+            return GET(`queries/${queryObject.fid}`)
+                .then(assertResponseStatus(404)).then(() => {
+                    return POST('queries', queryObject);
+                })
+                .then(assertResponseStatus(201))
+                .then(getResponseJson).then(json => {
+                    assert.deepEqual(omit('uids', json), omit('uids', queryObject));
+                    return GET(`queries/${queryObject.fid}`);
+                })
+                .then(assertResponseStatus(200))
+                .then(getResponseJson).then(json => {
+                    assert.deepEqual(omit('uids', json), omit('uids', queryObject));
+                });
         });
 
         it('deletes queries', function() {
