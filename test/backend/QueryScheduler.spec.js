@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 import sinon from 'sinon';
 
-import {merge, omit} from 'ramda';
+import {merge} from 'ramda';
 
 import {saveConnection} from '../../backend/persistent/Connections.js';
 import {
@@ -550,6 +550,7 @@ describe('QueryScheduler', function() {
             queryObject = {
                 fid,
                 uids,
+                refreshInterval,
                 cronInterval,
                 connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2',
@@ -562,7 +563,7 @@ describe('QueryScheduler', function() {
             queryScheduler.scheduleQuery(queryObject);
 
             assert.deepEqual(
-                getQueries().map(query => omit('refreshInterval', query)),
+                getQueries(),
                 [queryObject],
                 'Query has not been saved'
             );
