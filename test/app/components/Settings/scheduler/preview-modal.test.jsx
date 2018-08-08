@@ -64,7 +64,7 @@ describe('Preview Modal Tests', () => {
                 .find('button')
                 .at(1)
                 .text()
-        ).toEqual(expect.stringContaining('Log in'));
+        ).toEqual(expect.stringContaining('Switch users'));
     });
 
     it('should render edit and delete buttons if logged in', () => {
