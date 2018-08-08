@@ -175,10 +175,19 @@ export function updateGrid(rows, columnnames, fid, _unusedUIDs, requestor) {
     const baseUrl = `grids/${fid}/col`;
     const baseParams = { username, apiKey, accessToken };
 
-    // Fetch latest Grid to get the source of truth
+    // fetch latest grid to get the source of truth
     return getGrid(fid, requestor)
-      .then(res => res.json())
-      .then(data => {
+      .then(res => {
+          if (res.status !== 200) {
+              return res;
+          }
+          return res.json();
+      }).then(data => {
+          if (data.status) {
+              // bad res was passed along, return it
+              return data;
+          }
+
           const uids = Object.keys(data.cols)
             .map(key => data.cols[key])
             .sort((a, b) => a.order - b.order)
