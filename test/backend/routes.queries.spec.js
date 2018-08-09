@@ -128,7 +128,9 @@ describe('Routes:', () => {
                 });
         });
 
-        it('can register queries if the user is a collaborator', function() {
+        // disabled because collaborators cannot register queries since
+        // they lack permission to update metadata
+        xit('can register queries if the user is a collaborator', function() {
             /*
              * Plotly doesn't have a v2 endpoint for creating
              * collaborators, so we'll just use these hardcoded
