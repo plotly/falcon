@@ -511,7 +511,7 @@ class Settings extends Component {
                                 <p style={{textAlign: 'right'}}>
                                     Not logged in
                                     <br/>
-                                    <a onClick={() => window.location.assign('/login')}>Log into Plotly</a>
+                                    <a onClick={() => window.location.assign(`${homeUrl()}/login`)}>Log into Plotly</a>
                                 </p>
                             )}
                         </TabPanel> }
