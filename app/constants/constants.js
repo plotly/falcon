@@ -332,9 +332,10 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
                 }
             });
         case DIALECTS.BIGQUERY:
-            console.log( 'Getting Big Query', connection);
-            console.log( 'Getting Big Query table', table);
-            return `SELECT TOP 1000 * FROM ${connection.database}.${table}`;
+            let sql= `SELECT * FROM FROM ${connection.database}.__TABLES__ `;
+            console.log( 'Getting Query ', sql);
+            return sql;
+
         default:
             return '';
     }

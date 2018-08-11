@@ -73,32 +73,59 @@ export function schemas(connection) {
 
     //TODO Complete this.
 
-    let columnnames = ['advanced'];
-    let rows = ['A','B','C'];
+    let columnnames = ['table_name', 'column_name', 'data_type'];
+    let rows = [];
 
-    return new Promise(function(resolve, reject) {
-        console.log( 'Returning schema');
-        resolve( {columnnames, rows});
-    });
-
-    /*let tableNames = [];
+    /*rows:
+    [ [ 'clean_logs', 'serialnumber', 'varchar' ],
+      [ 'clean_logs', 'email', 'varchar' ],
+      [ 'clean_logs', 'company', 'varchar' ],
+      [ 'clean_logs', 'platform', 'varchar' ],
+      [ 'test', 'company', 'varchar' ],
+*/
+    let tableNames = [];
     const bigquery = new BigQuery({
       keyFilename: connection.keyfileName,
       projectId: connection.projectId
     });
-    bigquery.dataset( dbname ).getTables().then( results =>{
-        const tables = results[0];
-        console.log('Tables:', tables);
-        console.log('Number of tables :', tables.length);
-        tables.forEach(table => { 
-            console.log(table);
-            console.log( 'Table name', table.id);
-            return table.getMetadata().then( m =>{
-                const meta = m[0];
-                console.log( 'Meta data', meta.schema.fields);
+
+
+    return new Promise ((resolve,reject) =>{
+        return bigquery.dataset( connection.database ).getTables().then( results =>{
+            console.log( 'Resutls ', results);
+            const tables = results[0];
+            console.log('Tables:', tables);
+            console.log('Number of tables :', tables.length);
+            let tableMetadataPromise = [];//table.getMetadata();
+            tables.forEach(table => { 
+                console.log(table);
+                console.log( 'Table name', table.id);
+                
+                tableMetadataPromise.push( table.getMetadata() );
+                /*return .then( m =>{
+                    const meta = m[0];
+                    console.log( 'Meta data', meta.schema.fields);
+
+                })*/
+            });
+
+            return Promise.all( tableMetadataPromise ).then( result=> {
+                console.log( 'Results', result);
+
+                result.forEach( m=>{
+                    const meta = m[0];
+                    let tableName = meta.tableReference.tableId;
+                    console.log('Table Name', tableName);
+                    let tableAtttributes = meta.schema.fields.map( field => [tableName,field.name,field.type]);
+                    console.log( 'Table Attributres ', tableAtttributes);
+                    rows.push( tableAttributes );
+
+                })
+                resolve( {columnnames, rows});
             })
-        });
-     })*/
+         })
+    });
+
 }
 
 
@@ -116,19 +143,22 @@ export function tables(connection) {
 
 
     let tables = ['advanced'];
+    let t = [];
     //let rows = ['A','B','C'];
 
-    return new Promise(function(resolve, reject) {
+    /*return new Promise(function(resolve, reject) {
         console.log( 'Returning tables');
         resolve( tables);
-    });
-    /*let tableNames = [];
+    });*/
+    console.log( 'Tables about to be queried', connection);
+    let tableNames = ['advanced'];
     const bigquery = new BigQuery({
       keyFilename: connection.keyfileName,
       projectId: connection.projectId
     });
- 
-    bigquery.dataset( connection.database ).getTables().then( results =>{
+    console.log( 'Accessing Big Query', connection);
+    return bigquery.dataset( connection.database ).getTables().then( results =>{
+        console.log( 'Results', results);
        const tables = results[0];
 
        if( results && results.length >0){
@@ -136,6 +166,7 @@ export function tables(connection) {
                 tableNames.push( table.id );
             });
        }
+       console.log( 'Big Query tables', tableNames);
        return tableNames;
-    });*/
+    });
 }

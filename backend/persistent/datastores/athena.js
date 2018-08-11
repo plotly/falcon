@@ -65,7 +65,11 @@ export function query(queryObject, connection) {
  */
 export function schemas(connection) {
     const sqlStatement = `${SHOW_SCHEMA_QUERY} = '${connection.database}'` ;
-    return query(sqlStatement, connection);
+    let rst= query(sqlStatement, connection);
+
+    return rst.then( r=>{
+        console.log( 'R',r);
+    });
 }
 
 
