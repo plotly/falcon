@@ -71,54 +71,32 @@ export function query(queryObject, connection) {
  */
 export function schemas(connection) {
 
-    //TODO Complete this.
-
-    let columnnames = ['table_name', 'column_name', 'data_type'];
+    const columnnames = ['table_name', 'column_name', 'data_type'];
     let rows = [];
 
-    /*rows:
-    [ [ 'clean_logs', 'serialnumber', 'varchar' ],
-      [ 'clean_logs', 'email', 'varchar' ],
-      [ 'clean_logs', 'company', 'varchar' ],
-      [ 'clean_logs', 'platform', 'varchar' ],
-      [ 'test', 'company', 'varchar' ],
-*/
-    let tableNames = [];
+    //@n-riesco - This could be encapsulated in connection but I know we had problems with serialization 
+    // on athena connection data
     const bigquery = new BigQuery({
       keyFilename: connection.keyfileName,
       projectId: connection.projectId
     });
 
-
     return new Promise ((resolve,reject) =>{
         return bigquery.dataset( connection.database ).getTables().then( results =>{
-            console.log( 'Resutls ', results);
             const tables = results[0];
-            console.log('Tables:', tables);
-            console.log('Number of tables :', tables.length);
-            let tableMetadataPromise = [];//table.getMetadata();
-            tables.forEach(table => { 
-                console.log(table);
-                console.log( 'Table name', table.id);
-                
-                tableMetadataPromise.push( table.getMetadata() );
-                /*return .then( m =>{
-                    const meta = m[0];
-                    console.log( 'Meta data', meta.schema.fields);
 
-                })*/
+            let tableMetadataPromise = [];
+            tables.forEach(table => { 
+                //@n-riesco - I know we recently upgraded to node 8.  I using promise all.  Your thoughts?
+                tableMetadataPromise.push( table.getMetadata() );
             });
 
             return Promise.all( tableMetadataPromise ).then( result=> {
-                console.log( 'Results', result);
-
                 result.forEach( m=>{
-                    const meta = m[0];
-                    let tableName = meta.tableReference.tableId;
-                    console.log('Table Name', tableName);
-                    let tableAtttributes = meta.schema.fields.map( field => [tableName,field.name,field.type]);
-                    console.log( 'Table Attributres ', tableAtttributes);
-                    rows.push( tableAttributes );
+                    //@n-riesco - Is this a more efficent way to implement this
+                    let tableName = m[0].tableReference.tableId;
+                    let tableAtttributes = m[0].schema.fields.map( field => [tableName,field.name,field.type]);
+                    rows = rows.concat( tableAtttributes );
 
                 })
                 resolve( {columnnames, rows});
