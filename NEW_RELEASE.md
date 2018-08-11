@@ -32,3 +32,8 @@ This document lists conventions and steps to follow for creating a release.
 
 - [ ] Create branch `M.m-onprem`
 - [ ] Create Quay tag `M.m-onprem` (Visit https://quay.io/repository/plotly/falcon-sql-client?tab=tags , click the gear icon next to the thing you want to tag, then choose “Add new…")
+
+## Additional Checklist for an OnPrem Update
+
+- [ ] Create Quay tag `M.m.p-onprem` (Visit https://quay.io/repository/plotly/falcon-sql-client?tab=tags , click the gear icon next to the thing you want to tag, then choose “Add new…")
+
