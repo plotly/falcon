@@ -1,15 +1,26 @@
 
-
-const SHOW_TABLES_QUERY = 'SHOW TABLES';
-const SHOW_SCHEMA_QUERY =
-    'SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema';
-//const BIGQUERY_DEFAULT_QUERY = `SELECT * FROM FROM ${database}.__TABLES__ `;
-const DEFAULT_QUERY_INTERVAL = 2000;
-
 const BigQuery = require('@google-cloud/bigquery');
 
-//TODO.  1. Simple connect and run preview query
-//2. Get a list of schema's via API
+
+//Questions for @n-riesco 
+//1. - With Athena we ran into serialization problems with attaching the athena client to the connection
+// object.  Has that be resolved?  Should I do the same with big query
+//2. With Google Big Query they use a key file which is generated from the Google Console.  
+//3. The current implementation is using nested promises.  At work we are using co but I wanted 
+// to get your recommendation for what we should be using now that we have migrated to node 8?
+//4. Here is the reference from the nodejs API https://cloud.google.com/bigquery/docs/running-queries#bigquery-query-nodejs
+
+/**
+ * The following function will create a big query client
+ * @param {string} projectId - Google Big Query unique id for project
+ * @param {string} keyFilename - Google File Name where credentials are 
+ */
+function getBigQueryClient( projectId, keyFilename){
+    return new BigQuery({
+        keyFilename,
+        projectId
+      });
+}
 /*
  * The connection function will validate the parameters and return the connection
  * parameters
@@ -20,11 +31,12 @@ const BigQuery = require('@google-cloud/bigquery');
  * @returns {Promise} that resolves connection
  */
 export function connect(connection) {
-    //let defaultQuery = `SELECT * FROM FROM ${connection.database}.__TABLES__ `;
-    //return query(defaultQuery, connection).then(() => connection);
     return new Promise(function(resolve, reject) {
-        console.log( 'Returning connection');
-        resolve( connection );
+        tables( connection ).then( ()=>{
+            resolve( connection );
+        }).catch( err =>{
+            reject(err);
+        })
     });
 }
 
@@ -35,29 +47,54 @@ export function connect(connection) {
  * @returns {Promise} that resolves to { columnnames, rows }
  */
 export function query(queryObject, connection) {
+    const bigQuery = getBigQueryClient(connection.projectId,connection.keyfileName);
     connection.sqlStatement = queryObject;
 
-    let columnnames = ['advanced'];
-    let rows = [[1],[2],[3]];
+    let columnnames = [];
+    let rows = [];
+    let rs = [];
+    let cols = [];
 
+    const options = {
+        query: connection.sqlStatement,
+        useLegacySql: false, // Use standard SQL syntax for queries.
+    };
+    let job;
     return new Promise(function(resolve, reject) {
-        console.log( 'Returning query');
-        resolve( {columnnames, rows});
+
+        //@n-riesco. This should be refactored to use async or co.  Your thoughts?
+        bigQuery.createQueryJob(options).then(results => {
+          job = results[0];
+          return job.promise();
+        }).then(metadata => {
+            const errors = metadata[0].status.errors;
+            if (errors && errors.length > 0) {
+              reject(errors);
+            }
+        }).then(() => {
+            return job.getQueryResults();
+        }).then(results => {
+            const rowResult = results[0];
+
+            if( rowResult && rowResult.length > 0 ){
+                for( let key in rowResult[0]){
+                    columnnames.push( key);
+                }
+                rowResult.forEach(row => {
+                    let r1 = [];
+                    for( var key in row ){
+                        r1.push( row[key] );
+                    }
+                    rows.push( r1 );
+
+                });
+            }
+            resolve( {columnnames, rows});
+
+        }).catch(err => {
+            reject( err );
+        });
     });
-    /*return executeQuery(connection).then(dataSet => {
-        let columnnames = [];
-        let rows = [];
-
-        if (dataSet && dataSet.length > 0) {
-            // First row contains the column names
-            columnnames = dataSet[0].Data.map(columnname => columnname.VarCharValue);
-
-            // Loop through the remaining rows to extract data
-            rows = dataSet.slice(1).map(row => row.Data.map(element => element.VarCharValue));
-        }
-
-        return {columnnames, rows};
-    });*/
 }
 
 /**
@@ -70,17 +107,9 @@ export function query(queryObject, connection) {
  * @returns {Promise} that resolves to { columnnames, rows }
  */
 export function schemas(connection) {
-
+    const bigquery = getBigQueryClient(connection.projectId,connection.keyfileName);
     const columnnames = ['table_name', 'column_name', 'data_type'];
     let rows = [];
-
-    //@n-riesco - This could be encapsulated in connection but I know we had problems with serialization 
-    // on athena connection data
-    const bigquery = new BigQuery({
-      keyFilename: connection.keyfileName,
-      projectId: connection.projectId
-    });
-
     return new Promise ((resolve,reject) =>{
         return bigquery.dataset( connection.database ).getTables().then( results =>{
             const tables = results[0];
@@ -96,8 +125,8 @@ export function schemas(connection) {
                     //@n-riesco - Is this a more efficent way to implement this
                     let tableName = m[0].tableReference.tableId;
                     let tableAtttributes = m[0].schema.fields.map( field => [tableName,field.name,field.type]);
+                    //@n-riesco - This feels hacky:)  Do you have a better way?
                     rows = rows.concat( tableAtttributes );
-
                 })
                 resolve( {columnnames, rows});
             })
@@ -117,34 +146,15 @@ export function schemas(connection) {
  * @returns {Promise} that resolves to { columnnames, rows }
  */
 export function tables(connection) {
-
-
-
-    let tables = ['advanced'];
-    let t = [];
-    //let rows = ['A','B','C'];
-
-    /*return new Promise(function(resolve, reject) {
-        console.log( 'Returning tables');
-        resolve( tables);
-    });*/
-    console.log( 'Tables about to be queried', connection);
-    let tableNames = ['advanced'];
-    const bigquery = new BigQuery({
-      keyFilename: connection.keyfileName,
-      projectId: connection.projectId
-    });
-    console.log( 'Accessing Big Query', connection);
+    const bigquery = getBigQueryClient(connection.projectId,connection.keyfileName);
+    let tableNames = [];
     return bigquery.dataset( connection.database ).getTables().then( results =>{
-        console.log( 'Results', results);
        const tables = results[0];
-
        if( results && results.length >0){
             tables.forEach(table => { 
                 tableNames.push( table.id );
             });
        }
-       console.log( 'Big Query tables', tableNames);
        return tableNames;
     });
 }

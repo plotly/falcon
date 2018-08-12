@@ -271,7 +271,7 @@ export const CONNECTION_CONFIG = {
         },
         {'label': 'Database', 'value': 'database', 'type': 'text'},
         {
-            'label': 'Google Key File Name',
+            'label': 'Key File',
             'value': 'keyfileName',
             'type': 'filedrop',
             'description': `The location of the Google Service Account Key File`
@@ -332,7 +332,7 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
                 }
             });
         case DIALECTS.BIGQUERY:
-            let sql= `SELECT * FROM FROM ${connection.database}.__TABLES__ `;
+            let sql= `SELECT * FROM ${connection.database}.__TABLES__ `;
             console.log( 'Getting Query ', sql);
             return sql;
 
