@@ -71,6 +71,7 @@ const DEFAULT_SETTINGS = {
 
 // Settings that depend on other settings are described here
 const derivedSettingsNames = [
+    'BASE_URL',
     'PLOTLY_API_URL',
     'PLOTLY_URL',
     'CONNECTIONS_PATH',
@@ -84,6 +85,11 @@ const derivedSettingsNames = [
 
 function getDerivedSetting(settingName) {
     switch (settingName) {
+        case 'BASE_URL':
+            return getSetting('IS_RUNNING_INSIDE_ON_PREM') ?
+                process.env.PLOTLY_CONNECTOR_BASE_URL :
+                `https://${getSetting('CONNECTOR_HTTPS_DOMAIN')}:${getSetting('PORT_HTTPS')}`;
+
         case 'PLOTLY_URL': {
             if (getSetting('PLOTLY_API_DOMAIN') ===
                 DEFAULT_SETTINGS.PLOTLY_API_DOMAIN) {
