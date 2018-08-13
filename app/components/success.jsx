@@ -1,15 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const style = {marginBottom: 16, fontSize: 16, color: '#00cc96'};
+const style = {fontSize: 16};
 const SuccessMessage = (props) => (
-  <em style={style}>
+  <div style={{ padding: '8px 16px', borderLeft: '4px solid #00cc96', background: 'white'}}>
+    <div style={style}>{props.message}</div>
     {props.children}
-  </em>
+  </div>
 );
 
 SuccessMessage.propTypes = {
-  children: PropTypes.node
+  children: PropTypes.node,
+  message: PropTypes.string
 };
 
 export default SuccessMessage;

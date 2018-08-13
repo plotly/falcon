@@ -15,7 +15,7 @@ import Preview from './Preview/Preview.react';
 import {Link} from '../Link.react';
 import Scheduler from './scheduler/scheduler.jsx';
 import {DIALECTS, FAQ, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
-import {isElectron, isOnPrem} from '../../utils/utils';
+import {isElectron, isOnPrem, homeUrl} from '../../utils/utils';
 
 class Settings extends Component {
     constructor(props) {
@@ -25,7 +25,7 @@ class Settings extends Component {
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
         this.updateSelectedPanel = this.updateSelectedPanel.bind(this);
         this.openScheduler = this.openScheduler.bind(this);
-        this.openLogin = () => window.location.assign('/login');
+        this.openLogin = () => window.location.assign(`${homeUrl()}/login`);
         this.state = {
             editMode: true,
             selectedPanel: {},
@@ -511,7 +511,7 @@ class Settings extends Component {
                                 <p style={{textAlign: 'right'}}>
                                     Not logged in
                                     <br/>
-                                    <a onClick={() => window.location.assign('/login')}>Log into Plotly</a>
+                                    <a onClick={() => window.location.assign(`${homeUrl()}/login`)}>Log into Plotly</a>
                                 </p>
                             )}
                         </TabPanel> }

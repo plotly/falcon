@@ -1,43 +1,46 @@
+import {parseSQL} from '../../parse.js';
 
 const BigQuery = require('@google-cloud/bigquery');
 
+const Pool = require('./pool.js');
+const pool = new Pool(newClient, sameConnection);
 
-//Questions for @n-riesco 
-//1. - With Athena we ran into serialization problems with attaching the athena client to the connection
-// object.  Has that be resolved?  Should I do the same with big query
-//2. With Google Big Query they use a key file which is generated from the Google Console.  
-//3. The current implementation is using nested promises.  At work we are using co but I wanted 
-// to get your recommendation for what we should be using now that we have migrated to node 8?
-//4. Here is the reference from the nodejs API https://cloud.google.com/bigquery/docs/running-queries#bigquery-query-nodejs
-
-/**
- * The following function will create a big query client
- * @param {string} projectId - Google Big Query unique id for project
- * @param {string} keyFilename - Google File Name where credentials are 
- */
-function getBigQueryClient( projectId, keyFilename){
+function newClient(connection) {
     return new BigQuery({
-        keyFilename,
-        projectId
-      });
+        keyFilename: connection.keyFilename,
+        projectId: connection.projectId
+    });
 }
+
+function sameConnection(connection1, connection2) {
+    return (
+        connection1.projectId === connection2.projectId &&
+        connection1.database === connection2.database &&
+        connection1.keyFilename === connection2.keyFilename
+    );
+}
+
 /*
  * The connection function will validate the parameters and return the connection
  * parameters
  * @param {object} connection
  * @param {string} connection.projectId - Google Cloud Project Id
  * @param {string} connection.database - Google Big Query Database
- * @param {string} connection.keyfileName - Google Service Account Key File
+ * @param {string} connection.keyFilename - Google Service Account Key File
  * @returns {Promise} that resolves connection
  */
 export function connect(connection) {
-    return new Promise(function(resolve, reject) {
-        tables( connection ).then( ()=>{
-            resolve( connection );
-        }).catch( err =>{
-            reject(err);
-        })
-    });
+    const client = pool.getClient(connection);
+
+    // TODO: we need to validate connection,
+    // but requesting the list of tables is potentially too expensive.
+    // E.g. some databases accept simple queries like `SELECT 1+1;`
+
+    return Promise.resolve(client);
+}
+
+export function disconnect(connection) {
+    return pool.remove(connection);
 }
 
 /**
@@ -47,54 +50,34 @@ export function connect(connection) {
  * @returns {Promise} that resolves to { columnnames, rows }
  */
 export function query(queryObject, connection) {
-    const bigQuery = getBigQueryClient(connection.projectId,connection.keyfileName);
-    connection.sqlStatement = queryObject;
-
-    let columnnames = [];
-    let rows = [];
-    let rs = [];
-    let cols = [];
+    const client = pool.getClient(connection);
 
     const options = {
-        query: connection.sqlStatement,
-        useLegacySql: false, // Use standard SQL syntax for queries.
+        query: queryObject,
+        useLegacySql: false // Use standard SQL syntax for queries.
     };
-    let job;
-    return new Promise(function(resolve, reject) {
 
-        //@n-riesco. This should be refactored to use async or co.  Your thoughts?
-        bigQuery.createQueryJob(options).then(results => {
-          job = results[0];
-          return job.promise();
-        }).then(metadata => {
+    let job;
+
+    return client
+        .createQueryJob(options)
+        .then(results => {
+            job = results[0];
+            return job.promise();
+        })
+        .then(() => {
+            return job.getMetadata();
+        })
+        .then(metadata => {
             const errors = metadata[0].status.errors;
             if (errors && errors.length > 0) {
-              reject(errors);
+                throw new Error(errors.join(':'));
             }
-        }).then(() => {
+        })
+        .then(() => {
             return job.getQueryResults();
-        }).then(results => {
-            const rowResult = results[0];
-
-            if( rowResult && rowResult.length > 0 ){
-                for( let key in rowResult[0]){
-                    columnnames.push( key);
-                }
-                rowResult.forEach(row => {
-                    let r1 = [];
-                    for( var key in row ){
-                        r1.push( row[key] );
-                    }
-                    rows.push( r1 );
-
-                });
-            }
-            resolve( {columnnames, rows});
-
-        }).catch(err => {
-            reject( err );
-        });
-    });
+        })
+        .then(parseSQL);
 }
 
 /**
@@ -102,37 +85,41 @@ export function query(queryObject, connection) {
  * @param {object} connection - Connection parameters
  * @param {string} connection.projectId - Google Cloud Project Id
  * @param {string} connection.database - Google Big Query Database
- * @param {string} connection.keyfileName - Google Service Account Key File
+ * @param {string} connection.keyFilename - Google Service Account Key File
  * @returns {Promise} that resolves connection
  * @returns {Promise} that resolves to { columnnames, rows }
  */
 export function schemas(connection) {
-    const bigquery = getBigQueryClient(connection.projectId,connection.keyfileName);
-    const columnnames = ['table_name', 'column_name', 'data_type'];
-    let rows = [];
-    return new Promise ((resolve,reject) =>{
-        return bigquery.dataset( connection.database ).getTables().then( results =>{
-            const tables = results[0];
+    const client = pool.getClient(connection);
 
-            let tableMetadataPromise = [];
-            tables.forEach(table => { 
-                //@n-riesco - I know we recently upgraded to node 8.  I using promise all.  Your thoughts?
-                tableMetadataPromise.push( table.getMetadata() );
+    return client
+        .dataset(connection.database)
+        .getTables()
+        .then(results => {
+            // TODO: this algorithm won't work for a large number of tables.
+            // We need to:
+            // - figure out a single request to retrieve all the tables and columns
+            // - or either limit the number of concurrent requests
+            const metadataPromises = results[0].map(table => table.getMetadata());
+            return Promise.all(metadataPromises);
+        }).
+        then(results => {
+            const columnnames = ['table_name', 'column_name', 'data_type'];
+            const rows = [];
+
+            // iterate tables
+            results.forEach(result => {
+                const metadata = result[0];
+                const tableName = metadata.tableReference.tableId;
+
+                // iterate fields
+                metadata.schema.fields.forEach(({name, type}) => {
+                    rows.push([tableName, name, type]);
+                });
             });
 
-            return Promise.all( tableMetadataPromise ).then( result=> {
-                result.forEach( m=>{
-                    //@n-riesco - Is this a more efficent way to implement this
-                    let tableName = m[0].tableReference.tableId;
-                    let tableAtttributes = m[0].schema.fields.map( field => [tableName,field.name,field.type]);
-                    //@n-riesco - This feels hacky:)  Do you have a better way?
-                    rows = rows.concat( tableAtttributes );
-                })
-                resolve( {columnnames, rows});
-            })
-         })
-    });
-
+            return {columnnames, rows};
+        });
 }
 
 
@@ -141,20 +128,17 @@ export function schemas(connection) {
  * @param {object} connection - Connection Parameters
  * @param {string} connection.projectId - Google Cloud Project Id
  * @param {string} connection.database - Google Big Query Database
- * @param {string} connection.keyfileName - Google Service Account Key File
+ * @param {string} connection.keyFilename - Google Service Account Key File
  * @returns {Promise} that resolves connection
- * @returns {Promise} that resolves to { columnnames, rows }
+ * @returns {Promise} that resolves to an array of table names
  */
 export function tables(connection) {
-    const bigquery = getBigQueryClient(connection.projectId,connection.keyfileName);
-    let tableNames = [];
-    return bigquery.dataset( connection.database ).getTables().then( results =>{
-       const tables = results[0];
-       if( results && results.length >0){
-            tables.forEach(table => { 
-                tableNames.push( table.id );
-            });
-       }
-       return tableNames;
-    });
+    const client = pool.getClient(connection);
+
+    return client
+        .dataset(connection.database)
+        .getTables()
+        .then(results => {
+            return (results[0] || []).map(table => table.id);
+        });
 }
