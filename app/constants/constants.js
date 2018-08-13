@@ -266,7 +266,7 @@ export const CONNECTION_CONFIG = {
         {'label': 'Database', 'value': 'database', 'type': 'text'},
         {
             'label': 'Key File',
-            'value': 'keyfileName',
+            'value': 'keyFilename',
             'type': 'filedrop',
             'description': `The location of the Google Service Account Key File`
         }
@@ -511,7 +511,7 @@ export const SAMPLE_DBS = {
     [DIALECTS.BIGQUERY]: {
         projectId: 'Plotly',
         database: 'plotly',
-        keyfileName: '/home/plotly/falcon/google-credentials.json'
+        keyFilename: '/home/plotly/falcon/google-credentials.json'
     }
 };
 
