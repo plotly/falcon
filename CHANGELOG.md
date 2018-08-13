@@ -20,6 +20,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 
+## [3.0.3] - 2018-08-13
+
+### Added
+* OnPrem: Added env variable `PLOTY_CONNECTOR_BASE_URL` to customise the
+  `connectorUrl` set in a query metadata (#514)
+
+### Fixed
+* OnPrem: Fixed connectorUrl in query metadata
+  (https://github.com/plotly/streambed/issues/11310)
+
+
 ## [3.0.2] - 2018-08-10
 
 ### Fixed
