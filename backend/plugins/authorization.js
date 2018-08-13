@@ -44,13 +44,20 @@ export function PlotlyOAuth(electron) {
             return next();
         }
 
-        // Auth is disabled for certain urls:
-        if (ESCAPED_ROUTES.some(path.match.bind(path))) {
+        // No Auth for electron apps:
+        if (electron) {
             return next();
         }
 
-        // No Auth for electron apps:
-        if (electron) {
+        // If not logged in and on-promise private-mode, redirect to login page
+        const plotlyAuthToken = req.cookies['plotly-auth-token'];
+        const onprem = getSetting('IS_RUNNING_INSIDE_ON_PREM');
+        if (path === '/' && !plotlyAuthToken && onprem) {
+            return res.redirect('/external-data-connector/login', next);
+        }
+
+        // Auth is disabled for certain urls:
+        if (ESCAPED_ROUTES.some(path.match.bind(path))) {
             return next();
         }
 
@@ -58,12 +65,10 @@ export function PlotlyOAuth(electron) {
             return next();
         }
 
-        if (!req.cookies['plotly-auth-token']) {
+        if (!plotlyAuthToken) {
             res.json(401, {error: {message: 'Please login to access this page.'}});
             return next(false);
         }
-
-        const plotlyAuthToken = req.cookies['plotly-auth-token'];
 
         fetch(`${getSetting('PLOTLY_API_URL')}/v2/users/current`, {
             headers: {'Authorization': `Bearer ${plotlyAuthToken}`}

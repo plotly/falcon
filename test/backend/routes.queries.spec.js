@@ -1,5 +1,5 @@
 import {assert} from 'chai';
-import {merge} from 'ramda';
+import {merge, omit} from 'ramda';
 import uuid from 'uuid';
 
 import {saveConnection} from '../../backend/persistent/Connections.js';
@@ -17,8 +17,7 @@ import {
     POST,
     sqlConnections,
     username,
-    validFid,
-    validUids
+    validFid
 } from './utils.js';
 
 
@@ -34,7 +33,6 @@ describe('Routes:', () => {
         connectionId = saveConnection(sqlConnections);
         queryObject = {
             fid: validFid,
-            uids: validUids.slice(0, 2), // since this particular query only has 2 columns
             refreshInterval: 60, // every minute
             cronInterval: null,
             query: 'SELECT * FROM ebola_2014 LIMIT 1',
@@ -102,12 +100,10 @@ describe('Routes:', () => {
                 .then(assertResponseStatus(201))
                 .then(getResponseJson).then(json => {
                     fid = json.file.fid;
-                    const uids = json.file.cols.map(col => col.uid);
 
                     queryObject = {
                         fid,
                         requestor: fid.split(':')[0],
-                        uids,
                         refreshInterval: 60,
                         cronInterval: null,
                         connectionId,
@@ -118,18 +114,23 @@ describe('Routes:', () => {
                 })
                 .then(assertResponseStatus(201))
                 .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {});
+                    assert.deepEqual(omit(json, 'uids'), omit(queryObject, 'uids'));
+                    assert.equal(json.uids.length, 6);
 
                     return GET('queries');
                 })
                 .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, [queryObject]);
+                    assert.equal(json.length, 1);
+                    assert.deepEqual(omit(json[0], 'uids'), omit(queryObject, 'uids'));
+                    assert.equal(json[0].uids.length, 6);
 
                     return deleteGrid(fid, username);
                 });
         });
 
-        it('can register queries if the user is a collaborator', function() {
+        // disabled because collaborators cannot register queries since
+        // they lack permission to update metadata
+        xit('can register queries if the user is a collaborator', function() {
             /*
              * Plotly doesn't have a v2 endpoint for creating
              * collaborators, so we'll just use these hardcoded
@@ -144,12 +145,10 @@ describe('Routes:', () => {
                 apiKey: 'I6j80cqCVaBAnvH9ESD2'
             }]);
             const fid = 'plotly-database-connector:718';
-            const uids = ['d8ba6c', 'dfa411'];
 
             queryObject = {
                 fid,
                 requestor: collaborator,
-                uids,
                 refreshInterval: 60,
                 cronInterval: null,
                 connectionId,
@@ -158,11 +157,22 @@ describe('Routes:', () => {
 
             return POST('queries', queryObject)
                 .then(assertResponseStatus(201))
-                .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {});
+                .then(getResponseJson).then((json) => {
+                    queryObject = {
+                      ...queryObject,
+                      uids: [
+                        '08bd63',
+                        '3430b2',
+                        '618517',
+                        '812006',
+                        '3c7496',
+                        'b6b0bb'
+                      ]
+                    };
+                    assert.deepEqual(json, queryObject);
                     return GET('queries');
                 })
-                .then(getResponseJson).then(json => {
+                .then(getResponseJson).then((json) => {
                     assert.deepEqual(json, [queryObject]);
                 });
         });
@@ -175,12 +185,10 @@ describe('Routes:', () => {
                 apiKey: 'mUSjMmwa55d6hjvwvgI4'
             }]);
             const fid = 'plotly-database-connector:718';
-            const uids = ['d8ba6c', 'dfa411'];
 
             queryObject = {
                 fid,
                 requestor: viewer,
-                uids,
                 refreshInterval: 60,
                 cronInterval: null,
                 connectionId,
@@ -212,12 +220,10 @@ describe('Routes:', () => {
              * plot
              */
             const fid = 'plotly-database-connector:719';
-            const uids = ['3a6df9', 'b95e9d'];
 
             queryObject = {
                 fid,
                 requestor: viewer,
-                uids,
                 refreshInterval: 60,
                 cronInterval: null,
                 connectionId,
@@ -242,12 +248,32 @@ describe('Routes:', () => {
                 })
                 .then(assertResponseStatus(201))
                 .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {});
+                    assert.deepEqual(json, {
+                      ...queryObject,
+                      uids: [
+                        '9bbb87',
+                        '8d4dd0',
+                        '3e40ef',
+                        'b169c0',
+                        '55e326',
+                        'e69f70'
+                      ]
+                    });
                     return GET(`queries/${queryObject.fid}`);
                 })
                 .then(assertResponseStatus(200))
                 .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, queryObject);
+                    assert.deepEqual(json, {
+                      ...queryObject,
+                      uids: [
+                        '9bbb87',
+                        '8d4dd0',
+                        '3e40ef',
+                        'b169c0',
+                        '55e326',
+                        'e69f70'
+                      ]
+                    });
                 });
         });
 
