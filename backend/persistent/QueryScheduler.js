@@ -221,7 +221,7 @@ class QueryScheduler {
                     metadata: {
                         query,
                         connectionId,
-                        connectorUrl: `https://${getSetting('CONNECTOR_HTTPS_DOMAIN')}:${getSetting('PORT_HTTPS')}`
+                        connectorUrl: getSetting('BASE_URL')
                     },
                     refresh_interval: formattedRefresh
                 }
@@ -377,7 +377,7 @@ class QueryScheduler {
                     metadata: {
                         query,
                         connectionId,
-                        connectorUrl: `https://${getSetting('CONNECTOR_HTTPS_DOMAIN')}:${getSetting('PORT_HTTPS')}`
+                        connectorUrl: getSetting('BASE_URL')
                     },
                     refresh_interval: formattedRefresh
                 }
