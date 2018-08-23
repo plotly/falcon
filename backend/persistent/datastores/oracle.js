@@ -47,7 +47,7 @@ function disconnect(connection) {
 
 function tables(connection) {
     const sqlQuery = `
-        SELECT t.owner ||'.'|| t.table_name TABLE_NAME
+        SELECT owner ||'.'|| table_name TABLE_NAME
         FROM all_all_tables
         WHERE 
            owner not in ('SYS', 'SYSTEM') AND
