@@ -39,7 +39,7 @@ describe('QueryScheduler', function() {
     });
 
     beforeEach(function () {
-        clearSettings('QUERIES_PATH', 'SETTINGS_PATH', 'CONNECTIONS_PATH');
+        clearSettings('QUERIES_PATH', 'TAGS_PATH', 'SETTINGS_PATH', 'CONNECTIONS_PATH');
         saveSetting('USERS', [{username, apiKey}]);
 
         queryScheduler = new QueryScheduler();
