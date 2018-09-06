@@ -6,12 +6,16 @@ import ReactDataGrid from 'react-data-grid';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
 import cronstrue from 'cronstrue';
+import Select from 'react-select';
+import toHash from 'tohash';
 
 import CreateModal from './create-modal.jsx';
 import PreviewModal from './preview-modal.jsx';
 import PromptLoginModal from './login-modal.jsx';
 import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
+import Tag from './tag.jsx';
+import Status from './status.jsx';
 
 import {SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants';
 
@@ -21,6 +25,42 @@ const NO_OP = () => {};
 
 const ROW_HEIGHT = 84;
 
+const SORT_OPTIONS = [
+    {
+        label: 'Least recently run',
+        value: 'latent',
+        fn: (a, b) => a.last_run - b.last_run
+    },
+    {
+        label: 'Most recently run',
+        value: 'recent',
+        fn: (a, b) => b.last_run - a.last_run
+    },
+    {
+        label: 'Longest duration',
+        value: 'longest',
+        fn: (a, b) => b.duration - a.duration
+    },
+    {
+        label: 'Shortest duration',
+        value: 'shortest',
+        fn: (a, b) => a.duration - b.duration
+    },
+    {
+        label: 'Most rows',
+        value: 'most',
+        fn: (a, b) => b.size - a.size
+    },
+    {
+        label: 'Least rows',
+        value: 'least',
+        fn: (a, b) => a.size - b.size
+    }
+];
+
+const SORT_FUNCTIONS = toHash(SORT_OPTIONS, 'value');
+
+const flexStart = {justifyContent: 'flex-start'};
 class QueryFormatter extends React.Component {
     static propTypes = {
         /*
@@ -34,11 +74,15 @@ class QueryFormatter extends React.Component {
 
     render() {
         const query = this.props.value;
+
         return (
-            <Row>
+            <Row style={flexStart}>
+                <Column style={{width: '12px'}}>
+                    <Status success={query.status === 'SUCCESS'} />
+                </Column>
                 <Column
                     className="ellipsis"
-                    style={{maxHeight: ROW_HEIGHT, padding: 8, paddingRight: '24px', fontSize: 15}}
+                    style={{width: '50%', maxHeight: ROW_HEIGHT, padding: 8, paddingRight: '24px', fontSize: 15}}
                 >
                     {query.name ? (
                         <span className="ellipsis" style={{fontSize: 16}}>
@@ -47,6 +91,23 @@ class QueryFormatter extends React.Component {
                     ) : (
                         <SQL>{query.query}</SQL>
                     )}
+                    <em
+                        className="ellipsis"
+                        style={{
+                            display: 'block',
+                            fontSize: 15
+                        }}
+                    >
+                        Runs every{' '}
+                        {query.cronInterval
+                            ? cronstrue.toString(query.cronInterval)
+                            : `Runs every ${ms(query.refreshInterval * 1000, {
+                                  long: true
+                              })}`}
+                    </em>
+                </Column>
+                <Column style={{width: 'auto'}}>
+                    <Row style={flexStart}>{query.tags.map(tag => <Tag {...tag} />)}</Row>
                 </Column>
             </Row>
         );
@@ -66,36 +127,66 @@ class IntervalFormatter extends React.Component {
     };
 
     render() {
-        const run = this.props.value;
+        // TODO this.props.value
+        const run = {
+            last_run: Date.now() - 1000,
+            size: 64,
+            duration: 3 * 1000,
+            status: 'SUCCESS'
+        };
 
         return (
-            <em
-                className="ellipsis"
-                style={{
-                    display: 'block',
-                    fontSize: 15
-                }}
-            >
-                {run.cronInterval
-                    ? cronstrue.toString(run.cronInterval)
-                    : `Runs every ${ms(run.refreshInterval * 1000, {
-                          long: true
-                      })}`}
-            </em>
+            <Row>
+                <Column>
+                    <div
+                        style={{
+                            fontSize: 18,
+                            color: run.status === 'SUCCESS' ? '#30aa65' : '#ef595b'
+                        }}
+                    >
+                        {`${ms(Date.now() - run.last_run || Date.now(), {
+                            long: true
+                        })} ago`}
+                    </div>
+                    <em
+                        style={{
+                            fontSize: 12
+                        }}
+                    >
+                        {`${run.size} rows in ${ms(run.duration, {
+                            long: true
+                        })}`}
+                    </em>
+                </Column>
+            </Row>
         );
     }
 }
 
-function mapRows(rows) {
-    return rows.map(r => ({
-        query: r,
-        run: r
-    }));
+function mapRow(row) {
+    return {
+        query: row,
+        run: row
+    };
 }
 
 class Scheduler extends Component {
     static defaultProps = {
         queries: [],
+        tags: {
+            Xero: {
+                title: 'Xero',
+                color: '#F2C94C'
+            },
+            Important: {
+                title: 'Important',
+                color: '#56CCF2'
+            },
+            'Stage 2': {
+                title: 'Stage 2',
+                color: '#D14CF2'
+            }
+        }, // TODO
         refreshQueries: NO_OP,
         openLogin: NO_OP,
         createScheduledQuery: NO_OP,
@@ -112,6 +203,7 @@ class Scheduler extends Component {
                 fid: PropTypes.string.isRequired
             }).isRequired
         ),
+        tags: PropTypes.object,
         initialCode: PropTypes.string,
         requestor: PropTypes.string,
         dialect: PropTypes.string,
@@ -128,6 +220,7 @@ class Scheduler extends Component {
         super(props);
         this.state = {
             search: '',
+            sort: null,
             selectedQuery: null,
             createModalOpen: Boolean(this.props.initialCode)
         };
@@ -147,6 +240,7 @@ class Scheduler extends Component {
         ];
 
         this.handleSearchChange = this.handleSearchChange.bind(this);
+        this.handleSortChange = this.handleSortChange.bind(this);
         this.getRows = this.getRows.bind(this);
         this.rowGetter = this.rowGetter.bind(this);
         this.openPreview = this.openPreview.bind(this);
@@ -162,16 +256,32 @@ class Scheduler extends Component {
         this.setState({search: e.target.value});
     }
 
+    handleSortChange(change) {
+        // on clear, change is null
+        this.setState({sort: change ? change.value : null});
+    }
+
     getRows() {
-        return mapRows(
-            matchSorter(this.props.queries, this.state.search, {
-                keys: ['query', 'name']
+        const rows = this.props.queries.map(query =>
+            Object.assign({}, query, {
+                // TODO real tags, move `this.props.tags[k]` below matchSorter
+                tags: ['Xero', 'Important']
             })
         );
+
+        const sort = SORT_FUNCTIONS[this.state.sort];
+
+        return matchSorter(rows, this.state.search, {keys: ['query', 'name', 'status', 'tags']}).sort(sort && sort.fn);
     }
 
     rowGetter(i) {
-        return this.getRows()[i];
+        const row = this.getRows()[i];
+
+        return mapRow(
+            Object.assign({}, row, {
+                tags: row.tags.map(k => this.props.tags[k])
+            })
+        );
     }
 
     openPreview(i, query) {
@@ -269,8 +379,16 @@ class Scheduler extends Component {
                         </Row>
                     </Column>
                     <Column style={{width: 300}}>
-                        <Row>
+                        <Row style={{width: 'auto', justifyContent: 'flex-end'}}>
                             <Column>
+                                <Select
+                                    searchable={false}
+                                    value={this.state.sort}
+                                    options={SORT_OPTIONS}
+                                    onChange={this.handleSortChange}
+                                />
+                            </Column>
+                            <Column style={{marginLeft: 16, width: 'auto'}}>
                                 <button
                                     className="refresh-button"
                                     onClick={this.props.refreshQueries}

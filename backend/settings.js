@@ -76,6 +76,7 @@ const derivedSettingsNames = [
     'PLOTLY_URL',
     'CONNECTIONS_PATH',
     'QUERIES_PATH',
+    'TAGS_PATH',
     'LOG_PATH',
     'SETTINGS_PATH',
     'KEY_FILE',
@@ -114,6 +115,11 @@ function getDerivedSetting(settingName) {
             return path.join(
                 getSetting('STORAGE_PATH'),
                 'queries.yaml'
+            );
+        case 'TAGS_PATH':
+            return path.join(
+                getSetting('STORAGE_PATH'),
+                'tags.yaml'
             );
 
         case 'LOG_PATH':

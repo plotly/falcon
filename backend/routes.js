@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-import {contains, keys, isEmpty, merge, pluck} from 'ramda';
+import {contains, equals, filter, keys, isEmpty, merge, pluck, propEq, reject} from 'ramda';
 const restify = require('restify');
 const CookieParser = require('restify-cookies');
 
@@ -19,7 +19,8 @@ import * as Datastores from './persistent/datastores/Datastores.js';
 import init from './init.js';
 import Logger from './logger.js';
 import {checkWritePermissions, newDatacache} from './persistent/plotly-api.js';
-import {getQueries, getQuery, deleteQuery} from './persistent/Queries.js';
+import {getQueries, getQuery, deleteQuery, saveQuery} from './persistent/Queries.js';
+import {getTags, getTag, saveTag, deleteTag} from './persistent/Tags.js';
 import {
     deleteConnectionById,
     editConnectionById,
@@ -642,6 +643,69 @@ export default class Servers {
         });
 
         /* Persistent Datastores */
+        // get all tags
+        server.get('/tags', function getTagsHandler(req, res, next) {
+            res.json(200, getTags());
+            return next();
+        });
+
+        // register a tag
+        server.post('/tags', function postTagsHandler(req, res, next) {
+            const HEX_CODE_REGEX = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+            const MAX_TAG_LENGTH = 30;
+
+            const {
+                name,
+                color
+            } = req.params;
+
+            if (!name || !color) {
+                res.json(400, {error: {message: 'Tags must have name and color parameters.'}});
+                return next();
+            } else if (name.length > MAX_TAG_LENGTH) {
+                res.json(400, {error: {message: `Tag name must be less than ${MAX_TAG_LENGTH} characters.`}});
+                return next();
+            } else if (!HEX_CODE_REGEX.test(color)) {
+                res.json(400, {error: {message: 'Tag color must be a valid hex code.'}});
+                return next();
+            }
+
+            const existingTags = getTags();
+            const duplicateTags = filter(propEq('name', name), existingTags);
+            if (duplicateTags.length) {
+                res.json(400, {error: {message: 'A tag with that name already exists'}});
+                return next();
+            }
+
+            const createdTag = saveTag({name, color});
+            res.json(201, createdTag);
+            return next();
+        });
+
+        // delete a tag
+        server.del('/tags/:id', function deleteTagHandler(req, res, next) {
+            const {
+                id
+            } = req.params;
+
+            if (!getTag(id)) {
+                res.json(404, {});
+                return next();
+            }
+
+            deleteTag(id);
+            const queries = getQueries();
+            queries.forEach(query => {
+                if (query.tags) {
+                    deleteQuery(query.fid);
+                    query.tags = reject(equals(id), query.tags);
+                    saveQuery(query);
+                }
+            });
+
+            res.json(200, {});
+            return next();
+        });
 
         // return the list of registered queries
         server.get('/queries', function getQueriesHandler(req, res, next) {

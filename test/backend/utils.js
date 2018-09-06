@@ -180,7 +180,7 @@ export function createTestServers() {
     servers.httpServer.start();
 
     // cleanup
-    clearSettings('CONNECTIONS_PATH', 'QUERIES_PATH', 'SETTINGS_PATH');
+    clearSettings('CONNECTIONS_PATH', 'QUERIES_PATH', 'TAGS_PATH', 'SETTINGS_PATH');
 
     // enable authentication:
     saveSetting('AUTH_ENABLED', true);

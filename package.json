@@ -250,6 +250,7 @@
     "pg-hstore": "^2.3.2",
     "restify": "^4.3.2",
     "sequelize": "3.30.4",
+    "shortid": "^2.2.13",
     "source-map-support": "^0.5.0",
     "sqlite3": "^3.1.13",
     "tedious": "^2.1.4"
