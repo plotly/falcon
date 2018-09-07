@@ -1,5 +1,5 @@
 import fs from 'fs';
-import {findIndex, propEq} from 'ramda';
+import {findIndex, propEq, reject} from 'ramda';
 import YAML from 'yamljs';
 
 import {getSetting} from '../settings.js';
@@ -22,11 +22,24 @@ export function getQueries() {
 
 export function saveQuery(queryObject) {
     const queries = getQueries();
-    queries.push(queryObject);
+    queries.push(
+        stripUndefinedKeys(queryObject)
+    );
     if (!fs.existsSync(getSetting('STORAGE_PATH'))) {
         createStoragePath();
     }
     fs.writeFileSync(getSetting('QUERIES_PATH'), YAML.stringify(queries, 4));
+}
+
+export function updateQuery(fid, updatedQueryData) {
+    const existingQuery = getQuery(fid);
+    const updatedQuery = stripUndefinedKeys({
+        ...existingQuery,
+        ...updatedQueryData
+    });
+
+    deleteQuery(fid);
+    saveQuery(updatedQuery);
 }
 
 export function deleteQuery(fid) {
@@ -37,5 +50,13 @@ export function deleteQuery(fid) {
         queries.splice(index, 1);
         fs.writeFileSync(getSetting('QUERIES_PATH'), YAML.stringify(queries, 4));
     }
+}
 
+// prevent 'yamljs' from coerecing undefined keys into null
+function stripUndefinedKeys (obj) {
+    return reject(isUndefined, obj);
+}
+
+function isUndefined (val) {
+    return typeof val === 'undefined';
 }

@@ -12,20 +12,28 @@ import {Link} from '../../Link.react.js';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
+import Tag from './tag.jsx';
+import Status from './status.jsx';
 import {datasetUrl} from '../../../utils/utils.js';
 import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../constants/constants.js';
 import {getInitialCronMode} from '../cron-picker/cron-helpers.js';
 
 const NO_OP = () => {};
 
+const flexStart = {justifyContent: 'flex-start'};
 const rowStyle = {
-    justifyContent: 'flex-start',
+    ...flexStart,
     borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
     padding: '12px 0px'
 };
 const keyStyle = {boxSizing: 'border-box', width: '35%'};
 const valueStyle = {boxSizing: 'border-box', width: '65%'};
 const noMargin = {margin: 0};
+const headingRowStyle = {
+    ...flexStart,
+    padding: '0 32px 16px',
+    position: 'relative'
+};
 
 // implements a modal window to view details of a scheduled query
 export class PreviewModal extends Component {
@@ -157,9 +165,9 @@ export class PreviewModal extends Component {
 
         if (success) {
             return (
-              <Column>
-                <SuccessMessage>{this.state.successMessage}</SuccessMessage>
-              </Column>
+                <Column>
+                    <SuccessMessage>{this.state.successMessage}</SuccessMessage>
+                </Column>
             );
         }
 
@@ -243,17 +251,22 @@ export class PreviewModal extends Component {
                             EDITING
                         </Row>
                     )}
-                    <Row
-                        className="sql-preview"
-                        style={{
-                            padding: '0 32px 16px',
-                            position: 'relative',
-                            justifyContent: 'flex-start'
-                        }}
-                    >
-                        <h5 className="sql-preview ellipsis" style={{...noMargin, letterSpacing: '1px'}}>
-                            {this.state.name ? <b>{this.state.name}</b> : <SQL className="bold">{this.state.code}</SQL>}
-                        </h5>
+                    <Row style={headingRowStyle}>
+                        <Column style={{width: 'auto', marginRight: '32px', justifyContent: 'center'}}>
+                            <Status size={40} status={props.query.status} />
+                        </Column>
+                        <Column>
+                            <Row className="sql-preview" style={flexStart}>
+                                <h5 className="sql-preview ellipsis" style={{margin: '0 0 8px', letterSpacing: '1px'}}>
+                                    {this.state.name ? (
+                                        <b>{this.state.name}</b>
+                                    ) : (
+                                        <SQL className="bold">{this.state.code}</SQL>
+                                    )}
+                                </h5>
+                            </Row>
+                            <Row style={flexStart}>{props.query.tags.map(tag => <Tag {...tag} />)}</Row>
+                        </Column>
                     </Row>
                     <Column style={{background: '#F5F7FB', padding: '16px 32px'}}>
                         <Row style={rowStyle}>
@@ -349,7 +362,7 @@ export class PreviewModal extends Component {
                                 ...rowStyle,
                                 justifyContent: 'space-between',
                                 border: 'none',
-                                marginTop: 48,
+                                marginTop: 32,
                                 paddingBottom: 16
                             }}
                         >
