@@ -78,7 +78,7 @@ class QueryFormatter extends React.Component {
         return (
             <Row style={flexStart}>
                 <Column style={{width: '12px'}}>
-                    <Status success={query.status === 'SUCCESS'} />
+                    <Status size={12} status={query.status} />
                 </Column>
                 <Column
                     className="ellipsis"
@@ -233,7 +233,7 @@ class Scheduler extends Component {
             },
             {
                 key: 'run',
-                name: 'Schedule',
+                name: 'Last run',
                 filterable: true,
                 formatter: IntervalFormatter
             }
@@ -373,8 +373,20 @@ class Scheduler extends Component {
                 >
                     <Column style={{width: 300}}>
                         <Row>
-                            <Column style={{marginLeft: 8}}>
+                            <Column
+                                style={{
+                                    padding: '4px 0',
+                                    marginLeft: 8,
+                                    borderRight: '1px solid rgba(0, 0, 0, 0.12)'
+                                }}
+                            >
                                 {rows.length} {rows.length === 1 ? ' query' : ' queries'}
+                            </Column>
+                            <Column style={{padding: '4px 0', marginLeft: 24}}>
+                                Success ({rows.filter(row => row.status === 'SUCCESS').length})
+                            </Column>
+                            <Column style={{padding: '4px 0', marginLeft: 8}}>
+                                Error ({rows.filter(row => row.status === 'FAILURE').length})
                             </Column>
                         </Row>
                     </Column>

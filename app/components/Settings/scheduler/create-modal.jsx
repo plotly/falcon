@@ -111,11 +111,11 @@ class CreateModal extends Component {
                 cronInterval: this.state.interval,
                 name: this.state.name ? this.state.name.trim() : ''
             })
-            .then((res) => {
+            .then(res => {
                 this.setState({
-                  successMessage: 'Scheduled query saved successfully!',
-                  saving: false,
-                  datasetUrl: getDatasetURL(res.fid)
+                    successMessage: 'Scheduled query saved successfully!',
+                    saving: false,
+                    datasetUrl: getDatasetURL(res.fid)
                 });
             })
             .catch(error => this.setState({error: error.message, saving: false}));
@@ -200,10 +200,10 @@ class CreateModal extends Component {
                     </Column>
                     <Row>
                         {this.state.successMessage ? (
-                            <Column style={{ padding: '0 32px 16px' }}>
-                              <SuccessMessage message={this.state.successMessage}>
-                                <Link href={this.state.datasetUrl}>View Live Dataset</Link>
-                              </SuccessMessage>
+                            <Column style={{padding: '0 32px 16px'}}>
+                                <SuccessMessage message={this.state.successMessage}>
+                                    <Link href={this.state.datasetUrl}>View Live Dataset</Link>
+                                </SuccessMessage>
                             </Column>
                         ) : (
                             <Column>
