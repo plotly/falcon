@@ -12,6 +12,7 @@ import RequestError from './request-error.jsx';
 import TimedMessage from './timed-message.jsx';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 import SQL from './sql.jsx';
+import TagPicker from './tag-picker.jsx';
 
 import {datasetUrl as getDatasetURL} from '../../../utils/utils';
 import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../constants/constants.js';
@@ -46,7 +47,13 @@ class CreateModal extends Component {
         onSubmit: PropTypes.func.isRequired,
         openQueryPage: PropTypes.func.isRequired,
         open: PropTypes.bool,
-        dialect: PropTypes.string
+        dialect: PropTypes.string,
+        tags: PropTypes.arrayOf(
+            PropTypes.shape({
+                name: PropTypes.string.isRequired,
+                color: PropTypes.string
+            })
+        )
     };
     static defaultProps = {
         initialCode: '',
@@ -65,7 +72,8 @@ class CreateModal extends Component {
             interval: '*/5 * * * *',
             error: null,
             saving: false,
-            datasetUrl: null
+            datasetUrl: null,
+            tags: []
         };
         this.options = {
             lineWrapping: true,
@@ -78,6 +86,7 @@ class CreateModal extends Component {
         this.updateCode = this.updateCode.bind(this);
         this.handleIntervalChange = this.handleIntervalChange.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
+        this.handleTagsChange = this.handleTagsChange.bind(this);
         this.submit = this.submit.bind(this);
     }
 
@@ -91,6 +100,10 @@ class CreateModal extends Component {
 
     handleNameChange(e) {
         this.setState({name: e.target.value});
+    }
+
+    handleTagsChange(tags) {
+        this.setState({tags});
     }
 
     submit() {
@@ -183,6 +196,19 @@ class CreateModal extends Component {
                                 ) : (
                                     <CronPicker onChange={this.handleIntervalChange} />
                                 )}
+                            </div>
+                        </Row>
+                        <Row style={secondaryRowStyle}>
+                            <div className="row-header" style={{paddingTop: 5}}>
+                                Tags
+                            </div>
+                            <div className="row-body" style={{minHeight: '60px'}}>
+                                <TagPicker
+                                    disabled={Boolean(this.state.successMessage)}
+                                    value={this.state.tags}
+                                    options={this.props.tags}
+                                    onChange={this.handleTagsChange}
+                                />
                             </div>
                         </Row>
                         {this.state.error && (

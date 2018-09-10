@@ -227,6 +227,22 @@ export function deleteScheduledQuery(fid) {
   };
 }
 
+export function getTags() {
+    return dispatch => {
+        return dispatch(apiThunk(
+            'tags',
+            'GET',
+            'tagsRequest'
+        )).then((json => {
+            dispatch({
+                type: 'SET_TAGS',
+                payload: json
+            });
+            return json;
+        }));
+    };
+}
+
 export function connect(connectionId) {
     return apiThunk(
         `connections/${connectionId}/connect`,

@@ -174,6 +174,7 @@ class Settings extends Component {
             getElasticsearchMappings,
             getTables,
             getScheduledQueries,
+            getTags,
             getS3Keys,
             getSettings,
             initialize,
@@ -187,7 +188,8 @@ class Settings extends Component {
             selectedTab,
             selectedIndex,
             tablesRequest,
-            scheduledQueriesRequest
+            scheduledQueriesRequest,
+            tagsRequest
         } = this.props;
         if (connectionsRequest && !connectionsRequest.status) {
             initialize();
@@ -206,7 +208,11 @@ class Settings extends Component {
         }
 
         if (connectRequest.status === 200 && !scheduledQueriesRequest.status) {
-          getScheduledQueries();
+            getScheduledQueries();
+        }
+
+        if (connectRequest.status === 200 && !tagsRequest.status) {
+            getTags();
         }
 
         const connectionObject = connections[selectedTab] || {};
@@ -310,6 +316,7 @@ class Settings extends Component {
             createScheduledQuery,
             updateScheduledQuery,
             deleteScheduledQuery,
+            selectedTags,
             selectedIndex,
             setTab,
             tablesRequest,
@@ -418,6 +425,7 @@ class Settings extends Component {
                         <TabPanel>
                             <Scheduler
                               queries={selectedScheduledQueries}
+                              tags={selectedTags}
                               refreshQueries={getScheduledQueries}
                               createScheduledQuery={createScheduledQuery}
                               updateScheduledQuery={updateScheduledQuery}
@@ -556,7 +564,9 @@ function mapStateToProps(state) {
         previewTableRequests,
         tablesRequests,
         scheduledQueries,
+        tags,
         scheduledQueriesRequest,
+        tagsRequest,
         elasticsearchMappingsRequests,
         selectedTables,
         selectedIndecies,
@@ -595,6 +605,7 @@ function mapStateToProps(state) {
         previewTableRequest,
         tablesRequest: tablesRequests[selectedConnectionId] || {},
         scheduledQueriesRequest: scheduledQueriesRequest || {},
+        tagsRequest: tagsRequest || {},
         elasticsearchMappingsRequest: elasticsearchMappingsRequests[selectedConnectionId] || {},
         s3KeysRequest: s3KeysRequests[selectedConnectionId] || {},
         apacheDrillStorageRequest: apacheDrillStorageRequests[selectedConnectionId] || {},
@@ -609,6 +620,7 @@ function mapStateToProps(state) {
         queryRequest: queryRequests[selectedConnectionId],
         selectedTable,
         selectedScheduledQueries,
+        selectedTags: tags,
         selectedIndex,
         selectedConnectionId,
         settingsRequest,
@@ -660,6 +672,9 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     }
     function boundDeleteScheduledQuery(fid) {
       return dispatch(Actions.deleteScheduledQuery(fid));
+    }
+    function boundGetTags() {
+        return dispatch(Actions.getTags(selectedConnectionId));
     }
     function boundGetElasticsearchMappings() {
         return dispatch(Actions.getElasticsearchMappings(selectedConnectionId));
@@ -758,6 +773,7 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             createScheduledQuery: boundCreateScheduledQuery,
             updateScheduledQuery: boundUpdateScheduledQuery,
             deleteScheduledQuery: boundDeleteScheduledQuery,
+            getTags: boundGetTags,
             getElasticsearchMappings: boundGetElasticsearchMappings,
             setTable: boundSetTable,
             setIndex: boundSetIndex,
@@ -816,11 +832,17 @@ Settings.propTypes = {
         query: PropTypes.string,
         refreshInterval: PropTypes.number
     })),
+    selectedTags: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string,
+        color: PropTypes.string
+    })),
     scheduledQueriesRequest: PropTypes.object,
+    tagsRequest: PropTypes.object,
     getScheduledQueries: PropTypes.func,
     createScheduledQuery: PropTypes.func,
     updateScheduledQuery: PropTypes.func,
     deleteScheduledQuery: PropTypes.func,
+    getTags: PropTypes.func,
     tablesRequest: PropTypes.object,
     deleteTab: PropTypes.func,
     getSqlSchema: PropTypes.func,
