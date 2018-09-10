@@ -208,6 +208,19 @@ function scheduledQueries(state = [], action) {
     return state;
 }
 
+function tags(state = [], action) {
+    if (action.type === 'SET_TAGS') {
+        return action.payload;
+    }
+    if (action.type === 'CREATE_TAG') {
+      return [
+        action.payload,
+        ...state
+      ];
+    }
+    return state;
+}
+
 // object for each tab that tells us if the credentials have been modified since last save to disk
 function connectionsNeedToBeSaved(state = {}, action) {
     if (action.type === 'SET_CONNECTIONS_NEED_TO_BE_SAVED') {
@@ -275,6 +288,7 @@ const rootReducer = combineReducers({
     selectedTables,
     scheduledQueries,
     scheduledQueriesRequest,
+    tags,
     selectedIndecies,
     settingsRequest,
     connectRequests,

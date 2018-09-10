@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 /* eslint-disable */
-const Tag = ({title, color}) => (
+const Tag = ({name, color, style}) => (
     <span
         style={{
             display: 'inline-block',
@@ -12,15 +12,16 @@ const Tag = ({title, color}) => (
             padding: '4px 12px',
             fontSize: 16,
             marginRight: '1rem',
-            borderRadius: '2px'
+            borderRadius: '2px',
+            ...style
         }}
     >
-        {title}
+        {name}
     </span>
 );
 
 Tag.propTypes = {
-    title: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
     color: PropTypes.string
 };
 

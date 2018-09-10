@@ -15,4 +15,8 @@ Status.propTypes = {
     size: PropTypes.number
 };
 
+Status.defaultProps = {
+    status: 'SUCCESS'
+};
+
 export default Status;

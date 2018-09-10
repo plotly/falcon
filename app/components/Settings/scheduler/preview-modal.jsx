@@ -213,6 +213,8 @@ export class PreviewModal extends Component {
 
             const initialModeId = getInitialCronMode(props.query);
 
+            const run = props.query;
+
             content = (
                 <Column
                     style={{
@@ -339,6 +341,28 @@ export class PreviewModal extends Component {
                                 </em>
                             )}
                         </Row>
+                        {run.size &&
+                            run.duration && (
+                                <Row style={rowStyle}>
+                                    <div style={keyStyle}>Last Execution</div>
+                                    <em style={valueStyle}>
+                                        <span
+                                            style={{
+                                                color: run.status === 'SUCCESS' ? '#30aa65' : '#ef595b'
+                                            }}
+                                        >
+                                            {ms(Date.now() - (run.last_run || Date.now()), {
+                                                long: true
+                                            })}{' '}
+                                            ago
+                                        </span>
+                                        <br />
+                                        {`${run.size} rows in ${ms(run.duration, {
+                                            long: true
+                                        })}`}
+                                    </em>
+                                </Row>
+                            )}
                         <Row style={rowStyle}>
                             <div style={keyStyle}>Live Dataset</div>
                             <Link href={link} style={valueStyle}>

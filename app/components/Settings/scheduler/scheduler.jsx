@@ -173,20 +173,7 @@ function mapRow(row) {
 class Scheduler extends Component {
     static defaultProps = {
         queries: [],
-        tags: {
-            Xero: {
-                title: 'Xero',
-                color: '#F2C94C'
-            },
-            Important: {
-                title: 'Important',
-                color: '#56CCF2'
-            },
-            'Stage 2': {
-                title: 'Stage 2',
-                color: '#D14CF2'
-            }
-        }, // TODO
+        tags: [],
         refreshQueries: NO_OP,
         openLogin: NO_OP,
         createScheduledQuery: NO_OP,
@@ -203,7 +190,12 @@ class Scheduler extends Component {
                 fid: PropTypes.string.isRequired
             }).isRequired
         ),
-        tags: PropTypes.object,
+        tags: PropTypes.arrayOf(
+            PropTypes.shape({
+                name: PropTypes.string.isRequired,
+                color: PropTypes.string
+            })
+        ),
         initialCode: PropTypes.string,
         requestor: PropTypes.string,
         dialect: PropTypes.string,
@@ -223,6 +215,21 @@ class Scheduler extends Component {
             sort: null,
             selectedQuery: null,
             createModalOpen: Boolean(this.props.initialCode)
+        };
+        this.tags = {
+            // TODO
+            Xero: {
+                name: 'Xero',
+                color: '#F2C94C'
+            },
+            Important: {
+                name: 'Important',
+                color: '#56CCF2'
+            },
+            'Stage 2': {
+                name: 'Stage 2',
+                color: '#D14CF2'
+            }
         };
         this.columns = [
             {
@@ -279,7 +286,7 @@ class Scheduler extends Component {
 
         return mapRow(
             Object.assign({}, row, {
-                tags: row.tags.map(k => this.props.tags[k])
+                tags: row.tags.map(k => this.tags[k])
             })
         );
     }
@@ -383,7 +390,7 @@ class Scheduler extends Component {
                                 {rows.length} {rows.length === 1 ? ' query' : ' queries'}
                             </Column>
                             <Column style={{padding: '4px 0', marginLeft: 24}}>
-                                Success ({rows.filter(row => row.status === 'SUCCESS').length})
+                                Success ({rows.filter(row => row.status !== 'FAILURE').length})
                             </Column>
                             <Column style={{padding: '4px 0', marginLeft: 8}}>
                                 Error ({rows.filter(row => row.status === 'FAILURE').length})
@@ -430,6 +437,7 @@ class Scheduler extends Component {
                     onSubmit={this.createQuery}
                     dialect={this.props.dialect}
                     openQueryPage={this.props.openQueryPage}
+                    tags={this.props.tags}
                 />
                 <PromptLoginModal
                     open={!loggedIn && this.state.createModalOpen}
