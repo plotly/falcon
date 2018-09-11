@@ -152,6 +152,7 @@ export const previewTableRequests = createApiReducer('previewTableRequest');
 export const s3KeysRequests = createApiReducer('s3KeysRequests');
 export const tablesRequests = createApiReducer('tablesRequests');
 export const scheduledQueriesRequest = createApiReducer('scheduledQueriesRequest');
+export const tagsRequest = createApiReducer('tagsRequest');
 export const schemaRequests = createApiReducer('schemaRequests');
 export const queryRequests = createApiReducer('queryRequests');
 
@@ -289,6 +290,7 @@ const rootReducer = combineReducers({
     scheduledQueries,
     scheduledQueriesRequest,
     tags,
+    tagsRequest,
     selectedIndecies,
     settingsRequest,
     connectRequests,
