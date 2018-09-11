@@ -5,16 +5,20 @@ import Select from 'react-select';
 import Tag from './tag.jsx';
 
 const styles = {
-    item: {display: 'inline-block', padding: '2px 0px'},
-    tag: {marginRight: '0px'}
+    item: {zIndex: 999, display: 'inline-block', padding: '2px 0px', cursor: 'pointer'},
+    tag: {marginRight: '0px', cursor: 'pointer'}
 };
 class TagValue extends React.Component {
     constructor(props) {
         super(props);
+        this.handleRemove = this.handleRemove.bind(this);
+    }
+    handleRemove() {
+        this.props.onRemove(this.props.value);
     }
     render() {
         return (
-            <div style={styles.item}>
+            <div onClick={this.handleRemove} style={styles.item}>
                 <span className="Select-value-label">
                     <Tag name={this.props.value.label} color={this.props.value.color} style={styles.tag} />
                 </span>
@@ -24,7 +28,8 @@ class TagValue extends React.Component {
 }
 
 TagValue.propTypes = {
-    value: PropTypes.object
+    value: PropTypes.object,
+    onRemove: PropTypes.func
 };
 
 function optionRenderer(option) {
