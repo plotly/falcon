@@ -36,7 +36,8 @@ function optionRenderer(option) {
     return <Tag color={option.color} name={option.label} />;
 }
 
-class TagPicker extends React.Component {
+// TODO: Ensure PureComponent works when global tags are updated
+class TagPicker extends React.PureComponent {
     render() {
         return (
             <Select

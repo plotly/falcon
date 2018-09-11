@@ -26,6 +26,8 @@ const secondaryRowStyle = Object.assign({}, rowStyleOverride, {
     borderTop: '1px solid #c8d4e3',
     paddingTop: '18px'
 });
+const containerOverride = {width: '60%', maxHeight: '100vh', minWidth: 640, paddingBottom: '16px'};
+const minHeight = {minHeight: '60px'};
 
 function generateFilename() {
     let n = Math.floor(Math.random() * 1e8).toString();
@@ -137,10 +139,7 @@ class CreateModal extends Component {
     render() {
         return (
             <Modal open={this.props.open} onClickAway={this.props.onClickAway} className="scheduler create-modal">
-                <Column
-                    className="container"
-                    style={{width: '60%', maxHeight: '100vh', minWidth: 640, paddingBottom: '16px'}}
-                >
+                <Column className="container" style={containerOverride}>
                     <Row>
                         <Column className="innerColumn">
                             <h5 className="header">Create Scheduled Query</h5>
@@ -202,7 +201,7 @@ class CreateModal extends Component {
                             <div className="row-header" style={{paddingTop: 5}}>
                                 Tags
                             </div>
-                            <div className="row-body" style={{minHeight: '60px'}}>
+                            <div className="row-body" style={minHeight}>
                                 <TagPicker
                                     disabled={Boolean(this.state.successMessage)}
                                     value={this.state.tags}

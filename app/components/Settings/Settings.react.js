@@ -26,6 +26,7 @@ class Settings extends Component {
         this.updateSelectedPanel = this.updateSelectedPanel.bind(this);
         this.openScheduler = this.openScheduler.bind(this);
         this.openLogin = () => window.location.assign(`${homeUrl()}/login`);
+        this.openQueryPage = () => this.updateSelectedPanel(1);
         this.state = {
             editMode: true,
             selectedPanel: {},
@@ -435,7 +436,7 @@ class Settings extends Component {
                               requestor={username}
                               dialect={dialect}
                               preview={preview}
-                              openQueryPage={() => this.updateSelectedPanel(1)}
+                              openQueryPage={this.openQueryPage}
                             />
                         </TabPanel>
 

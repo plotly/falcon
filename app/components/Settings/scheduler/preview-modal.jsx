@@ -202,18 +202,24 @@ export class PreviewModal extends Component {
     }
 
     render() {
-        const props = this.props;
+        const {query} = this.props;
 
         let content;
-        if (!props.query) {
+        if (!query) {
             content = null;
         } else {
-            const link = datasetUrl(props.query.fid);
+            const link = datasetUrl(query.fid);
             const {editing, loading} = this.state;
 
-            const initialModeId = getInitialCronMode(props.query);
+            const initialModeId = getInitialCronMode(query);
 
-            const run = props.query;
+            // TODO this.props.value.lastExecution
+            const run = {
+                completedAt: Date.now() - 1000,
+                rowCount: 64,
+                duration: 3 * 1000,
+                status: 'SUCCESS'
+            };
 
             content = (
                 <Column
@@ -255,7 +261,7 @@ export class PreviewModal extends Component {
                     )}
                     <Row style={headingRowStyle}>
                         <Column style={{width: 'auto', marginRight: '32px', justifyContent: 'center'}}>
-                            <Status size={40} status={props.query.status} />
+                            <Status size={40} status={run.status} />
                         </Column>
                         <Column>
                             <Row className="sql-preview" style={flexStart}>
@@ -267,7 +273,7 @@ export class PreviewModal extends Component {
                                     )}
                                 </h5>
                             </Row>
-                            <Row style={flexStart}>{props.query.tags.map(tag => <Tag {...tag} />)}</Row>
+                            <Row style={flexStart}>{query.tags.map(tag => <Tag {...tag} />)}</Row>
                         </Column>
                     </Row>
                     <Column style={{background: '#F5F7FB', padding: '16px 32px'}}>
@@ -332,7 +338,7 @@ export class PreviewModal extends Component {
                                         <React.Fragment>
                                             Runs every{' '}
                                             <b>
-                                                {ms(props.query.refreshInterval * 1000, {
+                                                {ms(query.refreshInterval * 1000, {
                                                     long: true
                                                 })}
                                             </b>
@@ -341,28 +347,39 @@ export class PreviewModal extends Component {
                                 </em>
                             )}
                         </Row>
-                        {run.size &&
-                            run.duration && (
-                                <Row style={rowStyle}>
-                                    <div style={keyStyle}>Last Execution</div>
-                                    <em style={valueStyle}>
-                                        <span
-                                            style={{
-                                                color: run.status === 'SUCCESS' ? '#30aa65' : '#ef595b'
-                                            }}
-                                        >
-                                            {ms(Date.now() - (run.last_run || Date.now()), {
-                                                long: true
-                                            })}{' '}
-                                            ago
-                                        </span>
-                                        <br />
-                                        {`${run.size} rows in ${ms(run.duration, {
+                        {run && (
+                            <Row style={rowStyle}>
+                                <div style={keyStyle}>Last Execution</div>
+                                <em style={valueStyle}>
+                                    <span
+                                        style={{
+                                            color: run.status !== 'FAILURE' ? '#30aa65' : '#ef595b'
+                                        }}
+                                    >
+                                        {ms(Date.now() - run.completedAt, {
                                             long: true
-                                        })}`}
-                                    </em>
-                                </Row>
-                            )}
+                                        })}{' '}
+                                        ago
+                                    </span>
+                                    <br />
+                                    {`${run.rowCount} rows in ${ms(run.duration, {
+                                        long: true
+                                    })}`}
+                                </em>
+                            </Row>
+                        )}
+                        {run && (
+                            <Row style={rowStyle}>
+                                <div style={keyStyle}>Next Execution</div>
+                                <em style={valueStyle}>
+                                    {/* TODO query.nextScheduledAt */}
+                                    in{' '}
+                                    {ms((query.nextScheduledAt || Date.now() + 5000) - Date.now(), {
+                                        long: true
+                                    })}
+                                </em>
+                            </Row>
+                        )}
                         <Row style={rowStyle}>
                             <div style={keyStyle}>Live Dataset</div>
                             <Link href={link} style={valueStyle}>
@@ -398,7 +415,7 @@ export class PreviewModal extends Component {
         }
 
         return (
-            <Modal onClickAway={this.close} className="meta-preview" open={props.query !== null}>
+            <Modal onClickAway={this.close} className="meta-preview" open={query !== null}>
                 {content}
             </Modal>
         );

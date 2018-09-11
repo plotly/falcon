@@ -29,12 +29,12 @@ const SORT_OPTIONS = [
     {
         label: 'Least recently run',
         value: 'latent',
-        fn: (a, b) => a.last_run - b.last_run
+        fn: (a, b) => a.completedAt - b.completedAt
     },
     {
         label: 'Most recently run',
         value: 'recent',
-        fn: (a, b) => b.last_run - a.last_run
+        fn: (a, b) => b.completedAt - a.completedAt
     },
     {
         label: 'Longest duration',
@@ -49,18 +49,19 @@ const SORT_OPTIONS = [
     {
         label: 'Most rows',
         value: 'most',
-        fn: (a, b) => b.size - a.size
+        fn: (a, b) => b.rowCount - a.rowCount
     },
     {
         label: 'Least rows',
         value: 'least',
-        fn: (a, b) => a.size - b.size
+        fn: (a, b) => a.rowCount - b.rowCount
     }
 ];
 
 const SORT_FUNCTIONS = toHash(SORT_OPTIONS, 'value');
 
 const flexStart = {justifyContent: 'flex-start'};
+const widthAuto = {width: 'auto'};
 class QueryFormatter extends React.Component {
     static propTypes = {
         /*
@@ -78,7 +79,7 @@ class QueryFormatter extends React.Component {
         return (
             <Row style={flexStart}>
                 <Column style={{width: '12px'}}>
-                    <Status size={12} status={query.status} />
+                    <Status size={12} status={query.lastExecution && query.lastExecution.status} />
                 </Column>
                 <Column
                     className="ellipsis"
@@ -98,7 +99,6 @@ class QueryFormatter extends React.Component {
                             fontSize: 15
                         }}
                     >
-                        Runs every{' '}
                         {query.cronInterval
                             ? cronstrue.toString(query.cronInterval)
                             : `Runs every ${ms(query.refreshInterval * 1000, {
@@ -106,7 +106,7 @@ class QueryFormatter extends React.Component {
                               })}`}
                     </em>
                 </Column>
-                <Column style={{width: 'auto'}}>
+                <Column style={widthAuto}>
                     <Row style={flexStart}>{query.tags.map(tag => <Tag {...tag} />)}</Row>
                 </Column>
             </Row>
@@ -122,15 +122,16 @@ class IntervalFormatter extends React.Component {
          */
         value: PropTypes.shape({
             refreshInterval: PropTypes.number.isRequired,
-            cronInterval: PropTypes.string
+            cronInterval: PropTypes.string,
+            status: PropTypes.string
         })
     };
 
     render() {
-        // TODO this.props.value
+        // TODO this.props.value.lastExecution
         const run = {
-            last_run: Date.now() - 1000,
-            size: 64,
+            completedAt: Date.now() - 1000,
+            rowCount: 64,
             duration: 3 * 1000,
             status: 'SUCCESS'
         };
@@ -141,10 +142,10 @@ class IntervalFormatter extends React.Component {
                     <div
                         style={{
                             fontSize: 18,
-                            color: run.status === 'SUCCESS' ? '#30aa65' : '#ef595b'
+                            color: run.status !== 'FAILURE' ? '#30aa65' : '#ef595b'
                         }}
                     >
-                        {`${ms(Date.now() - run.last_run || Date.now(), {
+                        {`${ms(Date.now() - run.completedAt, {
                             long: true
                         })} ago`}
                     </div>
@@ -153,7 +154,7 @@ class IntervalFormatter extends React.Component {
                             fontSize: 12
                         }}
                     >
-                        {`${run.size} rows in ${ms(run.duration, {
+                        {`${run.rowCount} rows in ${ms(run.duration, {
                             long: true
                         })}`}
                     </em>
@@ -390,10 +391,16 @@ class Scheduler extends Component {
                                 {rows.length} {rows.length === 1 ? ' query' : ' queries'}
                             </Column>
                             <Column style={{padding: '4px 0', marginLeft: 24}}>
-                                Success ({rows.filter(row => row.status !== 'FAILURE').length})
+                                Success ({
+                                    rows.filter(row => row.lastExecution && row.lastExecution.status !== 'FAILURE')
+                                        .length
+                                })
                             </Column>
                             <Column style={{padding: '4px 0', marginLeft: 8}}>
-                                Error ({rows.filter(row => row.status === 'FAILURE').length})
+                                Error ({
+                                    rows.filter(row => row.lastExecution && row.lastExecution.status === 'FAILURE')
+                                        .length
+                                })
                             </Column>
                         </Row>
                     </Column>
