@@ -107,7 +107,7 @@ class QueryFormatter extends React.Component {
                     </em>
                 </Column>
                 <Column style={widthAuto}>
-                    <Row style={flexStart}>{query.tags.map(tag => <Tag {...tag} />)}</Row>
+                    <Row style={flexStart}>{query.tags.map(tag => <Tag key={tag.name} {...tag} />)}</Row>
                 </Column>
             </Row>
         );
@@ -133,7 +133,7 @@ class IntervalFormatter extends React.Component {
             completedAt: Date.now() - 1000,
             rowCount: 64,
             duration: 3 * 1000,
-            status: 'SUCCESS'
+            status: 'OK'
         };
 
         return (
@@ -142,7 +142,7 @@ class IntervalFormatter extends React.Component {
                     <div
                         style={{
                             fontSize: 18,
-                            color: run.status !== 'FAILURE' ? '#30aa65' : '#ef595b'
+                            color: run.status !== 'FAILED' ? '#30aa65' : '#ef595b'
                         }}
                     >
                         {`${ms(Date.now() - run.completedAt, {
@@ -217,21 +217,24 @@ class Scheduler extends Component {
             selectedQuery: null,
             createModalOpen: Boolean(this.props.initialCode)
         };
-        this.tags = {
-            // TODO
-            Xero: {
+        // TODO pass this in as prop
+        this.tags = toHash([
+            {
+                id: '1',
                 name: 'Xero',
                 color: '#F2C94C'
             },
-            Important: {
+            {
+                id: '2',
                 name: 'Important',
                 color: '#56CCF2'
             },
-            'Stage 2': {
+            {
+                id: '3',
                 name: 'Stage 2',
                 color: '#D14CF2'
             }
-        };
+        ]);
         this.columns = [
             {
                 key: 'query',
@@ -273,7 +276,7 @@ class Scheduler extends Component {
         const rows = this.props.queries.map(query =>
             Object.assign({}, query, {
                 // TODO real tags, move `this.props.tags[k]` below matchSorter
-                tags: ['Xero', 'Important']
+                tags: ['1', '2']
             })
         );
 
@@ -392,13 +395,13 @@ class Scheduler extends Component {
                             </Column>
                             <Column style={{padding: '4px 0', marginLeft: 24}}>
                                 Success ({
-                                    rows.filter(row => row.lastExecution && row.lastExecution.status !== 'FAILURE')
+                                    rows.filter(row => (row.lastExecution && row.lastExecution.status) !== 'FAILED')
                                         .length
                                 })
                             </Column>
                             <Column style={{padding: '4px 0', marginLeft: 8}}>
                                 Error ({
-                                    rows.filter(row => row.lastExecution && row.lastExecution.status === 'FAILURE')
+                                    rows.filter(row => (row.lastExecution && row.lastExecution.status) === 'FAILED')
                                         .length
                                 })
                             </Column>
@@ -461,6 +464,7 @@ class Scheduler extends Component {
                     <PreviewModal
                         onClickAway={this.closePreview}
                         query={this.state.selectedQuery}
+                        tags={this.props.tags}
                         currentRequestor={this.props.requestor}
                         onLogin={this.props.openLogin}
                         onSave={this.handleUpdate}
