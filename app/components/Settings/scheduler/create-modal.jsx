@@ -124,7 +124,8 @@ class CreateModal extends Component {
                 query: this.state.code,
                 filename: generateFilename(),
                 cronInterval: this.state.interval,
-                name: this.state.name ? this.state.name.trim() : ''
+                name: this.state.name ? this.state.name.trim() : '',
+                tags: this.state.tags.map(t => t.id)
             })
             .then(res => {
                 this.setState({

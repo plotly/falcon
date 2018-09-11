@@ -53,7 +53,7 @@ class TagPicker extends React.PureComponent {
 }
 
 TagPicker.propTypes = {
-    value: PropTypes.object,
+    value: PropTypes.array,
     options: PropTypes.array,
     onChange: PropTypes.func
 };

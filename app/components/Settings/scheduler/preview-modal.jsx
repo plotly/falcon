@@ -14,6 +14,7 @@ import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
 import Tag from './tag.jsx';
 import Status from './status.jsx';
+import TagPicker from './tag-picker.jsx';
 import {datasetUrl} from '../../../utils/utils.js';
 import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../constants/constants.js';
 import {getInitialCronMode} from '../cron-picker/cron-helpers.js';
@@ -42,7 +43,8 @@ export class PreviewModal extends Component {
         onDelete: NO_OP,
         onLogin: NO_OP,
         onClickAway: NO_OP,
-        openQueryPage: NO_OP
+        openQueryPage: NO_OP,
+        tags: []
     };
     static propTypes = {
         query: PropTypes.object,
@@ -52,7 +54,13 @@ export class PreviewModal extends Component {
         openQueryPage: PropTypes.func,
         onClickAway: PropTypes.func,
         dialect: PropTypes.string,
-        currentRequestor: PropTypes.string
+        currentRequestor: PropTypes.string,
+        tags: PropTypes.arrayOf(
+            PropTypes.shape({
+                name: PropTypes.string.isRequired,
+                color: PropTypes.string
+            })
+        )
     };
     constructor(props) {
         super(props);
@@ -63,7 +71,8 @@ export class PreviewModal extends Component {
             cronInterval: props.query && props.query.cronInterval,
             name: props.query && props.query.name,
             confirmedDelete: false,
-            loading: false
+            loading: false,
+            tags: (props.query && props.query.tags) || []
         };
         this.updateCode = this.updateCode.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -72,6 +81,7 @@ export class PreviewModal extends Component {
         this.renderButtonRow = this.renderButtonRow.bind(this);
         this.handleIntervalChange = this.handleIntervalChange.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
+        this.handleTagsChange = this.handleTagsChange.bind(this);
     }
 
     updateCode(editor, meta, code) {
@@ -86,10 +96,14 @@ export class PreviewModal extends Component {
         this.setState({name: e.target.value});
     }
 
+    handleTagsChange(tags) {
+        this.setState({tags});
+    }
+
     onSubmit() {
         if (this.state.editing) {
             const {connectionId, fid, requestor, uids} = this.props.query;
-            const {code: query, cronInterval} = this.state;
+            const {code: query, cronInterval, tags} = this.state;
             const name = this.state.name ? this.state.name.trim() : '';
 
             this.setState({loading: true, error: null});
@@ -101,7 +115,8 @@ export class PreviewModal extends Component {
                     uids,
                     query,
                     name,
-                    cronInterval
+                    cronInterval,
+                    tags: tags.map(t => t.id)
                 })
                 .then(() => {
                     this.setState({
@@ -218,7 +233,7 @@ export class PreviewModal extends Component {
                 completedAt: Date.now() - 1000,
                 rowCount: 64,
                 duration: 3 * 1000,
-                status: 'SUCCESS'
+                status: 'OK'
             };
 
             content = (
@@ -273,7 +288,7 @@ export class PreviewModal extends Component {
                                     )}
                                 </h5>
                             </Row>
-                            <Row style={flexStart}>{query.tags.map(tag => <Tag {...tag} />)}</Row>
+                            <Row style={flexStart}>{this.state.tags.map(tag => <Tag key={tag.name} {...tag} />)}</Row>
                         </Column>
                     </Row>
                     <Column style={{background: '#F5F7FB', padding: '16px 32px'}}>
@@ -347,28 +362,42 @@ export class PreviewModal extends Component {
                                 </em>
                             )}
                         </Row>
-                        {run && (
+                        {editing && (
                             <Row style={rowStyle}>
-                                <div style={keyStyle}>Last Execution</div>
+                                <div style={keyStyle}>Tags Execution</div>
                                 <em style={valueStyle}>
-                                    <span
-                                        style={{
-                                            color: run.status !== 'FAILURE' ? '#30aa65' : '#ef595b'
-                                        }}
-                                    >
-                                        {ms(Date.now() - run.completedAt, {
-                                            long: true
-                                        })}{' '}
-                                        ago
-                                    </span>
-                                    <br />
-                                    {`${run.rowCount} rows in ${ms(run.duration, {
-                                        long: true
-                                    })}`}
+                                    <TagPicker
+                                        disabled={Boolean(this.state.successMessage)}
+                                        value={this.state.tags.map(t => ({label: t.name, ...t}))}
+                                        options={this.props.tags.map(t => ({label: t.name, ...t}))}
+                                        onChange={this.handleTagsChange}
+                                    />
                                 </em>
                             </Row>
                         )}
-                        {run && (
+                        {!editing &&
+                            run && (
+                                <Row style={rowStyle}>
+                                    <div style={keyStyle}>Last Execution</div>
+                                    <em style={valueStyle}>
+                                        <span
+                                            style={{
+                                                color: run.status !== 'FAILED' ? '#30aa65' : '#ef595b'
+                                            }}
+                                        >
+                                            {ms(Date.now() - run.completedAt, {
+                                                long: true
+                                            })}{' '}
+                                            ago
+                                        </span>
+                                        <br />
+                                        {`${run.rowCount} rows in ${ms(run.duration, {
+                                            long: true
+                                        })}`}
+                                    </em>
+                                </Row>
+                            )}
+                        {!editing && (
                             <Row style={rowStyle}>
                                 <div style={keyStyle}>Next Execution</div>
                                 <em style={valueStyle}>
@@ -380,12 +409,14 @@ export class PreviewModal extends Component {
                                 </em>
                             </Row>
                         )}
-                        <Row style={rowStyle}>
-                            <div style={keyStyle}>Live Dataset</div>
-                            <Link href={link} style={valueStyle}>
-                                {link}
-                            </Link>
-                        </Row>
+                        {!editing && (
+                            <Row style={rowStyle}>
+                                <div style={keyStyle}>Live Dataset</div>
+                                <Link href={link} style={valueStyle}>
+                                    {link}
+                                </Link>
+                            </Row>
+                        )}
                         {this.state.error && (
                             <Row style={rowStyle}>
                                 <RequestError onClick={this.props.openQueryPage}>{this.state.error}</RequestError>

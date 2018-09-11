@@ -12,12 +12,14 @@ const mockQueries = [
     {
         query: 'SELECT * FROM foods;',
         refreshInterval: 5000,
-        fid: 'test:1'
+        fid: 'test:1',
+        tags: []
     },
     {
         query: 'SELECT color, price FROM foods;',
         refreshInterval: 10000,
-        fid: 'test:2'
+        fid: 'test:2',
+        tags: ['id:0']
     }
 ];
 

@@ -100,7 +100,8 @@ describe('Create Modal Test', () => {
             filename: expect.any(String),
             query: 'SELECT * FROM foods',
             cronInterval,
-            name
+            name,
+            tags: []
         });
     });
 

@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Status = ({status, size}) => {
-    if (status === 'SUCCESS') {
+    if (status === 'OK') {
         return <img width={size} height={size} src="images/checkmark.png" />;
     }
 
@@ -16,7 +16,7 @@ Status.propTypes = {
 };
 
 Status.defaultProps = {
-    status: 'SUCCESS'
+    status: 'OK'
 };
 
 export default Status;
