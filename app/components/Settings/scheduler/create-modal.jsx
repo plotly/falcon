@@ -62,7 +62,8 @@ class CreateModal extends Component {
         initialName: '',
         onClickAway: noop,
         onSubmit: noop,
-        openQueryPage: noop
+        openQueryPage: noop,
+        tags: []
     };
     constructor(props) {
         super(props);

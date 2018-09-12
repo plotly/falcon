@@ -17,10 +17,25 @@ global.document.createRange = function() {
 };
 
 const PreviewModal = require('../../../../../app/components/Settings/scheduler/preview-modal.jsx').default;
+const TagPicker = require('../../../../../app/components/Settings/scheduler/tag-picker.jsx').default;
 
 describe('Preview Modal Tests', () => {
     beforeAll(() => {
         configure({adapter: new Adapter()});
+    });
+
+    beforeEach(() => {
+      TagPicker.defaultProps = {
+          store: {
+              getState: () => {},
+              subscribe: () => {},
+              dispatch: () => {}
+          }
+      };
+    });
+
+    afterEach(() => {
+      TagPicker.defaultProps = null;
     });
 
     it('should not render the preview if query is falsey', () => {

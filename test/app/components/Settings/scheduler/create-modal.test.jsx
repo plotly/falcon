@@ -22,10 +22,25 @@ const CodeMirror = require('react-codemirror2').Controlled;
 const CreateModal = require('../../../../../app/components/Settings/scheduler/create-modal.jsx');
 const ErrorComponent = require('../../../../../app/components/error.jsx');
 const CronPicker = require('../../../../../app/components/Settings/cron-picker/cron-picker.jsx');
+const TagPicker = require('../../../../../app/components/Settings/scheduler/tag-picker.jsx').default;
 
 describe('Create Modal Test', () => {
     beforeAll(() => {
         configure({adapter: new Adapter()});
+    });
+
+    beforeEach(() => {
+      TagPicker.defaultProps = {
+          store: {
+              getState: () => {},
+              subscribe: () => {},
+              dispatch: () => {}
+          }
+      };
+    });
+
+    afterEach(() => {
+      TagPicker.defaultProps = null;
     });
 
     it("should not render the editor if it's closed", () => {

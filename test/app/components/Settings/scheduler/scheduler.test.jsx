@@ -19,7 +19,7 @@ const mockQueries = [
         query: 'SELECT color, price FROM foods;',
         refreshInterval: 10000,
         fid: 'test:2',
-        tags: ['id:0']
+        tags: []
     }
 ];
 
