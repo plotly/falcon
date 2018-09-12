@@ -168,6 +168,7 @@ export function createScheduledQuery(connectionId, payload = {}) {
         name: payload.name,
         query: payload.query,
         cronInterval: payload.cronInterval,
+        tags: payload.tags,
         connectionId
       }
     )).then((res) => {
@@ -190,6 +191,7 @@ export function updateScheduledQuery(connectionId, payload = {}) {
       name: payload.name,
       query: payload.query,
       cronInterval: payload.cronInterval,
+      tags: payload.tags,
       connectionId
     };
 
@@ -241,6 +243,27 @@ export function getTags() {
             return json;
         }));
     };
+}
+
+export function createTag(payload = {}) {
+  return (dispatch) => {
+    return dispatch(apiThunk(
+      'tags',
+      'POST',
+      'createTagRequest',
+      payload.name,
+      {
+        name: payload.name,
+        color: payload.color
+      }
+    )).then((res) => {
+      dispatch({
+          type: 'CREATE_TAG',
+          payload: res
+      });
+      return res;
+    });
+  };
 }
 
 export function connect(connectionId) {

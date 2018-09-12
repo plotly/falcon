@@ -7,7 +7,6 @@ import ms from 'ms';
 import matchSorter from 'match-sorter';
 import cronstrue from 'cronstrue';
 import Select from 'react-select';
-import toHash from 'tohash';
 
 import CreateModal from './create-modal.jsx';
 import PreviewModal from './preview-modal.jsx';
@@ -28,37 +27,29 @@ const ROW_HEIGHT = 84;
 const SORT_OPTIONS = [
     {
         label: 'Least recently run',
-        value: 'latent',
-        fn: (a, b) => a.completedAt - b.completedAt
+        value: (a, b) => a.completedAt - b.completedAt
     },
     {
         label: 'Most recently run',
-        value: 'recent',
-        fn: (a, b) => b.completedAt - a.completedAt
+        value: (a, b) => b.completedAt - a.completedAt
     },
     {
         label: 'Longest duration',
-        value: 'longest',
-        fn: (a, b) => b.duration - a.duration
+        value: (a, b) => b.duration - a.duration
     },
     {
         label: 'Shortest duration',
-        value: 'shortest',
-        fn: (a, b) => a.duration - b.duration
+        value: (a, b) => a.duration - b.duration
     },
     {
         label: 'Most rows',
-        value: 'most',
-        fn: (a, b) => b.rowCount - a.rowCount
+        value: (a, b) => b.rowCount - a.rowCount
     },
     {
         label: 'Least rows',
-        value: 'least',
-        fn: (a, b) => a.rowCount - b.rowCount
+        value: (a, b) => a.rowCount - b.rowCount
     }
 ];
-
-const SORT_FUNCTIONS = toHash(SORT_OPTIONS, 'value');
 
 const flexStart = {justifyContent: 'flex-start'};
 const widthAuto = {width: 'auto'};
@@ -83,7 +74,7 @@ class QueryFormatter extends React.Component {
                 </Column>
                 <Column
                     className="ellipsis"
-                    style={{width: '50%', maxHeight: ROW_HEIGHT, padding: 8, paddingRight: '24px', fontSize: 15}}
+                    style={{width: '50%', maxHeight: ROW_HEIGHT, padding: '0px 0px 8px 12px', fontSize: 15}}
                 >
                     {query.name ? (
                         <span className="ellipsis" style={{fontSize: 16}}>
@@ -217,24 +208,6 @@ class Scheduler extends Component {
             selectedQuery: null,
             createModalOpen: Boolean(this.props.initialCode)
         };
-        // TODO pass this in as prop
-        this.tags = toHash([
-            {
-                id: '1',
-                name: 'Xero',
-                color: '#F2C94C'
-            },
-            {
-                id: '2',
-                name: 'Important',
-                color: '#56CCF2'
-            },
-            {
-                id: '3',
-                name: 'Stage 2',
-                color: '#D14CF2'
-            }
-        ]);
         this.columns = [
             {
                 key: 'query',
@@ -267,22 +240,15 @@ class Scheduler extends Component {
         this.setState({search: e.target.value});
     }
 
-    handleSortChange(change) {
-        // on clear, change is null
-        this.setState({sort: change ? change.value : null});
+    handleSortChange(sort) {
+        // on clear, `sort` is null
+        this.setState({sort});
     }
 
     getRows() {
-        const rows = this.props.queries.map(query =>
-            Object.assign({}, query, {
-                // TODO real tags, move `this.props.tags[k]` below matchSorter
-                tags: ['1', '2']
-            })
+        return matchSorter(this.props.queries, this.state.search, {keys: ['query', 'name', 'status', 'tags']}).sort(
+            this.state.sort && this.state.sort.value
         );
-
-        const sort = SORT_FUNCTIONS[this.state.sort];
-
-        return matchSorter(rows, this.state.search, {keys: ['query', 'name', 'status', 'tags']}).sort(sort && sort.fn);
     }
 
     rowGetter(i) {
@@ -290,7 +256,7 @@ class Scheduler extends Component {
 
         return mapRow(
             Object.assign({}, row, {
-                tags: row.tags.map(k => this.tags[k])
+                tags: row.tags ? row.tags.map(id => this.props.tags.find(t => t.id === id)) : []
             })
         );
     }
@@ -411,6 +377,7 @@ class Scheduler extends Component {
                         <Row style={{width: 'auto', justifyContent: 'flex-end'}}>
                             <Column>
                                 <Select
+                                    placeholder="Sort by..."
                                     searchable={false}
                                     value={this.state.sort}
                                     options={SORT_OPTIONS}

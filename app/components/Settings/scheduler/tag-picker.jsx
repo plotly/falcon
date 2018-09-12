@@ -1,14 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 import Select from 'react-select';
 
+import * as Actions from '../../../actions/sessions';
 import Tag from './tag.jsx';
 
 const styles = {
     item: {zIndex: 999, display: 'inline-block', padding: '2px 0px', cursor: 'pointer'},
     tag: {marginRight: '0px', cursor: 'pointer'}
 };
-class TagValue extends React.Component {
+
+export class TagValue extends React.Component {
     constructor(props) {
         super(props);
         this.handleRemove = this.handleRemove.bind(this);
@@ -36,17 +39,43 @@ function optionRenderer(option) {
     return <Tag color={option.color} name={option.label} />;
 }
 
-// TODO: Ensure PureComponent works when global tags are updated
-class TagPicker extends React.PureComponent {
+// TODO pick from a subset?
+const randomColor = () => '#' + Math.floor(Math.random() * 13421772).toString(16);
+
+const promptTextCreator = label => `Create new tag "${label}"`;
+export class TagPicker extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    handleChange(tags) {
+        const newTag = tags && tags[tags.length - 1];
+        if (newTag && !newTag.name) {
+            newTag.name = newTag.label;
+            newTag.color = randomColor();
+
+            return this.props.createTag(newTag).then(res => {
+                tags[tags.length - 1] = res;
+                this.props.onChange(tags);
+            });
+        }
+
+        this.props.onChange(tags);
+    }
     render() {
         return (
-            <Select
+            // TODO use reselect?
+            <Select.Creatable
                 {...this.props}
+                value={this.props.value.map(t => ({label: t.name, ...t}))}
+                options={this.props.options.map(t => ({label: t.name, ...t}))}
+                onChange={this.handleChange}
                 placeholder="Select tags"
-                searchable={false}
                 multi={true}
                 optionRenderer={optionRenderer}
                 valueComponent={TagValue}
+                promptTextCreator={promptTextCreator}
             />
         );
     }
@@ -55,7 +84,17 @@ class TagPicker extends React.PureComponent {
 TagPicker.propTypes = {
     value: PropTypes.array,
     options: PropTypes.array,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+    createTag: PropTypes.func
 };
 
-export default TagPicker;
+function mapDispatchToProps(dispatch) {
+    return {
+        createTag: payload => dispatch(Actions.createTag(payload))
+    };
+}
+
+export default connect(
+    null,
+    mapDispatchToProps
+)(TagPicker);

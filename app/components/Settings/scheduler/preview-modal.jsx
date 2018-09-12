@@ -368,8 +368,9 @@ export class PreviewModal extends Component {
                                 <em style={valueStyle}>
                                     <TagPicker
                                         disabled={Boolean(this.state.successMessage)}
-                                        value={this.state.tags.map(t => ({label: t.name, ...t}))}
-                                        options={this.props.tags.map(t => ({label: t.name, ...t}))}
+                                        searchable={false}
+                                        value={this.state.tags}
+                                        options={this.props.tags}
                                         onChange={this.handleTagsChange}
                                     />
                                 </em>
