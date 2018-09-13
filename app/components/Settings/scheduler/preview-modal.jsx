@@ -16,7 +16,7 @@ import Tag from './tag.jsx';
 import Status from './status.jsx';
 import TagPicker from './tag-picker.jsx';
 import {datasetUrl} from '../../../utils/utils.js';
-import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../constants/constants.js';
+import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING, FAILED} from '../../../constants/constants.js';
 import {getInitialCronMode} from '../cron-picker/cron-helpers.js';
 
 const NO_OP = () => {};
@@ -228,13 +228,8 @@ export class PreviewModal extends Component {
 
             const initialModeId = getInitialCronMode(query);
 
-            // TODO this.props.value.lastExecution
-            const run = {
-                completedAt: Date.now() - 1000,
-                rowCount: 64,
-                duration: 3 * 1000,
-                status: 'OK'
-            };
+            const run = query.lastExecution;
+            const now = Date.now();
 
             content = (
                 <Column
@@ -276,7 +271,7 @@ export class PreviewModal extends Component {
                     )}
                     <Row style={headingRowStyle}>
                         <Column style={{width: 'auto', marginRight: '32px', justifyContent: 'center'}}>
-                            <Status size={40} status={run.status} />
+                            <Status size={40} status={run && run.status} />
                         </Column>
                         <Column>
                             <Row className="sql-preview" style={flexStart}>
@@ -383,16 +378,16 @@ export class PreviewModal extends Component {
                                     <em style={valueStyle}>
                                         <span
                                             style={{
-                                                color: run.status !== 'FAILED' ? '#30aa65' : '#ef595b'
+                                                color: (run && run.status) !== FAILED ? '#30aa65' : '#ef595b'
                                             }}
                                         >
-                                            {ms(Date.now() - run.completedAt, {
+                                            {ms(now - run.completedAt, {
                                                 long: true
                                             })}{' '}
                                             ago
                                         </span>
                                         <br />
-                                        {`${run.rowCount} rows in ${ms(run.duration, {
+                                        {`${run.rowCount} rows in ${ms(run.duration / 1000, {
                                             long: true
                                         })}`}
                                     </em>
@@ -402,9 +397,8 @@ export class PreviewModal extends Component {
                             <Row style={rowStyle}>
                                 <div style={keyStyle}>Next Execution</div>
                                 <em style={valueStyle}>
-                                    {/* TODO query.nextScheduledAt */}
                                     in{' '}
-                                    {ms((query.nextScheduledAt || Date.now() + 5000) - Date.now(), {
+                                    {ms((query.nextScheduledAt || now) - now, {
                                         long: true
                                     })}
                                 </em>

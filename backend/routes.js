@@ -8,7 +8,6 @@ import path from 'path';
 
 import {PlotlyOAuth} from './plugins/authorization.js';
 import {generateAndSaveAccessToken} from './utils/authUtils.js';
-import {extractOrderedUids} from './utils/gridUtils.js';
 import {
     getAccessTokenCookieOptions,
     getCookieOptions,
@@ -19,7 +18,7 @@ import * as Datastores from './persistent/datastores/Datastores.js';
 import init from './init.js';
 import Logger from './logger.js';
 import {checkWritePermissions, newDatacache} from './persistent/plotly-api.js';
-import {getQueries, getQuery, deleteQuery, saveQuery} from './persistent/Queries.js';
+import {getQueries, getQuery, deleteQuery, saveQuery, updateQuery} from './persistent/Queries.js';
 import {getTags, getTag, saveTag, deleteTag} from './persistent/Tags.js';
 import {
     deleteConnectionById,
@@ -34,6 +33,7 @@ import {
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
+import { EXE_STATUS } from '../shared/constants.js';
 
 
 export default class Servers {
@@ -745,11 +745,18 @@ export default class Servers {
                 return that.queryScheduler.queryAndCreateGrid(
                     filename, query, connectionId, requestor, cronInterval, refreshInterval
                 )
-                .then((newGridResponse) => {
+                .then((executionRes) => {
+                    const { completedAt, duration, rowCount, uids } = executionRes.queryResults;
                     const queryObject = {
                         ...req.params,
-                        fid: newGridResponse.file.fid,
-                        uids: newGridResponse.file.cols.map(col => col.uid)
+                        fid: executionRes.fid,
+                        uids,
+                        lastExecution: {
+                            status: EXE_STATUS.ok,
+                            completedAt,
+                            duration,
+                            rowCount
+                        }
                     };
                     that.queryScheduler.scheduleQuery(queryObject);
                     res.json(201, queryObject);
@@ -763,12 +770,13 @@ export default class Servers {
             // make the query and update the grid
             if (fid) {
                 return checkWritePermissions(fid, requestor).then(function () {
+                    updateQuery(fid, {lastExecution: {status: EXE_STATUS.running}});
                     return that.queryScheduler.queryAndUpdateGrid(
                         fid, query, connectionId, requestor, cronInterval, refreshInterval
                     );
                 })
-                .then((updatedGridResponse) => {
-                    const orderedUids = extractOrderedUids(updatedGridResponse);
+                .then((executionRes) => {
+                    const { completedAt, duration, rowCount, uids } = executionRes.queryResults;
                     const previousQuery = getQuery(req.params.fid);
 
                     let status;
@@ -782,19 +790,38 @@ export default class Servers {
 
                     let oldParamsToCarryOver = {};
                     if (previousQuery) {
-                        const {name} = previousQuery;
-                        oldParamsToCarryOver = {name};
+                        const {name, tags} = previousQuery;
+                        oldParamsToCarryOver = {name, tags};
                     }
 
                     const queryObject = {
                         ...oldParamsToCarryOver,
                         ...req.params,
-                        uids: orderedUids
+                        uids,
+                        lastExecution: {
+                            status: EXE_STATUS.ok,
+                            completedAt,
+                            duration,
+                            rowCount
+                        }
                     };
 
                     that.queryScheduler.scheduleQuery(queryObject);
                     res.json(status, queryObject);
                     return next();
+                })
+                .catch((err) => {
+                    if (getQuery(req.params.fid)) {
+                        updateQuery(req.params.fid, {
+                            lastExecution: {
+                                status: EXE_STATUS.failed,
+                                completedAt: Date.now(),
+                                errorMessage: err.toString()
+                            }
+                        });
+                    }
+
+                    throw err;
                 })
                 .catch(onError);
             }
