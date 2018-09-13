@@ -16,7 +16,7 @@ import SQL from './sql.jsx';
 import Tag from './tag.jsx';
 import Status from './status.jsx';
 
-import {SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants';
+import {SQL_DIALECTS_USING_EDITOR, FAILED} from '../../../constants/constants';
 
 import './scheduler.css';
 
@@ -24,30 +24,34 @@ const NO_OP = () => {};
 
 const ROW_HEIGHT = 84;
 
+const sortLastExecution = (key, reverse) => (a, b) => {
+    const s = (a.lastExecution && a.lastExecution[key]) || 0 - (b.lastExecution && b.lastExecution[key]) || 0;
+    return reverse ? -1 * s : s;
+};
 const SORT_OPTIONS = [
     {
-        label: 'Least recently run',
-        value: (a, b) => a.completedAt - b.completedAt
+        label: 'Most recently run',
+        value: sortLastExecution('completedAt', true)
     },
     {
-        label: 'Most recently run',
-        value: (a, b) => b.completedAt - a.completedAt
+        label: 'Least recently run',
+        value: sortLastExecution('completedAt')
     },
     {
         label: 'Longest duration',
-        value: (a, b) => b.duration - a.duration
+        value: sortLastExecution('duration', true)
     },
     {
         label: 'Shortest duration',
-        value: (a, b) => a.duration - b.duration
+        value: sortLastExecution('duration')
     },
     {
         label: 'Most rows',
-        value: (a, b) => b.rowCount - a.rowCount
+        value: sortLastExecution('rowCount', true)
     },
     {
         label: 'Least rows',
-        value: (a, b) => a.rowCount - b.rowCount
+        value: sortLastExecution('rowCount')
     }
 ];
 
@@ -111,44 +115,48 @@ class IntervalFormatter extends React.Component {
          * Object passed by `react-data-grid` to each row. Here the value
          * is an object containg the required `refreshInterval`.
          */
-        value: PropTypes.shape({
-            refreshInterval: PropTypes.number.isRequired,
-            cronInterval: PropTypes.string,
-            status: PropTypes.string
-        })
+        value: PropTypes.oneOfType([
+            PropTypes.shape({
+                completedAt: PropTypes.number,
+                duration: PropTypes.number,
+                rowsCount: PropTypes.number,
+                status: PropTypes.string
+            }),
+            // when value is undefined, `react-data-grid` passes ''
+            PropTypes.string
+        ])
     };
 
     render() {
-        // TODO this.props.value.lastExecution
-        const run = {
-            completedAt: Date.now() - 1000,
-            rowCount: 64,
-            duration: 3 * 1000,
-            status: 'OK'
-        };
+        const run = this.props.value;
 
         return (
             <Row>
                 <Column>
-                    <div
-                        style={{
-                            fontSize: 18,
-                            color: run.status !== 'FAILED' ? '#30aa65' : '#ef595b'
-                        }}
-                    >
-                        {`${ms(Date.now() - run.completedAt, {
-                            long: true
-                        })} ago`}
-                    </div>
-                    <em
-                        style={{
-                            fontSize: 12
-                        }}
-                    >
-                        {`${run.rowCount} rows in ${ms(run.duration, {
-                            long: true
-                        })}`}
-                    </em>
+                    {!run && '—'}
+                    {run && (
+                        <div
+                            style={{
+                                fontSize: 18,
+                                color: run.status !== FAILED ? '#30aa65' : '#ef595b'
+                            }}
+                        >
+                            {`${ms(Date.now() - run.completedAt, {
+                                long: true
+                            })} ago`}
+                        </div>
+                    )}
+                    {run && (
+                        <em
+                            style={{
+                                fontSize: 12
+                            }}
+                        >
+                            {`${run.rowCount} rows in ${ms(run.duration / 1000, {
+                                long: true
+                            })}`}
+                        </em>
+                    )}
                 </Column>
             </Row>
         );
@@ -158,7 +166,7 @@ class IntervalFormatter extends React.Component {
 function mapRow(row) {
     return {
         query: row,
-        run: row
+        run: row.lastExecution
     };
 }
 
@@ -361,13 +369,13 @@ class Scheduler extends Component {
                             </Column>
                             <Column style={{padding: '4px 0', marginLeft: 24}}>
                                 Success ({
-                                    rows.filter(row => (row.lastExecution && row.lastExecution.status) !== 'FAILED')
+                                    rows.filter(row => (row.lastExecution && row.lastExecution.status) !== FAILED)
                                         .length
                                 })
                             </Column>
                             <Column style={{padding: '4px 0', marginLeft: 8}}>
                                 Error ({
-                                    rows.filter(row => (row.lastExecution && row.lastExecution.status) === 'FAILED')
+                                    rows.filter(row => (row.lastExecution && row.lastExecution.status) === FAILED)
                                         .length
                                 })
                             </Column>

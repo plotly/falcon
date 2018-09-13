@@ -4,11 +4,13 @@ import * as scheduler from 'node-schedule';
 import {getConnectionById} from './Connections.js';
 import * as Connections from './datastores/Datastores.js';
 import { mapRefreshToCron, mapCronToRefresh } from '../utils/cronUtils.js';
+import {extractOrderedUids} from '../utils/gridUtils.js';
 import Logger from '../logger';
 import {
     getQuery,
     getQueries,
     saveQuery,
+    updateQuery,
     deleteQuery
 } from './Queries.js';
 import {
@@ -23,8 +25,10 @@ import {
     updateGrid,
     getGridColumn
 } from './plotly-api.js';
+import { EXE_STATUS } from '../../shared/constants.js';
 
 const SUCCESS_CODES = [200, 201, 204];
+
 
 class QueryScheduler {
     constructor() {
@@ -44,14 +48,44 @@ class QueryScheduler {
                 }
 
                 this.runningJobs[fid] = true;
+                updateQuery(fid, { lastExecution: { status: EXE_STATUS.running }});
+
                 return this.queryAndUpdateGrid(fid, query, connectionId, requestor, cronInterval, refreshInterval)
                     .catch(error => {
                         Logger.log(error, 0);
-                    }).then(() => {
+                        updateQuery(fid, {
+                            lastExecution: {
+                                status: EXE_STATUS.failed,
+                                completedAt: Date.now(),
+                                errorMessage: error.toString()
+                            }
+                        });
+                    }).then((exeRes) => {
+                        const { completedAt, duration, rowCount } = exeRes.queryResults;
+
+                        const existingQuery = getQuery(fid);
+                        if (existingQuery.lastExecution && existingQuery.lastExecution.status !== EXE_STATUS.failed) {
+                            updateQuery(fid, {
+                                lastExecution: {
+                                    status: EXE_STATUS.ok,
+                                    completedAt,
+                                    duration,
+                                    rowCount
+                                }
+                            });
+                        }
+
                         delete this.runningJobs[fid];
                     });
             } catch (e) {
                 Logger.log(e, 0);
+                updateQuery(fid, {
+                    lastExecution: {
+                        status: EXE_STATUS.failed,
+                        completedAt: Date.now(),
+                        errorMessage: e.toString()
+                    }
+                });
             }
         };
 
@@ -67,6 +101,9 @@ class QueryScheduler {
         refreshInterval = null,
         cronInterval = null,
         name,
+        tags,
+        lastExecution,
+        nextScheduledAt,
         query,
         connectionId
     }) {
@@ -103,14 +140,12 @@ class QueryScheduler {
             refreshInterval: refreshInterval || mapCronToRefresh(cronInterval),
             cronInterval,
             query,
-            connectionId
+            connectionId,
+            lastExecution,
+            nextScheduledAt,
+            name,
+            tags
         };
-
-        // explicitly omit name unless truthy to prevent 'yamljs' from
-        // coerecing an undefined key into null
-        if (name) {
-            queryParams.name = name;
-        }
 
         saveQuery(queryParams);
 
@@ -123,6 +158,13 @@ class QueryScheduler {
         }
 
         this.queryJobs[fid] = scheduler.scheduleJob(jobInterval, job);
+
+        this.queryJobs[fid].on('scheduled', nextInvocation => {
+            updateQuery(fid, { nextScheduledAt: nextInvocation.getTime() });
+        });
+
+        // we'll miss the first schedule event, so initialize manually the first time
+        updateQuery(fid, { nextScheduledAt: this.queryJobs[fid].nextInvocation().getTime() });
     }
 
     // Load and schedule queries - To be run on app start.
@@ -148,8 +190,11 @@ class QueryScheduler {
     queryAndCreateGrid(filename, query, connectionId, requestor, cronInterval, refreshInterval) {
         const {username, apiKey, accessToken} = getCredentials(requestor);
         const formattedRefresh = refreshInterval || mapCronToRefresh(cronInterval);
-        let startTime;
-        let createdJson;
+        let currStartTime;
+        let fid;
+
+        const STATIC_START_TIME = currStartTime;
+        const queryResults = {};
 
         // Check if the user even exists
         if (!username || !(apiKey || accessToken)) {
@@ -175,7 +220,7 @@ class QueryScheduler {
             }
 
 
-            startTime = process.hrtime();
+            currStartTime = process.hrtime();
 
             Logger.log(`Querying "${query}" with connection ${connectionId} to create a new grid`, 2);
             return Connections.query(query, getConnectionById(connectionId)).catch((e) => {
@@ -185,11 +230,15 @@ class QueryScheduler {
                 throw new Error(`QueryExecutionError: ${e.message}`);
             });
         }).then(({rows, columnnames}) => {
-            Logger.log(`Query "${query}" took ${process.hrtime(startTime)[0]} seconds`, 2);
+            Logger.log(`Query "${query}" took ${process.hrtime(currStartTime)[0]} seconds`, 2);
             Logger.log('Create a new grid with new data', 2);
             Logger.log(`First row: ${JSON.stringify(rows.slice(0, 1))}`, 2);
 
-            startTime = process.hrtime();
+            queryResults.rowCount = (rows && rows.length)
+                ? rows.length
+                : 0;
+
+            currStartTime = process.hrtime();
 
             return newGrid(
                 filename,
@@ -203,7 +252,7 @@ class QueryScheduler {
                 throw new Error(`PlotlyApiError: ${e.message}`);
             });
         }).then(res => {
-            Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(startTime)[0]} seconds`, 2);
+            Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(currStartTime)[0]} seconds`, 2);
 
             if (res.status !== 201) {
                 Logger.log(`Error ${res.status} while creating a grid`, 2);
@@ -211,11 +260,12 @@ class QueryScheduler {
 
             return res.json();
         }).then((json) => {
-            createdJson = json;
-            startTime = process.hrtime();
+            fid = json.file.fid;
+            queryResults.uids = json.file.cols.map(col => col.uid);
 
+            currStartTime = process.hrtime();
             return patchGrid(
-                createdJson.file.fid,
+                fid,
                 requestor,
                 {
                     metadata: {
@@ -232,16 +282,26 @@ class QueryScheduler {
                 throw new Error(`MetadataError: ${e.message}`);
             });
         }).then(() => {
-            Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(startTime)[0]} seconds`, 2);
-            Logger.log(`Grid ${createdJson.file.fid} has been updated.`, 2);
-            return createdJson;
+            Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(currStartTime)[0]} seconds`, 2);
+            Logger.log(`Grid ${fid} has been updated.`, 2);
+
+            queryResults.duration = process.hrtime(STATIC_START_TIME)[0];
+            queryResults.completedAt = Date.now();
+
+            return {
+                fid,
+                queryResults
+            };
         });
     }
 
     queryAndUpdateGrid(fid, query, connectionId, requestor, cronInterval, refreshInterval) {
         const requestedDBConnections = getConnectionById(connectionId);
         const formattedRefresh = refreshInterval || mapCronToRefresh(cronInterval);
-        let startTime = process.hrtime();
+        let currStartTime = process.hrtime();
+
+        const STATIC_START_TIME = currStartTime;
+        const queryResults = {};
 
         /*
          * Do a pre-query check that the user has the correct credentials
@@ -284,14 +344,18 @@ class QueryScheduler {
                 throw new Error(`QueryExecutionError: ${e.message}`);
             });
         }).then(({rows, columnnames}) => {
-            Logger.log(`Query "${query}" took ${process.hrtime(startTime)[0]} seconds`, 2);
+            Logger.log(`Query "${query}" took ${process.hrtime(currStartTime)[0]} seconds`, 2);
             Logger.log(`Updating grid ${fid} with new data`, 2);
             Logger.log(
                 'First row: ' +
                 JSON.stringify(rows.slice(0, 1)),
             2);
 
-            startTime = process.hrtime();
+            queryResults.rowCount = (rows && rows.length)
+                ? rows.length
+                : 0;
+
+            currStartTime = process.hrtime();
 
             return updateGrid(
                 rows,
@@ -305,7 +369,7 @@ class QueryScheduler {
                 throw new Error(`PlotlyApiError: ${e.message}`);
             });
         }).then(res => {
-            Logger.log(`Request to Plotly for grid ${fid} took ${process.hrtime(startTime)[0]} seconds`, 2);
+            Logger.log(`Request to Plotly for grid ${fid} took ${process.hrtime(currStartTime)[0]} seconds`, 2);
             if (!SUCCESS_CODES.includes(res.status)) {
                 Logger.log(`Error ${res.status} while updating grid ${fid}.`, 2);
 
@@ -368,7 +432,7 @@ class QueryScheduler {
 
             }
 
-            startTime = process.hrtime();
+            currStartTime = process.hrtime();
 
             return patchGrid(
                 fid,
@@ -388,7 +452,7 @@ class QueryScheduler {
                 throw new Error(`MetadataError: ${e.message}`);
             });
         }).then(res => {
-            Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(startTime)[0]} seconds`, 2);
+            Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(currStartTime)[0]} seconds`, 2);
             Logger.log(`Grid ${fid} has been updated.`, 2);
 
             // res is undefined if the `deleteQuery` is returned above
@@ -396,18 +460,29 @@ class QueryScheduler {
               throw new Error(`MetadataError: error updating grid metadata (status: ${res.status})`);
             }
 
-            startTime = process.hrtime();
+            currStartTime = process.hrtime();
 
             // fetch updated grid column for returning
             return getGridColumn(fid, requestor);
         }).then(res => {
-            Logger.log(`Request to Plotly for fetching updated grid took ${process.hrtime(startTime)[0]} seconds`, 2);
+            Logger.log(
+                `Request to Plotly for fetching updated grid took ${process.hrtime(currStartTime)[0]} seconds`,
+                2
+            );
 
             if (res.status !== 200) {
               throw new Error(`PlotlyApiError: error fetching updated columns (status: ${res.status})`);
             }
 
             return res.json();
+        }).then(grid => {
+            queryResults.uids = extractOrderedUids(grid);
+            queryResults.duration = process.hrtime(STATIC_START_TIME)[0];
+            queryResults.completedAt = Date.now();
+            return {
+                fid,
+                queryResults
+            };
         });
     }
 }
