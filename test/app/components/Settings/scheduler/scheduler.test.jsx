@@ -9,6 +9,7 @@ import SchedulerPreview from '../../../../../app/components/Settings/scheduler/p
 import Modal from '../../../../../app/components/modal.jsx';
 import Status from '../../../../../app/components/Settings/scheduler/status.jsx';
 import Tag from '../../../../../app/components/Settings/scheduler/tag.jsx';
+import TagPicker from '../../../../../app/components/Settings/scheduler/tag-picker.jsx';
 
 const mockTags = [
   { id: 'tag:0', name: 'Tag 0', color: 'blue' },
@@ -47,6 +48,20 @@ describe('Scheduler Test', () => {
         configure({adapter: new Adapter()});
     });
 
+    beforeEach(() => {
+      TagPicker.defaultProps = {
+          store: {
+              getState: () => {},
+              subscribe: () => {},
+              dispatch: () => {}
+          }
+      };
+    });
+
+    afterEach(() => {
+      TagPicker.defaultProps = null;
+    });
+
     it('should have no rows if not passed any queries', () => {
         const component = mount(<Scheduler queries={[]} />);
         expect(component.instance().getRows().length).toBe(0);
@@ -64,9 +79,9 @@ describe('Scheduler Test', () => {
       expect(values.map(v => v.text())).toEqual(
         [
           expect.stringContaining(mockQueries[0].query),
-          expect.stringContaining('0 rows in 3 seconds'),
+          expect.stringContaining('0 rows in 50 minutes'),
           expect.stringContaining(mockQueries[1].query),
-          expect.stringContaining('65 rows in 5 seconds')
+          expect.stringContaining('65 rows in 1 hour')
         ]
       );
 
@@ -326,5 +341,119 @@ describe('Scheduler Test', () => {
       component.instance().handleDelete();
       expect(deleteScheduledQuery).toHaveBeenCalled();
       expect(component.state('selectedQuery')).toBeNull();
+    });
+
+    describe('Search', () => {
+      it('should allow filter slugs to be used in search bar', () => {
+        const queries = [
+          {
+              query: 'SELECT * FROM foods;',
+              fid: 'test:0',
+              refreshInterval: 5000,
+              tags: [],
+              lastExecution: {
+                rowCount: 0,
+                duration: 3000,
+                status: 'failed',
+                completedAt: 1536941547470
+              }
+          },
+          {
+              query: 'SELECT color, name FROM foods;',
+              fid: 'test:0',
+              refreshInterval: 10000,
+              tags: ['tag:0'],
+              lastExecution: {
+                rowCount: 5,
+                duration: 5000,
+                status: 'ok',
+                completedAt: 1536941547470
+              }
+          },
+          {
+              query: 'SELECT color, price FROM foods;',
+              fid: 'test:0',
+              refreshInterval: 10000,
+              tags: ['tag:0', 'tag:1'],
+              lastExecution: {
+                rowCount: 65,
+                duration: 5000,
+                status: 'ok',
+                completedAt: 1536941547470
+              }
+          },
+          {
+              query: 'SELECT price FROM foods;',
+              fid: 'test:0',
+              refreshInterval: 10000,
+              tags: ['tag:0'],
+              lastExecution: {
+                rowCount: 14,
+                duration: 5000,
+                status: 'ok',
+                completedAt: 1536941547470
+              }
+          }
+        ];
+        const component = mount(
+          <Scheduler
+            queries={queries}
+            tags={mockTags}
+          />
+        );
+
+        component.setState({
+          search: 'sort:rowCount-desc tag:"Tag 0" status:success'
+        });
+
+        let rows = component.instance().getRows();
+
+        expect(rows).toEqual([queries[2], queries[3], queries[1]]);
+
+        component.setState({
+          search: 'sort:rowCount-desc tag:"Tag 0" status:success color'
+        });
+
+        rows = component.instance().getRows();
+
+        expect(rows).toEqual([queries[2], queries[1]]);
+
+        component.setState({
+          search: 'status:error'
+        });
+
+        rows = component.instance().getRows();
+
+        expect(rows).toEqual([queries[0]]);
+      });
+
+      it('sort, status, and tags should all add key to search bar', () => {
+        const component = mount(
+          <Scheduler
+            queries={mockQueries}
+            tags={mockTags}
+          />
+        );
+        component.instance().filterSuccess();
+        expect(component.state('search')).toBe('status:success');
+        component.instance().filterFailed();
+        expect(component.state('search')).toBe('status:error');
+        component.instance().filterTag([{ name: 'Tag Name'}]);
+        expect(component.state('search')).toBe('status:error tag:"Tag Name"');
+        component.instance().filterTag([{ name: 'tag-name-2'}]);
+        expect(component.state('search')).toBe('status:error tag:"Tag Name" tag:"tag-name-2"');
+        component.instance().handleSortChange({ id: 'objectKey-asc' });
+        expect(component.state('search')).toBe('status:error tag:"Tag Name" tag:"tag-name-2" sort:objectKey-asc');
+
+        expect(component.state('sort')).toEqual({ id: 'objectKey-asc'});
+
+        component.instance().handleSortChange(null);
+        expect(component.state('search')).toBe('status:error tag:"Tag Name" tag:"tag-name-2" ');
+        expect(component.state('sort')).toEqual(null);
+
+        component.update();
+        component.find('.clear-state').simulate('click');
+        expect(component.state('search')).toBe('');
+      });
     });
 });

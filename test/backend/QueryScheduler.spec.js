@@ -1,4 +1,5 @@
-import {assert} from 'chai';
+import chai from 'chai';
+import chaiSubset from 'chai-subset';
 import sinon from 'sinon';
 
 import {merge} from 'ramda';
@@ -23,6 +24,9 @@ import {
     username,
     wait
 } from './utils.js';
+
+chai.use(chaiSubset);
+const { assert } = chai;
 
 let queryScheduler;
 let savedUsers;
@@ -491,13 +495,13 @@ describe('QueryScheduler', function() {
         queryScheduler.scheduleQuery(queryObject);
 
         let queriesFromFile = getQueries();
-        assert.deepEqual(queriesFromFile, [queryObject]);
+        assert.containSubset(queriesFromFile, [queryObject]);
 
         const anotherQuery = merge(queryObject, {fid: 'new-fid'});
         queryScheduler.scheduleQuery(anotherQuery);
 
         queriesFromFile = getQueries();
-        assert.deepEqual(queriesFromFile, [queryObject, anotherQuery]);
+        assert.containSubset(queriesFromFile, [queryObject, anotherQuery]);
     });
 
     it('saving a query that already exists updates the query', function() {
@@ -513,17 +517,17 @@ describe('QueryScheduler', function() {
             requestor: 'test-fid'
         };
 
-        assert.deepEqual([], getQueries());
+        assert.containSubset([], getQueries());
 
         queryScheduler.scheduleQuery(queryObject);
-        assert.deepEqual(getQueries(), [queryObject]);
+        assert.containSubset(getQueries(), [queryObject]);
 
         const updatedQuery = merge(
             queryObject,
             {refreshInterval: 10, 'query': 'new query'}
         );
         queryScheduler.scheduleQuery(updatedQuery);
-        assert.deepEqual(getQueries(), [updatedQuery]);
+        assert.containSubset(getQueries(), [updatedQuery]);
     });
 
     it('clears and deletes the query if its associated grid was deleted', function() {
@@ -562,7 +566,7 @@ describe('QueryScheduler', function() {
 
             queryScheduler.scheduleQuery(queryObject);
 
-            assert.deepEqual(
+            assert.containSubset(
                 getQueries(),
                 [queryObject],
                 'Query has not been saved'

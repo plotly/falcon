@@ -387,7 +387,7 @@ export class PreviewModal extends Component {
                                             ago
                                         </span>
                                         <br />
-                                        {`${run.rowCount} rows in ${ms(run.duration / 1000, {
+                                        {`${run.rowCount} rows in ${ms(run.duration * 1000, {
                                             long: true
                                         })}`}
                                     </em>
