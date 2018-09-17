@@ -33,6 +33,11 @@ export function saveQuery(queryObject) {
 
 export function updateQuery(fid, updatedQueryData) {
     const existingQuery = getQuery(fid);
+    if (!existingQuery) {
+        // don't allow appending data to query that doesn't exist
+        return;
+    }
+
     const updatedQuery = stripUndefinedKeys({
         ...existingQuery,
         ...updatedQueryData

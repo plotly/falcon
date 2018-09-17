@@ -29,7 +29,6 @@ import { EXE_STATUS } from '../../shared/constants.js';
 
 const SUCCESS_CODES = [200, 201, 204];
 
-
 class QueryScheduler {
     constructor() {
         this.scheduleQuery = this.scheduleQuery.bind(this);
@@ -51,6 +50,17 @@ class QueryScheduler {
                 updateQuery(fid, { lastExecution: { status: EXE_STATUS.running }});
 
                 return this.queryAndUpdateGrid(fid, query, connectionId, requestor, cronInterval, refreshInterval)
+                    .then((exeRes) => {
+                        const { completedAt, duration, rowCount } = exeRes.queryResults;
+                        updateQuery(fid, {
+                            lastExecution: {
+                                status: EXE_STATUS.ok,
+                                completedAt,
+                                duration,
+                                rowCount
+                            }
+                        });
+                    })
                     .catch(error => {
                         Logger.log(error, 0);
                         updateQuery(fid, {
@@ -60,21 +70,7 @@ class QueryScheduler {
                                 errorMessage: error.toString()
                             }
                         });
-                    }).then((exeRes) => {
-                        const { completedAt, duration, rowCount } = exeRes.queryResults;
-
-                        const existingQuery = getQuery(fid);
-                        if (existingQuery.lastExecution && existingQuery.lastExecution.status !== EXE_STATUS.failed) {
-                            updateQuery(fid, {
-                                lastExecution: {
-                                    status: EXE_STATUS.ok,
-                                    completedAt,
-                                    duration,
-                                    rowCount
-                                }
-                            });
-                        }
-
+                    }).then(() => {
                         delete this.runningJobs[fid];
                     });
             } catch (e) {

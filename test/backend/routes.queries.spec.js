@@ -1,4 +1,5 @@
-import {assert} from 'chai';
+import chai from 'chai';
+import chaiSubset from 'chai-subset';
 import {merge, omit} from 'ramda';
 import uuid from 'uuid';
 
@@ -20,6 +21,8 @@ import {
     validFid
 } from './utils.js';
 
+chai.use(chaiSubset);
+const { assert } = chai;
 
 describe('Routes:', () => {
     let queryObject;
@@ -67,7 +70,7 @@ describe('Routes:', () => {
 
             queryObject = {
                 requestor: username,
-                refreshInterval: 60,
+                refreshInterval: 3600,
                 cronInterval: null,
                 connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2'
@@ -87,7 +90,7 @@ describe('Routes:', () => {
                     return GET('queries');
                 })
                 .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, [queryObject]);
+                    assert.containSubset(json, [queryObject]);
 
                     return deleteGrid(fid, username);
                 });
@@ -114,14 +117,14 @@ describe('Routes:', () => {
                 })
                 .then(assertResponseStatus(201))
                 .then(getResponseJson).then(json => {
-                    assert.deepEqual(omit(json, 'uids'), omit(queryObject, 'uids'));
+                    assert.containSubset(omit(json, 'uids'), omit(queryObject, 'uids'));
                     assert.equal(json.uids.length, 6);
 
                     return GET('queries');
                 })
                 .then(getResponseJson).then(json => {
                     assert.equal(json.length, 1);
-                    assert.deepEqual(omit(json[0], 'uids'), omit(queryObject, 'uids'));
+                    assert.containSubset(omit(json[0], 'uids'), omit(queryObject, 'uids'));
                     assert.equal(json[0].uids.length, 6);
 
                     return deleteGrid(fid, username);
@@ -169,11 +172,11 @@ describe('Routes:', () => {
                         'b6b0bb'
                       ]
                     };
-                    assert.deepEqual(json, queryObject);
+                    assert.containSubset(json, queryObject);
                     return GET('queries');
                 })
                 .then(getResponseJson).then((json) => {
-                    assert.deepEqual(json, [queryObject]);
+                    assert.containSubset(json, [queryObject]);
                 });
         });
 
@@ -248,7 +251,7 @@ describe('Routes:', () => {
                 })
                 .then(assertResponseStatus(201))
                 .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {
+                    assert.containSubset(json, {
                       ...queryObject,
                       uids: [
                         '9bbb87',
@@ -263,7 +266,7 @@ describe('Routes:', () => {
                 })
                 .then(assertResponseStatus(200))
                 .then(getResponseJson).then(json => {
-                    assert.deepEqual(json, {
+                    assert.containSubset(json, {
                       ...queryObject,
                       uids: [
                         '9bbb87',

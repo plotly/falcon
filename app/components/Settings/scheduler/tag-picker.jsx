@@ -67,11 +67,11 @@ export class TagPicker extends React.Component {
         return (
             // TODO use reselect?
             <Select.Creatable
+                placeholder="Select tags"
                 {...this.props}
                 value={this.props.value.map(t => ({label: t.name, ...t}))}
                 options={this.props.options.map(t => ({label: t.name, ...t}))}
                 onChange={this.handleChange}
-                placeholder="Select tags"
                 multi={true}
                 optionRenderer={optionRenderer}
                 valueComponent={TagValue}

@@ -770,7 +770,12 @@ export default class Servers {
             // make the query and update the grid
             if (fid) {
                 return checkWritePermissions(fid, requestor).then(function () {
-                    updateQuery(fid, {lastExecution: {status: EXE_STATUS.running}});
+                    // if query already exists, make sure it's status is correctly set while
+                    // executing
+                    if (getQuery(fid)) {
+                        updateQuery(fid, {lastExecution: {status: EXE_STATUS.running}}); 
+                    }
+
                     return that.queryScheduler.queryAndUpdateGrid(
                         fid, query, connectionId, requestor, cronInterval, refreshInterval
                     );

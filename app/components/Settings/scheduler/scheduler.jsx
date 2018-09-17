@@ -14,6 +14,7 @@ import PromptLoginModal from './login-modal.jsx';
 import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
 import Tag from './tag.jsx';
+import TagPicker from './tag-picker.jsx';
 import Status from './status.jsx';
 
 import {SQL_DIALECTS_USING_EDITOR, FAILED} from '../../../constants/constants';
@@ -25,33 +26,33 @@ const NO_OP = () => {};
 const ROW_HEIGHT = 84;
 
 const sortLastExecution = (key, reverse) => (a, b) => {
-    const s = (a.lastExecution && a.lastExecution[key]) || 0 - (b.lastExecution && b.lastExecution[key]) || 0;
+    const s = ((a.lastExecution && a.lastExecution[key]) || 0) - ((b.lastExecution && b.lastExecution[key]) || 0);
     return reverse ? -1 * s : s;
 };
 const SORT_OPTIONS = [
     {
-        label: 'Most recently run',
-        value: sortLastExecution('completedAt', true)
+        id: 'completedAt-desc',
+        label: 'Most recently run'
     },
     {
-        label: 'Least recently run',
-        value: sortLastExecution('completedAt')
+        id: 'completedAt-asc',
+        label: 'Least recently run'
     },
     {
-        label: 'Longest duration',
-        value: sortLastExecution('duration', true)
+        id: 'duration-desc',
+        label: 'Longest duration'
     },
     {
-        label: 'Shortest duration',
-        value: sortLastExecution('duration')
+        id: 'duration-asc',
+        label: 'Shortest duration'
     },
     {
-        label: 'Most rows',
-        value: sortLastExecution('rowCount', true)
+        id: 'rowCount-desc',
+        label: 'Most rows'
     },
     {
-        label: 'Least rows',
-        value: sortLastExecution('rowCount')
+        id: 'rowCount-asc',
+        label: 'Least rows'
     }
 ];
 
@@ -146,22 +147,30 @@ class IntervalFormatter extends React.Component {
                             })} ago`}
                         </div>
                     )}
-                    {run && (
-                        <em
-                            style={{
-                                fontSize: 12
-                            }}
-                        >
-                            {`${run.rowCount} rows in ${ms(run.duration / 1000, {
-                                long: true
-                            })}`}
-                        </em>
-                    )}
+                    {run &&
+                        run.duration && (
+                            <em
+                                style={{
+                                    fontSize: 12
+                                }}
+                            >
+                                {`${run.rowCount} rows in ${ms(run.duration * 1000, {
+                                    long: true
+                                })}`}
+                            </em>
+                        )}
                 </Column>
             </Row>
         );
     }
 }
+
+const addSlug = (str, slug) => {
+    if (str.indexOf(slug) > -1) {
+        return str;
+    }
+    return str + (str.length ? ' ' : '') + slug;
+};
 
 function mapRow(row) {
     return {
@@ -242,6 +251,10 @@ class Scheduler extends Component {
         this.createQuery = this.createQuery.bind(this);
         this.handleUpdate = this.handleUpdate.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
+        this.filterSuccess = this.filterSuccess.bind(this);
+        this.filterFailed = this.filterFailed.bind(this);
+        this.filterTag = this.filterTag.bind(this);
+        this.resetSearch = this.resetSearch.bind(this);
     }
 
     handleSearchChange(e) {
@@ -249,14 +262,60 @@ class Scheduler extends Component {
     }
 
     handleSortChange(sort) {
-        // on clear, `sort` is null
-        this.setState({sort});
+        this.setState(({search}) => {
+            // remove old sort slugs
+            const newSearch = search.replace(/sort:\S+/g, '');
+
+            if (sort) {
+                return {
+                    sort,
+                    search: addSlug(newSearch, `sort:${sort.id}`)
+                };
+            }
+
+            // on clear, `sort` is null
+            return {
+                sort,
+                search: newSearch
+            };
+        });
     }
 
     getRows() {
-        return matchSorter(this.props.queries, this.state.search, {keys: ['query', 'name', 'status', 'tags']}).sort(
-            this.state.sort && this.state.sort.value
-        );
+        let rows = this.props.queries;
+        const statusFilter = this.state.search.match(/status:(\S+)/);
+        const sortFilter = this.state.search.match(/sort:(\S+)/);
+        const tagFilter = this.state.search.match(/tag:(?:"(.*?)"|(\S+))/g);
+
+        if (statusFilter && statusFilter[1]) {
+            if (statusFilter[1] === 'error') {
+                rows = rows.filter(q => (q.lastExecution && q.lastExecution.status) === FAILED);
+            } else {
+                rows = rows.filter(q => (q.lastExecution && q.lastExecution.status) !== FAILED);
+            }
+        }
+
+        if (tagFilter) {
+            const selectedTags = tagFilter
+                .map(t => /tag:(?:"(.*?)"|(\S+))/.exec(t))
+                .map(match => match && (match[1] || match[2])) // match with or without quotes
+                .map(name => this.props.tags.find(t => t.name === name))
+                .map(tag => tag && tag.id)
+                .filter(Boolean);
+
+            rows = rows.filter(q => selectedTags.every(t => q.tags && q.tags.indexOf(t) > -1));
+        }
+
+        // remove tags in search
+        const search = this.state.search.replace(/\w+:(?:"(.*?)"|(\S+))/g, '');
+
+        rows = matchSorter(rows, search.trim(), {keys: ['query', 'name']});
+        if (sortFilter && sortFilter[1]) {
+            const [key, descOrAsc] = sortFilter[1].split('-');
+            rows.sort(sortLastExecution(key, descOrAsc === 'desc'));
+        }
+
+        return rows;
     }
 
     rowGetter(i) {
@@ -283,6 +342,40 @@ class Scheduler extends Component {
 
     closeCreateModal() {
         this.setState({createModalOpen: false});
+    }
+
+    filterSuccess() {
+        this.setState(({search}) => {
+            const stripFilter = search.replace(/status:\w+/g, '');
+
+            return {
+                search: addSlug(stripFilter, 'status:success')
+            };
+        });
+    }
+
+    filterFailed() {
+        this.setState(({search}) => {
+            const stripFilter = search.replace(/status:\w+/g, '');
+
+            return {
+                search: addSlug(stripFilter, 'status:error')
+            };
+        });
+    }
+
+    filterTag(tags) {
+        const tag = tags[0];
+        this.setState(({search}) => ({
+            search: addSlug(search, `tag:"${tag.name}"`)
+        }));
+    }
+
+    resetSearch() {
+        this.setState({
+            search: '',
+            sort: null
+        });
     }
 
     createQuery(queryConfig) {
@@ -367,13 +460,21 @@ class Scheduler extends Component {
                             >
                                 {rows.length} {rows.length === 1 ? ' query' : ' queries'}
                             </Column>
-                            <Column style={{padding: '4px 0', marginLeft: 24}}>
+                            <Column
+                                className="status-filter"
+                                style={{padding: '4px 0', marginLeft: 24, cursor: 'pointer'}}
+                                onClick={this.filterSuccess}
+                            >
                                 Success ({
                                     rows.filter(row => (row.lastExecution && row.lastExecution.status) !== FAILED)
                                         .length
                                 })
                             </Column>
-                            <Column style={{padding: '4px 0', marginLeft: 8}}>
+                            <Column
+                                className="status-filter"
+                                style={{padding: '4px 0', marginLeft: 8, cursor: 'pointer'}}
+                                onClick={this.filterFailed}
+                            >
                                 Error ({
                                     rows.filter(row => (row.lastExecution && row.lastExecution.status) === FAILED)
                                         .length
@@ -381,8 +482,39 @@ class Scheduler extends Component {
                             </Column>
                         </Row>
                     </Column>
-                    <Column style={{width: 300}}>
+                    <Column style={{width: 770}}>
                         <Row style={{width: 'auto', justifyContent: 'flex-end'}}>
+                            <Column style={{minWidth: 315, marginRight: 16, cursor: 'pointer'}}>
+                                {this.state.search && (
+                                    <u
+                                        className="clear-state"
+                                        onClick={this.resetSearch}
+                                        style={{borderRight: '1px solid rgba(0, 0, 0, 0.12)'}}
+                                    >
+                                        Clear current search query, filters, and sort
+                                    </u>
+                                )}
+                            </Column>
+                            <Column
+                                style={{
+                                    padding: '4px 0',
+                                    marginRight: 8
+                                }}
+                            >
+                                <TagPicker
+                                    placeholder="Filter tags..."
+                                    searchable={false}
+                                    onChange={this.filterTag}
+                                    value={
+                                        [
+                                            /* empty value makes the placeholder always display */
+                                        ]
+                                    }
+                                    options={this.props.tags.filter(
+                                        t => this.state.search.indexOf(`tag:"${t.name}"`) === -1
+                                    )}
+                                />
+                            </Column>
                             <Column>
                                 <Select
                                     placeholder="Sort by..."
