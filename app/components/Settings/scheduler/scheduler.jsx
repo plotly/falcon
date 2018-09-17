@@ -135,18 +135,19 @@ class IntervalFormatter extends React.Component {
             <Row>
                 <Column>
                     {!run && '—'}
-                    {run && (
-                        <div
-                            style={{
-                                fontSize: 18,
-                                color: run.status !== FAILED ? '#30aa65' : '#ef595b'
-                            }}
-                        >
-                            {`${ms(Date.now() - run.completedAt, {
-                                long: true
-                            })} ago`}
-                        </div>
-                    )}
+                    {run &&
+                        run.completedAt && (
+                            <div
+                                style={{
+                                    fontSize: 18,
+                                    color: run.status !== FAILED ? '#30aa65' : '#ef595b'
+                                }}
+                            >
+                                {`${ms(Date.now() - run.completedAt, {
+                                    long: true
+                                })} ago`}
+                            </div>
+                        )}
                     {run &&
                         run.duration && (
                             <em
@@ -242,6 +243,7 @@ class Scheduler extends Component {
 
         this.handleSearchChange = this.handleSearchChange.bind(this);
         this.handleSortChange = this.handleSortChange.bind(this);
+        this.getRowsWithoutStatus = this.getRowsWithoutStatus.bind(this);
         this.getRows = this.getRows.bind(this);
         this.rowGetter = this.rowGetter.bind(this);
         this.openPreview = this.openPreview.bind(this);
@@ -281,19 +283,10 @@ class Scheduler extends Component {
         });
     }
 
-    getRows() {
+    getRowsWithoutStatus() {
         let rows = this.props.queries;
-        const statusFilter = this.state.search.match(/status:(\S+)/);
         const sortFilter = this.state.search.match(/sort:(\S+)/);
         const tagFilter = this.state.search.match(/tag:(?:"(.*?)"|(\S+))/g);
-
-        if (statusFilter && statusFilter[1]) {
-            if (statusFilter[1] === 'error') {
-                rows = rows.filter(q => (q.lastExecution && q.lastExecution.status) === FAILED);
-            } else {
-                rows = rows.filter(q => (q.lastExecution && q.lastExecution.status) !== FAILED);
-            }
-        }
 
         if (tagFilter) {
             const selectedTags = tagFilter
@@ -313,6 +306,21 @@ class Scheduler extends Component {
         if (sortFilter && sortFilter[1]) {
             const [key, descOrAsc] = sortFilter[1].split('-');
             rows.sort(sortLastExecution(key, descOrAsc === 'desc'));
+        }
+
+        return rows;
+    }
+
+    getRows() {
+        const rows = this.getRowsWithoutStatus();
+        const statusFilter = this.state.search.match(/status:(\S+)/);
+
+        if (statusFilter && statusFilter[1]) {
+            if (statusFilter[1] === 'error') {
+                return rows.filter(q => (q.lastExecution && q.lastExecution.status) === FAILED);
+            } else if (statusFilter[1] === 'success') {
+                return rows.filter(q => (q.lastExecution && q.lastExecution.status) !== FAILED);
+            }
         }
 
         return rows;
@@ -419,6 +427,7 @@ class Scheduler extends Component {
     }
 
     render() {
+        const statuslessRows = this.getRowsWithoutStatus();
         const rows = this.getRows();
         const loggedIn = Boolean(this.props.requestor);
 
@@ -466,8 +475,9 @@ class Scheduler extends Component {
                                 onClick={this.filterSuccess}
                             >
                                 Success ({
-                                    rows.filter(row => (row.lastExecution && row.lastExecution.status) !== FAILED)
-                                        .length
+                                    statuslessRows.filter(
+                                        row => (row.lastExecution && row.lastExecution.status) !== FAILED
+                                    ).length
                                 })
                             </Column>
                             <Column
@@ -476,8 +486,9 @@ class Scheduler extends Component {
                                 onClick={this.filterFailed}
                             >
                                 Error ({
-                                    rows.filter(row => (row.lastExecution && row.lastExecution.status) === FAILED)
-                                        .length
+                                    statuslessRows.filter(
+                                        row => (row.lastExecution && row.lastExecution.status) === FAILED
+                                    ).length
                                 })
                             </Column>
                         </Row>

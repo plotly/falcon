@@ -18,8 +18,10 @@ import {
     POST,
     sqlConnections,
     username,
+    wait,
     validFid
 } from './utils.js';
+import { EXE_STATUS } from '../../shared/constants.js';
 
 chai.use(chaiSubset);
 const { assert } = chai;
@@ -91,6 +93,177 @@ describe('Routes:', () => {
                 })
                 .then(getResponseJson).then(json => {
                     assert.containSubset(json, [queryObject]);
+
+                    return deleteGrid(fid, username);
+                });
+        });
+
+        it('stores accurate query schema and nothing more', function() {
+            let fid;
+
+            const QUERY_KEYS = [
+                'fid',
+                'uids',
+                'requestor',
+                'refreshInterval',
+                'cronInterval',
+                'connectionId',
+                'query',
+                'tags',
+                'name',
+                'lastExecution',
+                'nextScheduledAt'
+            ];
+
+            const EXECUTION_KEYS = [
+                'status',
+                'duration',
+                'rowCount',
+                'completedAt'
+            ];
+
+            const INVALID_PROPS = {
+                abc: 'xyz',
+                foo: 'bar'
+            };
+
+            queryObject = {
+                requestor: username,
+                cronInterval: '*/5 * * * *',
+                connectionId,
+                query: 'SELECT * from ebola_2014 LIMIT 2',
+                tags: ['_', '__'],
+                name: '_',
+                ...INVALID_PROPS
+            };
+
+            return POST('queries', {...queryObject, filename: `test queries ${uuid.v4()}`})
+                .then(assertResponseStatus(201))
+                .then(getResponseJson).then(json => {
+                    fid = json.fid;
+
+                    assert(json.fid, 'undefined fid');
+                    assert(json.uids, 'undefined uids');
+
+                    queryObject.fid = json.fid;
+                    queryObject.uids = json.uids;
+
+                    return GET('queries');
+                })
+                .then(getResponseJson).then(json => {
+                    const NOW = Date.now();
+                    const FIVE_SECONDS_AGO = NOW - 5000;
+                    const FIVE_MINUTES_FROM_NOW = NOW + (5 * 60 * 1000);
+                    const MIN_DURATION = 0;
+                    const MAX_DURATION = 10;
+                    const CORRECT_ROW_COUNT = 2;
+
+                    assert.equal(json.length, 1, 'more than one query was created');
+
+                    const receivedQuery = json[0];
+                    assert.hasAllKeys(receivedQuery, QUERY_KEYS, 'query had incorrect keys');
+
+                    const receivedExecution = receivedQuery.lastExecution;
+                    assert.hasAllKeys(receivedExecution, EXECUTION_KEYS, 'execution had incorrect keys');
+
+                    assert.equal(receivedExecution.status, EXE_STATUS.ok, 'query status was not "ok"');
+                    assert.equal(receivedExecution.rowCount, CORRECT_ROW_COUNT, 'row count was not equal to two');
+                    assert(receivedExecution.duration >= MIN_DURATION, 'execution duration was less than zero seconds');
+                    assert(receivedExecution.duration < MAX_DURATION, 'execution duration was more than ten seconds');
+                    assert(receivedExecution.completedAt < NOW, 'execution completed in the future');
+                    assert(receivedExecution.completedAt > FIVE_SECONDS_AGO, 'execution completed too far in the past');
+
+                    assert(receivedQuery.nextScheduledAt > NOW, 'query scheduled to be run in the past');
+                    assert(
+                        receivedQuery.nextScheduledAt < FIVE_MINUTES_FROM_NOW,
+                        'query scheduled to be run more than five minutes from now'
+                    );
+
+
+                    return deleteGrid(fid, username);
+                });
+        });
+
+        it('sets status to "running" correctly', function() {
+            let fid;
+            let orphanedPromise;
+            return initGrid('test interval')
+                .then(assertResponseStatus(201))
+                .then(getResponseJson).then(json => {
+                    fid = json.file.fid;
+
+                    queryObject = {
+                        fid,
+                        requestor: fid.split(':')[0],
+                        refreshInterval: 60,
+                        cronInterval: null,
+                        connectionId,
+                        // this query purposely takes 30 seconds to run so we
+                        // have time to check its status
+                        query: 'SELECT pg_sleep(30);'
+                    };
+
+                    return POST('queries', queryObject);
+                })
+                .then(assertResponseStatus(201))
+                .then(() => {
+                    orphanedPromise = POST('queries', queryObject);
+                    return wait(4000);
+                })
+                .then(() => {
+                    return GET('queries');
+                })
+                .then(getResponseJson).then(json => {
+                    assert.equal(
+                        json[0].lastExecution.status, EXE_STATUS.running,
+                        'status was not "running"'
+                    );
+
+                    return orphanedPromise;
+                })
+                .then(assertResponseStatus(200))
+                .then(getResponseJson).then(json => {
+                    assert.equal(
+                        json.lastExecution.status, EXE_STATUS.ok,
+                        'status was not "ok"'
+                    );
+                    return deleteGrid(fid, username);
+                });
+        });
+
+        it('sets status to "failed" correctly', function() {
+            let fid;
+            return initGrid('test interval')
+                .then(assertResponseStatus(201))
+                .then(getResponseJson).then(json => {
+                    fid = json.file.fid;
+
+                    queryObject = {
+                        fid,
+                        requestor: fid.split(':')[0],
+                        refreshInterval: 60,
+                        cronInterval: null,
+                        connectionId,
+                        query: 'SELECT * from ebola_2014 LIMIT 2'
+                    };
+
+                    return POST('queries', queryObject);
+                })
+                .then(assertResponseStatus(201))
+                .then(() => {
+                    return POST('queries', {
+                        ...queryObject,
+                        query: 'invalid query'
+                    });
+                })
+                .then(assertResponseStatus(400))
+                .then(() => GET('queries'))
+                .then(assertResponseStatus(200))
+                .then(getResponseJson).then(json => {
+                    assert.equal(
+                        json[0].lastExecution.status, EXE_STATUS.failed,
+                        'status was not "failed"'
+                    );
 
                     return deleteGrid(fid, username);
                 });

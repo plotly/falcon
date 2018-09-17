@@ -65,7 +65,6 @@ export class TagPicker extends React.Component {
     }
     render() {
         return (
-            // TODO use reselect?
             <Select.Creatable
                 placeholder="Select tags"
                 {...this.props}

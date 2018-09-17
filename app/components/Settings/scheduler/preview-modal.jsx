@@ -374,7 +374,7 @@ export class PreviewModal extends Component {
                         {!editing &&
                             run && (
                                 <Row style={rowStyle}>
-                                    <div style={keyStyle}>Last Execution</div>
+                                    <div style={keyStyle}>Last ran</div>
                                     <em style={valueStyle}>
                                         <span
                                             style={{
@@ -395,7 +395,7 @@ export class PreviewModal extends Component {
                             )}
                         {!editing && (
                             <Row style={rowStyle}>
-                                <div style={keyStyle}>Next Execution</div>
+                                <div style={keyStyle}>Scheduled to run</div>
                                 <em style={valueStyle}>
                                     in{' '}
                                     {ms((query.nextScheduledAt || now) - now, {

@@ -189,7 +189,7 @@ class QueryScheduler {
         let currStartTime;
         let fid;
 
-        const STATIC_START_TIME = currStartTime;
+        const BEGIN_STAMP = Date.now();
         const queryResults = {};
 
         // Check if the user even exists
@@ -281,7 +281,7 @@ class QueryScheduler {
             Logger.log(`Request to Plotly for creating a grid took ${process.hrtime(currStartTime)[0]} seconds`, 2);
             Logger.log(`Grid ${fid} has been updated.`, 2);
 
-            queryResults.duration = process.hrtime(STATIC_START_TIME)[0];
+            queryResults.duration = Math.floor((Date.now() - BEGIN_STAMP) / 1000);
             queryResults.completedAt = Date.now();
 
             return {
@@ -296,7 +296,7 @@ class QueryScheduler {
         const formattedRefresh = refreshInterval || mapCronToRefresh(cronInterval);
         let currStartTime = process.hrtime();
 
-        const STATIC_START_TIME = currStartTime;
+        const BEGIN_STAMP = Date.now();
         const queryResults = {};
 
         /*
@@ -473,7 +473,7 @@ class QueryScheduler {
             return res.json();
         }).then(grid => {
             queryResults.uids = extractOrderedUids(grid);
-            queryResults.duration = process.hrtime(STATIC_START_TIME)[0];
+            queryResults.duration = Math.floor((Date.now() - BEGIN_STAMP) / 1000);
             queryResults.completedAt = Date.now();
             return {
                 fid,
