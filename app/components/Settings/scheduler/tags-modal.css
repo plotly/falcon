@@ -1,0 +1,51 @@
+.tag-modal .count {
+  padding: 16px 14px 16px 0px;
+  margin-right: 14px;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.tag-modal .note {
+  font-size: 14px;
+  color: #797979;
+}
+
+.tagsContainer {
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+}
+
+.description.row-body {
+  color: #797979;
+}
+
+.tagRow {
+  background: white;
+  padding: 26px 16px;
+  border-bottom: 1px solid black;
+}
+
+.color-box {
+  width: 30px;
+  height: 30px;
+  margin-right: 24px;
+  border: 1px solid #E0E7EF;
+  box-sizing: border-box;
+  border-radius: 3px;
+}
+
+.delete {
+  cursor: pointer;
+  color: #FF5E5E;
+  font-weight: bold;
+  margin-left: auto;
+}
+
+.tagRow .delete-button {
+  background: #FF5E5E;
+  border: none;
+  border-radius: 0;
+  margin: 0 0 0 auto;
+  color: white;
+  padding: 8px 10px;
+}

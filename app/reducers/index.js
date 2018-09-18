@@ -219,6 +219,10 @@ function tags(state = [], action) {
         ...state
       ];
     }
+    if (action.type === 'DELETE_TAG') {
+      const id = action.payload;
+      return state.filter(q => q.id !== id);
+    }
     return state;
 }
 

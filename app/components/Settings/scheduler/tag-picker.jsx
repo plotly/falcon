@@ -17,7 +17,9 @@ export class TagValue extends React.Component {
         this.handleRemove = this.handleRemove.bind(this);
     }
     handleRemove() {
-        this.props.onRemove(this.props.value);
+        if (!this.props.disabled) {
+            this.props.onRemove(this.props.value);
+        }
     }
     render() {
         return (
@@ -32,7 +34,8 @@ export class TagValue extends React.Component {
 
 TagValue.propTypes = {
     value: PropTypes.object,
-    onRemove: PropTypes.func
+    onRemove: PropTypes.func,
+    disabled: PropTypes.bool
 };
 
 function optionRenderer(option) {
@@ -73,6 +76,7 @@ export class TagPicker extends React.Component {
         return (
             <Select.Creatable
                 placeholder="Select tags"
+                noResultsText="No tags exist yet"
                 {...this.props}
                 multi
                 value={this.props.value.map(tagToOption)}

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {Controlled as CodeMirror} from 'react-codemirror2';
 import ms from 'ms';
 import cronstrue from 'cronstrue';
+import pluralize from 'pluralize';
 
 import Modal from '../../modal.jsx';
 import SuccessMessage from '../../success.jsx';
@@ -283,9 +284,13 @@ export class PreviewModal extends Component {
                                     )}
                                 </h5>
                             </Row>
-                            {this.state.tags && this.state.tags.length ? (<Row style={{...flexStart, flexWrap: 'wrap', marginTop: 8}}>
-                                {this.state.tags.map(tag => <Tag key={tag.name} style={{marginBottom: 8}} {...tag} />)}
-                            </Row>) : null}
+                            {this.state.tags && this.state.tags.length ? (
+                                <Row style={{...flexStart, flexWrap: 'wrap', marginTop: 8}}>
+                                    {this.state.tags.map(tag => (
+                                        <Tag key={tag.name} style={{marginBottom: 8}} {...tag} />
+                                    ))}
+                                </Row>
+                            ) : null}
                         </Column>
                     </Row>
                     <Column style={{background: '#F5F7FB', padding: '16px 32px'}}>
@@ -391,7 +396,7 @@ export class PreviewModal extends Component {
                                         )}
                                         <br />
                                         {run.duration &&
-                                            `${run.rowCount || 0} rows in ${ms(run.duration * 1000, {
+                                            `${pluralize('row', run.rowCount || 0, true)} in ${ms(run.duration * 1000, {
                                                 long: true
                                             })}`}
                                     </em>
