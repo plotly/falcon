@@ -25,7 +25,7 @@ const flexStart = {justifyContent: 'flex-start'};
 const rowStyle = {
     ...flexStart,
     borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
-    padding: '12px 0px'
+    padding: '12px 0px 24px'
 };
 const keyStyle = {boxSizing: 'border-box', width: '35%'};
 const valueStyle = {boxSizing: 'border-box', width: '65%'};
@@ -260,7 +260,7 @@ export class PreviewModal extends Component {
                                 padding: '0 32px',
                                 justifyContent: 'flex-start',
                                 fontSize: 12,
-                                marginTop: 8,
+                                margin: '8px 0',
                                 fontWeight: 600,
                                 opacity: 0.4,
                                 letterSpacing: '0.5px'
@@ -275,7 +275,7 @@ export class PreviewModal extends Component {
                         </Column>
                         <Column>
                             <Row className="sql-preview" style={flexStart}>
-                                <h5 className="sql-preview ellipsis" style={{margin: '0 0 8px', letterSpacing: '1px'}}>
+                                <h5 className="sql-preview ellipsis" style={{margin: '0', letterSpacing: '1px'}}>
                                     {this.state.name ? (
                                         <b>{this.state.name}</b>
                                     ) : (
@@ -283,7 +283,9 @@ export class PreviewModal extends Component {
                                     )}
                                 </h5>
                             </Row>
-                            <Row style={flexStart}>{this.state.tags.map(tag => <Tag key={tag.name} {...tag} />)}</Row>
+                            {this.state.tags && this.state.tags.length ? (<Row style={{...flexStart, flexWrap: 'wrap', marginTop: 8}}>
+                                {this.state.tags.map(tag => <Tag key={tag.name} style={{marginBottom: 8}} {...tag} />)}
+                            </Row>) : null}
                         </Column>
                     </Row>
                     <Column style={{background: '#F5F7FB', padding: '16px 32px'}}>
@@ -312,7 +314,7 @@ export class PreviewModal extends Component {
                                 )}
                             </div>
                         </Row>
-                        {(this.state.name || editing) && (
+                        {editing && (
                             <Row style={rowStyle}>
                                 <div style={keyStyle}>Query Name</div>
                                 {editing ? (
@@ -359,7 +361,7 @@ export class PreviewModal extends Component {
                         </Row>
                         {editing && (
                             <Row style={rowStyle}>
-                                <div style={keyStyle}>Tags Execution</div>
+                                <div style={keyStyle}>Tags</div>
                                 <em style={valueStyle}>
                                     <TagPicker
                                         disabled={Boolean(this.state.successMessage)}

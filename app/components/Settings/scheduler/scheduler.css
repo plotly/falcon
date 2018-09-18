@@ -52,6 +52,10 @@
     cursor: pointer;
 }
 
+.scheduler-table pre {
+  margin: 0;
+}
+
 .sql pre {
     margin: 0 auto;
     max-height: 100%;
@@ -75,6 +79,10 @@
 
 .meta-preview button {
     min-height: 28px;
+}
+
+.meta-preview pre {
+  margin: 0;
 }
 
 .meta-preview .Select-input > input {

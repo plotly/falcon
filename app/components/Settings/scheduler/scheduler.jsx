@@ -58,6 +58,9 @@ const SORT_OPTIONS = [
 
 const flexStart = {justifyContent: 'flex-start'};
 const widthAuto = {width: 'auto'};
+const tagStyle = {
+    maxWidth: '80px'
+};
 class QueryFormatter extends React.Component {
     static propTypes = {
         /*
@@ -74,15 +77,20 @@ class QueryFormatter extends React.Component {
 
         return (
             <Row style={flexStart}>
-                <Column style={{width: '12px'}}>
-                    <Status size={12} status={query.lastExecution && query.lastExecution.status} />
+                <Column style={{width: '40px', alignItems: 'center'}}>
+                    <Status size={20} status={query.lastExecution && query.lastExecution.status} />
                 </Column>
                 <Column
                     className="ellipsis"
-                    style={{width: '50%', maxHeight: ROW_HEIGHT, padding: '0px 0px 8px 12px', fontSize: 15}}
+                    style={{
+                        width: '70%',
+                        maxHeight: ROW_HEIGHT,
+                        padding: '0px 0px 4px 12px',
+                        fontSize: 16
+                    }}
                 >
                     {query.name ? (
-                        <span className="ellipsis" style={{fontSize: 16}}>
+                        <span className="ellipsis" style={{fontSize: 18}}>
                             {query.name}
                         </span>
                     ) : (
@@ -92,7 +100,8 @@ class QueryFormatter extends React.Component {
                         className="ellipsis"
                         style={{
                             display: 'block',
-                            fontSize: 15
+                            fontSize: 12,
+                            opacity: 0.5
                         }}
                     >
                         {query.cronInterval
@@ -102,8 +111,10 @@ class QueryFormatter extends React.Component {
                               })}`}
                     </em>
                 </Column>
-                <Column style={widthAuto}>
-                    <Row style={flexStart}>{query.tags.map(tag => <Tag key={tag.name} {...tag} />)}</Row>
+                <Column style={{width: 'auto', marginLeft: 16}}>
+                    <Row style={flexStart}>
+                        {query.tags.map(tag => <Tag key={tag.name} style={tagStyle} className="ellipsis" {...tag} />)}
+                    </Row>
                 </Column>
             </Row>
         );
@@ -139,7 +150,7 @@ class IntervalFormatter extends React.Component {
                         run.completedAt && (
                             <div
                                 style={{
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     color: run.status !== FAILED ? '#30aa65' : '#ef595b'
                                 }}
                             >
@@ -152,7 +163,8 @@ class IntervalFormatter extends React.Component {
                         run.duration && (
                             <em
                                 style={{
-                                    fontSize: 12
+                                    fontSize: 12,
+                                    opacity: 0.5
                                 }}
                             >
                                 {`${run.rowCount} rows in ${ms(run.duration * 1000, {
@@ -229,8 +241,10 @@ class Scheduler extends Component {
         };
         this.columns = [
             {
+                width: 850,
                 key: 'query',
                 name: 'Query',
+                width: '65%',
                 filterable: true,
                 formatter: QueryFormatter
             },
@@ -258,6 +272,14 @@ class Scheduler extends Component {
         this.filterFailed = this.filterFailed.bind(this);
         this.filterTag = this.filterTag.bind(this);
         this.resetSearch = this.resetSearch.bind(this);
+    }
+
+    componentDidMount() {
+        this.refreshQueriesInterval = setInterval(this.props.refreshQueries, 60 * 1000);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.refreshQueriesInterval);
     }
 
     handleSearchChange(e) {
@@ -374,11 +396,15 @@ class Scheduler extends Component {
     }
 
     filterTag(tags) {
-        const tag = tags[0];
-        this.setState(({search}) => ({
+        const existingSearchString = this.state.search;
+        const search = tags.length
+            ? addSlug(existingSearchString, `tag:"${tags[tags.length - 1].name}"`)
+            : existingSearchString.replace(/tag:(?:"(.*?)"|(\S+))/g, '');
+
+        this.setState({
             tags,
-            search: addSlug(search, `tag:"${tag.name}"`)
-        }));
+            search
+        });
     }
 
     resetSearch() {
@@ -477,8 +503,11 @@ class Scheduler extends Component {
                             <Column
                                 className="status-filter"
                                 style={{
-                                  fontWeight: statusFilter && statusFilter[1] === 'success' && 'bold',
-                                  padding: '4px 0', marginLeft: 24, cursor: 'pointer'}}
+                                    fontWeight: statusFilter && statusFilter[1] === 'success' && 'bold',
+                                    padding: '4px 0',
+                                    marginLeft: 24,
+                                    cursor: 'pointer'
+                                }}
                                 onClick={this.filterSuccess}
                             >
                                 Success ({
@@ -490,8 +519,11 @@ class Scheduler extends Component {
                             <Column
                                 className="status-filter"
                                 style={{
-                                  fontWeight: statusFilter && statusFilter[1] === 'error' && 'bold',
-                                  padding: '4px 0', marginLeft: 8, cursor: 'pointer'}}
+                                    fontWeight: statusFilter && statusFilter[1] === 'error' && 'bold',
+                                    padding: '4px 0',
+                                    marginLeft: 8,
+                                    cursor: 'pointer'
+                                }}
                                 onClick={this.filterFailed}
                             >
                                 Error ({
@@ -526,9 +558,7 @@ class Scheduler extends Component {
                                     searchable={false}
                                     onChange={this.filterTag}
                                     value={this.state.tags}
-                                    options={this.props.tags.filter(
-                                        t => this.state.search.indexOf(`tag:"${t.name}"`) === -1
-                                    )}
+                                    options={this.props.tags}
                                 />
                             </Column>
                             <Column>
