@@ -269,6 +269,22 @@ export function createTag(payload = {}) {
   };
 }
 
+export function deleteTag(tid) {
+  return (dispatch) => {
+    return dispatch(apiThunk(
+      `tags/${tid}`,
+      'DELETE',
+      'createTagRequest'
+    )).then((res) => {
+      dispatch({
+          type: 'DELETE_TAG',
+          payload: tid
+      });
+      return res;
+    });
+  };
+}
+
 export function connect(connectionId) {
     return apiThunk(
         `connections/${connectionId}/connect`,

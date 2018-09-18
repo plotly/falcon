@@ -13,6 +13,7 @@ import TimedMessage from './timed-message.jsx';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 import SQL from './sql.jsx';
 import TagPicker from './tag-picker.jsx';
+import TagModal from './tags-modal.jsx';
 
 import {datasetUrl as getDatasetURL} from '../../../utils/utils';
 import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../constants/constants.js';
@@ -76,7 +77,8 @@ class CreateModal extends Component {
             error: null,
             saving: false,
             datasetUrl: null,
-            tags: []
+            tags: [],
+            tagsModalOpen: false
         };
         this.options = {
             lineWrapping: true,
@@ -91,6 +93,8 @@ class CreateModal extends Component {
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleTagsChange = this.handleTagsChange.bind(this);
         this.submit = this.submit.bind(this);
+        this.openTagsModal = this.openTagsModal.bind(this);
+        this.closeTagsModal = this.closeTagsModal.bind(this);
     }
 
     updateCode(editor, meta, code) {
@@ -111,6 +115,16 @@ class CreateModal extends Component {
         } else {
             this.setState({tags, error: null});
         }
+    }
+
+    openTagsModal() {
+        this.setState({tagsModalOpen: true});
+    }
+
+    closeTagsModal(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.setState({tagsModalOpen: false});
     }
 
     submit() {
@@ -143,6 +157,9 @@ class CreateModal extends Component {
     }
 
     render() {
+        if (this.state.tagsModalOpen) {
+            return <TagModal open={true} tags={this.props.tags} onClickAway={this.closeTagsModal} />;
+        }
         return (
             <Modal open={this.props.open} onClickAway={this.props.onClickAway} className="scheduler create-modal">
                 <Column className="container" style={containerOverride}>
@@ -193,7 +210,7 @@ class CreateModal extends Component {
                             <div className="row-header" style={{paddingTop: 5}}>
                                 Schedule
                             </div>
-                            <div className="row-body" style={{minHeight: '108px'}}>
+                            <div className="row-body" style={{minHeight: '64px'}}>
                                 {this.state.successMessage ? (
                                     <em style={{marginTop: 5, display: 'inherit'}}>
                                         <b>{cronstrue.toString(this.state.interval)}</b>
@@ -205,7 +222,10 @@ class CreateModal extends Component {
                         </Row>
                         <Row style={secondaryRowStyle}>
                             <div className="row-header" style={{paddingTop: 5}}>
-                                Tags
+                                <div>Tags</div>
+                                <div onClick={this.openTagsModal}>
+                                    <u className="tag-manager-text">manage tags</u>
+                                </div>
                             </div>
                             <div className="row-body" style={minHeight}>
                                 <TagPicker
@@ -218,7 +238,9 @@ class CreateModal extends Component {
                         </Row>
                         {this.state.error && (
                             <Row style={rowStyleOverride}>
-                                <RequestError onClick={this.props.openQueryPage}>{this.state.error}</RequestError>
+                                <RequestError onClick={this.props.openQueryPage}>
+                                    <div>{this.state.error}</div>
+                                </RequestError>
                             </Row>
                         )}
                         {this.state.saving && (

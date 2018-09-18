@@ -24,7 +24,7 @@
 }
 
 .create-modal p {
-    margin: 32px 0;
+    margin: 16px 0;
     padding: 16px;
 }
 
@@ -79,4 +79,10 @@
     margin-top: 5px;
     overflow-y: auto;
     max-height: 300px;
+}
+
+.tag-manager-text {
+    cursor: pointer;
+    font-size: 12px;
+    color: #9D9D9D;
 }

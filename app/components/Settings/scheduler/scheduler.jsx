@@ -7,6 +7,7 @@ import ms from 'ms';
 import matchSorter from 'match-sorter';
 import cronstrue from 'cronstrue';
 import Select from 'react-select';
+import pluralize from 'pluralize';
 
 import CreateModal from './create-modal.jsx';
 import PreviewModal from './preview-modal.jsx';
@@ -25,6 +26,13 @@ const NO_OP = () => {};
 
 const ROW_HEIGHT = 84;
 
+const decapitalize = startString => {
+    if (startString.length === 0) {
+        return '';
+    }
+
+    return startString.slice(0, 1).toLowerCase() + startString.slice(1);
+};
 const sortLastExecution = (key, reverse) => (a, b) => {
     const s = ((a.lastExecution && a.lastExecution[key]) || 0) - ((b.lastExecution && b.lastExecution[key]) || 0);
     return reverse ? -1 * s : s;
@@ -57,7 +65,6 @@ const SORT_OPTIONS = [
 ];
 
 const flexStart = {justifyContent: 'flex-start'};
-const widthAuto = {width: 'auto'};
 const tagStyle = {
     maxWidth: '80px'
 };
@@ -105,7 +112,7 @@ class QueryFormatter extends React.Component {
                         }}
                     >
                         {query.cronInterval
-                            ? cronstrue.toString(query.cronInterval)
+                            ? `Runs ${decapitalize(cronstrue.toString(query.cronInterval))}`
                             : `Runs every ${ms(query.refreshInterval * 1000, {
                                   long: true
                               })}`}
@@ -113,7 +120,9 @@ class QueryFormatter extends React.Component {
                 </Column>
                 <Column style={{width: 'auto', marginLeft: 16}}>
                     <Row style={flexStart}>
-                        {query.tags.map(tag => <Tag key={tag.name} style={tagStyle} className="ellipsis" {...tag} />)}
+                        {query.tags
+                            .filter(Boolean)
+                            .map(tag => <Tag key={tag.name} style={tagStyle} className="ellipsis" {...tag} />)}
                     </Row>
                 </Column>
             </Row>
@@ -142,23 +151,26 @@ class IntervalFormatter extends React.Component {
     render() {
         const run = this.props.value;
 
+        const completedAt = run && run.completedAt && Date.now() - run.completedAt;
+
         return (
             <Row>
                 <Column>
                     {!run && '—'}
-                    {run &&
-                        run.completedAt && (
-                            <div
-                                style={{
-                                    fontSize: 16,
-                                    color: run.status !== FAILED ? '#30aa65' : '#ef595b'
-                                }}
-                            >
-                                {`${ms(Date.now() - run.completedAt, {
-                                    long: true
-                                })} ago`}
-                            </div>
-                        )}
+                    {completedAt && (
+                        <div
+                            style={{
+                                fontSize: 16,
+                                color: run.status !== FAILED ? '#30aa65' : '#ef595b'
+                            }}
+                        >
+                            {completedAt < 60 * 1000
+                                ? 'just now'
+                                : `${ms(completedAt, {
+                                      long: true
+                                  })} ago`}
+                        </div>
+                    )}
                     {run &&
                         run.duration && (
                             <em
@@ -167,7 +179,7 @@ class IntervalFormatter extends React.Component {
                                     opacity: 0.5
                                 }}
                             >
-                                {`${run.rowCount} rows in ${ms(run.duration * 1000, {
+                                {`${pluralize('row', run.rowCount, true)} in ${ms(run.duration * 1000, {
                                     long: true
                                 })}`}
                             </em>
@@ -244,7 +256,6 @@ class Scheduler extends Component {
                 width: 850,
                 key: 'query',
                 name: 'Query',
-                width: '65%',
                 filterable: true,
                 formatter: QueryFormatter
             },
@@ -396,15 +407,11 @@ class Scheduler extends Component {
     }
 
     filterTag(tags) {
-        const existingSearchString = this.state.search;
-        const search = tags.length
-            ? addSlug(existingSearchString, `tag:"${tags[tags.length - 1].name}"`)
-            : existingSearchString.replace(/tag:(?:"(.*?)"|(\S+))/g, '');
-
-        this.setState({
+        const tag = tags[0];
+        this.setState(({search}) => ({
             tags,
-            search
-        });
+            search: addSlug(search, `tag:"${tag.name}"`)
+        }));
     }
 
     resetSearch() {
@@ -558,7 +565,9 @@ class Scheduler extends Component {
                                     searchable={false}
                                     onChange={this.filterTag}
                                     value={this.state.tags}
-                                    options={this.props.tags}
+                                    options={this.props.tags.filter(
+                                        t => this.state.search.indexOf(`tag:"${t.name}"`) === -1
+                                    )}
                                 />
                             </Column>
                             <Column>
