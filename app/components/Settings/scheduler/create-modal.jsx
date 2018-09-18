@@ -106,7 +106,11 @@ class CreateModal extends Component {
     }
 
     handleTagsChange(tags) {
-        this.setState({tags});
+        if (tags.error) {
+            this.setState({error: tags.error.message || tags.error});
+        } else {
+            this.setState({tags, error: null});
+        }
     }
 
     submit() {

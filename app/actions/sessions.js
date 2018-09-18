@@ -257,6 +257,9 @@ export function createTag(payload = {}) {
         color: payload.color
       }
     )).then((res) => {
+      if (res.error) {
+          throw res;
+      }
       dispatch({
           type: 'CREATE_TAG',
           payload: res

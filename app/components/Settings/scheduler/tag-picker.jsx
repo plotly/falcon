@@ -39,42 +39,51 @@ function optionRenderer(option) {
     return <Tag color={option.color} name={option.label} />;
 }
 
-// TODO pick from a subset?
+// helpers
 const randomColor = () => '#' + Math.floor(Math.random() * 13421772).toString(16);
+const tagToOption = tag => ({label: tag.name, value: tag.id, color: tag.color});
 
 const promptTextCreator = label => `Create new tag "${label}"`;
+const isValidNewOption = tag => tag.label && tag.label.length && tag.label.trim().length;
+const inputProps = {maxlength: 30};
+
 export class TagPicker extends React.Component {
     constructor(props) {
         super(props);
-        this.handleChange = this.handleChange.bind(this);
+        this.handleCreate = this.handleCreate.bind(this);
+        this.onChange = this.onChange.bind(this);
     }
 
-    handleChange(tags) {
-        const newTag = tags && tags[tags.length - 1];
-        if (newTag && !newTag.name) {
-            newTag.name = newTag.label;
-            newTag.color = randomColor();
-
-            return this.props.createTag(newTag).then(res => {
-                tags[tags.length - 1] = res;
-                this.props.onChange(tags);
-            });
-        }
-
-        this.props.onChange(tags);
+    handleCreate(newTag) {
+        return this.props
+            .createTag({...newTag, name: newTag.label, color: randomColor()})
+            .then(res => this.props.onChange(this.props.value.concat(res)))
+            .catch(errorRes => this.props.onChange(errorRes));
     }
+
+    onChange(selectedOptions) {
+        const selectedTags = this.props.options.filter(tag => {
+            return selectedOptions.some(option => option.value === tag.id);
+        });
+
+        this.props.onChange(selectedTags);
+    }
+
     render() {
         return (
             <Select.Creatable
                 placeholder="Select tags"
                 {...this.props}
-                value={this.props.value.map(t => ({label: t.name, ...t}))}
-                options={this.props.options.map(t => ({label: t.name, ...t}))}
-                onChange={this.handleChange}
-                multi={true}
+                multi
+                value={this.props.value.map(tagToOption)}
+                options={this.props.options.map(tagToOption)}
+                onChange={this.onChange}
                 optionRenderer={optionRenderer}
                 valueComponent={TagValue}
                 promptTextCreator={promptTextCreator}
+                onNewOptionClick={this.handleCreate}
+                inputProps={inputProps}
+                isValidNewOption={isValidNewOption}
             />
         );
     }
