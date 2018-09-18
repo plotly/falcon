@@ -170,7 +170,7 @@ const addSlug = (str, slug) => {
     if (str.indexOf(slug) > -1) {
         return str;
     }
-    return str + (str.length ? ' ' : '') + slug;
+    return str.trim() + (str.trim().length ? ' ' : '') + slug;
 };
 
 function mapRow(row) {
@@ -223,6 +223,7 @@ class Scheduler extends Component {
         this.state = {
             search: '',
             sort: null,
+            tags: [],
             selectedQuery: null,
             createModalOpen: Boolean(this.props.initialCode)
         };
@@ -375,6 +376,7 @@ class Scheduler extends Component {
     filterTag(tags) {
         const tag = tags[0];
         this.setState(({search}) => ({
+            tags,
             search: addSlug(search, `tag:"${tag.name}"`)
         }));
     }
@@ -382,7 +384,8 @@ class Scheduler extends Component {
     resetSearch() {
         this.setState({
             search: '',
-            sort: null
+            sort: null,
+            tags: []
         });
     }
 
@@ -431,6 +434,8 @@ class Scheduler extends Component {
         const rows = this.getRows();
         const loggedIn = Boolean(this.props.requestor);
 
+        const statusFilter = this.state.search.match(/status:(\S+)/);
+
         return (
             <React.Fragment>
                 <Row
@@ -471,7 +476,9 @@ class Scheduler extends Component {
                             </Column>
                             <Column
                                 className="status-filter"
-                                style={{padding: '4px 0', marginLeft: 24, cursor: 'pointer'}}
+                                style={{
+                                  fontWeight: statusFilter && statusFilter[1] === 'success' && 'bold',
+                                  padding: '4px 0', marginLeft: 24, cursor: 'pointer'}}
                                 onClick={this.filterSuccess}
                             >
                                 Success ({
@@ -482,7 +489,9 @@ class Scheduler extends Component {
                             </Column>
                             <Column
                                 className="status-filter"
-                                style={{padding: '4px 0', marginLeft: 8, cursor: 'pointer'}}
+                                style={{
+                                  fontWeight: statusFilter && statusFilter[1] === 'error' && 'bold',
+                                  padding: '4px 0', marginLeft: 8, cursor: 'pointer'}}
                                 onClick={this.filterFailed}
                             >
                                 Error ({
@@ -516,11 +525,7 @@ class Scheduler extends Component {
                                     placeholder="Filter tags..."
                                     searchable={false}
                                     onChange={this.filterTag}
-                                    value={
-                                        [
-                                            /* empty value makes the placeholder always display */
-                                        ]
-                                    }
+                                    value={this.state.tags}
                                     options={this.props.tags.filter(
                                         t => this.state.search.indexOf(`tag:"${t.name}"`) === -1
                                     )}

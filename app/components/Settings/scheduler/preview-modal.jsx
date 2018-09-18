@@ -363,7 +363,6 @@ export class PreviewModal extends Component {
                                 <em style={valueStyle}>
                                     <TagPicker
                                         disabled={Boolean(this.state.successMessage)}
-                                        searchable={false}
                                         value={this.state.tags}
                                         options={this.props.tags}
                                         onChange={this.handleTagsChange}
@@ -376,20 +375,23 @@ export class PreviewModal extends Component {
                                 <Row style={rowStyle}>
                                     <div style={keyStyle}>Last ran</div>
                                     <em style={valueStyle}>
-                                        <span
-                                            style={{
-                                                color: (run && run.status) !== FAILED ? '#30aa65' : '#ef595b'
-                                            }}
-                                        >
-                                            {ms(now - run.completedAt, {
-                                                long: true
-                                            })}{' '}
-                                            ago
-                                        </span>
+                                        {run.completedAt && (
+                                            <span
+                                                style={{
+                                                    color: (run && run.status) !== FAILED ? '#30aa65' : '#ef595b'
+                                                }}
+                                            >
+                                                {ms(now - run.completedAt, {
+                                                    long: true
+                                                })}{' '}
+                                                ago
+                                            </span>
+                                        )}
                                         <br />
-                                        {`${run.rowCount} rows in ${ms(run.duration * 1000, {
-                                            long: true
-                                        })}`}
+                                        {run.duration &&
+                                            `${run.rowCount || 0} rows in ${ms(run.duration * 1000, {
+                                                long: true
+                                            })}`}
                                     </em>
                                 </Row>
                             )}
