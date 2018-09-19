@@ -189,11 +189,7 @@ export class PreviewModal extends Component {
     }
 
     renderButtonRow() {
-        const {loading, editing, tagsModalOpen} = this.state;
-
-        if (tagsModalOpen) {
-            return <TagModal open={true} tags={this.props.tags} onClickAway={this.closeTagsModal} />;
-        }
+        const {loading, editing} = this.state;
 
         const loggedIn = this.props.currentRequestor;
         const canEdit = this.props.currentRequestor && this.props.currentRequestor === this.props.query.requestor;
@@ -269,6 +265,10 @@ export class PreviewModal extends Component {
         if (!query) {
             content = null;
         } else {
+            if (this.state.tagsModalOpen) {
+                return <TagModal onClickAway={this.closeTagsModal} />;
+            }
+
             const link = datasetUrl(query.fid);
             const {editing, loading} = this.state;
 

@@ -136,7 +136,7 @@ export class TagsModal extends Component {
 
     render() {
         return (
-            <Modal open={this.props.open} onClickAway={this.props.onClickAway} className="create-modal tag-modal">
+            <Modal open={true} onClickAway={this.props.onClickAway} className="create-modal tag-modal">
                 <Column className="container" style={containerOverride}>
                     <Row>
                         <Column className="innerColumn">
@@ -183,7 +183,9 @@ export class TagsModal extends Component {
 }
 
 export default connect(
-    null,
+    state => ({
+        tags: state.tags
+    }),
     dispatch => ({
         createTag: payload => dispatch(Actions.createTag(payload)),
         deleteTag: payload => dispatch(Actions.deleteTag(payload)),
