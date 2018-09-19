@@ -10,36 +10,40 @@ const wait = () => new Promise(resolve => setTimeout(resolve, 0));
 const mockTags = [{id: 'id', name: 'Tag 1', color: '#ffffff'}];
 
 const mockStore = {
-  getState: () => {}
+    getState: () => {}
 };
 
-describe('Tag Picker Tests', () => {
+describe('Tag Modal Tests', () => {
     beforeAll(() => {
         configure({adapter: new Adapter()});
         // workaround `Error: Not implemented: HTMLCanvasElement.prototype.getContext`
-        HTMLCanvasElement.prototype.getContext = function () {return null;};
+        HTMLCanvasElement.prototype.getContext = function() {
+            return null;
+        };
     });
 
     it('should allow you to create tags', async () => {
         const createTag = jest.fn(v => Promise.resolve(v));
-        const component = mount(<TagModal store={mockStore} open={true} createTag={createTag}/>);
+        const component = mount(<TagModal store={mockStore} open={true} createTag={createTag} />);
 
         component.find('form').simulate('submit', {
-          target: [{
-            value: 'Tag name'
-          }]
+            target: [
+                {
+                    value: 'Tag name'
+                }
+            ]
         });
 
         await wait();
         expect(createTag).toHaveBeenCalledWith({
-          name: 'Tag name',
-          color: component.state('color')
+            name: 'Tag name',
+            color: component.state('color')
         });
     });
 
     it('should allow tags to be deleted', async () => {
         const deleteTag = jest.fn(v => Promise.resolve(v));
-        const component = mount(<TagModal store={mockStore} open={true} tags={mockTags} deleteTag={deleteTag}/>);
+        const component = mount(<TagModal store={mockStore} open={true} tags={mockTags} deleteTag={deleteTag} />);
 
         component.find('.delete').simulate('click');
         component.update();
@@ -51,20 +55,69 @@ describe('Tag Picker Tests', () => {
 
     it('should allow tags to be edited', () => {
         const updateTag = jest.fn(v => Promise.resolve(v));
-        const component = mount(<TagModal store={mockStore} open={true} tags={mockTags} updateTag={updateTag}/>);
+        const component = mount(<TagModal store={mockStore} open={true} tags={mockTags} updateTag={updateTag} />);
 
-        component.find('.color-box').at(1).simulate('click');
+        component
+            .find('.color-box')
+            .at(1)
+            .simulate('click');
         component.update();
 
-        component.find('input').at(1).simulate('change', {
-          target: {
-            value: '#fff'
-          }
-        });
+        component
+            .find('input')
+            .at(1)
+            .simulate('change', {
+                target: {
+                    value: '#fff'
+                }
+            });
 
-        return component.find(ColorPicker).at(1).instance().props.onClickAway()
-          .then(() => {
-              expect(updateTag).toHaveBeenCalledWith(mockTags[0].id, {color: '#ffffff'});
-          });
+        return component
+            .find(ColorPicker)
+            .at(1)
+            .instance()
+            .props.onClickAway()
+            .then(() => {
+                expect(updateTag).toHaveBeenCalledWith(mockTags[0].id, {color: '#ffffff'});
+            });
+    });
+
+    it('should set an error message on edit failures', () => {
+        const updateTag = jest.fn(() => Promise.reject({error: {message: 'Mock error'}}));
+        const createTag = jest.fn(() => Promise.reject({error: {message: 'Mock create error'}}));
+        const component = mount(
+            <TagModal store={mockStore} open={true} tags={mockTags} createTag={createTag} updateTag={updateTag} />
+        );
+
+        component
+            .find('.color-box')
+            .at(1)
+            .simulate('click');
+        component.update();
+
+        component
+            .find('input')
+            .at(1)
+            .simulate('change', {
+                target: {
+                    value: '#fff'
+                }
+            });
+
+        return component
+            .find(ColorPicker)
+            .at(1)
+            .instance()
+            .props.onClickAway()
+            .then(() => expect(component.state('error')).toBe('Mock error'))
+            .then(() =>
+                component.instance().handleCreate({
+                    preventDefault: () => {},
+                    target: [{value: 'value'}]
+                })
+            )
+            .then(() => {
+                expect(component.state('error')).toBe('Mock create error');
+            });
     });
 });
