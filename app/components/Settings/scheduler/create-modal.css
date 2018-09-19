@@ -85,9 +85,3 @@
     overflow-y: auto;
     max-height: 300px;
 }
-
-.tag-manager-text {
-    cursor: pointer;
-    font-size: 12px;
-    color: #9D9D9D;
-}

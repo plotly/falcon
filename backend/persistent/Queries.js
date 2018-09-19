@@ -1,11 +1,12 @@
 import fs from 'fs';
-import {findIndex, propEq, reject} from 'ramda';
+import {findIndex, propEq} from 'ramda';
 import YAML from 'yamljs';
 
 import {getSetting} from '../settings.js';
 import {
     createStoragePath
 } from '../utils/homeFiles';
+import {stripUndefinedKeys} from '../utils/persistenceUtils.js';
 
 
 export function getQuery(fid) {
@@ -55,13 +56,4 @@ export function deleteQuery(fid) {
         queries.splice(index, 1);
         fs.writeFileSync(getSetting('QUERIES_PATH'), YAML.stringify(queries, 4));
     }
-}
-
-// prevent 'yamljs' from coerecing undefined keys into null
-function stripUndefinedKeys (obj) {
-    return reject(isUndefined, obj);
-}
-
-function isUndefined (val) {
-    return typeof val === 'undefined';
 }

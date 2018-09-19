@@ -94,3 +94,9 @@
 .meta-preview .Select-create-option-placeholder, .meta-preview .Select-create-option-placeholder > span {
     color: #506784 !important;
 }
+
+.tag-manager-text {
+    cursor: pointer;
+    font-size: 12px;
+    color: #9D9D9D;
+}

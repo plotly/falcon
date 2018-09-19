@@ -16,6 +16,7 @@ import SQL from './sql.jsx';
 import Tag from './tag.jsx';
 import Status from './status.jsx';
 import TagPicker from './tag-picker.jsx';
+import TagModal from './tags-modal.jsx';
 import {datasetUrl} from '../../../utils/utils.js';
 import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING, FAILED} from '../../../constants/constants.js';
 import {getInitialCronMode} from '../cron-picker/cron-helpers.js';
@@ -73,7 +74,8 @@ export class PreviewModal extends Component {
             name: props.query && props.query.name,
             confirmedDelete: false,
             loading: false,
-            tags: (props.query && props.query.tags) || []
+            tags: (props.query && props.query.tags) || [],
+            tagsModalOpen: false
         };
         this.updateCode = this.updateCode.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -83,6 +85,8 @@ export class PreviewModal extends Component {
         this.handleIntervalChange = this.handleIntervalChange.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleTagsChange = this.handleTagsChange.bind(this);
+        this.openTagsModal = this.openTagsModal.bind(this);
+        this.closeTagsModal = this.closeTagsModal.bind(this);
     }
 
     updateCode(editor, meta, code) {
@@ -148,8 +152,21 @@ export class PreviewModal extends Component {
         this.props.onClickAway();
     }
 
+    closeTagsModal() {
+        this.setState({tagsModalOpen: false});
+    }
+
+    openTagsModal() {
+        this.setState({tagsModalOpen: true});
+    }
+
     renderButtonRow() {
-        const {loading, editing} = this.state;
+        const {loading, editing, tagsModalOpen} = this.state;
+
+        if (tagsModalOpen) {
+            return <TagModal open={true} tags={this.props.tags} onClickAway={this.closeTagsModal} />;
+        }
+
         const loggedIn = this.props.currentRequestor;
         const canEdit = this.props.currentRequestor && this.props.currentRequestor === this.props.query.requestor;
         const success = this.state.successMessage;
@@ -369,8 +386,10 @@ export class PreviewModal extends Component {
                         {editing && (
                             <Row style={rowStyle}>
                                 <div style={keyStyle}>
-                                  <div>Tags</div>
-                                  <u className="tag-manager-text">manage tags</u>
+                                    <div>Tags</div>
+                                    <div onClick={this.openTagsModal}>
+                                        <u className="tag-manager-text">manage tags</u>
+                                    </div>
                                 </div>
                                 <em style={valueStyle}>
                                     <TagPicker
