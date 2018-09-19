@@ -33,7 +33,7 @@ export default class SQLOptions extends Component {
             return (
                 <div>
                     <div>{'Hm.. there was an error loading up your tables'}</div>
-                    <div style={{color: 'red'}}>{JSON.stringify(tablesRequest)}</div>
+                    <div style={{color: '#EF553B'}}>{JSON.stringify(tablesRequest)}</div>
                 </div>
             );
         } else if (tablesRequest.status === 200) {

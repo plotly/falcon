@@ -166,7 +166,7 @@ class CreateModal extends Component {
                     <Row>
                         <Column className="innerColumn">
                             <h5 className="header">Create Scheduled Query</h5>
-                            <button className="button" onClick={this.props.onClickAway}>
+                            <button className="button close-btn" onClick={this.props.onClickAway}>
                                 &times;
                             </button>
                         </Column>
@@ -238,9 +238,7 @@ class CreateModal extends Component {
                         </Row>
                         {this.state.error && (
                             <Row style={rowStyleOverride}>
-                                <RequestError onClick={this.props.openQueryPage}>
-                                    <div>{this.state.error}</div>
-                                </RequestError>
+                                <RequestError onClick={this.props.openQueryPage}>{this.state.error}</RequestError>
                             </Row>
                         )}
                         {this.state.saving && (

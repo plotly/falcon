@@ -30,17 +30,17 @@ describe('Create Modal Test', () => {
     });
 
     beforeEach(() => {
-      TagPicker.defaultProps = {
-          store: {
-              getState: () => {},
-              subscribe: () => {},
-              dispatch: () => {}
-          }
-      };
+        TagPicker.defaultProps = {
+            store: {
+                getState: () => {},
+                subscribe: () => {},
+                dispatch: () => {}
+            }
+        };
     });
 
     afterEach(() => {
-      TagPicker.defaultProps = null;
+        TagPicker.defaultProps = null;
     });
 
     it("should not render the editor if it's closed", () => {

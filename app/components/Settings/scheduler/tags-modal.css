@@ -1,6 +1,6 @@
 .tag-modal .count {
-  padding: 16px 14px 16px 0px;
-  margin-right: 14px;
+  padding: 4px 16px 4px 0px;
+  margin-right: 16px;
   border-right: 1px solid rgba(0, 0, 0, 0.12);
 }
 
@@ -9,10 +9,28 @@
   color: #797979;
 }
 
+.createTag {
+  margin: 24px 0 16px;
+  padding: 0 24px;
+}
+
+.createTag .color-box {
+  margin: 0;
+}
+
+.create-modal .createTag input {
+  margin: 0 24px;
+}
+
 .tagsContainer {
-  border-top: 1px solid black;
-  border-left: 1px solid black;
-  border-right: 1px solid black;
+  border: 1px solid #c8d4e3;
+
+  max-height: 328px;
+  overflow-y: auto;
+}
+
+.scrollContainer {
+  justify-content: flex-start !important;
 }
 
 .description.row-body {
@@ -20,9 +38,14 @@
 }
 
 .tagRow {
+  flex-shrink: 0;
   background: white;
-  padding: 26px 16px;
-  border-bottom: 1px solid black;
+  padding: 16px 24px;
+  border-bottom: 1px solid #c8d4e3;
+}
+
+.tagRow:last-of-type {
+  border-bottom: none;
 }
 
 .color-box {
@@ -37,15 +60,13 @@
 .delete {
   cursor: pointer;
   color: #FF5E5E;
-  font-weight: bold;
   margin-left: auto;
+  font-size: 24px;
+  line-height: 1;
 }
 
 .tagRow .delete-button {
   background: #FF5E5E;
   border: none;
-  border-radius: 0;
-  margin: 0 0 0 auto;
-  color: white;
-  padding: 8px 10px;
+  margin-right: 0;
 }

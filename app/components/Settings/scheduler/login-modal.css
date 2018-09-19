@@ -15,6 +15,11 @@
     padding: 2px 4px;
 }
 
+.login-modal .close-btn {
+  line-height: 14px;
+  min-height: 16px;
+}
+
 .login-modal p {
     margin: 56px 0 8px;
     padding: 16px;

@@ -10,11 +10,9 @@ import {createStoragePath} from './utils/homeFiles';
 const DEFAULT_SETTINGS = {
     HEADLESS: false,
 
-    STORAGE_PATH: path.join(
-        os.homedir(),
-        '.plotly',
-        'connector'
-    ),
+    STORAGE_PATH: process.env.NODE_ENV !== 'test'
+        ? path.join(os.homedir(), '.plotly', 'connector')
+        : path.join(os.homedir(), '.plotly', 'testing', 'connector'),
     AUTH_ENABLED: true,
     SSL_ENABLED: true,
     WEB_BASE_PATHNAME: '/',

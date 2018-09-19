@@ -19,8 +19,7 @@ function FormattedMessage(props) {
     if (content.toLowerCase().includes('syntax')) {
         return (
             <React.Fragment>
-                {capitalize(content.replace('QueryExecutionError: ', ''))}.
-                <br />
+                {capitalize(content.replace('QueryExecutionError: ', ''))}.<br />
                 <br />
                 Syntax errors are usually easy to fix. We recommend making sure the query is correct in the{' '}
                 <a onClick={props.onClick}>preview editor</a> before scheduling it.

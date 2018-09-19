@@ -10,7 +10,7 @@ import './tags-modal.css';
 
 function noop() {}
 const rowStyleOverride = {justifyContent: 'flex-start', alignItems: 'center'};
-const containerOverride = {width: '60%', maxHeight: '100vh', maxWidth: 522, paddingBottom: '16px'};
+const containerOverride = {maxHeight: '100vh', width: 560, paddingBottom: '32px'};
 
 class TagRow extends React.Component {
     static propTypes = {
@@ -46,7 +46,7 @@ class TagRow extends React.Component {
                     </button>
                 ) : (
                     <div className="delete" onClick={this.handleDelete}>
-                        X
+                        &times;
                     </div>
                 )}
             </Row>
@@ -93,11 +93,18 @@ class TagsModal extends Component {
                     <Column className="detailsColumn">
                         <Row style={{...rowStyleOverride, padding: '24px 0px'}}>
                             <div className="count">{this.props.tags.length} tags</div>
-                            <div className="note">Note: deleting a tag will remove it from all applications</div>
+                            <div className="note">Note: deleting a tag will remove it from all scheduled queries</div>
                         </Row>
-                        <Column className="tagsContainer">
-                            {this.props.tags.map(tag => <ConnectedTagRow key={tag.name} {...tag} />)}
-                        </Column>
+                        <Row className="createTag" style={rowStyleOverride}>
+                          <div className="color-box" style={{background: '#567'}} />
+                          <input placeholder="tag name" />
+                          <div>create</div>
+                        </Row>
+                        <Row className="tagsContainer">
+                            <Column className="scrollContainer">
+                              {this.props.tags.map(tag => <ConnectedTagRow key={tag.name} {...tag} />)}
+                            </Column>
+                        </Row>
                     </Column>
                 </Column>
             </Modal>

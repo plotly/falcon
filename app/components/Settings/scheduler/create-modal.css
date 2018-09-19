@@ -19,6 +19,11 @@
     padding: 2px 4px;
 }
 
+.create-modal .close-btn {
+  line-height: 14px;
+  min-height: 16px;
+}
+
 .create-modal .detailsColumn {
     padding: 0 32px;
 }

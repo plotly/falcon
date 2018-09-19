@@ -9,8 +9,8 @@ const ClickAway = enhanceWithClickOutside(
           onClickAway: PropTypes.func,
           children: PropTypes.node
         }
-        handleClickOutside() {
-            this.props.onClickAway();
+        handleClickOutside(e) {
+            this.props.onClickAway(e);
         }
         render() {
             return this.props.children;
