@@ -207,7 +207,7 @@ export class PreviewModal extends Component {
                     style={{
                         margin: 0,
                         border: 'none',
-                        background: 'red'
+                        background: '#EF553B'
                     }}
                     onClick={this.onDelete}
                 >
@@ -250,6 +250,8 @@ export class PreviewModal extends Component {
                             top: '16px',
                             right: '16px',
                             padding: '2px 4px',
+                            lineHeight: '14px',
+                            minHeight: '16px',
                             zIndex: 99
                         }}
                     >
@@ -274,7 +276,7 @@ export class PreviewModal extends Component {
                         <Column style={{width: 'auto', marginRight: '32px', justifyContent: 'center'}}>
                             <Status size={40} status={run && run.status} />
                         </Column>
-                        <Column>
+                        <Column style={{width: '84%'}}>
                             <Row className="sql-preview" style={flexStart}>
                                 <h5 className="sql-preview ellipsis" style={{margin: '0', letterSpacing: '1px'}}>
                                     {this.state.name ? (
@@ -366,7 +368,10 @@ export class PreviewModal extends Component {
                         </Row>
                         {editing && (
                             <Row style={rowStyle}>
-                                <div style={keyStyle}>Tags</div>
+                                <div style={keyStyle}>
+                                  <div>Tags</div>
+                                  <u className="tag-manager-text">manage tags</u>
+                                </div>
                                 <em style={valueStyle}>
                                     <TagPicker
                                         disabled={Boolean(this.state.successMessage)}
@@ -385,7 +390,7 @@ export class PreviewModal extends Component {
                                         {run.completedAt && (
                                             <span
                                                 style={{
-                                                    color: (run && run.status) !== FAILED ? '#30aa65' : '#ef595b'
+                                                    color: (run && run.status) !== FAILED ? '#00cc96' : '#ef595b'
                                                 }}
                                             >
                                                 {ms(now - run.completedAt, {
@@ -395,6 +400,7 @@ export class PreviewModal extends Component {
                                             </span>
                                         )}
                                         <br />
+                                        {run.errorMessage && <span>{run.errorMessage}</span>}
                                         {run.duration &&
                                             `${pluralize('row', run.rowCount || 0, true)} in ${ms(run.duration * 1000, {
                                                 long: true

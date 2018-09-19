@@ -36,7 +36,7 @@ export default class ESIndicesOptions extends Component {
             return (
                 <div>
                     <div>{'There was an error loading up your docs'}</div>
-                    <div style={{color: 'red'}}>{JSON.stringify(EMR)}</div>
+                    <div style={{color: '#EF553B'}}>{JSON.stringify(EMR)}</div>
                 </div>
             );
         } else if (EMR.status === 200) {

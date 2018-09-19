@@ -30,9 +30,9 @@ const decapitalize = startString => {
     if (startString.length === 0) {
         return '';
     }
-
     return startString.slice(0, 1).toLowerCase() + startString.slice(1);
 };
+
 const sortLastExecution = (key, reverse) => (a, b) => {
     const s = ((a.lastExecution && a.lastExecution[key]) || 0) - ((b.lastExecution && b.lastExecution[key]) || 0);
     return reverse ? -1 * s : s;
@@ -63,6 +63,11 @@ const SORT_OPTIONS = [
         label: 'Least rows'
     }
 ];
+
+// react select requires value prop for all options
+SORT_OPTIONS.forEach(option => {
+    option.value = option.id;
+});
 
 const flexStart = {justifyContent: 'flex-start'};
 const tagStyle = {
@@ -161,7 +166,7 @@ class IntervalFormatter extends React.Component {
                         <div
                             style={{
                                 fontSize: 16,
-                                color: run.status !== FAILED ? '#30aa65' : '#ef595b'
+                                color: run.status !== FAILED ? '#00cc96' : '#ef595b'
                             }}
                         >
                             {completedAt < 60 * 1000
@@ -171,6 +176,17 @@ class IntervalFormatter extends React.Component {
                                   })} ago`}
                         </div>
                     )}
+                    {run &&
+                        run.errorMessage && (
+                            <em
+                                style={{
+                                    fontSize: 12,
+                                    opacity: 0.5
+                                }}
+                            >
+                                <div className="ellipsis">{run.errorMessage}</div>
+                            </em>
+                        )}
                     {run &&
                         run.duration && (
                             <em
@@ -407,11 +423,15 @@ class Scheduler extends Component {
     }
 
     filterTag(tags) {
-        const tag = tags[0];
-        this.setState(({search}) => ({
+        const existingSearchString = this.state.search;
+        const search = tags.length
+            ? addSlug(existingSearchString, `tag:"${tags[tags.length - 1].name}"`)
+            : existingSearchString.replace(/tag:(?:"(.*?)"|(\S+))/g, '');
+
+        this.setState({
             tags,
-            search: addSlug(search, `tag:"${tag.name}"`)
-        }));
+            search
+        });
     }
 
     resetSearch() {
@@ -517,11 +537,13 @@ class Scheduler extends Component {
                                 }}
                                 onClick={this.filterSuccess}
                             >
-                                Success ({
+                                Success (
+                                {
                                     statuslessRows.filter(
                                         row => (row.lastExecution && row.lastExecution.status) !== FAILED
                                     ).length
-                                })
+                                }
+                                )
                             </Column>
                             <Column
                                 className="status-filter"
@@ -533,24 +555,30 @@ class Scheduler extends Component {
                                 }}
                                 onClick={this.filterFailed}
                             >
-                                Error ({
+                                Error (
+                                {
                                     statuslessRows.filter(
                                         row => (row.lastExecution && row.lastExecution.status) === FAILED
                                     ).length
-                                })
+                                }
+                                )
                             </Column>
                         </Row>
                     </Column>
-                    <Column style={{width: 770}}>
+                    <Column style={{width: '100%', maxWidth: 720}}>
                         <Row style={{width: 'auto', justifyContent: 'flex-end'}}>
-                            <Column style={{minWidth: 315, marginRight: 16, cursor: 'pointer'}}>
+                            <Column style={{maxWidth: 168, marginRight: 16}}>
                                 {this.state.search && (
                                     <u
                                         className="clear-state"
                                         onClick={this.resetSearch}
-                                        style={{borderRight: '1px solid rgba(0, 0, 0, 0.12)'}}
+                                        style={{
+                                            fontWeight: 'bold',
+                                            borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+                                            cursor: 'pointer'
+                                        }}
                                     >
-                                        Clear current search query, filters, and sort
+                                        Clear current search
                                     </u>
                                 )}
                             </Column>
@@ -565,12 +593,10 @@ class Scheduler extends Component {
                                     searchable={false}
                                     onChange={this.filterTag}
                                     value={this.state.tags}
-                                    options={this.props.tags.filter(
-                                        t => this.state.search.indexOf(`tag:"${t.name}"`) === -1
-                                    )}
+                                    options={this.props.tags}
                                 />
                             </Column>
-                            <Column>
+                            <Column style={{maxWidth: 180}}>
                                 <Select
                                     placeholder="Sort by..."
                                     searchable={false}

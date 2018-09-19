@@ -48,7 +48,7 @@ const tagToOption = tag => ({label: tag.name, value: tag.id, color: tag.color});
 
 const promptTextCreator = label => `Create new tag "${label}"`;
 const isValidNewOption = tag => tag.label && tag.label.length && tag.label.trim().length;
-const inputProps = {maxlength: 30};
+const inputProps = {maxLength: 30};
 
 export class TagPicker extends React.Component {
     constructor(props) {

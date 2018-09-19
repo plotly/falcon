@@ -13,7 +13,7 @@ import TagPicker from '../../../../../app/components/Settings/scheduler/tag-pick
 
 const mockTags = [
   { id: 'tag:0', name: 'Tag 0', color: 'blue' },
-  { id: 'tag:1', name: 'Tag 1', color: 'red' }
+  { id: 'tag:1', name: 'Tag 1', color: '#EF553B' }
 ];
 
 const mockQueries = [
