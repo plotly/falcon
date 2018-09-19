@@ -223,6 +223,17 @@ function tags(state = [], action) {
       const id = action.payload;
       return state.filter(q => q.id !== id);
     }
+    if (action.type === 'UPDATE_TAG') {
+      return state.map(q => {
+        if (q.id === action.payload.id) {
+          return {
+            ...q,
+            ...action.payload
+          };
+        }
+        return q;
+      });
+    }
     return state;
 }
 

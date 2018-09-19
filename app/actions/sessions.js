@@ -269,6 +269,26 @@ export function createTag(payload = {}) {
   };
 }
 
+export function updateTag(id, body = {}) {
+  return (dispatch) => {
+    return dispatch(apiThunk(
+      `tags/${id}`,
+      'PUT',
+      'createTagRequest',
+      null,
+      body
+    )).then((res) => {
+      if (!res.error) {
+        dispatch({
+          type: 'UPDATE_TAG',
+          payload: res
+        });
+      }
+      return res;
+    });
+  };
+}
+
 export function deleteTag(tid) {
   return (dispatch) => {
     return dispatch(apiThunk(

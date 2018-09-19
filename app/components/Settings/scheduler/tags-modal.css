@@ -14,11 +14,7 @@
   padding: 0 24px;
 }
 
-.createTag .color-box {
-  margin: 0;
-}
-
-.create-modal .createTag input {
+.create-modal .createTag .tagName {
   margin: 0 24px;
 }
 
@@ -49,6 +45,8 @@
 }
 
 .color-box {
+  cursor: pointer;
+  margin: 0;
   width: 30px;
   height: 30px;
   margin-right: 24px;
@@ -69,4 +67,12 @@
   background: #FF5E5E;
   border: none;
   margin-right: 0;
+}
+
+.chrome-picker input {
+  /* reset styles */
+  margin: initial !important;
+  padding: initial;
+  width: initial;
+  float: none;
 }

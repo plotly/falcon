@@ -1,11 +1,13 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+
 import * as Actions from '../../../actions/sessions';
 
 import {Row, Column} from '../../layout.jsx';
 import Modal from '../../modal.jsx';
 import RequestError from './request-error.jsx';
+import ColorPicker from './color-picker.jsx';
 
 import './tags-modal.css';
 
@@ -16,15 +18,24 @@ const containerOverride = {maxHeight: '100vh', width: 560, paddingBottom: '32px'
 class TagRow extends React.Component {
     static propTypes = {
         id: PropTypes.string.isRequired,
+        color: PropTypes.string.isRequired,
         deleteTag: PropTypes.func,
+        updateTag: PropTypes.func,
         open: PropTypes.bool
     };
     constructor(props) {
         super(props);
         this.state = {
-            confirm: false
+            confirm: false,
+            color: this.props.color
         };
         this.handleDelete = this.handleDelete.bind(this);
+        this.handleEdit = this.handleEdit.bind(this);
+        this.handleColorChange = this.handleColorChange.bind(this);
+    }
+
+    handleColorChange(color) {
+        this.setState({color: color.hex});
     }
 
     handleDelete() {
@@ -35,11 +46,17 @@ class TagRow extends React.Component {
         }
     }
 
+    handleEdit() {
+        return this.props.updateTag(this.props.id, {
+            color: this.state.color
+        });
+    }
+
     render() {
         const tag = this.props;
         return (
             <Row className="tagRow" style={rowStyleOverride}>
-                <div className="color-box" style={{background: tag.color}} />
+                <ColorPicker color={this.state.color} onChange={this.handleColorChange} onClickAway={this.handleEdit} />
                 <span>{tag.name}</span>
                 {this.state.confirm ? (
                     <button className="delete-button" onClick={this.handleDelete}>
@@ -56,7 +73,7 @@ class TagRow extends React.Component {
 }
 
 // implements a modal window to schedule a new query
-class TagsModal extends Component {
+export class TagsModal extends Component {
     static propTypes = {
         onClickAway: PropTypes.func.isRequired,
         open: PropTypes.bool,
@@ -67,13 +84,15 @@ class TagsModal extends Component {
             })
         ),
         deleteTag: PropTypes.func,
-        createTag: PropTypes.func
+        createTag: PropTypes.func,
+        updateTag: PropTypes.func
     };
 
     static defaultProps = {
         onClickAway: noop,
         deleteTag: noop,
         createTag: noop,
+        updateTag: noop,
         tags: []
     };
 
@@ -81,10 +100,15 @@ class TagsModal extends Component {
         super(props);
 
         this.state = {
-            error: null
+            color: '#567567',
+            error: null,
+            colorPickerOpen: false
         };
 
         this.handleCreate = this.handleCreate.bind(this);
+        this.handleEdit = this.handleEdit.bind(this);
+        this.handleColorChange = this.handleColorChange.bind(this);
+
         this.form = React.createRef();
     }
 
@@ -96,10 +120,18 @@ class TagsModal extends Component {
         return this.props
             .createTag({
                 name: tagName,
-                color: '#' + Math.floor(Math.random() * 13421772).toString(16)
+                color: this.state.color
             })
             .then(() => this.form.current.reset())
             .catch(({error}) => this.setState({error: error.message || error}));
+    }
+
+    handleEdit(...args) {
+        return this.props.updateTag(...args).catch(({error}) => this.setState({error: error.message || error}));
+    }
+
+    handleColorChange(color) {
+        this.setState({color: color.hex});
     }
 
     render() {
@@ -126,15 +158,20 @@ class TagsModal extends Component {
                         )}
                         <form ref={this.form} onSubmit={this.handleCreate}>
                             <Row className="createTag" style={rowStyleOverride}>
-                                <div className="color-box" style={{background: '#567'}} />
-                                <input maxLength={30} placeholder="tag name" />
+                                <ColorPicker color={this.state.color} onChange={this.handleColorChange} />
+                                <input className="tag-name" maxLength={30} placeholder="tag name" />
                                 <button type="submit">create</button>
                             </Row>
                         </form>
                         <Row className="tagsContainer">
                             <Column className="scrollContainer">
                                 {this.props.tags.map(tag => (
-                                    <TagRow key={tag.name} deleteTag={this.props.deleteTag} {...tag} />
+                                    <TagRow
+                                        key={tag.name}
+                                        updateTag={this.handleEdit}
+                                        deleteTag={this.props.deleteTag}
+                                        {...tag}
+                                    />
                                 ))}
                             </Column>
                         </Row>
@@ -149,6 +186,7 @@ export default connect(
     null,
     dispatch => ({
         createTag: payload => dispatch(Actions.createTag(payload)),
-        deleteTag: payload => dispatch(Actions.deleteTag(payload))
+        deleteTag: payload => dispatch(Actions.deleteTag(payload)),
+        updateTag: (id, body) => dispatch(Actions.updateTag(id, body))
     })
 )(TagsModal);

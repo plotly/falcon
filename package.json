@@ -249,6 +249,7 @@
     "papaparse": "^4.3.7",
     "pg": "^4.5.5",
     "pg-hstore": "^2.3.2",
+    "react-color": "^2.14.1",
     "restify": "^4.3.2",
     "sequelize": "3.30.4",
     "shortid": "^2.2.13",
