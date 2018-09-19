@@ -201,6 +201,11 @@ class CreateModal extends Component {
                                         maxLength="150"
                                         placeholder="Enter query name here..."
                                         value={this.state.name}
+                                        style={{
+                                            margin: '0 0 16px',
+                                            width: '70%',
+                                            float: 'none'
+                                        }}
                                         onChange={this.handleNameChange}
                                     />
                                 )}

@@ -49,12 +49,6 @@
     justify-content: flex-start;
 }
 
-.create-modal input {
-    margin: 0 0 16px;
-    width: 70%;
-    float: none;
-}
-
 .create-modal .Select-input > input {
     margin: 0 auto;
     width: 100%;
