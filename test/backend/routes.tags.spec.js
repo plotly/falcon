@@ -11,6 +11,7 @@ import {
     createTestServers,
     DELETE,
     GET,
+    PUT,
     getResponseJson,
     POST,
     sqlConnections,
@@ -71,6 +72,22 @@ describe('Routes:', () => {
         .then(assertResponseStatus(400));
     });
 
+    it('updates a tag', () => {
+      let createdTag;
+      const UPDATED_COLOR = '#cccccc';
+
+      return POST('tags', TAG)
+        .then(assertResponseStatus(201))
+        .then(getResponseJson).then(json => {
+          createdTag = json;
+        })
+        .then(() => PUT(`tags/${createdTag.id}`, {color: UPDATED_COLOR}))
+        .then(assertResponseStatus(200))
+        .then(getResponseJson).then(json => {
+          assert.deepEqual(json, { ...createdTag, color: UPDATED_COLOR });
+        });
+    });
+
     it('fails to create a tag with invalid name or color parameters', () => {
       const EMPTY_TAG = {};
       const TAG_WITH_INVALID_NAME = { name: '_'.repeat(31), color: '#ffffff' };
@@ -99,7 +116,7 @@ describe('Routes:', () => {
     });
 
     // TODO: run this test once tags are persisted on queries
-    xit('deletes a tag and removes it from existing queries', () => {
+    it('deletes a tag and removes it from existing queries', () => {
       let createdTagId, createdQueryFid;
 
       return POST('tags', TAG)

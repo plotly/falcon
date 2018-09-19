@@ -19,7 +19,8 @@ import init from './init.js';
 import Logger from './logger.js';
 import {checkWritePermissions, newDatacache} from './persistent/plotly-api.js';
 import {getQueries, getQuery, deleteQuery, saveQuery, updateQuery} from './persistent/Queries.js';
-import {getTags, getTag, saveTag, deleteTag} from './persistent/Tags.js';
+import {HEX_CODE_REGEX, MAX_TAG_LENGTH, getTags, getTag, saveTag, updateTag, deleteTag} from './persistent/Tags.js';
+import {stripUndefinedKeys} from './utils/persistenceUtils.js';
 import {
     deleteConnectionById,
     editConnectionById,
@@ -651,9 +652,6 @@ export default class Servers {
 
         // register a tag
         server.post('/tags', function postTagsHandler(req, res, next) {
-            const HEX_CODE_REGEX = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-            const MAX_TAG_LENGTH = 30;
-
             const {
                 name,
                 color
@@ -679,6 +677,33 @@ export default class Servers {
 
             const createdTag = saveTag({name, color});
             res.json(201, createdTag);
+            return next();
+        });
+
+        // update an existing tag
+        server.put('/tags/:id', function putTagsHandler(req, res, next) {
+            const {
+                id,
+                name,
+                color
+            } = req.params;
+
+            const existingTag = getTag(id);
+            if (!existingTag) {
+                res.json(400, {error: {message: `Tag ${id} not found.`}});
+                return next();
+            }
+
+            if (name && name.length > MAX_TAG_LENGTH) {
+                res.json(400, {error: {message: `Tag name must be less than ${MAX_TAG_LENGTH} characters.`}});
+                return next();
+            } else if (color && !HEX_CODE_REGEX.test(color)) {
+                res.json(400, {error: {message: 'Tag color must be a valid hex code.'}});
+                return next();
+            }
+
+            const updatedTag = updateTag(id, stripUndefinedKeys({name, color}));
+            res.json(200, updatedTag);
             return next();
         });
 

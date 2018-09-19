@@ -1,6 +1,6 @@
 import {assert} from 'chai';
 
-import {getTags, getTag, saveTag, deleteTag} from '../../backend/persistent/Tags';
+import {getTags, getTag, saveTag, deleteTag, updateTag} from '../../backend/persistent/Tags';
 import {
     clearSettings
 } from './utils.js';
@@ -27,6 +27,17 @@ describe('Tags', function() {
 
     const retrievedTag2 = getTag(savedTag2.id);
     assert.deepEqual(savedTag2, retrievedTag2);
+  });
+
+  it('updates tags', function () {
+    const savedTag = saveTag(TAG);
+    assert.deepEqual({ ...TAG, id: savedTag.id }, savedTag);
+
+    const UPDATED_COLOR = 'updatedColor';
+    updateTag(savedTag.id, { color: UPDATED_COLOR });
+
+    const updatedTag = getTag(savedTag.id);
+    assert.deepEqual(updatedTag, { ...TAG, id: savedTag.id, color: UPDATED_COLOR });
   });
 
   it('gets all tags', function () {
