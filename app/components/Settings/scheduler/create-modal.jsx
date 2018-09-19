@@ -158,7 +158,7 @@ class CreateModal extends Component {
 
     render() {
         if (this.state.tagsModalOpen) {
-            return <TagModal open={true} tags={this.props.tags} onClickAway={this.closeTagsModal} />;
+            return <TagModal onClickAway={this.closeTagsModal} />;
         }
         return (
             <Modal open={this.props.open} onClickAway={this.props.onClickAway} className="scheduler create-modal">

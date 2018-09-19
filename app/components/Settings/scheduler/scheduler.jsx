@@ -12,6 +12,7 @@ import pluralize from 'pluralize';
 import CreateModal from './create-modal.jsx';
 import PreviewModal from './preview-modal.jsx';
 import PromptLoginModal from './login-modal.jsx';
+import TagModal from './tags-modal.jsx';
 import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
 import Tag from './tag.jsx';
@@ -265,7 +266,8 @@ class Scheduler extends Component {
             sort: null,
             tags: [],
             selectedQuery: null,
-            createModalOpen: Boolean(this.props.initialCode)
+            createModalOpen: Boolean(this.props.initialCode),
+            manageTags: false
         };
         this.columns = [
             {
@@ -511,7 +513,7 @@ class Scheduler extends Component {
                 </Row>
                 <Row
                     style={{
-                        marginBottom: 16,
+                        marginBottom: 22,
                         padding: '0 16px',
                         justifyContent: 'space-between'
                     }}
@@ -584,6 +586,7 @@ class Scheduler extends Component {
                             </Column>
                             <Column
                                 style={{
+                                    position: 'relative',
                                     padding: '4px 0',
                                     marginRight: 8
                                 }}
@@ -595,6 +598,12 @@ class Scheduler extends Component {
                                     value={this.state.tags}
                                     options={this.props.tags}
                                 />
+                                <div
+                                    style={{position: 'absolute', bottom: '-16px'}}
+                                    onClick={() => this.setState({manageTags: true})}
+                                >
+                                    <u className="tag-manager-text">manage tags</u>
+                                </div>
                             </Column>
                             <Column style={{maxWidth: 180}}>
                                 <Select
@@ -627,6 +636,8 @@ class Scheduler extends Component {
                         headerRowHeight={32}
                     />
                 </Row>
+
+                {this.state.manageTags && <TagModal onClickAway={() => this.setState({manageTags: false})} />}
 
                 <CreateModal
                     initialCode={this.props.initialCode}
