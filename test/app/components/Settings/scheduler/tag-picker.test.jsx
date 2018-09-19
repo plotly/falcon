@@ -29,10 +29,16 @@ describe('Tag Picker Tests', () => {
             value: 'tag'
         };
 
-        const component = mount(<Tag value={value} onRemove={onRemove} />);
+        let component = mount(<Tag value={value} onRemove={onRemove} />);
 
         component.simulate('click');
         expect(onRemove).toHaveBeenCalledWith(value);
+        onRemove.mockReset();
+
+        component = mount(<Tag disabled={true} value={value} onRemove={onRemove} />);
+
+        component.simulate('click');
+        expect(onRemove).not.toHaveBeenCalled();
     });
 
     it('should handle adding a tag', () => {
@@ -51,6 +57,21 @@ describe('Tag Picker Tests', () => {
             });
     });
 
+    it('should call `onChange` with error if there is one', () => {
+        const error = new Error('Mock error');
+        const onChange = jest.fn();
+        const createTag = jest.fn(() => Promise.reject(error));
+        const component = mount(<TagPicker value={[]} options={mockTags} onChange={onChange} createTag={createTag} />);
+
+        const change = {label: 'Tag', id: 'tag'};
+        return component
+            .instance()
+            .handleCreate(change)
+            .then(() => {
+                expect(onChange).toHaveBeenCalledWith(error);
+            });
+    });
+
     it('should render a create new tag option', async () => {
         const onChange = jest.fn();
         const component = mount(<TagPicker value={[]} options={mockTags} onChange={onChange} />);
@@ -64,5 +85,13 @@ describe('Tag Picker Tests', () => {
 
         const createOption = component.find('.Select-create-option-placeholder');
         expect(createOption.text()).toBe(`Create new tag "${tagName}"`);
+    });
+
+    it('should filter selected values on change', () => {
+        const onChange = jest.fn();
+        const component = mount(<TagPicker value={[mockTags[0]]} options={mockTags} onChange={onChange} />);
+
+        component.instance().onChange(mockTags);
+        expect(onChange).toHaveBeenCalledWith(mockTags.slice(1));
     });
 });

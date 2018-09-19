@@ -25,17 +25,17 @@ describe('Preview Modal Tests', () => {
     });
 
     beforeEach(() => {
-      TagPicker.defaultProps = {
-          store: {
-              getState: () => {},
-              subscribe: () => {},
-              dispatch: () => {}
-          }
-      };
+        TagPicker.defaultProps = {
+            store: {
+                getState: () => {},
+                subscribe: () => {},
+                dispatch: () => {}
+            }
+        };
     });
 
     afterEach(() => {
-      TagPicker.defaultProps = null;
+        TagPicker.defaultProps = null;
     });
 
     it('should not render the preview if query is falsey', () => {

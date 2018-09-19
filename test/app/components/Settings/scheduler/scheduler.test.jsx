@@ -11,10 +11,7 @@ import Status from '../../../../../app/components/Settings/scheduler/status.jsx'
 import Tag from '../../../../../app/components/Settings/scheduler/tag.jsx';
 import TagPicker from '../../../../../app/components/Settings/scheduler/tag-picker.jsx';
 
-const mockTags = [
-  { id: 'tag:0', name: 'Tag 0', color: 'blue' },
-  { id: 'tag:1', name: 'Tag 1', color: '#EF553B' }
-];
+const mockTags = [{id: 'tag:0', name: 'Tag 0', color: 'blue'}, {id: 'tag:1', name: 'Tag 1', color: '#EF553B'}];
 
 const mockQueries = [
     {
@@ -23,10 +20,10 @@ const mockQueries = [
         fid: 'test:1',
         tags: [],
         lastExecution: {
-          rowCount: 0,
-          duration: 3000,
-          status: 'FAILED',
-          completedAt: 1536941547470
+            rowCount: 0,
+            duration: 3000,
+            status: 'FAILED',
+            completedAt: 1536941547470
         }
     },
     {
@@ -35,10 +32,10 @@ const mockQueries = [
         fid: 'test:2',
         tags: [],
         lastExecution: {
-          rowCount: 65,
-          duration: 5000,
-          status: 'OK',
-          completedAt: 1536941547470
+            rowCount: 65,
+            duration: 5000,
+            status: 'OK',
+            completedAt: 1536941547470
         }
     }
 ];
@@ -49,17 +46,17 @@ describe('Scheduler Test', () => {
     });
 
     beforeEach(() => {
-      TagPicker.defaultProps = {
-          store: {
-              getState: () => {},
-              subscribe: () => {},
-              dispatch: () => {}
-          }
-      };
+        TagPicker.defaultProps = {
+            store: {
+                getState: () => {},
+                subscribe: () => {},
+                dispatch: () => {}
+            }
+        };
     });
 
     afterEach(() => {
-      TagPicker.defaultProps = null;
+        TagPicker.defaultProps = null;
     });
 
     it('should have no rows if not passed any queries', () => {
@@ -73,49 +70,45 @@ describe('Scheduler Test', () => {
     });
 
     it('should display the correct row info', () => {
-      const component = mount(<Scheduler queries={mockQueries} />);
+        const component = mount(<Scheduler queries={mockQueries} />);
 
-      const values = component.find('.react-grid-Cell__value');
-      expect(values.map(v => v.text())).toEqual(
-        [
-          expect.stringContaining(mockQueries[0].query),
-          expect.stringContaining('0 rows in 50 minutes'),
-          expect.stringContaining(mockQueries[1].query),
-          expect.stringContaining('65 rows in 1 hour')
-        ]
-      );
+        const values = component.find('.react-grid-Cell__value');
+        expect(values.map(v => v.text())).toEqual([
+            expect.stringContaining(mockQueries[0].query),
+            expect.stringContaining('0 rows in 50 minutes'),
+            expect.stringContaining(mockQueries[1].query),
+            expect.stringContaining('65 rows in 1 hour')
+        ]);
 
-      expect(component.find(Status).map(n => n.props().status)).toEqual(mockQueries.map(q => q.lastExecution.status));
+        expect(component.find(Status).map(n => n.props().status)).toEqual(mockQueries.map(q => q.lastExecution.status));
     });
 
     it('should display tags correctly', () => {
-      const mockQuery = {
-          query: 'SELECT * FROM foods;',
-          refreshInterval: 5000,
-          fid: 'test:1',
-          tags: [mockTags[0].id]
-      };
+        const mockQuery = {
+            query: 'SELECT * FROM foods;',
+            refreshInterval: 5000,
+            fid: 'test:1',
+            tags: [mockTags[0].id]
+        };
 
-      const component = mount(<Scheduler queries={[mockQuery]} tags={mockTags} />);
+        const component = mount(<Scheduler queries={[mockQuery]} tags={mockTags} />);
 
-      expect(component.find(Tag).map(t => t.text())).toEqual([
-        'Tag 0'
-      ]);
+        expect(component.find(Tag).map(t => t.text())).toEqual(['Tag 0']);
     });
 
     it('should still render if lastExecution does not exist', () => {
-      const mockQuery = {
-          query: 'SELECT * FROM foods;',
-          refreshInterval: 5000,
-          fid: 'test:1',
-          tags: [],
-          lastExecution: null
-      };
+        const mockQuery = {
+            query: 'SELECT * FROM foods;',
+            refreshInterval: 5000,
+            fid: 'test:1',
+            tags: [],
+            lastExecution: null
+        };
 
-      const component = mount(<Scheduler queries={[mockQuery]} />);
+        const component = mount(<Scheduler queries={[mockQuery]} />);
 
-      const values = component.find('.react-grid-Cell__value');
-      expect(values.at(1).text()).toEqual(expect.stringContaining('—'));
+        const values = component.find('.react-grid-Cell__value');
+        expect(values.at(1).text()).toEqual(expect.stringContaining('—'));
     });
 
     it('should filter rows based on search', () => {
@@ -140,9 +133,7 @@ describe('Scheduler Test', () => {
     });
 
     it('should open and close modal with correct query', () => {
-        const component = mount(
-            <Scheduler requestor="fake_login" queries={mockQueries} />
-        );
+        const component = mount(<Scheduler requestor="fake_login" queries={mockQueries} />);
 
         // Preview modal is now only rendered if a `selectedQuery` has been set
         // This simplifies the rerender logic
@@ -193,11 +184,7 @@ describe('Scheduler Test', () => {
     it('should render a create button for dialect not in `SQL_DIALECTS_USING_EDITOR`', () => {
         const refreshQueries = jest.fn();
         const component = mount(
-            <Scheduler
-                queries={mockQueries}
-                dialect="new_dialect"
-                refreshQueries={refreshQueries}
-            />
+            <Scheduler queries={mockQueries} dialect="new_dialect" refreshQueries={refreshQueries} />
         );
         const createButton = component.find('button').at(0);
         expect(createButton.at(0).text()).toEqual(expect.stringContaining('Create'));
@@ -208,13 +195,7 @@ describe('Scheduler Test', () => {
 
     it('should render a refresh button to reload queries', () => {
         const refreshQueries = jest.fn();
-        const component = mount(
-            <Scheduler
-                queries={mockQueries}
-                dialect="athena"
-                refreshQueries={refreshQueries}
-            />
-        );
+        const component = mount(<Scheduler queries={mockQueries} dialect="athena" refreshQueries={refreshQueries} />);
         const refreshButton = component.find('button').at(0);
         refreshButton.simulate('click');
 
@@ -230,230 +211,195 @@ describe('Scheduler Test', () => {
     });
 
     describe('Creating Queries', () => {
-      it('should schedule a query only if logged in', () => {
-        const mockResult = {};
-        const createScheduledQuery = jest.fn(() => Promise.resolve(mockResult));
-        let component = mount(
-          <Scheduler
-            queries={mockQueries}
-            createScheduledQuery={createScheduledQuery}
-          />
-        );
-        component.instance().createQuery({});
-        // since there was no requestor
-        expect(createScheduledQuery).not.toHaveBeenCalled();
+        it('should schedule a query only if logged in', () => {
+            const mockResult = {};
+            const createScheduledQuery = jest.fn(() => Promise.resolve(mockResult));
+            let component = mount(<Scheduler queries={mockQueries} createScheduledQuery={createScheduledQuery} />);
+            component.instance().createQuery({});
+            // since there was no requestor
+            expect(createScheduledQuery).not.toHaveBeenCalled();
 
-        component = mount(
-          <Scheduler
-            queries={mockQueries}
-            createScheduledQuery={createScheduledQuery}
-            requestor="user"
-          />
-        );
+            component = mount(
+                <Scheduler queries={mockQueries} createScheduledQuery={createScheduledQuery} requestor="user" />
+            );
 
-        return component.instance().createQuery({})
-          .then(res => {
-            expect(createScheduledQuery).toHaveBeenCalled();
-            expect(component.state('createModalOpen')).toBe(false);
-            expect(res).toEqual(mockResult);
-          });
-      });
+            return component
+                .instance()
+                .createQuery({})
+                .then(res => {
+                    expect(createScheduledQuery).toHaveBeenCalled();
+                    expect(component.state('createModalOpen')).toBe(false);
+                    expect(res).toEqual(mockResult);
+                });
+        });
 
-      it('should throw errors from backend on failure', () => {
-        const mockResult = { error: 'Error' };
-        const createScheduledQuery = jest.fn(() => Promise.resolve(mockResult));
-        const component = mount(
-          <Scheduler
-            queries={mockQueries}
-            createScheduledQuery={createScheduledQuery}
-            requestor="user"
-          />
-        );
+        it('should throw errors from backend on failure', () => {
+            const mockResult = {error: 'Error'};
+            const createScheduledQuery = jest.fn(() => Promise.resolve(mockResult));
+            const component = mount(
+                <Scheduler queries={mockQueries} createScheduledQuery={createScheduledQuery} requestor="user" />
+            );
 
-        return component.instance().createQuery({})
-          .catch(error => expect(error).toBe('Error'));
-      });
+            return component
+                .instance()
+                .createQuery({})
+                .catch(error => expect(error).toBe('Error'));
+        });
     });
 
     describe('Updating Queries', () => {
-      it('should update a scheduled query only if logged in', () => {
-        const mockResult = {};
-        const updateScheduledQuery = jest.fn(() => Promise.resolve(mockResult));
-        let component = mount(
-          <Scheduler
-            queries={mockQueries}
-            updateScheduledQuery={updateScheduledQuery}
-          />
-        );
-        component.instance().createQuery({});
-        // since there was no requestor
-        expect(updateScheduledQuery).not.toHaveBeenCalled();
+        it('should update a scheduled query only if logged in', () => {
+            const mockResult = {};
+            const updateScheduledQuery = jest.fn(() => Promise.resolve(mockResult));
+            let component = mount(<Scheduler queries={mockQueries} updateScheduledQuery={updateScheduledQuery} />);
+            component.instance().createQuery({});
+            // since there was no requestor
+            expect(updateScheduledQuery).not.toHaveBeenCalled();
 
-        component = mount(
-          <Scheduler
-            queries={mockQueries}
-            updateScheduledQuery={updateScheduledQuery}
-            requestor="user"
-          />
-        );
+            component = mount(
+                <Scheduler queries={mockQueries} updateScheduledQuery={updateScheduledQuery} requestor="user" />
+            );
 
-        return component.instance().handleUpdate({})
-          .then(res => {
-            expect(updateScheduledQuery).toHaveBeenCalled();
-            expect(component.state('createModalOpen')).toBe(false);
-            expect(res).toEqual(mockResult);
-          });
-      });
+            return component
+                .instance()
+                .handleUpdate({})
+                .then(res => {
+                    expect(updateScheduledQuery).toHaveBeenCalled();
+                    expect(component.state('createModalOpen')).toBe(false);
+                    expect(res).toEqual(mockResult);
+                });
+        });
 
-      it('should throw errors from backend on failure', () => {
-        const mockResult = { error: 'Error' };
-        const updateScheduledQuery = jest.fn(() => Promise.resolve(mockResult));
-        const component = mount(
-          <Scheduler
-            queries={mockQueries}
-            updateScheduledQuery={updateScheduledQuery}
-            requestor="user"
-          />
-        );
+        it('should throw errors from backend on failure', () => {
+            const mockResult = {error: 'Error'};
+            const updateScheduledQuery = jest.fn(() => Promise.resolve(mockResult));
+            const component = mount(
+                <Scheduler queries={mockQueries} updateScheduledQuery={updateScheduledQuery} requestor="user" />
+            );
 
-        return component.instance().handleUpdate({})
-          .catch(error => expect(error).toBe('Error'));
-      });
+            return component
+                .instance()
+                .handleUpdate({})
+                .catch(error => expect(error).toBe('Error'));
+        });
     });
 
     it('Delete Queries', () => {
-      const deleteScheduledQuery = jest.fn();
-      let component = mount(
-        <Scheduler
-          queries={mockQueries}
-          deleteScheduledQuery={deleteScheduledQuery}
-        />
-      );
+        const deleteScheduledQuery = jest.fn();
+        let component = mount(<Scheduler queries={mockQueries} deleteScheduledQuery={deleteScheduledQuery} />);
 
-      component = mount(
-        <Scheduler
-          queries={mockQueries}
-          deleteScheduledQuery={deleteScheduledQuery}
-          requestor="user"
-        />
-      );
-      component.setState({ selectedQuery: mockQueries[0] });
-      component.instance().handleDelete();
-      expect(deleteScheduledQuery).toHaveBeenCalled();
-      expect(component.state('selectedQuery')).toBeNull();
+        component = mount(
+            <Scheduler queries={mockQueries} deleteScheduledQuery={deleteScheduledQuery} requestor="user" />
+        );
+        component.setState({selectedQuery: mockQueries[0]});
+        component.instance().handleDelete();
+        expect(deleteScheduledQuery).toHaveBeenCalled();
+        expect(component.state('selectedQuery')).toBeNull();
     });
 
     describe('Search', () => {
-      it('should allow filter slugs to be used in search bar', () => {
-        const queries = [
-          {
-              query: 'SELECT * FROM foods;',
-              fid: 'test:0',
-              refreshInterval: 5000,
-              tags: [],
-              lastExecution: {
-                rowCount: 0,
-                duration: 3000,
-                status: 'failed',
-                completedAt: 1536941547470
-              }
-          },
-          {
-              query: 'SELECT color, name FROM foods;',
-              fid: 'test:0',
-              refreshInterval: 10000,
-              tags: ['tag:0'],
-              lastExecution: {
-                rowCount: 5,
-                duration: 5000,
-                status: 'ok',
-                completedAt: 1536941547470
-              }
-          },
-          {
-              query: 'SELECT color, price FROM foods;',
-              fid: 'test:0',
-              refreshInterval: 10000,
-              tags: ['tag:0', 'tag:1'],
-              lastExecution: {
-                rowCount: 65,
-                duration: 5000,
-                status: 'ok',
-                completedAt: 1536941547470
-              }
-          },
-          {
-              query: 'SELECT price FROM foods;',
-              fid: 'test:0',
-              refreshInterval: 10000,
-              tags: ['tag:0'],
-              lastExecution: {
-                rowCount: 14,
-                duration: 5000,
-                status: 'ok',
-                completedAt: 1536941547470
-              }
-          }
-        ];
-        const component = mount(
-          <Scheduler
-            queries={queries}
-            tags={mockTags}
-          />
-        );
+        it('should allow filter slugs to be used in search bar', () => {
+            const queries = [
+                {
+                    query: 'SELECT * FROM foods;',
+                    fid: 'test:0',
+                    refreshInterval: 5000,
+                    tags: [],
+                    lastExecution: {
+                        rowCount: 0,
+                        duration: 3000,
+                        status: 'failed',
+                        completedAt: 1536941547470
+                    }
+                },
+                {
+                    query: 'SELECT color, name FROM foods;',
+                    fid: 'test:0',
+                    refreshInterval: 10000,
+                    tags: ['tag:0'],
+                    lastExecution: {
+                        rowCount: 5,
+                        duration: 5000,
+                        status: 'ok',
+                        completedAt: 1536941547470
+                    }
+                },
+                {
+                    query: 'SELECT color, price FROM foods;',
+                    fid: 'test:0',
+                    refreshInterval: 10000,
+                    tags: ['tag:0', 'tag:1'],
+                    lastExecution: {
+                        rowCount: 65,
+                        duration: 5000,
+                        status: 'ok',
+                        completedAt: 1536941547470
+                    }
+                },
+                {
+                    query: 'SELECT price FROM foods;',
+                    fid: 'test:0',
+                    refreshInterval: 10000,
+                    tags: ['tag:0'],
+                    lastExecution: {
+                        rowCount: 14,
+                        duration: 5000,
+                        status: 'ok',
+                        completedAt: 1536941547470
+                    }
+                }
+            ];
+            const component = mount(<Scheduler queries={queries} tags={mockTags} />);
 
-        component.setState({
-          search: 'sort:rowCount-desc tag:"Tag 0" status:success'
+            component.setState({
+                search: 'sort:rowCount-desc tag:"Tag 0" status:success'
+            });
+
+            let rows = component.instance().getRows();
+
+            expect(rows).toEqual([queries[2], queries[3], queries[1]]);
+
+            component.setState({
+                search: 'sort:rowCount-desc tag:"Tag 0" status:success color'
+            });
+
+            rows = component.instance().getRows();
+
+            expect(rows).toEqual([queries[2], queries[1]]);
+
+            component.setState({
+                search: 'status:error'
+            });
+
+            rows = component.instance().getRows();
+
+            expect(rows).toEqual([queries[0]]);
+
+            component.unmount();
         });
 
-        let rows = component.instance().getRows();
+        it('sort, status, and tags should all add key to search bar', () => {
+            const component = mount(<Scheduler queries={mockQueries} tags={mockTags} />);
+            component.instance().filterSuccess();
+            expect(component.state('search')).toBe('status:success');
+            component.instance().filterFailed();
+            expect(component.state('search')).toBe('status:error');
+            component.instance().filterTag([{name: 'Tag Name'}]);
+            expect(component.state('search')).toBe('status:error tag:"Tag Name"');
+            component.instance().filterTag([{name: 'tag-name-2'}]);
+            expect(component.state('search')).toBe('status:error tag:"Tag Name" tag:"tag-name-2"');
+            component.instance().handleSortChange({id: 'objectKey-asc'});
+            expect(component.state('search')).toBe('status:error tag:"Tag Name" tag:"tag-name-2" sort:objectKey-asc');
 
-        expect(rows).toEqual([queries[2], queries[3], queries[1]]);
+            expect(component.state('sort')).toEqual({id: 'objectKey-asc'});
 
-        component.setState({
-          search: 'sort:rowCount-desc tag:"Tag 0" status:success color'
+            component.instance().handleSortChange(null);
+            expect(component.state('search')).toBe('status:error tag:"Tag Name" tag:"tag-name-2" ');
+            expect(component.state('sort')).toEqual(null);
+
+            component.update();
+            component.find('.clear-state').simulate('click');
+            expect(component.state('search')).toBe('');
         });
-
-        rows = component.instance().getRows();
-
-        expect(rows).toEqual([queries[2], queries[1]]);
-
-        component.setState({
-          search: 'status:error'
-        });
-
-        rows = component.instance().getRows();
-
-        expect(rows).toEqual([queries[0]]);
-      });
-
-      it('sort, status, and tags should all add key to search bar', () => {
-        const component = mount(
-          <Scheduler
-            queries={mockQueries}
-            tags={mockTags}
-          />
-        );
-        component.instance().filterSuccess();
-        expect(component.state('search')).toBe('status:success');
-        component.instance().filterFailed();
-        expect(component.state('search')).toBe('status:error');
-        component.instance().filterTag([{ name: 'Tag Name'}]);
-        expect(component.state('search')).toBe('status:error tag:"Tag Name"');
-        component.instance().filterTag([{ name: 'tag-name-2'}]);
-        expect(component.state('search')).toBe('status:error tag:"Tag Name" tag:"tag-name-2"');
-        component.instance().handleSortChange({ id: 'objectKey-asc' });
-        expect(component.state('search')).toBe('status:error tag:"Tag Name" tag:"tag-name-2" sort:objectKey-asc');
-
-        expect(component.state('sort')).toEqual({ id: 'objectKey-asc'});
-
-        component.instance().handleSortChange(null);
-        expect(component.state('search')).toBe('status:error tag:"Tag Name" tag:"tag-name-2" ');
-        expect(component.state('sort')).toEqual(null);
-
-        component.update();
-        component.find('.clear-state').simulate('click');
-        expect(component.state('search')).toBe('');
-      });
     });
 });
