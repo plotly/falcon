@@ -75,8 +75,10 @@ export class PreviewModal extends Component {
             confirmedDelete: false,
             loading: false,
             tags: (props.query && props.query.tags) || [],
-            tagsModalOpen: false
+            tagsModalOpen: false,
+            confirmedRun: false
         };
+        this.save = this.save.bind(this);
         this.updateCode = this.updateCode.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onDelete = this.onDelete.bind(this);
@@ -85,6 +87,7 @@ export class PreviewModal extends Component {
         this.handleIntervalChange = this.handleIntervalChange.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleTagsChange = this.handleTagsChange.bind(this);
+        this.handleRefresh = this.handleRefresh.bind(this);
         this.openTagsModal = this.openTagsModal.bind(this);
         this.closeTagsModal = this.closeTagsModal.bind(this);
     }
@@ -105,32 +108,57 @@ export class PreviewModal extends Component {
         this.setState({tags});
     }
 
+    save() {
+        const {connectionId, fid, requestor, uids} = this.props.query;
+        const {code: query, cronInterval, tags} = this.state;
+        const name = this.state.name ? this.state.name.trim() : '';
+
+        this.setState({loading: true, error: null});
+        return this.props
+            .onSave({
+                connectionId,
+                fid,
+                requestor,
+                uids,
+                query,
+                name,
+                cronInterval,
+                tags: tags.map(t => t.id)
+            })
+            .then(() => {
+                this.setState({
+                    loading: false,
+                    editing: false,
+                    confirmedDelete: false,
+                    confirmedRun: false
+                });
+            });
+    }
+
+    handleRefresh() {
+        if (this.state.confirmedRun) {
+            if (!this.state.loading) {
+                this.save()
+                    .then(() =>
+                        this.setState({
+                            successMessage: 'Query has run successfully.'
+                        })
+                    )
+                    .catch(error => this.setState({error: error.message, loading: false}));
+            }
+        } else {
+            this.setState({confirmedRun: true});
+        }
+    }
+
     onSubmit() {
         if (this.state.editing) {
-            const {connectionId, fid, requestor, uids} = this.props.query;
-            const {code: query, cronInterval, tags} = this.state;
-            const name = this.state.name ? this.state.name.trim() : '';
-
-            this.setState({loading: true, error: null});
-            this.props
-                .onSave({
-                    connectionId,
-                    fid,
-                    requestor,
-                    uids,
-                    query,
-                    name,
-                    cronInterval,
-                    tags: tags.map(t => t.id)
-                })
-                .then(() => {
+            this.save()
+                .then(() =>
                     this.setState({
-                        successMessage: 'Query saved successfully!',
-                        loading: false,
-                        editing: false,
-                        confirmedDelete: false
-                    });
-                })
+                        successMessage: 'Query saved successfully!'
+                    })
+                )
                 .catch(error => this.setState({error: error.message, loading: false}));
         } else {
             this.setState({editing: true, confirmedDelete: false});
@@ -434,7 +462,14 @@ export class PreviewModal extends Component {
                                     in{' '}
                                     {ms((query.nextScheduledAt || now) - now, {
                                         long: true
-                                    })}
+                                    })}{' '}
+                                    (<Link disabled={this.state.loading} onClick={this.handleRefresh}>
+                                        {this.state.loading
+                                            ? 'saving...'
+                                            : this.state.confirmedRun
+                                                ? 'are you sure?'
+                                                : 'run now'}
+                                    </Link>)
                                 </em>
                             </Row>
                         )}
