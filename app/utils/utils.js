@@ -71,3 +71,10 @@ export function getPathNames(url) {
 
     return pathNames;
 }
+
+export function decapitalize(startString) {
+    if (startString.length === 0) {
+        return '';
+    }
+    return startString.slice(0, 1).toLowerCase() + startString.slice(1);
+}

@@ -17,7 +17,7 @@ import Tag from '../presentational/tag';
 import Status from '../presentational/status';
 import TagPicker from '../pickers/tag-picker';
 import TagModal from './tags-modal/tags-modal.jsx';
-import {datasetUrl} from '../../../../utils/utils';
+import {datasetUrl, decapitalize} from '../../../../utils/utils';
 import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../../constants/constants';
 import {EXE_STATUS} from '../../../../../shared/constants.js';
 import {getInitialCronMode} from '../../cron-picker/cron-helpers';
@@ -142,7 +142,7 @@ export class PreviewModal extends Component {
                 this.save()
                     .then(() =>
                         this.setState({
-                            successMessage: 'Query has run successfully.'
+                            successMessage: 'Query ran successfully.'
                         })
                     )
                     .catch(error => this.setState({error: error.message, loading: false}));
@@ -370,19 +370,13 @@ export class PreviewModal extends Component {
                         {editing && (
                             <Row style={rowStyle}>
                                 <div style={keyStyle}>Query Name</div>
-                                {editing ? (
-                                    <input
-                                        maxLength="150"
-                                        style={noMargin}
-                                        placeholder="Enter query name here..."
-                                        value={this.state.name}
-                                        onChange={this.handleNameChange}
-                                    />
-                                ) : (
-                                    <em style={{...valueStyle, wordWrap: 'break-word'}}>
-                                        <b>{this.state.name}</b>
-                                    </em>
-                                )}
+                                <input
+                                    maxLength="150"
+                                    style={noMargin}
+                                    placeholder="Enter query name here..."
+                                    value={this.state.name}
+                                    onChange={this.handleNameChange}
+                                />
                             </Row>
                         )}
                         <Row style={rowStyle}>
@@ -396,20 +390,13 @@ export class PreviewModal extends Component {
                                     />
                                 </div>
                             ) : (
-                                <em style={valueStyle}>
-                                    {this.state.cronInterval ? (
-                                        <b>{cronstrue.toString(this.state.cronInterval)}</b>
-                                    ) : (
-                                        <React.Fragment>
-                                            Runs every{' '}
-                                            <b>
-                                                {ms(query.refreshInterval * 1000, {
-                                                    long: true
-                                                })}
-                                            </b>
-                                        </React.Fragment>
-                                    )}
-                                </em>
+                                <div style={valueStyle}>
+                                    {this.state.cronInterval
+                                        ? `Runs ${decapitalize(cronstrue.toString(this.state.cronInterval))}`
+                                        : `Runs every ${ms(query.refreshInterval * 1000, {
+                                              long: true
+                                          })}`}
+                                </div>
                             )}
                         </Row>
                         {editing && (
@@ -420,22 +407,22 @@ export class PreviewModal extends Component {
                                         <u className="tag-manager-text">manage tags</u>
                                     </div>
                                 </div>
-                                <em style={valueStyle}>
+                                <div style={valueStyle}>
                                     <TagPicker
                                         disabled={Boolean(this.state.successMessage)}
                                         value={this.state.tags}
                                         options={this.props.tags}
                                         onChange={this.handleTagsChange}
                                     />
-                                </em>
+                                </div>
                             </Row>
                         )}
                         {!editing &&
                             run && (
                                 <Row style={rowStyle}>
                                     <div style={keyStyle}>Last ran</div>
-                                    <em style={valueStyle}>
-                                        {run.completedAt && (
+                                    <div style={valueStyle}>
+                                        {run.completedAt ? (
                                             <span
                                                 style={{
                                                     color:
@@ -444,37 +431,53 @@ export class PreviewModal extends Component {
                                                             : '#ef595b'
                                                 }}
                                             >
-                                                {ms(now - run.completedAt, {
-                                                    long: true
-                                                })}{' '}
-                                                ago
+                                                {now - run.completedAt < 60 * 1000
+                                                    ? 'Just now'
+                                                    : `${ms(now - run.completedAt, {
+                                                          long: true
+                                                      })} ago`}
                                             </span>
+                                        ) : (
+                                            run.status === EXE_STATUS.running && (
+                                                <span style={{color: '#e4cf11'}}>Currently running</span>
+                                            )
                                         )}
                                         <br />
                                         {run.errorMessage && <span>{run.errorMessage}</span>}
-                                        {run.duration &&
-                                            `${pluralize('row', run.rowCount || 0, true)} in ${ms(run.duration * 1000, {
-                                                long: true
-                                            })}`}
-                                    </em>
+                                        {run.duration && (
+                                            <span style={{fontSize: 12}}>
+                                                {`${pluralize('row', run.rowCount || 0, true)} in ${ms(
+                                                    run.duration * 1000,
+                                                    {long: true}
+                                                )}`}
+                                            </span>
+                                        )}
+                                    </div>
                                 </Row>
                             )}
                         {!editing && (
                             <Row style={rowStyle}>
                                 <div style={keyStyle}>Scheduled to run</div>
-                                <em style={valueStyle}>
+                                <div style={valueStyle}>
                                     in{' '}
                                     {ms((query.nextScheduledAt || now) - now, {
                                         long: true
                                     })}{' '}
-                                    (<Link disabled={this.state.loading} onClick={this.handleRefresh}>
+                                    (
+                                    <Link
+                                        className="refresh-button"
+                                        style={{color: '#506784'}}
+                                        disabled={this.state.loading}
+                                        onClick={this.handleRefresh}
+                                    >
                                         {this.state.loading
                                             ? 'saving...'
                                             : this.state.confirmedRun
                                                 ? 'are you sure?'
                                                 : 'run now'}
-                                    </Link>)
-                                </em>
+                                    </Link>
+                                    )
+                                </div>
                             </Row>
                         )}
                         {!editing && (

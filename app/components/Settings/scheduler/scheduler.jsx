@@ -19,6 +19,7 @@ import Tag from './presentational/tag';
 import TagPicker from './pickers/tag-picker.jsx';
 import Status from './presentational/status';
 
+import {decapitalize} from '../../../utils/utils';
 import {SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants';
 import {EXE_STATUS} from '../../../../shared/constants.js';
 
@@ -59,13 +60,6 @@ SORT_OPTIONS.forEach(option => {
 });
 
 // helpers
-const decapitalize = startString => {
-    if (startString.length === 0) {
-        return '';
-    }
-    return startString.slice(0, 1).toLowerCase() + startString.slice(1);
-};
-
 const sortLastExecution = (key, reverse) => (a, b) => {
     const s = ((a.lastExecution && a.lastExecution[key]) || 0) - ((b.lastExecution && b.lastExecution[key]) || 0);
     return reverse ? -1 * s : s;
@@ -105,9 +99,19 @@ class QueryFormatter extends React.Component {
     render() {
         const query = this.props.value;
 
+        let tags = query.tags
+            .filter(Boolean)
+            .map(tag => <Tag key={tag.name} style={tagStyle} className="ellipsis" {...tag} />);
+
+        if (tags && tags.length > 4) {
+            const numHidden = tags.length - 4;
+            tags = tags.slice(0, 4);
+            tags.push(<span style={{lineHeight: 2.2, opacity: 0.5}}>+ {numHidden}</span>);
+        }
+
         return (
             <Row style={flexStart}>
-                <Column style={{width: '40px', alignItems: 'center'}}>
+                <Column style={{width: '40px', alignItems: 'center', flexShrink: 0}}>
                     <Status size={20} status={query.lastExecution && query.lastExecution.status} />
                 </Column>
                 <Column
@@ -141,12 +145,8 @@ class QueryFormatter extends React.Component {
                               })}`}
                     </em>
                 </Column>
-                <Column style={{width: 'auto', marginLeft: 16}}>
-                    <Row style={flexStart}>
-                        {query.tags
-                            .filter(Boolean)
-                            .map(tag => <Tag key={tag.name} style={tagStyle} className="ellipsis" {...tag} />)}
-                    </Row>
+                <Column style={{width: 'auto', margin: '0 16px'}}>
+                    <Row style={{justifyContent: 'flex-start', maxWidth: 400}}>{tags}</Row>
                 </Column>
             </Row>
         );
@@ -180,7 +180,7 @@ class IntervalFormatter extends React.Component {
             <Row>
                 <Column>
                     {!run && '—'}
-                    {completedAt && (
+                    {completedAt ? (
                         <div
                             style={{
                                 fontSize: 16,
@@ -188,11 +188,16 @@ class IntervalFormatter extends React.Component {
                             }}
                         >
                             {completedAt < 60 * 1000
-                                ? 'just now'
+                                ? 'Just now'
                                 : `${ms(completedAt, {
                                       long: true
                                   })} ago`}
                         </div>
+                    ) : (
+                        run &&
+                        run.status === EXE_STATUS.running && (
+                            <span style={{fontSize: 16, color: '#e4cf11'}}>Currently running</span>
+                        )
                     )}
                     {run &&
                         run.errorMessage && (
@@ -274,13 +279,13 @@ class Scheduler extends Component {
         };
         this.columns = [
             {
-                width: 850,
                 key: 'query',
                 name: 'Query',
                 filterable: true,
                 formatter: QueryFormatter
             },
             {
+                width: 400,
                 key: 'run',
                 name: 'Last run',
                 filterable: true,
@@ -521,12 +526,12 @@ class Scheduler extends Component {
                         justifyContent: 'space-between'
                     }}
                 >
-                    <Column style={{width: 300}}>
+                    <Column style={{width: '100%', maxWidth: 288}}>
                         <Row>
                             <Column
                                 style={{
                                     padding: '4px 0',
-                                    marginLeft: 8,
+                                    marginLeft: 6,
                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)'
                                 }}
                             >

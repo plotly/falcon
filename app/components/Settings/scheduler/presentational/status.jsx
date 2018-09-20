@@ -9,6 +9,10 @@ const Status = ({status, size}) => {
         return <img width={size} height={size} src="images/checkmark.png" />;
     }
 
+    if (status === EXE_STATUS.running) {
+        return <img width={size} height={size} src="images/running.png" />;
+    }
+
     return <img width={size} height={size} src="images/x.png" />;
 };
 

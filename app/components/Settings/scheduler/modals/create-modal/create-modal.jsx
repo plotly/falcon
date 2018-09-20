@@ -15,7 +15,7 @@ import SQL from '../../presentational/sql';
 import TagPicker from '../../pickers/tag-picker.jsx';
 import TagModal from '../tags-modal/tags-modal.jsx';
 
-import {datasetUrl as getDatasetURL} from '../../../../../utils/utils';
+import {datasetUrl as getDatasetURL, decapitalize} from '../../../../../utils/utils';
 import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../../../constants/constants';
 
 import './create-modal.css';
@@ -191,11 +191,9 @@ class CreateModal extends Component {
                         </Row>
                         <Row style={secondaryRowStyle}>
                             <div className="row-header">Query name</div>
-                            <div className="row-body">
+                            <div className="row-body" style={{marginBottom: this.state.successMessage ? 16 : 0}}>
                                 {this.state.successMessage ? (
-                                    <em style={{marginTop: 5, display: 'inherit'}}>
-                                        <b>{this.state.name}</b>
-                                    </em>
+                                    <span>{this.state.name}</span>
                                 ) : (
                                     <input
                                         maxLength="150"
@@ -215,11 +213,11 @@ class CreateModal extends Component {
                             <div className="row-header" style={{paddingTop: 5}}>
                                 Schedule
                             </div>
-                            <div className="row-body" style={{minHeight: '64px'}}>
+                            <div className="row-body" style={{minHeight: this.state.successMessage ? '48px' : '64px'}}>
                                 {this.state.successMessage ? (
-                                    <em style={{marginTop: 5, display: 'inherit'}}>
-                                        <b>{cronstrue.toString(this.state.interval)}</b>
-                                    </em>
+                                    <span style={{marginTop: 5, display: 'inherit'}}>
+                                        {`Runs ${decapitalize(cronstrue.toString(this.state.interval))}`}
+                                    </span>
                                 ) : (
                                     <CronPicker onChange={this.handleIntervalChange} />
                                 )}
@@ -256,7 +254,7 @@ class CreateModal extends Component {
                     </Column>
                     <Row>
                         {this.state.successMessage ? (
-                            <Column style={{padding: '0 32px 16px'}}>
+                            <Column style={{padding: '24px 32px 16px'}}>
                                 <SuccessMessage message={this.state.successMessage}>
                                     <Link href={this.state.datasetUrl}>View Live Dataset</Link>
                                 </SuccessMessage>
