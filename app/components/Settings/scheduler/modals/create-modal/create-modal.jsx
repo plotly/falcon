@@ -4,19 +4,19 @@ import PropTypes from 'prop-types';
 import {Controlled as CodeMirror} from 'react-codemirror2';
 import cronstrue from 'cronstrue';
 
-import {Row, Column} from '../../layout.jsx';
-import Modal from '../../modal.jsx';
-import {Link} from '../../Link.react';
-import SuccessMessage from '../../success.jsx';
-import RequestError from './request-error.jsx';
-import TimedMessage from './timed-message.jsx';
-import CronPicker from '../cron-picker/cron-picker.jsx';
-import SQL from './sql.jsx';
-import TagPicker from './tag-picker.jsx';
-import TagModal from './tags-modal.jsx';
+import {Row, Column} from '../../../../layout';
+import Modal from '../../../../modal';
+import {Link} from '../../../../Link.react';
+import SuccessMessage from '../../../../success';
+import RequestError from '../../presentational/request-error.jsx';
+import TimedMessage from '../../presentational/timed-message.jsx';
+import CronPicker from '../../../cron-picker/cron-picker';
+import SQL from '../../presentational/sql';
+import TagPicker from '../../pickers/tag-picker.jsx';
+import TagModal from '../tags-modal/tags-modal.jsx';
 
-import {datasetUrl as getDatasetURL} from '../../../utils/utils';
-import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../constants/constants.js';
+import {datasetUrl as getDatasetURL} from '../../../../../utils/utils';
+import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../../../constants/constants';
 
 import './create-modal.css';
 

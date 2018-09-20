@@ -9,35 +9,23 @@ import cronstrue from 'cronstrue';
 import Select from 'react-select';
 import pluralize from 'pluralize';
 
-import CreateModal from './create-modal.jsx';
-import PreviewModal from './preview-modal.jsx';
-import PromptLoginModal from './login-modal.jsx';
-import TagModal from './tags-modal.jsx';
+import CreateModal from './modals/create-modal/create-modal.jsx';
+import PreviewModal from './modals/preview-modal.jsx';
+import PromptLoginModal from './modals/login-modal/login-modal.jsx';
+import TagModal from './modals/tags-modal/tags-modal.jsx';
 import {Row, Column} from '../../layout.jsx';
-import SQL from './sql.jsx';
-import Tag from './tag.jsx';
-import TagPicker from './tag-picker.jsx';
-import Status from './status.jsx';
+import SQL from './presentational/sql';
+import Tag from './presentational/tag';
+import TagPicker from './pickers/tag-picker.jsx';
+import Status from './presentational/status';
 
-import {SQL_DIALECTS_USING_EDITOR, FAILED} from '../../../constants/constants';
+import {SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants';
+import {EXE_STATUS} from '../../../../shared/constants.js';
 
 import './scheduler.css';
 
 const NO_OP = () => {};
-
 const ROW_HEIGHT = 84;
-
-const decapitalize = startString => {
-    if (startString.length === 0) {
-        return '';
-    }
-    return startString.slice(0, 1).toLowerCase() + startString.slice(1);
-};
-
-const sortLastExecution = (key, reverse) => (a, b) => {
-    const s = ((a.lastExecution && a.lastExecution[key]) || 0) - ((b.lastExecution && b.lastExecution[key]) || 0);
-    return reverse ? -1 * s : s;
-};
 const SORT_OPTIONS = [
     {
         id: 'completedAt-desc',
@@ -70,10 +58,39 @@ SORT_OPTIONS.forEach(option => {
     option.value = option.id;
 });
 
+// helpers
+const decapitalize = startString => {
+    if (startString.length === 0) {
+        return '';
+    }
+    return startString.slice(0, 1).toLowerCase() + startString.slice(1);
+};
+
+const sortLastExecution = (key, reverse) => (a, b) => {
+    const s = ((a.lastExecution && a.lastExecution[key]) || 0) - ((b.lastExecution && b.lastExecution[key]) || 0);
+    return reverse ? -1 * s : s;
+};
+
+const addSlug = (str, slug) => {
+    if (str.indexOf(slug) > -1) {
+        return str;
+    }
+    return str.trim() + (str.trim().length ? ' ' : '') + slug;
+};
+
+const mapRow = row => {
+    return {
+        query: row,
+        run: row.lastExecution
+    };
+};
+
+// shared styles
 const flexStart = {justifyContent: 'flex-start'};
 const tagStyle = {
     maxWidth: '80px'
 };
+
 class QueryFormatter extends React.Component {
     static propTypes = {
         /*
@@ -167,7 +184,7 @@ class IntervalFormatter extends React.Component {
                         <div
                             style={{
                                 fontSize: 16,
-                                color: run.status !== FAILED ? '#00cc96' : '#ef595b'
+                                color: run.status !== EXE_STATUS.failed ? '#00cc96' : '#ef595b'
                             }}
                         >
                             {completedAt < 60 * 1000
@@ -205,20 +222,6 @@ class IntervalFormatter extends React.Component {
             </Row>
         );
     }
-}
-
-const addSlug = (str, slug) => {
-    if (str.indexOf(slug) > -1) {
-        return str;
-    }
-    return str.trim() + (str.trim().length ? ' ' : '') + slug;
-};
-
-function mapRow(row) {
-    return {
-        query: row,
-        run: row.lastExecution
-    };
 }
 
 class Scheduler extends Component {
@@ -369,9 +372,9 @@ class Scheduler extends Component {
 
         if (statusFilter && statusFilter[1]) {
             if (statusFilter[1] === 'error') {
-                return rows.filter(q => (q.lastExecution && q.lastExecution.status) === FAILED);
+                return rows.filter(q => (q.lastExecution && q.lastExecution.status) === EXE_STATUS.failed);
             } else if (statusFilter[1] === 'success') {
-                return rows.filter(q => (q.lastExecution && q.lastExecution.status) !== FAILED);
+                return rows.filter(q => (q.lastExecution && q.lastExecution.status) !== EXE_STATUS.failed);
             }
         }
 
@@ -542,7 +545,7 @@ class Scheduler extends Component {
                                 Success (
                                 {
                                     statuslessRows.filter(
-                                        row => (row.lastExecution && row.lastExecution.status) !== FAILED
+                                        row => (row.lastExecution && row.lastExecution.status) !== EXE_STATUS.failed
                                     ).length
                                 }
                                 )
@@ -560,7 +563,7 @@ class Scheduler extends Component {
                                 Error (
                                 {
                                     statuslessRows.filter(
-                                        row => (row.lastExecution && row.lastExecution.status) === FAILED
+                                        row => (row.lastExecution && row.lastExecution.status) === EXE_STATUS.failed
                                     ).length
                                 }
                                 )

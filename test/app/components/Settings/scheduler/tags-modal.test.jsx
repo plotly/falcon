@@ -3,8 +3,8 @@ import {mount, configure} from 'enzyme';
 
 import Adapter from 'enzyme-adapter-react-16';
 
-const TagModal = require('../../../../../app/components/Settings/scheduler/tags-modal.jsx').TagsModal;
-const ColorPicker = require('../../../../../app/components/Settings/scheduler/color-picker.jsx');
+const TagModal = require('../../../../../app/components/Settings/scheduler/modals/tags-modal/tags-modal.jsx').TagsModal;
+const ColorPicker = require('../../../../../app/components/Settings/scheduler/pickers/color-picker');
 const wait = () => new Promise(resolve => setTimeout(resolve, 0));
 
 const mockTags = [{id: 'id', name: 'Tag 1', color: '#ffffff'}];

@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
-import {Row, Column} from '../../layout.jsx';
-import Modal from '../../modal.jsx';
+import {Row, Column} from '../../../../layout';
+import Modal from '../../../../modal';
 
 import './login-modal.css';
 

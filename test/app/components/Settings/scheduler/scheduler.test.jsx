@@ -4,12 +4,12 @@ import {mount, configure} from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
 import Scheduler from '../../../../../app/components/Settings/scheduler/scheduler.jsx';
-import SQL from '../../../../../app/components/Settings/scheduler/sql.jsx';
-import SchedulerPreview from '../../../../../app/components/Settings/scheduler/preview-modal.jsx';
+import SQL from '../../../../../app/components/Settings/scheduler/presentational/sql';
+import SchedulerPreview from '../../../../../app/components/Settings/scheduler/modals/preview-modal.jsx';
 import Modal from '../../../../../app/components/modal.jsx';
-import Status from '../../../../../app/components/Settings/scheduler/status.jsx';
-import Tag from '../../../../../app/components/Settings/scheduler/tag.jsx';
-import TagPicker from '../../../../../app/components/Settings/scheduler/tag-picker.jsx';
+import Status from '../../../../../app/components/Settings/scheduler/presentational/status';
+import Tag from '../../../../../app/components/Settings/scheduler/presentational/tag';
+import TagPicker from '../../../../../app/components/Settings/scheduler/pickers/tag-picker.jsx';
 
 const mockTags = [{id: 'tag:0', name: 'Tag 0', color: 'blue'}, {id: 'tag:1', name: 'Tag 1', color: '#EF553B'}];
 
@@ -34,7 +34,7 @@ const mockQueries = [
         lastExecution: {
             rowCount: 65,
             duration: 5000,
-            status: 'OK',
+            status: 'ok',
             completedAt: 1536941547470
         }
     }

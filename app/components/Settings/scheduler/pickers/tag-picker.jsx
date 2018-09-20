@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import Select from 'react-select';
 
-import * as Actions from '../../../actions/sessions';
-import Tag from './tag.jsx';
+import * as Actions from '../../../../actions/sessions';
+import Tag from '../presentational/tag';
 
 const styles = {
     item: {zIndex: 999, display: 'inline-block', padding: '2px 0px', cursor: 'pointer'},

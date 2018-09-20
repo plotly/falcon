@@ -3,7 +3,7 @@ import {mount, configure} from 'enzyme';
 
 import Adapter from 'enzyme-adapter-react-16';
 
-const LoginModal = require('../../../../../app/components/Settings/scheduler/login-modal.jsx');
+const LoginModal = require('../../../../../app/components/Settings/scheduler/modals/login-modal/login-modal.jsx');
 
 describe('Login Modal Tests', () => {
     beforeAll(() => {
