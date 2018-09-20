@@ -4,9 +4,7 @@ import {findIndex, propEq} from 'ramda';
 import YAML from 'yamljs';
 
 import {getSetting} from '../settings.js';
-import {
-    createStoragePath
-} from '../utils/homeFiles';
+import {createStoragePath} from '../utils/homeFiles';
 import {stripUndefinedKeys} from '../utils/persistenceUtils.js';
 
 export const HEX_CODE_REGEX = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;

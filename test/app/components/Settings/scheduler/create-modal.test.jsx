@@ -3,6 +3,8 @@ import {mount, configure} from 'enzyme';
 
 import Adapter from 'enzyme-adapter-react-16';
 
+import {wait} from '../../../../backend/utils';
+
 global.document.createRange = function() {
     return {
         setEnd: function() {},
@@ -15,8 +17,6 @@ global.document.createRange = function() {
         }
     };
 };
-
-const wait = () => new Promise(resolve => setTimeout(resolve, 0));
 
 const CodeMirror = require('react-codemirror2').Controlled;
 const CreateModal = require('../../../../../app/components/Settings/scheduler/modals/create-modal/create-modal.jsx');

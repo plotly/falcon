@@ -3,6 +3,8 @@ import {mount, configure} from 'enzyme';
 
 import Adapter from 'enzyme-adapter-react-16';
 
+import {wait} from '../../../../backend/utils';
+
 global.document.createRange = function() {
     return {
         setEnd: function() {},
@@ -172,5 +174,82 @@ describe('Preview Modal Tests', () => {
                 cronInterval: '* * * * *'
             })
         );
+    });
+
+    it('should save query when refresh button is clicked', async () => {
+        const onSave = jest.fn(() => Promise.resolve());
+        const query = {
+            query: 'SELECT * FROM table',
+            fid: 'fid:1',
+            requestor: 'user',
+            cronInterval: '* * * * *'
+        };
+
+        const component = mount(<PreviewModal query={query} currentRequestor="user" onSave={onSave} />);
+
+        const refreshButton = component.find('.refresh-button').at(0);
+
+        // start editing
+        refreshButton.simulate('click');
+        component.update();
+        expect(refreshButton.text()).toBe('are you sure?');
+        // submit
+        refreshButton.simulate('click');
+
+        expect(refreshButton.text()).toBe('saving...');
+        await wait();
+        expect(refreshButton.text()).toBe('run now');
+        expect(onSave).toHaveBeenCalledWith(expect.objectContaining(query));
+    });
+
+    it('should set error when saving fails', async () => {
+        const onSave = jest.fn(() => Promise.reject(new Error('Mock error')));
+        const query = {
+            query: 'SELECT * FROM table',
+            fid: 'fid:1',
+            requestor: 'user',
+            cronInterval: '* * * * *'
+        };
+
+        const component = mount(<PreviewModal query={query} currentRequestor="user" onSave={onSave} />);
+
+        const refreshButton = component.find('.refresh-button').at(0);
+
+        refreshButton.simulate('click');
+        refreshButton.simulate('click');
+
+        await wait();
+        expect(component.state('error')).toBe('Mock error');
+
+        component.setState({error: null});
+
+        const editButton = component.find('button').at(1);
+
+        editButton.simulate('click');
+        editButton.simulate('click');
+
+        await wait();
+        expect(component.state('error')).toBe('Mock error');
+    });
+
+    it('should render lastExectution correctly', () => {
+        const tags = [{id: 'tag:0', name: 'Tag 0', color: '#000000'}];
+        const query = {
+            query: 'SELECT * FROM table',
+            fid: 'fid:1',
+            refreshInterval: 60,
+            requestor: 'user1',
+            lastExecution: {
+                status: 'ok',
+                rowCount: 100,
+                duration: 3000,
+                completedAt: 1536941547470
+            },
+            tags
+        };
+
+        mount(<PreviewModal tags={tags} query={query} currentRequestor="user" />);
+
+        expect(() => mount(<PreviewModal query={query} currentRequestor="user" />)).not.toThrow();
     });
 });

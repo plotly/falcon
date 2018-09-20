@@ -12,6 +12,7 @@ const Tag = ({name, color, style, className}) => (
             color: 'white',
             padding: '4px 12px',
             fontSize: 12,
+            flexShrink: 0,
             marginRight: '1rem',
             borderRadius: '2px',
             ...style

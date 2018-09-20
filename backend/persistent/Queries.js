@@ -3,11 +3,8 @@ import {findIndex, propEq} from 'ramda';
 import YAML from 'yamljs';
 
 import {getSetting} from '../settings.js';
-import {
-    createStoragePath
-} from '../utils/homeFiles';
+import {createStoragePath} from '../utils/homeFiles';
 import {stripUndefinedKeys} from '../utils/persistenceUtils.js';
-
 
 export function getQuery(fid) {
     const queries = getQueries();
@@ -23,9 +20,7 @@ export function getQueries() {
 
 export function saveQuery(queryObject) {
     const queries = getQueries();
-    queries.push(
-        stripUndefinedKeys(queryObject)
-    );
+    queries.push(stripUndefinedKeys(queryObject));
     if (!fs.existsSync(getSetting('STORAGE_PATH'))) {
         createStoragePath();
     }
