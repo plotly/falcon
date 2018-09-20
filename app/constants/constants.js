@@ -2,10 +2,6 @@
 /* eslint-disable no-multi-str */
 import {concat} from 'ramda';
 
-export const OK = 'ok';
-export const RUNNING = 'running';
-export const FAILED = 'failed';
-
 export const DIALECTS = {
     MYSQL: 'mysql',
     MARIADB: 'mariadb',

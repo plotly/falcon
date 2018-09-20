@@ -2,12 +2,12 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import * as Actions from '../../../actions/sessions';
+import * as Actions from '../../../../../actions/sessions';
 
-import {Row, Column} from '../../layout.jsx';
-import Modal from '../../modal.jsx';
-import RequestError from './request-error.jsx';
-import ColorPicker from './color-picker.jsx';
+import {Row, Column} from '../../../../layout';
+import Modal from '../../../../modal';
+import RequestError from '../../presentational/request-error';
+import ColorPicker from '../../pickers/color-picker';
 
 import './tags-modal.css';
 

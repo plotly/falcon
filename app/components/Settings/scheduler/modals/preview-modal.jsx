@@ -5,21 +5,22 @@ import ms from 'ms';
 import cronstrue from 'cronstrue';
 import pluralize from 'pluralize';
 
-import Modal from '../../modal.jsx';
-import SuccessMessage from '../../success.jsx';
-import RequestError from './request-error.jsx';
-import TimedMessage from './timed-message.jsx';
-import {Link} from '../../Link.react.js';
-import CronPicker from '../cron-picker/cron-picker.jsx';
-import {Row, Column} from '../../layout.jsx';
-import SQL from './sql.jsx';
-import Tag from './tag.jsx';
-import Status from './status.jsx';
-import TagPicker from './tag-picker.jsx';
-import TagModal from './tags-modal.jsx';
-import {datasetUrl} from '../../../utils/utils.js';
-import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING, FAILED} from '../../../constants/constants.js';
-import {getInitialCronMode} from '../cron-picker/cron-helpers.js';
+import Modal from '../../../modal';
+import SuccessMessage from '../../../success';
+import RequestError from '../presentational/request-error';
+import TimedMessage from '../presentational/timed-message';
+import {Link} from '../../../Link.react';
+import CronPicker from '../../cron-picker/cron-picker';
+import {Row, Column} from '../../../layout';
+import SQL from '../presentational/sql';
+import Tag from '../presentational/tag';
+import Status from '../presentational/status';
+import TagPicker from '../pickers/tag-picker';
+import TagModal from './tags-modal/tags-modal.jsx';
+import {datasetUrl} from '../../../../utils/utils';
+import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../../constants/constants';
+import {EXE_STATUS} from '../../../../../shared/constants.js';
+import {getInitialCronMode} from '../../cron-picker/cron-helpers';
 
 const NO_OP = () => {};
 
@@ -437,7 +438,10 @@ export class PreviewModal extends Component {
                                         {run.completedAt && (
                                             <span
                                                 style={{
-                                                    color: (run && run.status) !== FAILED ? '#00cc96' : '#ef595b'
+                                                    color:
+                                                        (run && run.status) !== EXE_STATUS.failed
+                                                            ? '#00cc96'
+                                                            : '#ef595b'
                                                 }}
                                             >
                                                 {ms(now - run.completedAt, {

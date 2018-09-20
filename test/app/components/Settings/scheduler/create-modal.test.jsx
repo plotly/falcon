@@ -19,10 +19,10 @@ global.document.createRange = function() {
 const wait = () => new Promise(resolve => setTimeout(resolve, 0));
 
 const CodeMirror = require('react-codemirror2').Controlled;
-const CreateModal = require('../../../../../app/components/Settings/scheduler/create-modal.jsx');
+const CreateModal = require('../../../../../app/components/Settings/scheduler/modals/create-modal/create-modal.jsx');
 const ErrorComponent = require('../../../../../app/components/error.jsx');
 const CronPicker = require('../../../../../app/components/Settings/cron-picker/cron-picker.jsx');
-const TagPicker = require('../../../../../app/components/Settings/scheduler/tag-picker.jsx').default;
+const TagPicker = require('../../../../../app/components/Settings/scheduler/pickers/tag-picker').default;
 
 describe('Create Modal Test', () => {
     beforeAll(() => {

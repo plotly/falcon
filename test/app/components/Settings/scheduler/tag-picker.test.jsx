@@ -4,8 +4,8 @@ import Select from 'react-select';
 
 import Adapter from 'enzyme-adapter-react-16';
 
-const TagPicker = require('../../../../../app/components/Settings/scheduler/tag-picker.jsx').TagPicker;
-const Tag = require('../../../../../app/components/Settings/scheduler/tag-picker.jsx').TagValue;
+const TagPicker = require('../../../../../app/components/Settings/scheduler/pickers/tag-picker.jsx').TagPicker;
+const Tag = require('../../../../../app/components/Settings/scheduler/pickers/tag-picker.jsx').TagValue;
 
 const mockTags = [{id: 'id', name: 'Tag 1', color: 'blue'}];
 

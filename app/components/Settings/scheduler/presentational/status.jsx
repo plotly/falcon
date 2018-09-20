@@ -2,10 +2,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {OK} from '../../../constants/constants';
+import {EXE_STATUS} from '../../../../../shared/constants.js';
 
 const Status = ({status, size}) => {
-    if (status === OK) {
+    if (status === EXE_STATUS.ok) {
         return <img width={size} height={size} src="images/checkmark.png" />;
     }
 
@@ -18,7 +18,7 @@ Status.propTypes = {
 };
 
 Status.defaultProps = {
-    status: OK
+    status: EXE_STATUS.ok
 };
 
 export default Status;

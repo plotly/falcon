@@ -4,7 +4,7 @@ import {ChromePicker} from 'react-color';
 
 import Adapter from 'enzyme-adapter-react-16';
 
-const ColorPicker = require('../../../../../app/components/Settings/scheduler/color-picker.jsx');
+const ColorPicker = require('../../../../../app/components/Settings/scheduler/pickers/color-picker.jsx');
 
 jest.mock('react-click-outside', () => i => i);
 describe('Color Picker Tests', () => {

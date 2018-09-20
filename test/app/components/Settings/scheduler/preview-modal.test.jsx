@@ -16,8 +16,8 @@ global.document.createRange = function() {
     };
 };
 
-const PreviewModal = require('../../../../../app/components/Settings/scheduler/preview-modal.jsx').default;
-const TagPicker = require('../../../../../app/components/Settings/scheduler/tag-picker.jsx').default;
+const PreviewModal = require('../../../../../app/components/Settings/scheduler/modals/preview-modal.jsx').default;
+const TagPicker = require('../../../../../app/components/Settings/scheduler/pickers/tag-picker').default;
 
 describe('Preview Modal Tests', () => {
     beforeAll(() => {
