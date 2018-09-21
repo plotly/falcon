@@ -10,7 +10,10 @@ import {createStoragePath} from './utils/homeFiles';
 const DEFAULT_SETTINGS = {
     HEADLESS: false,
 
-    STORAGE_PATH: path.join(os.homedir(), '.plotly', 'connector'),
+    // when testing locally, don't overwrite dev storage
+    STORAGE_PATH: process.env.NODE_ENV === 'test' && !process.env.CI
+        ? path.join(os.homedir(), '.plotly', 'testing', 'connector')
+        : path.join(os.homedir(), '.plotly', 'connector'),
     AUTH_ENABLED: true,
     SSL_ENABLED: true,
     WEB_BASE_PATHNAME: '/',

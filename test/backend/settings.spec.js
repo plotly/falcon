@@ -22,8 +22,13 @@ describe('Settings', function() {
     });
 
     it('Loads default settings OK', function() {
+        // if not on CI, correct path includes `testing` prefix
+        const CORRECT_SUB_PATH = process.env.CI
+            ? '.plotly/connector'
+            : '.plotly/testing/connector';
+
         const storagePath = getSetting('STORAGE_PATH');
-        assert(contains('.plotly/connector', getSetting('STORAGE_PATH')));
+        assert(contains(CORRECT_SUB_PATH, getSetting('STORAGE_PATH')));
         assert(getSetting('PLOTLY_API_DOMAIN'), 'api.plot.ly');
         assert.equal(getSetting('LOG_PATH'), `${storagePath}/log.log`);
     });
