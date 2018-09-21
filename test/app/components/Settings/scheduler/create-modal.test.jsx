@@ -3,7 +3,7 @@ import {mount, configure} from 'enzyme';
 
 import Adapter from 'enzyme-adapter-react-16';
 
-import {wait} from '../../../../backend/utils';
+import {wait} from '../../../utils';
 
 global.document.createRange = function() {
     return {
