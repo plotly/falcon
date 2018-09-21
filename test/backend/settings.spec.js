@@ -23,7 +23,7 @@ describe('Settings', function() {
 
     it('Loads default settings OK', function() {
         const storagePath = getSetting('STORAGE_PATH');
-        assert(contains('.plotly/testing/connector', getSetting('STORAGE_PATH')));
+        assert(contains('.plotly/connector', getSetting('STORAGE_PATH')));
         assert(getSetting('PLOTLY_API_DOMAIN'), 'api.plot.ly');
         assert.equal(getSetting('LOG_PATH'), `${storagePath}/log.log`);
     });
