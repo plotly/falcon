@@ -278,6 +278,8 @@ export class PreviewModal extends Component {
             const run = query.lastExecution;
             const now = Date.now();
 
+            const nextRun = (query.nextScheduledAt || now) - now;
+
             content = (
                 <Column
                     style={{
@@ -459,10 +461,16 @@ export class PreviewModal extends Component {
                             <Row style={rowStyle}>
                                 <div style={keyStyle}>Scheduled to run</div>
                                 <div style={valueStyle}>
-                                    in{' '}
-                                    {ms((query.nextScheduledAt || now) - now, {
-                                        long: true
-                                    })}{' '}
+                                    {nextRun < 1000 ? (
+                                        'just now'
+                                    ) : (
+                                        <React.Fragment>
+                                            in{' '}
+                                            {ms(nextRun, {
+                                                long: true
+                                            })}
+                                        </React.Fragment>
+                                    )}{' '}
                                     (
                                     <Link
                                         className="refresh-button"
