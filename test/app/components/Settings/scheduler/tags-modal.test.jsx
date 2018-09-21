@@ -3,7 +3,7 @@ import {mount, configure} from 'enzyme';
 
 import Adapter from 'enzyme-adapter-react-16';
 
-import {wait} from '../../../../backend/utils';
+import {wait} from '../../../utils';
 
 const TagModal = require('../../../../../app/components/Settings/scheduler/modals/tags-modal/tags-modal.jsx').TagsModal;
 const ColorPicker = require('../../../../../app/components/Settings/scheduler/pickers/color-picker');
