@@ -471,20 +471,22 @@ export class PreviewModal extends Component {
                                             })}
                                         </React.Fragment>
                                     )}{' '}
-                                    (
-                                    <Link
-                                        className="refresh-button"
-                                        style={{color: '#506784'}}
-                                        disabled={this.state.loading}
-                                        onClick={this.handleRefresh}
-                                    >
-                                        {this.state.loading
-                                            ? 'saving...'
-                                            : this.state.confirmedRun
-                                                ? 'are you sure?'
-                                                : 'run now'}
-                                    </Link>
-                                    )
+                                    {this.props.currentRequestor && (
+                                        <React.Fragment>
+                                            (<Link
+                                                className="refresh-button"
+                                                style={{color: '#506784'}}
+                                                disabled={this.state.loading}
+                                                onClick={this.handleRefresh}
+                                            >
+                                                {this.state.loading
+                                                    ? 'saving...'
+                                                    : this.state.confirmedRun
+                                                        ? 'are you sure?'
+                                                        : 'run now'}
+                                            </Link>)
+                                        </React.Fragment>
+                                    )}
                                 </div>
                             </Row>
                         )}
