@@ -279,6 +279,7 @@ export class PreviewModal extends Component {
             const now = Date.now();
 
             const nextRun = (query.nextScheduledAt || now) - now;
+            const canEdit = this.props.currentRequestor && this.props.currentRequestor === query.requestor;
 
             content = (
                 <Column
@@ -471,7 +472,7 @@ export class PreviewModal extends Component {
                                             })}
                                         </React.Fragment>
                                     )}{' '}
-                                    {this.props.currentRequestor && (
+                                    {canEdit && (
                                         <React.Fragment>
                                             (<Link
                                                 className="refresh-button"
