@@ -27,30 +27,46 @@ import './scheduler.css';
 
 const NO_OP = () => {};
 const ROW_HEIGHT = 84;
+
+const sortLastExecution = (key, reverse) => (a, b) => {
+    const s = ((a.lastExecution && a.lastExecution[key]) || 0) - ((b.lastExecution && b.lastExecution[key]) || 0);
+    return reverse ? -1 * s : s;
+};
 const SORT_OPTIONS = [
     {
+        id: 'nextScheduledAt-asc',
+        label: 'Next to run',
+        fn: (a = {}, b = {}) => (a.nextScheduledAt || 0) - (b.nextScheduledAt || 0)
+    },
+    {
         id: 'completedAt-desc',
-        label: 'Most recently run'
+        label: 'Most recently run',
+        fn: sortLastExecution('completedAt', true)
     },
     {
         id: 'completedAt-asc',
-        label: 'Least recently run'
+        label: 'Least recently run',
+        fn: sortLastExecution('completedAt', false)
     },
     {
         id: 'duration-desc',
-        label: 'Longest duration'
+        label: 'Longest duration',
+        fn: sortLastExecution('duration', true)
     },
     {
         id: 'duration-asc',
-        label: 'Shortest duration'
+        label: 'Shortest duration',
+        fn: sortLastExecution('duration', false)
     },
     {
         id: 'rowCount-desc',
-        label: 'Most rows'
+        label: 'Most rows',
+        fn: sortLastExecution('rowCount', true)
     },
     {
         id: 'rowCount-asc',
-        label: 'Least rows'
+        label: 'Least rows',
+        fn: sortLastExecution('rowCount', false)
     }
 ];
 
@@ -60,11 +76,6 @@ SORT_OPTIONS.forEach(option => {
 });
 
 // helpers
-const sortLastExecution = (key, reverse) => (a, b) => {
-    const s = ((a.lastExecution && a.lastExecution[key]) || 0) - ((b.lastExecution && b.lastExecution[key]) || 0);
-    return reverse ? -1 * s : s;
-};
-
 const addSlug = (str, slug) => {
     if (str.indexOf(slug) > -1) {
         return str;
@@ -364,8 +375,9 @@ class Scheduler extends Component {
 
         rows = matchSorter(rows, search.trim(), {keys: ['query', 'name']});
         if (sortFilter && sortFilter[1]) {
-            const [key, descOrAsc] = sortFilter[1].split('-');
-            rows.sort(sortLastExecution(key, descOrAsc === 'desc'));
+            const sort = SORT_OPTIONS.find(o => o.id === sortFilter[1]);
+
+            rows.sort(sort && sort.fn);
         }
 
         return rows;
