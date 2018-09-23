@@ -47,8 +47,10 @@ function disconnect(connection) {
 
 function tables(connection) {
     const sqlQuery = `
-        SELECT * FROM user_all_tables
-        WHERE
+        SELECT owner ||'.'|| table_name TABLE_NAME
+        FROM all_all_tables
+        WHERE 
+           owner not in ('MDSYS', 'SYS', 'SYSTEM') AND
            table_name NOT LIKE '%$%' AND
            (table_type IS NULL OR table_type <> 'XMLTYPE') AND
            (num_rows IS NULL OR num_rows > 0) AND
@@ -65,13 +67,14 @@ function tables(connection) {
 function schemas(connection) {
     const sqlQuery = `
         SELECT
-            c.table_name,
+            t.owner ||'.'|| t.table_name TABLE_NAME,
             c.column_name,
             c.data_type
         FROM
-            user_tab_columns c,
-            user_all_tables t
+            all_tab_columns c,
+            all_all_tables t
         WHERE
+           t.owner not in ('MDSYS', 'SYS', 'SYSTEM') AND
            c.table_name = t.table_name AND
            t.table_name NOT LIKE '%$%' AND
            (t.table_type IS NULL OR t.table_type <> 'XMLTYPE') AND
