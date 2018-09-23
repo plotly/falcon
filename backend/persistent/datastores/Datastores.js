@@ -66,7 +66,7 @@ function getDatastoreClient(connection) {
         return Athena;
     } else if (dialect === 'oracle') {
         return Oracle;
-    }else if (dialect === 'bigquery') {
+    } else if (dialect === 'bigquery') {
         return BigQuery;
     }
     return Sql;

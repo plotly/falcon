@@ -19,7 +19,7 @@ export const DIALECTS = {
     DATA_WORLD: 'data.world',
     ATHENA: 'athena',
     CSV: 'csv',
-    BIGQUERY:'bigquery'
+    BIGQUERY: 'bigquery'
 };
 
 export const SQL_DIALECTS_USING_EDITOR = [
@@ -261,16 +261,16 @@ export const CONNECTION_CONFIG = {
             'label': 'Google Project Id',
             'value': 'projectId',
             'type': 'text',
-            'description': `The Google Cloud Project Id`
+            'description': 'The Google Cloud Project Id'
         },
         {'label': 'Database', 'value': 'database', 'type': 'text'},
         {
             'label': 'Key File',
             'value': 'keyFilename',
             'type': 'filedrop',
-            'description': `The location of the Google Service Account Key File`
+            'description': 'The location of the Google Service Account Key File'
         }
-    ],
+    ]
 };
 
 
@@ -291,7 +291,7 @@ export const LOGOS = {
     [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png',
     [DIALECTS.DATA_WORLD]: 'images/dataworld-logo.png',
     [DIALECTS.ATHENA]: 'images/athena-logo.png',
-    [DIALECTS.BIGQUERY]:'images/bigquery-logo.png'
+    [DIALECTS.BIGQUERY]: 'images/bigquery-logo.png'
 };
 
 export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
@@ -326,10 +326,7 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
                 }
             });
         case DIALECTS.BIGQUERY:
-            let sql= `SELECT * FROM ${connection.database}.__TABLES__ `;
-            console.log( 'Getting Query ', sql);
-            return sql;
-
+            return `SELECT * FROM ${connection.database}.__TABLES__ `;
         default:
             return '';
     }

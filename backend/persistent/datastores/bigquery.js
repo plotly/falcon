@@ -31,11 +31,6 @@ function sameConnection(connection1, connection2) {
  */
 export function connect(connection) {
     const client = pool.getClient(connection);
-
-    // TODO: we need to validate connection,
-    // but requesting the list of tables is potentially too expensive.
-    // E.g. some databases accept simple queries like `SELECT 1+1;`
-
     return Promise.resolve(client);
 }
 
@@ -75,7 +70,9 @@ export function query(queryObject, connection) {
             }
         })
         .then(() => {
-            return job.getQueryResults();
+            return job.getQueryResults().then(rst => {
+                return rst[0];
+            });
         })
         .then(parseSQL);
 }
@@ -96,10 +93,6 @@ export function schemas(connection) {
         .dataset(connection.database)
         .getTables()
         .then(results => {
-            // TODO: this algorithm won't work for a large number of tables.
-            // We need to:
-            // - figure out a single request to retrieve all the tables and columns
-            // - or either limit the number of concurrent requests
             const metadataPromises = results[0].map(table => table.getMetadata());
             return Promise.all(metadataPromises);
         }).
