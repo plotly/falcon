@@ -20,33 +20,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 
-## [3.0.3] - 2018-08-13
-
-### Added
-* OnPrem: Added env variable `PLOTY_CONNECTOR_BASE_URL` to customise the
-  `connectorUrl` set in a query metadata (#514)
-
-### Fixed
-* OnPrem: Fixed connectorUrl in query metadata
-  (https://github.com/plotly/streambed/issues/11310)
-
-
-## [3.0.2] - 2018-08-10
-
-### Fixed
-* Scheduler: Handle query updates that change the names or the number of columns
-  (#511)
-* OnPrem: Fixed login link in modal window (#512)
-
-
-## [3.0.1] - 2018-08-06
-
-### Fixed
-* Scheduler: Upload grid metadata as required by Chart Studio  (#504)
-* OnPrem: Fixed /external-data-connector page not accessible in private mode
-  (#505)
-
-
 ## [3.0.0] - 2018-07-27
 
 ### Added

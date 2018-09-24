@@ -50,17 +50,6 @@ function FormattedMessage(props) {
         );
     }
 
-    if (content.startsWith('MetadataError')) {
-        return (
-            <details style={outlineStyle}>
-                <summary style={outlineStyle}>
-                    An unexpected error occurred while uploading query metadata. Please try again now.
-                </summary>
-                <pre>{capitalize(content.replace('MetadataError: ', ''))}</pre>
-            </details>
-        );
-    }
-
     return content.slice(0, 100);
 }
 

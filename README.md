@@ -25,6 +25,7 @@ We want to encourage a warm, welcoming, and safe environment for contributing to
 
 ## Contact
 
+- Lead maintainer: [@n-riesco](https://github.com/n-riesco)
 - [Feature requests and support](https://plot.ly/products/consulting-and-oem/)
 - [Security reports](https://help.plot.ly/security/)
 
@@ -33,6 +34,7 @@ We want to encourage a warm, welcoming, and safe environment for contributing to
 |   | Github | Twitter |
 |---|--------|---------|
 |**Chris Parmer**| [@chriddyp](https://github.com/chriddyp) | |
+|**Nicolas Riesco**| [@n-riesco](https://github.com/n-riesco) | |
 |**Tarun Gaba**| [@tarzzz](https://github.com/tarzzz) | |
 |**Shannon Lal**| [@shannonlal](https://github.com/shannonlal) | |
 |**Kinuthia Ndung'u**| [@kndungu](https://github.com/kndungu) | |

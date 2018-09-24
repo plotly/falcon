@@ -17,6 +17,7 @@ global.document.createRange = function() {
 };
 
 const PreviewModal = require('../../../../../app/components/Settings/scheduler/preview-modal.jsx').default;
+const {DEFAULT_REFRESH_INTERVAL} = require('../../../../../app/constants/constants');
 
 describe('Preview Modal Tests', () => {
     beforeAll(() => {
@@ -64,7 +65,7 @@ describe('Preview Modal Tests', () => {
                 .find('button')
                 .at(1)
                 .text()
-        ).toEqual(expect.stringContaining('Switch users'));
+        ).toEqual(expect.stringContaining('Log in'));
     });
 
     it('should render edit and delete buttons if logged in', () => {
@@ -154,7 +155,9 @@ describe('Preview Modal Tests', () => {
                 fid: 'fid:1',
                 requestor: 'user',
                 query: 'SELECT * FROM table',
-                cronInterval: '* * * * *'
+                cronInterval: '* * * * *',
+                // This is necessary to prevent older versions from breaking
+                refreshInterval: DEFAULT_REFRESH_INTERVAL
             })
         );
     });
