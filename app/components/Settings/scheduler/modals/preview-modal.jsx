@@ -457,7 +457,7 @@ export class PreviewModal extends Component {
                             <Row style={rowStyle}>
                                 <div style={keyStyle}>Scheduled to run</div>
                                 <div style={valueStyle}>
-                                    <Timestamp value={query.nextScheduledAt} />
+                                    <Timestamp value={query.nextScheduledAt} />{' '}
                                     {canEdit && (
                                         <span style={{ paddingLeft: '7px' }}>
                                             (<Link
