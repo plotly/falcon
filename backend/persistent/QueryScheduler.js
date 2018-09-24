@@ -35,8 +35,10 @@ class QueryScheduler {
                 this.runningJobs[fid] = true;
 
                 updateQuery(fid, {
-                    lastExecution: {status: EXE_STATUS.running},
-                     startedAt
+                    lastExecution: {
+                        status: EXE_STATUS.running,
+                        startedAt
+                    }
                 });
 
                 return this.queryAndUpdateGrid(fid, query, connectionId, requestor, cronInterval, refreshInterval)
