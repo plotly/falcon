@@ -23,6 +23,7 @@ import {datasetUrl, decapitalize} from '../../../../utils/utils';
 import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../../constants/constants';
 import {EXE_STATUS} from '../../../../../shared/constants.js';
 import {getInitialCronMode} from '../../cron-picker/cron-helpers';
+import ExecutionDetails from '../presentational/executionDetails';
 
 const NO_OP = () => {};
 
@@ -443,12 +444,11 @@ export class PreviewModal extends Component {
                                         <br />
                                         {run.errorMessage && <span>{run.errorMessage}</span>}
                                         {run.duration && (
-                                            <span style={{fontSize: 12}}>
-                                                {`${pluralize('row', run.rowCount || 0, true)} in ${ms(
-                                                    run.duration * 1000,
-                                                    {long: true}
-                                                )}`}
-                                            </span>
+                                            <ExecutionDetails
+                                                rowCount={run.rowCount}
+                                                duration={run.duration}
+                                                completedAt={run.completedAt}
+                                            />
                                         )}
                                     </div>
                                 </Row>
