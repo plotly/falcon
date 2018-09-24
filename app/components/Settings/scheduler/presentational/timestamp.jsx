@@ -4,7 +4,7 @@ import moment from 'moment';
 
 const ONE_MINUTE = 60 * 1000;
 
-const formatAbsolute = timestamp => {
+const formatAbsolute = (timestamp, inline) => {
     const now = Date.now();
     const start = new Date();
     const end = new Date();
@@ -22,14 +22,14 @@ const formatAbsolute = timestamp => {
     }
 
     return isToday
-        ? `Today at ${moment(timestamp).format('h:mm a')}`
+        ? `${inline ? 't' : 'T'}oday at ${moment(timestamp).format('h:mm a')}`
         : `${moment(timestamp).format('h:mm a')} on ${moment(timestamp).format('MMM Do')}`;
 };
 
 const Timestamp = props => {
     return (
         <React.Fragment>
-            <span data-tip={moment(props.value).fromNow()}>{formatAbsolute(props.value)}</span>
+            <span data-tip={formatAbsolute(props.value, props.inline)}>{moment(props.value).fromNow()}</span>
             <ReactToolTip />
         </React.Fragment>
     );
