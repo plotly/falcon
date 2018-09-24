@@ -459,7 +459,7 @@ export class PreviewModal extends Component {
                                 <div style={valueStyle}>
                                     <Timestamp value={query.nextScheduledAt} />
                                     {canEdit && (
-                                        <React.Fragment>
+                                        <span style={{ paddingLeft: '7px' }}>
                                             (<Link
                                                 className="refresh-button"
                                                 style={{color: '#506784'}}
@@ -472,7 +472,7 @@ export class PreviewModal extends Component {
                                                         ? 'are you sure?'
                                                         : 'run now'}
                                             </Link>)
-                                        </React.Fragment>
+                                        </span>
                                     )}
                                 </div>
                             </Row>
