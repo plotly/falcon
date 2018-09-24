@@ -2,6 +2,7 @@ import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {Controlled as CodeMirror} from 'react-codemirror2';
 import ms from 'ms';
+import moment from 'moment';
 import cronstrue from 'cronstrue';
 import pluralize from 'pluralize';
 
@@ -9,6 +10,7 @@ import Modal from '../../../modal';
 import SuccessMessage from '../../../success';
 import RequestError from '../presentational/request-error';
 import TimedMessage from '../presentational/timed-message';
+import Timestamp from '../presentational/timestamp.jsx';
 import {Link} from '../../../Link.react';
 import CronPicker from '../../cron-picker/cron-picker';
 import {Row, Column} from '../../../layout';
@@ -276,9 +278,6 @@ export class PreviewModal extends Component {
             const initialModeId = getInitialCronMode(query);
 
             const run = query.lastExecution;
-            const now = Date.now();
-
-            const nextRun = (query.nextScheduledAt || now) - now;
             const canEdit = this.props.currentRequestor && this.props.currentRequestor === query.requestor;
 
             content = (
@@ -434,11 +433,7 @@ export class PreviewModal extends Component {
                                                             : '#ef595b'
                                                 }}
                                             >
-                                                {now - run.startedAt < 60 * 1000
-                                                    ? 'Just now'
-                                                    : `${ms(now - run.startedAt, {
-                                                          long: true
-                                                      })} ago`}
+                                                <Timestamp value={run.startedAt} />
                                             </span>
                                         ) : (
                                             run.status === EXE_STATUS.running && (
@@ -462,16 +457,7 @@ export class PreviewModal extends Component {
                             <Row style={rowStyle}>
                                 <div style={keyStyle}>Scheduled to run</div>
                                 <div style={valueStyle}>
-                                    {nextRun < 1000 ? (
-                                        'just now'
-                                    ) : (
-                                        <React.Fragment>
-                                            in{' '}
-                                            {ms(nextRun, {
-                                                long: true
-                                            })}
-                                        </React.Fragment>
-                                    )}{' '}
+                                    <Timestamp value={query.nextScheduledAt} />
                                     {canEdit && (
                                         <React.Fragment>
                                             (<Link
