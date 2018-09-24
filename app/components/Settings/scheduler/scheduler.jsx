@@ -39,14 +39,14 @@ const SORT_OPTIONS = [
         fn: (a = {}, b = {}) => (a.nextScheduledAt || 0) - (b.nextScheduledAt || 0)
     },
     {
-        id: 'completedAt-desc',
+        id: 'startedAt-desc',
         label: 'Most recently run',
-        fn: sortLastExecution('completedAt', true)
+        fn: sortLastExecution('startedAt', true)
     },
     {
-        id: 'completedAt-asc',
+        id: 'startedAt-asc',
         label: 'Least recently run',
-        fn: sortLastExecution('completedAt', false)
+        fn: sortLastExecution('startedAt', false)
     },
     {
         id: 'duration-desc',
@@ -172,6 +172,7 @@ class IntervalFormatter extends React.Component {
          */
         value: PropTypes.oneOfType([
             PropTypes.shape({
+                startedAt: PropTypes.number,
                 completedAt: PropTypes.number,
                 duration: PropTypes.number,
                 rowsCount: PropTypes.number,
@@ -185,22 +186,22 @@ class IntervalFormatter extends React.Component {
     render() {
         const run = this.props.value;
 
-        const completedAt = run && run.completedAt && Date.now() - run.completedAt;
+        const startedAt = run && run.startedAt && Date.now() - run.startedAt;
 
         return (
             <Row>
                 <Column>
                     {!run && '—'}
-                    {completedAt ? (
+                    {startedAt ? (
                         <div
                             style={{
                                 fontSize: 16,
                                 color: run.status !== EXE_STATUS.failed ? '#00cc96' : '#ef595b'
                             }}
                         >
-                            {completedAt < 60 * 1000
+                            {startedAt < 60 * 1000
                                 ? 'Just now'
-                                : `${ms(completedAt, {
+                                : `${ms(startedAt, {
                                       long: true
                                   })} ago`}
                         </div>

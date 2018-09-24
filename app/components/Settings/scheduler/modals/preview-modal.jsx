@@ -425,7 +425,7 @@ export class PreviewModal extends Component {
                                 <Row style={rowStyle}>
                                     <div style={keyStyle}>Last ran</div>
                                     <div style={valueStyle}>
-                                        {run.completedAt ? (
+                                        {run.startedAt ? (
                                             <span
                                                 style={{
                                                     color:
@@ -434,9 +434,9 @@ export class PreviewModal extends Component {
                                                             : '#ef595b'
                                                 }}
                                             >
-                                                {now - run.completedAt < 60 * 1000
+                                                {now - run.startedAt < 60 * 1000
                                                     ? 'Just now'
-                                                    : `${ms(now - run.completedAt, {
+                                                    : `${ms(now - run.startedAt, {
                                                           long: true
                                                       })} ago`}
                                             </span>
