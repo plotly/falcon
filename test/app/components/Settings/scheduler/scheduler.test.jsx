@@ -23,6 +23,7 @@ const mockQueries = [
             rowCount: 0,
             duration: 3000,
             status: 'FAILED',
+            startedAt: 1536941543470,
             completedAt: 1536941547470
         }
     },
@@ -35,6 +36,7 @@ const mockQueries = [
             rowCount: 65,
             duration: 5000,
             status: 'ok',
+            startedAt: 1536941543470,
             completedAt: 1536941547470
         }
     }
@@ -309,6 +311,7 @@ describe('Scheduler Test', () => {
                         rowCount: 0,
                         duration: 3000,
                         status: 'failed',
+                        startedAt: 1536941543470,
                         completedAt: 1536941547470
                     }
                 },
@@ -321,6 +324,7 @@ describe('Scheduler Test', () => {
                         rowCount: 5,
                         duration: 5000,
                         status: 'ok',
+                        startedAt: 1536941543470,
                         completedAt: 1536941547470
                     }
                 },
@@ -333,6 +337,7 @@ describe('Scheduler Test', () => {
                         rowCount: 65,
                         duration: 5000,
                         status: 'ok',
+                        startedAt: 1536941543470,
                         completedAt: 1536941547470
                     }
                 },
@@ -345,6 +350,7 @@ describe('Scheduler Test', () => {
                         rowCount: 14,
                         duration: 5000,
                         status: 'ok',
+                        startedAt: 1536941543470,
                         completedAt: 1536941547470
                     }
                 }

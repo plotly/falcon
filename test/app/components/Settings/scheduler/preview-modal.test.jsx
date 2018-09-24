@@ -243,6 +243,7 @@ describe('Preview Modal Tests', () => {
                 status: 'ok',
                 rowCount: 100,
                 duration: 3000,
+                startedAt: 1536941543470,
                 completedAt: 1536941547470
             },
             tags
