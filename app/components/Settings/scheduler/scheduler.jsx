@@ -413,7 +413,7 @@ class Scheduler extends Component {
     }
 
     openPreview(i, query) {
-        this.setState({selectedQuery: query.query});
+        this.setState({selectedQuery: query.query.fid});
     }
 
     closePreview() {
@@ -506,8 +506,6 @@ class Scheduler extends Component {
             if (res.error) {
                 throw res.error;
             }
-
-            this.setState({selectedQuery: res});
 
             return res;
         });
@@ -719,7 +717,7 @@ class Scheduler extends Component {
                 {this.state.selectedQuery && (
                     <PreviewModal
                         onClickAway={this.closePreview}
-                        query={this.state.selectedQuery}
+                        query={this.props.queries.find(q => this.state.selectedQuery === q.fid)}
                         tags={this.props.tags}
                         currentRequestor={this.props.requestor}
                         onLogin={this.props.openLogin}

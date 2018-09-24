@@ -208,7 +208,7 @@ describe('Scheduler Test', () => {
         const component = mount(<Scheduler queries={mockQueries} />);
         const cell = component.find('.react-grid-Cell').first();
         cell.simulate('click');
-        expect(component.state('selectedQuery')).toEqual(mockQueries[0]);
+        expect(component.state('selectedQuery')).toEqual(mockQueries[0].fid);
         expect(component.find(SchedulerPreview).prop('query')).toEqual(mockQueries[0]);
     });
 
