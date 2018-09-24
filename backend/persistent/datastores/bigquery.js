@@ -46,7 +46,6 @@ export function disconnect(connection) {
  */
 export function query(queryObject, connection) {
     const client = pool.getClient(connection);
-
     const options = {
         query: queryObject,
         useLegacySql: false // Use standard SQL syntax for queries.
@@ -83,7 +82,6 @@ export function query(queryObject, connection) {
  * @param {string} connection.projectId - Google Cloud Project Id
  * @param {string} connection.database - Google Big Query Database
  * @param {string} connection.keyFilename - Google Service Account Key File
- * @returns {Promise} that resolves connection
  * @returns {Promise} that resolves to { columnnames, rows }
  */
 export function schemas(connection) {
@@ -122,7 +120,6 @@ export function schemas(connection) {
  * @param {string} connection.projectId - Google Cloud Project Id
  * @param {string} connection.database - Google Big Query Database
  * @param {string} connection.keyFilename - Google Service Account Key File
- * @returns {Promise} that resolves connection
  * @returns {Promise} that resolves to an array of table names
  */
 export function tables(connection) {
