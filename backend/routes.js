@@ -802,8 +802,10 @@ export default class Servers {
                     // executing
                     if (getQuery(fid)) {
                         updateQuery(fid, {
-                            lastExecution: {status: EXE_STATUS.running},
-                            startedAt
+                            lastExecution: {
+                                status: EXE_STATUS.running,
+                                startedAt
+                            }
                         });
                     }
 
