@@ -764,6 +764,8 @@ export default class Servers {
                 refreshInterval = null
             } = req.params;
 
+            const startedAt = Date.now();
+
             // If a filename has been provided,
             // make the query and create a new grid
             if (filename) {
@@ -778,6 +780,7 @@ export default class Servers {
                         uids,
                         lastExecution: {
                             status: EXE_STATUS.ok,
+                            startedAt,
                             completedAt,
                             duration,
                             rowCount
@@ -798,7 +801,10 @@ export default class Servers {
                     // if query already exists, make sure it's status is correctly set while
                     // executing
                     if (getQuery(fid)) {
-                        updateQuery(fid, {lastExecution: {status: EXE_STATUS.running}});
+                        updateQuery(fid, {
+                            lastExecution: {status: EXE_STATUS.running},
+                            startedAt
+                        });
                     }
 
                     return that.queryScheduler.queryAndUpdateGrid(
@@ -830,6 +836,7 @@ export default class Servers {
                         uids,
                         lastExecution: {
                             status: EXE_STATUS.ok,
+                            startedAt,
                             completedAt,
                             duration,
                             rowCount
@@ -845,6 +852,7 @@ export default class Servers {
                         updateQuery(req.params.fid, {
                             lastExecution: {
                                 status: EXE_STATUS.failed,
+                                startedAt,
                                 completedAt: Date.now(),
                                 errorMessage: err.toString()
                             }

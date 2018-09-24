@@ -24,6 +24,8 @@ class QueryScheduler {
 
         // this.job wraps this.queryAndUpdateGrid to avoid concurrent runs of the same job
         this.runningJobs = {};
+        const startedAt = Date.now();
+
         this.job = (fid, query, connectionId, requestor, cronInterval, refreshInterval) => {
             try {
                 if (this.runningJobs[fid]) {
@@ -31,7 +33,11 @@ class QueryScheduler {
                 }
 
                 this.runningJobs[fid] = true;
-                updateQuery(fid, {lastExecution: {status: EXE_STATUS.running}});
+
+                updateQuery(fid, {
+                    lastExecution: {status: EXE_STATUS.running},
+                     startedAt
+                });
 
                 return this.queryAndUpdateGrid(fid, query, connectionId, requestor, cronInterval, refreshInterval)
                     .then(exeRes => {
@@ -39,6 +45,7 @@ class QueryScheduler {
                         updateQuery(fid, {
                             lastExecution: {
                                 status: EXE_STATUS.ok,
+                                startedAt,
                                 completedAt,
                                 duration,
                                 rowCount
@@ -50,6 +57,7 @@ class QueryScheduler {
                         updateQuery(fid, {
                             lastExecution: {
                                 status: EXE_STATUS.failed,
+                                startedAt,
                                 completedAt: Date.now(),
                                 errorMessage: error.toString()
                             }
@@ -63,6 +71,7 @@ class QueryScheduler {
                 updateQuery(fid, {
                     lastExecution: {
                         status: EXE_STATUS.failed,
+                        startedAt,
                         completedAt: Date.now(),
                         errorMessage: e.toString()
                     }
