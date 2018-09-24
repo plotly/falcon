@@ -506,6 +506,9 @@ class Scheduler extends Component {
             if (res.error) {
                 throw res.error;
             }
+
+            this.setState({selectedQuery: res});
+
             return res;
         });
     }
