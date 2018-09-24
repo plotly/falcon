@@ -119,6 +119,7 @@ describe('Routes:', () => {
                 'status',
                 'duration',
                 'rowCount',
+                'startedAt',
                 'completedAt'
             ];
 
@@ -153,6 +154,7 @@ describe('Routes:', () => {
                 .then(getResponseJson).then(json => {
                     const NOW = Date.now();
                     const FIVE_SECONDS_AGO = NOW - 5000;
+                    const TEN_SECONDS_AGO = NOW - 10000;
                     const FIVE_MINUTES_FROM_NOW = NOW + (5 * 60 * 1000);
                     const MIN_DURATION = 0;
                     const MAX_DURATION = 10;
@@ -170,9 +172,11 @@ describe('Routes:', () => {
                     assert.equal(receivedExecution.rowCount, CORRECT_ROW_COUNT, 'row count was not equal to two');
                     assert(receivedExecution.duration >= MIN_DURATION, 'execution duration was less than zero seconds');
                     assert(receivedExecution.duration < MAX_DURATION, 'execution duration was more than ten seconds');
+                    assert(receivedExecution.startedAt < NOW, 'execution began in the future');
                     assert(receivedExecution.completedAt < NOW, 'execution completed in the future');
+                    // use arbitrary cutoffs to check timestamps are reasonable
+                    assert(receivedExecution.startedAt > TEN_SECONDS_AGO, 'execution began too far in the past');
                     assert(receivedExecution.completedAt > FIVE_SECONDS_AGO, 'execution completed too far in the past');
-
                     assert(receivedQuery.nextScheduledAt > NOW, 'query scheduled to be run in the past');
                     assert(
                         receivedQuery.nextScheduledAt < FIVE_MINUTES_FROM_NOW,
