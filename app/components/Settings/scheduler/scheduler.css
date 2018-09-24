@@ -52,6 +52,10 @@
     cursor: pointer;
 }
 
+.scheduler-table .react-grid-Grid {
+    min-height: calc(100vh - 280px) !important;
+}
+
 .scheduler-table pre {
   margin: 0;
 }
