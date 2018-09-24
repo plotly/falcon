@@ -687,7 +687,7 @@ class Scheduler extends Component {
                         rowsCount={rows.length}
                         rowHeight={ROW_HEIGHT}
                         headerRowHeight={32}
-                        minHeight={ROW_HEIGHT * rows.length + 32}
+                        minHeight={Math.max(ROW_HEIGHT * rows.length + 32, 350)}
                     />
                 </Row>
 
