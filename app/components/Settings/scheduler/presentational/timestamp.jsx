@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactToolTip from 'react-tooltip';
 import moment from 'moment';
 
@@ -33,6 +34,11 @@ const Timestamp = props => {
             <ReactToolTip />
         </React.Fragment>
     );
+};
+
+Timestamp.propTypes = {
+    value: PropTypes.number,
+    inline: PropTypes.bool
 };
 
 export default Timestamp;

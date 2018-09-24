@@ -457,7 +457,7 @@ export class PreviewModal extends Component {
                                 <div style={valueStyle}>
                                     <Timestamp value={query.nextScheduledAt} />{' '}
                                     {canEdit && (
-                                        <span style={{ paddingLeft: '7px' }}>
+                                        <span style={{paddingLeft: '7px'}}>
                                             (<Link
                                                 className="refresh-button"
                                                 style={{color: '#506784'}}
