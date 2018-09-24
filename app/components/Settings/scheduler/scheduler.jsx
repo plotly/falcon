@@ -317,6 +317,7 @@ class Scheduler extends Component {
         this.createQuery = this.createQuery.bind(this);
         this.handleUpdate = this.handleUpdate.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
+        this.filterRunning = this.filterRunning.bind(this);
         this.filterSuccess = this.filterSuccess.bind(this);
         this.filterFailed = this.filterFailed.bind(this);
         this.filterTag = this.filterTag.bind(this);
@@ -392,7 +393,9 @@ class Scheduler extends Component {
             if (statusFilter[1] === 'error') {
                 return rows.filter(q => (q.lastExecution && q.lastExecution.status) === EXE_STATUS.failed);
             } else if (statusFilter[1] === 'success') {
-                return rows.filter(q => (q.lastExecution && q.lastExecution.status) !== EXE_STATUS.failed);
+                return rows.filter(q => (q.lastExecution && q.lastExecution.status) === EXE_STATUS.ok);
+            } else if (statusFilter[1] === 'running') {
+                return rows.filter(q => (q.lastExecution && q.lastExecution.status) === EXE_STATUS.running);
             }
         }
 
@@ -423,6 +426,16 @@ class Scheduler extends Component {
 
     closeCreateModal() {
         this.setState({createModalOpen: false});
+    }
+
+    filterRunning() {
+        this.setState(({search}) => {
+            const stripFilter = search.replace(/status:\w+/g, '');
+
+            return {
+                search: addSlug(stripFilter, 'status:running')
+            };
+        });
     }
 
     filterSuccess() {
@@ -539,23 +552,24 @@ class Scheduler extends Component {
                         justifyContent: 'space-between'
                     }}
                 >
-                    <Column style={{width: '100%', maxWidth: 288}}>
-                        <Row>
-                            <Column
+                    <Column style={{width: '100%', maxWidth: 350}}>
+                        <div style={{display: 'flex'}}>
+                            <div
                                 style={{
                                     padding: '4px 0',
                                     marginLeft: 6,
+                                    paddingRight: '10px',
                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)'
                                 }}
                             >
                                 {rows.length} {rows.length === 1 ? ' query' : ' queries'}
-                            </Column>
-                            <Column
+                            </div>
+                            <div
                                 className="status-filter"
                                 style={{
                                     fontWeight: statusFilter && statusFilter[1] === 'success' && 'bold',
                                     padding: '4px 0',
-                                    marginLeft: 24,
+                                    marginLeft: 10,
                                     cursor: 'pointer'
                                 }}
                                 onClick={this.filterSuccess}
@@ -563,17 +577,17 @@ class Scheduler extends Component {
                                 Success (
                                 {
                                     statuslessRows.filter(
-                                        row => (row.lastExecution && row.lastExecution.status) !== EXE_STATUS.failed
+                                        row => (row.lastExecution && row.lastExecution.status) === EXE_STATUS.ok
                                     ).length
                                 }
                                 )
-                            </Column>
-                            <Column
+                            </div>
+                            <div
                                 className="status-filter"
                                 style={{
                                     fontWeight: statusFilter && statusFilter[1] === 'error' && 'bold',
                                     padding: '4px 0',
-                                    marginLeft: 8,
+                                    marginLeft: 12,
                                     cursor: 'pointer'
                                 }}
                                 onClick={this.filterFailed}
@@ -585,8 +599,26 @@ class Scheduler extends Component {
                                     ).length
                                 }
                                 )
-                            </Column>
-                        </Row>
+                            </div>
+                            <div
+                                className="status-filter"
+                                style={{
+                                    fontWeight: statusFilter && statusFilter[1] === 'running' && 'bold',
+                                    padding: '4px 0',
+                                    marginLeft: 12,
+                                    cursor: 'pointer'
+                                }}
+                                onClick={this.filterRunning}
+                            >
+                                Running (
+                                {
+                                    statuslessRows.filter(
+                                        row => (row.lastExecution && row.lastExecution.status) === EXE_STATUS.running
+                                    ).length
+                                }
+                                )
+                            </div>
+                        </div>
                     </Column>
                     <Column style={{width: '100%', maxWidth: 720}}>
                         <Row style={{width: 'auto', justifyContent: 'flex-end'}}>
