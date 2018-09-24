@@ -2,9 +2,7 @@ import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {Controlled as CodeMirror} from 'react-codemirror2';
 import ms from 'ms';
-import moment from 'moment';
 import cronstrue from 'cronstrue';
-import pluralize from 'pluralize';
 
 import Modal from '../../../modal';
 import SuccessMessage from '../../../success';
@@ -23,7 +21,7 @@ import {datasetUrl, decapitalize} from '../../../../utils/utils';
 import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../../constants/constants';
 import {EXE_STATUS} from '../../../../../shared/constants.js';
 import {getInitialCronMode} from '../../cron-picker/cron-helpers';
-import ExecutionDetails from '../presentational/executionDetails';
+import ExecutionDetails from '../presentational/execution-details';
 
 const NO_OP = () => {};
 
