@@ -8,7 +8,6 @@ import path from 'path';
 
 import {PlotlyOAuth} from './plugins/authorization.js';
 import {generateAndSaveAccessToken} from './utils/authUtils.js';
-import {extractOrderedUids} from './utils/gridUtils.js';
 import {
     getAccessTokenCookieOptions,
     getCookieOptions,
@@ -665,21 +664,13 @@ export default class Servers {
          * the endpoint `/queries/:fid`
          */
         server.post('/queries', function postQueriesHandler(req, res, next) {
-            const {
-                filename,
-                fid,
-                query,
-                connectionId,
-                requestor,
-                cronInterval = null,
-                refreshInterval = null
-            } = req.params;
+            const {filename, fid, uids, query, connectionId, requestor} = req.params;
 
             // If a filename has been provided,
             // make the query and create a new grid
             if (filename) {
                 return that.queryScheduler.queryAndCreateGrid(
-                    filename, query, connectionId, requestor, cronInterval, refreshInterval
+                    filename, query, connectionId, requestor
                 )
                 .then((newGridResponse) => {
                     const queryObject = {
@@ -700,36 +691,20 @@ export default class Servers {
             if (fid) {
                 return checkWritePermissions(fid, requestor).then(function () {
                     return that.queryScheduler.queryAndUpdateGrid(
-                        fid, query, connectionId, requestor, cronInterval, refreshInterval
+                        fid, uids, query, connectionId, requestor
                     );
                 })
-                .then((updatedGridResponse) => {
-                    const orderedUids = extractOrderedUids(updatedGridResponse);
-                    const previousQuery = getQuery(req.params.fid);
-
+                .then(() => {
                     let status;
-                    if (previousQuery) {
+                    if (getQuery(req.params.fid)) {
                         // TODO - Technically, this should be
                         // under the endpoint `/queries/:fid`
                         status = 200;
                     } else {
                         status = 201;
                     }
-
-                    let oldParamsToCarryOver = {};
-                    if (previousQuery) {
-                        const {name} = previousQuery;
-                        oldParamsToCarryOver = {name};
-                    }
-
-                    const queryObject = {
-                        ...oldParamsToCarryOver,
-                        ...req.params,
-                        uids: orderedUids
-                    };
-
-                    that.queryScheduler.scheduleQuery(queryObject);
-                    res.json(status, queryObject);
+                    that.queryScheduler.scheduleQuery(req.params);
+                    res.json(status, {});
                     return next();
                 })
                 .catch(onError);

@@ -464,13 +464,13 @@ describe('QueryScheduler', function() {
         clock.tick(3.25 * refreshInterval * 1000);
         assert(spy1.calledThrice, 'job1 should have been called three times');
         assert(spy1.alwaysCalledWith(
-            query.fid, query.query,
+            query.fid, query.uids, query.query,
             query.connectionId, query.requestor
         ), `job1 was called with unexpected args: ${spy1.args}`);
         assert(spy2.calledThrice, 'job2 should have been called three times');
         assert(spy2.alwaysCalledWith(
-            query.fid, 'query-2',
-            query.connectionId, query.requestor,
+            query.fid, query.uids, 'query-2',
+            query.connectionId, query.requestor
         ), `job2 was called with unexpected args: ${spy2.args}`);
 
         clock.restore();
@@ -528,7 +528,7 @@ describe('QueryScheduler', function() {
 
     it('clears and deletes the query if its associated grid was deleted', function() {
         const refreshInterval = 5;
-        const cronInterval = `*/${refreshInterval} * * * * *`; // every 5 seconds
+        const cronInterval = `*/${refreshInterval} * * * * *`;
 
         /*
          * Save the sqlConnections to a file.
@@ -562,11 +562,7 @@ describe('QueryScheduler', function() {
 
             queryScheduler.scheduleQuery(queryObject);
 
-            assert.deepEqual(
-                getQueries(),
-                [queryObject],
-                'Query has not been saved'
-            );
+            assert.deepEqual(getQueries(), [queryObject], 'Query has not been saved');
             assert(Boolean(queryScheduler.queryJobs[fid]), 'Query has not been scheduled');
 
             return deleteGrid(fid, username);
@@ -625,8 +621,8 @@ describe('QueryScheduler', function() {
             });
         }
 
-        function resetAndVerifyGridContents(fid) {
-            return updateGrid([[1, 2, 3, 4, 5, 6]], names, fid, username, apiKey)
+        function resetAndVerifyGridContents(fid, uids) {
+            return updateGrid([[1, 2, 3, 4, 5, 6]], fid, uids, username, apiKey)
             .then(assertResponseStatus(200)).then(() => {
                 return getGrid(fid, username);
             })
@@ -674,7 +670,7 @@ describe('QueryScheduler', function() {
         })
         .then(() => wait(1.5 * refreshInterval * 1000))
         .then(() => checkGridAgainstQuery(fid, 'First check'))
-        .then(() => resetAndVerifyGridContents(fid))
+        .then(() => resetAndVerifyGridContents(fid, uids))
         .then(() => wait(1.5 * refreshInterval * 1000))
         .then(() => checkGridAgainstQuery(fid, 'Second check'))
         .then(() => deleteGrid(fid, username));

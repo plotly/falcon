@@ -12,8 +12,13 @@ import {Link} from '../../Link.react.js';
 import CronPicker from '../cron-picker/cron-picker.jsx';
 import {Row, Column} from '../../layout.jsx';
 import SQL from './sql.jsx';
-import {datasetUrl} from '../../../utils/utils.js';
-import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../constants/constants.js';
+import {plotlyUrl} from '../../../utils/utils.js';
+import {
+    getHighlightMode,
+    DEFAULT_REFRESH_INTERVAL,
+    WAITING_MESSAGE,
+    SAVE_WARNING
+} from '../../../constants/constants.js';
 import {getInitialCronMode} from '../cron-picker/cron-helpers.js';
 
 const NO_OP = () => {};
@@ -80,7 +85,7 @@ export class PreviewModal extends Component {
 
     onSubmit() {
         if (this.state.editing) {
-            const {connectionId, fid, requestor, uids} = this.props.query;
+            const {connectionId, fid, requestor, uids, refreshInterval} = this.props.query;
             const {code: query, cronInterval} = this.state;
             const name = this.state.name ? this.state.name.trim() : '';
 
@@ -93,7 +98,8 @@ export class PreviewModal extends Component {
                     uids,
                     query,
                     name,
-                    cronInterval
+                    cronInterval,
+                    refreshInterval: refreshInterval || DEFAULT_REFRESH_INTERVAL
                 })
                 .then(() => {
                     this.setState({
@@ -156,11 +162,7 @@ export class PreviewModal extends Component {
         }
 
         if (success) {
-            return (
-              <Column>
-                <SuccessMessage>{this.state.successMessage}</SuccessMessage>
-              </Column>
-            );
+            return <SuccessMessage>{this.state.successMessage}</SuccessMessage>;
         }
 
         if (editing) {
@@ -200,7 +202,8 @@ export class PreviewModal extends Component {
         if (!props.query) {
             content = null;
         } else {
-            const link = datasetUrl(props.query.fid);
+            const [account, gridId] = props.query.fid.split(':');
+            const link = `${plotlyUrl()}/~${account}/${gridId}`;
             const {editing, loading} = this.state;
 
             const initialModeId = getInitialCronMode(props.query);
@@ -311,7 +314,7 @@ export class PreviewModal extends Component {
                                 </div>
                             ) : (
                                 <em style={valueStyle}>
-                                    {this.state.cronInterval ? (
+                                    {props.query.cronInterval ? (
                                         <b>{cronstrue.toString(this.state.cronInterval)}</b>
                                     ) : (
                                         <React.Fragment>

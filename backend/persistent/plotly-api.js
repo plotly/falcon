@@ -6,7 +6,6 @@ import {
     getCredentials,
     getSetting
 } from '../settings.js';
-import {extractOrderedUids} from '../utils/gridUtils.js';
 
 
 // Module to access Plot.ly REST API
@@ -153,115 +152,36 @@ export function deleteGrid(fid, requestor) {
     });
 }
 
-export function patchGrid(fid, requestor, body) {
+export function updateGrid(rows, fid, uids, requestor) {
     const {username, apiKey, accessToken} = getCredentials(requestor);
 
-    return plotlyAPIRequest(`grids/${fid}`, {
-        method: 'PATCH',
-        username,
-        apiKey,
-        accessToken,
-        body
-    });
-}
+    // TODO - Test case where no rows are returned.
+    if (uids.length !== (rows[0] || []).length) {
+        Logger.log(`
+            A different number of columns was returned in the
+            query than what was initially saved in the grid.
+            ${rows[0].length} columns were queried,
+            ${uids.length} columns were originally saved.
+            The connector does not create columns (yet),
+            and so we will only update the first ${uids.length}
+            columns.
+        `);
+    }
 
-export function getGridColumn(fid, requestor) {
-    const {username, apiKey, accessToken} = getCredentials(requestor);
+    /*
+     * For now, only update up to the number of columns that are
+     * already saved. In the future, we should just create more
+     * columns. See error message above.
+     */
+    const columns = getColumns(rows, uids.length);
 
-    return plotlyAPIRequest(`grids/${fid}/col`, {
-        method: 'GET',
-        username,
-        apiKey,
-        accessToken
-    });
-}
-
-export function updateGrid(rows, columnnames, fid, requestor) {
-    const numColumns = columnnames.length;
-    const columns = getColumns(rows, numColumns);
-    const columnEntries = columns.map((column, columnIndex) => {
-        return { data: column, name: columnnames[columnIndex], order: columnIndex };
-    });
-
-    const {username, apiKey, accessToken} = getCredentials(requestor);
-    const baseUrl = `grids/${fid}/col`;
-    const baseParams = { username, apiKey, accessToken };
-
-    // fetch latest grid to get the source of truth
-    return getGridColumn(fid, requestor)
-        .then(res => {
-            if (res.status !== 200) {
-                return res;
-            }
-            return res.json();
-        }).then(data => {
-            if (data.status) {
-                // bad res was passed along, return it
-                return data;
-            }
-
-            const uids = extractOrderedUids(data);
-
-            if (numColumns > uids.length) {
-                // repopulate existing columns
-                const putUrl = `${baseUrl}?uid=${uids.join(',')}`;
-                const putBody = { cols: columnEntries.slice(0, uids.length) };
-
-                // append new columns
-                const postUrl = baseUrl;
-                const postBody = { cols: columnEntries.slice(uids.length) };
-
-                return plotlyAPIRequest(postUrl, {
-                    ...baseParams,
-                    body: postBody,
-                    method: 'POST'
-                }).then((res) => {
-                    if (res.status !== 200) {
-                        return res;
-                    }
-
-                    return plotlyAPIRequest(putUrl, {
-                        ...baseParams,
-                        body: putBody,
-                        method: 'PUT'
-                    });
-                });
-            } else if (numColumns < uids.length) {
-                // delete unused existing columns
-                const deleteUrl = `${baseUrl}?uid=${uids.slice(numColumns)}`;
-
-                // repopulate used existing columns
-                const putUrl = `${baseUrl}?uid=${uids.slice(0, numColumns).join(',')}`;
-                const putBody = { cols: columnEntries };
-
-
-
-                return plotlyAPIRequest(deleteUrl, {
-                    ...baseParams,
-                    method: 'DELETE'
-                }).then((res) => {
-                    if (res.status !== 204) {
-                        return res;
-                    }
-
-                    return plotlyAPIRequest(putUrl, {
-                        ...baseParams,
-                        body: putBody,
-                        method: 'PUT'
-                    });
-                });
-            }
-
-            // repopulate existing columns
-            const putUrl = `${baseUrl}?uid=${uids.join(',')}`;
-            const putBody = { cols: columnEntries };
-
-            return plotlyAPIRequest(putUrl, {
-                ...baseParams,
-                body: putBody,
-                method: 'PUT'
-            });
-    });
+    const url = `grids/${fid}/col?uid=${uids.join(',')}`;
+    const body = {
+        cols: JSON.stringify(columns.map(column => ({
+            data: column
+        })))
+    };
+    return plotlyAPIRequest(url, {body, username, apiKey, accessToken, method: 'PUT'});
 }
 
 function getColumns(rows, maxColumns) {
