@@ -18,7 +18,7 @@ import Status from '../presentational/status';
 import TagPicker from '../pickers/tag-picker';
 import TagModal from './tags-modal/tags-modal.jsx';
 import {datasetUrl, decapitalize} from '../../../../utils/utils';
-import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../../constants/constants';
+import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING, COLORS} from '../../../../constants/constants';
 import {EXE_STATUS} from '../../../../../shared/constants.js';
 import {getInitialCronMode} from '../../cron-picker/cron-helpers';
 import ExecutionDetails from '../presentational/execution-details';
@@ -250,7 +250,7 @@ export class PreviewModal extends Component {
                     style={{
                         margin: 0,
                         border: 'none',
-                        background: '#EF553B'
+                        background: COLORS.red
                     }}
                     onClick={this.onDelete}
                 >

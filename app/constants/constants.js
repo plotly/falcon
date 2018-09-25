@@ -508,4 +508,8 @@ export const WAITING_MESSAGE = 'This may take a long time. Your query is ' +
   'currently executing and must finish before it can be saved.';
 
 export const SAVE_WARNING = 'Note: when you save, the query will ' +
-  'execute and update the dataset immediately. Thereafter it will do so on the requested schedule.';
+  'execute and update the dataset immediately. Thereafter it will do so on the requested schedule.'
+
+export const COLORS = {
+    red: '#EF553B'
+};
