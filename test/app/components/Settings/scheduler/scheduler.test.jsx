@@ -10,8 +10,9 @@ import Modal from '../../../../../app/components/modal.jsx';
 import Status from '../../../../../app/components/Settings/scheduler/presentational/status';
 import Tag from '../../../../../app/components/Settings/scheduler/presentational/tag';
 import TagPicker from '../../../../../app/components/Settings/scheduler/pickers/tag-picker.jsx';
+import {COLORS} from '../../../../../app/constants/constants';
 
-const mockTags = [{id: 'tag:0', name: 'Tag 0', color: 'blue'}, {id: 'tag:1', name: 'Tag 1', color: '#EF553B'}];
+const mockTags = [{id: 'tag:0', name: 'Tag 0', color: 'blue'}, {id: 'tag:1', name: 'Tag 1', color: COLORS.red}];
 
 const mockQueries = [
     {
