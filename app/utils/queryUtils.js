@@ -1,4 +1,5 @@
-export function mapQueryToDailyCallCount ({ cronInterval, refreshInterval }) {
+export function mapQueryToDailyCallCount (query) {
+  const { cronInterval, refreshInterval } = query || {};
   if (!cronInterval && !refreshInterval) {
     return 0;
   }
