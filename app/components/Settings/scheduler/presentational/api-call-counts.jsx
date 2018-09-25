@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import pluralize from 'pluralize';
 import {COLORS} from '../../../../constants/constants';
 
 const MAX_CALLS_PER_DAY = 10000;
 
-const formatCallTotal = total => (total > MAX_CALLS_PER_DAY ? <span color={COLORS.red}>{total}</span> : total);
+const formatCallTotal = total => (total > MAX_CALLS_PER_DAY ? <span style={{color: COLORS.red}}>{total}</span> : total);
 
 const formatUsageRatio = usage => {
     return (
@@ -28,11 +29,15 @@ AdditionalCallsPreview.propTypes = {
     additionalCalls: PropTypes.number.isRequired,
     currTotal: PropTypes.number.isRequired
 };
+AdditionalCallsPreview.defaultProps = {
+    additionalCalls: 0,
+    currTotal: 0
+};
 
 export const IndividualCallCount = ({count}) => {
     return (
         <span style={{fontSize: '12px'}}>
-            {count} API {count === 1 ? 'call' : 'calls'} per day
+            {pluralize('API call', count, true)} per day
         </span>
     );
 };

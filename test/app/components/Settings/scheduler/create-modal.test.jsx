@@ -23,6 +23,9 @@ const CreateModal = require('../../../../../app/components/Settings/scheduler/mo
 const ErrorComponent = require('../../../../../app/components/error.jsx');
 const CronPicker = require('../../../../../app/components/Settings/cron-picker/cron-picker.jsx');
 const TagPicker = require('../../../../../app/components/Settings/scheduler/pickers/tag-picker').default;
+const AdditionalCallsPreview = require(
+  '../../../../../app/components/Settings/scheduler/presentational/api-call-counts.jsx'
+).AdditionalCallsPreview;
 
 describe('Create Modal Test', () => {
     beforeAll(() => {
@@ -152,5 +155,38 @@ describe('Create Modal Test', () => {
             .onModeChange({value: 'MONTHLY'});
 
         expect(component.state('interval')).toBe('0 0 1 * *');
+    });
+
+    it('should correctly display additional call count preview', () => {
+        let component = mount(
+            <CreateModal
+                open={true}
+                initialCode="SELECT * FROM foods"
+                initialName="queryname"
+                totalCallsPerDay={1000}
+            />
+        );
+
+        expect(component.find(AdditionalCallsPreview).text()).toBe(
+            'API usage: 288 calls/day (new total: 1288 / 10000)'
+        );
+
+        component = mount(
+            <CreateModal
+                open={true}
+                initialCode="SELECT * FROM foods"
+                initialName="queryname"
+                totalCallsPerDay={100000}
+            />
+        );
+
+        expect(
+            component
+                .find(AdditionalCallsPreview)
+                .find('span')
+                .last()
+                .prop('style')
+                .color
+        ).toBe('#EF553B');
     });
 });

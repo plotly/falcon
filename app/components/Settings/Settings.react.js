@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {contains, dissoc, flip, head, hasIn, isEmpty, keys, merge, propEq, propOr, reduce} from 'ramda';
 import {connect} from 'react-redux';
-import ReactToolTip from 'react-tooltip';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
 import fetch from 'isomorphic-fetch';

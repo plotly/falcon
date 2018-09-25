@@ -22,7 +22,7 @@ import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING, COLORS} from '../../../
 import {EXE_STATUS} from '../../../../../shared/constants.js';
 import {getInitialCronMode} from '../../cron-picker/cron-helpers';
 import ExecutionDetails from '../presentational/execution-details';
-import {AdditionalCallsPreview, IndividualCallCount} from '../presentational/api-call-counts';
+import {AdditionalCallsPreview, IndividualCallCount} from '../presentational/api-call-counts.jsx';
 import {mapQueryToDailyCallCount} from '../../../../utils/queryUtils';
 
 const NO_OP = () => {};
@@ -50,7 +50,8 @@ export class PreviewModal extends Component {
         onLogin: NO_OP,
         onClickAway: NO_OP,
         openQueryPage: NO_OP,
-        tags: []
+        tags: [],
+        totalCallsPerDay: 0
     };
     static propTypes = {
         query: PropTypes.object,
