@@ -24,10 +24,10 @@ describe('Dialog Selector Test', () => {
         />);
 
         // Number of Logos should match number of images
-        expect(selector.find('.logo').length).toEqual(Object.keys(DIALECTS).length);
+        expect(selector.find('.dialectSelector .Select-option').length).toEqual(Object.keys(DIALECTS).length);
 
         // Dialect not selected so should not be found
-        expect(selector.find('.logoSelected').length).toBe(0);
+        expect(selector.find('.dialectSelector .Select-option .is-selected').length).toBe(0);
     });
 
     it('should verify Dialect Selector created with dialect', () => {
@@ -42,6 +42,7 @@ describe('Dialog Selector Test', () => {
         />);
 
         // Dialect not selected so should not be found
-        expect(selector.find('.logoSelected').first().key()).toBe(connectionObject.dialect);
+        expect(selector.find('.dialectSelector .Select-option .is-selected')
+          .first().key()).toBe(connectionObject.dialect);
     });
 });
