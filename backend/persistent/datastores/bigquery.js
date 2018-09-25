@@ -1,7 +1,6 @@
 import {parseSQL} from '../../parse.js';
 
 const BigQuery = require('@google-cloud/bigquery');
-
 const Pool = require('./pool.js');
 const pool = new Pool(newClient, sameConnection);
 
