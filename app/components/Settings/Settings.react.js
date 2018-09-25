@@ -122,7 +122,6 @@ class Settings extends Component {
                 )}
             >
                 <div className={'dialectSelector'}>
-                    <ReactToolTip place={'top'} type={'dark'} effect={'solid'} />
                     <DialectSelector
                         connectionObject={connectionObject}
                         updateConnection={updateConnection}
