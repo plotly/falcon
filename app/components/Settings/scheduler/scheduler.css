@@ -56,6 +56,10 @@
     min-height: calc(100vh - 280px) !important;
 }
 
+.scheduler-table .react-grid-Canvas {
+  height: calc(100vh - 312px) !important;
+}
+
 .scheduler-table pre {
   margin: 0;
 }
