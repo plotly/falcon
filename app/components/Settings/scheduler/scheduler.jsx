@@ -18,10 +18,12 @@ import SQL from './presentational/sql';
 import Tag from './presentational/tag';
 import TagPicker from './pickers/tag-picker.jsx';
 import Status from './presentational/status';
+import {CallCountWidget} from './presentational/api-call-counts';
 
 import {decapitalize} from '../../../utils/utils';
 import {SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants';
 import {EXE_STATUS} from '../../../../shared/constants.js';
+import {mapQueryToDailyCallCount} from '../../../utils/queryUtils';
 
 import './scheduler.css';
 
@@ -524,6 +526,10 @@ class Scheduler extends Component {
         const rows = this.getRows();
         const loggedIn = Boolean(this.props.requestor);
 
+        const totalCallsPerDay = this.props.queries.reduce((accum, currQuery) => {
+            return accum + mapQueryToDailyCallCount(currQuery);
+        }, 0);
+
         const statusFilter = this.state.search.match(/status:(\S+)/);
 
         return (
@@ -545,6 +551,9 @@ class Scheduler extends Component {
                             Create Scheduled Query
                         </button>
                     )}
+                    <div style={{paddingRight: '40px'}}>
+                        <CallCountWidget count={totalCallsPerDay} />
+                    </div>
                 </Row>
                 <Row
                     style={{
@@ -702,6 +711,7 @@ class Scheduler extends Component {
                     dialect={this.props.dialect}
                     openQueryPage={this.props.openQueryPage}
                     tags={this.props.tags}
+                    totalCallsPerDay={totalCallsPerDay}
                 />
                 <PromptLoginModal
                     open={!loggedIn && this.state.createModalOpen}
@@ -725,6 +735,7 @@ class Scheduler extends Component {
                         onDelete={this.handleDelete}
                         dialect={this.props.dialect}
                         openQueryPage={this.props.openQueryPage}
+                        totalCallsPerDay={totalCallsPerDay}
                     />
                 )}
             </React.Fragment>

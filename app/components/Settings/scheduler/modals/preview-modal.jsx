@@ -22,6 +22,8 @@ import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING, COLORS} from '../../../
 import {EXE_STATUS} from '../../../../../shared/constants.js';
 import {getInitialCronMode} from '../../cron-picker/cron-helpers';
 import ExecutionDetails from '../presentational/execution-details';
+import {AdditionalCallsPreview, IndividualCallCount} from '../presentational/api-call-counts';
+import {mapQueryToDailyCallCount} from '../../../../utils/queryUtils';
 
 const NO_OP = () => {};
 
@@ -64,7 +66,8 @@ export class PreviewModal extends Component {
                 name: PropTypes.string.isRequired,
                 color: PropTypes.string
             })
-        )
+        ),
+        totalCallsPerDay: PropTypes.number.isRequired
     };
     constructor(props) {
         super(props);
@@ -261,7 +264,9 @@ export class PreviewModal extends Component {
     }
 
     render() {
-        const {query} = this.props;
+        const {query, totalCallsPerDay} = this.props;
+        const callCount = mapQueryToDailyCallCount(query);
+        const additionalCalls = mapQueryToDailyCallCount({cronInterval: this.state.cronInterval});
 
         let content;
         if (!query) {
@@ -389,6 +394,10 @@ export class PreviewModal extends Component {
                                         initialModeId={initialModeId}
                                         initialCronExpression={this.state.cronInterval}
                                     />
+                                    <AdditionalCallsPreview
+                                        additionalCalls={additionalCalls}
+                                        currTotal={totalCallsPerDay}
+                                    />
                                 </div>
                             ) : (
                                 <div style={valueStyle}>
@@ -397,6 +406,8 @@ export class PreviewModal extends Component {
                                         : `Runs every ${ms(query.refreshInterval * 1000, {
                                               long: true
                                           })}`}
+                                    <br />
+                                    <IndividualCallCount count={callCount} />
                                 </div>
                             )}
                         </Row>
