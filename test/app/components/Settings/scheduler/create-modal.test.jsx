@@ -23,9 +23,8 @@ const CreateModal = require('../../../../../app/components/Settings/scheduler/mo
 const ErrorComponent = require('../../../../../app/components/error.jsx');
 const CronPicker = require('../../../../../app/components/Settings/cron-picker/cron-picker.jsx');
 const TagPicker = require('../../../../../app/components/Settings/scheduler/pickers/tag-picker').default;
-const AdditionalCallsPreview = require(
-  '../../../../../app/components/Settings/scheduler/presentational/api-call-counts.jsx'
-).AdditionalCallsPreview;
+const AdditionalCallsPreview = require('../../../../../app/components/Settings/scheduler/presentational/api-call-counts.jsx')
+    .AdditionalCallsPreview;
 
 describe('Create Modal Test', () => {
     beforeAll(() => {
@@ -168,7 +167,7 @@ describe('Create Modal Test', () => {
         );
 
         expect(component.find(AdditionalCallsPreview).text()).toBe(
-            'API usage: 288 calls/day (new total: 1288 / 10000)'
+            'API Usage: 288 calls/day (new total: 1288 / 10000)'
         );
 
         component = mount(
@@ -185,8 +184,7 @@ describe('Create Modal Test', () => {
                 .find(AdditionalCallsPreview)
                 .find('span')
                 .last()
-                .prop('style')
-                .color
+                .prop('style').color
         ).toBe('#EF553B');
     });
 });

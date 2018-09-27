@@ -470,7 +470,8 @@ export class PreviewModal extends Component {
                                     <Timestamp value={query.nextScheduledAt} />{' '}
                                     {canEdit && (
                                         <span style={{paddingLeft: '7px'}}>
-                                            (<Link
+                                            (
+                                            <Link
                                                 className="refresh-button"
                                                 style={{color: '#506784'}}
                                                 disabled={this.state.loading}
@@ -481,7 +482,8 @@ export class PreviewModal extends Component {
                                                     : this.state.confirmedRun
                                                         ? 'are you sure?'
                                                         : 'run now'}
-                                            </Link>)
+                                            </Link>
+                                            )
                                         </span>
                                     )}
                                 </div>

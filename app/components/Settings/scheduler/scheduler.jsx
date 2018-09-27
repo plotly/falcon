@@ -536,9 +536,9 @@ class Scheduler extends Component {
             <React.Fragment>
                 <Row
                     style={{
-                        marginTop: 24,
-                        marginBottom: 24,
-                        justifyContent: 'space-between'
+                        marginBottom: 8,
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
                     }}
                 >
                     <input
@@ -551,7 +551,7 @@ class Scheduler extends Component {
                             Create Scheduled Query
                         </button>
                     )}
-                    <div style={{paddingRight: '40px'}}>
+                    <div style={{marginRight: '16px'}}>
                         <CallCountWidget count={totalCallsPerDay} />
                     </div>
                 </Row>
