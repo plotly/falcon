@@ -20,8 +20,8 @@ export const AdditionalCallsPreview = props => {
     const newTotal = additionalCalls + currTotal;
 
     return (
-        <div>
-            API usage: {additionalCalls} calls/day (new total: {formatUsageRatio(newTotal)})
+        <div style={{fontSize: '12px', opacity: 0.5, marginBottom: 16}}>
+            API Usage: {additionalCalls} calls/day (new total: {formatUsageRatio(newTotal)})
         </div>
     );
 };
@@ -35,11 +35,7 @@ AdditionalCallsPreview.defaultProps = {
 };
 
 export const IndividualCallCount = ({count}) => {
-    return (
-        <span style={{fontSize: '12px'}}>
-            {pluralize('API call', count, true)} per day
-        </span>
-    );
+    return <span style={{fontSize: '12px', opacity: 0.5}}>{pluralize('API call', count, true)} per day</span>;
 };
 IndividualCallCount.propTypes = {
     count: PropTypes.number.isRequired
@@ -48,8 +44,10 @@ IndividualCallCount.propTypes = {
 export const CallCountWidget = ({count}) => {
     return (
         <React.Fragment>
-            <h4>API Usage</h4>
-            <p style={{fontSize: '12px'}}>{formatUsageRatio(count)} API calls</p>
+            <p style={{fontSize: '12px', padding: '8px 16px'}}>
+                <div style={{fontWeight: 600, textAlign: 'center'}}>API Usage</div>
+                {formatUsageRatio(count)} API calls
+            </p>
         </React.Fragment>
     );
 };
