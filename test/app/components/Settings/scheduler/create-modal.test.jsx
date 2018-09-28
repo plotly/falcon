@@ -167,7 +167,7 @@ describe('Create Modal Test', () => {
         );
 
         expect(component.find(AdditionalCallsPreview).text()).toBe(
-            'API Usage: 288 calls/day (new total: 1288 / 10000)'
+            'API Usage: 288 calls/day (new total: 1,288 / 10,000)'
         );
 
         component = mount(

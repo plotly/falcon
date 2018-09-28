@@ -5,12 +5,17 @@ import {COLORS} from '../../../../constants/constants';
 
 const MAX_CALLS_PER_DAY = 10000;
 
-const formatCallTotal = total => (total > MAX_CALLS_PER_DAY ? <span style={{color: COLORS.red}}>{total}</span> : total);
+const formatCallTotal = total =>
+    total > MAX_CALLS_PER_DAY ? (
+        <span style={{color: COLORS.red}}>{total.toLocaleString('en')}</span>
+    ) : (
+        total.toLocaleString('en')
+    );
 
 const formatUsageRatio = usage => {
     return (
         <span>
-            {formatCallTotal(usage)} / {MAX_CALLS_PER_DAY}
+            {formatCallTotal(usage)} / {MAX_CALLS_PER_DAY.toLocaleString('en')}
         </span>
     );
 };
@@ -21,7 +26,7 @@ export const AdditionalCallsPreview = props => {
 
     return (
         <div style={{fontSize: '12px', opacity: 0.5, marginBottom: 16}}>
-            API Usage: {additionalCalls} calls/day (new total: {formatUsageRatio(newTotal)})
+            API Usage: {additionalCalls.toLocaleString('en')} calls/day (new total: {formatUsageRatio(newTotal)})
         </div>
     );
 };
@@ -45,7 +50,7 @@ export const CallCountWidget = ({count}) => {
     return (
         <React.Fragment>
             <p style={{fontSize: '12px', padding: '8px 16px'}}>
-                <div style={{fontWeight: 600, textAlign: 'center'}}>API Usage</div>
+                <span style={{fontWeight: 600, textAlign: 'center', display: 'block'}}>API Usage</span>
                 {formatUsageRatio(count)} API calls
             </p>
         </React.Fragment>
