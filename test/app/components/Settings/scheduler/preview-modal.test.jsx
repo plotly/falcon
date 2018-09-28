@@ -265,7 +265,7 @@ describe('Preview Modal Tests', () => {
                 .find('span')
                 .last()
                 .prop('data-tip')
-        ).toBe('completed execution at 9:12 am');
+        ).toMatch(/completed execution(.*):12/);
 
         query.lastExecution.duration = 1;
         component = mount(<PreviewModal tags={tags} query={query} currentRequestor="user" />);
