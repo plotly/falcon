@@ -120,7 +120,6 @@ describe('Routes:', () => {
                 });
         });
 
-        // TODO: run this test once tags are persisted on queries
         it('deletes a tag and removes it from existing queries', () => {
             let createdTagId, createdQueryFid;
 
