@@ -23,6 +23,7 @@ const CreateModal = require('../../../../../app/components/Settings/scheduler/mo
 const ErrorComponent = require('../../../../../app/components/error.jsx');
 const CronPicker = require('../../../../../app/components/Settings/cron-picker/cron-picker.jsx');
 const TagPicker = require('../../../../../app/components/Settings/scheduler/pickers/tag-picker').default;
+/* eslint-disable-next-line */
 const AdditionalCallsPreview = require('../../../../../app/components/Settings/scheduler/presentational/api-call-counts.jsx')
     .AdditionalCallsPreview;
 
