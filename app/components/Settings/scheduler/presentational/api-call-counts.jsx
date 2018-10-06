@@ -1,24 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import pluralize from 'pluralize';
-import {COLORS} from '../../../../constants/constants';
 
-const MAX_CALLS_PER_DAY = 10000;
-
-const formatCallTotal = total =>
-    total > MAX_CALLS_PER_DAY ? (
-        <span style={{color: COLORS.red}}>{total.toLocaleString('en')}</span>
-    ) : (
-        total.toLocaleString('en')
-    );
-
-const formatUsageRatio = usage => {
-    return (
-        <span>
-            {formatCallTotal(usage)} / {MAX_CALLS_PER_DAY.toLocaleString('en')}
-        </span>
-    );
-};
+const formatCalls = count => count.toLocaleString('en');
+const pluralize = (word, num) => (num > 1 ? `${word}s` : word);
 
 export const AdditionalCallsPreview = props => {
     const {additionalCalls, currTotal} = props;
@@ -26,7 +10,8 @@ export const AdditionalCallsPreview = props => {
 
     return (
         <div style={{fontSize: '12px', opacity: 0.5, marginBottom: 16}}>
-            API Usage: {additionalCalls.toLocaleString('en')} calls/day (new total: {formatUsageRatio(newTotal)})
+            API Usage: {formatCalls(additionalCalls)} {pluralize('call', additionalCalls)}/day (new total:{' '}
+            {formatCalls(newTotal)})
         </div>
     );
 };
@@ -39,8 +24,10 @@ AdditionalCallsPreview.defaultProps = {
     currTotal: 0
 };
 
+export const toIndividualCallCountString = count => `${formatCalls(count)} API ${pluralize('call', count)} per day`;
+
 export const IndividualCallCount = ({count}) => {
-    return <span style={{fontSize: '12px', opacity: 0.5}}>{pluralize('API call', count, true)} per day</span>;
+    return <span style={{fontSize: '12px', opacity: 0.5}}>{toIndividualCallCountString(count)}</span>;
 };
 IndividualCallCount.propTypes = {
     count: PropTypes.number.isRequired
@@ -49,9 +36,10 @@ IndividualCallCount.propTypes = {
 export const CallCountWidget = ({count}) => {
     return (
         <React.Fragment>
-            <p style={{fontSize: '12px', padding: '8px 16px'}}>
+            <p style={{fontSize: '12px', padding: '8px 16px', textAlign: 'center'}}>
                 <span style={{fontWeight: 600, textAlign: 'center', display: 'block'}}>API Usage</span>
-                {formatUsageRatio(count)} API calls
+                {formatCalls(count)} {pluralize('call', count)}/day
+                <i style={{display: 'block', textAlign: 'center'}}>for this connection</i>
             </p>
         </React.Fragment>
     );
