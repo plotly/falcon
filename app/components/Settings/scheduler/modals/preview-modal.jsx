@@ -397,7 +397,7 @@ export class PreviewModal extends Component {
                                     />
                                     <AdditionalCallsPreview
                                         additionalCalls={additionalCalls}
-                                        currTotal={totalCallsPerDay}
+                                        currTotal={totalCallsPerDay - callCount}
                                     />
                                 </div>
                             ) : (

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import {contains} from 'ramda';
 import ReactDataGrid from 'react-data-grid';
+import ReactToolTip from 'react-tooltip';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
 import cronstrue from 'cronstrue';
@@ -18,7 +19,7 @@ import SQL from './presentational/sql';
 import Tag from './presentational/tag';
 import TagPicker from './pickers/tag-picker.jsx';
 import Status from './presentational/status';
-import {CallCountWidget} from './presentational/api-call-counts';
+import {CallCountWidget, toIndividualCallCountString} from './presentational/api-call-counts';
 
 import {decapitalize} from '../../../utils/utils';
 import {SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants';
@@ -34,6 +35,11 @@ const sortLastExecution = (key, reverse) => (a, b) => {
     const s = ((a.lastExecution && a.lastExecution[key]) || 0) - ((b.lastExecution && b.lastExecution[key]) || 0);
     return reverse ? -1 * s : s;
 };
+const sortCallCount = reverse => (a, b) => {
+    const s = mapQueryToDailyCallCount(b) - mapQueryToDailyCallCount(a);
+    return reverse ? -1 * s : s;
+};
+
 const SORT_OPTIONS = [
     {
         id: 'nextScheduledAt-asc',
@@ -69,6 +75,16 @@ const SORT_OPTIONS = [
         id: 'rowCount-asc',
         label: 'Least rows',
         fn: sortLastExecution('rowCount', false)
+    },
+    {
+        id: 'callCount-desc',
+        label: 'Most API calls/day',
+        fn: sortCallCount()
+    },
+    {
+        id: 'callCount-asc',
+        label: 'Least API calls/day',
+        fn: sortCallCount(true)
     }
 ];
 
@@ -151,11 +167,13 @@ class QueryFormatter extends React.Component {
                             opacity: 0.5
                         }}
                     >
-                        {query.cronInterval
-                            ? `Runs ${decapitalize(cronstrue.toString(query.cronInterval))}`
-                            : `Runs every ${ms(query.refreshInterval * 1000, {
-                                  long: true
-                              })}`}
+                        <span data-tip={toIndividualCallCountString(mapQueryToDailyCallCount(query))}>
+                            {query.cronInterval
+                                ? `Runs ${decapitalize(cronstrue.toString(query.cronInterval))}`
+                                : `Runs every ${ms(query.refreshInterval * 1000, {
+                                      long: true
+                                  })}`}
+                        </span>
                     </em>
                 </Column>
                 <Column style={{width: 'auto', margin: '0 16px'}}>
@@ -738,6 +756,7 @@ class Scheduler extends Component {
                         totalCallsPerDay={totalCallsPerDay}
                     />
                 )}
+                <ReactToolTip className="tool-tip" />
             </React.Fragment>
         );
     }

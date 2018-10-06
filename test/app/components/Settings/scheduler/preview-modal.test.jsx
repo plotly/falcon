@@ -287,7 +287,7 @@ describe('Preview Modal Tests', () => {
       };
 
       let component = mount(<PreviewModal query={query} currentRequestor="user" />);
-      expect(component.find(IndividualCallCount).text()).toBe('1440 API calls per day');
+      expect(component.find(IndividualCallCount).text()).toBe('1,440 API calls per day');
 
       query.cronInterval = '0 0 * * *';
       component = mount(<PreviewModal query={query} currentRequestor="user" />);

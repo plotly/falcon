@@ -158,7 +158,7 @@ describe('Create Modal Test', () => {
     });
 
     it('should correctly display additional call count preview', () => {
-        let component = mount(
+        const component = mount(
             <CreateModal
                 open={true}
                 initialCode="SELECT * FROM foods"
@@ -167,25 +167,6 @@ describe('Create Modal Test', () => {
             />
         );
 
-        expect(component.find(AdditionalCallsPreview).text()).toBe(
-            'API Usage: 288 calls/day (new total: 1,288 / 10,000)'
-        );
-
-        component = mount(
-            <CreateModal
-                open={true}
-                initialCode="SELECT * FROM foods"
-                initialName="queryname"
-                totalCallsPerDay={100000}
-            />
-        );
-
-        expect(
-            component
-                .find(AdditionalCallsPreview)
-                .find('span')
-                .last()
-                .prop('style').color
-        ).toBe('#EF553B');
+        expect(component.find(AdditionalCallsPreview).text()).toBe('API Usage: 288 calls/day (new total: 1,288)');
     });
 });
