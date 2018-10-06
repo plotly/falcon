@@ -214,6 +214,7 @@ class IntervalFormatter extends React.Component {
                     {!run && '—'}
                     {startedAt ? (
                         <div
+                            data-tip={new Date(run.startedAt).toISOString()}
                             style={{
                                 fontSize: 16,
                                 color: run.status !== EXE_STATUS.failed ? '#00cc96' : '#ef595b'
