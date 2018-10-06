@@ -24,9 +24,9 @@ class QueryScheduler {
 
         // this.job wraps this.queryAndUpdateGrid to avoid concurrent runs of the same job
         this.runningJobs = {};
-        const startedAt = Date.now();
 
         this.job = (fid, query, connectionId, requestor, cronInterval, refreshInterval) => {
+            const startedAt = Date.now();
             try {
                 if (this.runningJobs[fid]) {
                     return;

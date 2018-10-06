@@ -4,6 +4,11 @@ import ReactToolTip from 'react-tooltip';
 import moment from 'moment';
 
 const ONE_MINUTE = 60 * 1000;
+const toIso = timestamp => {
+    const date = new Date(timestamp);
+
+    return date.getTime() > 0 ? date.toISOString() : 'Invalid ISO';
+};
 
 const formatAbsolute = (timestamp, inline) => {
     const now = Date.now();
@@ -31,6 +36,7 @@ const Timestamp = props => {
     return (
         <React.Fragment>
             <span data-tip={formatAbsolute(props.value, props.inline)}>{moment(props.value).fromNow()}</span>
+            <i style={{fontSize: '12px', color: 'grey', paddingLeft: '10px'}}>({toIso(props.value)})</i>
             <ReactToolTip />
         </React.Fragment>
     );
