@@ -680,12 +680,6 @@ class Scheduler extends Component {
                                     value={this.state.tags}
                                     options={this.props.tags}
                                 />
-                                <div
-                                    style={{position: 'absolute', bottom: '-16px'}}
-                                    onClick={() => this.setState({manageTags: true})}
-                                >
-                                    <u className="tag-manager-text">manage tags</u>
-                                </div>
                             </Column>
                             <Column style={{maxWidth: 180}}>
                                 <Select
