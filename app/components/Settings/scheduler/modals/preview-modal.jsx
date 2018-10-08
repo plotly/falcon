@@ -201,6 +201,10 @@ export class PreviewModal extends Component {
         const canEdit = this.props.currentRequestor && this.props.currentRequestor === this.props.query.requestor;
         const success = this.state.successMessage;
 
+        if (this.props.query.lastExecution && this.props.query.lastExecution.status === EXE_STATUS.running) {
+            return null;
+        }
+
         if (!canEdit) {
             return (
                 <React.Fragment>
@@ -435,7 +439,7 @@ export class PreviewModal extends Component {
                                 <Row style={rowStyle}>
                                     <div style={keyStyle}>Last ran</div>
                                     <div style={valueStyle}>
-                                        {run.startedAt ? (
+                                        {run.status !== EXE_STATUS.running ? (
                                             <span
                                                 style={{
                                                     color:
@@ -447,9 +451,7 @@ export class PreviewModal extends Component {
                                                 <Timestamp value={run.startedAt} />
                                             </span>
                                         ) : (
-                                            run.status === EXE_STATUS.running && (
-                                                <span style={{color: '#e4cf11'}}>Currently running</span>
-                                            )
+                                            <span style={{color: '#e4cf11'}}>Currently running</span>
                                         )}
                                         <br />
                                         {run.errorMessage && <span>{run.errorMessage}</span>}
