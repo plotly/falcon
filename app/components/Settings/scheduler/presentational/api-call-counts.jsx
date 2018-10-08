@@ -10,8 +10,8 @@ export const AdditionalCallsPreview = props => {
 
     return (
         <div style={{fontSize: '12px', opacity: 0.5, marginBottom: 16}}>
-            API Usage: {formatCalls(additionalCalls)} {pluralize('call', additionalCalls)}/day (new total:{' '}
-            {formatCalls(newTotal)})
+            API Usage: {formatCalls(additionalCalls)} {pluralize('call', additionalCalls)}
+            /day (new total: {formatCalls(newTotal)})
         </div>
     );
 };
@@ -36,10 +36,20 @@ IndividualCallCount.propTypes = {
 export const CallCountWidget = ({count}) => {
     return (
         <React.Fragment>
-            <p style={{fontSize: '12px', padding: '8px 16px', textAlign: 'center'}}>
-                <span style={{fontWeight: 600, textAlign: 'center', display: 'block'}}>API Usage</span>
-                {formatCalls(count)} {pluralize('call', count)}/day
-                <i style={{display: 'block', textAlign: 'center'}}>for this connection</i>
+            <p style={{fontSize: '10px', padding: '8px 16px', textAlign: 'center'}}>
+                <span
+                    style={{
+                        display: 'block',
+                        opacity: 0.6
+                    }}
+                >
+                    API USAGE
+                </span>
+                <span style={{fontSize: '14px', fontWeight: 600, padding: '8px 16px'}}>
+                    {formatCalls(count)} {pluralize('call', count)}
+                    /day
+                </span>
+                <i style={{display: 'block'}}>(for this connection)</i>
             </p>
         </React.Fragment>
     );

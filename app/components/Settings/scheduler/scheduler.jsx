@@ -556,21 +556,36 @@ class Scheduler extends Component {
                 <Row
                     style={{
                         marginBottom: 8,
-                        justifyContent: 'space-between',
                         alignItems: 'center'
                     }}
                 >
                     <input
+                        style={{width: '40%'}}
                         value={this.state.search}
                         onChange={this.handleSearchChange}
                         placeholder="Search scheduled queries..."
                     />
+                    <Column style={{width: 'unset', marginLeft: 16}}>
+                        {this.state.search && (
+                            <u
+                                className="clear-state"
+                                onClick={this.resetSearch}
+                                style={{
+                                    borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
+                                    paddingLeft: 16,
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Clear
+                            </u>
+                        )}
+                    </Column>
                     {!contains(this.props.dialect, SQL_DIALECTS_USING_EDITOR) && (
                         <button style={{marginRight: '16px'}} onClick={this.openCreateModal}>
                             Create Scheduled Query
                         </button>
                     )}
-                    <div style={{marginRight: '16px'}}>
+                    <div style={{marginLeft: 'auto', marginRight: '16px'}}>
                         <CallCountWidget count={totalCallsPerDay} />
                     </div>
                 </Row>
@@ -649,23 +664,8 @@ class Scheduler extends Component {
                             </div>
                         </div>
                     </Column>
-                    <Column style={{width: '100%', maxWidth: 720}}>
+                    <Column style={{width: '100%', maxWidth: 560}}>
                         <Row style={{width: 'auto', justifyContent: 'flex-end'}}>
-                            <Column style={{maxWidth: 168, marginRight: 16}}>
-                                {this.state.search && (
-                                    <u
-                                        className="clear-state"
-                                        onClick={this.resetSearch}
-                                        style={{
-                                            fontWeight: 'bold',
-                                            borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        Clear current search
-                                    </u>
-                                )}
-                            </Column>
                             <Column
                                 style={{
                                     position: 'relative',
