@@ -212,26 +212,24 @@ class IntervalFormatter extends React.Component {
             <Row>
                 <Column>
                     {!run && '—'}
-                    {startedAt ? (
-                        <div
-                            data-tip={new Date(run.startedAt).toISOString()}
-                            style={{
-                                fontSize: 16,
-                                color: run.status !== EXE_STATUS.failed ? '#00cc96' : '#ef595b'
-                            }}
-                        >
-                            {startedAt < 60 * 1000
-                                ? 'Just now'
-                                : `${ms(startedAt, {
-                                      long: true
-                                  })} ago`}
-                        </div>
-                    ) : (
-                        run &&
-                        run.status === EXE_STATUS.running && (
+                    {startedAt &&
+                        (run.status === EXE_STATUS.running ? (
                             <span style={{fontSize: 16, color: '#e4cf11'}}>Currently running</span>
-                        )
-                    )}
+                        ) : (
+                            <div
+                                data-tip={new Date(run.startedAt).toISOString()}
+                                style={{
+                                    fontSize: 16,
+                                    color: run.status !== EXE_STATUS.failed ? '#00cc96' : '#ef595b'
+                                }}
+                            >
+                                {startedAt < 60 * 1000
+                                    ? 'Just now'
+                                    : `${ms(startedAt, {
+                                          long: true
+                                      })} ago`}
+                            </div>
+                        ))}
                     {run &&
                         run.errorMessage && (
                             <em
@@ -428,7 +426,7 @@ class Scheduler extends Component {
 
         return mapRow(
             Object.assign({}, row, {
-                tags: row.tags ? row.tags.map(id => this.props.tags.find(t => t.id === id)) : []
+                tags: row && row.tags ? row.tags.map(id => this.props.tags.find(t => t.id === id)) : []
             })
         );
     }
