@@ -764,6 +764,14 @@ export default class Servers {
                 refreshInterval = null
             } = req.params;
 
+            // validate data integrity before proceding
+            if (req.params.tags) {
+                const tagIds = getTags().map(tag => tag.id);
+                if (req.params.tags.some(tag => !tagIds.includes(tag))) {
+                    return onError('Invalid tags');
+                }
+            }
+
             const startedAt = Date.now();
 
             // If a filename has been provided,
