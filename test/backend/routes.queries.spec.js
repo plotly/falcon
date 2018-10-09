@@ -4,6 +4,7 @@ import {merge, omit} from 'ramda';
 import uuid from 'uuid';
 
 import {saveConnection} from '../../backend/persistent/Connections.js';
+import {saveTag} from '../../backend/persistent/Tags.js';
 import {deleteGrid} from '../../backend/persistent/plotly-api.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
 import {
@@ -128,12 +129,15 @@ describe('Routes:', () => {
                 foo: 'bar'
             };
 
+            const TAG_1 = saveTag({ name: '_' });
+            const TAG_2 = saveTag({ name: '__' });
+
             queryObject = {
                 requestor: username,
                 cronInterval: '*/5 * * * *',
                 connectionId,
                 query: 'SELECT * from ebola_2014 LIMIT 2',
-                tags: ['_', '__'],
+                tags: [TAG_1.id, TAG_2.id],
                 name: '_',
                 ...INVALID_PROPS
             };
@@ -182,6 +186,7 @@ describe('Routes:', () => {
                         receivedQuery.nextScheduledAt < FIVE_MINUTES_FROM_NOW,
                         'query scheduled to be run more than five minutes from now'
                     );
+                    assert.deepEqual(receivedQuery.tags, [TAG_1.id, TAG_2.id]);
 
 
                     return deleteGrid(fid, username);
