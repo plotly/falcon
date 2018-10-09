@@ -18,7 +18,8 @@ export const DIALECTS = {
     APACHE_DRILL: 'apache drill',
     DATA_WORLD: 'data.world',
     ATHENA: 'athena',
-    CSV: 'csv'
+    CSV: 'csv',
+    BIGQUERY: 'bigquery'
 };
 
 export const SQL_DIALECTS_USING_EDITOR = [
@@ -34,7 +35,8 @@ export const SQL_DIALECTS_USING_EDITOR = [
     'apache impala',
     'data.world',
     'athena',
-    'csv'
+    'csv',
+    'bigquery'
 ];
 
 const commonSqlOptions = [
@@ -253,6 +255,21 @@ export const CONNECTION_CONFIG = {
                             Note that this is just the connection between this app and your database; \
                             connections to plot.ly or your plotly instance are always encrypted.'
         }
+    ],
+    [DIALECTS.BIGQUERY]: [
+        {
+            'label': 'Google Project Id',
+            'value': 'projectId',
+            'type': 'text',
+            'description': 'The Google Cloud Project Id'
+        },
+        {'label': 'Database', 'value': 'database', 'type': 'text'},
+        {
+            'label': 'Key File',
+            'value': 'keyFilename',
+            'type': 'filedrop',
+            'description': 'The location of the Google Service Account Key File'
+        }
     ]
 };
 
@@ -273,7 +290,8 @@ export const LOGOS = {
     [DIALECTS.S3]: 'images/s3-logo.png',
     [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png',
     [DIALECTS.DATA_WORLD]: 'images/dataworld-logo.png',
-    [DIALECTS.ATHENA]: 'images/athena-logo.png'
+    [DIALECTS.ATHENA]: 'images/athena-logo.png',
+    [DIALECTS.BIGQUERY]: 'images/bigquery-logo.png'
 };
 
 export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
@@ -307,6 +325,8 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
                     size: 1000
                 }
             });
+        case DIALECTS.BIGQUERY:
+            return `SELECT * FROM ${connection.database}.__TABLES__ `;
         default:
             return '';
     }
@@ -484,6 +504,11 @@ export const SAMPLE_DBS = {
     },
     [DIALECTS.DATA_WORLD]: {
         url: 'https://data.world/rflprr/reported-lyme-disease-cases-by-state'
+    },
+    [DIALECTS.BIGQUERY]: {
+        projectId: 'Plotly',
+        database: 'plotly',
+        keyFilename: '/home/plotly/falcon/google-credentials.json'
     }
 };
 

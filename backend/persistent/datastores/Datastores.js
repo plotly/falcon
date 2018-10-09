@@ -14,6 +14,7 @@ import * as ApacheImpala from './impala';
 import * as DataWorld from './dataworld';
 import * as DatastoreMock from './datastoremock';
 import * as Athena from './athena';
+import * as BigQuery from './bigquery';
 
 const CSV = require('./csv');
 const Oracle = require('./oracle.js');
@@ -65,6 +66,8 @@ function getDatastoreClient(connection) {
         return Athena;
     } else if (dialect === 'oracle') {
         return Oracle;
+    } else if (dialect === 'bigquery') {
+        return BigQuery;
     }
     return Sql;
 }
