@@ -114,6 +114,14 @@ export class PreviewModal extends Component {
         this.setState({tags});
     }
 
+    formatTags(tags) {
+        if (tags.length === 0 || typeof tags[0] === 'string') {
+            return tags;
+        }
+
+        return tags.map(tag => tag.id);
+    }
+
     save() {
         const {connectionId, fid, requestor, uids} = this.props.query;
         const {code: query, cronInterval, tags} = this.state;
@@ -129,7 +137,7 @@ export class PreviewModal extends Component {
                 query,
                 name,
                 cronInterval,
-                tags: tags.map(t => t.id)
+                tags: this.formatTags(tags)
             })
             .then(() => {
                 this.setState({
