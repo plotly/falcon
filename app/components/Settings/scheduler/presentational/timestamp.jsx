@@ -34,10 +34,10 @@ const formatRelative = ({value, checkIfRunning}) => {
 };
 
 const Timestamp = props => {
-    const {value, checkIfRunning} = props;
+    const {value, checkIfRunning, inline} = props;
     return (
         <React.Fragment>
-            <span data-tip={formatAbsolute(props.value, props.inline)}>{formatRelative({value, checkIfRunning})}</span>
+            <span data-tip={formatAbsolute(value, inline)}>{formatRelative({value, checkIfRunning})}</span>
             <i style={{fontSize: '12px', color: 'grey', paddingLeft: '10px'}}>({toIso(props.value)})</i>
             <ReactToolTip />
         </React.Fragment>
@@ -46,6 +46,7 @@ const Timestamp = props => {
 
 Timestamp.propTypes = {
     value: PropTypes.number,
+    checkIfRunning: PropTypes.bool,
     inline: PropTypes.bool
 };
 
