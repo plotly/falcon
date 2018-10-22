@@ -351,6 +351,10 @@ class Scheduler extends Component {
         clearInterval(this.refreshQueriesInterval);
     }
 
+    componentDidUpdate() {
+        ReactToolTip.rebuild()
+    }
+
     handleSearchChange(e) {
         this.setState({search: e.target.value});
     }
@@ -749,7 +753,7 @@ class Scheduler extends Component {
                         totalCallsPerDay={totalCallsPerDay}
                     />
                 )}
-                <ReactToolTip className="tool-tip" />
+                <ReactToolTip />
             </React.Fragment>
         );
     }
