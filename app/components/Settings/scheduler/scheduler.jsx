@@ -344,7 +344,7 @@ class Scheduler extends Component {
     }
 
     componentDidMount() {
-        this.refreshQueriesInterval = setInterval(this.props.refreshQueries, 60 * 1000);
+        this.refreshQueriesInterval = setInterval(this.props.refreshQueries, 20 * 1000);
     }
 
     componentWillUnmount() {
