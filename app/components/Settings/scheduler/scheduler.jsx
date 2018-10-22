@@ -352,7 +352,7 @@ class Scheduler extends Component {
     }
 
     componentDidUpdate() {
-        ReactToolTip.rebuild()
+        ReactToolTip.rebuild();
     }
 
     handleSearchChange(e) {
