@@ -456,7 +456,7 @@ export class PreviewModal extends Component {
                                                             : '#ef595b'
                                                 }}
                                             >
-                                                <Timestamp value={run.startedAt} />
+                                                <Timestamp value={run.startedAt} checkIfRunning={false} />
                                             </span>
                                         ) : (
                                             <span style={{color: '#e4cf11'}}>Currently running</span>
@@ -477,7 +477,10 @@ export class PreviewModal extends Component {
                             <Row style={rowStyle}>
                                 <div style={keyStyle}>Scheduled to run</div>
                                 <div style={valueStyle}>
-                                    <Timestamp value={query.nextScheduledAt} />{' '}
+                                    <Timestamp
+                                        value={query.nextScheduledAt}
+                                        checkIfRunning={run && run.status !== EXE_STATUS.failed}
+                                    />{' '}
                                     {canEdit && (
                                         <span style={{paddingLeft: '7px'}}>
                                             (
