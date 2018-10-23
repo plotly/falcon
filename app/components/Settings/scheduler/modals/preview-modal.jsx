@@ -477,10 +477,7 @@ export class PreviewModal extends Component {
                             <Row style={rowStyle}>
                                 <div style={keyStyle}>Scheduled to run</div>
                                 <div style={valueStyle}>
-                                    <Timestamp
-                                        value={query.nextScheduledAt}
-                                        checkIfRunning={run && run.status !== EXE_STATUS.failed}
-                                    />{' '}
+                                    <Timestamp value={query.nextScheduledAt} checkIfRunning={true} />{' '}
                                     {canEdit && (
                                         <span style={{paddingLeft: '7px'}}>
                                             (
