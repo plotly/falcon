@@ -27,7 +27,7 @@ const formatAbsolute = (timestamp, inline) => {
 
 const formatRelative = ({value, checkIfRunning}) => {
     if (checkIfRunning && value < Date.now()) {
-        return 'currently running';
+        return 'Currently running';
     }
 
     return moment(value).fromNow();

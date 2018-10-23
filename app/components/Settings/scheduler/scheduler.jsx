@@ -223,11 +223,7 @@ class IntervalFormatter extends React.Component {
                                     color: run.status !== EXE_STATUS.failed ? '#00cc96' : '#ef595b'
                                 }}
                             >
-                                {startedAt < 60 * 1000
-                                    ? 'Just now'
-                                    : `${ms(startedAt, {
-                                          long: true
-                                      })} ago`}
+                                {ms(startedAt, {long: true})} ago
                             </div>
                         ))}
                     {run &&
