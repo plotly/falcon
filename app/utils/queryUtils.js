@@ -19,5 +19,5 @@ export function mapQueryToDailyCallCount (query) {
   }
 
   // otherwise, fallback to refresh interval
-  return Math.floor(1440 / refreshInterval); // seconds per day / scheduling interval in seconds
+  return Math.floor(86400 / refreshInterval); // seconds per day / scheduling interval in seconds
 }
