@@ -7,6 +7,7 @@ import {mapRefreshToCron, mapCronToRefresh} from '../utils/cronUtils.js';
 import {extractOrderedUids} from '../utils/gridUtils.js';
 import Logger from '../logger';
 import {getQuery, getQueries, saveQuery, updateQuery, deleteQuery} from './Queries.js';
+import {getTags} from './Tags.js';
 import {getCredentials, getSetting} from '../settings.js';
 import {getCurrentUser, getGridMeta, newGrid, patchGrid, updateGrid, getGridColumn} from './plotly-api.js';
 import {EXE_STATUS} from '../../shared/constants.js';
@@ -24,9 +25,9 @@ class QueryScheduler {
 
         // this.job wraps this.queryAndUpdateGrid to avoid concurrent runs of the same job
         this.runningJobs = {};
-        const startedAt = Date.now();
 
         this.job = (fid, query, connectionId, requestor, cronInterval, refreshInterval) => {
+            const startedAt = Date.now();
             try {
                 if (this.runningJobs[fid]) {
                     return;
@@ -163,9 +164,19 @@ class QueryScheduler {
 
     // Load and schedule queries - To be run on app start.
     loadQueries() {
-        // read queries from a file
+        // read persisted data from disk
+        const tags = getTags();
         const queries = getQueries();
-        queries.forEach(this.scheduleQuery);
+
+        // sanitize queries before scheduling
+        queries.forEach((query) => {
+            const cleanQuery = this.sanitizeQuery({ query, tags });
+            updateQuery(query.fid, cleanQuery);
+        });
+
+        const cleanedQueries = getQueries();
+
+        cleanedQueries.forEach(this.scheduleQuery);
     }
 
     // Remove query from memory
@@ -179,6 +190,27 @@ class QueryScheduler {
     // Clear out setInterval queries from memory - used to clean up tests
     clearQueries() {
         Object.keys(this.queryJobs).forEach(this.clearQuery);
+    }
+
+    sanitizeQuery({ query, tags }) {
+        // prune invalid "running" executions from last shutdown
+        if (query.lastExecution && query.lastExecution.status === EXE_STATUS.running) {
+            query.lastExecution = null;
+        }
+
+        // prune invalid tags
+        if (query.tags) {
+            const allTagIds = tags.map(tag => tag.id);
+
+            if (!Array.isArray(query.tags)) {
+                query.tags = [];
+            }
+
+            const validTags = query.tags.filter(tagId => allTagIds.includes(tagId));
+            query.tags = validTags;
+        }
+
+        return query;
     }
 
     queryAndCreateGrid(filename, query, connectionId, requestor, cronInterval, refreshInterval) {

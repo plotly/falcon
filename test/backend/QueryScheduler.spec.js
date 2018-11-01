@@ -10,7 +10,8 @@ import {
     getGrid,
     updateGrid
 } from '../../backend/persistent/plotly-api.js';
-import {getQueries} from '../../backend/persistent/Queries.js';
+import {getQueries, saveQuery} from '../../backend/persistent/Queries.js';
+import {saveTag} from '../../backend/persistent/Tags.js';
 import QueryScheduler from '../../backend/persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
 import {
@@ -24,6 +25,7 @@ import {
     username,
     wait
 } from './utils.js';
+import {EXE_STATUS} from '../../shared/constants.js';
 
 chai.use(chaiSubset);
 const { assert } = chai;
@@ -116,6 +118,65 @@ describe('QueryScheduler', function() {
                 query.connectionId, query.requestor
             ), `job2 was called with unexpected args: ${spy2.args}`);
         });
+    });
+
+    it('sanitizes queries correctly on load', function () {
+        const NO_OP = () => {};
+        const QUERY_BASE = {
+            refreshInterval: 60, // arbitrary
+            uids: '...',
+            query: '...',
+            connectionId: '...'
+        };
+
+        const TAG_1 = saveTag({ name: 'tag 1'});
+        const TAG_2 = saveTag({ name: 'tag 2'});
+
+        const QUERY_WITH_INVALID_LAST_EXECUTION = {
+            ...QUERY_BASE,
+            fid: 1,
+            lastExecution: {
+                status: EXE_STATUS.running
+            },
+            tags: [TAG_1.id, TAG_2.id]
+        };
+        const QUERY_WITH_INVALID_TAGS = {
+            ...QUERY_BASE,
+            fid: 2,
+            lastExecution: {
+                status: EXE_STATUS.ok
+            },
+            tags: ['invalid', TAG_1.id, 'another invalid', TAG_2.id]
+        };
+        const QUERY_WITH_BAD_SCHEMA = {
+            ...QUERY_BASE,
+            fid: 3,
+            tags: {}
+        };
+
+        saveQuery(QUERY_WITH_INVALID_LAST_EXECUTION);
+        saveQuery(QUERY_WITH_INVALID_TAGS);
+        saveQuery(QUERY_WITH_BAD_SCHEMA);
+
+        // prevent queries from actually running
+        queryScheduler.job = NO_OP;
+
+        queryScheduler.loadQueries();
+
+        const loadedQueries = getQueries();
+
+        const invalidLastExecutionLoaded = loadedQueries[0];
+        assert(!invalidLastExecutionLoaded.lastExecution);
+        assert.deepEqual(invalidLastExecutionLoaded.tags, [TAG_1.id, TAG_2.id]);
+
+
+        const invalidTagsLoaded = loadedQueries[1];
+        assert(invalidTagsLoaded.lastExecution.status === EXE_STATUS.ok);
+        assert.deepEqual(invalidTagsLoaded.tags, [TAG_1.id, TAG_2.id]);
+
+        const invalidSchemaLoaded = loadedQueries[2];
+        assert(Array.isArray(invalidSchemaLoaded.tags));
+        assert(invalidSchemaLoaded.tags.length === 0);
     });
 
     it('executes a function on a refresh interval', function () {

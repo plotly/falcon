@@ -14,9 +14,11 @@ import CronPicker from '../../../cron-picker/cron-picker';
 import SQL from '../../presentational/sql';
 import TagPicker from '../../pickers/tag-picker.jsx';
 import TagModal from '../tags-modal/tags-modal.jsx';
+import {AdditionalCallsPreview} from '../../presentational/api-call-counts.jsx';
 
 import {datasetUrl as getDatasetURL, decapitalize} from '../../../../../utils/utils';
 import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING} from '../../../../../constants/constants';
+import {mapQueryToDailyCallCount} from '../../../../../utils/queryUtils';
 
 import './create-modal.css';
 
@@ -56,15 +58,18 @@ class CreateModal extends Component {
                 name: PropTypes.string.isRequired,
                 color: PropTypes.string
             })
-        )
+        ),
+        totalCallsPerDay: PropTypes.number.isRequired
     };
+
     static defaultProps = {
         initialCode: '',
         initialName: '',
         onClickAway: noop,
         onSubmit: noop,
         openQueryPage: noop,
-        tags: []
+        tags: [],
+        totalCallsPerDay: 0
     };
     constructor(props) {
         super(props);
@@ -157,6 +162,9 @@ class CreateModal extends Component {
     }
 
     render() {
+        const {totalCallsPerDay} = this.props;
+        const additionalCalls = mapQueryToDailyCallCount({cronInterval: this.state.interval});
+
         if (this.state.tagsModalOpen) {
             return <TagModal onClickAway={this.closeTagsModal} />;
         }
@@ -221,6 +229,10 @@ class CreateModal extends Component {
                                 ) : (
                                     <CronPicker onChange={this.handleIntervalChange} />
                                 )}
+                                <AdditionalCallsPreview
+                                    additionalCalls={additionalCalls}
+                                    currTotal={totalCallsPerDay}
+                                />
                             </div>
                         </Row>
                         <Row style={secondaryRowStyle}>

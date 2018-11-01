@@ -4,30 +4,28 @@ jest.unmock('../../../../../app/constants/constants.js');
 import DialectSelector from '../../../../../app/components/Settings/DialectSelector/DialectSelector.react.js';
 import {DIALECTS} from '../../../../../app/constants/constants.js';
 import React from 'react';
-import { mount, configure } from 'enzyme';
+import Select from 'react-select';
+import {mount, configure} from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
 describe('Dialog Selector Test', () => {
-
     beforeAll(() => {
-        configure({ adapter: new Adapter() });
+        configure({adapter: new Adapter()});
     });
 
-   it('should verify Dialect Selector created without dialect', () => {
+    it('should verify Dialect Selector created without dialect', () => {
         const updateConnection = function() {};
-        const connectionObject = {
-        };
+        const connectionObject = {};
 
-        const selector = mount(<DialectSelector
-            connectionObject={connectionObject}
-            updateConnection={updateConnection}
-        />);
+        const selector = mount(
+            <DialectSelector connectionObject={connectionObject} updateConnection={updateConnection} />
+        );
 
         // Number of Logos should match number of images
-        expect(selector.find('.logo').length).toEqual(Object.keys(DIALECTS).length);
+        expect(selector.find(Select).prop('options').length).toEqual(Object.keys(DIALECTS).length);
 
         // Dialect not selected so should not be found
-        expect(selector.find('.logoSelected').length).toBe(0);
+        expect(selector.find('.Select-option .is-selected').length).toBe(0);
     });
 
     it('should verify Dialect Selector created with dialect', () => {
@@ -36,12 +34,19 @@ describe('Dialog Selector Test', () => {
             dialect: 'mysql'
         };
 
-        const selector = mount(<DialectSelector
-            connectionObject={connectionObject}
-            updateConnection={updateConnection}
-        />);
+        const selector = mount(
+            <DialectSelector connectionObject={connectionObject} updateConnection={updateConnection} />
+        );
+
+        // open selector
+        selector.find('.Select-control').simulate('keyDown', {keyCode: 40});
 
         // Dialect not selected so should not be found
-        expect(selector.find('.logoSelected').first().key()).toBe(connectionObject.dialect);
+        expect(
+            selector
+                .find('.Select-option .is-selected')
+                .first()
+                .prop('children')
+        ).toBe(connectionObject.dialect);
     });
 });

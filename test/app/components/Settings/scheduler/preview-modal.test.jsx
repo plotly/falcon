@@ -20,6 +20,12 @@ global.document.createRange = function() {
 
 const PreviewModal = require('../../../../../app/components/Settings/scheduler/modals/preview-modal.jsx').default;
 const TagPicker = require('../../../../../app/components/Settings/scheduler/pickers/tag-picker').default;
+const ExecutionDetails = require(
+  '../../../../../app/components/Settings/scheduler/presentational/execution-details.jsx'
+);
+const IndividualCallCount = require(
+  '../../../../../app/components/Settings/scheduler/presentational/api-call-counts.jsx'
+).IndividualCallCount;
 
 describe('Preview Modal Tests', () => {
     beforeAll(() => {
@@ -249,8 +255,42 @@ describe('Preview Modal Tests', () => {
             tags
         };
 
-        mount(<PreviewModal tags={tags} query={query} currentRequestor="user" />);
+        let component = mount(<PreviewModal tags={tags} query={query} currentRequestor="user" />);
 
         expect(() => mount(<PreviewModal query={query} currentRequestor="user" />)).not.toThrow();
+        expect(component.find(ExecutionDetails).text()).toBe('100 rows in 50 minutes');
+        expect(
+            component
+                .find(ExecutionDetails)
+                .find('span')
+                .last()
+                .prop('data-tip')
+        ).toMatch(/completed execution(.*):12/);
+
+        query.lastExecution.duration = 1;
+        component = mount(<PreviewModal tags={tags} query={query} currentRequestor="user" />);
+        expect(
+            component
+                .find(ExecutionDetails)
+                .find('span')
+                .last()
+                .prop('data-tip')
+        ).toBe('');
+    });
+
+    it('should correctly render individual call counts', () => {
+      const query = {
+          query: 'SELECT * FROM table',
+          fid: 'fid:1',
+          cronInterval: '* * * * *',
+          requestor: 'user1'
+      };
+
+      let component = mount(<PreviewModal query={query} currentRequestor="user" />);
+      expect(component.find(IndividualCallCount).text()).toBe('1,440 API calls per day');
+
+      query.cronInterval = '0 0 * * *';
+      component = mount(<PreviewModal query={query} currentRequestor="user" />);
+      expect(component.find(IndividualCallCount).text()).toBe('1 API call per day');
     });
 });

@@ -23,7 +23,7 @@ const mockQueries = [
         lastExecution: {
             rowCount: 0,
             duration: 3000,
-            status: 'FAILED',
+            status: 'failed',
             startedAt: 1536941543470,
             completedAt: 1536941547470
         }
@@ -351,6 +351,19 @@ describe('Scheduler Test', () => {
                         rowCount: 14,
                         duration: 5000,
                         status: 'ok',
+                        startedAt: 1536941543470,
+                        completedAt: 1536941547470
+                    }
+                },
+                {
+                    query: 'SELECT price FROM foods;',
+                    fid: 'test:0',
+                    refreshInterval: 10000,
+                    tags: ['tag:2'],
+                    lastExecution: {
+                        rowCount: 14,
+                        duration: 5000,
+                        status: 'running',
                         startedAt: 1536941543470,
                         completedAt: 1536941547470
                     }

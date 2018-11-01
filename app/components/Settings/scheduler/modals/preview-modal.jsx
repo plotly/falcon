@@ -22,6 +22,8 @@ import {getHighlightMode, WAITING_MESSAGE, SAVE_WARNING, COLORS} from '../../../
 import {EXE_STATUS} from '../../../../../shared/constants.js';
 import {getInitialCronMode} from '../../cron-picker/cron-helpers';
 import ExecutionDetails from '../presentational/execution-details';
+import {AdditionalCallsPreview, IndividualCallCount} from '../presentational/api-call-counts.jsx';
+import {mapQueryToDailyCallCount} from '../../../../utils/queryUtils';
 
 const NO_OP = () => {};
 
@@ -48,7 +50,8 @@ export class PreviewModal extends Component {
         onLogin: NO_OP,
         onClickAway: NO_OP,
         openQueryPage: NO_OP,
-        tags: []
+        tags: [],
+        totalCallsPerDay: 0
     };
     static propTypes = {
         query: PropTypes.object,
@@ -64,7 +67,8 @@ export class PreviewModal extends Component {
                 name: PropTypes.string.isRequired,
                 color: PropTypes.string
             })
-        )
+        ),
+        totalCallsPerDay: PropTypes.number.isRequired
     };
     constructor(props) {
         super(props);
@@ -110,6 +114,14 @@ export class PreviewModal extends Component {
         this.setState({tags});
     }
 
+    formatTags(tags) {
+        if (tags.length === 0 || typeof tags[0] === 'string') {
+            return tags;
+        }
+
+        return tags.map(tag => tag.id);
+    }
+
     save() {
         const {connectionId, fid, requestor, uids} = this.props.query;
         const {code: query, cronInterval, tags} = this.state;
@@ -125,7 +137,7 @@ export class PreviewModal extends Component {
                 query,
                 name,
                 cronInterval,
-                tags: tags.map(t => t.id)
+                tags: this.formatTags(tags)
             })
             .then(() => {
                 this.setState({
@@ -197,6 +209,10 @@ export class PreviewModal extends Component {
         const canEdit = this.props.currentRequestor && this.props.currentRequestor === this.props.query.requestor;
         const success = this.state.successMessage;
 
+        if (this.props.query.lastExecution && this.props.query.lastExecution.status === EXE_STATUS.running) {
+            return null;
+        }
+
         if (!canEdit) {
             return (
                 <React.Fragment>
@@ -261,7 +277,9 @@ export class PreviewModal extends Component {
     }
 
     render() {
-        const {query} = this.props;
+        const {query, totalCallsPerDay} = this.props;
+        const callCount = mapQueryToDailyCallCount(query);
+        const additionalCalls = mapQueryToDailyCallCount({cronInterval: this.state.cronInterval});
 
         let content;
         if (!query) {
@@ -389,6 +407,10 @@ export class PreviewModal extends Component {
                                         initialModeId={initialModeId}
                                         initialCronExpression={this.state.cronInterval}
                                     />
+                                    <AdditionalCallsPreview
+                                        additionalCalls={additionalCalls}
+                                        currTotal={totalCallsPerDay - callCount}
+                                    />
                                 </div>
                             ) : (
                                 <div style={valueStyle}>
@@ -397,6 +419,8 @@ export class PreviewModal extends Component {
                                         : `Runs every ${ms(query.refreshInterval * 1000, {
                                               long: true
                                           })}`}
+                                    <br />
+                                    <IndividualCallCount count={callCount} />
                                 </div>
                             )}
                         </Row>
@@ -423,7 +447,7 @@ export class PreviewModal extends Component {
                                 <Row style={rowStyle}>
                                     <div style={keyStyle}>Last ran</div>
                                     <div style={valueStyle}>
-                                        {run.startedAt ? (
+                                        {run.status !== EXE_STATUS.running ? (
                                             <span
                                                 style={{
                                                     color:
@@ -432,12 +456,10 @@ export class PreviewModal extends Component {
                                                             : '#ef595b'
                                                 }}
                                             >
-                                                <Timestamp value={run.startedAt} />
+                                                <Timestamp value={run.startedAt} checkIfRunning={false} />
                                             </span>
                                         ) : (
-                                            run.status === EXE_STATUS.running && (
-                                                <span style={{color: '#e4cf11'}}>Currently running</span>
-                                            )
+                                            <span style={{color: '#e4cf11'}}>Currently running</span>
                                         )}
                                         <br />
                                         {run.errorMessage && <span>{run.errorMessage}</span>}
@@ -455,10 +477,11 @@ export class PreviewModal extends Component {
                             <Row style={rowStyle}>
                                 <div style={keyStyle}>Scheduled to run</div>
                                 <div style={valueStyle}>
-                                    <Timestamp value={query.nextScheduledAt} />{' '}
+                                    <Timestamp value={query.nextScheduledAt} checkIfRunning={true} />{' '}
                                     {canEdit && (
                                         <span style={{paddingLeft: '7px'}}>
-                                            (<Link
+                                            (
+                                            <Link
                                                 className="refresh-button"
                                                 style={{color: '#506784'}}
                                                 disabled={this.state.loading}
@@ -469,7 +492,8 @@ export class PreviewModal extends Component {
                                                     : this.state.confirmedRun
                                                         ? 'are you sure?'
                                                         : 'run now'}
-                                            </Link>)
+                                            </Link>
+                                            )
                                         </span>
                                     )}
                                 </div>

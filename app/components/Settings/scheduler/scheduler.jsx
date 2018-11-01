@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import {contains} from 'ramda';
 import ReactDataGrid from 'react-data-grid';
+import ReactToolTip from 'react-tooltip';
 import ms from 'ms';
 import matchSorter from 'match-sorter';
 import cronstrue from 'cronstrue';
@@ -18,10 +19,12 @@ import SQL from './presentational/sql';
 import Tag from './presentational/tag';
 import TagPicker from './pickers/tag-picker.jsx';
 import Status from './presentational/status';
+import {CallCountWidget, toIndividualCallCountString} from './presentational/api-call-counts';
 
 import {decapitalize} from '../../../utils/utils';
 import {SQL_DIALECTS_USING_EDITOR} from '../../../constants/constants';
 import {EXE_STATUS} from '../../../../shared/constants.js';
+import {mapQueryToDailyCallCount} from '../../../utils/queryUtils';
 
 import './scheduler.css';
 
@@ -32,6 +35,11 @@ const sortLastExecution = (key, reverse) => (a, b) => {
     const s = ((a.lastExecution && a.lastExecution[key]) || 0) - ((b.lastExecution && b.lastExecution[key]) || 0);
     return reverse ? -1 * s : s;
 };
+const sortCallCount = reverse => (a, b) => {
+    const s = mapQueryToDailyCallCount(b) - mapQueryToDailyCallCount(a);
+    return reverse ? -1 * s : s;
+};
+
 const SORT_OPTIONS = [
     {
         id: 'nextScheduledAt-asc',
@@ -67,6 +75,16 @@ const SORT_OPTIONS = [
         id: 'rowCount-asc',
         label: 'Least rows',
         fn: sortLastExecution('rowCount', false)
+    },
+    {
+        id: 'callCount-desc',
+        label: 'Most API calls/day',
+        fn: sortCallCount()
+    },
+    {
+        id: 'callCount-asc',
+        label: 'Least API calls/day',
+        fn: sortCallCount(true)
     }
 ];
 
@@ -149,11 +167,13 @@ class QueryFormatter extends React.Component {
                             opacity: 0.5
                         }}
                     >
-                        {query.cronInterval
-                            ? `Runs ${decapitalize(cronstrue.toString(query.cronInterval))}`
-                            : `Runs every ${ms(query.refreshInterval * 1000, {
-                                  long: true
-                              })}`}
+                        <span data-tip={toIndividualCallCountString(mapQueryToDailyCallCount(query))}>
+                            {query.cronInterval
+                                ? `Runs ${decapitalize(cronstrue.toString(query.cronInterval))}`
+                                : `Runs every ${ms(query.refreshInterval * 1000, {
+                                      long: true
+                                  })}`}
+                        </span>
                     </em>
                 </Column>
                 <Column style={{width: 'auto', margin: '0 16px'}}>
@@ -192,25 +212,20 @@ class IntervalFormatter extends React.Component {
             <Row>
                 <Column>
                     {!run && '—'}
-                    {startedAt ? (
-                        <div
-                            style={{
-                                fontSize: 16,
-                                color: run.status !== EXE_STATUS.failed ? '#00cc96' : '#ef595b'
-                            }}
-                        >
-                            {startedAt < 60 * 1000
-                                ? 'Just now'
-                                : `${ms(startedAt, {
-                                      long: true
-                                  })} ago`}
-                        </div>
-                    ) : (
-                        run &&
-                        run.status === EXE_STATUS.running && (
+                    {startedAt &&
+                        (run.status === EXE_STATUS.running ? (
                             <span style={{fontSize: 16, color: '#e4cf11'}}>Currently running</span>
-                        )
-                    )}
+                        ) : (
+                            <div
+                                data-tip={new Date(run.startedAt).toISOString()}
+                                style={{
+                                    fontSize: 16,
+                                    color: run.status !== EXE_STATUS.failed ? '#00cc96' : '#ef595b'
+                                }}
+                            >
+                                {ms(startedAt, {long: true})} ago
+                            </div>
+                        ))}
                     {run &&
                         run.errorMessage && (
                             <em
@@ -325,11 +340,15 @@ class Scheduler extends Component {
     }
 
     componentDidMount() {
-        this.refreshQueriesInterval = setInterval(this.props.refreshQueries, 60 * 1000);
+        this.refreshQueriesInterval = setInterval(this.props.refreshQueries, 20 * 1000);
     }
 
     componentWillUnmount() {
         clearInterval(this.refreshQueriesInterval);
+    }
+
+    componentDidUpdate() {
+        ReactToolTip.rebuild();
     }
 
     handleSearchChange(e) {
@@ -407,7 +426,7 @@ class Scheduler extends Component {
 
         return mapRow(
             Object.assign({}, row, {
-                tags: row.tags ? row.tags.map(id => this.props.tags.find(t => t.id === id)) : []
+                tags: row && row.tags ? row.tags.map(id => this.props.tags.find(t => t.id === id)) : []
             })
         );
     }
@@ -524,27 +543,49 @@ class Scheduler extends Component {
         const rows = this.getRows();
         const loggedIn = Boolean(this.props.requestor);
 
+        const totalCallsPerDay = this.props.queries.reduce((accum, currQuery) => {
+            return accum + mapQueryToDailyCallCount(currQuery);
+        }, 0);
+
         const statusFilter = this.state.search.match(/status:(\S+)/);
 
         return (
             <React.Fragment>
                 <Row
                     style={{
-                        marginTop: 24,
-                        marginBottom: 24,
-                        justifyContent: 'space-between'
+                        marginBottom: 8,
+                        alignItems: 'center'
                     }}
                 >
                     <input
+                        style={{width: '40%'}}
                         value={this.state.search}
                         onChange={this.handleSearchChange}
                         placeholder="Search scheduled queries..."
                     />
+                    <Column style={{width: 'unset', marginLeft: 16}}>
+                        {this.state.search && (
+                            <u
+                                className="clear-state"
+                                onClick={this.resetSearch}
+                                style={{
+                                    borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
+                                    paddingLeft: 16,
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Clear
+                            </u>
+                        )}
+                    </Column>
                     {!contains(this.props.dialect, SQL_DIALECTS_USING_EDITOR) && (
                         <button style={{marginRight: '16px'}} onClick={this.openCreateModal}>
                             Create Scheduled Query
                         </button>
                     )}
+                    <div style={{marginLeft: 'auto', marginRight: '16px'}}>
+                        <CallCountWidget count={totalCallsPerDay} />
+                    </div>
                 </Row>
                 <Row
                     style={{
@@ -621,23 +662,8 @@ class Scheduler extends Component {
                             </div>
                         </div>
                     </Column>
-                    <Column style={{width: '100%', maxWidth: 720}}>
+                    <Column style={{width: '100%', maxWidth: 560}}>
                         <Row style={{width: 'auto', justifyContent: 'flex-end'}}>
-                            <Column style={{maxWidth: 168, marginRight: 16}}>
-                                {this.state.search && (
-                                    <u
-                                        className="clear-state"
-                                        onClick={this.resetSearch}
-                                        style={{
-                                            fontWeight: 'bold',
-                                            borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        Clear current search
-                                    </u>
-                                )}
-                            </Column>
                             <Column
                                 style={{
                                     position: 'relative',
@@ -652,12 +678,6 @@ class Scheduler extends Component {
                                     value={this.state.tags}
                                     options={this.props.tags}
                                 />
-                                <div
-                                    style={{position: 'absolute', bottom: '-16px'}}
-                                    onClick={() => this.setState({manageTags: true})}
-                                >
-                                    <u className="tag-manager-text">manage tags</u>
-                                </div>
                             </Column>
                             <Column style={{maxWidth: 180}}>
                                 <Select
@@ -702,6 +722,7 @@ class Scheduler extends Component {
                     dialect={this.props.dialect}
                     openQueryPage={this.props.openQueryPage}
                     tags={this.props.tags}
+                    totalCallsPerDay={totalCallsPerDay}
                 />
                 <PromptLoginModal
                     open={!loggedIn && this.state.createModalOpen}
@@ -725,8 +746,10 @@ class Scheduler extends Component {
                         onDelete={this.handleDelete}
                         dialect={this.props.dialect}
                         openQueryPage={this.props.openQueryPage}
+                        totalCallsPerDay={totalCallsPerDay}
                     />
                 )}
+                <ReactToolTip />
             </React.Fragment>
         );
     }
