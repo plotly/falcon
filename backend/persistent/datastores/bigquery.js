@@ -84,6 +84,12 @@ export function query(queryObject, connection) {
  * @returns {Promise} that resolves to { columnnames, rows }
  */
 export function schemas(connection) {
+    if (!connection.database || connection.database === '') {
+        const columnnames = ['table_name', 'column_name', 'data_type'];
+        const rows = [];
+        return {columnnames, rows};
+    }
+
     const client = pool.getClient(connection);
 
     return client
@@ -103,9 +109,12 @@ export function schemas(connection) {
                 const tableName = metadata.tableReference.tableId;
 
                 // iterate fields
-                metadata.schema.fields.forEach(({name, type}) => {
-                    rows.push([tableName, name, type]);
-                });
+                if (metadata.schema.fields)
+                {
+                    metadata.schema.fields.forEach(({name, type}) => {
+                        rows.push([tableName, name, type]);
+                    });
+                }
             });
 
             return {columnnames, rows};
@@ -122,6 +131,10 @@ export function schemas(connection) {
  * @returns {Promise} that resolves to an array of table names
  */
 export function tables(connection) {
+    if (!connection.database || connection.database === '') {
+        return [];
+    }
+
     const client = pool.getClient(connection);
 
     return client

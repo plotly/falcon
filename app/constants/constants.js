@@ -325,8 +325,6 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
                     size: 1000
                 }
             });
-        case DIALECTS.BIGQUERY:
-            return `SELECT * FROM ${connection.database}.__TABLES__ `;
         default:
             return '';
     }
