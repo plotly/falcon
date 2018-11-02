@@ -338,8 +338,7 @@ class Settings extends Component {
 
         const queryPanelDisabled = (
             connectRequest.status !== 200 ||
-            (dialect !== DIALECTS.BIGQUERY &&
-             !selectedTable && contains(dialect, SQL_DIALECTS_USING_EDITOR))
+            (!selectedTable && contains(dialect, SQL_DIALECTS_USING_EDITOR))
         );
 
         return (
