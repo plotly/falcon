@@ -1,6 +1,6 @@
 {
   "name": "falcon-sql-client",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Free, open-source SQL client for Windows, Mac and Linux",
   "main": "./backend/main.js",
   "scripts": {
@@ -145,6 +145,7 @@
     "fsevents": "*"
   },
   "devDependencies": {
+    "@google-cloud/bigquery": "^1.3.0",
     "aws-sdk": "^2.156.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.2",
@@ -235,6 +236,7 @@
     "sinon": "^4.3.0",
     "style-loader": "^0.19.0",
     "tohash": "^1.0.2",
+    "uglifyjs-webpack-plugin": "^1.2.7",
     "webpack": "^3.8.1",
     "yamljs": "^0.3.0"
   },
