@@ -109,7 +109,7 @@ export function schemas(connection) {
                 const tableName = metadata.tableReference.tableId;
 
                 // iterate fields
-                if (metadata.schema.fields)
+                if (metadata.schema && metadata.schema.fields)
                 {
                     metadata.schema.fields.forEach(({name, type}) => {
                         rows.push([tableName, name, type]);

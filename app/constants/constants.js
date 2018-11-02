@@ -325,6 +325,8 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
                     size: 1000
                 }
             });
+        case DIALECTS.BIGQUERY:
+            return 'SELECT \'connected\' as status';
         default:
             return '';
     }
