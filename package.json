@@ -1,6 +1,6 @@
 {
   "name": "falcon-sql-client",
-  "version": "3.0.4",
+  "version": "3.1.0",
   "description": "Free, open-source SQL client for Windows, Mac and Linux",
   "main": "./backend/main.js",
   "scripts": {
@@ -202,7 +202,7 @@
     "query-string": "^5.0.1",
     "ramda": "^0.21.0",
     "react": "^16.2.0",
-    "react-chart-editor": "0.21.1",
+    "react-chart-editor": "0.33.2",
     "react-click-outside": "^3.0.1",
     "react-codemirror2": "^4.2.1",
     "react-cookies": "^0.1.0",
