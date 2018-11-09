@@ -2986,9 +2986,9 @@ date-now@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/date-now/-/date-now-0.1.4.tgz#eaf439fd4d4848ad74e5cc7dbef200672b9e345b"
 
-db-connectors@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/db-connectors/-/db-connectors-0.0.2.tgz#f1a2af271daf74137a8f9599181b415d9003ffd2"
+db-connectors@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/db-connectors/-/db-connectors-0.0.3.tgz#be933d61652931258cd288b1a6e3c96190282b29"
   dependencies:
     "@google-cloud/bigquery" "^1.3.0"
     alasql "^0.4.11"
