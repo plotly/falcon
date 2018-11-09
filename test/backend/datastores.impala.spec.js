@@ -3,7 +3,7 @@ import {assert} from 'chai';
 import {apacheImpalaConnection as connection} from './utils.js';
 import {
     query, connect, tables
-} from '../../backend/persistent/datastores/Datastores.js';
+} from 'db-connectors';
 
 // Suppressing ESLint cause Mocha ensures `this` is bound in test functions
 /* eslint-disable no-invalid-this */

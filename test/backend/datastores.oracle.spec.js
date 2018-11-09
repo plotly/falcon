@@ -8,7 +8,7 @@ import {
     query,
     schemas,
     tables
-} from '../../backend/persistent/datastores/Datastores.js';
+} from 'db-connectors';
 
 const connection = {
     dialect: DIALECTS.ORACLE,

@@ -4,7 +4,7 @@ import {DIALECTS} from '../../app/constants/constants.js';
 
 import {
     query, connect, tables
-} from '../../backend/persistent/datastores/Datastores.js';
+} from 'db-connectors';
 
 import {disconnect} from '../../backend/persistent/datastores/livy.js';
 

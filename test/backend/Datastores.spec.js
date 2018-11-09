@@ -12,7 +12,7 @@ import {
 
 import {
     query, connect, files, storage, listS3Files
-} from '../../backend/persistent/datastores/Datastores.js';
+} from 'db-connectors';
 
 // Suppressing ESLint cause Mocha ensures `this` is bound in test functions
 /* eslint-disable no-invalid-this */
