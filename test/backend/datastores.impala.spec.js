@@ -24,7 +24,8 @@ describe('Apache Impala:', function () {
         });
     });
 
-    /*it('query returns rows and column names', function() {
+    /*
+    it('query returns rows and column names', function() {
         const tableName = (connection.database) ?
             `${connection.database}.ALCOHOL_CONSUMPTION_BY_COUNTRY_2010`.toUpperCase() :
             'ALCOHOL_CONSUMPTION_BY_COUNTRY_2010';
@@ -39,7 +40,8 @@ describe('Apache Impala:', function () {
             ]);
             assert.deepEqual(results.columnnames, ['loc', 'alcohol']);
         });
-    });*/
+    });
+    */
 
     it('connect for invalid credentials fails', function() {
         connection.host = 'http://lah-lah.lemons.com';
