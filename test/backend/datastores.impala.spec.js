@@ -2,7 +2,7 @@ import {assert} from 'chai';
 
 import {apacheImpalaConnection as connection} from './utils.js';
 import {
-    query, connect, tables
+    connect, tables
 } from '../../backend/persistent/datastores/Datastores.js';
 
 // Suppressing ESLint cause Mocha ensures `this` is bound in test functions
