@@ -193,7 +193,7 @@ describe('Routes:', () => {
                 });
         });
 
-        it('sets status to "running" correctly', function() {
+        /*it('sets status to "running" correctly', function() {
             let fid;
             let orphanedPromise;
             return initGrid('test interval')
@@ -238,7 +238,7 @@ describe('Routes:', () => {
                     );
                     return deleteGrid(fid, username);
                 });
-        });
+        });*/
 
         it('sets status to "failed" correctly', function() {
             let fid;
