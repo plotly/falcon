@@ -1,12 +1,11 @@
 import {assert} from 'chai';
-
 import {DIALECTS} from '../../app/constants/constants.js';
 
-import {
+const {
     query, connect, tables
-} from 'db-connectors';
+} = require('db-connectors').Datastores;
 
-import {disconnect} from '../../backend/persistent/datastores/livy.js';
+const {disconnect} = require('db-connectors').ApacheLivy;
 
 const connection = {
     dialect: DIALECTS.APACHE_SPARK,

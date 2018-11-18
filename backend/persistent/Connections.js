@@ -4,7 +4,7 @@ import fs from 'fs';
 import {assoc, dissoc, findIndex} from 'ramda';
 import uuid from 'uuid';
 import YAML from 'yamljs';
-import * as Datastores from 'db-connectors';
+import {Datastores} from 'db-connectors';
 import {DIALECTS} from '../../app/constants/constants.js';
 
 import {getSetting} from '../settings';
