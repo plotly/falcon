@@ -1,6 +1,6 @@
 const {assert} = require('chai');
 
-const {DIALECTS} = require('../src/common/constants.js');
+import {DIALECTS} from '../../app/constants/constants.js';
 
 const {
     query, connect, tables
