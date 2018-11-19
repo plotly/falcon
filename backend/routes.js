@@ -14,7 +14,7 @@ import {
     getUnsecuredCookieOptions
 } from './constants.js';
 import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates.js';
-import * as Datastores from './persistent/datastores/Datastores.js';
+const {Datastores} = require('db-connectors');
 import init from './init.js';
 import Logger from './logger.js';
 import {checkWritePermissions, newDatacache} from './persistent/plotly-api.js';

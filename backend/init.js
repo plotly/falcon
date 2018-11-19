@@ -6,7 +6,7 @@ import {
 } from './persistent/Connections.js';
 import {getSetting} from './settings.js';
 
-const setCSVStorageSize = require('./persistent/datastores/csv.js').setStorageSize;
+const {setCSVStorageSize} = require('db-connectors').CSV;
 
 export default function init() {
     try {

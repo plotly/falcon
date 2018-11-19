@@ -2,7 +2,7 @@ import {has} from 'ramda';
 import * as scheduler from 'node-schedule';
 
 import {getConnectionById} from './Connections.js';
-import * as Connections from './datastores/Datastores.js';
+const {query} = require('db-connectors').Datastores;
 import {mapRefreshToCron, mapCronToRefresh} from '../utils/cronUtils.js';
 import {extractOrderedUids} from '../utils/gridUtils.js';
 import Logger from '../logger';
