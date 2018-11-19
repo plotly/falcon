@@ -8,7 +8,7 @@ const {
     schemas,
     tables,
     disconnect
-}  = require('db-connectors').Datastores;
+} = require('db-connectors').Datastores;
 
 const {
     getAvailableSize,
