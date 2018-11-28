@@ -241,6 +241,7 @@
     "yamljs": "^0.3.0"
   },
   "dependencies": {
+    "@apla/clickhouse": "^1.5.3",
     "alasql": "^0.4.5",
     "csv-parse": "^2.0.0",
     "dtrace-provider": "^0.8.6",
