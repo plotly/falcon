@@ -44,6 +44,8 @@ export default class ConnectionTab extends Component {
             label = connectionObject.storage;
         } else if (connectionObject.dialect === DIALECTS.BIGQUERY) {
             label = `Big Query ${connectionObject.database}`;
+        } else if(connectionObject.dialect === DIALECTS.CLICKHOUSE) {
+            label = `ClickHouse ${connectionObject.database}`;
         } else if (connectionObject.dialect === DIALECTS.DATA_WORLD) {
             const pathNames = getPathNames(connectionObject.url);
             if (pathNames.length >= 3) {

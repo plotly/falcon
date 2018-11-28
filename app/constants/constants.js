@@ -19,7 +19,8 @@ export const DIALECTS = {
     DATA_WORLD: 'data.world',
     ATHENA: 'athena',
     CSV: 'csv',
-    BIGQUERY: 'bigquery'
+    BIGQUERY: 'bigquery',
+    CLICKHOUSE: 'clickhouse'
 };
 
 export const SQL_DIALECTS_USING_EDITOR = [
@@ -36,7 +37,8 @@ export const SQL_DIALECTS_USING_EDITOR = [
     'data.world',
     'athena',
     'csv',
-    'bigquery'
+    'bigquery',
+    'clickhouse'
 ];
 
 const commonSqlOptions = [
@@ -270,6 +272,22 @@ export const CONNECTION_CONFIG = {
             'type': 'filedrop',
             'description': 'The location of the Google Service Account Key File'
         }
+    ],
+    [DIALECTS.CLICKHOUSE]: [
+        {'label': 'Username', 'value': 'username', 'type': 'text'},
+        {'label': 'Password', 'value': 'password', 'type': 'password'},
+        {
+            'label': 'Host',
+            'value': 'host',
+            'type': 'text'
+        },
+        {
+            'label': 'Port',
+            'value': 'port',
+            'type': 'number',
+            'description': 'Server port number (e.g. 8123)'
+        },
+        {'label': 'Database', 'value': 'database', 'type': 'text'},
     ]
 };
 
@@ -291,7 +309,8 @@ export const LOGOS = {
     [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png',
     [DIALECTS.DATA_WORLD]: 'images/dataworld-logo.png',
     [DIALECTS.ATHENA]: 'images/athena-logo.png',
-    [DIALECTS.BIGQUERY]: 'images/bigquery-logo.png'
+    [DIALECTS.BIGQUERY]: 'images/bigquery-logo.png',
+    [DIALECTS.CLICKHOUSE]: 'images/clickhouse-logo.png'
 };
 
 export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
@@ -311,6 +330,7 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
         case DIALECTS.DATA_WORLD:
         case DIALECTS.REDSHIFT:
         case DIALECTS.ATHENA:
+        case DIALECTS.CLICKHOUSE:
             return `SELECT * FROM ${table} LIMIT 1000`;
         case DIALECTS.MSSQL:
             return (connection.database) ?
@@ -485,6 +505,12 @@ export const SAMPLE_DBS = {
         projectId: 'Plotly',
         database: 'plotly',
         keyFilename: '/home/plotly/falcon/google-credentials.json'
+    },
+    [DIALECTS.CLICKHOUSE]: {
+        username: 'default',
+        password: 'connecttoplotly',
+        host: 'clickhouse.test.plotly.host',
+        port: 8123,
     }
 };
 
