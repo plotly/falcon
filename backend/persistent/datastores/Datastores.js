@@ -15,6 +15,7 @@ import * as DataWorld from './dataworld';
 import * as DatastoreMock from './datastoremock';
 import * as Athena from './athena';
 import * as BigQuery from './bigquery';
+import * as ClickHouse from './clickhouse';
 
 const CSV = require('./csv');
 const Oracle = require('./oracle.js');
@@ -68,6 +69,8 @@ function getDatastoreClient(connection) {
         return Oracle;
     } else if (dialect === 'bigquery') {
         return BigQuery;
+    } else if (dialect === 'clickhouse') {
+        return ClickHouse;
     }
     return Sql;
 }
