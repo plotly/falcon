@@ -282,12 +282,36 @@ export const CONNECTION_CONFIG = {
             'type': 'text'
         },
         {
+            'label': 'Pathname',
+            'value': 'pathname',
+            'type': 'text',
+        },   
+        {
             'label': 'Port',
             'value': 'port',
             'type': 'number',
-            'description': 'Server port number (e.g. 8123)'
         },
         {'label': 'Database', 'value': 'database', 'type': 'text'},
+        {
+            'label': 'Profile',
+            'value': 'profile',
+            'type': 'text',
+        },
+        {
+            'label': 'Max rows to read',
+            'value': 'max_rows_to_read',
+            'type': 'number'
+        },
+        {
+            'label': 'Use https',
+            'value': 'https',
+            'type': 'checkbox'
+        },
+        {
+            'label': 'Read only',
+            'value': 'readonly',
+            'type': 'checkbox',
+        }
     ]
 };
 
@@ -511,6 +535,10 @@ export const SAMPLE_DBS = {
         password: 'connecttoplotly',
         host: 'clickhouse.test.plotly.host',
         port: 8123,
+        pathname: '/path_to_clickhouse',
+        database: 'plotly_datasets',
+        profile: 'web',
+        max_rows_to_read: 1000
     }
 };
 
