@@ -526,6 +526,7 @@ export const SAMPLE_DBS = {
         keyFilename: '/home/plotly/falcon/google-credentials.json'
     },
     [DIALECTS.CLICKHOUSE]: {
+        dialect: 'clickhouse',
         username: 'default',
         password: 'connecttoplotly',
         host: 'clickhouse.test.plotly.host',

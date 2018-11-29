@@ -1,0 +1,3 @@
+The Dockerfile in this folder builds a Docker image that starts a ClickHouse server and sets up a test database.
+
+Will fill this out more tomorrow...
