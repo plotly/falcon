@@ -9,18 +9,16 @@ import ClickHouse from '@apla/clickhouse';
  * @param {String} database
  * @returns {Object} ClickHouse client
  */ 
-function createClient({ host, port, pathname, https, username = '', password = '', database, profile, readonly = false, max_rows_to_read }) {
+function createClient({ host, port, https, username = '', password = '', database, readonly = false, max_rows_to_read }) {
   return new ClickHouse({
     host,
     port,
-    pathname,
     protocol: https ? 'https:' : 'http:',
     auth: `${username}:${password}`,
     queryOptions: {
       database,
       readonly,
       ...(max_rows_to_read && { max_rows_to_read }),
-      ...(profile && { profile })
     }
   });
 }

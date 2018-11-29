@@ -282,36 +282,31 @@ export const CONNECTION_CONFIG = {
             'type': 'text'
         },
         {
-            'label': 'Pathname',
-            'value': 'pathname',
-            'type': 'text',
-        },   
-        {
             'label': 'Port',
             'value': 'port',
             'type': 'number',
         },
         {'label': 'Database', 'value': 'database', 'type': 'text'},
         {
-            'label': 'Profile',
-            'value': 'profile',
-            'type': 'text',
-        },
-        {
             'label': 'Max rows to read',
             'value': 'max_rows_to_read',
             'type': 'number'
         },
         {
-            'label': 'Use https',
-            'value': 'https',
-            'type': 'checkbox'
-        },
-        {
             'label': 'Read only',
             'value': 'readonly',
             'type': 'checkbox',
-        }
+            'description': 'Restrict the connection to read-only operations.'
+        },
+        {
+            'label': 'SSL Enabled',
+            'value': 'https',
+            'type': 'checkbox',
+            'description': 'Does your database require that you connect to it via SSL? \
+            Note that this is just the connection between this app and your database; \
+            connections to plot.ly or your plotly instance are always encrypted.'
+        },
+
     ]
 };
 
