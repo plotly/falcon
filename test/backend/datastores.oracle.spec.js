@@ -2,13 +2,13 @@ import {assert} from 'chai';
 
 import {DIALECTS} from '../../app/constants/constants.js';
 
-import {
+const {
     connect,
     disconnect,
     query,
     schemas,
     tables
-} from '../../backend/persistent/datastores/Datastores.js';
+} = require('db-connectors').Datastores;
 
 const connection = {
     dialect: DIALECTS.ORACLE,

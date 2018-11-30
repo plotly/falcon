@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 import {keys, map} from 'ramda';
 import {saveSetting} from '../../backend/settings.js';
-import {mockResults} from '../../backend/persistent/datastores/datastoremock.js';
+const {mockResults} = require('db-connectors').DatastoreMock;
 
 import {
     assertResponseStatus,

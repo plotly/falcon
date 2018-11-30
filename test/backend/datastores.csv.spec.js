@@ -1,20 +1,19 @@
 // do not use import, otherwise other test units won't be able to reactivate nock
 const nock = require('nock');
+const {assert} = require('chai');
 
-import {assert} from 'chai';
-
-import {
+const {
     connect,
     query,
     schemas,
     tables,
     disconnect
-} from '../../backend/persistent/datastores/Datastores.js';
+} = require('db-connectors').Datastores;
 
 const {
     getAvailableSize,
     setStorageSize
-} = require('../../backend/persistent/datastores/csv.js');
+} = require('db-connectors').CSV;
 
 const csvFile = [
     'col1,col 2,"col 3",col 4',

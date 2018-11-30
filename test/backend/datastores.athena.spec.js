@@ -1,10 +1,10 @@
 // do not use import, otherwise other test units won't be able to reactivate nock
 const nock = require('nock');
 
-import {assert} from 'chai';
-import uuid from 'uuid';
+const {assert} = require('chai');
+const uuid = require('uuid');
 
-import {connect, schemas, query, tables} from '../../backend/persistent/datastores/athena';
+const {connect, schemas, query, tables} = require('db-connectors').Athena;
 
 describe('Athena:', function () {
     const URL = 'https://athena.us-east-1.amazonaws.com:443';

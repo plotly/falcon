@@ -1,15 +1,15 @@
 // do not use import, otherwise other test units won't be able to reactivate nock
 const nock = require('nock');
 
-import {assert} from 'chai';
+const {assert} = require('chai');
 
-import {
-    dataWorldConnection as connection,
+const {
+    dataWorldConnection,
     dataWorldTablesResponse,
     dataWorldQueryResponse,
     dataWorldColumnsResponse
-} from './utils.js';
-import {connect, tables, query, schemas} from '../../backend/persistent/datastores/dataworld';
+} = require('./utils.js');
+const {connect, tables, query, schemas} = require('db-connectors').DataWorld;
 
 describe('Data World:', function () {
     before(function() {
@@ -78,17 +78,17 @@ describe('Data World:', function () {
     });
 
     it('connect succeeds', function() {
-        return connect(connection);
+        return connect(dataWorldConnection);
     });
 
     it('tables returns list of tables', function() {
-        return tables(connection).then(result => {
+        return tables(dataWorldConnection).then(result => {
             assert.deepEqual(result, ['sampletable']);
         });
     });
 
     it('query returns rows and column names', function() {
-        return query('SELECT * FROM sampletable LIMIT 5', connection).then(result => {
+        return query('SELECT * FROM sampletable LIMIT 5', dataWorldConnection).then(result => {
             assert.deepEqual(
                 result.columnnames,
                 [ 'stringcolumn', 'datecolumn', 'decimalcolumn' ]
@@ -104,7 +104,7 @@ describe('Data World:', function () {
     });
 
     it('schemas returns table schemas', function() {
-        return schemas(connection).then(result => {
+        return schemas(dataWorldConnection).then(result => {
             assert.deepEqual(
                 result.columnnames,
                 [ 'tablename', 'column_name', 'data_type' ]

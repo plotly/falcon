@@ -1,18 +1,18 @@
 // do not use import, otherwise other test units won't be able to reactivate nock
 const nock = require('nock');
 
-import {assert} from 'chai';
-import {range} from 'ramda';
+const {assert} = require('chai');
+const {range} = require('ramda');
 
-import {
+const {
     assertResponseStatus,
     elasticsearchConnections,
     getResponseJson
-} from './utils.js';
+} = require('./utils.js');
 
-import {
+const {
     query, connect, elasticsearchMappings
-} from '../../backend/persistent/datastores/Datastores.js';
+} = require('db-connectors').Datastores;
 
 describe('Elasticsearch v2:', function () {
     let url;

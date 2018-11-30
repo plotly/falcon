@@ -1,5 +1,5 @@
-import {parseCSV} from '../../backend/parse.js';
-import {assert} from 'chai';
+const {parseCSV} = require('../../backend/parse.js');
+const {assert} = require('chai');
 
 const TEST_CASES = [
     {

@@ -1,10 +1,10 @@
-import {assert} from 'chai';
+const {assert} = require('chai');
 
 import {DIALECTS} from '../../app/constants/constants.js';
 
-import {
+const {
     query, connect, tables
-} from '../../backend/persistent/datastores/Datastores.js';
+} = require('db-connectors').Datastores;
 
 const connection = {
     dialect: DIALECTS.IBM_DB2,
