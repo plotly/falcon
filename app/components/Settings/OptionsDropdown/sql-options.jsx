@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {flatten} from 'ramda';
 import Select from 'react-select';
+import {COLORS} from '../../../constants/constants';
 
 export default class SQLOptions extends Component {
 
@@ -33,7 +34,7 @@ export default class SQLOptions extends Component {
             return (
                 <div>
                     <div>{'Hm.. there was an error loading up your tables'}</div>
-                    <div style={{color: 'red'}}>{JSON.stringify(tablesRequest)}</div>
+                    <div style={{color: COLORS.red}}>{JSON.stringify(tablesRequest)}</div>
                 </div>
             );
         } else if (tablesRequest.status === 200) {

@@ -5,21 +5,12 @@ import Filedrop from './filedrop.jsx';
 import {contains} from 'ramda';
 
 import {CONNECTION_CONFIG, SAMPLE_DBS} from '../../../constants/constants';
-import {dynamicRequireElectron} from '../../../utils/utils';
-
-let dialog;
-try {
-    dialog = dynamicRequireElectron().remote.dialog;
-} catch (e) {
-    dialog = null;
-}
+import {showOpenDialog} from '../../../utils/utils';
 
 /*
  *  Displays and alters user inputs for `configuration`
  *  username, password, and local port number.
 */
-
-
 export default class UserConnections extends Component {
     constructor(props) {
         super(props);
@@ -47,7 +38,7 @@ export default class UserConnections extends Component {
     getStorageOnClick(setting) {
         // sqlite requires a path
         return () => {
-            dialog.showOpenDialog({
+            showOpenDialog({
                 properties: ['openFile'],
                 filters: [{
                     name: 'databases',

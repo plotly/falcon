@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {keys} from 'ramda';
 import Select from 'react-select';
+import {COLORS} from '../../../constants/constants';
 
 export default class ESIndicesOptions extends Component {
     static propTypes = {
@@ -36,7 +37,7 @@ export default class ESIndicesOptions extends Component {
             return (
                 <div>
                     <div>{'There was an error loading up your docs'}</div>
-                    <div style={{color: 'red'}}>{JSON.stringify(EMR)}</div>
+                    <div style={{color: COLORS.red}}>{JSON.stringify(EMR)}</div>
                 </div>
             );
         } else if (EMR.status === 200) {

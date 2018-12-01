@@ -137,6 +137,174 @@ export function editConnections(connectionObject, connectionId) {
     );
 }
 
+export function getScheduledQueries() {
+    return dispatch => {
+        return dispatch(apiThunk(
+            'queries',
+            'GET',
+            'scheduledQueriesRequest'
+        )).then((json => {
+            dispatch({
+                type: 'SET_SCHEDULED_QUERIES',
+                payload: json
+            });
+            return json;
+        }));
+    };
+}
+
+export function createScheduledQuery(connectionId, payload = {}) {
+  return (dispatch) => {
+    return dispatch(apiThunk(
+      'queries',
+      'POST',
+      'createScheduledQueryRequest',
+      payload.filename,
+      {
+        requestor: payload.requestor,
+        uids: payload.uids,
+        fid: payload.fid,
+        filename: payload.filename,
+        name: payload.name,
+        query: payload.query,
+        cronInterval: payload.cronInterval,
+        tags: payload.tags,
+        connectionId
+      }
+    )).then((res) => {
+      dispatch({
+          type: 'CREATE_SCHEDULED_QUERY',
+          payload: res
+      });
+      return res;
+    });
+  };
+}
+
+export function updateScheduledQuery(connectionId, payload = {}) {
+  return (dispatch) => {
+    const body = {
+      requestor: payload.requestor,
+      uids: payload.uids,
+      fid: payload.fid,
+      filename: payload.filename,
+      name: payload.name,
+      query: payload.query,
+      cronInterval: payload.cronInterval,
+      tags: payload.tags,
+      connectionId
+    };
+
+    return dispatch(apiThunk(
+      'queries',
+      'POST',
+      'createScheduledQueryRequest',
+      payload.filename,
+      body
+    )).then((res) => {
+      if (!res.error) {
+        dispatch({
+          type: 'UPDATE_SCHEDULED_QUERY',
+          payload: res
+        });
+      }
+      return res;
+    });
+  };
+}
+
+export function deleteScheduledQuery(fid) {
+  return (dispatch) => {
+    return dispatch(apiThunk(
+      `queries/${fid}`,
+      'DELETE',
+      'createScheduledQueryRequest'
+    )).then((res) => {
+      dispatch({
+          type: 'DELETE_SCHEDULED_QUERY',
+          payload: fid
+      });
+      return res;
+    });
+  };
+}
+
+export function getTags() {
+    return dispatch => {
+        return dispatch(apiThunk(
+            'tags',
+            'GET',
+            'tagsRequest'
+        )).then((json => {
+            dispatch({
+                type: 'SET_TAGS',
+                payload: json
+            });
+            return json;
+        }));
+    };
+}
+
+export function createTag(payload = {}) {
+  return (dispatch) => {
+    return dispatch(apiThunk(
+      'tags',
+      'POST',
+      'createTagRequest',
+      payload.name,
+      {
+        name: payload.name,
+        color: payload.color
+      }
+    )).then((res) => {
+      if (res.error) {
+          throw res;
+      }
+      dispatch({
+          type: 'CREATE_TAG',
+          payload: res
+      });
+      return res;
+    });
+  };
+}
+
+export function updateTag(id, body = {}) {
+  return (dispatch) => {
+    return dispatch(apiThunk(
+      `tags/${id}`,
+      'PUT',
+      'createTagRequest',
+      null,
+      body
+    )).then((res) => {
+      if (!res.error) {
+        dispatch({
+          type: 'UPDATE_TAG',
+          payload: res
+        });
+      }
+      return res;
+    });
+  };
+}
+
+export function deleteTag(tid) {
+  return (dispatch) => {
+    return dispatch(apiThunk(
+      `tags/${tid}`,
+      'DELETE',
+      'createTagRequest'
+    )).then((res) => {
+      dispatch({
+          type: 'DELETE_TAG',
+          payload: tid
+      });
+      return res;
+    });
+  };
+}
+
 export function connect(connectionId) {
     return apiThunk(
         `connections/${connectionId}/connect`,

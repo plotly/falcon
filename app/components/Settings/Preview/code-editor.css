@@ -1,0 +1,24 @@
+.CodeMirror {
+    border: 1px solid #c8d4e3;
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 14px;
+    height: 140px;
+    margin-bottom: 20px;
+    width: 740px;
+}
+
+.CodeMirror-gutters {
+    background-color: #f3f6fa;
+    border-right: 1px solid #c8d4e3;
+}
+
+.react-resizable-handle {
+    z-index: 9;
+}
+
+.scheduleButton {
+    bottom: 18px;
+    position: absolute;
+    right: 136px;
+    z-index: 10;
+}

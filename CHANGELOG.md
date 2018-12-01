@@ -19,6 +19,120 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Security
 
+## [3.1.0] - 2018-11-02
+
+### Added
+
+* More informative Schedule tab with previous run results, tags for organization, next scheduled run time, API calls per day estimates
+* Google BigQuery support
+
+### Fixed
+
+* Query tab not available after connecting to Oracle (#516)
+
+## [3.0.3] - 2018-08-13
+
+### Added
+* OnPrem: Added env variable `PLOTY_CONNECTOR_BASE_URL` to customise the
+  `connectorUrl` set in a query metadata (#514)
+
+### Fixed
+* OnPrem: Fixed connectorUrl in query metadata
+  (https://github.com/plotly/streambed/issues/11310)
+
+
+## [3.0.2] - 2018-08-10
+
+### Fixed
+* Scheduler: Handle query updates that change the names or the number of columns
+  (#511)
+* OnPrem: Fixed login link in modal window (#512)
+
+
+## [3.0.1] - 2018-08-06
+
+### Fixed
+* Scheduler: Upload grid metadata as required by Chart Studio  (#504)
+* OnPrem: Fixed /external-data-connector page not accessible in private mode
+  (#505)
+
+
+## [3.0.0] - 2018-07-27
+
+### Added
+* Added UI to show scheduled queries (#472)
+* Added UI to create, update and delete scheduled queries (#476)
+* Support cron rules to schedule queries (#488)
+* Added UI to name scheduled queries (#500)
+
+### Changed
+* The refresh interval of scheduled queries created in previous versions of
+  Falcon is now converted into one of the following: every minute, every 5
+  minutes, hourly, daily and weekly (#488)
+
+### Removed
+* Removed the chart editor and the export tab when running onprem mode (#496)
+
+### Fixed
+* MSSQL: Fixed #299, #409 and #462 (#464)
+
+### Security
+* Mitigated clickjacking by setting `X-Frame-Options: DENY` (#489)
+
+
+## [2.8.0] - 2018-06-07
+
+### Fixed
+* Fixed query panel for non-sql connectors (#451)
+* Fixed build failure with dtrace-provider (#421)
+* Fixed broken oauth redirection in web app (#260)
+
+### Security
+* Disabled nodeIntegration (#453)
+* Ensured new windows are created using `shell.openExternal` (#453)
+
+
+## [2.7.0] - 2018-05-28
+
+### Added
+* Connector for Oracle databases (#437)
+* Backend: Added API for creating a grid to store results from scheduled queries (#444)
+
+### Changed
+* UI: Added a vertical scrollbar to the database view
+* UI: Don't hide the code editor when the chart editor opens (#445)
+* Log: Reduced verbosity
+
+### Fixed
+* Backend: Fixed error message on failed connection
+
+### Security
+* Upgraded to Electron v2.0.1 (and Node v8)
+* Prevent navigation on drag'n'drop (#436)
+
+
+## [2.6.0] - 2018-04-13
+
+### Added
+* Connector to AWS Athena service (#352 contributed by Shannon Lal @shannonlal)
+* Connector to query CSV files (via URL or drag'n'drop) (#375 and #385)
+* New chart editor based on Plotly React Component Suite (#405)
+* New code editor, resizeable and with improved performance (#411)
+* New table view with row filters (#393)
+* Test UI using jest and enzyme
+
+### Changed
+* ElasticSearch: Use mocked servers for testing
+* ElasticSearch: Run tests against elasticsearch v2 and v5
+* Query: Show query times (#358 contributed by Álvaro Abella Bascarán, @alvaroabascar)
+* Query: Improved error displays (#394)
+
+### Fixed
+* CodeEditor: Fixed initial query (#371)
+* ElasticSearch: Fixed connection to an elasticsearch server behind nginx (#377)
+* Query: Prevent the code editor from opening before a table has been selected (#379)
+* Test: Improved logging of backend failures
+
 
 ## [2.5.0] - 2018-01-19
 

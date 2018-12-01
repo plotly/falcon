@@ -1,18 +1,19 @@
 import fs from 'fs';
+import os from 'os';
+import path from 'path';
+
 import {concat, contains, has} from 'ramda';
 import YAML from 'yamljs';
+
 import {createStoragePath} from './utils/homeFiles';
-import path from 'path';
-import os from 'os';
 
 const DEFAULT_SETTINGS = {
     HEADLESS: false,
 
-    STORAGE_PATH: path.join(
-        os.homedir(),
-        '.plotly',
-        'connector'
-    ),
+    // when testing locally, don't overwrite dev storage
+    STORAGE_PATH: process.env.NODE_ENV === 'test' && !process.env.CI
+        ? path.join(os.homedir(), '.plotly', 'testing', 'connector')
+        : path.join(os.homedir(), '.plotly', 'connector'),
     AUTH_ENABLED: true,
     SSL_ENABLED: true,
     WEB_BASE_PATHNAME: '/',
@@ -69,10 +70,12 @@ const DEFAULT_SETTINGS = {
 
 // Settings that depend on other settings are described here
 const derivedSettingsNames = [
+    'BASE_URL',
     'PLOTLY_API_URL',
     'PLOTLY_URL',
     'CONNECTIONS_PATH',
     'QUERIES_PATH',
+    'TAGS_PATH',
     'LOG_PATH',
     'SETTINGS_PATH',
     'KEY_FILE',
@@ -82,6 +85,11 @@ const derivedSettingsNames = [
 
 function getDerivedSetting(settingName) {
     switch (settingName) {
+        case 'BASE_URL':
+            return getSetting('IS_RUNNING_INSIDE_ON_PREM') ?
+                process.env.PLOTLY_CONNECTOR_BASE_URL :
+                `https://${getSetting('CONNECTOR_HTTPS_DOMAIN')}:${getSetting('PORT_HTTPS')}`;
+
         case 'PLOTLY_URL': {
             if (getSetting('PLOTLY_API_DOMAIN') ===
                 DEFAULT_SETTINGS.PLOTLY_API_DOMAIN) {
@@ -106,6 +114,11 @@ function getDerivedSetting(settingName) {
             return path.join(
                 getSetting('STORAGE_PATH'),
                 'queries.yaml'
+            );
+        case 'TAGS_PATH':
+            return path.join(
+                getSetting('STORAGE_PATH'),
+                'tags.yaml'
             );
 
         case 'LOG_PATH':
@@ -225,4 +238,9 @@ export function saveSetting(settingName, settingValue) {
      * without a more thorough investigation.
      */
     fs.writeFileSync(getSetting('SETTINGS_PATH'), YAML.stringify(settingsOnFile));
+}
+
+// Get user credentials
+export function getCredentials(username) {
+    return getSetting('USERS').find(u => u.username === username) || {};
 }

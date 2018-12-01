@@ -23,7 +23,16 @@
 }
 
 .dialectSelector {
-    display: inline-block;
+  margin-top: 32px;
+}
+
+.dialectSelector .Select {
+  width: 56%;
+  height: 40px;
+  margin-left: 20px;
+  font-size: 14px;
+  font-weight: 300;
+  text-align: left;
 }
 
 .editButtonContainer {

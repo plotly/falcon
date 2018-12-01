@@ -1,0 +1,78 @@
+.tag-modal .count {
+  padding: 4px 16px 4px 0px;
+  margin-right: 16px;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.tag-modal .note {
+  font-size: 14px;
+  color: #797979;
+}
+
+.createTag {
+  margin: 24px 0 16px;
+  padding: 0 24px;
+}
+
+.create-modal .createTag .tagName {
+  margin: 0 24px;
+}
+
+.tagsContainer {
+  border: 1px solid #c8d4e3;
+
+  max-height: 328px;
+  overflow-y: auto;
+}
+
+.scrollContainer {
+  justify-content: flex-start !important;
+}
+
+.description.row-body {
+  color: #797979;
+}
+
+.tagRow {
+  flex-shrink: 0;
+  background: white;
+  padding: 16px 24px;
+  border-bottom: 1px solid #c8d4e3;
+}
+
+.tagRow:last-of-type {
+  border-bottom: none;
+}
+
+.color-box {
+  cursor: pointer;
+  margin: 0;
+  width: 30px;
+  height: 30px;
+  margin-right: 24px;
+  border: 1px solid #E0E7EF;
+  box-sizing: border-box;
+  border-radius: 3px;
+}
+
+.delete {
+  cursor: pointer;
+  color: #FF5E5E;
+  margin-left: auto;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.tagRow .delete-button {
+  background: #FF5E5E;
+  border: none;
+  margin-right: 0;
+}
+
+.chrome-picker input {
+  /* reset styles */
+  margin: initial !important;
+  padding: initial;
+  width: initial;
+  float: none;
+}

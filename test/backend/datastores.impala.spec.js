@@ -7,7 +7,7 @@ import {
 
 // Suppressing ESLint cause Mocha ensures `this` is bound in test functions
 /* eslint-disable no-invalid-this */
-describe('Apache Impala:', function () {
+describe.skip('Apache Impala:', function () {
 
     it('connect succeeds', function() {
         this.timeout(180 * 1000);

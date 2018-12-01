@@ -1,4 +1,10 @@
-import * as Sql from './Sql';
+import Logger from '../../logger';
+function logError(error) {
+    Logger.log(`${error.constructor}: ${error.message}`);
+    throw error;
+}
+
+import * as Sql from './sql.js';
 import * as Elasticsearch from './Elasticsearch';
 import * as S3 from './S3';
 import * as ApacheDrill from './ApacheDrill';
@@ -7,8 +13,11 @@ import * as ApacheLivy from './livy';
 import * as ApacheImpala from './impala';
 import * as DataWorld from './dataworld';
 import * as DatastoreMock from './datastoremock';
+import * as Athena from './athena';
+import * as BigQuery from './bigquery';
 
 const CSV = require('./csv');
+const Oracle = require('./oracle.js');
 
 /*
  * Switchboard to all of the different types of connections
@@ -36,6 +45,7 @@ function getDatastoreClient(connection) {
     }
 
     const {dialect} = connection;
+
     if (dialect === 'elasticsearch') {
         return Elasticsearch;
     } else if (dialect === 's3') {
@@ -52,6 +62,12 @@ function getDatastoreClient(connection) {
         return IbmDb2;
     } else if (dialect === 'data.world') {
         return DataWorld;
+    } else if (dialect === 'athena') {
+        return Athena;
+    } else if (dialect === 'oracle') {
+        return Oracle;
+    } else if (dialect === 'bigquery') {
+        return BigQuery;
     }
     return Sql;
 }
@@ -67,7 +83,7 @@ function getDatastoreClient(connection) {
  *   }
  */
 export function query(queryStatement, connection) {
-    return getDatastoreClient(connection).query(queryStatement, connection);
+    return getDatastoreClient(connection).query(queryStatement, connection).catch(logError);
 }
 
 /**
@@ -76,7 +92,7 @@ export function query(queryStatement, connection) {
  * @returns {Promise} that resolves when the connection succeeds
  */
 export function connect(connection) {
-    return getDatastoreClient(connection).connect(connection);
+    return getDatastoreClient(connection).connect(connection).catch(logError);
 }
 
 /**
@@ -87,7 +103,7 @@ export function connect(connection) {
 export function disconnect(connection) {
     const client = getDatastoreClient(connection);
     return (client.disconnect) ?
-        client.disconnect(connection) :
+        client.disconnect(connection).catch(logError) :
         Promise.resolve(connection);
 }
 
@@ -103,7 +119,7 @@ export function disconnect(connection) {
  *   }
  */
 export function schemas(connection) {
-    return getDatastoreClient(connection).schemas(connection);
+    return getDatastoreClient(connection).schemas(connection).catch(logError);
 }
 
 /**
@@ -114,7 +130,7 @@ export function schemas(connection) {
  * for elasticsearch, this means return the available "documents" per an "index"
  */
 export function tables(connection) {
-    return getDatastoreClient(connection).tables(connection);
+    return getDatastoreClient(connection).tables(connection).catch(logError);
 }
 
 /*
@@ -127,7 +143,7 @@ export function tables(connection) {
 // TODO - I think specificity is better here, just name this to "keys"
 // and if we ever add local file stuff, add a new function like "files".
 export function files(connection) {
-    return getDatastoreClient(connection).files(connection);
+    return getDatastoreClient(connection).files(connection).catch(logError);
 }
 
 
@@ -137,7 +153,7 @@ export function files(connection) {
  * Return a list of configured Apache Drill storage plugins
  */
 export function storage(connection) {
-    return getDatastoreClient(connection).storage(connection);
+    return getDatastoreClient(connection).storage(connection).catch(logError);
 }
 
 /*
@@ -148,9 +164,9 @@ export function storage(connection) {
  * that plugin.
  */
 export function listS3Files(connection) {
-    return getDatastoreClient(connection).listS3Files(connection);
+    return getDatastoreClient(connection).listS3Files(connection).catch(logError);
 }
 
 export function elasticsearchMappings(connection) {
-    return getDatastoreClient(connection).elasticsearchMappings(connection);
+    return getDatastoreClient(connection).elasticsearchMappings(connection).catch(logError);
 }

@@ -1,9 +1,13 @@
-import {contains} from 'ramda';
-import {getSetting} from '../settings.js';
-import {getAccessTokenCookieOptions} from '../constants.js';
-import {generateAndSaveAccessToken} from '../utils/authUtils';
-import Logger from '../logger';
 import fetch from 'node-fetch';
+import {contains} from 'ramda';
+
+import {generateAndSaveAccessToken} from '../utils/authUtils.js';
+import {
+    getAccessTokenCookieOptions,
+    getUnsecuredCookieOptions
+} from '../constants.js';
+import Logger from '../logger.js';
+import {getSetting} from '../settings.js';
 
 /*
  * backend does not see `/external-data-connector` in on-prem (because it is proxied).
@@ -29,12 +33,14 @@ export function PlotlyOAuth(electron) {
     return function isAuthorized(req, res, next) {
         const path = req.href();
 
-        if (!getSetting('AUTH_ENABLED')) {
-            return next();
-        }
+        const clientId = process.env.PLOTLY_CONNECTOR_OAUTH2_CLIENT_ID ||
+            'isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt';
+        res.setCookie('db-connector-oauth2-client-id', clientId, getUnsecuredCookieOptions());
 
-        // Auth is disabled for certain urls:
-        if (ESCAPED_ROUTES.some(path.match.bind(path))) {
+        const authEnabled = getSetting('AUTH_ENABLED');
+        res.setCookie('db-connector-auth-enabled', authEnabled, getUnsecuredCookieOptions());
+
+        if (!authEnabled) {
             return next();
         }
 
@@ -43,16 +49,26 @@ export function PlotlyOAuth(electron) {
             return next();
         }
 
+        // If not logged in and on-promise private-mode, redirect to login page
+        const plotlyAuthToken = req.cookies['plotly-auth-token'];
+        const onprem = getSetting('IS_RUNNING_INSIDE_ON_PREM');
+        if (path === '/' && !plotlyAuthToken && onprem) {
+            return res.redirect('/external-data-connector/login', next);
+        }
+
+        // Auth is disabled for certain urls:
+        if (ESCAPED_ROUTES.some(path.match.bind(path))) {
+            return next();
+        }
+
         if (accessTokenIsValid(req.cookies['db-connector-auth-token'])) {
             return next();
         }
 
-        if (!req.cookies['plotly-auth-token']) {
+        if (!plotlyAuthToken) {
             res.json(401, {error: {message: 'Please login to access this page.'}});
             return next(false);
         }
-
-        const plotlyAuthToken = req.cookies['plotly-auth-token'];
 
         fetch(`${getSetting('PLOTLY_API_URL')}/v2/users/current`, {
             headers: {'Authorization': `Bearer ${plotlyAuthToken}`}

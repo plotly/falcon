@@ -1,6 +1,6 @@
 ![Falcon logo](https://github.com/plotly/falcon-sql-client/raw/master/static/images/falcon-logo-by-plotly-stripe.png)
 
-Falcon in a free, open-source SQL editor with inline data visualization. It currently supports connecting to **RedShift**, **MySQL**, **PostgreSQL**, **IBM DB2**, **Impala**, **MS SQL**, and **SQLite**.
+Falcon is a free, open-source SQL editor with inline data visualization. It currently supports connecting to **RedShift**, **MySQL**, **PostgreSQL**, **IBM DB2**, **Impala**, **MS SQL**, **Oracle**, **SQLite** and more (for connecting to Oracle, please, see [here](https://github.com/plotly/falcon-sql-client/blob/master/ORACLE.md) the instructions to install the required free Oracle Instant Client).
 
 Visit [plot.ly](https://plot.ly/free-sql-client-download) to learn more or visit the [Plotly forum](https://community.plot.ly/c/falcon-sql-client).
 
@@ -25,7 +25,6 @@ We want to encourage a warm, welcoming, and safe environment for contributing to
 
 ## Contact
 
-- Lead maintainer: [@n-riesco](https://github.com/n-riesco)
 - [Feature requests and support](https://plot.ly/products/consulting-and-oem/)
 - [Security reports](https://help.plot.ly/security/)
 
@@ -34,9 +33,9 @@ We want to encourage a warm, welcoming, and safe environment for contributing to
 |   | Github | Twitter |
 |---|--------|---------|
 |**Chris Parmer**| [@chriddyp](https://github.com/chriddyp) | |
-|**Nicolas Riesco**| [@n-riesco](https://github.com/n-riesco) | |
 |**Tarun Gaba**| [@tarzzz](https://github.com/tarzzz) | |
 |**Shannon Lal**| [@shannonlal](https://github.com/shannonlal) | |
+|**Kinuthia Ndung'u**| [@kndungu](https://github.com/kndungu) | |
 
 ## Credit
 

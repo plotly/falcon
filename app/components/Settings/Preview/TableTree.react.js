@@ -55,6 +55,8 @@ class TableTree extends Component {
                 return getPathNames(connectionObject.url)[2];
             case DIALECTS.CSV:
                 return connectionObject.label || connectionObject.id || connectionObject.database;
+            case DIALECTS.ORACLE:
+                return connectionObject.connectionString;
             default:
                 return connectionObject.database;
         }
@@ -176,7 +178,7 @@ class TableTree extends Component {
         const labelNode = <span className="node">{label}</span>;
 
         return (
-            <div style={{padding: '5px 0 0 10px'}}>
+            <div style={{padding: '5px 0 0 10px', maxHeight: 650, overflowY: 'auto'}}>
                 <TreeView key={label} nodeLabel={labelNode} defaultCollapsed={false}>{
                     this.getTreeNodes(treeSchema)
                 }</TreeView>

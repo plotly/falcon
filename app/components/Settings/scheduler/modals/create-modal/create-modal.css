@@ -1,0 +1,81 @@
+.create-modal .container {
+    background: #F5F7FB;
+}
+
+.create-modal .innerColumn {
+    background: #fff;
+    position: relative;
+}
+
+.create-modal .header {
+    margin-bottom: 16px;
+    padding: 0 32px;
+}
+
+.create-modal .button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 2px 4px;
+}
+
+.create-modal .close-btn {
+  line-height: 14px;
+  min-height: 16px;
+}
+
+.create-modal .detailsColumn {
+    padding: 0 32px;
+}
+
+.create-modal p {
+    margin: 16px 0;
+    padding: 16px;
+}
+
+.create-modal .submit {
+    width: auto;
+    margin: 24px 32px 16px;
+    min-height: 28px;
+}
+
+.create-modal .save-warning {
+    font-size: 12px;
+    margin: 0 32px 16px;
+    opacity: 0.7;
+}
+
+.create-modal .row {
+    justify-content: flex-start;
+}
+
+.create-modal .Select-input > input {
+    margin: 0 auto;
+    width: 100%;
+    height: auto;
+}
+
+.create-modal .Select-create-option-placeholder, .create-modal .Select-create-option-placeholder > span {
+    color: #506784 !important;
+}
+
+.create-modal .dropdown {
+    padding: 0;
+    margin-bottom: 16px;
+    width: 100%;
+    max-width: 432px;
+}
+
+.create-modal .row-header {
+    width: 20%;
+}
+
+.create-modal .row-body {
+    width: 80%;
+}
+
+.create-modal .row-body > pre {
+    margin-top: 5px;
+    overflow-y: auto;
+    max-height: 300px;
+}

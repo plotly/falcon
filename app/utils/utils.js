@@ -1,7 +1,20 @@
 import {contains} from 'ramda';
 
-export function dynamicRequireElectron() {
-    return window.require('electron');
+export function isElectron() {
+    // the electron's main process preloads a script that sets up `window.$falcon`
+    return Boolean(window.$falcon);
+}
+
+export function setUsernameListener(callback) {
+    if (isElectron()) {
+        window.$falcon.setUsernameListener(callback);
+    }
+}
+
+export function showOpenDialog(options, callback) {
+    if (isElectron()) {
+        return window.$falcon.showOpenDialog(options, callback);
+    }
 }
 
 export function baseUrl() {
@@ -40,14 +53,15 @@ export function plotlyUrl() {
     return 'https://plot.ly';
 }
 
-export function isElectron() {
-    return window.process && window.process.type === 'renderer';
-}
-
 export function homeUrl() {
     return (isOnPrem()) ?
         '/external-data-connector' :
         '';
+}
+
+export function datasetUrl(fid) {
+  const [account, gridId] = fid.split(':');
+  return `${plotlyUrl()}/~${account}/${gridId}`;
 }
 
 export function getPathNames(url) {
@@ -56,4 +70,11 @@ export function getPathNames(url) {
     const pathNames = parser.pathname.split('/');
 
     return pathNames;
+}
+
+export function decapitalize(startString) {
+    if (startString.length === 0) {
+        return '';
+    }
+    return startString.slice(0, 1).toLowerCase() + startString.slice(1);
 }

@@ -11,7 +11,7 @@
     id: postgres-189ebfb4-e1b4-446c-9b83-b326875fa2d8
     username: masteruser
     password: connecttoplotly
-    host: readonly-test-postgres.cwwxgcilxwxw.us-west-2.rds.amazonaws.com
+    host: falcon-test-postgres.c52asitjzpsx.us-east-1.rds.amazonaws.com
     port: 5432
     database: plotly_datasets
 
@@ -20,7 +20,7 @@
     id: mysql-189ebfb4-e1b4-446c-9b83-b326875fa2d8
     username: masteruser
     password: connecttoplotly
-    host: readonly-test-mysql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com
+    host: falcon-test-mysql.c52asitjzpsx.us-east-1.rds.amazonaws.com
     port: 3306
     database: plotly_datasets
 
@@ -29,7 +29,7 @@
     id: mariadb-189ebfb4-e1b4-446c-9b83-b326875fa2d8
     username: masteruser
     password: connecttoplotly
-    host: readonly-test-mariadb.cwwxgcilxwxw.us-west-2.rds.amazonaws.com
+    host: mariadb-test-mysql.c52asitjzpsx.us-east-1.rds.amazonaws.com
     port: 3306
     database: plotly_datasets
 
@@ -47,7 +47,7 @@
     id: mssql-189ebfb4-e1b4-446c-9b83-b326875fa2d8
     username: masteruser
     password: connecttoplotly
-    host: test-mssql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com
+    host: falcon-test-mssql.c52asitjzpsx.us-east-1.rds.amazonaws.com
     port: 1433
     database: plotly_datasets
 
@@ -65,7 +65,7 @@
 -
     dialect: s3
     id: s3-189ebfb4-e1b4-446c-9b83-b326875fa2d8
-    bucket: plotly-s3-connector-test
+    bucket: falcon-s3-connector-test
     accessKeyId: AKIAIMHMSHTGARJYSKMQ
     secretAccessKey: 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
 
@@ -74,7 +74,7 @@
     id: apache drill-189ebfb4-e1b4-446c-9b83-b326875fa2d8
     host: http://ec2-35-164-71-216.us-west-2.compute.amazonaws.com
     port: 8047
-    bucket: plotly-s3-connector-test
+    bucket: falcon-s3-connector-test
     accessKeyId: AKIAIMHMSHTGARJYSKMQ
     secretAccessKey: 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
 

@@ -10,6 +10,66 @@ describe('Connect Button Test', () => {
         configure({ adapter: new Adapter() });
     });
 
+    it('should handle malformatted Connection Request Error', () => {
+        const connect = function() {};
+        const connectRequest = {
+            status: 500,
+            content: {error: {message: {}}}
+        };
+        const saveConnectionsRequest = {
+        };
+        const editMode = true;
+
+        const button = mount(<ConnectButton
+            connect={connect}
+            connectRequest={connectRequest}
+            saveConnectionsRequest={saveConnectionsRequest}
+            editMode={editMode}
+        />);
+
+        expect(button.find('.errorMessage').length).toBe(1);
+    });
+
+    it('should handle malformatted Save Connections Request Error', () => {
+        const connect = function() {};
+        const connectRequest = {
+            status: 200
+        };
+        const saveConnectionsRequest = {
+            status: 500,
+            content: {error: {message: {}}}
+        };
+        const editMode = true;
+
+        const button = mount(<ConnectButton
+            connect={connect}
+            connectRequest={connectRequest}
+            saveConnectionsRequest={saveConnectionsRequest}
+            editMode={editMode}
+        />);
+
+        expect(button.find('.errorMessage').length).toBe(1);
+    });
+
+    it('should handle Connection Request Error Status 500', () => {
+        const connect = function() {};
+        const connectRequest = {
+            status: 500
+        };
+        const saveConnectionsRequest = {
+        };
+        const editMode = true;
+
+        const button = mount(<ConnectButton
+            connect={connect}
+            connectRequest={connectRequest}
+            saveConnectionsRequest={saveConnectionsRequest}
+            editMode={editMode}
+        />);
+
+        expect(button.instance().connectionFailed()).toBe(true);
+    });
+
     it('should verify Connection Request Error', () => {
         const connect = function() {};
         const connectRequest = {

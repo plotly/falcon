@@ -24,7 +24,7 @@ export default {
         libraryTarget: 'commonjs2'
     },
     resolve: {
-        extensions: ['.js', '.jsx']
+        extensions: ['.js', '.jsx', '.json']
     },
     plugins: [
     ],
@@ -32,9 +32,11 @@ export default {
         {
             'csv-parse': 'commonjs csv-parse',
             'data-urls': 'commonjs data-urls',
+            'dtrace-provider': 'commonjs dtrace-provider',
             'font-awesome': 'font-awesome',
             'ibm_db': 'commonjs ibm_db',
             'mysql': 'mysql',
+            'oracledb': 'commonjs oracledb',
             'pg': 'pg',
             'pg-hstore': 'pg-hstore',
             'restify': 'commonjs restify',

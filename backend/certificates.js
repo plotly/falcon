@@ -1,6 +1,10 @@
 import {getSetting, saveSetting} from './settings.js';
 import * as fs from 'fs';
-import fetch from 'node-fetch';
+
+const https = require('https');
+https.globalAgent.options.ecdhCurve = 'auto'; // fix default in node v8
+const fetch = require('node-fetch');
+
 import Logger from './logger';
 
 import {fakeCerts} from '../test/backend/utils';

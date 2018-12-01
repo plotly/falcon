@@ -36,8 +36,14 @@ export default class ConnectionTab extends Component {
             label = connectionObject.label || connectionObject.id || connectionObject.database;
         } else if (connectionObject.dialect === DIALECTS.ELASTICSEARCH) {
             label = `Elasticsearch (${connectionObject.host})`;
+        } else if (connectionObject.dialect === DIALECTS.ATHENA) {
+            label = `Athena (${connectionObject.database})`;
+        } else if (connectionObject.dialect === DIALECTS.ORACLE) {
+            label = `${connectionObject.connectionString}`;
         } else if (connectionObject.dialect === DIALECTS.SQLITE) {
             label = connectionObject.storage;
+        } else if (connectionObject.dialect === DIALECTS.BIGQUERY) {
+            label = `Big Query ${connectionObject.database}`;
         } else if (connectionObject.dialect === DIALECTS.DATA_WORLD) {
             const pathNames = getPathNames(connectionObject.url);
             if (pathNames.length >= 3) {

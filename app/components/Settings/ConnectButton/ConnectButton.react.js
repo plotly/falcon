@@ -23,10 +23,10 @@ export default class ConnectButton extends Component {
     }
 
     /**
-    * @returns {boolean} true if waiting for a response to a connection request
-    */
-   isConnecting() {
-    return this.props.connectRequest.status === 'loading';
+     * @returns {boolean} true if waiting for a response to a connection request
+     */
+    isConnecting() {
+        return this.props.connectRequest.status === 'loading';
     }
 
     /**
@@ -34,7 +34,7 @@ export default class ConnectButton extends Component {
     */
     isConnected() {
         const status = Number(this.props.connectRequest.status);
-        return (status >= 200 || status < 300);
+        return (status >= 200 && status < 300);
     }
 
     /**
@@ -56,7 +56,7 @@ export default class ConnectButton extends Component {
     */
     isSaved() {
         const status = Number(this.props.saveConnectionsRequest.status);
-        return (status >= 200 || status < 300);
+        return (status >= 200 && status < 300);
     }
 
     /**
@@ -89,18 +89,19 @@ export default class ConnectButton extends Component {
             buttonClick = connect;
 
             const connectErrorMessage = pathOr(
-                null, ['content', 'error'], connectRequest
+                null, ['content', 'error', 'message'], connectRequest
             );
             const saveErrorMessage = pathOr(
                 null, ['content', 'error', 'message'], saveConnectionsRequest
             );
             const genericErrorMessage = 'Hm... had trouble connecting.';
-            const errorMessage = connectErrorMessage || saveErrorMessage || genericErrorMessage;
+            const errorMessage = String(connectErrorMessage || saveErrorMessage || genericErrorMessage);
             error = <div className={'errorMessage'}>{errorMessage}</div>;
 
         } else if (this.isConnected() && this.isSaved()) {
             buttonText = 'Save changes';
             buttonClick = connect;
+
         } else {
             buttonText = 'Connect';
             buttonClick = connect;

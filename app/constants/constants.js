@@ -5,6 +5,7 @@ import {concat} from 'ramda';
 export const DIALECTS = {
     MYSQL: 'mysql',
     MARIADB: 'mariadb',
+    ORACLE: 'oracle',
     POSTGRES: 'postgres',
     REDSHIFT: 'redshift',
     ELASTICSEARCH: 'elasticsearch',
@@ -16,12 +17,15 @@ export const DIALECTS = {
     APACHE_IMPALA: 'apache impala',
     APACHE_DRILL: 'apache drill',
     DATA_WORLD: 'data.world',
-    CSV: 'csv'
+    ATHENA: 'athena',
+    CSV: 'csv',
+    BIGQUERY: 'bigquery'
 };
 
 export const SQL_DIALECTS_USING_EDITOR = [
     'mysql',
     'mariadb',
+    'oracle',
     'postgres',
     'redshift',
     'mssql',
@@ -30,7 +34,9 @@ export const SQL_DIALECTS_USING_EDITOR = [
     'apache spark',
     'apache impala',
     'data.world',
-    'csv'
+    'athena',
+    'csv',
+    'bigquery'
 ];
 
 const commonSqlOptions = [
@@ -137,6 +143,22 @@ export const CONNECTION_CONFIG = {
             }
         ]
     ),
+    [DIALECTS.ORACLE]: [
+        {'label': 'Username', 'value': 'username', 'type': 'text'},
+        {'label': 'Password', 'value': 'password', 'type': 'password'},
+        {
+            'label': 'Connection',
+            'value': 'connectionString',
+            'type': 'text',
+            'description': `
+                An Easy Connect string,
+                a Net Service Name from a local 'tnsnames.ora' file or an external naming service,
+                an SID of a local Oracle database instance,
+                or leave empty to connect to the local default database.
+                See https://oracle.github.io/node-oracledb/doc/api.html#connectionstrings for examples.
+            `
+        }
+    ],
     [DIALECTS.POSTGRES]: commonSqlOptions,
     [DIALECTS.REDSHIFT]: commonSqlOptions,
     [DIALECTS.SQLITE]: [
@@ -189,6 +211,7 @@ export const CONNECTION_CONFIG = {
             'type': 'password'
         }
     ], // TODO - password options for apache drill
+
     [DIALECTS.DATA_WORLD]: [
         {
             'label': 'Dataset/Project URL',
@@ -202,6 +225,51 @@ export const CONNECTION_CONFIG = {
             'type': 'password',
             'description': 'Your data.world read/write token. It can be obtained from https://data.world/settings/advanced'
         }
+    ],
+    [DIALECTS.ATHENA]: [
+        {
+            'label': 'S3 Access Key', 'value': 'accessKey', 'type': 'password'
+        },
+        {
+            'label': 'S3 Secret Access Key', 'value': 'secretAccessKey', 'type': 'password'
+        },
+        {
+            'label': 'AWS Region', 'value': 'region', 'type': 'text',
+            'description': 'The AWS region (i.e. us-east-1) where the database resides'
+        },
+        {
+            'label': 'S3 Bucket', 'value': 'outputS3Bucket', 'type': 'text',
+            'description': 'The Athena connector will store query results in this location.'
+        },
+        {
+            'label': 'Database', 'value': 'database', 'type': 'text'
+        },
+        {
+            'label': 'Query Interval', 'value': 'queryInterval', 'type': 'number',
+            'description': 'The Interval (In Milliseconds) that Falcon will check to see \
+                             if the Athena Query is done. Default 2 seconds'
+        },
+        {
+            'label': 'SSL Enabled', 'value': 'sslEnabled', 'type': 'checkbox',
+            'description': 'Does your database require that you connect to it via SSL? \
+                            Note that this is just the connection between this app and your database; \
+                            connections to plot.ly or your plotly instance are always encrypted.'
+        }
+    ],
+    [DIALECTS.BIGQUERY]: [
+        {
+            'label': 'Google Project Id',
+            'value': 'projectId',
+            'type': 'text',
+            'description': 'The Google Cloud Project Id'
+        },
+        {'label': 'Database', 'value': 'database', 'type': 'text'},
+        {
+            'label': 'Key File',
+            'value': 'keyFilename',
+            'type': 'filedrop',
+            'description': 'The location of the Google Service Account Key File'
+        }
     ]
 };
 
@@ -212,6 +280,7 @@ export const LOGOS = {
     [DIALECTS.CSV]: 'images/csv-logo.png',
     [DIALECTS.IBM_DB2]: 'images/ibmdb2-logo.png',
     [DIALECTS.REDSHIFT]: 'images/redshift-logo.png',
+    [DIALECTS.ORACLE]: 'images/oracle-logo.png',
     [DIALECTS.POSTGRES]: 'images/postgres-logo.png',
     [DIALECTS.ELASTICSEARCH]: 'images/elastic-logo.png',
     [DIALECTS.MYSQL]: 'images/mysql-logo.png',
@@ -220,7 +289,9 @@ export const LOGOS = {
     [DIALECTS.SQLITE]: 'images/sqlite-logo.png',
     [DIALECTS.S3]: 'images/s3-logo.png',
     [DIALECTS.APACHE_DRILL]: 'images/apache_drill-logo.png',
-    [DIALECTS.DATA_WORLD]: 'images/dataworld-logo.png'
+    [DIALECTS.DATA_WORLD]: 'images/dataworld-logo.png',
+    [DIALECTS.ATHENA]: 'images/athena-logo.png',
+    [DIALECTS.BIGQUERY]: 'images/bigquery-logo.png'
 };
 
 export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
@@ -229,6 +300,8 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
             return 'SELECT TOP 1000 * FROM ?';
         case DIALECTS.IBM_DB2:
             return `SELECT * FROM ${table} FETCH FIRST 1000 ROWS ONLY`;
+        case DIALECTS.ORACLE:
+            return `SELECT * FROM ${table} WHERE ROWNUM <= 1000`;
         case DIALECTS.APACHE_IMPALA:
         case DIALECTS.APACHE_SPARK:
         case DIALECTS.MYSQL:
@@ -237,9 +310,12 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
         case DIALECTS.POSTGRES:
         case DIALECTS.DATA_WORLD:
         case DIALECTS.REDSHIFT:
+        case DIALECTS.ATHENA:
             return `SELECT * FROM ${table} LIMIT 1000`;
         case DIALECTS.MSSQL:
-            return `SELECT TOP 1000 * FROM ${connection.database}.dbo.${table}`;
+            return (connection.database) ?
+                `SELECT TOP 1000 * FROM "${connection.database}".${table}` :
+                `SELECT TOP 1000 * FROM ${table}`;
         case DIALECTS.ELASTICSEARCH:
             return JSON.stringify({
                 index: elasticsearchIndex || '_all',
@@ -249,6 +325,8 @@ export function PREVIEW_QUERY(connection, table, elasticsearchIndex) {
                     size: 1000
                 }
             });
+        case DIALECTS.BIGQUERY:
+            return 'SELECT \'connected\' as status';
         default:
             return '';
     }
@@ -347,6 +425,11 @@ export const SAMPLE_DBS = {
         host: 'db2.test.plotly.host',
         dialect: DIALECTS.IBM_DB2
     },
+    [DIALECTS.ORACLE]: {
+        username: 'XDB',
+        password: 'xdb',
+        connectionString: 'localhost/XE'
+    },
     [DIALECTS.POSTGRES]: {
         username: 'masteruser',
         password: 'connecttoplotly',
@@ -411,7 +494,47 @@ export const SAMPLE_DBS = {
         dialect: 'sqlite',
         storage: `${__dirname}/plotly_datasets.db`
     },
+    [DIALECTS.ATHENA]: {
+        s3Outputlocation: 'plotly-s3-connector-test',
+        accessKey: 'AKIAIMHMSHTGARJYSKMQ',
+        secretAccessKey: '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',
+        region: 'us-east-1',
+        database: 'falcon',
+        queryTimeout: 5000
+    },
     [DIALECTS.DATA_WORLD]: {
         url: 'https://data.world/rflprr/reported-lyme-disease-cases-by-state'
+    },
+    [DIALECTS.BIGQUERY]: {
+        projectId: 'Plotly',
+        database: 'plotly',
+        keyFilename: '/home/plotly/falcon/google-credentials.json'
     }
+};
+
+export function getHighlightMode(dialect) {
+    if (!SQL_DIALECTS_USING_EDITOR.includes(dialect)) {
+        return 'text/plain';
+    }
+
+    return {
+            [DIALECTS.APACHE_SPARK]: 'text/x-sparksql',
+            [DIALECTS.MYSQL]: 'text/x-mysql',
+            [DIALECTS.SQLITE]: 'text/x-sqlite',
+            [DIALECTS.MARIADB]: 'text/x-mariadb',
+            [DIALECTS.ORACLE]: 'text/x-plsql',
+            [DIALECTS.POSTGRES]: 'text/x-pgsql',
+            [DIALECTS.REDSHIFT]: 'text/x-pgsql',
+            [DIALECTS.MSSQL]: 'text/x-mssql'
+    }[dialect] || 'text/x-sql';
+}
+
+export const WAITING_MESSAGE = 'This may take a long time. Your query is ' +
+  'currently executing and must finish before it can be saved.';
+
+export const SAVE_WARNING = 'Note: when you save, the query will ' +
+  'execute and update the dataset immediately. Thereafter it will do so on the requested schedule.';
+
+export const COLORS = {
+    red: '#EF553B'
 };

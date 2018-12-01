@@ -1,13 +1,26 @@
+const fetch = require('node-fetch');
+import {contains, equals, filter, keys, isEmpty, merge, pluck, propEq, reject} from 'ramda';
 const restify = require('restify');
 const CookieParser = require('restify-cookies');
-const fetch = require('node-fetch');
 
 import * as fs from 'fs';
 import path from 'path';
 
-import * as Datastores from './persistent/datastores/Datastores.js';
 import {PlotlyOAuth} from './plugins/authorization.js';
-import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
+import {generateAndSaveAccessToken} from './utils/authUtils.js';
+import {
+    getAccessTokenCookieOptions,
+    getCookieOptions,
+    getUnsecuredCookieOptions
+} from './constants.js';
+import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates.js';
+import * as Datastores from './persistent/datastores/Datastores.js';
+import init from './init.js';
+import Logger from './logger.js';
+import {checkWritePermissions, newDatacache} from './persistent/plotly-api.js';
+import {getQueries, getQuery, deleteQuery, saveQuery, updateQuery} from './persistent/Queries.js';
+import {HEX_CODE_REGEX, MAX_TAG_LENGTH, getTags, getTag, saveTag, updateTag, deleteTag} from './persistent/Tags.js';
+import {stripUndefinedKeys} from './utils/persistenceUtils.js';
 import {
     deleteConnectionById,
     editConnectionById,
@@ -21,13 +34,8 @@ import {
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
-import {generateAndSaveAccessToken} from './utils/authUtils';
-import {getAccessTokenCookieOptions, getCookieOptions} from './constants';
-import {checkWritePermissions, newDatacache} from './persistent/PlotlyAPI.js';
-import {contains, keys, isEmpty, merge, pluck} from 'ramda';
-import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
-import Logger from './logger';
-import init from './init.js';
+import { EXE_STATUS } from '../shared/constants.js';
+
 
 export default class Servers {
     /*
@@ -143,17 +151,35 @@ export default class Servers {
 
         that.electronWindow = that.httpsServer.electronWindow || that.httpServer.electronWindow;
 
+        server.pre(function (req, res, next) {
+            res.header(
+                'X-Frame-Options',
+                'DENY'
+            );
+            next();
+        });
+
         server.use(CookieParser.parse);
         server.use(PlotlyOAuth(Boolean(that.isElectron)));
 
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
         server.pre(function (request, response, next) {
-            Logger.log(`Request: ${request.href()}`, 2);
+            const href = request.href();
+            const skip =
+                href.startsWith('/settings/urls') ||
+                href.startsWith('/static') ||
+                href.startsWith('/images');
+            if (!skip) Logger.log(`Request: ${href}`, 2);
             next();
         });
         server.use(function (request, response, next) {
-            Logger.log(`Response: ${request.href()}`, 2);
+            const href = request.href();
+            const skip =
+                href.startsWith('/settings/urls') ||
+                href.startsWith('/static') ||
+                href.startsWith('/images');
+            if (!skip) Logger.log(`Response: ${href}`, 2);
             next();
         });
 
@@ -299,7 +325,7 @@ export default class Servers {
                         res.setCookie('db-connector-auth-token',
                                       db_connector_access_token,
                                       getAccessTokenCookieOptions());
-                        res.setCookie('db-connector-user', username, getCookieOptions());
+                        res.setCookie('db-connector-user', username, getUnsecuredCookieOptions());
 
                         const existingUsers = getSetting('USERS');
                         const existingUsernames = pluck('username', existingUsers);
@@ -457,11 +483,11 @@ export default class Servers {
                     return next();
                 }
                 Logger.log(validation, 2);
-                res.json(400, {error: validation.message});
+                res.json(400, {error: {message: validation.message}});
                 return next();
             }).catch(err => {
                 Logger.log(err, 2);
-                res.json(400, {error: err.message});
+                res.json(400, {error: {message: err.message}});
                 return next();
             });
         });
@@ -603,19 +629,108 @@ export default class Servers {
             }
             else {
                 const rand = Math.round(Math.random() * 1000).toString();
-                const downloadPath = path.join(getSetting('STORAGE_PATH'), `data_export_${rand}.csv`);
+                const downloadPath = path.resolve(
+                    path.join(getSetting('STORAGE_PATH'), `data_export_${rand}.csv`)
+                );
                 fs.writeFile(downloadPath, payload, (err) => {
                     if (err) {
                         res.json({type: 'error', message: err});
                         return next();
                     }
-                    res.json({type: 'csv', url: 'file:///'.concat(downloadPath)});
+                    res.json({type: 'csv', url: 'file://'.concat(downloadPath)});
                     return next();
                 });
             }
         });
 
         /* Persistent Datastores */
+        // get all tags
+        server.get('/tags', function getTagsHandler(req, res, next) {
+            res.json(200, getTags());
+            return next();
+        });
+
+        // register a tag
+        server.post('/tags', function postTagsHandler(req, res, next) {
+            const {
+                name,
+                color
+            } = req.params;
+
+            if (!name || !color) {
+                res.json(400, {error: {message: 'Tags must have name and color parameters.'}});
+                return next();
+            } else if (name.length > MAX_TAG_LENGTH) {
+                res.json(400, {error: {message: `Tag name must be less than ${MAX_TAG_LENGTH} characters.`}});
+                return next();
+            } else if (!HEX_CODE_REGEX.test(color)) {
+                res.json(400, {error: {message: 'Tag color must be a valid hex code.'}});
+                return next();
+            }
+
+            const existingTags = getTags();
+            const duplicateTags = filter(propEq('name', name), existingTags);
+            if (duplicateTags.length) {
+                res.json(400, {error: {message: 'A tag with that name already exists'}});
+                return next();
+            }
+
+            const createdTag = saveTag({name, color});
+            res.json(201, createdTag);
+            return next();
+        });
+
+        // update an existing tag
+        server.put('/tags/:id', function putTagsHandler(req, res, next) {
+            const {
+                id,
+                name,
+                color
+            } = req.params;
+
+            const existingTag = getTag(id);
+            if (!existingTag) {
+                res.json(400, {error: {message: `Tag ${id} not found.`}});
+                return next();
+            }
+
+            if (name && name.length > MAX_TAG_LENGTH) {
+                res.json(400, {error: {message: `Tag name must be less than ${MAX_TAG_LENGTH} characters.`}});
+                return next();
+            } else if (color && !HEX_CODE_REGEX.test(color)) {
+                res.json(400, {error: {message: 'Tag color must be a valid hex code.'}});
+                return next();
+            }
+
+            const updatedTag = updateTag(id, stripUndefinedKeys({name, color}));
+            res.json(200, updatedTag);
+            return next();
+        });
+
+        // delete a tag
+        server.del('/tags/:id', function deleteTagHandler(req, res, next) {
+            const {
+                id
+            } = req.params;
+
+            if (!getTag(id)) {
+                res.json(404, {});
+                return next();
+            }
+
+            deleteTag(id);
+            const queries = getQueries();
+            queries.forEach(query => {
+                if (query.tags) {
+                    deleteQuery(query.fid);
+                    query.tags = reject(equals(id), query.tags);
+                    saveQuery(query);
+                }
+            });
+
+            res.json(200, {});
+            return next();
+        });
 
         // return the list of registered queries
         server.get('/queries', function getQueriesHandler(req, res, next) {
@@ -633,42 +748,139 @@ export default class Servers {
             return next();
         });
 
-        // register or overwrite a query
+        // register/update a query (and create/update a grid)
         /*
          * TODO - Updating a query should be a PATCH or PUT under
          * the endpoint `/queries/:fid`
          */
         server.post('/queries', function postQueriesHandler(req, res, next) {
-            // Make the query and update the user's grid
-            const {fid, uids, query, connectionId, requestor} = req.params;
+            const {
+                filename,
+                fid,
+                query,
+                connectionId,
+                requestor,
+                cronInterval = null,
+                refreshInterval = null
+            } = req.params;
 
-            // Check that the user has permission to edit the grid
-
-            checkWritePermissions(fid, requestor)
-            .then(function nowQueryAndUpdateGrid() {
-                return that.queryScheduler.queryAndUpdateGrid(
-                    fid, uids, query, connectionId, requestor
-                );
-            })
-            .then(function returnSuccess() {
-                let status;
-                if (getQuery(req.params.fid)) {
-                    // TODO - Technically, this should be
-                    // under the endpoint `/queries/:fid`
-                    status = 200;
-                } else {
-                    status = 201;
+            // validate data integrity before proceding
+            if (req.params.tags) {
+                const tagIds = getTags().map(tag => tag.id);
+                if (req.params.tags.some(tag => !tagIds.includes(tag))) {
+                    return onError('Invalid tags');
                 }
-                that.queryScheduler.scheduleQuery(req.params);
-                res.json(status, {});
-                return next();
-            })
-            .catch(function returnError(error) {
+            }
+
+            const startedAt = Date.now();
+
+            // If a filename has been provided,
+            // make the query and create a new grid
+            if (filename) {
+                return that.queryScheduler.queryAndCreateGrid(
+                    filename, query, connectionId, requestor, cronInterval, refreshInterval
+                )
+                .then((executionRes) => {
+                    const { completedAt, duration, rowCount, uids } = executionRes.queryResults;
+                    const queryObject = {
+                        ...req.params,
+                        fid: executionRes.fid,
+                        uids,
+                        lastExecution: {
+                            status: EXE_STATUS.ok,
+                            startedAt,
+                            completedAt,
+                            duration,
+                            rowCount
+                        }
+                    };
+                    that.queryScheduler.scheduleQuery(queryObject);
+                    res.json(201, queryObject);
+                    return next();
+                })
+                .catch(onError);
+            }
+
+            // If a grid fid has been provided,
+            // check the user has permission to edit,
+            // make the query and update the grid
+            if (fid) {
+                return checkWritePermissions(fid, requestor).then(function () {
+                    // if query already exists, make sure it's status is correctly set while
+                    // executing
+                    if (getQuery(fid)) {
+                        updateQuery(fid, {
+                            lastExecution: {
+                                status: EXE_STATUS.running,
+                                startedAt
+                            }
+                        });
+                    }
+
+                    return that.queryScheduler.queryAndUpdateGrid(
+                        fid, query, connectionId, requestor, cronInterval, refreshInterval
+                    );
+                })
+                .then((executionRes) => {
+                    const { completedAt, duration, rowCount, uids } = executionRes.queryResults;
+                    const previousQuery = getQuery(req.params.fid);
+
+                    let status;
+                    if (previousQuery) {
+                        // TODO - Technically, this should be
+                        // under the endpoint `/queries/:fid`
+                        status = 200;
+                    } else {
+                        status = 201;
+                    }
+
+                    let oldParamsToCarryOver = {};
+                    if (previousQuery) {
+                        const {name, tags} = previousQuery;
+                        oldParamsToCarryOver = {name, tags};
+                    }
+
+                    const queryObject = {
+                        ...oldParamsToCarryOver,
+                        ...req.params,
+                        uids,
+                        lastExecution: {
+                            status: EXE_STATUS.ok,
+                            startedAt,
+                            completedAt,
+                            duration,
+                            rowCount
+                        }
+                    };
+
+                    that.queryScheduler.scheduleQuery(queryObject);
+                    res.json(status, queryObject);
+                    return next();
+                })
+                .catch((err) => {
+                    if (getQuery(req.params.fid)) {
+                        updateQuery(req.params.fid, {
+                            lastExecution: {
+                                status: EXE_STATUS.failed,
+                                startedAt,
+                                completedAt: Date.now(),
+                                errorMessage: err.toString()
+                            }
+                        });
+                    }
+
+                    throw err;
+                })
+                .catch(onError);
+            }
+
+            return onError(new Error('Bad request'));
+
+            function onError(error) {
                 Logger.log(error, 0);
                 res.json(400, {error: {message: error.message}});
                 return next();
-            });
-
+            }
         });
 
         // delete a query

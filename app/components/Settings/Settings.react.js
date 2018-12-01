@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {contains, dissoc, flip, head, hasIn, isEmpty, keys, merge, propOr, reduce} from 'ramda';
+import {contains, dissoc, flip, head, hasIn, isEmpty, keys, merge, propEq, propOr, reduce} from 'ramda';
 import {connect} from 'react-redux';
-import ReactToolTip from 'react-tooltip';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
 import fetch from 'isomorphic-fetch';
@@ -13,9 +12,9 @@ import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import Preview from './Preview/Preview.react';
 import {Link} from '../Link.react';
+import Scheduler from './scheduler/scheduler.jsx';
 import {DIALECTS, FAQ, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
-import {isElectron, isOnPrem} from '../../utils/utils';
-
+import {isElectron, isOnPrem, homeUrl} from '../../utils/utils';
 
 class Settings extends Component {
     constructor(props) {
@@ -23,6 +22,10 @@ class Settings extends Component {
         this.fetchData = this.fetchData.bind(this);
         this.renderEditButton = this.renderEditButton.bind(this);
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
+        this.updateSelectedPanel = this.updateSelectedPanel.bind(this);
+        this.openScheduler = this.openScheduler.bind(this);
+        this.openLogin = () => window.location.assign(`${homeUrl()}/login`);
+        this.openQueryPage = () => this.updateSelectedPanel(1);
         this.state = {
             editMode: true,
             selectedPanel: {},
@@ -31,7 +34,8 @@ class Settings extends Component {
                 http: null
             },
             timeElapsed: 0,
-            httpsServerIsOK: false
+            httpsServerIsOK: false,
+            scheduledQuery: null
         };
         this.intervals = {
             timeElapsedInterval: null,
@@ -60,10 +64,14 @@ class Settings extends Component {
 
         this.intervals.checkHTTPSEndpointInterval = setInterval(() => {
             if (this.state.urls.https) {
-                fetch(this.state.urls.https).then(() => {
+                fetch(this.state.urls.https)
+                .then(() => {
                     this.setState({httpsServerIsOK: true});
                     clearInterval(this.intervals.checkHTTPSEndpointInterval);
                     clearInterval(this.intervals.timeElapsedInterval);
+                })
+                .catch(() => {
+                    // silence fetch errors
                 });
             }
         }, 5 * 1000);
@@ -113,7 +121,6 @@ class Settings extends Component {
                 )}
             >
                 <div className={'dialectSelector'}>
-                    <ReactToolTip place={'top'} type={'dark'} effect={'solid'} />
                     <DialectSelector
                         connectionObject={connectionObject}
                         updateConnection={updateConnection}
@@ -165,6 +172,8 @@ class Settings extends Component {
             getApacheDrillS3Keys,
             getElasticsearchMappings,
             getTables,
+            getScheduledQueries,
+            getTags,
             getS3Keys,
             getSettings,
             initialize,
@@ -177,7 +186,9 @@ class Settings extends Component {
             s3KeysRequest,
             selectedTab,
             selectedIndex,
-            tablesRequest
+            tablesRequest,
+            scheduledQueriesRequest,
+            tagsRequest
         } = this.props;
         if (connectionsRequest && !connectionsRequest.status) {
             initialize();
@@ -193,6 +204,14 @@ class Settings extends Component {
         // // get the settings to prefill the URL
         if (!settingsRequest.status) {
             getSettings();
+        }
+
+        if (connectRequest.status === 200 && !scheduledQueriesRequest.status) {
+            getScheduledQueries();
+        }
+
+        if (connectRequest.status === 200 && !tagsRequest.status) {
+            getTags();
         }
 
         const connectionObject = connections[selectedTab] || {};
@@ -242,11 +261,39 @@ class Settings extends Component {
         }
     }
 
+    updateSelectedPanel(panelIndex, cb) {
+      this.props.updatePreview({
+          showChart: false,
+          showEditor: true,
+          size: 200
+      });
+      this.setState({
+        selectedPanel: {
+          [this.props.selectedTab]: panelIndex
+        }
+      }, typeof cb === 'function' ? cb : () => {});
+    }
+
+    openScheduler() {
+      this.setState({ scheduledQuery: this.props.preview.code }, () => {
+        this.updateSelectedPanel(2, () => {
+          /*
+           * Setting scheduledQuery to `null` right after opening the Schedule panel
+           * ensures that when the user switches to another connector, or back
+           * and forth between tabs, `initialCode` isn't set to the
+           * `scheduledQuery` causing the create modal to be open..
+           */
+          this.setState({ scheduledQuery: null });
+        });
+      });
+    }
+
     render() {
         const {
             apacheDrillStorageRequest,
             apacheDrillS3KeysRequest,
             connections,
+            connectRequest,
             deleteTab,
             elasticsearchMappingsRequest,
             getSqlSchema,
@@ -263,6 +310,12 @@ class Settings extends Component {
             setIndex,
             setTable,
             selectedTable,
+            selectedScheduledQueries,
+            getScheduledQueries,
+            createScheduledQuery,
+            updateScheduledQuery,
+            deleteScheduledQuery,
+            selectedTags,
             selectedIndex,
             setTab,
             tablesRequest,
@@ -283,13 +336,25 @@ class Settings extends Component {
 
         const dialect = connections[selectedTab].dialect;
 
+        const queryPanelDisabled = (
+            connectRequest.status !== 200 ||
+            (!selectedTable && contains(dialect, SQL_DIALECTS_USING_EDITOR))
+        );
+
         return (
             <div>
                 <ConnectionTabs
                     connections={connections}
                     selectedTab={selectedTab}
                     newTab={newTab}
-                    setTab={setTab}
+                    setTab={tabId => {
+                        updatePreview({
+                            showChart: false,
+                            showEditor: true,
+                            size: 200
+                        });
+                        setTab(tabId);
+                    }}
                     deleteTab={deleteTab}
                 />
 
@@ -297,16 +362,13 @@ class Settings extends Component {
 
                     <Tabs
                         selectedIndex={this.state.selectedPanel[selectedTab] || 0}
-                        onSelect={panelIndex => this.setState({selectedPanel: {[selectedTab]: panelIndex}})}
+                        onSelect={this.updateSelectedPanel}
                     >
 
                         <TabList>
                             <Tab>Connection</Tab>
-                            {this.props.connectRequest.status === 200 && selectedTable ? (
-                                <Tab>Query</Tab>
-                            ) : (
-                                <Tab disabled={true}>Query</Tab>
-                            )}
+                            <Tab disabled={queryPanelDisabled}>Query</Tab>
+                            <Tab disabled={queryPanelDisabled}>Schedule</Tab>
                             {isOnPrem() || <Tab
                                 className="test-ssl-tab react-tabs__tab"
                             >
@@ -321,7 +383,11 @@ class Settings extends Component {
                         </TabPanel>
 
                         <TabPanel className={['tab-panel-query', 'react-tabs__tab-panel']}>
-                            {this.props.connectRequest.status === 200 && selectedTable ? (
+                            {queryPanelDisabled ? (
+                                <div className="big-whitespace-tab">
+                                    <p>Please connect to a data store in the Connection tab first.</p>
+                                </div>
+                            ) : (
                                 <Preview
                                     username={username}
 
@@ -343,6 +409,7 @@ class Settings extends Component {
                                     updatePreview={updatePreview}
 
                                     runSqlQuery={runSqlQuery}
+                                    openScheduler={this.openScheduler}
                                     queryRequest={queryRequest || {}}
                                     s3KeysRequest={s3KeysRequest}
                                     apacheDrillStorageRequest={apacheDrillStorageRequest}
@@ -351,11 +418,24 @@ class Settings extends Component {
                                     previewTableRequest={previewTableRequest || {}}
                                     tablesRequest={tablesRequest}
                                 />
-                            ) : (
-                                <div className="big-whitespace-tab">
-                                    <p>Please connect to a data store in the Connection tab first.</p>
-                                </div>
                             )}
+                        </TabPanel>
+
+                        <TabPanel>
+                            <Scheduler
+                              queries={selectedScheduledQueries}
+                              tags={selectedTags}
+                              refreshQueries={getScheduledQueries}
+                              createScheduledQuery={createScheduledQuery}
+                              updateScheduledQuery={updateScheduledQuery}
+                              deleteScheduledQuery={deleteScheduledQuery}
+                              initialCode={this.state.scheduledQuery}
+                              openLogin={this.openLogin}
+                              requestor={username}
+                              dialect={dialect}
+                              preview={preview}
+                              openQueryPage={this.openQueryPage}
+                            />
                         </TabPanel>
 
                         {isOnPrem() || <TabPanel>
@@ -416,26 +496,31 @@ class Settings extends Component {
                                     ) : (
                                         <div>
                                             <p>
-                                                <a onClick={() => window.location.assign('/login')}>Log into Plotly</a>
-                                                <br/>
-                                                Log in to Plotly in order to schedule queries and make queries
-                                                directly from the <a href={`https://${plotlyUrl}/create`}>
-                                                Plotly Chart Studio </a>
+                                                Please connect to Plotly
+                                                to generate an SSL certificate and a URL for you.
                                             </p>
                                         </div>
-                                    )
-                                    }
+                                    )}
                                 </div>
                             ) : (
                                 <div className="big-whitespace-tab">
                                     <p>Please connect to a data store in the Connection tab first.</p>
                                 </div>
                             )}
-                            {username && <p style={{textAlign: 'right'}}>
-                                {`Logged in as "${username}"`}
-                                <br/>
-                                <a onClick={logout}>Log Out</a>
-                            </p>}
+
+                            {(username) ? (
+                                <p style={{textAlign: 'right'}}>
+                                    {`Logged in as "${username}"`}
+                                    <br/>
+                                    <a onClick={logout}>Log Out</a>
+                                </p>
+                            ) : (
+                                <p style={{textAlign: 'right'}}>
+                                    Not logged in
+                                    <br/>
+                                    <a onClick={() => window.location.assign(`${homeUrl()}/login`)}>Log into Plotly</a>
+                                </p>
+                            )}
                         </TabPanel> }
 
                         {isElectron() && <TabPanel>
@@ -477,6 +562,10 @@ function mapStateToProps(state) {
         deleteConnectionsRequests,
         previewTableRequests,
         tablesRequests,
+        scheduledQueries,
+        tags,
+        scheduledQueriesRequest,
+        tagsRequest,
         elasticsearchMappingsRequests,
         selectedTables,
         selectedIndecies,
@@ -493,6 +582,7 @@ function mapStateToProps(state) {
     const connectionsHaveBeenSaved = Boolean(selectedConnectionId);
     const selectedTable = selectedTables[selectedConnectionId] || null;
     const selectedIndex = selectedIndecies[selectedConnectionId] || null;
+    const selectedScheduledQueries = scheduledQueries.filter(propEq('connectionId', selectedConnectionId));
 
     let previewTableRequest = {};
     if (previewTableRequests[selectedConnectionId] &&
@@ -513,6 +603,8 @@ function mapStateToProps(state) {
         deleteConnectionsRequest: deleteConnectionsRequests[selectedConnectionId] || {},
         previewTableRequest,
         tablesRequest: tablesRequests[selectedConnectionId] || {},
+        scheduledQueriesRequest: scheduledQueriesRequest || {},
+        tagsRequest: tagsRequest || {},
         elasticsearchMappingsRequest: elasticsearchMappingsRequests[selectedConnectionId] || {},
         s3KeysRequest: s3KeysRequests[selectedConnectionId] || {},
         apacheDrillStorageRequest: apacheDrillStorageRequests[selectedConnectionId] || {},
@@ -526,6 +618,8 @@ function mapStateToProps(state) {
         schemaRequest: schemaRequests[selectedConnectionId],
         queryRequest: queryRequests[selectedConnectionId],
         selectedTable,
+        selectedScheduledQueries,
+        selectedTags: tags,
         selectedIndex,
         selectedConnectionId,
         settingsRequest,
@@ -565,6 +659,21 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     }
     function boundGetTables() {
         return dispatch(Actions.getTables(selectedConnectionId));
+    }
+    function boundGetScheduledQueries() {
+        return dispatch(Actions.getScheduledQueries(selectedConnectionId));
+    }
+    function boundCreateScheduledQuery(payload) {
+      return dispatch(Actions.createScheduledQuery(selectedConnectionId, payload));
+    }
+    function boundUpdateScheduledQuery(payload) {
+      return dispatch(Actions.updateScheduledQuery(selectedConnectionId, payload));
+    }
+    function boundDeleteScheduledQuery(fid) {
+      return dispatch(Actions.deleteScheduledQuery(fid));
+    }
+    function boundGetTags() {
+        return dispatch(Actions.getTags(selectedConnectionId));
     }
     function boundGetElasticsearchMappings() {
         return dispatch(Actions.getElasticsearchMappings(selectedConnectionId));
@@ -659,6 +768,11 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             setConnectionNeedToBeSaved: boundSetConnectionNeedToBeSaved,
             updateConnection: boundUpdateConnection,
             getTables: boundGetTables,
+            getScheduledQueries: boundGetScheduledQueries,
+            createScheduledQuery: boundCreateScheduledQuery,
+            updateScheduledQuery: boundUpdateScheduledQuery,
+            deleteScheduledQuery: boundDeleteScheduledQuery,
+            getTags: boundGetTags,
             getElasticsearchMappings: boundGetElasticsearchMappings,
             setTable: boundSetTable,
             setIndex: boundSetIndex,
@@ -713,6 +827,21 @@ Settings.propTypes = {
     s3KeysRequest: PropTypes.object,
     selectedTab: PropTypes.string,
     selectedIndex: PropTypes.any,
+    selectedScheduledQueries: PropTypes.arrayOf(PropTypes.shape({
+        query: PropTypes.string,
+        refreshInterval: PropTypes.number
+    })),
+    selectedTags: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string,
+        color: PropTypes.string
+    })),
+    scheduledQueriesRequest: PropTypes.object,
+    tagsRequest: PropTypes.object,
+    getScheduledQueries: PropTypes.func,
+    createScheduledQuery: PropTypes.func,
+    updateScheduledQuery: PropTypes.func,
+    deleteScheduledQuery: PropTypes.func,
+    getTags: PropTypes.func,
     tablesRequest: PropTypes.object,
     deleteTab: PropTypes.func,
     getSqlSchema: PropTypes.func,
