@@ -33,10 +33,6 @@ export function connect(connection) {
     return Promise.resolve(client);
 }
 
-export function disconnect(connection) {
-    return pool.remove(connection);
-}
-
 /**
  * The following method will execute a query against the specified connection
  * @param {object} queryObject - The SQL to query against the connection
