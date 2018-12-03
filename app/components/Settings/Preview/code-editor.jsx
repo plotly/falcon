@@ -16,13 +16,17 @@ import './code-editor.css';
 
 import {getHighlightMode} from '../../../constants/constants';
 
+import clickHouseDialect from '../../../utils/codemirror/clickhouse';
+
+// Define ClickHouse SQL dialect
+CM.defineMIME("text/x-chsql", clickHouseDialect);
+
 const MIN_CONSTRAINTS_HEIGHT = 74;
 
 export default class CodeEditor extends React.Component {
     static propTypes = {
         value: PropTypes.string,
         onChange: PropTypes.func,
-
         dialect: PropTypes.string,
         runQuery: PropTypes.func,
         openScheduler: PropTypes.func,
