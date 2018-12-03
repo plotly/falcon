@@ -10,7 +10,7 @@ Follow [@plotlygraphs](https://twitter.com/plotlygraphs) on Twitter for Falcon a
 
 ➡ [Download Falcon for Windows](https://plot.ly/free-sql-client-download/)
 
-![Screencast of falcon sql client](https://github.com/plotly/falcon-sql-client/raw/master/static/images/falcon_hero.gif)
+![Screencast of Falcon sql client](https://github.com/plotly/falcon-sql-client/raw/master/static/images/falcon_hero.gif)
 
 ## Documentation
 
