@@ -113,7 +113,7 @@ export function newGrid(filename, columnnames, rows, requestor) {
         accessToken,
         body: {
             data: grid,
-            world_readable: true,
+            world_readable: false,
             parent: -1,
             filename
         }
