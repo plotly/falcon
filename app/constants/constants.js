@@ -551,7 +551,8 @@ export function getHighlightMode(dialect) {
             [DIALECTS.ORACLE]: 'text/x-plsql',
             [DIALECTS.POSTGRES]: 'text/x-pgsql',
             [DIALECTS.REDSHIFT]: 'text/x-pgsql',
-            [DIALECTS.MSSQL]: 'text/x-mssql'
+            [DIALECTS.MSSQL]: 'text/x-mssql',
+            [DIALECTS.CLICKHOUSE]: 'text/x-chsql'
     }[dialect] || 'text/x-sql';
 }
 
