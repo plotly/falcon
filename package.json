@@ -202,7 +202,7 @@
     "query-string": "^5.0.1",
     "ramda": "^0.21.0",
     "react": "^16.2.0",
-    "react-chart-editor": "0.33.2",
+    "react-chart-editor": "0.33.4",
     "react-click-outside": "^3.0.1",
     "react-codemirror2": "^4.2.1",
     "react-cookies": "^0.1.0",
