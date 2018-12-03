@@ -224,13 +224,13 @@ class Login extends Component {
                     {'Falcon SQL Client'}
                 </h2>
                 <h4>
-                    {'Log in to Plotly to continue'}
+                    {'Log in to Chart Studio to continue'}
                 </h4>
 
                 {!isOnPrem() &&
                 <div>
                     <div style={{'height': 60}}>
-                        <label>Connect to Plotly Cloud</label>
+                        <label>Connect to Chart Studio Cloud</label>
                         <input
                             type="radio"
                             checked={this.state.serverType !== ONPREM}
@@ -239,7 +239,7 @@ class Login extends Component {
                     </div>
 
                     <div style={{'height': 60}}>
-                        <label>Connect to <Link href="https://plot.ly/products/on-premise/" className="externalLink">Plotly On-Premise</Link></label>
+                        <label>Connect to <Link href="https://plot.ly/products/on-premise/" className="externalLink">Chart Studio Enterprise</Link></label>
                         <input
                             type="radio"
                             checked={this.state.serverType === ONPREM}
@@ -250,7 +250,7 @@ class Login extends Component {
                     {
                         this.state.serverType === ONPREM ? (
                             <div style={{'height': 60}}>
-                                <label>Your Plotly On-Premise Domain</label>
+                                <label>Your Chart Studio Enterprise Domain</label>
                                 <input
                                     type="text"
                                     placeholder="https://plotly.your-company.com"
@@ -275,14 +275,14 @@ class Login extends Component {
 
                 <div style={{'marginTop': '30px'}}>
                     <span>
-                        {'To schedule queries and update data, the Falcon SQL Client requires a Plotly login.'}
+                        {'To schedule queries and update data, the Falcon SQL Client requires a Chart Studio login.'}
                     </span>
                 </div>
 
                 {!isOnPrem() &&
                 <div>
                     <span>
-                        {'Don\'t have an account yet?'}
+                        {'Don\'t have a Chart Studio Cloud account yet?'}
                     </span>
                     <Link href={`${domain}/accounts/login/?action=signup`} className="externalLink">
                         {'Create an account '}

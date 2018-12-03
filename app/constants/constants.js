@@ -58,7 +58,7 @@ const commonSqlOptions = [
         'label': 'SSL Enabled', 'value': 'ssl', 'type': 'checkbox',
         'description': 'Does your database require that you connect to it via SSL? \
                         Note that this is just the connection between this app and your database; \
-                        connections to plot.ly or your plotly instance are always encrypted.'
+                        connections to Chart Studio are always encrypted.'
     }
 ];
 
@@ -253,7 +253,7 @@ export const CONNECTION_CONFIG = {
             'label': 'SSL Enabled', 'value': 'sslEnabled', 'type': 'checkbox',
             'description': 'Does your database require that you connect to it via SSL? \
                             Note that this is just the connection between this app and your database; \
-                            connections to plot.ly or your plotly instance are always encrypted.'
+                            connections to Chart Studio are always encrypted.'
         }
     ],
     [DIALECTS.BIGQUERY]: [
@@ -348,53 +348,29 @@ export const INITIAL_CONNECTIONS = {
 export const FAQ = [
     {
         q: 'I ran into an issue - where can I get help?',
-        a: 'Head over to the Plotly Forum for help from other Plotly users: \
+        a: 'Head over to the Community Forum for help from other Falcon users: \
             https://community.plot.ly/c/database-connector. For guaranteed prompt support by a Plotly engineer, \
-            consider purchasing a plot.ly Pro plan or Plotly On-Premises: https://plot.ly/plans.'
+            consider purchasing a Chart Studio Cloud Professional plan or Chart Studio Enterprise: https://plot.ly/plans.'
     }, {
         q: 'How does this app work?',
-        a: 'This app is a SQL client. Connect to your database in the Connection tab, run SQL queries in the \
-            Query tab, then export your results as a CSV or share them online through plot.ly. Optionally, \
-            you can run this app as a middleman between plot.ly and your database (see the next question).'
+        a: 'This app is a SQL/NoSQL client. Connect to your database in the Connection tab, run queries in the \
+            "QUERY" tab, then export your results as a CSV or share them online through Chart Studio. Optionally, \
+            you can run this app as a middleman between Chart Studio and your database (see the next question).'
     }, {
-        q: 'I want a persistent connection between my database and a chart hosted on plot.ly. How do I do that?',
-        a: 'Click the link in the "PLOT.LY" tab. This will open the plot.ly chart studio with a connection to this \
-            app. From there, you can run, save, and schedule queries that will update your charts on plot.ly when your \
-            database updates. As long as this app stays open, it will send the latest data to plot.ly to update your \
-            chart. Here is a tutorial on scheduling queries: https://help.plot.ly/database-connectors/schedule-query/'
+        q: 'I want a live dataset in Chart Studio that is synced to my database. How do I do that?',
+        a: 'In the "QUERY" tab, click on the "Schedule" button once you have written your query. You will be able \
+            to create a live dataset that will be updated on the schedule of your choice. Falcon will run your query \
+            and update your live dataset as long as it is open and running on this computer. We recommend setting up \
+            this app on an office computer or server if you want it to update a chart or dashboard 24/7. \
+            If you have Chart Studio Enterprise, you\'re in luck - this app is already running in your Chart Studio \
+            Enterprise container. Contact your Enterprise admin to learn how to access it.'
     }, {
-        q: 'Am I exposing my database credentials to plot.ly?',
-        a: 'No. All of your credentials are only saved locally on this computer (the computer where the app is run). \
+        q: 'Am I exposing my database credentials to Plotly or Chart Studio?',
+        a: 'No. All of your credentials are only saved locally on the computer where the app is run. \
             We do not recommend uploading your database credentials to any cloud service.'
     }, {
-        q: 'Where do I make SQL queries?',
-        a: 'For one-shot queries, make them in this app (see the "QUERY" tab). If you want a persistent connection \
-            between your charts and your database, make them in the plot.ly chart studio (see the "PLOT.LY" tab).'
-    }, {
         q: 'Is this app open-source?',
-        a: 'Yep! You can view and contribute to the source code on GitHub: \
-            https://github.com/plotly/falcon-sql-client'
-    }, {
-        q: '[Advanced] How do scheduled queries work?',
-        a: 'You can run queries on a scheduler (ie daily or hourly) through the plot.ly chart studio. \
-            Scheduled queries are saved and run by this app, so keep this app open as long as you want \
-            your charts and dashboards to update. When you restart this app, all of the scheduled \
-            queries will run automatically and their scheduling timer will reset. We recommend setting up \
-            this app on an office computer or server if you want it to update a chart or dashboard 24/7. \
-            If you have Plotly On-Premises, you\'re in luck - this app is already running in your Plotly \
-            On-Premises container. Contact your On-Prem admin to learn how to access it.'
-    }, {
-        q: '[Advanced] What\'s an SSL certificate (and why do I need one?)',
-        a: 'An SSL certificate is used to encrypt the requests between your web browser and this \
-            connector. Unencrypted requests are blocked by default in modern web browsers. \
-            We generate these certificates for you automatically through Let\'s Encrypt. This \
-            certificate takes several minutes to generate.'
-    }, {
-        q: '[Advanced] How do you generate certificates for a localhost web server?',
-        a: 'This application runs a server locally on localhost: It is not exposed to the network. SSL \
-            certificates cannot be issued for localhost servers, so we create a unique, local URL for you \
-            and a global DNS entry that points that URL to localhost. We use Let\'s Encrypt \
-            to generate certificates for that unique, local URL.'
+        a: 'Yes! You can view and contribute to the source code on GitHub at https://github.com/plotly/falcon'
     }
 ];
 
@@ -530,10 +506,11 @@ export function getHighlightMode(dialect) {
 }
 
 export const WAITING_MESSAGE = 'This may take a long time. Your query is ' +
-  'currently executing and must finish before it can be saved.';
+  'currently executing and must finish before the dataset can be updated.';
 
-export const SAVE_WARNING = 'Note: when you save, the query will ' +
-  'execute and update the dataset immediately. Thereafter it will do so on the requested schedule.';
+export const SAVE_WARNING = 'Note: the query will first execute and then ' +
+    'create a dataset in Chart Studio with the resulting data. Thereafter, ' +
+    'the query will execute and update the dataset on the requested schedule.';
 
 export const COLORS = {
     red: '#EF553B'

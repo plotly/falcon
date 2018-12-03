@@ -1,5 +1,6 @@
 import webpack from 'webpack';
 import baseConfig from './webpack.config.base';
+import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 
 export default {
     ...baseConfig,
@@ -16,10 +17,8 @@ export default {
     plugins: [
         ...baseConfig.plugins,
 
-        new webpack.optimize.UglifyJsPlugin({
-            compressor: {
-                warnings: false
-            }
+        new UglifyJsPlugin({
+            sourceMap: false
         }),
         new webpack.BannerPlugin(
             {banner: 'require("source-map-support").install();',

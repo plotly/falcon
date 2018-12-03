@@ -42,7 +42,7 @@ function FormattedMessage(props) {
         return (
             <details style={outlineStyle}>
                 <summary style={outlineStyle}>
-                    An unexpected error occurred syncing the query to the Plotly Cloud. Please try again later.
+                    An unexpected error occurred syncing the query to the Chart Studio. Please try again later.
                 </summary>
                 <pre>{content}</pre>
             </details>
