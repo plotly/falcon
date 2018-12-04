@@ -45,7 +45,7 @@ describe('Datastore Mock:', function () {
         return GET('connections')
         .then(assertResponseStatus(200)).then(getResponseJson)
         .then(json => {
-            assert.equal(Object.keys(json).length, 12, 'Missing mock connectors');
+            assert.equal(Object.keys(json).length, 11, 'Missing mock connectors');
         });
     });
 
