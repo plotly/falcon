@@ -3,7 +3,7 @@ version: 0.4.{build}
 environment:
   matrix:
     - nodejs_version: 8.11.3
-    - yarn_version: 1.5.1
+      yarn_version: 1.5.1
       POSTGRES_PATH: C:\Program Files\PostgreSQL\9.6
 
 platform:
