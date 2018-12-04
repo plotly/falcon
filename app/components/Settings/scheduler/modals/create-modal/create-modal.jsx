@@ -173,7 +173,7 @@ class CreateModal extends Component {
                 <Column className="container" style={containerOverride}>
                     <Row>
                         <Column className="innerColumn">
-                            <h5 className="header">Create Scheduled Query</h5>
+                            <h5 className="header">Create Live Dataset & Scheduled Query</h5>
                             <button className="button close-btn" onClick={this.props.onClickAway}>
                                 &times;
                             </button>
@@ -181,7 +181,7 @@ class CreateModal extends Component {
                     </Row>
                     <Column className="detailsColumn">
                         <Row>
-                            <p>A scheduled query runs and updates its corresponding dataset in Plotly Cloud.</p>
+                            <p>A scheduled query runs and updates its corresponding dataset in Chart Studio.</p>
                         </Row>
                         <Row style={rowStyleOverride}>
                             <div className="row-header">Query</div>
@@ -274,7 +274,8 @@ class CreateModal extends Component {
                         ) : (
                             <Column>
                                 <button type="submit" className="submit" onClick={this.submit}>
-                                    {this.state.saving ? 'Saving...' : 'Save'}
+                                    {this.state.saving ? 'Creating...' :
+                                    'Create Live Dataset & Scheduled Query'}
                                 </button>
                                 <div className="save-warning">{SAVE_WARNING}</div>
                             </Column>

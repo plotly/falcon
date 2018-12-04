@@ -54,7 +54,7 @@ Visit the app in your web browser at `http://localhost:9494`.
 
 Note that the API requests to the connector are not authenticated. Only run the app as a server on trusted networks, do not run the app on public networks.
 
-By default, the connector app will connect to Plotly Cloud. If you would like to connect the app to your private [Plotly On-Premise](https://plot.ly/products/on-premise) server, then modify the app's settings in `~/.plotly/connector/settings.yaml` with:
+By default, the connector app will connect to Chart Studio Cloud. If you would like to connect the app to your private [Chart Studio Enterprise](https://plot.ly/products/on-premise) server, then modify the app's settings in `~/.plotly/connector/settings.yaml` with:
 
 ```
 PLOTLY_API_DOMAIN: 'plotly.your-company.com'
@@ -62,7 +62,7 @@ CORS_ALLOWED_ORIGINS:
     - 'https://plotly.your-company.com'
 ```
 
-The database connector runs as a server by default as part of [Plotly On-Premise](https://plot.ly/products/on-premise). On Plotly On-Premise, every user who has access to the on-premise server also has access to the database connector, no extra installation or SSL configuration is necessary. If you would like to try out Plotly On-Premise at your company, please [get in touch with our team](https://plotly.typeform.com/to/seG7Vb), we'd love to help you out.
+The database connector runs as a server by default as part of [Chart Studio Enterprise](https://plot.ly/products/on-premise). On Chart Studio Enterprise, every user who has access to the on-premise server also has access to the database connector, no extra installation or SSL configuration is necessary. If you would like to try out Chart Studio Enterprise at your company, please [get in touch with our team](https://plotly.typeform.com/to/seG7Vb), we'd love to help you out.
 
 
 ## Run as a Docker Container

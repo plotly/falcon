@@ -11,10 +11,9 @@ import UserConnections from './UserConnections/UserConnections.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
 import Preview from './Preview/Preview.react';
-import {Link} from '../Link.react';
 import Scheduler from './scheduler/scheduler.jsx';
 import {DIALECTS, FAQ, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
-import {isElectron, isOnPrem, homeUrl} from '../../utils/utils';
+import {isElectron, homeUrl} from '../../utils/utils';
 
 class Settings extends Component {
     constructor(props) {
@@ -138,7 +137,7 @@ class Settings extends Component {
                 />
                 {!isElectron() && <div className={'description'}>
                     Warning:
-                    connections set up in this instance of Falcon are accessible to all Plotly On-Premise users.
+                    connections set up in this instance of Falcon are accessible to all Chart Studio Enterprise users.
                 </div>}
             </div>
         );
@@ -306,7 +305,6 @@ class Settings extends Component {
             queryRequest,
             s3KeysRequest,
             selectedTab,
-            settingsRequest,
             setIndex,
             setTable,
             selectedTable,
@@ -326,13 +324,6 @@ class Settings extends Component {
         if (!selectedTab) {
             return null; // initializing
         }
-
-        const connectorUrl = this.state.urls.https;
-        const {httpsServerIsOK, timeElapsed} = this.state;
-
-        const plotlyUrl = (settingsRequest.status === 200 ?
-            settingsRequest.content.PLOTLY_URL : 'https://plot.ly'
-        );
 
         const dialect = connections[selectedTab].dialect;
 
@@ -369,11 +360,6 @@ class Settings extends Component {
                             <Tab>Connection</Tab>
                             <Tab disabled={queryPanelDisabled}>Query</Tab>
                             <Tab disabled={queryPanelDisabled}>Schedule</Tab>
-                            {isOnPrem() || <Tab
-                                className="test-ssl-tab react-tabs__tab"
-                            >
-                                Plot.ly
-                            </Tab>}
                             { isElectron() && <Tab>FAQ</Tab> }
                         </TabList>
 
@@ -422,6 +408,20 @@ class Settings extends Component {
                         </TabPanel>
 
                         <TabPanel>
+                            {(username) ? (
+                                <p style={{textAlign: 'right', margin: 0}}>
+                                    {`Logged in to Chart Studio as "${username}"`}
+                                    &nbsp;&nbsp;
+                                    <a onClick={logout}>Log Out</a>
+                                </p>
+                            ) : (
+                                <p style={{textAlign: 'right', margin: 0}}>
+                                    {'Not logged in to Chart Studio'}
+                                    &nbsp;&nbsp;
+                                    <a onClick={() => window.location.assign(`${homeUrl()}/login`)}>
+                                    Log In</a>
+                                </p>
+                            )}
                             <Scheduler
                               queries={selectedScheduledQueries}
                               tags={selectedTags}
@@ -437,91 +437,6 @@ class Settings extends Component {
                               openQueryPage={this.openQueryPage}
                             />
                         </TabPanel>
-
-                        {isOnPrem() || <TabPanel>
-                            {this.props.connectRequest.status === 200 ? (
-                                <div className="big-whitespace-tab">
-                                    {httpsServerIsOK ? (
-                                        <div id="test-ssl-initialized" style={{textAlign: 'center'}}>
-                                            <img
-                                                src="/static/images/ms-icon-150x150.png"
-                                                style={{border: '1px solid #ebf0f8'}}
-                                            >
-                                            </img>
-                                            <p>
-                                                {`The Falcon SQL Client can be a middle man between
-                                                    your database and Plot.ly, so that when your database updates,
-                                                    your charts and dashboards update as well. Run Falcon on a server
-                                                    for 24/7 dashboard updates, or just keep this app open on an
-                                                    office computer. If you have Plotly On-Premises, this app is
-                                                    already running in your container. Contact your On-Prem admin
-                                                    to learn how to connect.`}
-                                            </p>
-
-                                            <Link
-                                                className="btn-primary"
-                                                style={{maxWidth: '50%', marginTop: '40px', marginBottom: '30px'}}
-                                                href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}
-                                                target="_blank"
-                                            >
-                                                Query {dialect} from plot.ly
-                                            </Link>
-                                            <div>
-                                                <code>Falcon has auto-generated a local URL
-                                                    and SSL certificate for itself: </code>
-                                                <br />
-                                                <Link
-                                                    href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}
-                                                    target="_blank"
-                                                >
-                                                    <strong><code>{connectorUrl}</code></strong>
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    ) : (username) ? (
-                                        <div>
-                                            <p>
-                                                {`Plotly is automatically initializing a
-                                                  unique SSL certificate and URL for you.
-                                                  This can take up to 10 minutes. Once this
-                                                  is complete, you'll be able to query your
-                                                  databases from `}
-                                                <Link href={`${plotlyUrl}/create?upload=sql`}>
-                                                        Plotly
-                                                </Link>
-                                                {`. It has been ${timeElapsed}. Check out the
-                                                FAQ while you wait! 📰`}
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <div>
-                                            <p>
-                                                Please connect to Plotly
-                                                to generate an SSL certificate and a URL for you.
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="big-whitespace-tab">
-                                    <p>Please connect to a data store in the Connection tab first.</p>
-                                </div>
-                            )}
-
-                            {(username) ? (
-                                <p style={{textAlign: 'right'}}>
-                                    {`Logged in as "${username}"`}
-                                    <br/>
-                                    <a onClick={logout}>Log Out</a>
-                                </p>
-                            ) : (
-                                <p style={{textAlign: 'right'}}>
-                                    Not logged in
-                                    <br/>
-                                    <a onClick={() => window.location.assign(`${homeUrl()}/login`)}>Log into Plotly</a>
-                                </p>
-                            )}
-                        </TabPanel> }
 
                         {isElectron() && <TabPanel>
                             <div className="big-whitespace-tab">

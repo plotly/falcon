@@ -8,7 +8,7 @@ import * as Sql from './sql.js';
 import * as Elasticsearch from './Elasticsearch';
 import * as S3 from './S3';
 import * as ApacheDrill from './ApacheDrill';
-import * as IbmDb2 from './ibmdb2';
+// import * as IbmDb2 from './ibmdb2';
 import * as ApacheLivy from './livy';
 import * as ApacheImpala from './impala';
 import * as DataWorld from './dataworld';
@@ -58,8 +58,8 @@ function getDatastoreClient(connection) {
         return ApacheImpala;
     } else if (dialect === 'csv') {
         return CSV;
-    } else if (dialect === 'ibm db2') {
-        return IbmDb2;
+    // } else if (dialect === 'ibm db2') {
+    //    return IbmDb2;
     } else if (dialect === 'data.world') {
         return DataWorld;
     } else if (dialect === 'athena') {

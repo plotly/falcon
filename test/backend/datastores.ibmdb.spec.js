@@ -20,7 +20,7 @@ if (process.env.CIRCLECI) {
     connection.host = 'localhost';
 }
 
-describe('IBM DB2:', function () {
+xdescribe('IBM DB2:', function () {
     it('connect succeeds', function(done) {
         connect(connection).then(database => {
             assert(database.connected);

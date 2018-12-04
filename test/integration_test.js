@@ -52,30 +52,6 @@ describe('plotly database connector', function() {
             .then(() => this.driver && this.driver.quit())
             .then(() => chromedriver.stop())
     );
-
-    it('should create an SSL certificate', () => {
-        let chain = Promise.resolve();
-
-        // Fill out SQL Credentials
-        [
-            ['test-input-username', 'masteruser'],
-            ['test-input-host', 'readonly-test-mysql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com'],
-            ['test-input-port', '3306'],
-            ['test-input-password', 'connecttoplotly'],
-            ['test-input-database', 'plotly_datasets']
-        ].forEach(([id, keys]) => {
-            chain = chain
-                .then(() => this.driver.findElement(webdriver.By.id(id)).sendKeys(keys));
-        });
-
-        return chain
-            // Connect
-            .then(() => this.driver.findElement(webdriver.By.id('test-connect-button')).click())
-
-            // Wait for certificate to be initialized - could take several minutes
-            .then(() => this.driver.findElement(webdriver.By.className('test-ssl-tab')).click())
-            .then(() => this.driver.wait(webdriver.until.elementLocated(webdriver.By.id('test-ssl-initialized'))));
-    });
 });
 
 function saveCredentials() {
