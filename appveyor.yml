@@ -21,6 +21,7 @@ init:
 
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
+  - ps: Install-Product yarn 1.5.1
   - yarn install --force
 
 build_script:
