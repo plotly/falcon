@@ -48,4 +48,8 @@ describe('ClickHouse', function() {
         assert.deepEqual(columnnames, ['location', 'alcohol']);
     });
   });
+
+  it('query rejects with an error when the query is invalid', function() {
+    return query('invalid query', connection).catch(err => assert.isDefined(err))
+  });
 })
