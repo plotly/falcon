@@ -285,12 +285,14 @@ export const CONNECTION_CONFIG = {
             'label': 'Port',
             'value': 'port',
             'type': 'number',
+            'description': 'Server port number (e.g. 8123)'
         },
         {'label': 'Database', 'value': 'database', 'type': 'text'},
         {
             'label': 'Max rows to read',
             'value': 'max_rows_to_read',
-            'type': 'number'
+            'type': 'number',
+            'description': 'Maximum number of rows that can be read from a table when running a query. By default, all rows can be read.'
         },
         {
             'label': 'Read only',
@@ -531,9 +533,7 @@ export const SAMPLE_DBS = {
         password: 'connecttoplotly',
         host: 'clickhouse.test.plotly.host',
         port: 8123,
-        pathname: '/path_to_clickhouse',
         database: 'plotly_datasets',
-        profile: 'web',
         max_rows_to_read: 1000
     }
 };
