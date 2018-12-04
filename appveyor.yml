@@ -21,12 +21,11 @@ init:
 
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
-  - npm install -g yarn@1.5.1
-  - C:\Users\appveyor\AppData\Roaming\npm\yarn install --force
+  - yarn install --force
 
 build_script:
-  - C:\Users\appveyor\AppData\Roaming\npm\yarn run build
-  - C:\Users\appveyor\AppData\Roaming\npm\yarn run pack
+  - yarn run build
+  - yarn run pack
 
 after_build:
         - ps: |
