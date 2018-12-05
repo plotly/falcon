@@ -10,7 +10,6 @@ import ClickHouse from '@apla/clickhouse';
  * @returns {Object} ClickHouse client
  */ 
 function createClient({ host, port, https, username = '', password = '', database, readonly, max_rows_to_read }) {
-  console.log('CREATING with READONLY', readonly)
   return new ClickHouse({
     host,
     port,
