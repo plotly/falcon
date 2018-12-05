@@ -19,6 +19,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Security
 
+## [4.0.0] - 2018-12-04
+
+### Fixed
+
+* Google BigQuery tabs are now closeable and delete scheduled queries
+
+### Changed
+
+* Branding and labelling has been changed from Plot.ly/On-Premises to Chart Studio Cloud/Enterprise
+
+### Removed
+
+* The "Plot.ly" tab has been removed and the login button has been moved to the "Schedule" tab
+* The IBM DB2 connector has been (hopefully temporarily) removed
+
+### Security
+
+* Grids created by Falcon are now non-world-readable by default
+
 ## [3.1.0] - 2018-11-02
 
 ### Added
