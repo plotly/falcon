@@ -292,7 +292,8 @@ export const CONNECTION_CONFIG = {
             'label': 'Max rows to read',
             'value': 'max_rows_to_read',
             'type': 'number',
-            'description': 'Maximum number of rows that can be read from a table when running a query. By default, all rows can be read.'
+            'description': 'Maximum number of rows that can be read from a table when running a query. \
+            By default, all rows can be read.'
         },
         {
             'label': 'Read only',
@@ -307,7 +308,7 @@ export const CONNECTION_CONFIG = {
             'description': 'Does your database require that you connect to it via SSL? \
             Note that this is just the connection between this app and your database; \
             connections to plot.ly or your plotly instance are always encrypted.'
-        },
+        }
 
     ]
 };
