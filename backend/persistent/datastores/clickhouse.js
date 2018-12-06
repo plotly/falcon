@@ -2,13 +2,13 @@ import ClickHouse from '@apla/clickhouse';
 
 /**
  * The following function will create a ClickHouse client
- * @param {String} host
- * @param {Number} port
- * @param {String} username
- * @param {String} password
- * @param {String} database
+ * @param {String} host server host
+ * @param {Number} port server port
+ * @param {String} username Clickhouse username
+ * @param {String} password Clickhouse password
+ * @param {String} database database name
  * @returns {Object} ClickHouse client
- */ 
+ */
 function createClient({ host, port, https, username = '', password = '', database, readonly, max_rows_to_read }) {
   return new ClickHouse({
     host,
@@ -18,25 +18,25 @@ function createClient({ host, port, https, username = '', password = '', databas
     queryOptions: {
       database,
       readonly: readonly ? 1 : 0,
-      ...(max_rows_to_read && { max_rows_to_read }),
+      ...(max_rows_to_read && { max_rows_to_read })
     }
   });
 }
 
 /**
  * The following function will connect to the datasource
- * @param {Object} connection
+ * @param {Object} connection connection parameters
  * @returns {Promise} that resolves when the connection succeeds
- */ 
+ */
 export function connect(connection) {
-  return createClient(connection).pinging()
+  return createClient(connection).pinging();
 }
 
 /**
- * The following function will return a list of schemas.  
- * @param {Object} connection 
- * @returns {Promise} that resolves to { 
- *                    columnnames: [ 'tablename', 'column_name','data_type' ], 
+ * The following function will return a list of schemas.
+ * @param {Object} connection connection parameters
+ * @returns {Promise} that resolves to {
+ *                    columnnames: [ 'tablename', 'column_name','data_type' ],
  *                    rows: [[tablename1, columnname1, datatype1], ...]] }
  */
 export function schemas(connection) {
@@ -46,47 +46,47 @@ export function schemas(connection) {
     WHERE database = '${connection.database}'
     ORDER BY table
   `, connection).then(({ rows }) => ({
-    columnnames: [ 'tablename', 'column_name','data_type' ],
+    columnnames: [ 'tablename', 'column_name', 'data_type' ],
     rows
-  }))
+  }));
 }
 
 
 /**
- * The following function will return a list of tables.  
- * @param {Object} connection
+ * The following function will return a list of tables.
+ * @param {Object} connection connection parameters
  * @returns {Promise} that resolves to an array of table names
  */
 export function tables(connection) {
-  return query('SHOW TABLES', connection).then(({ rows }) => rows.map(row => row[0]))
+  return query('SHOW TABLES', connection).then(({ rows }) => rows.map(row => row[0]));
 }
 
 /**
- * The following function will execute a query against the 
- * data source.  The function should return a tuple which contains 
+ * The following function will execute a query against the
+ * data source.  The function should return a tuple which contains
  * two elements.  The first is an array of strings which is the column names
  * The second is a two dimensional array which represents the rows to be displayed
- * @param {String|Object} queryObject
- * @param {Object} connection
+ * @param {String|Object} queryObject query parameters
+ * @param {Object} connection connection parameters
  * @returns {Promise} that resolves to { columnnames, rows }
- */ 
+ */
 export function query(queryObject, connection) {
-  const client = createClient(connection)
+  const client = createClient(connection);
 
-  const stream = client.query(queryObject)
+  const stream = client.query(queryObject);
 
-  let columnnames = []
+  let columnnames = [];
   const rows = [];
 
   return new Promise((resolve, reject) => {
     stream.on('metadata', columns => {
-      columnnames = columns.map(({ name }) => name)
-    })
+      columnnames = columns.map(({ name }) => name);
+    });
 
-    stream.on('data', row => rows.push(row))
+    stream.on('data', row => rows.push(row));
 
-    stream.on('error', err => reject(err))
+    stream.on('error', err => reject(err));
 
-    stream.on('end', () => resolve({ columnnames, rows }))
-  })
+    stream.on('end', () => resolve({ columnnames, rows }));
+  });
 }
