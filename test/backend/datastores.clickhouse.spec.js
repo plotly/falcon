@@ -22,7 +22,7 @@ describe('ClickHouse', function() {
   });
 
   it('tables returns list of tables', function() {
-    return tables(connection).then(result => assert.include(result, 'consumption'))
+    return tables(connection).then(result => assert.include(result, 'consumption'));
   });
 
   it('schemas returns schemas for all tables', function() {
@@ -50,6 +50,6 @@ describe('ClickHouse', function() {
   });
 
   it('query rejects with an error when the query is invalid', function() {
-    return query('invalid query', connection).catch(err => assert.exists(err))
+    return query('invalid query', connection).catch(err => assert.exists(err));
   });
-})
+});

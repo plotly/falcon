@@ -19,7 +19,7 @@ import {getHighlightMode} from '../../../constants/constants';
 import clickHouseDialect from '../../../utils/codemirror/clickhouse';
 
 // Define ClickHouse SQL dialect
-CM.defineMIME("text/x-chsql", clickHouseDialect);
+CM.defineMIME('text/x-chsql', clickHouseDialect);
 
 const MIN_CONSTRAINTS_HEIGHT = 74;
 
