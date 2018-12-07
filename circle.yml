@@ -5,6 +5,7 @@ jobs:
       - image: circleci/node:8-browsers
       - image: quay.io/plotly/falcon-test-spark
       - image: quay.io/plotly/falcon-test-db2
+      - image: quay.io/plotly/falcon-test-clickhouse
     environment:
       PATH: "/usr/local/opt/curl/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/home/circleci/project/node_modules/.bin"
     working_directory: /home/circleci/falcon
@@ -34,10 +35,10 @@ jobs:
       - run: yarn run build
       - run: yarn run test
       - run: yarn run pack
-      
+
       # create artifacts/ and move installer from release/falcon-sql-client-vM.m.p.tar.gz to artifacts/linux-falcon-vM.m.p.tar.gz
       - run: mkdir artifacts
       - run: for f in release/falcon-sql-client-*.tar.gz ; do mv $f artifacts/linux-falcon-v${f#release/falcon-sql-client-}; done
-      
+
       - store_artifacts:
           path: artifacts
