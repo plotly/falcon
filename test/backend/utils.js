@@ -220,7 +220,7 @@ export const sqlConnections = {
     password: 'connecttoplotly',
     database: 'plotly_datasets',
     port: 5432,
-    host: 'readonly-test-postgres.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
+    host: 'falcon-test-postgres.c52asitjzpsx.us-east-1.rds.amazonaws.com',
     dialect: 'postgres'
 };
 
@@ -232,7 +232,7 @@ export const mysqlConnection = {
     dialect: 'mysql',
     username: 'masteruser',
     password: 'connecttoplotly',
-    host: 'readonly-test-mysql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
+    host: 'falcon-test-mysql.c52asitjzpsx.us-east-1.rds.amazonaws.com',
     port: 3306,
     database: 'plotly_datasets'
 };
@@ -240,7 +240,7 @@ export const mariadbConnection = {
     dialect: 'mariadb',
     username: 'masteruser',
     password: 'connecttoplotly',
-    host: 'readonly-test-mariadb.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
+    host: 'mariadb-test-mysql.c52asitjzpsx.us-east-1.rds.amazonaws.com',
     port: 3306,
     database: 'plotly_datasets'
 };
@@ -256,7 +256,7 @@ export const mssqlConnection = {
     dialect: 'mssql',
     username: 'masteruser',
     password: 'connecttoplotly',
-    host: 'test-mssql.cwwxgcilxwxw.us-west-2.rds.amazonaws.com',
+    host: 'falcon-test-mssql.c52asitjzpsx.us-east-1.rds.amazonaws.com',
     instanceName: '',
     port: 1433,
     database: 'plotly_datasets',
@@ -269,7 +269,7 @@ export const elasticsearchConnections = {
 };
 export const publicReadableS3Connections = {
     dialect: 's3',
-    bucket: 'plotly-s3-connector-test',
+    bucket: 'falcon-s3-connector-test',
     accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
     secretAccessKey: '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'
 };
@@ -278,7 +278,7 @@ export const apacheDrillConnections = {
     host: 'http://ec2-35-164-71-216.us-west-2.compute.amazonaws.com',
     port: 8047,
 
-    bucket: 'plotly-s3-connector-test',
+    bucket: 'falcon-s3-connector-test',
     accessKeyId: 'AKIAIMHMSHTGARJYSKMQ',
     secretAccessKey: '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'
 };
