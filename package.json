@@ -19,7 +19,7 @@
     "docker:mssql:start": "docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=yourStrong(!)Password' -p 1433:1433 -d microsoft/mssql-server-linux:latest",
     "docker:oracle:build": "docker build test/docker/oracle -t falcon-test-oracle --no-cache",
     "docker:oracle:start": "docker run --rm -ti -p 1521:1521 falcon-test-oracle",
-    "docker:clickhouse:build": "docker build test/docker/clickhouse -t falcon-test-clickhouse --no-cache",
+    "docker:clickhouse:build": "docker build test/docker/clickhouse -t falcon-test-clickhouse",
     "docker:clickhouse:start": "docker run --rm -ti -p 8123:8123 -p 9000:9000 falcon-test-clickhouse",
     "rebuild:modules:electron": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/rebuild-modules.js --electron",
     "rebuild:modules:node": "cross-env FSEVENTS_BUILD_FROM_SOURCE=true node scripts/rebuild-modules.js",
