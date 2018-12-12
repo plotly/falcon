@@ -308,8 +308,8 @@ export const testConnections = [
     mssqlConnection,
     sqliteConnection,
     elasticsearchConnections,
-    publicReadableS3Connections,
-    apacheDrillConnections,
+//    publicReadableS3Connections,
+//    apacheDrillConnections,
     apacheImpalaConnection
 ];
 

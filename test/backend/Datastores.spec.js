@@ -102,7 +102,7 @@ describe('MSSQL - ', function () {
     });
 });
 
-describe('S3 - Connection', function () {
+xdescribe('S3 - Connection', function () {
     it('connect succeeds with the right connection', function(done) {
         connect(publicReadableS3Connections).then(done).catch(done);
     });
@@ -146,7 +146,7 @@ describe('S3 - Connection', function () {
 
 });
 
-describe('Apache Drill - Connection', function () {
+xdescribe('Apache Drill - Connection', function () {
     it('connects', function(done) {
         connect(apacheDrillConnections)
         .then(() => done())

@@ -1291,7 +1291,7 @@ describe('Routes:', () => {
         });
     });
 
-    describe('connections: nosql connectors: s3:', function() {
+    xdescribe('connections: nosql connectors: s3:', function() {
         it('s3-keys returns a list of keys', function() {
             const s3CredId = saveConnection(publicReadableS3Connections);
             return POST(`connections/${s3CredId}/s3-keys`).then(getResponseJson).then(files => {
@@ -1348,7 +1348,7 @@ describe('Routes:', () => {
         });
     });
 
-    describe('connections: nosql connectors: apache-drill:', function() {
+    xdescribe('connections: nosql connectors: apache-drill:', function() {
         it('apache-drill-storage returns a list of storage items', function() {
             const s3CredId = saveConnection(apacheDrillConnections);
 
@@ -1526,7 +1526,7 @@ describe('Routes:', () => {
             });
         });
 
-        it('returns sanitized connections', function() {
+        xit('returns sanitized connections', function() {
             return POST('connections', publicReadableS3Connections)
                 .then(assertResponseStatus(200))
                 .then(function() {
@@ -1546,7 +1546,7 @@ describe('Routes:', () => {
                 });
         });
 
-        it('connection/:id returns sanitized connections', function() {
+        xit('connection/:id returns sanitized connections', function() {
             return POST('connections', publicReadableS3Connections).then(assertResponseStatus(200))
                 .then(() => {
                     return GET('connections').then(getResponseJson);
