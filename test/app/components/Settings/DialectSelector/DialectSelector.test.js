@@ -41,12 +41,11 @@ describe('Dialog Selector Test', () => {
         // open selector
         selector.find('.Select-control').simulate('keyDown', {keyCode: 40});
 
-        // Dialect not selected so should not be found
         expect(
             selector
                 .find('.Select-option .is-selected')
                 .first()
-                .prop('children')
+                .text()
         ).toBe(connectionObject.dialect);
     });
 });
