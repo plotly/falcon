@@ -67,7 +67,8 @@
   "jest": {
     "moduleNameMapper": {
       "\\.css$": "identity-obj-proxy"
-    }
+    },
+    "testURL": "http://localhost"
   },
   "build": {
     "appId": "org.plotly.connector",
