@@ -1,34 +1,43 @@
-# Plotly Database Connector
-<p align="center">
-<img src="https://raw.githubusercontent.com/plotly/plotly-database-connector/master/app/app.ico">
-</p>
+![Falcon logo](https://github.com/plotly/falcon-sql-client/raw/master/static/images/falcon-logo-by-plotly-stripe.png)
 
-> Plotly Database Connector for https://plot.ly/create. Connect your database and query your data to use in your charts.
+Falcon in a free, open-source SQL editor with inline data visualization. It currently supports connecting to **RedShift**, **MySQL**, **PostgreSQL**, **IBM DB2**, **Impala**, **MS SQL**, and **SQLite**.
 
-The Plotly database connector is a cross-platform desktop application that connects the [Plotly 2.0 Visualization Platform](https://plot.ly/create) to your database.
+Visit [plot.ly](https://plot.ly/free-sql-client-download) to learn more or visit the [Plotly forum](https://community.plot.ly/c/falcon-sql-client).
 
-![Screencast of the plotly database connector](http://g.recordit.co/LqhQcEcwti.gif)
+Follow [@plotlygraphs](https://twitter.com/plotlygraphs) on Twitter for Falcon announcements.
 
-Plotly 2.0 makes HTTP requests from the local web browser directly to this database connector app. This database connector runs as a server on localhost and forwards queries from the Plotly 2.0 web-application to the database that connect to. Requests are made client-side, so you don't need to open up the connector or your database to the world, you just need to be able to access it from the machine that is running this connector app.
+➡ [Download Falcon for Mac OS](https://plot.ly/free-sql-client-download/)
 
-[Learn more in our online documentation](http://help.plot.ly/database-connectors/) or just give it a try in [Plotly 2.0](https://plot.ly/create/?upload=sql).
+➡ [Download Falcon for Windows](https://plot.ly/free-sql-client-download/)
 
-## Feature Requests
+![Screencast of falcon sql client](https://github.com/plotly/falcon-sql-client/raw/master/static/images/falcon_hero.gif)
 
-[Contact us](https://plot.ly/products/consulting-and-oem/) for feature additions, support, training, consulting, and more.
+## Documentation
 
-## Contribute
+If you want to read more about connecting Falcon to your data warehouse, [help.plot.ly](https://help.plot.ly/database-connectors/) is free and available online. You can also [contribute](https://github.com/plotly/plotly.github.io/tree/master/_posts/connectors) to this documentation through GitHub.
 
-See [CONTRIBUTING.md](https://github.com/plotly/plotly-database-connector/blob/master/CONTRIBUTING.md).
+## Contributing
+
+See [CONTRIBUTING.md](https://github.com/plotly/falcon-sql-client/blob/master/CONTRIBUTING.md).
 You can also [contact us](https://plot.ly/products/consulting-and-oem/) if you would like a specific feature added.
 
 We want to encourage a warm, welcoming, and safe environment for contributing to this project. See the [code of conduct](CODE_OF_CONDUCT.md) for more information.
 
 ## Contact
 
-- Maintainer: Chris - chris@plot.ly
-- Feature requests and consulting: https://plot.ly/products/consulting-and-oem/
-- Security reports: https://help.plot.ly/security/
+- Lead maintainer: [@n-riesco](https://github.com/n-riesco)
+- [Feature requests and support](https://plot.ly/products/consulting-and-oem/)
+- [Security reports](https://help.plot.ly/security/)
+
+## Maintainers
+
+|   | Github | Twitter |
+|---|--------|---------|
+|**Chris Parmer**| [@chriddyp](https://github.com/chriddyp) | |
+|**Nicolas Riesco**| [@n-riesco](https://github.com/n-riesco) | |
+|**Tarun Gaba**| [@tarzzz](https://github.com/tarzzz) | |
+|**Shannon Lal**| [@shannonlal](https://github.com/shannonlal) | |
+|**Kinuthia Ndung'u**| [@kndungu](https://github.com/kndungu) | |
 
 ## Credit
 
@@ -37,4 +46,4 @@ Originally forked from [electron-react-boilerplate](https://github.com/chentsuli
 
 ## License
 
-Code released under the MIT © [License](https://github.com/plotly/plotly-sql-connector/blob/master/LICENSE).
+Code released under the MIT © [License](https://github.com/plotly/falcon-sql-client/blob/master/LICENSE).

@@ -1,7 +1,13 @@
 import webpack from 'webpack';
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import baseConfig from './webpack.config.base';
 import path from 'path';
+
+const AUTH_ENABLED = process.env.PLOTLY_CONNECTOR_AUTH_ENABLED ?
+                     JSON.parse(process.env.PLOTLY_CONNECTOR_AUTH_ENABLED) : true;
+
+const OAUTH2_CLIENT_ID = process.env.PLOTLY_CONNECTOR_OAUTH2_CLIENT_ID ?
+    JSON.stringify(process.env.PLOTLY_CONNECTOR_OAUTH2_CLIENT_ID) :
+    JSON.stringify('isFcew9naom2f1khSiMeAtzuOvHXHuLwhPsM7oPt');
 
 const config = {
     ...baseConfig,
@@ -9,9 +15,7 @@ const config = {
     devtool: 'source-map',
 
     entry: {
-        'web': './app/index',
-        'oauth': './app/oauth/index',
-        'login': './app/login/index'
+        'web': './app/index'
     },
 
     output: {
@@ -21,45 +25,23 @@ const config = {
         libraryTarget: 'var'
     },
 
-    module: {
-        ...baseConfig.module,
-
-        loaders: [
-            ...baseConfig.module.loaders,
-
-            {
-                test: /\.global\.css$/,
-                loader: ExtractTextPlugin.extract(
-                    'style-loader',
-                    'css-loader'
-                )
-            },
-
-            {
-                test: /^((?!\.global).)*\.css$/,
-                loader: ExtractTextPlugin.extract(
-                    'style-loader',
-                    'css-loader?modules&importLoaders=1&localIdentName=' +
-                        '[name]__[local]___[hash:base64:5]'
-                )
-            }
-        ]
-    },
-
     plugins: [
         ...baseConfig.plugins,
-        new webpack.optimize.OccurenceOrderPlugin(),
+
         new webpack.DefinePlugin({
             __DEV__: false,
             'process.env.NODE_ENV': JSON.stringify('production')
         }),
-        new webpack.optimize.UglifyJsPlugin({
-            compressor: {
-                screw_ie8: true,
-                warnings: false
+
+        // This is used to pass environment variables to frontend
+        // detailed discussions on this ticket:
+        // https://github.com/plotly/streambed/issues/10436
+        new webpack.DefinePlugin({
+            'PLOTLY_ENV': {
+                'AUTH_ENABLED': AUTH_ENABLED,
+                'OAUTH2_CLIENT_ID': OAUTH2_CLIENT_ID
             }
-        }),
-        new ExtractTextPlugin('style.css', { allChunks: true })
+        })
     ],
 
     target: 'web'

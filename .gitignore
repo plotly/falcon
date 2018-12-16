@@ -1,4 +1,14 @@
 npm-debug.log
+
+# Tern
+.tern-port
+
+# Vim
+*.sw?
+
+# IntelliJ Idea
+.idea
+
 # Runtime data
 pids
 *.pid
@@ -54,3 +64,6 @@ backend/headlessBundle.js
 backend/headlessBundle.js.map
 
 npm-shrinkwrap.unsafe.json
+
+#AWS Credentials
+aws.json

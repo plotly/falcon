@@ -1,11 +1,10 @@
 import * as Connections from './datastores/Datastores';
-import {updateGrid} from './PlotlyAPI';
 import {getConnectionById} from './Connections';
 import {getQuery, getQueries, saveQuery, deleteQuery} from './Queries';
 import {getSetting} from '../settings';
 import Logger from '../logger';
-import {PlotlyAPIRequest} from './PlotlyAPI';
-import {has, merge} from 'ramda';
+import {PlotlyAPIRequest, updateGrid} from './PlotlyAPI';
+import {has} from 'ramda';
 
 class QueryScheduler {
     constructor() {
@@ -15,8 +14,26 @@ class QueryScheduler {
         this.clearQueries = this.clearQueries.bind(this);
         this.queryAndUpdateGrid = this.queryAndUpdateGrid.bind(this);
 
-        // Expose this.job so that tests can overwrite it
-        this.job = this.queryAndUpdateGrid;
+        // this.job wraps this.queryAndUpdateGrid to avoid concurrent runs of the same job
+        this.runningJobs = {};
+        this.job = (fid, uids, query, connectionId, requestor) => {
+            try {
+                if (this.runningJobs[fid]) {
+                    return;
+                }
+
+                this.runningJobs[fid] = true;
+
+                return this.queryAndUpdateGrid(fid, uids, query, connectionId, requestor)
+                    .catch(error => {
+                        Logger.log(error, 0);
+                    }).then(() => {
+                        delete this.runningJobs[fid];
+                    });
+            } catch (e) {
+                Logger.log(e, 0);
+            }
+        };
 
         // Expose this.minimumRefreshInterval so that tests can overwrite it
         this.minimumRefreshInterval = 60;
@@ -33,17 +50,15 @@ class QueryScheduler {
     }) {
         if (!refreshInterval) {
             throw new Error('Refresh interval was not supplied');
-        // TODO - bump up to 60 when done testing.
-    } else if (refreshInterval < this.minimumRefreshInterval) {
-            throw new Error(
-                'Refresh interval must be at least ' +
-                `${this.minimumRefreshInterval} ` +
-                `(${this.minimumRefreshInterval} seconds). ` +
-                `${refreshInterval} was supplied.`
-            );
+        } else if (refreshInterval < this.minimumRefreshInterval) {
+            throw new Error([
+                `Refresh interval must be at least ${this.minimumRefreshInterval} seconds`,
+                `(supplied ${refreshInterval})`
+            ].join(' '));
         }
 
         Logger.log(`Scheduling "${query}" with connection ${connectionId} updating grid ${fid}`);
+
         // Delete query if it is already saved
         if (getQuery(fid)) {
             deleteQuery(fid);
@@ -67,18 +82,10 @@ class QueryScheduler {
         // Schedule
         this.queryJobs[fid] = setInterval(
             () => {
-                try {
-                    this.job(fid, uids, query, connectionId, requestor)
-                    .catch(error => {
-                        Logger.log(error, 0);
-                    });
-                } catch (e) {
-                    Logger.log(e, 0);
-                }
+                this.job(fid, uids, query, connectionId, requestor);
             },
             refreshInterval * 1000
         );
-
     }
 
     // Load and schedule queries - To be run on app start.
@@ -143,7 +150,7 @@ class QueryScheduler {
             }
 
             Logger.log(`Querying "${queryString}" with connection ${connectionId} to update grid ${fid}`, 2);
-            return Connections.query(queryString, requestedDBConnections)
+            return Connections.query(queryString, requestedDBConnections);
 
         }).then(rowsAndColumns => {
 
@@ -192,9 +199,8 @@ class QueryScheduler {
                 return PlotlyAPIRequest(
                     `grids/${fid}`,
                     {username, apiKey, accessToken, method: 'GET'}
-                ).then(res => {
-
-                    if (res.status === 404) {
+                ).then(resFromGET => {
+                    if (resFromGET.status === 404) {
                         Logger.log(('' +
                             `Grid ID ${fid} doesn't exist on Plotly anymore, ` +
                             'removing persistent query.'),
@@ -202,40 +208,37 @@ class QueryScheduler {
                         );
                         this.clearQuery(fid);
                         return deleteQuery(fid);
-                    } else {
-                        return res.text()
-                        .then(text => {
-                            let filemeta;
-                            try {
-                                filemeta = JSON.parse(text);
-                            } catch (e) {
-                                // Well, that's annoying.
-                                Logger.log(`Failed to parse the JSON of request ${fid}`, 0);
-                                Logger.log(e)
-                                Logger.log('Text response: ' + text, 0);
-                                throw new Error(e);
-                            }
-                            if (filemeta.deleted) {
-                                Logger.log(`
-                                    Grid ID ${fid} was deleted,
-                                    removing persistent query.`,
-                                    2
-                                );
-                                this.clearQuery(fid);
-                                return deleteQuery(fid);
-                            }
-                        });
                     }
-                });
 
-            } else {
-
-                return res.json().then(json => {
-                    Logger.log(`Grid ${fid} has been updated.`, 2);
+                    return resFromGET.text()
+                    .then(text => {
+                        let filemeta;
+                        try {
+                            filemeta = JSON.parse(text);
+                        } catch (e) {
+                            // Well, that's annoying.
+                            Logger.log(`Failed to parse the JSON of request ${fid}`, 0);
+                            Logger.log(e);
+                            Logger.log('Text response: ' + text, 0);
+                            throw new Error(e);
+                        }
+                        if (filemeta.deleted) {
+                            Logger.log(`
+                                Grid ID ${fid} was deleted,
+                                removing persistent query.`,
+                                2
+                            );
+                            this.clearQuery(fid);
+                            return deleteQuery(fid);
+                        }
+                    });
                 });
 
             }
 
+            return res.json().then(() => {
+                Logger.log(`Grid ${fid} has been updated.`, 2);
+            });
         });
 
     }

@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 import {createAction} from 'redux-actions';
-import {DIALECTS, INITIAL_CONNECTIONS} from '../constants/constants';
+import {INITIAL_CONNECTIONS, PREVIEW_QUERY} from '../constants/constants';
 import {baseUrl} from '../utils/utils';
 
 export const reset = createAction('RESET');
@@ -12,6 +12,7 @@ export const setIndex = createAction('SET_INDEX');
 export const mergeConnections = createAction('MERGE_CONNECTIONS');
 export const updateConnection = createAction('UPDATE_CREDENTIAL');
 export const deleteConnection = createAction('DELETE_CREDENTIAL');
+export const updatePreview = createAction('UPDATE_PREVIEW');
 
 const DELETE_TAB_MESSAGE = 'You are about to delete a connection. ' +
 'If you have scheduled persistent queries with that connection, they ' +
@@ -42,7 +43,7 @@ function DELETE(path) {
 }
 
 function POST(path, body = {}) {
-    return fetch(`${baseUrl()}/${path}`, {
+    const payload = {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -50,7 +51,9 @@ function POST(path, body = {}) {
             'Content-Type': 'application/json'
         },
         body: body ? JSON.stringify(body) : null
-    });
+    };
+
+    return fetch(`${baseUrl()}/${path}`, payload);
 }
 
 function PUT(path, body = {}) {
@@ -86,7 +89,7 @@ function apiThunk(endpoint, method, store, id, body) {
             }
         ))
         .catch(err => {
-            console.error(err);
+            console.error(err); // eslint-disable-line no-console
             dispatch({
                 type: store,
                 payload: {
@@ -94,6 +97,7 @@ function apiThunk(endpoint, method, store, id, body) {
                     status: 500
                 }
             });
+            throw new Error(err);
         });
     };
 }
@@ -204,9 +208,9 @@ export function getApacheDrillS3Keys(connectionId) {
     );
 }
 
-export function previewTable (connectionId, dialect, table, database) {
+export function previewTable(connectionId, connectionObject, table, elasticsearchIndex) {
     const body = {
-        query: PREVIEW_QUERY(dialect, table, database)
+        query: PREVIEW_QUERY(connectionObject, table, elasticsearchIndex)
     };
     return apiThunk(
         `connections/${connectionId}/query`,
@@ -217,14 +221,36 @@ export function previewTable (connectionId, dialect, table, database) {
     );
 }
 
+export function getSqlSchema (connectionId) {
+    return apiThunk(
+        `connections/${connectionId}/sql-schemas`,
+        'POST',
+        'schemaRequests',
+        connectionId
+    );
+}
+
+export function runSqlQuery (connectionId, query) {
+    const body = {
+        query: query
+    };
+    return apiThunk(
+        `connections/${connectionId}/query`,
+        'POST',
+        'queryRequests',
+        connectionId,
+        body
+    );
+}
+
+
 export function initializeTabs() {
     return function(dispatch, getState) {
         const state = getState();
         const {connectionsRequest} = state;
         if (connectionsRequest.status !== 200) {
-            console.error(
-                "Can't initialize tabs - credentials haven't been retreived yet."
-            );
+            // eslint-disable-next-line no-console
+            console.error("Can't initialize tabs - credentials haven't been retreived yet.");
             return;
         }
         const savedConnections = connectionsRequest.content;
@@ -249,7 +275,7 @@ export function initializeTabs() {
 }
 
 export function newTab() {
-    return function(dispatch, getState) {
+    return function(dispatch) {
         const newId = uuid.v4();
         dispatch(mergeConnections({
             [newId]: INITIAL_CONNECTIONS
@@ -328,29 +354,4 @@ export function setConnectionNeedToBeSaved(tabId, bool) {
             }
         });
     };
-}
-
-function PREVIEW_QUERY (dialect, table, database = '') {
-    switch (dialect) {
-        case DIALECTS.MYSQL:
-        case DIALECTS.SQLITE:
-        case DIALECTS.MARIADB:
-        case DIALECTS.POSTGRES:
-        case DIALECTS.REDSHIFT:
-            return `SELECT * FROM ${table} LIMIT 5`;
-        case DIALECTS.MSSQL:
-            return 'SELECT TOP 5 * FROM ' +
-                `${database}.dbo.${table}`;
-        case DIALECTS.ELASTICSEARCH:
-            return JSON.stringify({
-                index: database || '_all',
-                type: table || '_all',
-                body: {
-                    query: { 'match_all': {} },
-                    size: 5
-                }
-            });
-        default:
-            throw new Error(`Dialect ${dialect} is not one of the DIALECTS`);
-    }
 }

@@ -1,21 +1,33 @@
 import React from 'react';
+
+// Workaround to use `react-router@3` in React 16
+import PropTypes from 'prop-types'; // eslint-disable-line no-unused-vars
+
 import {render} from 'react-dom';
 import {Provider} from 'react-redux';
+import {Route, Router, browserHistory} from 'react-router';
 
 import configureStore from './store/configureStore';
+import {build, version} from '../package.json';
 
-import {productName, version} from '../package.json';
-import './app.global.css';
+import Login from './components/Login.react';
+import Configuration from './components/Configuration.react';
+import Status from './components/Oauth.react';
+import {homeUrl, isOnPrem} from './utils/utils';
 
 const store = configureStore();
 
-import ConfigurationPage from './containers/ConfigurationPage';
-
-window.document.title = `${productName} v${version}`;
+window.document.title = isOnPrem() ?
+    `${build.productName}` :
+    `${build.productName} v${version}`;
 
 render(
     <Provider store={store}>
-        <ConfigurationPage/>
+      <Router history={browserHistory}>
+        <Route path={homeUrl() + '/'} component={Configuration} />
+        <Route path={homeUrl() + '/login'} component={Login} />
+        <Route path={homeUrl() + '/oauth2/callback'} component={Status} />
+      </Router>
     </Provider>,
     document.getElementById('root')
 );

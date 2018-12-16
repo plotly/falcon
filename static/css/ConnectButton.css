@@ -1,0 +1,15 @@
+.connectButtonContainer {
+    margin-top: 30px;
+    border-top: thin #c8dfe3 dashed;
+    padding-top: 30px;
+}
+
+.errorMessage {
+    color: red;
+    height: 30px;
+    padding-top: 10px;
+}
+
+.footer {
+    padding-top: 10px;
+}

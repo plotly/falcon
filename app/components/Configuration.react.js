@@ -1,66 +1,76 @@
+import cookie from 'react-cookies';
 import React, { Component, PropTypes } from 'react';
-import ImmutablePropTypes from 'react-immutable-proptypes';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import Settings from './Settings/Settings.react';
-import {baseUrl} from '../utils/utils';
-import {Link} from './Link.react';
-import {contains} from 'ramda';
+import {isElectron} from '../utils/utils';
+import * as SessionsActions from '../actions/sessions';
+import Login from './Login.react';
 
-import * as styles from './Configuration.css';
 
-const LINKS = {
-    PLANS: 'http://plot.ly/plans/',
-    DOCS: 'http://help.plot.ly/database-connectors/',
-    TYPEFORM: 'https://plotly.typeform.com/to/KUiCSl'
-};
-
-export default class Configuration extends Component {
+class Configuration extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            isMenuOpen: false,
+            username: cookie.load('db-connector-user'),
+            /* global PLOTLY_ENV */
+            authDisabled: !PLOTLY_ENV.AUTH_ENABLED
+        };
+        this.toggle = this.toggle.bind(this);
+        this.close = this.close.bind(this);
+        this.logOut = this.logOut.bind(this);
+
+        /*
+         * If this is an electron app, then we don't have access to cookies and
+         * we don't require authentication in the API.
+         * In the browser, the username is set with a cookie but in electron
+         * this is set using electron's ipcRenderer.
+         */
+        if (isElectron()) {
+            window.require('electron').ipcRenderer.once('username',
+                (event, message) => {
+                    this.setState({username: message});
+                });
+        }
+    }
+
+    toggle() {
+        this.setState({ isMenuOpen: !this.state.isMenuOpen });
+    }
+
+    close() {
+        this.setState({ isMenuOpen: false });
+    }
+
+    logOut() {
+
+      /*
+       * Delete all the cookies and reset user state. This does not kill
+       * any running connections, but user will not be able to access them
+       * without logging in again.
+       */
+      cookie.remove('db-connector-user');
+      cookie.remove('plotly-auth-token');
+      cookie.remove('db-connector-auth-token');
+      cookie.remove('db-connector-auth-disabled');
+      this.setState({ username: ''});
+
+      // reload page when running in browser:
+      if (!isElectron()) {
+          window.location.reload();
+      }
     }
 
     render() {
-
-        return (
-            <div className={styles.fullApp}>
-                <div className={styles.header}>
-                    <span className={styles.logoAndTitle}>
-                        <img className={styles.plotlyLogo}
-                            src="images/plotly-connector-logo.svg"
-                        >
-                        </img>
-                        <h5 className={styles.applicationTitle}>
-                            Plotly Database Connector
-                        </h5>
-                    </span>
-
-                    <span className={styles.supportLinksContainer}>
-                        <div className={styles.externalLinkContainer}>
-                            {/* Hide Upgrade button for on-prem */}
-                            {
-                                contains(
-                                    'external-data-connector',
-                                    window.location.href
-                                ) ?
-                                null : <Link className={styles.supportLinks} href={LINKS.PLANS}>Plans and Pricing</Link>
-                            }
-                            {/* TODO - Template in ONPREM */}
-                            {
-                                contains(
-                                    'external-data-connector',
-                                    window.location.href
-                                ) ?
-                                null : <Link className={styles.supportLinks} href={'https://plot.ly/create'}>Chart Creator and SQL Editor</Link>
-                            }
-                            <Link className={styles.supportLinks} href={LINKS.DOCS}>Documentation</Link>
-                            <Link className={styles.supportLinks} href={LINKS.TYPEFORM}>Request a Connector</Link>
-                        </div>
-                    </span>
-                </div>
-
-                <Settings/>
-
+        return (isElectron() || this.state.authDisabled || this.state.username) ? (
+            <div className="fullApp">
+                <Settings username={this.state.username} logout={this.logOut}/>
             </div>
-
+        ) : (
+            <div className="fullApp">
+                <Login/>
+            </div>
         );
     }
 }
@@ -68,3 +78,14 @@ export default class Configuration extends Component {
 Configuration.propTypes = {
     sessionsActions: PropTypes.object
 };
+
+function mapStateToProps(state) {
+    return {sessions: state.sessions};
+}
+
+function mapDispatchToProps(dispatch) {
+    const sessionsActions = bindActionCreators(SessionsActions, dispatch);
+    return {sessionsActions};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Configuration);

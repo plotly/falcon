@@ -1,18 +1,17 @@
 version: 0.4.{build}
 
 environment:
-  POSTGRES_PATH: C:\Program Files\PostgreSQL\9.6
+  matrix:
+    - nodejs_version: 6
+      POSTGRES_PATH: C:\Program Files\PostgreSQL\9.6
 
 platform:
   - x64
-  - x86
 
 services:
   - postgresql96
 
 cache:
-  - node_modules
-  - '%APPDATA%\npm-cache'
   - '%USERPROFILE%\.electron'
 
 init:
@@ -21,15 +20,15 @@ init:
 
 
 install:
-  - ps: Install-Product node 7 x64
-  - npm install
+  - ps: Install-Product node $env:nodejs_version $env:platform
+  - yarn install --force
 
 build_script:
-  - npm run build
-  - npm run package
+  - yarn run build
+  - yarn run pack
 
 after_build:
-  - 7z a release.zip release
+  - 7z a release.zip release/latest.yml release/*.exe
 
 artifacts:
   - path: release.zip

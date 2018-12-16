@@ -1,0 +1,44 @@
+.react-grid-Main {
+    font-size: 12px;
+    outline: 0 !important;
+}
+
+.react-grid-Grid, .react-grid-Header, .react-grid-HeaderCell {
+    background: #f3f6fa !important;
+}
+
+.react-grid-Grid {
+    border-color: #c8d4e3 !important;
+}
+
+.react-grid-Header {
+    box-shadow: unset !important;
+    max-height: 64px;
+    overflow: hidden;
+}
+
+.react-grid-HeaderRow {
+    max-height: 32px;
+    overflow: hidden;
+}
+
+.react-grid-HeaderCell .form-control {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: normal;
+    margin: inherit;
+    padding: 0;
+    width: 100%;
+}
+
+.react-grid-Viewport {
+    border-top: 1px solid #c8d4e3;
+}
+
+.react-grid-Row--odd .react-grid-Cell {
+    background: #fafbfd;
+}
+
+.react-grid-Cell:focus {
+    outline: 0 !important;
+}

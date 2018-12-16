@@ -1,0 +1,16 @@
+.CodeMirror {
+    border: 1px solid #c8d4e3;
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 14px;
+    height: 140px;
+    margin-bottom: 20px;
+}
+
+.CodeMirror-gutters {
+    background-color: #f3f6fa;
+    border-right: 1px solid #c8d4e3;
+}
+
+.react-resizable-handle {
+    z-index: 9;
+}

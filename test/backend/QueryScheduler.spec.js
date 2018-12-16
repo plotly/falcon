@@ -1,113 +1,116 @@
-import chai, {expect, assert} from 'chai';
-import spies from 'chai-spies';
-chai.use(spies);
+import {assert} from 'chai';
+import sinon from 'sinon';
 
-import fs from 'fs';
-import {merge, dissoc, has} from 'ramda';
+import {merge} from 'ramda';
 
 import QueryScheduler from '../../backend/persistent/QueryScheduler.js';
 import {saveConnection} from '../../backend/persistent/Connections.js';
-import {getQuery, getQueries} from '../../backend/persistent/Queries.js';
-import { PlotlyAPIRequest,
-    updateGrid
-} from '../../backend/persistent/PlotlyAPI.js';
+import {getQueries} from '../../backend/persistent/Queries.js';
+import {PlotlyAPIRequest, updateGrid} from '../../backend/persistent/PlotlyAPI.js';
 import {getSetting, saveSetting} from '../../backend/settings.js';
-import {createGrid, names, sqlConnections, username, apiKey} from './utils.js';
+import {
+    apiKey,
+    assertResponseStatus,
+    clearSettings,
+    createGrid,
+    getResponseJson,
+    names,
+    sqlConnections,
+    username,
+    wait
+} from './utils.js';
 
 let queryScheduler;
 let savedUsers;
+
+// Suppressing ESLint cause Mocha ensures `this` is bound in test functions
+/* eslint-disable no-invalid-this */
 describe('QueryScheduler', function() {
-    beforeEach(function () {
-        this.timeout(1000 * 5);
-        try {
-            fs.unlinkSync(getSetting('QUERIES_PATH'));
-        } catch (e) {}
-        try {
-            fs.unlinkSync(getSetting('SETTINGS_PATH'));
-        } catch (e) {}
-        try {
-            fs.unlinkSync(getSetting('CONNECTIONS_PATH'));
-        } catch (e) {}
-        queryScheduler = new QueryScheduler();
-        queryScheduler.minimumRefreshInterval = 1;
+    before(function() {
         savedUsers = getSetting('USERS');
-        saveSetting('USERS', [{username, apiKey}]);
     });
 
-    afterEach(function () {
-        this.timeout(1000 * 5);
-        queryScheduler.clearQueries();
-        queryScheduler = null;
+    after(function() {
         saveSetting('USERS', savedUsers);
     });
 
-    it('executes a function on an interval', function (done) {
-        const spy = chai.spy(() => {});
+    beforeEach(function () {
+        clearSettings('QUERIES_PATH', 'SETTINGS_PATH', 'CONNECTIONS_PATH');
+        saveSetting('USERS', [{username, apiKey}]);
+
+        queryScheduler = new QueryScheduler();
+        queryScheduler.minimumRefreshInterval = 1;
+    });
+
+    afterEach(function () {
+        queryScheduler.clearQueries();
+        queryScheduler = null;
+    });
+
+    it('executes a function on an interval', function () {
+        const spy = sinon.spy();
+        const refreshInterval = 1; // second
+
         queryScheduler.job = spy;
-
-        const delay = 1;
-        this.timeout(delay * 10 * 1000);
-
         queryScheduler.scheduleQuery({
-            refreshInterval: delay,
+            refreshInterval,
             fid: '...',
             uids: '...',
             query: '...',
             connectionId: '...'
         });
-        setTimeout(function() {
-            expect(spy).to.have.been.called();
-        }, (delay + 1) * 1000);
-        setTimeout(function() {
-            expect(spy).to.have.been.called.twice();
-            done();
-        }, (delay * 3) * 1000);
+
+        assert(spy.notCalled, 'job should not have been called yet');
+
+        return wait(1.5 * refreshInterval * 1000)
+            .then(() => assert(spy.called, 'job should have been called'))
+            .then(() => wait(refreshInterval * 1000))
+            .then(() => assert(spy.calledTwice, 'job should have been called twice'));
     });
 
-    it('overwrites interval functions', function (done) {
-        const spy1 = chai.spy(() => {});
-        queryScheduler.job = spy1;
-
-        const delay = 2;
-        this.timeout(delay * 20 * 1000);
+    it('overwrites interval functions', function () {
+        const spy1 = sinon.spy();
+        const spy2 = sinon.spy();
+        const refreshInterval = 1; // second
 
         const query = {
             requestor: 'requestor',
             fid: 'fid',
             uids: 'uids',
-            refreshInterval: delay,
+            refreshInterval,
             query: 'query-1',
             connectionId: '1'
         };
 
+        queryScheduler.job = spy1;
         queryScheduler.scheduleQuery(query);
 
-        setTimeout(function() {
-            expect(spy1).to.have.been.called.exactly(5);
+        assert(spy1.notCalled, 'job1 should not have been called yet');
 
-            const spy2 = chai.spy(() => {});
+        return wait(3.25 * refreshInterval * 1000)
+        .then(() => {
+            assert(spy1.calledThrice, 'job1 should have been called three times');
+
             queryScheduler.job = spy2;
             queryScheduler.scheduleQuery(merge(query, {query: 'query-2'}));
-            setTimeout(function() {
-                expect(spy1).to.have.been.called.exactly(5);
-                expect(spy1).to.have.been.called.always.with.exactly(
-                    query.fid, query.uids, query.query,
-                    query.connectionId, query.requestor
-                );
-                expect(spy2).to.have.been.called.exactly(5);
-                expect(spy2).to.have.been.called.always.with.exactly(
-                    query.fid, query.uids, 'query-2',
-                    query.connectionId, query.requestor
-                );
-                done();
-            }, (delay + 1) * 1000 + delay * 4 * 1000);
+        })
+        .then(() => wait(3.25 * refreshInterval * 1000))
+        .then(() => {
+            assert(spy1.calledThrice, 'job1 should have been called three times');
+            assert(spy1.alwaysCalledWith(
+                query.fid, query.uids, query.query,
+                query.connectionId, query.requestor
+            ), `job1 was called with unexpected args: ${spy1.args}`);
 
-        }, (delay + 1) * 1000 + delay * 4 * 1000);
-
-
+            assert(spy2.calledThrice, 'job2 should have been called three times');
+            assert(spy2.alwaysCalledWith(
+                query.fid, query.uids, 'query-2',
+                query.connectionId, query.requestor
+            ), `job2 was called with unexpected args: ${spy2.args}`);
+        });
     });
 
-    it('saves queries to file', () => {
+    it('saves queries to file', function() {
         queryScheduler.job = () => {};
 
         const queryObject = {
@@ -119,18 +122,18 @@ describe('QueryScheduler', function() {
             requestor: 'test-fid'
         };
         queryScheduler.scheduleQuery(queryObject);
+
         let queriesFromFile = getQueries();
         assert.deepEqual(queriesFromFile, [queryObject]);
 
         const anotherQuery = merge(queryObject, {fid: 'new-fid'});
         queryScheduler.scheduleQuery(anotherQuery);
+
         queriesFromFile = getQueries();
-        assert.deepEqual(queriesFromFile,
-            [queryObject, anotherQuery]
-        );
+        assert.deepEqual(queriesFromFile, [queryObject, anotherQuery]);
     });
 
-    it('saving a query that already exists updates the query', () => {
+    it('saving a query that already exists updates the query', function() {
         queryScheduler.job = () => {};
 
         const queryObject = {
@@ -143,19 +146,20 @@ describe('QueryScheduler', function() {
         };
 
         assert.deepEqual([], getQueries());
+
         queryScheduler.scheduleQuery(queryObject);
-        assert.deepEqual([queryObject], getQueries());
+        assert.deepEqual(getQueries(), [queryObject]);
+
         const updatedQuery = merge(
             queryObject,
             {refreshInterval: 10, 'query': 'new query'}
         );
         queryScheduler.scheduleQuery(updatedQuery);
-        assert.deepEqual([updatedQuery], getQueries());
+        assert.deepEqual(getQueries(), [updatedQuery]);
     });
 
-    it('clears and deletes the query if its associated grid was deleted', function(done) {
+    it('clears and deletes the query if its associated grid was deleted', function() {
         const refreshInterval = 1;
-        this.timeout(refreshInterval * 20 * 1000);
 
         /*
          * Save the sqlConnections to a file.
@@ -168,58 +172,52 @@ describe('QueryScheduler', function() {
          * Note that the scheduler doesn't ever actually create grids,
          * it only updates them
          */
-         createGrid('test delete').then(res => res.json().then(json => {
-             assert.equal(res.status, 201);
-             const fid = json.file.fid;
-             const uids = json.file.cols.map(col => col.uid);
-             const queryObject = {
-                 fid,
-                 uids,
-                 refreshInterval,
-                 connectionId,
-                 query: 'SELECT * from ebola_2014 LIMIT 2',
-                 requestor: fid.split(':')[0]
-             };
-             assert.deepEqual(getQueries(), [], 'No queries existed');
-             assert(!Boolean(queryScheduler.queryJobs[fid]), 'No queries were scheduled');
-             queryScheduler.scheduleQuery(queryObject);
-             assert.deepEqual(getQueries(), [queryObject], 'A query has been saved');
+        let fid, uids, queryObject;
+        return createGrid('test delete')
+        .then(assertResponseStatus(201))
+        .then(getResponseJson).then(json => {
+            fid = json.file.fid;
+            uids = json.file.cols.map(col => col.uid);
+            queryObject = {
+                fid,
+                uids,
+                refreshInterval,
+                connectionId,
+                query: 'SELECT * from ebola_2014 LIMIT 2',
+                requestor: fid.split(':')[0]
+            };
 
-             assert(Boolean(queryScheduler.queryJobs[fid]), 'A query has been scheduled');
+            assert.deepEqual(getQueries(), [], 'Should have no saved queries initially');
+            assert(!queryScheduler.queryJobs[fid], 'Should have no scheduled queries initially');
 
-             PlotlyAPIRequest(`grids/${fid}`, {username, apiKey, method: 'DELETE'}).then(res => {
-                 if (res.status !== 204) {
-                     res.json().then(json => {
-                         assert.equal(res.status, 204, 'Grid was successfully deleted: ' + JSON.stringify(json, null, 2));
-                     });
-                 }
+            queryScheduler.scheduleQuery(queryObject);
 
+            assert.deepEqual(getQueries(), [queryObject], 'Query has not been saved');
+            assert(Boolean(queryScheduler.queryJobs[fid]), 'Query has not been scheduled');
 
-                setTimeout(function() {
-                    /*
-                     * By now, QueryScheduler should've attempted to update
-                     * the grid and failed and then detected that it was deleted
-                     * and removed the query and the timeout handler.
-                     * 10 seconds may be excessive but there are a lot of
-                     * network delays that happen when updating a grid
-                     * that are hard to account for precisely.
-                     */
-                    assert(!Boolean(queryScheduler.queryJobs[fid]), 'Queries were removed');
-                    assert.deepEqual(getQueries(), [], 'Queries were deleted');
-                    done();
-                }, refreshInterval * 10 * 1000);
+            return PlotlyAPIRequest(`grids/${fid}`, {username, apiKey, method: 'DELETE'});
+        })
+        .then(assertResponseStatus(204))
+        .then(() => {
+            return waitAndAssertRemoval();
 
-            }).catch(done);
-
-        })).catch(done);
-
+            function waitAndAssertRemoval() {
+                return wait(refreshInterval * 1000).then(() => {
+                    const removedSavedQuery = !queryScheduler.queryJobs[fid];
+                    const removedScheduledQuery = (getQueries().length === 0);
+                    if (!removedSavedQuery || !removedScheduledQuery) {
+                        return waitAndAssertRemoval();
+                    }
+                });
+            }
+        });
     });
 
-    it('queries a database and updates a plotly grid on an interval', function(done) {
+    it('queries a database and updates a plotly grid on an interval', function() {
         function checkGridAgainstQuery(fid, name) {
             return PlotlyAPIRequest(`grids/${fid}/content`, {username, apiKey, method: 'GET'})
-            .then(res => res.json().then(json => {
-                assert.equal(res.status, 200);
+            .then(assertResponseStatus(200))
+            .then(getResponseJson).then(json => {
                 assert.deepEqual(
                     json.cols[names[0]].data,
                     ['Guinea', 'Guinea'],
@@ -250,35 +248,32 @@ describe('QueryScheduler', function() {
                     ['122', '224'],
                     name
                 );
-            }));
+            });
         }
 
         function resetAndVerifyGridContents(fid, uids) {
             return updateGrid([[1, 2, 3, 4, 5, 6]], fid, uids, username, apiKey)
-
-            // Verify that the grid was updated
-            .then(res => {
-                assert.equal(res.status, 200, 'grid was updated');
+            .then(assertResponseStatus(200)).then(() => {
                 return PlotlyAPIRequest(`grids/${fid}/content`, {username, apiKey, method: 'GET'});
             })
-            .then(res => res.json().then(json => {
-                assert.equal(res.status, 200, 'data was retrieved');
+            .then(assertResponseStatus(200))
+            .then(getResponseJson).then(json => {
                 assert.deepEqual(json.cols[names[0]].data, [1]);
                 assert.deepEqual(json.cols[names[1]].data, [2]);
                 assert.deepEqual(json.cols[names[2]].data, [3]);
                 assert.deepEqual(json.cols[names[3]].data, [4]);
                 assert.deepEqual(json.cols[names[4]].data, [5]);
                 assert.deepEqual(json.cols[names[5]].data, [6]);
-            }));
+            });
         }
 
-        const refreshInterval = 30;
-        this.timeout(refreshInterval * 10 * 1000);
+        const refreshInterval = 60; // seconds
+        this.timeout(10 * refreshInterval * 1000);
 
         /*
          * Save the sqlConnections to a file.
          * This is done by the UI or by the user.
-        */
+         */
         const connectionId = saveConnection(sqlConnections);
 
         /*
@@ -286,45 +281,29 @@ describe('QueryScheduler', function() {
          * Note that the scheduler doesn't ever actually create grids,
          * it only updates them
          */
-         createGrid('test interval').then(res => res.json().then(json => {
-             assert.equal(res.status, 201);
-             const fid = json.file.fid;
-             const uids = json.file.cols.map(col => col.uid);
+        let fid, uids, queryObject;
+        return createGrid('test interval')
+        .then(assertResponseStatus(201))
+        .then(getResponseJson).then(json => {
+            fid = json.file.fid;
+            uids = json.file.cols.map(col => col.uid);
+            queryObject = {
+                fid,
+                uids,
+                refreshInterval,
+                connectionId,
+                query: 'SELECT * from ebola_2014 LIMIT 2',
+                requestor: fid.split(':')[0]
+            };
 
-             const queryObject = {
-                 fid,
-                 uids,
-                 refreshInterval,
-                 connectionId,
-                 query: 'SELECT * from ebola_2014 LIMIT 2',
-                 requestor: fid.split(':')[0]
-             };
-             queryScheduler.scheduleQuery(queryObject);
-
-             /*
-              * After refreshInterval seconds, the scheduler will update the grid's contents.
-              * Download the grid's contents and check.
-              */
-             setTimeout(() => {
-                 checkGridAgainstQuery(fid, 'First check')
-                 .then(() => {
-                    /*
-                     * Now check that _another_ update happens.
-                     * Update the grids contents and then wait for
-                     * the scheduler to update the contents.
-                     */
-                     return resetAndVerifyGridContents(fid, uids);
-                 })
-                 .then(() => {
-                     setTimeout(() => {
-                         checkGridAgainstQuery(fid, 'Second check')
-                         .then(() => done())
-                         .catch(done);
-                     }, (refreshInterval + 10) * 1000);
-                 })
-                 .catch(done);
-            }, (refreshInterval + 10) * 1000); // Give scheduleQuery an extra 10 seconds.
-        })).catch(done);
+            queryScheduler.scheduleQuery(queryObject);
+        })
+        .then(() => wait(1.5 * refreshInterval * 1000))
+        .then(() => checkGridAgainstQuery(fid, 'First check'))
+        .then(() => resetAndVerifyGridContents(fid, uids))
+        .then(() => wait(1.5 * refreshInterval * 1000))
+        .then(() => checkGridAgainstQuery(fid, 'Second check'));
     });
 
 });
+/* eslint-enable no-invalid-this */

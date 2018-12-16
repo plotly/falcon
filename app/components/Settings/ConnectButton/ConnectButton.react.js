@@ -1,14 +1,73 @@
-import React, {Component, PropTypes} from 'react';
-import * as styles from './ConnectButton.css';
-import {has, pathOr} from 'ramda';
-
-const isLoading = (status) => status === 'loading';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {pathOr} from 'ramda';
 
 export default class ConnectButton extends Component {
+    /**
+     * Component props
+     * @type     {object}          props
+     * @property {function}        props.connect - Connect function
+     * @property {object}          props.connectRequest - Connection Request
+     * @property {(number|string)} props.connectRequest.status - 400 or loading
+     * @property {Error}           props.connectRequest.error
+     * @property {object}          props.saveConnectionsRequest - Saved Connection Request
+     * @property {(number|string)} props.saveConnectionsRequest.status - 400 or loading
+     * @property {Error}           props.saveConnectionsRequest.error
+     * @property {boolean}         props.editMode  - Enabled if editing credentials
+     */
+    static propTypes = {
+        connect: PropTypes.func,
+        connectRequest: PropTypes.object,
+        saveConnectionsRequest: PropTypes.object,
+        editMode: PropTypes.bool
+    }
+
+    /**
+    * @returns {boolean} true if waiting for a response to a connection request
+    */
+   isConnecting() {
+    return this.props.connectRequest.status === 'loading';
+    }
+
+    /**
+    * @returns {boolean} true if successfully connected to database
+    */
+    isConnected() {
+        const status = Number(this.props.connectRequest.status);
+        return (status >= 200 || status < 300);
+    }
+
+    /**
+    * @returns {boolean} true if successfully connected to database
+    */
+    connectionFailed() {
+        return Number(this.props.connectRequest.status) >= 400;
+    }
+
+    /**
+    * @returns {boolean} true if waiting for a response to a save request
+    */
+    isSaving() {
+        return this.props.saveConnectionsRequest.status === 'loading';
+    }
+
+    /**
+    * @returns {boolean} true if connection has been saved
+    */
+    isSaved() {
+        const status = Number(this.props.saveConnectionsRequest.status);
+        return (status >= 200 || status < 300);
+    }
+
+    /**
+    * @returns {boolean} true if successfully connected to database
+    */
+    saveFailed() {
+        return Number(this.props.saveConnectionsRequest.status) >= 400;
+    }
 
     render() {
         const {
-            connectionsHaveBeenSaved,
             connect,
             connectRequest,
             saveConnectionsRequest,
@@ -19,12 +78,16 @@ export default class ConnectButton extends Component {
         let buttonClick = () => {};
         let error = null;
 
-        if (connectRequest.status >= 400 || saveConnectionsRequest.status >= 400) {
+        if (!editMode) {
+            buttonText = 'Connected';
+
+        } else if (this.isConnecting() || this.isSaving()) {
+            buttonText = 'Connecting...';
+
+        } else if (this.connectionFailed() || this.saveFailed()) {
             buttonText = 'Connect';
             buttonClick = connect;
-            // TODO - Try out locking the home folder and verifying this.
 
-            // Possible errors.
             const connectErrorMessage = pathOr(
                 null, ['content', 'error'], connectRequest
             );
@@ -33,28 +96,18 @@ export default class ConnectButton extends Component {
             );
             const genericErrorMessage = 'Hm... had trouble connecting.';
             const errorMessage = connectErrorMessage || saveErrorMessage || genericErrorMessage;
-            error = <div className={styles.errorMessage}>{errorMessage}</div>;
-        } else if (
-            isLoading(connectRequest.status) ||
-            isLoading(saveConnectionsRequest.status)
-        ) {
-            buttonText = 'Connecting...';
-        } else if (
-            connectRequest.status >= 200 &&
-            connectRequest.status < 300
-        ) {
-            if (editMode) {
-                buttonText = 'Save changes';
-                buttonClick = connect;
-            } else {
-                buttonText = 'Connected';
-            }
-        } else if (!connectRequest.status) {
+            error = <div className={'errorMessage'}>{errorMessage}</div>;
+
+        } else if (this.isConnected() && this.isSaved()) {
+            buttonText = 'Save changes';
+            buttonClick = connect;
+        } else {
             buttonText = 'Connect';
             buttonClick = connect;
         }
-       return (
-            <div className={styles.connectButtonContainer}>
+
+        return (
+            <div className={'connectButtonContainer'}>
                 <button
                     id="test-connect-button"
                     onClick={buttonClick}

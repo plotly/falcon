@@ -1,7 +1,8 @@
-import chai, {assert, expect} from 'chai';
-import spies from 'chai-spies';
+import {assert, expect} from 'chai';
+import sinon from 'sinon';
+
 import fs from 'fs';
-import {contains, dissoc, merge, isEmpty} from 'ramda';
+import {isEmpty} from 'ramda';
 import fetch from 'node-fetch';
 import Servers from '../../backend/routes.js';
 
@@ -20,13 +21,14 @@ import {
 
 const cleanUp = () => {
     ['KEY_FILE', 'CERT_FILE', 'SETTINGS_PATH'].forEach(fileName => {
+        const settingPath = getSetting(fileName);
         try {
-            fs.unlinkSync(getSetting(fileName));
-        } catch (e) {}
+            fs.unlinkSync(settingPath);
+        } catch (e) {
+            // empty intentionally
+        }
     });
 };
-
-chai.use(spies);
 
 const mockedCaServerURL = 'http://localhost:9494/certificate';
 
@@ -133,15 +135,16 @@ describe('Certificates', function() {
         assert.equal(noDaysLeft, 0, 'If last update was 24 days ago, 0 days left.');
     });
 
-    it('Mocks CA server properly. Changed CA url, can take a status, object and return it when endpoint is hit.', (done) => {
+    it('Mocks CA server properly. Changed CA url, can take a status, ' +
+        'object and return it when endpoint is hit.', (done) => {
         ServerCA.start(201, {});
         setTimeout(() => {
             return fetch(mockedCaServerURL, {method: 'POST'})
-            .then(res => res.json().then(json => {
-                assert.deepEqual(json, {});
-                assert.equal(res.status, 201);
-                done();
-            })).catch(done);
+                .then(res => res.json().then(json => {
+                    assert.deepEqual(json, {});
+                    assert.equal(res.status, 201);
+                    done();
+                })).catch(done);
         }, 500);
     });
 
@@ -153,7 +156,6 @@ describe('Certificates', function() {
         assert.equal(certificateSettings.TIMEOUT_BETWEEN_TRIES, 1);
 
         timeoutFetchAndSaveCerts();
-        const {cert, key} = fakeCerts;
         setTimeout(() => {
             // Check that timout was increased
             assert.equal(certificateSettings.TIMEOUT_BETWEEN_TRIES, 60);
@@ -161,7 +163,7 @@ describe('Certificates', function() {
             expect(getCerts()).to.deep.equal({});
             done();
         }, 3000);
-    }).timeout(5000);
+    });
 
     it('timeoutFetchAndSaveCerts - Will create certs if returned status 201 with certificates.', (done) => {
         // Start server that returns the correct response.
@@ -196,7 +198,7 @@ describe('Certificates', function() {
             assert.equal(ServerCA.count, 2);
             done();
         }, 6000);
-    }).timeout(10000);
+    });
 
     it('setRenewalJob - renews certificate after a given time if receives 201 from CA', (done) => {
         ServerCA.start(201, fakeCerts);
@@ -208,7 +210,8 @@ describe('Certificates', function() {
         setTimeout(() => {
             assert.deepEqual(getCerts(), {cert, key});
             assert.equal(ServerCA.count, 1, 'Took one hit to get certificates.');
-            assert.equal(getSetting('CONNECTOR_HTTPS_DOMAIN'), 'plotly--33ffba0f-fc02-4f41-a338-d5f5ff.plotly-connector.com');
+            assert.equal(getSetting('CONNECTOR_HTTPS_DOMAIN'),
+                'plotly--33ffba0f-fc02-4f41-a338-d5f5ff.plotly-connector.com');
             assert.isTrue(
                 (new Date().getTime() - Date.parse(getSetting('CERTIFICATE_LAST_UPDATED'))) / 1000 < 2,
                 'Certificate\'s last update is recent.'
@@ -227,7 +230,7 @@ describe('Certificates', function() {
             );
             done();
         }, 6000);
-    }).timeout(10000);
+    });
 
     it('setRenewalJob - tries again if received a 500 status from CA', (done) => {
         ServerCA.start(500, {error: 'An error occurred.'});
@@ -246,7 +249,7 @@ describe('Certificates', function() {
             assert.deepEqual(getCerts(), {});
             done();
         }, 7000);
-    }).timeout(10000);
+    });
 
     it('setRenewalJob - Restarts the https server.', (done) => { ServerCA.start(201, fakeCerts);
         const {cert, key} = fakeCerts;
@@ -260,18 +263,18 @@ describe('Certificates', function() {
         ServerUnderTest = new Servers({startHTTPS: true, createCerts: false});
         // Set a spy on ServerUnderTest.httpsServer.restart
         saveSetting('USERS', [{username, accessToken}]);
-        ServerUnderTest.httpsServer.restart = chai.spy(() => {});
+        ServerUnderTest.httpsServer.restart = sinon.spy();
         // Make sure restart has not been called yet.
         const {restart} = ServerUnderTest.httpsServer;
         // Renew the certificates in 1s.
-        expect(restart).not.to.have.been.called();
+        assert(restart.notCalled, 'restart should not have been called yet');
         setRenewalJob({server: ServerUnderTest.httpsServer, timeout: 1000});
         setTimeout(() => {
             assert.equal(ServerCA.count, 1, 'Made a call to renew.');
             assert.deepEqual(getCerts(), {cert, key}, 'Real certificates appeared.');
-            expect(restart).to.have.been.called();
+            assert(restart.called, 'restart should have been called');
             done();
         }, 5000);
-    }).timeout(10000);
+    });
 
 });

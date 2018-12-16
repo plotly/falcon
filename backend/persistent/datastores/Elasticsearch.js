@@ -6,13 +6,18 @@ const MAX_RESULTS_SIZE = 10 * 1000;
 
 function request(relativeUrl, connection, {body, method, queryStringParams = ''}) {
     const {host, port, username, password} = connection;
-    const url = `${host}:${port}/${relativeUrl}?format=json${queryStringParams}`;
+    let url;
+    if (typeof port !== 'undefined' && port !== '') {
+        url = `${host}:${port}/${relativeUrl}?format=json${queryStringParams}`;
+    } else {
+        url = `${host}/${relativeUrl}?format=json${queryStringParams}`;
+    }
     const headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     };
     if (username && password) {
-        headers['Authorization'] = 'Basic ' + new Buffer(
+        headers.Authorization = 'Basic ' + new Buffer(
             username + ':' + password
         ).toString('base64');
     }
@@ -27,8 +32,8 @@ export function connect(connection) {
     return request('_cat/indices/', connection, {method: 'GET'});
 }
 
-export function query(query, connection) {
-    const queryObject = JSON.parse(query);
+export function query(queryStmt, connection) {
+    const queryObject = JSON.parse(queryStmt);
     const {body, index, type} = queryObject;
     /*
      * If size is not defined or smaller than 10K, keep scroll disabled and
@@ -54,9 +59,8 @@ export function query(query, connection) {
         .then(res => res.json().then(results => {
             if (res.status === 200) {
                 return parseElasticsearch(body, results, mapping);
-            } else {
-                throw new Error(JSON.stringify(results));
             }
+            throw new Error(JSON.stringify(results));
         }));
     });
 }

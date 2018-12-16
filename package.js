@@ -9,6 +9,7 @@ const cfg = require('./webpack.config.production.js');
 const packager = require('electron-packager');
 const del = require('del');
 const exec = require('child_process').exec;
+const execSync = require('child_process').execSync;
 const argv = require('minimist')(process.argv.slice(2));
 const pkg = require('./package.json');
 const deps = Object.keys(pkg.dependencies);
@@ -28,6 +29,8 @@ const DEFAULT_OPTS = {
     name: appName,
     asar: shouldUseAsar,
     ignore: [
+        '^/scripts($|/)',
+        '^/spec($|/)',
         '^/test($|/)',
         '^/tools($|/)',
         '^/release($|/)',
@@ -37,11 +40,6 @@ const DEFAULT_OPTS = {
     .concat(
         devDeps
         .map(dep => `/node_modules/${dep}($|/)`))
-    .concat(
-        deps
-        .filter(dep => !Object.keys(electronCfg.externals[0]).includes(dep))
-        .map(dep => `/node_modules/${dep}($|/)`)
-    )
 };
 
 const icon = argv.icon || argv.i || 'app/app';
@@ -62,7 +60,32 @@ function build(cfg) {
 }
 
 function startPack() {
-    console.log('start pack...');
+    console.log('start pack: ' + os.platform());
+    /*
+     * Workaround for: https://github.com/ibmdb/node-ibm_db/issues/329
+     * This can be removed once the issue is resolved.
+     */
+    if (os.platform() === 'darwin') {
+        // Surpressed ESLint cause this is a complex command and concatenation would make it harder to maintain
+        // eslint-disable-next-line max-len
+        console.log('Running command:');
+        execSync('echo install_name_tool -change ' +
+                 '`pwd`/node_modules/ibm_db/installer/clidriver/lib/libdb2.dylib ' +
+                 '@loader_path/../../installer/clidriver/lib/libdb2.dylib ' +
+                 'node_modules/ibm_db/build/Release/odbc_bindings.node', {stdio: [0, 1, 2]});
+        execSync('install_name_tool -change ' +
+                 '`pwd`/node_modules/ibm_db/installer/clidriver/lib/libdb2.dylib ' +
+                 '@loader_path/../../installer/clidriver/lib/libdb2.dylib ' +
+                 'node_modules/ibm_db/build/Release/odbc_bindings.node',
+                 function(err, stdout, stderr) {
+                    console.log(stdout);
+                    if (stderr) {
+                        console.warn('An error occured:' + stderr);
+                        return;
+                    }
+                 });
+
+    }
     build(electronCfg)
     .then(() => build(cfg))
     .then(() => del('release'))
@@ -117,6 +140,7 @@ function pack(plat, arch, cb) {
 function log(plat, arch) {
     return (err, filepath) => {
         if (err) return console.error(err);
-        console.log(`${plat}-${arch} finished! see release/${userFriendlyAppNames.plat[plat]}-${userFriendlyAppNames.arch[arch]}`);
+        console.log(`${plat}-${arch} finished! see release/` +
+            `${userFriendlyAppNames.plat[plat]}-${userFriendlyAppNames.arch[arch]}`);
     };
 }

@@ -1,4 +1,4 @@
-import {contains, has, head, replace} from 'ramda';
+import {contains} from 'ramda';
 
 export function dynamicRequireElectron() {
     return window.require('electron');
@@ -38,4 +38,22 @@ export function plotlyUrl() {
         return window.location.origin;
     }
     return 'https://plot.ly';
+}
+
+export function isElectron() {
+    return window.process && window.process.type === 'renderer';
+}
+
+export function homeUrl() {
+    return (isOnPrem()) ?
+        '/external-data-connector' :
+        '';
+}
+
+export function getPathNames(url) {
+    const parser = document.createElement('a');
+    parser.href = url;
+    const pathNames = parser.pathname.split('/');
+
+    return pathNames;
 }

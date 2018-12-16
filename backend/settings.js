@@ -1,5 +1,5 @@
 import fs from 'fs';
-import {concat, contains, has, keys} from 'ramda';
+import {concat, contains, has} from 'ramda';
 import YAML from 'yamljs';
 import {createStoragePath} from './utils/homeFiles';
 import path from 'path';
@@ -13,7 +13,9 @@ const DEFAULT_SETTINGS = {
         '.plotly',
         'connector'
     ),
-
+    AUTH_ENABLED: true,
+    SSL_ENABLED: true,
+    WEB_BASE_PATHNAME: '/',
     PLOTLY_API_SSL_ENABLED: true,
     PLOTLY_API_DOMAIN: 'api.plot.ly',
 
@@ -23,12 +25,21 @@ const DEFAULT_SETTINGS = {
     // TODO - This should just be an object keyed by username
     USERS: [],
 
+    ACCESS_TOKEN: '',
+    ACCESS_TOKEN_EXPIRY: 0,
+    ACCESS_TOKEN_AGE: 300,
+    ALLOWED_USERS: [],
     /*
      * The actual CORS origins is a "derived" setting
      * that is composed of ADDITIONAL_CORS_ALLOWED_ORIGINS,
      * DEFAULT_CORS_ALLOWED_ORIGINS, and the PLOTLY_API_DOMAIN if on-prem
      */
     ADDITIONAL_CORS_ALLOWED_ORIGINS: [],
+
+    /*
+     * Storage size of CSV connector in bytes (0 to disable size limit)
+     */
+    CSV_STORAGE_SIZE: 0,
 
     DEFAULT_CORS_ALLOWED_ORIGINS: [
         'https://plot.ly',
@@ -73,11 +84,10 @@ function getDerivedSetting(settingName) {
     switch (settingName) {
         case 'PLOTLY_URL': {
             if (getSetting('PLOTLY_API_DOMAIN') ===
-                DEFAULT_SETTINGS['PLOTLY_API_DOMAIN']) {
-                return 'https://plot.ly'
-            } else {
-                return getSetting('PLOTLY_API_URL');
+                DEFAULT_SETTINGS.PLOTLY_API_DOMAIN) {
+                return 'https://plot.ly';
             }
+            return getSetting('PLOTLY_API_URL');
         }
 
         case 'PLOTLY_API_URL':
@@ -133,7 +143,7 @@ function getDerivedSetting(settingName) {
              * on-prem
              */
             if (getSetting('PLOTLY_API_DOMAIN') !==
-                    DEFAULT_SETTINGS['PLOTLY_API_DOMAIN']) {
+                    DEFAULT_SETTINGS.PLOTLY_API_DOMAIN) {
 
                 corsOrigins.push(getSetting('PLOTLY_URL'));
 
@@ -155,7 +165,7 @@ export function getSetting(settingName) {
     if (contains(settingName, derivedSettingsNames)) {
         return getDerivedSetting(settingName);
     } else if (has(`PLOTLY_CONNECTOR_${settingName}`, process.env)) {
-        let envObject = process.env[`PLOTLY_CONNECTOR_${settingName}`];
+        const envObject = process.env[`PLOTLY_CONNECTOR_${settingName}`];
         try {
             return JSON.parse(envObject);
         } catch (e) {
@@ -174,18 +184,16 @@ export function getSetting(settingName) {
         }
         if (has(settingName, DEFAULT_SETTINGS)) {
             return DEFAULT_SETTINGS[settingName];
-        } else {
-            throw new Error(`Setting ${settingName} does not exist`);
         }
+        throw new Error(`Setting ${settingName} does not exist`);
     }
 }
 
 function loadSettings() {
     if (fs.existsSync(getSetting('SETTINGS_PATH'))) {
         return YAML.load(getSetting('SETTINGS_PATH'));
-    } else {
-        return {};
     }
+    return {};
 }
 
 // Save settings to a file - primarily used for setting up tests

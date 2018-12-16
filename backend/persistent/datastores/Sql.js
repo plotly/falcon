@@ -1,6 +1,16 @@
 import Sequelize from 'sequelize';
 import {parseSQL} from '../../parse';
-import {contains, dissoc, flatten, gt, has, merge, mergeAll, sort, uniq, values} from 'ramda';
+import {
+    dissoc,
+    gt,
+    has,
+    merge,
+    omit,
+    sort,
+    trim,
+    uniq,
+    values
+} from 'ramda';
 import {DIALECTS} from '../../../app/constants/constants';
 import Logger from '../../logger';
 import fs from 'fs';
@@ -9,8 +19,8 @@ import fs from 'fs';
 const REDSHIFT_OPTIONS = {
     dialect: 'postgres',
     pool: false,
-    keepDefaultTimezone: true,  // avoid SET TIMEZONE
-    databaseVersion: '8.0.2',   // avoid SHOW SERVER_VERSION
+    keepDefaultTimezone: true, // avoid SET TIMEZONE
+    databaseVersion: '8.0.2', // avoid SHOW SERVER_VERSION
     dialectOptions: {
         ssl: true
     }
@@ -20,20 +30,26 @@ const SHOW_TABLES_QUERY = {
     [DIALECTS.MYSQL]: 'SHOW TABLES',
     [DIALECTS.MARIADB]: 'SHOW TABLES',
     [DIALECTS.SQLITE]: 'SELECT name FROM sqlite_master WHERE type="table"',
-    [DIALECTS.POSTGRES]: (
-        'SELECT table_name FROM ' +
-        'information_schema.tables WHERE ' +
-        'table_schema = \'public\''
-    ),
     [DIALECTS.MSSQL]: (
         'SELECT TABLE_NAME FROM ' +
         'information_schema.tables'
     ),
-    [DIALECTS.REDSHIFT]: (
-        'SELECT table_name FROM ' +
-        'information_schema.tables WHERE ' +
-        'table_schema = \'public\''
-    )
+    [DIALECTS.POSTGRES]: `
+        SELECT table_schema || '."'  || table_name || '"'
+        FROM information_schema.tables
+        WHERE table_type != 'VIEW'
+           AND table_schema != 'pg_catalog'
+           AND table_schema != 'information_schema'
+        ORDER BY table_schema, table_name
+    `,
+    [DIALECTS.REDSHIFT]: `
+        SELECT table_schema || '."'  || table_name || '"'
+        FROM information_schema.tables
+        WHERE table_type != 'VIEW'
+           AND table_schema != 'pg_catalog'
+           AND table_schema != 'information_schema'
+        ORDER BY table_schema, table_name
+    `
 };
 
 
@@ -57,7 +73,16 @@ function createClient(connection) {
          * See all options here:
          * http://tediousjs.github.io/tedious/api-connection.html
          */
-        options.dialectOptions.encrypt = true;
+        options.dialectOptions.encrypt = connection.encrypt;
+        const trimmedInstanceName = trim(connection.instanceName || '');
+        if (trimmedInstanceName) {
+            /*
+             * port is mutually exclusive with instance name
+             * see https://github.com/sequelize/sequelize/issues/3097
+             */
+            options = omit(['port'], options);
+            options.dialectOptions.instanceName = trimmedInstanceName;
+        }
         ['connectTimeout', 'requestTimeout'].forEach(timeoutSetting => {
             if (has(timeoutSetting, connection) &&
                 !isNaN(parseInt(connection[timeoutSetting], 10))) {
@@ -80,29 +105,30 @@ export function connect(connection) {
     );
     if (connection.dialect !== 'sqlite') {
         return createClient(connection).authenticate();
-    } else {
-        /*
-         * sqlite's createClient will create a sqlite file even if it
-         * doesn't exist. that means that bad storage parameters won't
-         * reject. Instead of trying `authenticate`, just check if
-         * the file exists.
-         */
-        return new Promise(function(resolve, reject) {
-            if (fs.existsSync(connection.storage)) {
-                resolve();
-            } else {
-                reject(new Error(`SQLite file at path "${connection.storage}" does not exist.`));
-            }
-        })
     }
 
+    /*
+     * sqlite's createClient will create a sqlite file even if it
+     * doesn't exist. that means that bad storage parameters won't
+     * reject. Instead of trying `authenticate`, just check if
+     * the file exists.
+     */
+    return new Promise(function(resolve, reject) {
+        if (fs.existsSync(connection.storage)) {
+            resolve();
+        } else {
+            reject(new Error(`SQLite file at path "${connection.storage}" does not exist.`));
+        }
+    });
 }
 
 export function query(queryString, connection) {
     return createClient(connection).query(
         queryString,
         {type: Sequelize.QueryTypes.SELECT}
-    ).then(results => parseSQL(results));
+    ).then(results => {
+        return parseSQL(results);
+    });
 }
 
 export function tables(connection) {
@@ -113,11 +139,24 @@ export function tables(connection) {
 
         let tableNames;
 
-        if (contains(connection.dialect, ['postgres', 'redshift'])) {
+        if (connection.dialect === 'postgres' || connection.dialect === 'redshift') {
             tableNames = tableList.map(data => {
-                return data[0]
+                let tableName = String(data['?column?']);
+
+                // if schema is public, remove it from table name
+                if (tableName.startsWith('public.')) {
+                    tableName = tableName.substring(7);
+
+                    // if table name is lowercase, remove unnecessary quote marks
+                    const lowercase = tableName.toLowerCase();
+                    if (tableName === lowercase) {
+                        tableName = lowercase.substring(1, lowercase.length - 1);
+                    }
+                }
+
+                return tableName;
             });
-        } else if(connection.dialect === 'sqlite'){
+        } else if (connection.dialect === 'sqlite') {
             tableNames = tableList;
         } else {
             tableNames = tableList.map(object => values(object)[0]);
@@ -126,5 +165,79 @@ export function tables(connection) {
         return uniq(sort((a, b) => gt(a, b) ? 1 : -1, tableNames));
 
     });
+}
 
+export function schemas(connection) {
+    const {database, dialect} = connection;
+
+    // Suppressing ESLint cause single quote strings beside template strings
+    // would be inconvenient when changed queries
+    /* eslint-disable quotes */
+    let queryString;
+    switch (dialect) {
+        case DIALECTS.MYSQL:
+        case DIALECTS.MARIADB:
+            queryString = `SELECT table_name, column_name, data_type FROM information_schema.columns ` +
+                `WHERE table_schema = '${database}' ORDER BY table_name`;
+            break;
+        case DIALECTS.SQLITE:
+            return sqlite_schemas(connection);
+        case DIALECTS.POSTGRES:
+        case DIALECTS.REDSHIFT:
+            queryString = `
+                SELECT table_schema || '."'  || table_name || '"', column_name, data_type
+                FROM information_schema.columns
+                WHERE table_catalog = '${database}'
+                    AND table_schema != 'pg_catalog'
+                    AND table_schema != 'information_schema'
+                ORDER BY table_schema, table_name, column_name
+            `;
+            break;
+        case DIALECTS.MSSQL:
+            queryString = `
+                SELECT T.name AS Table_Name, C.name AS Column_Name, P.name AS Data_Type
+                FROM sys.objects AS T
+                   JOIN sys.columns AS C ON T.object_id = C.object_id
+                   JOIN sys.types AS P ON C.system_type_id = P.system_type_id
+                WHERE T.type_desc = 'USER_TABLE';
+            `;
+            break;
+        default:
+            throw new Error(`Dialect ${dialect} is not one of the SQL DIALECTS`);
+    }
+    /* eslint-enable quotes */
+
+    return query(queryString, connection);
+}
+
+function sqlite_schemas(connection) {
+    // Unfortunately, we need to make one query per table
+    return tables(connection).then(tableNames => {
+        const queries = tableNames.map(tableName => {
+            return createClient(connection).query(
+                `PRAGMA table_info(${tableName})`,
+                {type: Sequelize.QueryTypes.SELECT}
+            );
+        });
+
+        return Promise.all(queries).then(responses => {
+            const schemasResponse = {
+                columnnames: ['table_name', 'column_name', 'data_type'],
+                rows: []
+            };
+
+            responses.forEach((response, index) => {
+                const tableName = tableNames[index];
+                response.forEach(row => {
+                    schemasResponse.rows.push([
+                        tableName,
+                        row.name,
+                        row.type
+                    ]);
+                });
+            });
+
+            return schemasResponse;
+        });
+    });
 }

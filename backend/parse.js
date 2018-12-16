@@ -1,4 +1,4 @@
-import {contains, gt, keys, replace, toString, type} from 'ramda';
+import {contains, keys, replace, type} from 'ramda';
 import parse from 'csv-parse';
 
 export function parseSQL(data) {
@@ -39,10 +39,7 @@ export function parseSQL(data) {
             // Like PostGIS's GeoJSON or Dates
             const cellType = type(cell);
             if (contains(cellType, ['Object', 'Boolean'])) {
-                try {
-                    cell = JSON.stringify(cell);
-                } catch (e) {
-                }
+                cell = JSON.stringify(cell);
             } else if (cellType === 'Date') {
                 /*
                  * JSON.stringify on a date wraps the date in 2 sets of quotes,
@@ -214,55 +211,54 @@ export function parseElasticsearch(inputJson, outputJson, mappings) {
              columnnames: [],
              rows: [[]]
          };
-     } else {
-         const data = outputJson.hits.hits;
+     }
 
-         const elasticColumns = keys(data[0]._source).sort();
-         const columnnames = [];
-         for (let i = 0; i < elasticColumns.length; i++) {
-             const columnName = elasticColumns[i];
-             if (mappings[columnName].type === 'geo_point') {
-                 columnnames.push(`${columnName} (lat)`);
-                 columnnames.push(`${columnName} (lon)`);
-             } else {
-                 columnnames.push(columnName);
-             }
+     const data = outputJson.hits.hits;
+
+     const elasticColumns = keys(data[0]._source).sort();
+     const columnnames = [];
+     for (let i = 0; i < elasticColumns.length; i++) {
+         const columnName = elasticColumns[i];
+         if (mappings[columnName].type === 'geo_point') {
+             columnnames.push(`${columnName} (lat)`);
+             columnnames.push(`${columnName} (lon)`);
+         } else {
+             columnnames.push(columnName);
          }
+     }
 
-         const rows = [];
-         let cell;
-         for (let i = 0; i < data.length; i++) {
-             rows[i] = [];
-             for (let j = 0; j < elasticColumns.length; j++) {
-                 cell = data[i]._source[elasticColumns[j]];
+     const rows = [];
+     let cell;
+     for (let i = 0; i < data.length; i++) {
+         rows[i] = [];
+         for (let j = 0; j < elasticColumns.length; j++) {
+             cell = data[i]._source[elasticColumns[j]];
 
-                 if (mappings[elasticColumns[j]].type === 'geo_point') {
-                     const cellType = type(cell);
-                     if (cellType === 'String' && contains(',', cell)) {
-                         const latlon = cell.split(',');
-                         rows[i].push(parseFloat(latlon[0], 10));
-                         rows[i].push(parseFloat(latlon[1], 10));
-                     } else if (cellType === 'Object') {
-                         rows[i].push(cell.lat);
-                         rows[i].push(cell.lon);
-                     } else if (cellType === 'Array') {
-                         // geo_points as arrays are [lon, lat] not [lat, lon]
-                         rows[i].push(cell[1]);
-                         rows[i].push(cell[0]);
-                     } else {
-                         // geohash and anything that might've slipped through the cracks
-                         rows[i].push(cell);
-                     }
+             if (mappings[elasticColumns[j]].type === 'geo_point') {
+                 const cellType = type(cell);
+                 if (cellType === 'String' && contains(',', cell)) {
+                     const latlon = cell.split(',');
+                     rows[i].push(parseFloat(latlon[0], 10));
+                     rows[i].push(parseFloat(latlon[1], 10));
+                 } else if (cellType === 'Object') {
+                     rows[i].push(cell.lat);
+                     rows[i].push(cell.lon);
+                 } else if (cellType === 'Array') {
+                     // geo_points as arrays are [lon, lat] not [lat, lon]
+                     rows[i].push(cell[1]);
+                     rows[i].push(cell[0]);
                  } else {
+                     // geohash and anything that might've slipped through the cracks
                      rows[i].push(cell);
                  }
-
+             } else {
+                 rows[i].push(cell);
              }
+
          }
-
-         return {columnnames, rows};
-
      }
+
+     return {columnnames, rows};
 }
 
 export function parseCSV(textData) {

@@ -13,7 +13,7 @@
 #
 # Adapted from https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
 
-FROM node:6.11.1
+FROM node:6
 
 # I'd like to install the latest version of npm with something like this:
 # RUN npm install --global npm@4.0.3
@@ -23,6 +23,9 @@ FROM node:6.11.1
 
 # The App saves folders to the `os.homedir()` directory.
 ENV HOME=/home/
+
+# Upgrade yarn to v1
+RUN npm install -g yarn@1
 
 # Create app directory
 RUN mkdir -p /usr/src/app
@@ -41,12 +44,12 @@ ENV PLOTLY_CONNECTOR_LOG_TO_STDOUT="true"
 
 # Install app dependencies
 COPY package.json /usr/src/app
-COPY npm-shrinkwrap.json /usr/src/app
-RUN npm install --no-optional
+COPY yarn.lock /usr/src/app
+RUN yarn install
 
 COPY . /usr/src/app
-RUN npm run heroku-postbuild
+RUN yarn run heroku-postbuild
 
 ENV PLOTLY_CONNECTOR_PORT 9494
 EXPOSE 9494
-CMD [ "node", "/usr/src/app/dist/headless-bundle.js" ]
+ENTRYPOINT yarn run build-web && yarn run start-headless

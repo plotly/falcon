@@ -1,6 +1,11 @@
 import fetch from 'node-fetch';
 import {getSetting} from '../settings.js';
 import Logger from '../logger';
+import FormData from 'form-data';
+
+// Module to access Plot.ly REST API
+//
+// See API documentation at https://api.plot.ly/v2/
 
 export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessToken, method}) {
     let authorization;
@@ -25,6 +30,59 @@ export function PlotlyAPIRequest(relativeUrl, {body, username, apiKey, accessTok
     });
 }
 
+export function newDatacache(payloadJSON, type, requestor) {
+    const form = new FormData();
+    form.append('type', type);
+    form.append('origin', 'Falcon');
+    form.append('payload', payloadJSON);
+    const body = form;
+
+    const users = getSetting('USERS');
+    const user = users.find(
+        u => u.username === requestor
+    );
+
+    if (user) {
+        form.append('username', user.username);
+    }
+
+    /*
+     * Authentication is only required for on-premise private-mode for this
+     * endpoint, so even if the user is not logged in, we should still be able
+     * to proceed with blank `Authorization` header.
+     */
+    let authorization = '';
+    if (user) {
+        const apiKey = user.apiKey;
+        const accessToken = user.accessToken;
+
+        if (apiKey) {
+            authorization = 'Basic ' + new Buffer(
+                requestor + ':' + apiKey
+            ).toString('base64');
+        } else if (accessToken) {
+            authorization = `Bearer ${accessToken}`;
+        }
+    }
+
+    return fetch(`${getSetting('PLOTLY_URL')}/datacache`, {
+        method: 'POST',
+        body: body,
+        headers: {
+            'Authorization': authorization
+        }
+    }).then(res => {
+        if (res.status !== 200) {
+            return res.text().then(text => {
+                throw new Error(`Failed request 'datacache'. Status: ${res.status}. Body: ${text}`);
+            });
+        }
+        return res.json();
+    }).catch(err => {
+        Logger.log(err, 0);
+        throw err;
+    });
+}
 
 export function updateGrid(rows, fid, uids, requestor) {
     const username = requestor;
@@ -95,14 +153,14 @@ export function checkWritePermissions(fid, requestor) {
         apiKey,
         accessToken,
         method: 'GET'
-    }).then(function(res){
+    }).then(function(res) {
         if (res.status === 404) {
             throw new Error('Not found');
         } else if (res.status === 401) {
             throw new Error('Unauthenticated');
         } else if (res.status !== 200) {
-            return res.json().then(json => {
-                throw new Error(`${res.status}: ${JSON.stringify(json, null, 2)}`);
+            return res.text().then(body => {
+                throw new Error(`Failed request 'grids/${fid}'. Status: ${res.status}. Body: ${body}`);
             });
         } else {
             return res.json();
@@ -112,11 +170,10 @@ export function checkWritePermissions(fid, requestor) {
             filemeta.collaborators.results &&
             Boolean(filemeta.collaborators.results.find(collab => requestor === collab.username))
         ) {
-            return new Promise(function(resolve){resolve()});
+            return new Promise(function(resolve) {resolve();});
         } else if (owner === requestor) {
-            return new Promise(function(resolve){resolve()});
-        } else {
-            throw new Error('Permission denied');
+            return new Promise(function(resolve) {resolve();});
         }
-    })
+        throw new Error('Permission denied');
+    });
 }

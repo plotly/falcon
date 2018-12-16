@@ -1,31 +1,39 @@
-import chai, {expect, assert} from 'chai';
-import spies from 'chai-spies';
-chai.use(spies);
+import {assert} from 'chai';
 
 import {
     PlotlyAPIRequest,
     updateGrid
 } from '../../backend/persistent/PlotlyAPI.js';
-import {names, createGrid, username, apiKey} from './utils.js';
 import {saveSetting} from '../../backend/settings.js';
+import {
+    apiKey,
+    assertResponseStatus,
+    createGrid,
+    getResponseJson,
+    names,
+    username
+} from './utils.js';
 
+// Suppressing ESLint cause Mocha ensures `this` is bound in test functions
+/* eslint-disable no-invalid-this */
 describe('Grid API Functions', function () {
-    beforeEach(() => {
+    before(() => {
         saveSetting('USERS', [{username, apiKey}]);
+        saveSetting('PLOTLY_API_DOMAIN', 'api.plot.ly');
+        saveSetting('PLOTLY_API_SSL_ENABLED', true);
     });
 
-    it('updateGrid overwrites a grid with new data', function (done) {
-        this.timeout(15 * 1000);
+    it('updateGrid overwrites a grid with new data', function () {
         // First, create a new grid.
         // Note that the app never actually does this,
         // it works off of the assumption that a grid exists
 
         let fid;
-        createGrid('Test updateGrid').then(res => res.json().then(json => {
-            // Update the grid's data
+        return createGrid('Test updateGrid')
+        .then(assertResponseStatus(201))
+        .then(getResponseJson).then(json => {
             fid = json.file.fid;
             const uids = json.file.cols.map(col => col.uid);
-
             return updateGrid(
                 [
                     ['x', 10, 40, 70, 100, 130],
@@ -36,12 +44,14 @@ describe('Grid API Functions', function () {
                 uids,
                 username
             );
-        })).then(() => {
+        })
+        .then(assertResponseStatus(200))
+        .then(() => {
             const url = `grids/${fid}/content`;
-            // Retrieve the contents from the grid
             return PlotlyAPIRequest(url, {username, apiKey, method: 'GET'});
-        }).then(res => res.json().then(json => {
-            // Test that the update worked
+        })
+        .then(assertResponseStatus(200))
+        .then(getResponseJson).then(json => {
             assert.deepEqual(
                 json.cols[names[0]].data,
                 ['x', 'y', 'z']
@@ -66,8 +76,7 @@ describe('Grid API Functions', function () {
                 json.cols[names[5]].data,
                 [130, 140, 150]
             );
-            done();
-        })).catch(done);
-
+        });
     });
 });
+/* eslint-enable no-invalid-this */

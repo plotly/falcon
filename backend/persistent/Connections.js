@@ -1,11 +1,11 @@
 // Save and load connection objects that contain the DB credentials, host, and more
 
 import fs from 'fs';
-import {assoc, assocPath, dissoc, findIndex, merge} from 'ramda';
-import uuid from 'node-uuid';
+import {assoc, dissoc, findIndex} from 'ramda';
+import uuid from 'uuid';
 import YAML from 'yamljs';
-import Logger from '../logger';
 import * as Datastores from './datastores/Datastores.js';
+import {DIALECTS} from '../../app/constants/constants.js';
 
 import {getSetting} from '../settings';
 
@@ -20,18 +20,16 @@ export function sanitize(connection) {
 export function getConnections() {
     if (fs.existsSync(getSetting('CONNECTIONS_PATH'))) {
         return YAML.load(getSetting('CONNECTIONS_PATH').toString());
-    } else {
-        return [];
     }
+    return [];
 }
 
 export function getSanitizedConnectionById(id) {
     const connection = getConnections().find(c => c.id === id);
     if (connection) {
         return sanitize(connection);
-    } else {
-        return null;
     }
+    return null;
 }
 
 export function getConnectionById(id) {
@@ -42,9 +40,30 @@ export function deleteConnectionById(id) {
     const connections = getConnections();
     const index = findIndex(connection => connection.id === id, connections);
     if (index > -1) {
+        Datastores.disconnect(connections[index]);
         connections.splice(index, 1);
         fs.writeFileSync(getSetting('CONNECTIONS_PATH'), YAML.stringify(connections, 4));
     }
+}
+
+export function deleteBadConnections() {
+    getConnections().forEach(connection => {
+        const {id, dialect} = connection;
+
+        const dialects = Object.getOwnPropertyNames(DIALECTS).map(k => DIALECTS[k]);
+
+        const isUnknownDialect = (dialects.indexOf(dialect) === -1);
+        if (isUnknownDialect) {
+            deleteConnectionById(id);
+        }
+    });
+}
+
+export function deleteAllConnections() {
+    if (!fs.existsSync(getSetting('STORAGE_PATH'))) {
+        createStoragePath();
+    }
+    fs.writeFileSync(getSetting('CONNECTIONS_PATH'), YAML.stringify([], 4));
 }
 
 export function getSanitizedConnections() {
@@ -63,7 +82,7 @@ export function saveConnection(connectionObject) {
     return connectionId;
 }
 
-export function validateConnection (connectionObject) {
+export function validateConnection(connectionObject) {
     return Datastores.connect(connectionObject).then(() => {
         return {};
     }).catch(err => {

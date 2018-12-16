@@ -1,0 +1,33 @@
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode9.0
+      language: node_js
+      node_js: "6"
+      env:
+        - ELECTRON_CACHE=$HOME/.cache/electron
+        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+
+cache:
+  directories:
+  - node_modules
+  - $HOME/.cache/electron
+  - $HOME/.cache/electron-builder
+  yarn: true
+
+install:
+  - yarn install
+
+script:
+  - yarn run build
+  - yarn run pack
+  - zip mac-release.zip release/Falcon* release/*.yml
+
+before_cache:
+  - rm -rf $HOME/.cache/electron-builder/wine
+
+addons:
+  artifacts:
+    s3_region: us-east-1
+    paths: mac-release.zip
+    debug: true

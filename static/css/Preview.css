@@ -1,0 +1,50 @@
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+th, td {
+    border: 1px solid #828282;
+    color: #828282;
+    font-size: 0.875em;
+    padding: 0.3125rem 0.625rem;
+    text-align: left;
+}
+
+.previewContainer {
+    border-radius: 3px;
+    margin: 0 25px 25px 25px;
+    overflow: auto;
+}
+
+.runButton {
+    bottom: 18px;
+    position: absolute;
+    right: 18px;
+    width: 70px;
+    z-index: 10;
+}
+
+.errorStatus pre {
+    background: none;
+    border: none;
+    border-bottom: 1px solid #ebf0f8;
+    color: rgb(211, 96, 70);
+    font-family: 'Ubuntu Mono';
+    font-size: 12px;
+    margin: 0 0 20px 0;
+    max-height: 150px;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.successMsg p {
+    background: none;
+    border: none;
+    color: #00cc96;
+    font-family: 'Ubuntu Mono';
+    font-size: 14px;
+    margin: 0;
+    padding: 20px;
+}

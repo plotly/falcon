@@ -1,11 +1,21 @@
-import React, { Component, PropTypes } from 'react';
-import * as styles from './Tabs.css';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import {LOGOS, DIALECTS} from '../../../constants/constants';
+import {getPathNames} from '../../../utils/utils';
 
-export default class Tab extends Component {
+export default class ConnectionTab extends Component {
     constructor(props) {
         super(props);
+    }
+
+    static propTypes = {
+        tabId: PropTypes.string,
+        isSelected: PropTypes.bool,
+        connectionObject: PropTypes.object,
+        setTab: PropTypes.func,
+        deleteTab: PropTypes.func,
+        isDeletable: PropTypes.bool
     }
 
     render() {
@@ -18,10 +28,25 @@ export default class Tab extends Component {
             label = `S3 - (${connectionObject.bucket})`;
         } else if (dialect === DIALECTS.APACHE_DRILL) {
             label = `Apache Drill (${connectionObject.host})`;
+        } else if (dialect === DIALECTS.APACHE_IMPALA) {
+              label = `Apache Impala (${connectionObject.host}:${connectionObject.port})`;
+        } else if (dialect === DIALECTS.APACHE_SPARK) {
+            label = `Apache Spark (${connectionObject.host}:${connectionObject.port})`;
+        } else if (connectionObject.dialect === DIALECTS.CSV) {
+            label = connectionObject.label || connectionObject.id || connectionObject.database;
         } else if (connectionObject.dialect === DIALECTS.ELASTICSEARCH) {
             label = `Elasticsearch (${connectionObject.host})`;
+        } else if (connectionObject.dialect === DIALECTS.ATHENA) {
+            label = `Athena (${connectionObject.database})`;
         } else if (connectionObject.dialect === DIALECTS.SQLITE) {
             label = connectionObject.storage;
+        } else if (connectionObject.dialect === DIALECTS.DATA_WORLD) {
+            const pathNames = getPathNames(connectionObject.url);
+            if (pathNames.length >= 3) {
+                label = `data.world (${pathNames[1]}/${pathNames[2]})`;
+            } else {
+                label = 'data.world (/)';
+            }
         } else {
             label = `${connectionObject.database} (${connectionObject.username}@${connectionObject.host})`;
         }
@@ -29,13 +54,13 @@ export default class Tab extends Component {
         return (
             <div
                 className={classnames(
-                    styles.tabWrapper,
-                    {[styles.tabWrapperSelected]: isSelected}
+                    'tabWrapper',
+                    {['tabWrapperSelected']: isSelected}
                 )}
             >
                 {isDeletable ?
                     <img
-                        className={styles.tabDelete}
+                        className={'tabDelete'}
                         onClick={() => deleteTab(tabId)}
                         src="images/delete.png"
                         id={`test-tab-delete-${id}`}
@@ -45,13 +70,13 @@ export default class Tab extends Component {
 
                 <span onClick={() => setTab(tabId)}>
                     <img
-                        className={styles.tabLogo}
+                        className={'tabLogo'}
                         src={LOGOS[dialect]}
                         id={`test-tab-id-${id}`}
                     >
                     </img>
 
-                    <p className={styles.tabIdentifier}>
+                    <p className={'tabIdentifier'}>
                         <span>
                             {label}
                         </span>

@@ -16,7 +16,7 @@ export const LOCAL_SETTINGS = {
     DAYS_CERT_IS_GOOD: 24,
     MAX_TRIES_COUNT: 5,
     ONGOING_COUNT: 0,
-    TIMEOUT_BETWEEN_TRIES: 1,  // seconds
+    TIMEOUT_BETWEEN_TRIES: 1, // seconds
     USE_MOCK_CERTS: false,
     CERT_DOMAIN: 'plotly-connector.com'
 };
@@ -62,45 +62,58 @@ export function saveCertsLocally({key, cert, subdomain}) {
 }
 
 export function fetchCertsFromCA() {
-    const {username, accessToken} = getSetting('USERS')[0];
-    Logger.log('Sending request to the CA:' + LOCAL_SETTINGS.CA_HOST_URL);
-    return fetch(
-        `${LOCAL_SETTINGS.CA_HOST_URL}`, {
-            method: 'POST',
-            body: JSON.stringify({
-                credentials: {
-                    username,
-                    access_token: accessToken,
-                    plotly_api_domain: getSetting('PLOTLY_API_URL')
-                }
-            })
-        }
-    ).then((res) => {
+    return new Promise(function(resolve) {
+        const {username, accessToken} = getSetting('USERS')[0];
+        Logger.log('Sending request to the CA:' + LOCAL_SETTINGS.CA_HOST_URL);
+        return resolve(fetch(
+            `${LOCAL_SETTINGS.CA_HOST_URL}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    credentials: {
+                        username,
+                        access_token: accessToken,
+                        plotly_api_domain: getSetting('PLOTLY_API_URL')
+                    }
+                })
+            }
+        ));
+    }).then((res) => {
         if (res.status !== 201) {
-            let errorMessage = `An error occured requesting certificates from the CA, status ${res.status} was returned. `;
-            res.json().then(json => {
+            let errorMessage =
+                'An error occured requesting certificates from the CA, ' +
+                `status ${res.status} was returned.`;
+
+            return res.json().then(json => {
                 errorMessage += `JSON response was: ${JSON.stringify(json)}`;
-                Logger.log(errorMessage, 0);
-                return errorMessage;
-            }).catch(e => {
-                throw errorMessage;
-            }).then(() => {
-                throw errorMessage;
+            })
+            .catch(() => {
+                // ignore failure to parse response as json
+            })
+            .then(() => {
+                // report error to request certificates from the CA
+                throw new Error(errorMessage);
             });
         }
+
         return res.json();
     }).catch((e) => {
-        Logger.log(`CA Server fails to respond. ${JSON.stringify(e)}`, 0);
+        Logger.log(`CA Server fails to respond. ${e.message}`, 0);
+
         if (e.code === 'ECONNREFUSED') {
             Logger.log('Caught ECONNREFUSED from CA server.', 0);
+
             // If server is down, increase TIMEOUT to try a 1 minute later.
             setCertificatesSettings('TIMEOUT_BETWEEN_TRIES', 60);
+
+            return;
         }
+
+        throw e;
     });
 }
 
 export function mockFetchCertsFromCA() {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
         resolve(fakeCerts);
     });
 }
@@ -122,7 +135,7 @@ export function fetchAndSaveCerts() {
     }
     return fetchCerts().then(response => {
         if (!response.key || !response.cert || !response.subdomain) {
-            throw 'CA did not return one or more of [key, cert, subdomain].';
+            throw new Error('CA did not return one or more of [key, cert, subdomain].');
         }
         Logger.log('Received a successful response from the CA.');
         return saveCertsLocally(response);
@@ -145,7 +158,7 @@ export function timeoutFetchAndSaveCerts(callback = () => {}) {
                 `Failed to restart the https server. Please restart manually. ${e}.
             `);
         }
-    }).catch((e) => {
+    }).catch(() => {
         // Retry calling CA if less than max count of tries.
         const {ONGOING_COUNT, MAX_TRIES_COUNT, TIMEOUT_BETWEEN_TRIES} = LOCAL_SETTINGS;
         if (ONGOING_COUNT < MAX_TRIES_COUNT) {

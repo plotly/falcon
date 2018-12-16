@@ -1,7 +1,12 @@
-var restify = require('restify');
-import * as Datastores from './persistent/datastores/Datastores.js';
-import * as fs from 'fs';
+const restify = require('restify');
+const CookieParser = require('restify-cookies');
+const fetch = require('node-fetch');
 
+import * as fs from 'fs';
+import path from 'path';
+
+import * as Datastores from './persistent/datastores/Datastores.js';
+import {PlotlyOAuth} from './plugins/authorization.js';
 import {getQueries, getQuery, deleteQuery} from './persistent/Queries';
 import {
     deleteConnectionById,
@@ -16,11 +21,13 @@ import {
 } from './persistent/Connections.js';
 import QueryScheduler from './persistent/QueryScheduler.js';
 import {getSetting, saveSetting} from './settings.js';
-import {checkWritePermissions} from './persistent/PlotlyAPI.js';
-import {contains, has, keys, isEmpty, merge, pluck} from 'ramda';
+import {generateAndSaveAccessToken} from './utils/authUtils';
+import {getAccessTokenCookieOptions, getCookieOptions} from './constants';
+import {checkWritePermissions, newDatacache} from './persistent/PlotlyAPI.js';
+import {contains, keys, isEmpty, merge, pluck} from 'ramda';
 import {getCerts, timeoutFetchAndSaveCerts, setRenewalJob} from './certificates';
 import Logger from './logger';
-import fetch from 'node-fetch';
+import init from './init.js';
 
 export default class Servers {
     /*
@@ -28,7 +35,9 @@ export default class Servers {
      * The httpServer is always open for oauth.
      * The httpsServer starts when certificates have been created.
      */
-    constructor(args = {createCerts: true, startHttps: true}) {
+    constructor(args = {createCerts: true, startHttps: true, isElectron: false}) {
+        init();
+
         this.httpServer = {
             port: null,
             server: null,
@@ -42,6 +51,7 @@ export default class Servers {
             protocol: null,
             domain: null
         };
+        this.isElectron = args.isElectron;
 
         /*
          * `args` is of form {protocol: 'HTTP', createCerts: true}
@@ -57,7 +67,7 @@ export default class Servers {
         this.httpServer.protocol = 'http';
         this.httpServer.domain = 'localhost';
 
-        if (args.startHttps && !getSetting('IS_RUNNING_INSIDE_ON_PREM')) {
+        if (args.startHttps && !getSetting('IS_RUNNING_INSIDE_ON_PREM') && this.isElectron) {
             // Create certs if necessary when we have an approved user.
             if (args.createCerts && isEmpty(getCerts())) {
                 const createCertificates = setInterval(() => {
@@ -90,8 +100,17 @@ export default class Servers {
         this.httpsServer.start = this.startHttpsServer.bind(this);
         this.httpsServer.restart = this.restartHttpsServer.bind(this);
 
-        this.httpServer.close = this.close.bind(this);
-        this.httpsServer.close = this.closeHttpsServer.bind(this);
+        this.httpServer.close = function() {
+            Logger.log('Closing the http server.');
+            const server = this.httpServer.server;
+            server.close.apply(server, arguments);
+        }.bind(this);
+
+        this.httpsServer.close = function() {
+            Logger.log('Closing the https server.');
+            const server = this.httpsServer.server;
+            server.close.apply(server, arguments);
+        }.bind(this);
     }
 
     startHttpsServer() {
@@ -121,10 +140,20 @@ export default class Servers {
         const that = this;
         const restifyServer = type === 'https' ? that.httpsServer : that.httpServer;
         const {server} = restifyServer;
+
+        that.electronWindow = that.httpsServer.electronWindow || that.httpServer.electronWindow;
+
+        server.use(CookieParser.parse);
+        server.use(PlotlyOAuth(Boolean(that.isElectron)));
+
         server.use(restify.queryParser());
         server.use(restify.bodyParser({mapParams: true}));
         server.pre(function (request, response, next) {
             Logger.log(`Request: ${request.href()}`, 2);
+            next();
+        });
+        server.use(function (request, response, next) {
+            Logger.log(`Response: ${request.href()}`, 2);
             next();
         });
 
@@ -159,10 +188,10 @@ export default class Servers {
         Logger.log('CORS_ALLOWED_ORIGINS: ' + JSON.stringify(
             getSetting('CORS_ALLOWED_ORIGINS')
         ), 2);
-        server.opts( /.*/, function (req, res) {
+        server.opts(/.*/, function (req, res) {
             res.header(
                 'Access-Control-Allow-Headers',
-                restify.CORS.ALLOW_HEADERS.join( ', ' )
+                restify.CORS.ALLOW_HEADERS.join(', ')
             );
             res.header(
                 'Access-Control-Allow-Methods',
@@ -207,7 +236,8 @@ export default class Servers {
                 PLOTLY_URL: getSetting('PLOTLY_URL')
             };
 
-            return res.json(200, filteredSettings)
+            res.json(200, filteredSettings);
+            return next();
         });
 
         // Patch on /settings does a merge
@@ -216,7 +246,8 @@ export default class Servers {
             keys(partialSettings).forEach(settingName =>
                 saveSetting(settingName, partialSettings[settingName])
             );
-            return res.json(200, {});
+            res.json(200, {});
+            return next();
         });
 
         // TODO - urls isn't actually a setting, it's more of a config
@@ -227,67 +258,125 @@ export default class Servers {
                 ? `${httpsServer.protocol}://${httpsServer.domain}:${httpsServer.port}`
                 : '';
             res.json(200, {http: HTTP_URL, https: HTTPS_URL});
+            return next();
         });
 
-        server.post(/\/oauth2\/token\/?$/, function saveOauth(req, res, next) {
+        server.post(/\/oauth2\/?$/, function saveOauth(req, res, next) {
             const {access_token} = req.params;
             Logger.log(`Checking token ${access_token} against ${getSetting('PLOTLY_API_URL')}/v2/users/current`);
             fetch(`${getSetting('PLOTLY_API_URL')}/v2/users/current`, {
                 headers: {'Authorization': `Bearer ${access_token}`}
             })
-            .then(userRes => userRes.json().then(userMeta => {
-                if (userRes.status === 200) {
+            .then(userRes => {
+                if (userRes.status !== 200) {
+                    return userRes.text().then(body => {
+                        const errorMessage = `Error fetching user. Status: ${userRes.status}. Body: ${body}.`;
+                        Logger.log(errorMessage, 0);
+                        res.json(500, {error: {message: errorMessage}});
+                        return next();
+                    });
+                }
+
+                return userRes.json().then(userMeta => {
                     const {username} = userMeta;
                     if (!username) {
                         res.json(500, {error: {message: `User was not found at ${getSetting('PLOTLY_API_URL')}`}});
-                        return;
+                        return next();
                     }
-                    const existingUsers = getSetting('USERS');
-                    const existingUsernames = pluck('username', existingUsers);
-                    let status;
-                    if (contains(username, existingUsernames)) {
-                        existingUsers[
-                            existingUsernames.indexOf(username)
-                        ].accessToken = access_token;
-                        status = 200;
-                    } else {
-                        existingUsers.push({username, accessToken: access_token});
-                        status = 201;
+
+                    /*
+                     * Allow users access to app if any one of the following conditions apply:
+                     * 1. username is present in `ALLOWED_USERS` setting.
+                     * 2. The app is running locally (as electron-app).
+                     * 3. Authentication is disabled.
+                     * 4. The app is running on-premise.
+                     */
+                    if (contains(username, getSetting('ALLOWED_USERS')) || that.isElectron ||
+                        !getSetting('AUTH_ENABLED') || getSetting('IS_RUNNING_INSIDE_ON_PREM')) {
+                        res.setCookie('plotly-auth-token', access_token, getCookieOptions());
+
+                        const db_connector_access_token = generateAndSaveAccessToken();
+                        res.setCookie('db-connector-auth-token',
+                                      db_connector_access_token,
+                                      getAccessTokenCookieOptions());
+                        res.setCookie('db-connector-user', username, getCookieOptions());
+
+                        const existingUsers = getSetting('USERS');
+                        const existingUsernames = pluck('username', existingUsers);
+                        let status;
+
+                        if (contains(username, existingUsernames)) {
+                            existingUsers[
+                                existingUsernames.indexOf(username)
+                            ].accessToken = access_token;
+                            status = 200;
+                        } else {
+                            existingUsers.push({username, accessToken: access_token});
+                            status = 201;
+                        }
+                        saveSetting('USERS', existingUsers);
+
+                        if (getSetting('IS_RUNNING_INSIDE_ON_PREM') &&
+                            !contains(username, getSetting('ALLOWED_USERS'))) {
+
+                            // Add user to ALLOWED_USERS:
+                            const allowedUsers = getSetting('ALLOWED_USERS');
+                            allowedUsers.push(username);
+                            saveSetting('ALLOWED_USERS', allowedUsers);
+                        }
+                        if (that.isElectron) {
+                            /*
+                             * This part is handled separately for electron-app
+                             * because electron apps does not support cookies
+                             * like browsers do.
+                             */
+                            that.electronWindow.loadURL(`${protocol}://${domain}:${port}/`);
+                            that.electronWindow.webContents.on('did-finish-load', () => {
+                                that.electronWindow.webContents.send('username', username);
+                            });
+                        }
+                        res.json(status, {});
+                        return next();
                     }
-                    saveSetting('USERS', existingUsers);
-                    res.json(status, {});
-                } else {
-                    Logger.log(userMeta, 0);
-                    res.json(500, {error: {message: `Error ${userRes.status} fetching user`}});
-                }
-            }))
-            .catch(err => {
-                Logger.log(err, 0);
-                res.json(500, {error: {message: err.message}});
+                    res.json(403, {error: {message: `User ${username} is not allowed to view this app`}});
+                    return next();
+                })
+                .catch(err => {
+                    Logger.log(err, 0);
+                    res.json(500, {error: {message: err.message}});
+                    return next();
+                });
             });
         });
 
         // Keeping the base route to have backwards compatibility.
         server.get('/', restify.serveStatic({
             directory: `${__dirname}/../static`,
-            file: 'login.html'
+            file: 'index.html'
         }));
 
-        server.get('/database-connector', restify.serveStatic({
+        server.post('/logout', function logoutHandler(req, res, next) {
+            req.logout();
+            res.redirect('/', next);
+        });
+
+        server.get('/login', restify.serveStatic({
             directory: `${__dirname}/../static`,
             file: 'index.html'
         }));
 
         server.get('/status', function statusHandler(req, res, next) {
             res.send('Connector status - running and available for requests.');
+            return next();
         });
 
         server.get('/ping', function pingHandler(req, res, next) {
             res.json(200, {message: 'pong'});
+            return next();
         });
 
         // Hidden URL to test uncaught exceptions
-        server.post('/_throw', function throwHandler(req, res, next) {
+        server.post('/_throw', function throwHandler() {
             throw new Error('Yikes - uncaught error');
         });
 
@@ -310,33 +399,35 @@ export default class Servers {
                 sanitize(req.params)
             );
             if (connectionsOnFile) {
-                res.send(409, {connectionId: connectionsOnFile.id});
-                return;
-            } else {
-
-                // Check that the connections are valid
-                const connectionObject = req.params;
-                validateConnection(req.params).then(validation => {
-                    if (isEmpty(validation)) {
-                        res.json(200, {connectionId: saveConnection(req.params)});
-                        return;
-                    } else {
-                        Logger.log(validation, 2);
-                        res.json(400, {error: {message: validation.message}
-                        });
-                        return;
-                    }
-                }).catch(err => {
-                    Logger.log(err, 2);
-                    res.json(400, {error: {message: err.message}
-                    });
-                });
+                res.json(409, {connectionId: connectionsOnFile.id});
+                return next();
             }
+
+            // Check that the connections are valid
+            validateConnection(req.params).then(validation => {
+                if (isEmpty(validation)) {
+                    res.json(200, {connectionId: saveConnection(req.params)});
+                    return next();
+                }
+
+                Logger.log(validation, 2);
+                res.json(400, {
+                    error: {message: validation.message}
+                });
+                return next();
+            }).catch(err => {
+                Logger.log(err, 2);
+                res.json(400, {
+                    error: {message: err.message}
+                });
+                return next();
+            });
         });
 
         // return sanitized connections
         server.get('/connections', function getDatastoresHandler(req, res, next) {
             res.json(200, getSanitizedConnections());
+            return next();
         });
 
         /*
@@ -347,28 +438,31 @@ export default class Servers {
             const connection = getSanitizedConnectionById(req.params.id);
             if (connection) {
                 res.json(200, connection);
-            } else {
-                res.json(404, {});
+                return next();
             }
+            res.json(404, {});
+            return next();
         });
 
         server.put('/connections/:id', (req, res, next) => {
             const connectionExists = getSanitizedConnectionById(req.params.id);
             if (!connectionExists) {
                 res.json(404, {});
-                return;
+                return next();
             }
             // continue knowing that the id exists already
             validateConnection(req.params).then(validation => {
                 if (isEmpty(validation)) {
                     res.json(200, editConnectionById(req.params));
-                } else {
-                    Logger.log(validation, 2);
-                    res.json(400, {error: validation.message});
+                    return next();
                 }
+                Logger.log(validation, 2);
+                res.json(400, {error: validation.message});
+                return next();
             }).catch(err => {
                 Logger.log(err, 2);
                 res.json(400, {error: err.message});
+                return next();
             });
         });
 
@@ -378,9 +472,10 @@ export default class Servers {
             if (getSanitizedConnectionById(req.params.id)) {
                 deleteConnectionById(req.params.id);
                 res.json(200, {});
-            } else {
-                res.json(404, {});
+                return next();
             }
+            res.json(404, {});
+            return next();
         });
 
         /* Connect */
@@ -388,6 +483,7 @@ export default class Servers {
             Datastores.connect(getConnectionById(req.params.connectionId))
             .then(() => {
                 res.json(200, {});
+                return next();
             });
         });
 
@@ -400,9 +496,10 @@ export default class Servers {
                 getConnectionById(req.params.connectionId)
             ).then(rows => {
                 res.json(200, rows);
-                next();
+                return next();
             }).catch(error => {
                 res.json(400, {error: {message: error.message}});
+                return next();
             });
         });
 
@@ -419,8 +516,22 @@ export default class Servers {
                 getConnectionById(req.params.connectionId)
             ).then(tables => {
                 res.json(200, tables);
+                return next();
             }).catch(error => {
                 res.json(500, {error: {message: error.message}});
+                return next();
+            });
+        });
+
+        server.post('/connections/:connectionId/sql-schemas', function schemasHandler(req, res, next) {
+            Datastores.schemas(
+                getConnectionById(req.params.connectionId)
+            ).then(schemas => {
+                res.json(200, schemas);
+                return next();
+            }).catch(error => {
+                res.json(500, {error: {message: error.message}});
+                return next();
             });
         });
 
@@ -429,39 +540,79 @@ export default class Servers {
                 getConnectionById(req.params.connectionId)
             ).then(files => {
                 res.json(200, files);
+                return next();
             }).catch(error => {
                 res.json(500, {error: {message: error.message}});
+                return next();
             });
         });
 
-        server.post('/connections/:connectionId/apache-drill-storage', function apacheDrillStorageHandler(req, res, next) {
-            Datastores.storage(
-                getConnectionById(req.params.connectionId)
-            ).then(files => {
-                res.json(200, files);
-            }).catch(error => {
-                res.json(500, {error: {message: error.message}});
+        server.post('/connections/:connectionId/apache-drill-storage',
+            function apacheDrillStorageHandler(req, res, next) {
+                Datastores.storage(
+                    getConnectionById(req.params.connectionId)
+                ).then(files => {
+                    res.json(200, files);
+                    return next();
+                }).catch(error => {
+                    res.json(500, {error: {message: error.message}});
+                    return next();
+                });
             });
-        });
 
-        server.post('/connections/:connectionId/apache-drill-s3-keys', function apacheDrills3KeysHandler(req, res, next) {
-            Datastores.listS3Files(
-                getConnectionById(req.params.connectionId)
-            ).then(files => {
-                res.json(200, files);
-            }).catch(error => {
-                res.json(500, {error: {message: error.message}});
+        server.post('/connections/:connectionId/apache-drill-s3-keys',
+            function apacheDrills3KeysHandler(req, res, next) {
+                Datastores.listS3Files(
+                    getConnectionById(req.params.connectionId)
+                ).then(files => {
+                    res.json(200, files);
+                    return next();
+                }).catch(error => {
+                    res.json(500, {error: {message: error.message}});
+                    return next();
+                });
             });
-        });
 
-        server.post('/connections/:connectionId/elasticsearch-mappings', function elasticsearchMappingsHandler(req, res, next) {
-            Datastores.elasticsearchMappings(
-                getConnectionById(req.params.connectionId)
-            ).then(mappings => {
-                res.json(200, mappings);
-            }).catch(error => {
-                res.json(500, {error: {message: error.message}});
+        server.post('/connections/:connectionId/elasticsearch-mappings',
+            function elasticsearchMappingsHandler(req, res, next) {
+                Datastores.elasticsearchMappings(
+                    getConnectionById(req.params.connectionId)
+                ).then(mappings => {
+                    res.json(200, mappings);
+                    return next();
+                }).catch(error => {
+                    res.json(500, {error: {message: error.message}});
+                    return next();
+                });
             });
+
+        /* Plotly v2 API requests */
+
+        server.post('/datacache', function getDatacacheHandler(req, res, next) {
+            const {payload, requestor, type: contentType} = req.params;
+
+            if (contentType !== 'csv') {
+                const datacacheResp = newDatacache(payload, contentType, requestor);
+                datacacheResp.then(json => {
+                    res.json(200, json);
+                    return next();
+                }).catch(error => {
+                    res.json(500, {error: {message: error.message}});
+                    return next();
+                });
+            }
+            else {
+                const rand = Math.round(Math.random() * 1000).toString();
+                const downloadPath = path.join(getSetting('STORAGE_PATH'), `data_export_${rand}.csv`);
+                fs.writeFile(downloadPath, payload, (err) => {
+                    if (err) {
+                        res.json({type: 'error', message: err});
+                        return next();
+                    }
+                    res.json({type: 'csv', url: 'file:///'.concat(downloadPath)});
+                    return next();
+                });
+            }
         });
 
         /* Persistent Datastores */
@@ -469,15 +620,17 @@ export default class Servers {
         // return the list of registered queries
         server.get('/queries', function getQueriesHandler(req, res, next) {
             res.json(200, getQueries());
+            return next();
         });
 
         server.get('/queries/:fid', function getQueriesFidHandler(req, res, next) {
             const query = getQuery(req.params.fid);
             if (query) {
                 res.json(200, query);
-            } else {
-                res.json(404, {});
+                return next();
             }
+            res.json(404, {});
+            return next();
         });
 
         // register or overwrite a query
@@ -508,10 +661,12 @@ export default class Servers {
                 }
                 that.queryScheduler.scheduleQuery(req.params);
                 res.json(status, {});
+                return next();
             })
             .catch(function returnError(error) {
                 Logger.log(error, 0);
                 res.json(400, {error: {message: error.message}});
+                return next();
             });
 
         });
@@ -528,9 +683,10 @@ export default class Servers {
                  * a little easier to write
                  */
                 res.json(200, {});
-            } else {
-                res.json(404, {});
+                return next();
             }
+            res.json(404, {});
+            return next();
         });
 
         // Transform restify's error messages into our standard error object
@@ -551,18 +707,5 @@ export default class Servers {
                 error: {message: err.message}
             });
         });
-    }
-
-    closeHttpsServer() {
-        const that = this;
-        that.close('https');
-    }
-
-    close(type = 'http') {
-        Logger.log(`Closing the ${type} server.`);
-        const that = this;
-        const restifyServer = type === 'https' ? that.httpsServer : that.httpServer;
-        const {server} = restifyServer;
-        server.close();
     }
 }

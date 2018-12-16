@@ -16,9 +16,8 @@ export function getQuery(fid) {
 export function getQueries() {
     if (fs.existsSync(getSetting('QUERIES_PATH'))) {
         return YAML.load(getSetting('QUERIES_PATH').toString());
-    } else {
-        return [];
     }
+    return [];
 }
 
 export function saveQuery(queryObject) {

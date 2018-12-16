@@ -1,12 +1,11 @@
-import React, {Component, PropTypes} from 'react';
-import ImmutablePropTypes from 'react-immutable-proptypes';
-import * as styles from './UserConnections.css';
-import {contains, head, flatten, keys, values} from 'ramda';
-import {
-    CONNECTION_CONFIG, CONNECTION_OPTIONS, DIALECTS, LOGOS
-} from '../../../constants/constants';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import Filedrop from './filedrop.jsx';
+
+import {contains} from 'ramda';
+
+import {CONNECTION_CONFIG, SAMPLE_DBS} from '../../../constants/constants';
 import {dynamicRequireElectron} from '../../../utils/utils';
-import classnames from 'classnames';
 
 let dialog;
 try {
@@ -16,57 +15,89 @@ try {
 }
 
 /*
- *	Displays and alters user inputs for `configuration`
- *	username, password, and local port number.
+ *  Displays and alters user inputs for `configuration`
+ *  username, password, and local port number.
 */
 
 
 export default class UserConnections extends Component {
     constructor(props) {
         super(props);
-		this.getStorageOnClick = this.getStorageOnClick.bind(this);
-		this.testClass = this.testClass.bind(this);
+        this.getStorageOnClick = this.getStorageOnClick.bind(this);
+        this.testClass = this.testClass.bind(this);
+        this.toggleSampleCredentials = this.toggleSampleCredentials.bind(this);
+
+        this.state = {showSampleCredentials: false};
     }
 
-	testClass() {
-		/*
-			No internal tests for now.
-		*/
 
-		return 'test-input-created';
-	}
 
-	getStorageOnClick(setting) {
+    toggleSampleCredentials() {
+        this.setState({showSampleCredentials: !this.state.showSampleCredentials});
+    }
+
+    testClass() {
+        /*
+            No internal tests for now.
+        */
+
+        return 'test-input-created';
+    }
+
+    getStorageOnClick(setting) {
         // sqlite requires a path
-		return () => {
-			dialog.showOpenDialog({
-				properties: ['openFile', 'openDirectory'],
-				filters: [{name: 'databases', extensions: ['db']}]
-			}, (paths) => {
-				// result returned in an array
-				// TODO: add length of paths === 0 check
-				// TODO: add path non null check
-				const path = head(paths);
-				this.props.updateConnection({
-					[setting.value]: paths[0]
-				});
-			});
-		};
-	}
+        return () => {
+            dialog.showOpenDialog({
+                properties: ['openFile'],
+                filters: [{
+                    name: 'databases',
+                    // pulled from https://stackoverflow.com/a/47096815/4142536
+                    extensions: [
+                        'db',
+                        'sdb',
+                        'sqlite',
+                        'db3',
+                        's3db',
+                        'sqlite3',
+                        'sl3',
+                        'db2',
+                        's2db',
+                        'sqlite2',
+                        'sl2'
+                    ]
+                }]
+            }, (paths) => {
+                if (!paths || !paths.length) return;
+                this.props.updateConnection({
+                    [setting.value]: paths[0]
+                });
+            });
+        };
+    }
 
-	render() {
+    render() {
 
-		const {connectionObject, updateConnection} = this.props;
-		const inputs = CONNECTION_CONFIG[connectionObject.dialect]
-			.map(setting => {
+        const {connectionObject, updateConnection} = this.props;
+        const sampleCredentialsStyle = {
+            lineHeight: 1,
+            textAlign: 'left',
+            width: '100%',
+            maxWidth: 200,
+            overflowWrap: 'break-word',
+            display: this.state.showSampleCredentials ? 'inline-block' : 'none'
+        };
+
+        const inputs = CONNECTION_CONFIG[connectionObject.dialect]
+            .map(setting => {
                 let input;
+                const dialect = connectionObject.dialect;
                 if (contains(setting.type, ['text', 'number', 'password'])) {
                     input = (
-                        <div className={styles.inputContainer}>
-                            <label className={styles.label}>
+                        <div className={'inputContainer'}>
+                            <label className={'label'}>
                                 {setting.label}
                             </label>
-                            <div className={styles.wrapInput}>
+                            <div className={'wrapInput'}>
                                 <input className={this.testClass()}
                                     onChange={e => (updateConnection({
                                         [setting.value]: e.target.value
@@ -76,16 +107,21 @@ export default class UserConnections extends Component {
                                     placeholder={setting.placeholder}
                                     type={setting.type}
                                 />
+                                <div style={sampleCredentialsStyle}>
+                                    <code>
+                                        {(SAMPLE_DBS[dialect]) ? SAMPLE_DBS[dialect][setting.value] : null}
+                                    </code>
+                                </div>
                             </div>
                         </div>
                     );
                 } else if (setting.type === 'path') {
                     input = (
-                        <div className={styles.inputContainer}>
-                            <label className={styles.label}>
+                        <div className={'inputContainer'}>
+                            <label className={'label'}>
                                 {setting.label}
                             </label>
-                            <div className={styles.wrapInput}>
+                            <div className={'wrapInput'}>
                                 <input className={this.testClass()}
                                     onClick={this.getStorageOnClick(setting)}
                                     value={connectionObject[setting.value]}
@@ -98,12 +134,13 @@ export default class UserConnections extends Component {
                     );
                 } else if (setting.type === 'checkbox') {
                     input = (
-                        <div className={styles.inputContainer}>
-                            <label className={styles.label}>
+                        <div className={'inputContainer'}>
+                            <label className={'label'}>
                                 {setting.label}
                             </label>
-                            <div className={styles.wrapInput}>
+                            <div className={'wrapInput'}>
                                 <input
+                                    checked={connectionObject[setting.value]}
                                     type="checkbox"
                                     onChange={() => {
                                         updateConnection({
@@ -117,6 +154,15 @@ export default class UserConnections extends Component {
                             </div>
                         </div>
                     );
+                } else if (setting.type === 'filedrop') {
+                    input = (
+                        <Filedrop
+                            settings={setting}
+                            connection={connectionObject}
+                            updateConnection={updateConnection}
+                            sampleCredentialsStyle={sampleCredentialsStyle}
+                        />
+                    );
                 }
 
                 return (
@@ -124,7 +170,7 @@ export default class UserConnections extends Component {
                         {input}
                         {
                             setting.description ? (
-                                <div className={styles.description}>
+                                <div className={'description'}>
                                     {setting.description}
                                 </div>
                             ) : null
@@ -133,12 +179,21 @@ export default class UserConnections extends Component {
                 );
         });
 
-		return (
+        return (
             <div>
                 {inputs}
+                {connectionObject.dialect !== 'sqlite' &&
+                    <small className="sampleCredentials">
+                        <a onClick={this.toggleSampleCredentials}>
+                            {this.state.showSampleCredentials && 'Hide Sample Credentials'}
+                            {!this.state.showSampleCredentials && 'Show Sample Credentials'}
+                        </a>
+                    </small>
+                }
             </div>
-		);
-	}
+
+        );
+    }
 }
 
 UserConnections.propTypes = {

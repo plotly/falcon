@@ -1,0 +1,35 @@
+.openTab {
+    background: rgb(251, 252, 253);
+    border-bottom: 1px solid #c8dfe3;
+    border-left: 1px solid #c8dfe3;
+    border-radius: 0 0 6px 6px;
+    border-right: 1px solid #c8dfe3;
+}
+
+.configurationContainer {
+    font-family: 'Ubuntu';
+    text-align: center;
+    width: 100%;
+}
+
+.disabledSection {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.info {
+    font-size: 14px;
+    padding: 25px;
+}
+
+.dialectSelector {
+    display: inline-block;
+}
+
+.editButtonContainer {
+    margin: 20px 0;
+}
+
+.url {
+    text-decoration: underline;
+}

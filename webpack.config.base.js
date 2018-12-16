@@ -2,13 +2,20 @@ import path from 'path';
 
 export default {
     module: {
-        loaders: [{
+        noParse: [/alasql/],
+        rules: [{
             test: /\.jsx?$/,
-            loaders: ['babel-loader'],
+            use: [{
+                loader: 'babel-loader'
+            }],
             exclude: /node_modules/
         }, {
-            test: /\.json$/,
-            loader: 'json-loader'
+            test: /\.css$/,
+            use: [{
+                loader: 'style-loader'
+            }, {
+                loader: 'css-loader'
+            }]
         }]
     },
     output: {
@@ -17,32 +24,25 @@ export default {
         libraryTarget: 'commonjs2'
     },
     resolve: {
-        extensions: ['', '.js', '.jsx'],
-        packageMains: [
-            'webpack',
-            'browser',
-            'web',
-            'browserify',
-            ['jam', 'main'],
-            'main'
-        ]
+        extensions: ['.js', '.jsx']
     },
     plugins: [
-
     ],
     externals: [
         {
+            'csv-parse': 'commonjs csv-parse',
+            'data-urls': 'commonjs data-urls',
+            'font-awesome': 'font-awesome',
+            'ibm_db': 'commonjs ibm_db',
             'mysql': 'mysql',
             'pg': 'pg',
-            'pg-native': 'pg-native',
             'pg-hstore': 'pg-hstore',
-            'sqlite3': 'sqlite3',
             'restify': 'commonjs restify',
             'sequelize': 'commonjs sequelize',
-            'bunyan': 'commonjs bunyan',
+            'source-map-support': 'source-map-support',
+            'sqlite3': 'sqlite3',
             'tedious': 'tedious',
-            'electron-sudo': 'commonjs electron-sudo',
-            'csv-parse': 'commonjs csv-parse'
+            'whatwg-encoding': 'commonjs whatwg-encoding'
         }
     ]
 };

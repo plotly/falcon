@@ -1,24 +1,21 @@
-import React, {Component, PropTypes} from 'react';
-import {contains, dissoc, eqProps, hasIn, flip, head, keys, isEmpty, reduce } from 'ramda';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {contains, dissoc, flip, head, hasIn, isEmpty, keys, merge, propOr, reduce} from 'ramda';
 import {connect} from 'react-redux';
+import ReactToolTip from 'react-tooltip';
 import classnames from 'classnames';
 import * as Actions from '../../actions/sessions';
-import * as styles from './Settings.css';
-import * as buttonStyles from './ConnectButton/ConnectButton.css';
 import fetch from 'isomorphic-fetch';
-import Tabs from './Tabs/Tabs.react';
+import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
+import ConnectionTabs from './Tabs/Tabs.react';
 import UserConnections from './UserConnections/UserConnections.react';
 import DialectSelector from './DialectSelector/DialectSelector.react';
 import ConnectButton from './ConnectButton/ConnectButton.react';
-import OptionsDropdown from './OptionsDropdown/OptionsDropdown.react';
 import Preview from './Preview/Preview.react';
 import {Link} from '../Link.react';
-import {DIALECTS} from '../../constants/constants.js';
-import {getAllBaseUrls} from '../../utils/utils';
+import {DIALECTS, FAQ, PREVIEW_QUERY, SQL_DIALECTS_USING_EDITOR} from '../../constants/constants.js';
+import {isElectron, isOnPrem} from '../../utils/utils';
 
-
-let checkconnectorUrls;
-let checkDNS;
 
 class Settings extends Component {
     constructor(props) {
@@ -28,6 +25,7 @@ class Settings extends Component {
         this.renderSettingsForm = this.renderSettingsForm.bind(this);
         this.state = {
             editMode: true,
+            selectedPanel: {},
             urls: {
                 https: null,
                 http: null
@@ -39,7 +37,7 @@ class Settings extends Component {
             timeElapsedInterval: null,
             checkHTTPSEndpointInterval: null,
             getConnectorUrlsInterval: null
-        }
+        };
     }
 
     componentDidMount() {
@@ -61,7 +59,6 @@ class Settings extends Component {
         }, 5 * 1000);
 
         this.intervals.checkHTTPSEndpointInterval = setInterval(() => {
-            console.warn(`Attempting a connection at ${this.state.urls.https}`);
             if (this.state.urls.https) {
                 fetch(this.state.urls.https).then(() => {
                     this.setState({httpsServerIsOK: true});
@@ -79,14 +76,10 @@ class Settings extends Component {
 
     renderEditButton(show) {
         return (
-            <div className={styles.editButtonContainer}>
+            <div className={'editButtonContainer'}>
                 {show ? (
                     <button
-                        style={{
-                            'display': 'block',
-                            'marginLeft': 'auto',
-                            'marginRight': 'auto'
-                        }}
+                        className = "btn-secondary"
                         onClick={() => {
                             this.setState({showConnections: true, editMode: true});
                             this.props.setConnectionNeedToBeSaved(true);
@@ -102,22 +95,25 @@ class Settings extends Component {
 
     renderSettingsForm() {
         const {
-            connect,
             connectionObject,
             connectRequest,
-            connectionsHaveBeenSaved,
             saveConnectionsRequest,
-            updateConnection
+            updateConnection,
+
+            // Assign to new variable name to avoid shadowing (ESLint no-shadow)
+            // function `connect` in outer scope
+            connect: doConnect
         } = this.props;
 
         return (
             <div
                 className={classnames(
-                    styles.configurationContainer,
-                    this.state.editMode ? null : styles.disabledSection
+                    'configurationContainer',
+                    this.state.editMode ? null : 'disabledSection'
                 )}
             >
-                <div className={styles.dialectSelector}>
+                <div className={'dialectSelector'}>
+                    <ReactToolTip place={'top'} type={'dark'} effect={'solid'} />
                     <DialectSelector
                         connectionObject={connectionObject}
                         updateConnection={updateConnection}
@@ -128,12 +124,15 @@ class Settings extends Component {
                     updateConnection={updateConnection}
                 />
                 <ConnectButton
-                    connectionsHaveBeenSaved={connectionsHaveBeenSaved}
-                    connect={connect}
+                    connect={doConnect}
                     connectRequest={connectRequest}
                     editMode={this.state.editMode}
                     saveConnectionsRequest={saveConnectionsRequest}
                 />
+                {!isElectron() && <div className={'description'}>
+                    Warning:
+                    connections set up in this instance of Falcon are accessible to all Plotly On-Premise users.
+                </div>}
             </div>
         );
     }
@@ -141,10 +140,13 @@ class Settings extends Component {
     componentWillReceiveProps(nextProps) {
         // if status goes to 200, credentials have been successfully saved to disk
         if (nextProps.connectRequest.status === 200 &&
-            this.props.connectRequest.status !== 200)
-        {
-            if (this.state.editMode) this.setState({editMode: false});
-            if (this.props.connectionNeedToBeSaved) this.props.setConnectionNeedToBeSaved(false);
+            this.props.connectRequest.status !== 200) {
+            if (this.state.editMode) {
+                this.setState({editMode: false});
+            }
+            if (this.props.connectionNeedToBeSaved) {
+                this.props.setConnectionNeedToBeSaved(false);
+            }
         }
         if (nextProps.connectorUrlsRequest.status === 200 && this.props.connectorUrlsRequest.status !== 200) {
             this.setState({urls: nextProps.connectorUrlsRequest.content});
@@ -155,15 +157,12 @@ class Settings extends Component {
         const {
             apacheDrillStorageRequest,
             apacheDrillS3KeysRequest,
-            connect,
             connections,
             connectRequest,
             connectionsRequest,
-            connectionNeedToBeSaved,
             elasticsearchMappingsRequest,
             getApacheDrillStorage,
             getApacheDrillS3Keys,
-            getConnectorUrls,
             getElasticsearchMappings,
             getTables,
             getS3Keys,
@@ -173,7 +172,6 @@ class Settings extends Component {
             previewTableRequest,
             selectedTable,
             settingsRequest,
-            setConnectionNeedToBeSaved,
             setTable,
             setIndex,
             s3KeysRequest,
@@ -181,7 +179,7 @@ class Settings extends Component {
             selectedIndex,
             tablesRequest
         } = this.props;
-        if (connectionsRequest && !connectionsRequest.status ) {
+        if (connectionsRequest && !connectionsRequest.status) {
             initialize();
         }
         // keeps the credentials form open until connected
@@ -198,10 +196,7 @@ class Settings extends Component {
         }
 
         const connectionObject = connections[selectedTab] || {};
-        if (contains(connectionObject.dialect, [
-                    DIALECTS.MYSQL, DIALECTS.MARIADB, DIALECTS.POSTGRES,
-                    DIALECTS.REDSHIFT, DIALECTS.MSSQL, DIALECTS.SQLITE
-        ])) {
+        if (contains(connectionObject.dialect, SQL_DIALECTS_USING_EDITOR)) {
             if (connectRequest.status === 200 && !tablesRequest.status) {
                 this.setState({editMode: false});
                 getTables();
@@ -251,30 +246,28 @@ class Settings extends Component {
         const {
             apacheDrillStorageRequest,
             apacheDrillS3KeysRequest,
-            connect,
-            connectRequest,
             connections,
-            connectionsHaveBeenSaved,
-            connectorUrlsRequest,
-            createCerts,
-            deleteConnectionsRequest,
             deleteTab,
             elasticsearchMappingsRequest,
+            getSqlSchema,
+            logout,
+            schemaRequest,
             newTab,
+            preview,
             previewTableRequest,
-            redirectUrl,
-            redirectUrlRequest,
+            runSqlQuery,
+            queryRequest,
             s3KeysRequest,
             selectedTab,
             settingsRequest,
-            saveConnectionsRequest,
             setIndex,
             setTable,
             selectedTable,
             selectedIndex,
             setTab,
             tablesRequest,
-            updateConnection
+            updatePreview,
+            username
         } = this.props;
 
         if (!selectedTab) {
@@ -288,234 +281,185 @@ class Settings extends Component {
             settingsRequest.content.PLOTLY_URL : 'https://plot.ly'
         );
 
+        const dialect = connections[selectedTab].dialect;
+
         return (
             <div>
-                <Tabs
+                <ConnectionTabs
                     connections={connections}
                     selectedTab={selectedTab}
                     newTab={newTab}
-                    setTab={setTab}
+                    setTab={tabId => {
+                        setTab(tabId);
+                        updatePreview({
+                            showChart: false,
+                            showEditor: true,
+                            size: 200
+                        });
+                    }}
                     deleteTab={deleteTab}
                 />
 
-                <div className={styles.openTab} style={{'padding': 30}}>
+                <div className={'openTab'}>
 
-                    <h3>Step 1. Set Up Connections</h3>
+                    <Tabs
+                        selectedIndex={this.state.selectedPanel[selectedTab] || 0}
+                        onSelect={panelIndex => this.setState({selectedPanel: {[selectedTab]: panelIndex}})}
+                    >
 
-                    {this.renderSettingsForm()}
+                        <TabList>
+                            <Tab>Connection</Tab>
+                            {this.props.connectRequest.status === 200 && selectedTable ? (
+                                <Tab>Query</Tab>
+                            ) : (
+                                <Tab disabled={true}>Query</Tab>
+                            )}
+                            {isOnPrem() || <Tab
+                                className="test-ssl-tab react-tabs__tab"
+                            >
+                                Plot.ly
+                            </Tab>}
+                            { isElectron() && <Tab>FAQ</Tab> }
+                        </TabList>
 
-                    {this.renderEditButton(!this.state.editMode)}
+                        <TabPanel className={['tab-panel-connection', 'react-tabs__tab-panel']}>
+                            {this.renderSettingsForm()}
+                            {this.renderEditButton(!this.state.editMode)}
+                        </TabPanel>
 
-                    {this.props.connectRequest.status === 200 ? (
-                    <div>
-                        <h3>Step 2. Preview Database</h3>
+                        <TabPanel className={['tab-panel-query', 'react-tabs__tab-panel']}>
+                            {this.props.connectRequest.status === 200 && selectedTable ? (
+                                <Preview
+                                    username={username}
 
-                        <div>
-                            <OptionsDropdown
-                                connectionObject={connections[selectedTab]}
-                                selectedTable={selectedTable}
-                                elasticsearchMappingsRequest={elasticsearchMappingsRequest}
-                                tablesRequest={tablesRequest}
-                                setTable={setTable}
-                                setIndex={setIndex}
-                                selectedIndex={selectedIndex}
-                            />
+                                    connections={connections}
+                                    connectionObject={connections[selectedTab]}
 
-                            <Preview
-                                previewTableRequest={previewTableRequest}
-                                s3KeysRequest={s3KeysRequest}
-                                apacheDrillStorageRequest={apacheDrillStorageRequest}
-                                apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
-                            />
-                        </div>
+                                    selectedTab={selectedTab}
 
-                        <h3>Step 3. Wait for a SSL Certificate</h3>
+                                    selectedIndex={selectedIndex}
+                                    setIndex={setIndex}
 
-                        {httpsServerIsOK ? (
-                            <div>
-                                <div>
-                                    {'Step 3 is now complete, Plotly has generated a unique SSL certificate for you.'}
+                                    selectedTable={selectedTable}
+                                    setTable={setTable}
+
+                                    getSqlSchema={getSqlSchema}
+                                    schemaRequest={schemaRequest}
+
+                                    preview={preview || {}}
+                                    updatePreview={updatePreview}
+
+                                    runSqlQuery={runSqlQuery}
+                                    queryRequest={queryRequest || {}}
+                                    s3KeysRequest={s3KeysRequest}
+                                    apacheDrillStorageRequest={apacheDrillStorageRequest}
+                                    apacheDrillS3KeysRequest={apacheDrillS3KeysRequest}
+                                    elasticsearchMappingsRequest={elasticsearchMappingsRequest}
+                                    previewTableRequest={previewTableRequest || {}}
+                                    tablesRequest={tablesRequest}
+                                />
+                            ) : (
+                                <div className="big-whitespace-tab">
+                                    <p>Please connect to a data store in the Connection tab first.</p>
                                 </div>
-                            </div>
-                        ) : (
-                            <div>
-                                <p>
-                                    {`Plotly is automatically initializing a
-                                      unique SSL certificate and URL for you.
-                                      This can take up to 10 minutes.`}
-                                </p>
-                                <p>
-                                    {`It has been ${timeElapsed}`}.
-                                </p>
-                                <p>
-                                    {`Once this is complete, you'll be able to
-                                      query your databases from the `}
-                                    <Link href={`${plotlyUrl}/create?upload=sql`}>
-                                            Plotly Chart Creator
-                                    </Link>
-                                    {'.'}
-                                </p>
-                            </div>
-                        )}
+                            )}
+                        </TabPanel>
 
-                        <div>
-                            <h3>Final Step. Query Data on Plotly</h3>
+                        {isOnPrem() || <TabPanel>
+                            {this.props.connectRequest.status === 200 ? (
+                                <div className="big-whitespace-tab">
+                                    {httpsServerIsOK ? (
+                                        <div id="test-ssl-initialized" style={{textAlign: 'center'}}>
+                                            <img
+                                                src="/static/images/ms-icon-150x150.png"
+                                                style={{border: '1px solid #ebf0f8'}}
+                                            >
+                                            </img>
+                                            <p>
+                                                {`The Falcon SQL Client can be a middle man between
+                                                    your database and Plot.ly, so that when your database updates,
+                                                    your charts and dashboards update as well. Run Falcon on a server
+                                                    for 24/7 dashboard updates, or just keep this app open on an
+                                                    office computer. If you have Plotly On-Premises, this app is
+                                                    already running in your container. Contact your On-Prem admin
+                                                    to learn how to connect.`}
+                                            </p>
 
-                            {httpsServerIsOK ? (
-                                <div id="test-ssl-initialized">
-                                    <p>
-                                        <Link href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}>
-                                            Click to Open Query Editor
-                                         </Link>
-                                        &nbsp;
-                                        {`in the Plotly Chart Creator.`}
-                                    </p>
-
-                                    <p>
-                                        {`Plotly has generated this secure URL for you: `}
-                                        <br/>
-                                        <b><code>{connectorUrl}</code></b>
-                                        <br/>
-                                        {`use this URL when you connect in the Plotly Chart Creator.`}
-                                    </p>
+                                            <Link
+                                                className="btn-primary"
+                                                style={{maxWidth: '50%', marginTop: '40px', marginBottom: '30px'}}
+                                                href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}
+                                                target="_blank"
+                                            >
+                                                Query {dialect} from plot.ly
+                                            </Link>
+                                            <div>
+                                                <code>Falcon has auto-generated a local URL
+                                                    and SSL certificate for itself: </code>
+                                                <br />
+                                                <Link
+                                                    href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}
+                                                    target="_blank"
+                                                >
+                                                    <strong><code>{connectorUrl}</code></strong>
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    ) : (username) ? (
+                                        <div>
+                                            <p>
+                                                {`Plotly is automatically initializing a
+                                                  unique SSL certificate and URL for you.
+                                                  This can take up to 10 minutes. Once this
+                                                  is complete, you'll be able to query your
+                                                  databases from `}
+                                                <Link href={`${plotlyUrl}/create?upload=sql`}>
+                                                        Plotly
+                                                </Link>
+                                                {`. It has been ${timeElapsed}. Check out the
+                                                FAQ while you wait! 📰`}
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <p>
+                                                <a onClick={() => window.location.assign('/login')}>Log into Plotly</a>
+                                                <br/>
+                                                Log in to Plotly in order to schedule queries and make queries
+                                                directly from the <a href={`https://${plotlyUrl}/create`}>
+                                                Plotly Chart Studio </a>
+                                            </p>
+                                        </div>
+                                    )
+                                    }
                                 </div>
                             ) : (
-                                <div>
-                                    {`Before you can query, wait until Plotly has
-                                      finished Step 3 for you.`}
+                                <div className="big-whitespace-tab">
+                                    <p>Please connect to a data store in the Connection tab first.</p>
                                 </div>
-                            )
-                            }
-                        </div>
+                            )}
+                            {username && <p style={{textAlign: 'right'}}>
+                                {`Logged in as "${username}"`}
+                                <br/>
+                                <a onClick={logout}>Log Out</a>
+                            </p>}
+                        </TabPanel> }
 
-                    </div>
-                    ) : null}
-
-                    <hr style={{'marginTop': '60px'}}/>
-
-                    <div>
-                        <h3>FAQ</h3>
-
-                        <div>
-                            <ul>
-                                <li>
-                                    <strong>{`How does this app work?`}</strong>
-
-                                    <p>
-                                        {`The Plotly Database Connector is a local web server that
-                                        listens for requests from your web browser in
-                                        the`}
-                                        &nbsp;
-                                        <Link href={`${plotlyUrl}/create`}>Plotly Chart Creator</Link>.
-                                        &nbsp;
-                                        {`This application makes queries against the databases that you have
-                                          connected to and returns the results to the Plotly Chart Creator.`}
-                                    </p>
-                                </li>
-
-                                <li>
-                                    <strong>{`Do I need to keep this application open?`}</strong>
-
-                                    <p>
-                                        {`Keep this application open when you're making queries!
-                                        The Plotly Chart Creator connects to your database through
-                                        this application.`}
-                                    </p>
-
-                                </li>
-
-                                <li>
-                                    <strong>{`Do I need to expose my database to your servers?`}</strong>
-                                    <p>
-                                          {`Since these requests are made locally from your web browser
-                                          to this application, you do not need to open up
-                                          your database's network: you just need to make sure
-                                          that you can connect to your database from this computer.`}
-                                    </p>
-                                </li>
-
-                                <li>
-                                    <strong>{`Where do I make SQL queries?`}</strong>
-                                    <p>
-                                        {`The`}
-                                        &nbsp;
-                                        <Link href={`${plotlyUrl}/create`}>Plotly Chart Creator</Link>
-                                        &nbsp;
-                                        {`includes a SQL editor that you can use
-                                          to import data from your databases into Plotly.`}
-                                    </p>
-
-                                </li>
-
-                                <li>
-                                    <strong>{`Are these database credentials shared on the Plotly server?`}</strong>
-                                    <p>
-                                        {`Your database credentials are only stored on your
-                                          computer (they are not saved on any Plotly servers).`}
-                                    </p>
-                                </li>
-
-                                <li>
-                                    <strong>{`How do scheduled queries work?`}</strong>
-
-                                    <p>
-                                        {`You can run queries on a schedule (e.g. daily or hourly) in the`}
-                                        &nbsp;
-                                        <Link href={`${plotlyUrl}/create?upload=sql&url=${connectorUrl}`}>
-                                            Plotly Chart Creator
-                                         </Link>
-                                         {`. Scheduled queries are saved and managed by this application,
-                                         so keep this app open if you want your queries to run and your
-                                         datasets to update. When you start the application, all of the
-                                         scheduled queries will run automatically and their scheduling timer
-                                         will reset.`}
-
-                                    </p>
-                                </li>
-
-                                <li>
-                                    <strong>{`What's a SSL certificate and why do I need it?`}</strong>
-
-                                    <p>
-                                        {`An SSL certificate is used to encrypt the requests between your
-                                          web browser and this connector. Unencrypted requests are blocked by
-                                          default in modern web browsers. We generate these certificates for you
-                                          automatically through the `}
-                                        <Link href="https://letsencrypt.org/">
-                                            {`Let's Encrypt service`}
-                                        </Link>
-                                        {`. This certificate takes
-                                          a several minutes to generate.`}
-                                    </p>
-
-                                </li>
-
-                                <li>
-                                    <strong>{`How do you generate certificates for a localhost web server?`}</strong>
-
-                                    <p>
-                                        {`This application runs a server on localhost:
-                                          it is not exposed to the network.
-                                          SSL certificates can not be issued for localhost servers,
-                                          so we create a unique URL for you and a global DNS entry that points
-                                          that URL to localhost. We use the Let's Encrypt service to
-                                          generate certificates on that unique URL.`}
-                                    </p>
-                                </li>
-
-                                <li>
-                                    <strong>{`Is this app open source?`}</strong>
-                                    <p>
-                                        {`Yes! You can view the code in our GitHub repo: `}
-                                        <Link href={'https://github.com/plotly/plotly-database-connector'}>
-                                            {'https://github.com/plotly/plotly-database-connector'}
-                                         </Link>.
-                                    </p>
-                                </li>
-
-                            </ul>
-                        </div>
-                    </div>
+                        {isElectron() && <TabPanel>
+                            <div className="big-whitespace-tab">
+                                <ul>
+                                    {FAQ.map(function(obj, i) {
+                                        return (
+                                            <li key={i}>
+                                                {obj.q}
+                                                <p>{obj.a}</p>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
+                        </TabPanel>}
+                    </Tabs>
                 </div>
             </div>
         );
@@ -546,7 +490,10 @@ function mapStateToProps(state) {
         settingsRequest,
         s3KeysRequests,
         apacheDrillStorageRequests,
-        apacheDrillS3KeysRequests
+        apacheDrillS3KeysRequests,
+        schemaRequests,
+        queryRequests,
+        previews
     } = state;
 
     const selectedConnectionId = tabMap[selectedTab];
@@ -559,6 +506,11 @@ function mapStateToProps(state) {
         previewTableRequests[selectedConnectionId][selectedTable]
     ) {
         previewTableRequest = previewTableRequests[selectedConnectionId][selectedTable];
+    }
+    const preview = previews[selectedConnectionId] || {};
+    const connection = connections[selectedTab];
+    if (connection && !hasIn('code', preview)) {
+        preview.code = PREVIEW_QUERY(connection, selectedTable);
     }
 
     return {
@@ -577,6 +529,9 @@ function mapStateToProps(state) {
         connectionNeedToBeSaved: connectionsNeedToBeSaved[selectedTab] || true,
         connectionsHaveBeenSaved,
         connectionObject: connections[selectedTab],
+        preview,
+        schemaRequest: schemaRequests[selectedConnectionId],
+        queryRequest: queryRequests[selectedConnectionId],
         selectedTable,
         selectedIndex,
         selectedConnectionId,
@@ -604,7 +559,8 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         selectedIndex,
         connectionNeedToBeSaved,
         connectionsHaveBeenSaved,
-        connectionObject
+        connectionObject,
+        preview
     } = stateProps;
     const {dispatch} = dispatchProps;
 
@@ -638,9 +594,17 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     function boundPreviewTables() {
         return dispatch(Actions.previewTable(
             selectedConnectionId,
-            connectionObject.dialect,
+            connectionObject,
             selectedTable,
-            connectionObject.database || selectedIndex
+            selectedIndex
+        ));
+    }
+    function boundUpdatePreview(previewUpdateObject) {
+        return dispatch(Actions.updatePreview(
+            merge(
+                {connectionId: selectedConnectionId},
+                previewUpdateObject
+            )
         ));
     }
     function boundSetConnectionNeedToBeSaved(bool) {
@@ -651,6 +615,20 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     }
     function boundGetSettings() {
         return dispatch(Actions.getSettings());
+    }
+    function boundGetSqlSchema() {
+        return dispatch(Actions.getSqlSchema(
+            selectedConnectionId,
+            connectionObject.dialect,
+            connectionObject.database
+        ));
+    }
+
+    function boundRunSqlQuery() {
+        return dispatch(Actions.runSqlQuery(
+            selectedConnectionId,
+            propOr('', 'code', preview)
+        ));
     }
 
     /*
@@ -696,13 +674,64 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
             getSettings: boundGetSettings,
             getApacheDrillStorage: boundGetApacheDrillStorage,
             getApacheDrillS3Keys: boundGetApacheDrillS3Keys,
+            runSqlQuery: boundRunSqlQuery,
+            getSqlSchema: boundGetSqlSchema,
             newTab: () => dispatch(Actions.newTab()),
             deleteTab: tab => dispatch(Actions.deleteTab(tab)),
             setTab: tab => dispatch(Actions.setTab(tab)),
             connect: dispatchConnect,
-            editCredential: c => dispatch(Actions.editCredential(c))
+            editCredential: c => dispatch(Actions.editCredential(c)),
+            updatePreview: boundUpdatePreview
         }
     );
 }
+
+Settings.propTypes = {
+    connect: PropTypes.func,
+    connectionObject: PropTypes.object,
+    connectRequest: PropTypes.object,
+    saveConnectionsRequest: PropTypes.object,
+    updateConnection: PropTypes.func,
+    dispatch: PropTypes.func,
+    setConnectionNeedToBeSaved: PropTypes.func,
+    connectorUrlsRequest: PropTypes.shape({
+        status: PropTypes.number,
+        content: PropTypes.array
+    }),
+    connectionNeedToBeSaved: PropTypes.bool,
+    apacheDrillStorageRequest: PropTypes.object,
+    apacheDrillS3KeysRequest: PropTypes.object,
+    connections: PropTypes.object,
+    connectionsRequest: PropTypes.object,
+    elasticsearchMappingsRequest: PropTypes.object,
+    getApacheDrillStorage: PropTypes.func,
+    getApacheDrillS3Keys: PropTypes.func,
+    getElasticsearchMappings: PropTypes.func,
+    getTables: PropTypes.func,
+    getS3Keys: PropTypes.func,
+    getSettings: PropTypes.func,
+    initialize: PropTypes.func,
+    previewTables: PropTypes.func,
+    previewTableRequest: PropTypes.object,
+    selectedTable: PropTypes.any,
+    settingsRequest: PropTypes.object,
+    setTable: PropTypes.func,
+    setIndex: PropTypes.func,
+    s3KeysRequest: PropTypes.object,
+    selectedTab: PropTypes.string,
+    selectedIndex: PropTypes.any,
+    tablesRequest: PropTypes.object,
+    deleteTab: PropTypes.func,
+    getSqlSchema: PropTypes.func,
+    schemaRequest: PropTypes.object,
+    newTab: PropTypes.func,
+    preview: PropTypes.object,
+    runSqlQuery: PropTypes.func,
+    queryRequest: PropTypes.object,
+    setTab: PropTypes.func,
+    updatePreview: PropTypes.func,
+    logout: PropTypes.func,
+    username: PropTypes.string
+};
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(Settings);

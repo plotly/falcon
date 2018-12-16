@@ -1,10 +1,41 @@
-machine:
-    node:
-        version: 6.9.2
-
-test:
-    post:
-        - npm run build
-        - npm run package
-        - zip -r release.zip release
-        - mv release.zip $CIRCLE_ARTIFACTS
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:6.13.0-browsers
+      - image: quay.io/plotly/falcon-test-spark
+      - image: quay.io/plotly/falcon-test-db2
+    environment:
+      PATH: "/usr/local/opt/curl/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/home/circleci/project/node_modules/.bin"
+    working_directory: /home/circleci/falcon
+    steps:
+      - restore_cache:
+          key: v1-source-{{ .Branch }}-{{ .Revision }}
+          keys:
+            - v1-source-{{ .Branch }}-
+            - v1-source-
+      - checkout
+      - save_cache:
+          key: v1-source-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ".git"
+      - restore_cache:
+          key: v2-yarn-{{ checksum "yarn.lock" }}
+          keys:
+            - v2-yarn-
+      - run: node --version
+      - run: yarn --version
+      - run: yarn install
+      - run: yarn run rebuild:modules:electron
+      - save_cache:
+          key: v2-yarn-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+      - run: yarn run build
+      - run: yarn run test
+      - run: yarn run pack
+      - run: mkdir artifacts
+      - run: mv release/*.yml artifacts || true
+      - run: mv release/falcon-sql-client* artifacts
+      - store_artifacts:
+          path: artifacts

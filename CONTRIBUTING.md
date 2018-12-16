@@ -2,37 +2,50 @@
 
 Note that this section targets contributors and those who wish to set up and run the server themselves.
 
-If you're interested in using the distributed App, [download the latest release.](https://github.com/plotly/plotly-database-connector/releases)
+If you're interested in using the distributed App, [download the latest release.](https://github.com/plotly/falcon-sql-client/releases)
+
+## Prerequisites
+It is recommended to use node v6.12 with the latest electron-builder
 
 ## Install
 
 Start by cloning the repo via git:
 
 ```bash
-git clone https://github.com/plotly/electron-sql-connector your-project-name
+git clone https://github.com/plotly/falcon-sql-client falcon-sql-client
 ```
 
-And then install dependencies.
+And then install dependencies with **yarn**.
 
 ```bash
-$ cd your-project-name && npm install
+$ cd falcon-sql-client
+$ yarn install
+$ yarn run rebuild:modules:electron
 ```
 
-*Note: requires a node version >= 4 and an npm version >= 2.*
+*Note: See package.json for the version of node that is required*
 
-### Run as Electron App
+## Run as an Electron App
 Run the app with
 ```bash
-$ npm run build
-$ npm run start
+$ yarn run build
+$ yarn run start
 ```
 
-### Run on a Server
+## Run as a Server
 
 Build and run the app:
 ```bash
-$ npm run build-headless
-$ node ./dist/headless-bundle.js
+$ yarn install
+$ yarn run heroku-postbuild
+$ yarn run start-headless
+```
+
+Build (after it was already built for electron desktop) and run the app:
+```bash
+$ yarn run rebuild:modules:node
+$ yarn run heroku-postbuild
+$ yarn run start-headless
 ```
 
 Visit the app in your web browser at `http://localhost:9494`.
@@ -47,55 +60,82 @@ CORS_ALLOWED_ORIGINS:
     - 'https://plotly.your-company.com'
 ```
 
-If you have issued an SSL certificate for your app, modify your `settings.yaml` file to include the location of the cert and its key:
-```
-KEY_FILE: '/ssl/certs/server/privkey.pem'
-CSR_FILE: '/ssl/certs/server/fullchain.pem'
-```
-
 The database connector runs as a server by default as part of [Plotly On-Premise](https://plot.ly/products/on-premise). On Plotly On-Premise, every user who has access to the on-premise server also has access to the database connector, no extra installation or SSL configuration is necessary. If you would like to try out Plotly On-Premise at your company, please [get in touch with our team](https://plotly.typeform.com/to/seG7Vb), we'd love to help you out.
 
-### Run as a docker image
+## Run as a docker image
 
-See the [Dockerfile](https://github.com/plotly/plotly-database-connector/blob/master/Dockerfile) for more information.
-
-### Developing
-
-Run the electron app in dev mode with
-```bash
-$ npm run dev
+Build and run the docker image:
+```
+$ yarn run docker:falcon:build
+$ PLOTLY_CONNECTOR_AUTH_ENABLED=false yarn run docker:falcon:start
 ```
 
-Run watchers for the electron main process and web bundle.
-```bash
-$ npm run watch-main
-```
+The web app will be accessible in your browser at `http://localhost:9494`.
 
-```bash
-$ npm run watch-web
-```
+See the [Dockerfile](https://github.com/plotly/falcon-sql-client/blob/master/Dockerfile) for more information.
 
+## Developing
 
-Or, develop using the headless server by running watchers on headless and web bundles
+Run watchers for the electron main process, the web bundle (the front-end), and the headless-bundle:
 ```bash
-$ npm run watch-headless
+$ yarn run watch-main
 ```
 
 ```bash
-$ npm run watch-web
+$ yarn run watch-web
 ```
 
-as well as hot-relaoding the updated server side bundle with nodemon
-(`npm install -g nodemon` if you do not have it already)
 ```bash
-$ nodemon ./dist/headless-bundle.js
+$ yarn run watch-headless
 ```
 
-### Testing
-
-Note: Currently access to remote databases is required to run local tests. These connections are not committed to git at the moment. Contact us if you require running tests locally.
+Then, view the the app in the electron window with:
 
 ```bash
-$ npm run build
-$ npm run test-unit-all
+$ yarn run dev
+```
+
+If you need to fully start over and rebuild the electron app, try:
+```
+$ yarn install
+$ yarn run rebuild:modules:electron
+$ rm -rf dist
+$ yarn run build
+$ yarn start
+```
+
+and in your web browser by visiting http://localhost:9494
+
+## Testing
+
+There are unit tests for the nodejs backend and integration tests to test the flow of the app.
+
+Run unit tests:
+```bash
+$ yarn run test-unit-all
+```
+
+Run integration tests:
+```bash
+$ yarn run test-e2e
+```
+
+## Builds and Releases
+
+- Update package.json with the new semver version
+- Linux builds are created in [CircleCI tests](https://circleci.com/gh/plotly/falcon-sql-client/tree/master) under the latest master build -> Artifacts -> release.zip
+- Windows 64bit builds are created in [AppVeyor tests](https://ci.appveyor.com/project/AppVeyorDashAdmin/falcon-sql-client)  under Latest Build -> Artifacts -> release.zip
+- Mac builds are created in TravisCI tests and automatically hosted on [amazon](https://s3.console.aws.amazon.com/s3/buckets/falcon-travis-artifacts/plotly/falcon-sql-client/?region=us-east-1&tab=overview). Select the latest build (largest number *note:* the folders are not necessarily sequential) -> release.zip
+
+Builds are uploaded to https://github.com/plotly/falcon-sql-client/releases.
+
+## Troubleshooting
+The Falcon Configuration information is installed in the user's home directory.
+For example Unix and Mac (~/.plotly/connector) and for Windows (%userprofile%\.plotly\connector\).  If you have tried the install
+process and the app is still not running, this may be related to some corrupted 
+configuration files.  You can try removing the existing configuration files and then 
+restarting the build process
+
+```bash
+rm -rf ~/.plotly/connector/
 ```

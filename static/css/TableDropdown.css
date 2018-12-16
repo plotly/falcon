@@ -1,0 +1,7 @@
+.dropdown {
+    text-transform: capitalize;
+    cursor: pointer;
+    width: 80%;
+    padding-bottom: 10px;
+    padding-left: 25px;
+}
