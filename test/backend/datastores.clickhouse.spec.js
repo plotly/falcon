@@ -13,6 +13,7 @@ const connection = {
   host: 'localhost',
   port: 8123,
   username: 'default',
+  password: '',
   database: 'plotly'
 };
 
