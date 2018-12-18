@@ -9,7 +9,7 @@ import ClickHouse from '@apla/clickhouse';
  * @param {String} database database name
  * @returns {Object} ClickHouse client
  */
-function createClient({ host, port, https, username, password, database, readonly, max_rows_to_read }) {
+function createClient({ host, port, https, username, password, database, readonly }) {
   return new ClickHouse({
     host,
     port,
@@ -17,8 +17,7 @@ function createClient({ host, port, https, username, password, database, readonl
     auth: `${username || 'default'}:${password}`,
     queryOptions: {
       database,
-      readonly: readonly ? 1 : 0,
-      ...(max_rows_to_read && { max_rows_to_read })
+      readonly: readonly ? 1 : 0
     }
   });
 }
