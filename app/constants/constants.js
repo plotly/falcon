@@ -289,13 +289,6 @@ export const CONNECTION_CONFIG = {
         },
         {'label': 'Database', 'value': 'database', 'type': 'text'},
         {
-            'label': 'Max rows to read',
-            'value': 'max_rows_to_read',
-            'type': 'number',
-            'description': 'Maximum number of rows that can be read from a table when running a query. \
-            By default, all rows can be read.'
-        },
-        {
             'label': 'Read only',
             'value': 'readonly',
             'type': 'checkbox',
@@ -534,8 +527,7 @@ export const SAMPLE_DBS = {
         password: 'connecttoplotly',
         host: 'clickhouse.test.plotly.host',
         port: 8123,
-        database: 'plotly_datasets',
-        max_rows_to_read: 1000
+        database: 'plotly_datasets'
     }
 };
 
