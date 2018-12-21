@@ -19,6 +19,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Security
 
+## [4.1.0] - 2018-12-21
+
+### Added
+
+* Clickhouse connector
+
+### Security
+
+* Upgraded Electron
+
 ## [4.0.0] - 2018-12-04
 
 ### Fixed
