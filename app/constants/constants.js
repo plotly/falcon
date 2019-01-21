@@ -409,6 +409,9 @@ export const FAQ = [
     }
 ];
 
+// The credentials in `SAMPLE_DBS` are made intentionally public.
+// These test databases contain only sample data.
+
 export const SAMPLE_DBS = {
     [DIALECTS.APACHE_IMPALA]: {
         timeout: 180,
