@@ -2,6 +2,11 @@
 
 Falcon is a free, open-source SQL editor with inline data visualization. It currently supports connecting to **RedShift**, **MySQL**, **PostgreSQL**, **IBM DB2**, **Impala**, **MS SQL**, **Oracle**, **SQLite** and more (for connecting to Oracle, please, see [here](https://github.com/plotly/falcon-sql-client/blob/master/ORACLE.md) the instructions to install the required free Oracle Instant Client).
 
+> Heads up! Falcon is open source and works without an internet connection or a Plotly Chart Studio account. The software works well and we hope you find it useful.
+FYI, as a company we are spending most of our development effort on [Dash Open Source](https://github.com/plotly/dash) & [Dash Enterprise](https://plotly.com/dash). Truth be told, we found that most companies we worked with preferred to own the analytical backend. With Dash, we provide the visualization and application primitives so that you can build your own tailor-made dashboards, analytical apps, or yes, even, SQL editors.
+> If you are wondering what we're up to lately, check out our latest post on our Dash vision: [Dash is bringing React to Python, R, and Julia](https://medium.com/plotly/dash-is-react-for-python-r-and-julia-c75822d1cc24).
+
+
 Visit [plot.ly](https://plot.ly/free-sql-client-download) to learn more or visit the [Plotly forum](https://community.plot.ly/c/falcon-sql-client).
 
 Follow [@plotlygraphs](https://twitter.com/plotlygraphs) on Twitter for Falcon announcements.
