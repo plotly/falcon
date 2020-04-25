@@ -15,7 +15,7 @@ testing).
 ## Install
 
 ```sh
-$ git clone https://github.com/plotly/falcon-sql-client falcon-sql-client
+$ git clone https://github.com/plotly/falcon falcon
 $ cd falcon-sql-client
 $ yarn install
 ```
