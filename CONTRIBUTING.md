@@ -98,7 +98,7 @@ $ yarn run watch-headless
 Then, view the app in the electron window with:
 
 ```bash
-$ yarn run dev
+$ yarn run start-hot
 ```
 
 If you need to fully start over and rebuild the electron app, try:
