@@ -1,0 +1,28 @@
+jobs:
+  image_release:
+      docker:
+        - image: circleci/python:3.6-stretch
+      working_directory: ~/falcon
+      steps:
+        - checkout
+        - setup_remote_docker:
+            docker_layer_caching: true
+        - run:
+            name: publish docker image
+            command: |
+              SANITIZED_BRANCH=$(echo "$CIRCLE_BRANCH" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9\.]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z)
+              docker login -u $QUAY_USERNAME -p $QUAY_PASSWORD quay.io
+              docker pull quay.io/plotly/falcon:${SANITIZED_BRANCH}-sha-${CIRCLE_SHA1}
+              docker tag quay.io/plotly/falcon:${SANITIZED_BRANCH}-sha-${CIRCLE_SHA1} quay.io/plotly/falcon:${SANITIZED_BRANCH}
+              docker push quay.io/plotly/falcon:${SANITIZED_BRANCH}
+        - run:
+            name: Trigger the version upgrade and release build
+            command: |
+              cd ..
+              if git clone https://${GITHUB_TOKEN}@github.com/plotly/on-prem.git -b ${CIRCLE_BRANCH} > /dev/null; then
+                cd on-prem
+                ./onprem git:setup
+                ./onprem version:update ${CIRCLE_PROJECT_REPONAME} ../${CIRCLE_PROJECT_REPONAME} ${CIRCLE_BRANCH}
+              else
+                echo "Could not locate branch ${CIRCLE_BRANCH}"
+              fi
