@@ -254,7 +254,7 @@
     "moment": "^2.22.2",
     "mysql": "^2.15.0",
     "oracledb": "https://github.com/oracle/node-oracledb/releases/download/v2.2.0/oracledb-src-2.2.0.tgz",
-    "papaparse": "^4.3.7",
+    "papaparse": "^5.2.0",
     "pg": "^4.5.5",
     "pg-hstore": "^2.3.2",
     "react-color": "^2.14.1",
