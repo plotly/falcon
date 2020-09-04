@@ -259,7 +259,7 @@
     "pg-hstore": "^2.3.2",
     "react-color": "^2.14.1",
     "restify": "^4.3.2",
-    "sequelize": "3.30.4",
+    "sequelize": "5.15.1",
     "shortid": "^2.2.13",
     "source-map-support": "^0.5.0",
     "sqlite3": "^3.1.13",
