@@ -170,7 +170,7 @@
     "chai-subset": "^1.6.0",
     "chromedriver": "2.33.2",
     "classnames": "^2.2.5",
-    "codemirror": "^5.32.0",
+    "codemirror": "^5.58.2",
     "cronstrue": "^1.31.0",
     "cross-env": "^5.1.1",
     "css-loader": "^0.28.7",
